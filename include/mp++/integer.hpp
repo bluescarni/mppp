@@ -2486,10 +2486,6 @@ MPPP_CONCEPT_DECL IntegerIntegralOpTypes = are_integer_integral_op_types<T, U>::
 using integer_integral_op_types_enabler = detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int>;
 #endif
 
-/** @defgroup integer_arithmetic integer_arithmetic
- *  @{
- */
-
 namespace detail
 {
 
@@ -2776,16 +2772,7 @@ inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, 
 }
 } // namespace detail
 
-/// Ternary \link mppp::integer integer\endlink addition.
-/**
- * This function will set \p rop to <tt>op1 + op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition.
 template <std::size_t SSize>
 inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -3051,20 +3038,7 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
 
 } // namespace detail
 
-/// Ternary \link mppp::integer integer\endlink addition with C++ unsigned integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` addition function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition with C++ unsigned integral types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, CppUnsignedIntegralInteroperable T>
 inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
@@ -3076,20 +3050,7 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, co
     return detail::add_ui_impl(rop, op1, op2);
 }
 
-/// Ternary \link mppp::integer integer\endlink addition with C++ signed integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` addition function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition with C++ signed integral types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, CppSignedIntegralInteroperable T>
 inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
@@ -3104,16 +3065,7 @@ inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, co
     return sub_ui(rop, op1, detail::nint_abs(op2));
 }
 
-/// Ternary \link mppp::integer integer\endlink subtraction.
-/**
- * This function will set \p rop to <tt>op1 - op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction.
 template <std::size_t SSize>
 inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -3185,20 +3137,7 @@ inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op
 
 } // namespace detail
 
-/// Ternary \link mppp::integer integer\endlink subtraction with C++ unsigned integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` subtraction function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction with C++ unsigned integral types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, CppUnsignedIntegralInteroperable T>
 inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
@@ -3210,20 +3149,7 @@ inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, co
     return detail::sub_ui_impl(rop, op1, op2);
 }
 
-/// Ternary \link mppp::integer integer\endlink subtraction with C++ signed integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` subtraction function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction with C++ signed integral types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, CppSignedIntegralInteroperable T>
 inline integer<SSize> &sub_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
@@ -3442,16 +3368,7 @@ inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &o
 }
 } // namespace detail
 
-/// Ternary multiplication.
-/**
- * This function will set \p rop to <tt>op1 * op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiplication.
 template <std::size_t SSize>
 inline integer<SSize> &mul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -3673,16 +3590,7 @@ inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSi
 }
 } // namespace detail
 
-/// Ternary multiply–add.
-/**
- * This function will set \p rop to <tt>rop + op1 * op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiply–add.
 template <std::size_t SSize>
 inline integer<SSize> &addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -3702,16 +3610,7 @@ inline integer<SSize> &addmul(integer<SSize> &rop, const integer<SSize> &op1, co
     return rop;
 }
 
-/// Ternary multiply–sub.
-/**
- * This function will set \p rop to <tt>rop - op1 * op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiply–sub.
 template <std::size_t SSize>
 inline integer<SSize> &submul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -3909,18 +3808,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
 }
 } // namespace detail
 
-/// Ternary left shift.
-/**
- * This function will set \p rop to \p n multiplied by <tt>2**s</tt>.
- *
- * @param rop the return value.
- * @param n the multiplicand.
- * @param s the bit shift value.
- *
- * @return a reference to \p rop.
- *
- * @throws std::overflow_error if \p s is larger than an implementation-defined limit.
- */
+// Ternary left shift.
 template <std::size_t SSize>
 inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
@@ -4312,15 +4200,7 @@ inline integer<SSize> sqrm(const integer<SSize> &op, const integer<SSize> &mod)
 
 #endif
 
-/// Binary negation.
-/**
- * This function will set \p rop to <tt>-n</tt>.
- *
- * @param rop the return value.
- * @param n the integer that will be negated.
- *
- * @return a reference to \p rop.
- */
+// Binary negation.
 template <std::size_t SSize>
 inline integer<SSize> &neg(integer<SSize> &rop, const integer<SSize> &n)
 {
@@ -4328,12 +4208,7 @@ inline integer<SSize> &neg(integer<SSize> &rop, const integer<SSize> &n)
     return rop.neg();
 }
 
-/// Unary negation.
-/**
- * @param n the integer that will be negated.
- *
- * @return <tt>-n</tt>.
- */
+// Unary negation.
 template <std::size_t SSize>
 inline integer<SSize> neg(const integer<SSize> &n)
 {
@@ -4342,15 +4217,7 @@ inline integer<SSize> neg(const integer<SSize> &n)
     return ret;
 }
 
-/// Binary absolute value.
-/**
- * This function will set \p rop to the absolute value of \p n.
- *
- * @param rop the return value.
- * @param n the argument.
- *
- * @return a reference to \p rop.
- */
+// Binary absolute value.
 template <std::size_t SSize>
 inline integer<SSize> &abs(integer<SSize> &rop, const integer<SSize> &n)
 {
@@ -4358,12 +4225,7 @@ inline integer<SSize> &abs(integer<SSize> &rop, const integer<SSize> &n)
     return rop.abs();
 }
 
-/// Unary absolute value.
-/**
- * @param n the argument.
- *
- * @return the absolute value of \p n.
- */
+// Unary absolute value.
 template <std::size_t SSize>
 inline integer<SSize> abs(const integer<SSize> &n)
 {
@@ -4371,8 +4233,6 @@ inline integer<SSize> abs(const integer<SSize> &n)
     ret.abs();
     return ret;
 }
-
-/** @} */
 
 /** @defgroup integer_division integer_division
  *  @{

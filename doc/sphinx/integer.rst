@@ -866,42 +866,17 @@ Assignment
 ~~~~~~~~~~
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::set_zero(mppp::integer<SSize> &n)
-
-   Set to zero.
-
-   After calling this function, the storage type of *n* will be static and its value will be zero.
-
-   .. note::
-
-      This is a specialised higher-performance alternative to the assignment operator.
-
-   :param n: the argument.
-
-   :return: a reference to *n*.
-
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::set_one(mppp::integer<SSize> &n)
-
-   Set to one.
-
-   After calling this function, the storage type of *n* will be static and its value will be one.
-
-   .. note::
-
-      This is a specialised higher-performance alternative to the assignment operator.
-
-   :param n: the argument.
-
-   :return: a reference to *n*.
-
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::set_negative_one(mppp::integer<SSize> &n)
 
-   Set to minus one.
+   Set to :math:`0`, :math:`1` or :math:`-1`.
 
-   After calling this function, the storage type of *n* will be static and its value will be minus one.
+   After calling these functions, the storage type of *n* will be static and its value will be
+   :math:`0`, :math:`1` or :math:`-1`.
 
    .. note::
 
-      This is a specialised higher-performance alternative to the assignment operator.
+      These are specialised higher-performance alternatives to the assignment operators.
 
    :param n: the argument.
 
@@ -959,8 +934,67 @@ Conversion
 Arithmetic
 ~~~~~~~~~~
 
-.. doxygengroup:: integer_arithmetic
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::add(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::sub(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::mul(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+
+   Ternary arithmetic primitives.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`x + y`,
+   * :math:`x - y`,
+   * :math:`x \times y`.
+
+   :param rop: the return value.
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize, mppp::CppUnsignedIntegralInteroperable T> mppp::integer<SSize> &mppp::add_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
+.. cpp:function:: template <std::size_t SSize, mppp::CppSignedIntegralInteroperable T> mppp::integer<SSize> &mppp::add_si(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
+.. cpp:function:: template <std::size_t SSize, mppp::CppUnsignedIntegralInteroperable T> mppp::integer<SSize> &mppp::sub_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
+.. cpp:function:: template <std::size_t SSize, mppp::CppSignedIntegralInteroperable T> mppp::integer<SSize> &mppp::sub_si(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
+
+   Ternary addition/subtraction primitives with C++ integral types.
+
+   These functions, which will set *rop* to :math:`x \pm y`, can be faster
+   alternatives to the :cpp:class:`~mppp::integer` addition function
+   if *y* fits in a single limb.
+
+   :param rop: the return value.
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::addmul(mppp::integer<SSize> &z, const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::submul(mppp::integer<SSize> &z, const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+
+   Ternary fused multiply-add/sub.
+
+   These functions will set *z* to :math:`z \pm x \times y`.
+
+   :param z: the return value.
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a reference to *z*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::mul_2exp(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n, mp_bitcnt_t s)
+
+   Ternary left shift.
+
+   This function will set *rop* to :math:`n\times 2^s`.
+
+   :param rop: the return value.
+   :param n: the multiplicand.
+   :param s: the bit shift value.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:overflow_error: if *s* is larger than an implementation-defined limit.
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::sqr(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n)
 
@@ -1016,6 +1050,27 @@ Arithmetic
 
    :return: the square of *n* modulo *mod*.
    :exception mppp\:\:zero_division_error: if *mod* is zero.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::neg(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::abs(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n)
+
+   Binary negation and absolute value.
+
+   These functions will set *rop* to, respectively, :math:`-n` and :math:`\left| n \right|`.
+
+   :param rop: the return value.
+   :param n: the input argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::neg(const mppp::integer<SSize> &n)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::abs(const mppp::integer<SSize> &n)
+
+   Unary negation and absolute value.
+
+   :param n: the input argument.
+
+   :return: :math:`-n` and :math:`\left| n \right|` respectively.
 
 .. _integer_division:
 
