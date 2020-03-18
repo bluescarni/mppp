@@ -224,7 +224,7 @@ User-defined literals
 .. versionadded:: 0.18
 
 User-defined literals are available to construct
-:cpp:class:`mppp::integer` instances with 1, 2 and 3
+:cpp:class:`~mppp::integer` instances with 1, 2 and 3
 limbs of static storage. The :ref:`literals <integer_literals>`
 are defined within
 the inline namespace ``mppp::literals``, and, like the builtin
