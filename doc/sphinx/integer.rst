@@ -716,6 +716,50 @@ The integer class
       :exception unspecified: any exception thrown by :cpp:func:`~mppp::integer::binary_size()`, by memory errors in
         standard containers, or by the public interface of ``std::ostream``.
 
+   .. cpp:function:: std::size_t binary_load(const char *src)
+   .. cpp:function:: std::size_t binary_load(const std::vector<char> &src)
+   .. cpp:function:: template <std::size_t S> std::size_t binary_load(const std::array<char, S> &src)
+   .. cpp:function:: std::size_t binary_load(std::istream &src)
+
+      Deserialise from a memory buffer or an input stream.
+
+      These member functions will load into ``this`` the content of the memory buffer or input stream
+      *src*, which must contain the serialised representation of an :cpp:class:`~mppp::integer`
+      produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
+
+      For the first overload, *src* does not have any special alignment requirements.
+
+      For the second and third overloads, the serialised representation of the
+      :cpp:class:`~mppp::integer` must start at the beginning of *src*,
+      but it can end before the end of *src*. Data
+      past the end of the serialised representation of the :cpp:class:`~mppp::integer`
+      will be ignored.
+
+      For the fourth overload, the serialised representation of the :cpp:class:`~mppp::integer`
+      must start at
+      the current position of *src*, but *src* can contain other data before and after
+      the serialised :cpp:class:`~mppp::integer` value. Data
+      past the end of the serialised representation of the :cpp:class:`~mppp::integer`
+      will be ignored. If a stream error state is detected at any point of the deserialisation
+      process after a read operation, zero will be returned and ``this`` will not have been modified.
+      Note that a return value of zero does not necessarily imply that no
+      bytes were read from *src*, just that an error occurred at some point during the serialisation process.
+
+      .. warning::
+
+         Although these member functions perform a few consistency checks on the data in *src*,
+         they cannot ensure complete safety against maliciously-crafted data. Users are
+         advised to use these member functions only with trusted data.
+
+      :param src: the source memory buffer or stream.
+
+      :return: the number of bytes read from *src* (that is, the output of :cpp:func:`~mppp::integer::binary_size()`
+        after the deserialisation into ``this`` has successfully completed).
+
+      :exception std\:\:overflow_error: in case of (unlikely) overflow errors.
+      :exception std\:\:invalid_argument: if invalid data is detected in *src*.
+      :exception unspecified: any exception thrown by memory errors in standard containers,
+        the public interface of ``std::istream``, or :cpp:func:`~mppp::integer::binary_size()`.
 
 Types
 -----

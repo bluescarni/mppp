@@ -2171,31 +2171,7 @@ private:
     }
 
 public:
-    /// Load a value from a memory buffer.
-    /**
-     * \rststar
-     * This member function will load into ``this`` the content of the memory buffer starting
-     * at ``src``, which must contain the serialised representation of an :cpp:class:`~mppp::integer`
-     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
-     *
-     * ``dest`` does not have any special alignment requirements.
-     *
-     * .. warning::
-     *
-     *    Although this member function performs a few consistency checks on the data in ``src``,
-     *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this member function only with trusted data.
-     * \endrststar
-     *
-     * @param src the source memory buffer.
-     *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
-     * into ``this`` has successfully completed).
-     *
-     * @throws std::overflow_error if the computation of the size of the serialised value leads
-     * to overflow.
-     * @throws std::invalid_argument if invalid data is detected in ``src``.
-     */
+    // Load a value from a memory buffer.
     std::size_t binary_load(const char *src)
     {
         // NOTE: disable the use of structured bindings
@@ -2247,104 +2223,18 @@ private:
     }
 
 public:
-    /// Load a value from a ``std::vector<char>``.
-    /**
-     * \rststar
-     * This member function will load into ``this`` the content of ``src``,
-     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
-     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
-     *
-     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
-     * the beginning of ``src``, but it can end before the end of ``src``. Data
-     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
-     * will be ignored.
-     *
-     * .. warning::
-     *
-     *    Although this member function performs a few consistency checks on the data in ``src``,
-     *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this member function only with trusted data.
-     * \endrststar
-     *
-     * @param src the source ``std::vector<char>``.
-     *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
-     * into ``this`` has successfully completed).
-     *
-     * @throws std::overflow_error if the computation of the size of the serialised value leads
-     * to overflow.
-     * @throws std::invalid_argument if invalid data is detected in ``src``.
-     */
+    // Load a value from a vector.
     std::size_t binary_load(const std::vector<char> &src)
     {
         return binary_load_vector(src, "std::vector");
     }
-    /// Load a value from a ``std::array<char>``.
-    /**
-     * \rststar
-     * This member function will load into ``this`` the content of ``src``,
-     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
-     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
-     *
-     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
-     * the beginning of ``src``, but it can end before the end of ``src``. Data
-     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
-     * will be ignored.
-     *
-     * .. warning::
-     *
-     *    Although this member function performs a few consistency checks on the data in ``src``,
-     *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this member function only with trusted data.
-     * \endrststar
-     *
-     * @param src the source ``std::array<char>``.
-     *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
-     * into ``this`` has successfully completed).
-     *
-     * @throws std::overflow_error if the computation of the size of the serialised value leads
-     * to overflow.
-     * @throws std::invalid_argument if invalid data is detected in ``src``.
-     */
+    // Load a value from an array.
     template <std::size_t S>
     std::size_t binary_load(const std::array<char, S> &src)
     {
         return binary_load_vector(src, "std::array");
     }
-    /// Load a value from a ``std::istream``.
-    /**
-     * \rststar
-     * This member function will load into ``this`` the content of ``src``,
-     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
-     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
-     *
-     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
-     * the current position of ``src``, but ``src`` can contain other data before and after
-     * the serialised :cpp:class:`~mppp::integer` value. Data
-     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
-     * will be ignored. If a stream error state is detected at any point of the deserialisation
-     * process after a read operation, zero will be returned and ``this`` will not have been modified.
-     * Note that a return value of zero does not necessarily imply that no
-     * bytes were read from ``src``, just that an error occurred at some point during the serialisation process.
-     *
-     * .. warning::
-     *
-     *    Although this member function performs a few consistency checks on the data in ``src``,
-     *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this member function only with trusted data.
-     * \endrststar
-     *
-     * @param src the source ``std::istream``.
-     *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
-     * into ``this`` has successfully completed), or zero if a stream error occurs.
-     *
-     * @throws std::overflow_error in case of internal overflows.
-     * @throws std::invalid_argument if invalid data is detected in ``src``.
-     * @throws unspecified any exception thrown by memory errors in standard containers,
-     * the public interface of ``std::istream``, or binary_size().
-     */
+    // Load a value from a stream.
     std::size_t binary_load(std::istream &src)
     {
         // Let's start by reading size/asize.
