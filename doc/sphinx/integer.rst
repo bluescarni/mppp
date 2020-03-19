@@ -1159,8 +1159,43 @@ Division
 Comparison
 ~~~~~~~~~~
 
-.. doxygengroup:: integer_comparison
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> int mppp::cmp(const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+
+   Three-way comparison.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: 0 if :math:`x = y`, a negative value if :math:`x<y`, a positive value if
+     :math:`x>y`.
+
+.. cpp:function:: template <std::size_t SSize> int mppp::sgn(const mppp::integer<SSize> &n)
+
+   Sign function.
+
+   :param n: the input argument.
+
+   :return: 0 if *n* is zero, 1 if *n* is positive, -1 if *n* is negative.
+
+.. cpp:function:: template <std::size_t SSize> bool mppp::odd_p(const mppp::integer<SSize> &n)
+.. cpp:function:: template <std::size_t SSize> bool mppp::even_p(const mppp::integer<SSize> &n)
+
+   Parity detection.
+
+   :param n: the input argument.
+
+   :return: ``true`` if *n* is odd (resp. even), ``false`` otherwise.
+
+.. cpp:function:: template <std::size_t SSize> bool mppp::is_zero(const mppp::integer<SSize> &n)
+.. cpp:function:: template <std::size_t SSize> bool mppp::is_one(const mppp::integer<SSize> &n)
+.. cpp:function:: template <std::size_t SSize> bool mppp::is_negative_one(const mppp::integer<SSize> &n)
+
+   Detect special values.
+
+   :param n: the input argument.
+
+   :return: ``true`` if *n* is equal to :math:`0`, :math:`1` or :math:`-1` respectively,
+     ``false`` otherwise.
 
 .. _integer_logic:
 
@@ -1169,16 +1204,157 @@ Logic and bit fiddling
 
 .. versionadded:: 0.6
 
-.. doxygengroup:: integer_logic
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::bitwise_not(mppp::integer<SSize> &rop, const mppp::integer<SSize> &op)
+
+   Bitwise NOT.
+
+   This function will set *rop* to the bitwise NOT (i.e., the one's complement) of *op*. Negative operands
+   are treated as-if they were represented using two's complement.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::bitwise_ior(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::bitwise_and(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::bitwise_xor(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const mppp::integer<SSize> &y)
+
+   Binary bitwise operations.
+
+   These functions will set *rop* to, respectively the bitwise OR, AND and XOR of :math:`x` and :math:`y`.
+   Negative operands are treated as-if they were represented using two's complement.
+
+   :param rop: the return value.
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *rop*.
 
 .. _integer_ntheory:
 
 Number theoretic functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. doxygengroup:: integer_ntheory
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::gcd(mppp::integer<SSize> &rop, const mppp::integer<SSize> &op1, const mppp::integer<SSize> &op2)
+
+   Ternary GCD.
+
+   This function will set *rop* to the GCD of *op1* and *op2*. The result is always nonnegative.
+   If both operands are zero, *rop* is set to zero.
+
+   :param rop: the return value.
+   :param op1: the first operand.
+   :param op2: the second operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::gcd(const mppp::integer<SSize> &op1, const mppp::integer<SSize> &op2)
+
+   Binary GCD.
+
+   This function will return the GCD of *op1* and *op2*. The result is always nonnegative.
+   If both operands are zero, zero is returned.
+
+   :param op1: the first operand.
+   :param op2: the second operand.
+
+   :return: the GCD of *op1* and *op2*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::fac_ui(mppp::integer<SSize> &rop, unsigned long n)
+
+   Factorial.
+
+   This function will set *rop* to :math:`n!`.
+
+   :param rop: the return value.
+   :param n: the operand.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:invalid_argument: if *n* is larger than an implementation-defined limit.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::bin_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n, unsigned long k)
+
+   Ternary binomial coefficient.
+
+   This function will set *rop* to :math:`{n \choose k}`. Negative values of *n* are
+   supported.
+
+   :param rop: the return value.
+   :param n: the top argument.
+   :param k: the bottom argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::bin_ui(const mppp::integer<SSize> &n, unsigned long k)
+
+   Binary binomial coefficient.
+
+   :param n: the top argument.
+   :param k: the bottom argument.
+
+   :return: :math:`{n \choose k}`.
+
+.. cpp:function:: template <typename T, typename U> auto mppp::binomial(const T &n, const U &k)
+
+   .. note::
+
+      This function participates in overload resolution only if ``T`` and ``U``
+      satisfy the :cpp:concept:`~mppp::IntegerIntegralOpTypes` concept.
+
+   Generic binomial coefficient.
+
+   This function will compute the binomial coefficient :math:`{{n}\choose{k}}`, supporting integral input values.
+   The implementation can handle positive and negative values for both the top and the bottom argument.
+
+   The return type is always :cpp:class:`~mppp::integer`.
+
+   .. seealso::
+
+      https://arxiv.org/abs/1105.3689/
+
+   :param n: the top argument.
+   :param k: the bottom argument.
+
+   :return: :math:`{n \choose k}`.
+
+   :exception std\:\:overflow_error: if *k* is outside an implementation-defined range.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::nextprime(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n)
+
+   Compute next prime number (binary version).
+
+   This function will set *rop* to the first prime number greater than *n*.
+   Note that for negative values of *n* this function always sets *rop* to :math:`2`.
+
+   :param rop: the return value.
+   :param n: the input argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::nextprime(const mppp::integer<SSize> &n)
+
+   Compute next prime number (unary version).
+
+   For negative values of *n* this function always returns :math:`2`.
+
+   :param n: the input argument.
+
+   :return: the first prime number greater than *n*.
+
+.. cpp:function:: template <std::size_t SSize> int mppp::probab_prime_p(const mppp::integer<SSize> &n, int reps = 25)
+
+   Primality test.
+
+   This is the free-function version of :cpp:func:`mppp::integer::probab_prime_p()`.
+
+   :param n: the integer whose primality will be tested.
+   :param reps: the number of tests to run.
+
+   :return: an integer indicating if *n* is a prime.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::integer::probab_prime_p()`.
 
 .. _integer_exponentiation:
 

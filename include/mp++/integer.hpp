@@ -1034,6 +1034,8 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 // - We can probably remove the public dependency on the GMP library by writing
 //   thin wrappers for all the invoked GMP functions, implemented in the mp++ library.
 //   Same for MPFR.
+// - Implement a binary version of fac_ui(). Note that it will not be able to be called
+//   via ADL because the argument is a primitive type.
 
 // NOTE: about the nails:
 // - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),
@@ -4932,10 +4934,6 @@ inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n,
     return rop;
 }
 
-/** @defgroup integer_comparison integer_comparison
- *  @{
- */
-
 namespace detail
 {
 
@@ -5004,14 +5002,7 @@ inline int static_cmp(const static_int<2> &n1, const static_int<2> &n2)
 }
 } // namespace detail
 
-/// Comparison function for integer.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
- * <tt>op1 > op2</tt>.
- */
+// Comparison function.
 template <std::size_t SSize>
 inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -5022,83 +5013,47 @@ inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
     return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
 }
 
-/// Sign function.
-/**
- * @param n the integer whose sign will be computed.
- *
- * @return 0 if \p n is zero, 1 if \p n is positive, -1 if \p n is negative.
- */
+// Sign function.
 template <std::size_t SSize>
 inline int sgn(const integer<SSize> &n)
 {
     return n.sgn();
 }
 
-/// Test if integer is odd.
-/**
- * @param n the argument.
- *
- * @return \p true if \p n is odd, \p false otherwise.
- */
+// Test if integer is odd.
 template <std::size_t SSize>
 inline bool odd_p(const integer<SSize> &n)
 {
     return n.odd_p();
 }
 
-/// Test if integer is even.
-/**
- * @param n the argument.
- *
- * @return \p true if \p n is even, \p false otherwise.
- */
+// Test if integer is even.
 template <std::size_t SSize>
 inline bool even_p(const integer<SSize> &n)
 {
     return n.even_p();
 }
 
-/// Test if an integer is zero.
-/**
- * @param n the integer to be tested.
- *
- * @return \p true if \p n is zero, \p false otherwise.
- */
+// Test if an integer is zero.
 template <std::size_t SSize>
 inline bool is_zero(const integer<SSize> &n)
 {
     return n.is_zero();
 }
 
-/// Test if an integer is equal to one.
-/**
- * @param n the integer to be tested.
- *
- * @return \p true if \p n is equal to 1, \p false otherwise.
- */
+// Test if an integer is equal to one.
 template <std::size_t SSize>
 inline bool is_one(const integer<SSize> &n)
 {
     return n.is_one();
 }
 
-/// Test if an integer is equal to minus one.
-/**
- * @param n the integer to be tested.
- *
- * @return \p true if \p n is equal to -1, \p false otherwise.
- */
+// Test if an integer is equal to minus one.
 template <std::size_t SSize>
 inline bool is_negative_one(const integer<SSize> &n)
 {
     return n.is_negative_one();
 }
-
-/** @} */
-
-/** @defgroup integer_logic integer_logic
- *  @{
- */
 
 namespace detail
 {
@@ -5198,16 +5153,7 @@ inline bool static_not(static_int<SSize> &rop, const static_int<SSize> &op)
 }
 } // namespace detail
 
-/// Bitwise NOT for \link mppp::integer integer\endlink.
-/**
- * This function will set ``rop`` to the bitwise NOT (i.e., the one's complement) of ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to ``rop``.
- */
+// Bitwise NOT.
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_not(integer<SSize> &rop, const integer<SSize> &op)
 {
@@ -5464,17 +5410,7 @@ inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, con
 }
 } // namespace detail
 
-/// Bitwise OR for \link mppp::integer integer\endlink.
-/**
- * This function will set ``rop`` to the bitwise OR of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return a reference to ``rop``.
- */
+// Bitwise OR.
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_ior(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -5715,17 +5651,7 @@ inline bool static_and(static_int<SSize> &rop, const static_int<SSize> &op1, con
 }
 } // namespace detail
 
-/// Bitwise AND for \link mppp::integer integer\endlink.
-/**
- * This function will set ``rop`` to the bitwise AND of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return a reference to ``rop``.
- */
+// Bitwise AND.
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_and(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -5977,17 +5903,7 @@ inline bool static_xor(static_int<SSize> &rop, const static_int<SSize> &op1, con
 }
 } // namespace detail
 
-/// Bitwise XOR for \link mppp::integer integer\endlink.
-/**
- * This function will set ``rop`` to the bitwise XOR of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return a reference to ``rop``.
- */
+// Bitwise XOR.
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -6008,12 +5924,6 @@ inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op
     ::mpz_xor(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
-
-/** @} */
-
-/** @defgroup integer_ntheory integer_ntheory
- *  @{
- */
 
 namespace detail
 {
@@ -6126,17 +6036,7 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
 }
 } // namespace detail
 
-/// GCD (ternary version).
-/**
- * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always nonnegative.
- * If both operands are zero, zero is returned.
- *
- * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return a reference to \p rop.
- */
+// GCD (ternary version).
 template <std::size_t SSize>
 inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -6155,13 +6055,7 @@ inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const
     return rop;
 }
 
-/// GCD (binary version).
-/**
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return the GCD of \p op1 and \p op2.
- */
+// GCD (binary version).
 template <std::size_t SSize>
 inline integer<SSize> gcd(const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -6170,17 +6064,7 @@ inline integer<SSize> gcd(const integer<SSize> &op1, const integer<SSize> &op2)
     return retval;
 }
 
-/// Factorial.
-/**
- * This function will set \p rop to the factorial of \p n.
- *
- * @param rop the return value.
- * @param n the argument for the factorial.
- *
- * @return a reference to \p rop.
- *
- * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
- */
+// Factorial.
 template <std::size_t SSize>
 inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
 {
@@ -6200,17 +6084,7 @@ inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
     return rop = &tmp.m_mpz;
 }
 
-/// Binomial coefficient (ternary version).
-/**
- * This function will set \p rop to the binomial coefficient of \p n and \p k. Negative values of \p n are
- * supported.
- *
- * @param rop the return value.
- * @param n the top argument.
- * @param k the bottom argument.
- *
- * @return a reference to \p rop.
- */
+// Binomial coefficient (ternary version).
 template <std::size_t SSize>
 inline integer<SSize> &bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
 {
@@ -6219,13 +6093,7 @@ inline integer<SSize> &bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsi
     return rop = &tmp.m_mpz;
 }
 
-/// Binomial coefficient (binary version).
-/**
- * @param n the top argument.
- * @param k the bottom argument.
- *
- * @return the binomial coefficient of \p n and \p k.
- */
+// Binomial coefficient (binary version).
 template <std::size_t SSize>
 inline integer<SSize> bin_ui(const integer<SSize> &n, unsigned long k)
 {
@@ -6313,34 +6181,15 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 }
 } // namespace detail
 
-/// Generic binomial coefficient.
-/**
- * \rststar
- * This function will compute the binomial coefficient :math:`{{n}\choose{k}}`, supporting integral input values.
- * The implementation can handle positive and negative values for both the top and the bottom argument.
- *
- * The return type is always an :cpp:class:`~mppp::integer`.
- *
- * .. seealso::
- *
- *    https://arxiv.org/abs/1105.3689/
- *
- * \endrststar
- *
- * @param n the top argument.
- * @param k the bottom argument.
- *
- * @return \f$ {{n}\choose{k}} \f$.
- *
- * @throws std::overflow_error if \p k is outside an implementation-defined range.
- */
+// Generic binomial coefficient.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto binomial(const T &n, const U &k)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> binomial(const T &n, const U &k)
+inline detail::integer_common_t<T, U>
 #endif
+binomial(const T &n, const U &k)
 {
     return detail::binomial_impl(n, k);
 }
@@ -6357,16 +6206,7 @@ inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
 }
 } // namespace detail
 
-/// Compute next prime number (binary version).
-/**
- * This function will set \p rop to the first prime number greater than \p n.
- * Note that for negative values of \p n this function always returns 2.
- *
- * @param rop the return value.
- * @param n the integer argument.
- *
- * @return a reference to \p rop.
- */
+// Compute next prime number (binary version).
 template <std::size_t SSize>
 inline integer<SSize> &nextprime(integer<SSize> &rop, const integer<SSize> &n)
 {
@@ -6375,12 +6215,7 @@ inline integer<SSize> &nextprime(integer<SSize> &rop, const integer<SSize> &n)
     return rop;
 }
 
-/// Compute next prime number (unary version).
-/**
- * @param n the integer argument.
- *
- * @return the first prime number greater than \p n.
- */
+// Compute next prime number (unary version).
 template <std::size_t SSize>
 inline integer<SSize> nextprime(const integer<SSize> &n)
 {
@@ -6389,26 +6224,12 @@ inline integer<SSize> nextprime(const integer<SSize> &n)
     return retval;
 }
 
-/// Test primality.
-/**
- * \rststar
- * This is the free-function version of :cpp:func:`mppp::integer::probab_prime_p()`.
- * \endrststar
- *
- * @param n the integer whose primality will be tested.
- * @param reps the number of tests to run.
- *
- * @return an integer indicating if \p n is a prime.
- *
- * @throws unspecified any exception thrown by integer::probab_prime_p().
- */
+// Test primality.
 template <std::size_t SSize>
 inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
 {
     return n.probab_prime_p(reps);
 }
-
-/** @} */
 
 // Ternary exponentiation.
 template <std::size_t SSize>
