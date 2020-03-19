@@ -1034,6 +1034,8 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 // - We can probably remove the public dependency on the GMP library by writing
 //   thin wrappers for all the invoked GMP functions, implemented in the mp++ library.
 //   Same for MPFR.
+// - Implement a binary version of fac_ui(). Note that it will not be able to be called
+//   via ADL because the argument is a primitive type.
 
 // NOTE: about the nails:
 // - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),
@@ -1073,158 +1075,7 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 // - Contrary to the nail business, ensuring that the upper limbs are zeroed is essential, and it is something
 //   we check in the unit tests.
 
-/// Multiprecision integer class.
-/**
- * \rststar
- * This class represents arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
- * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
- * occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of
- * ``SSize`` must be at least 1 and less than an implementation-defined upper limit. On most modern architectures,
- * a limb contains either 32 or 64 bits of data. Thus, for instance, if ``SSize`` is set to 2 on a 64-bit system,
- * the small value optimisation will be employed for all integral values less than :math:`2^{64 \times 2} = 2^{128}`.
- *
- * When the value of an :cpp:class:`~mppp::integer` is stored directly within the object, the *storage type* of the
- * integer is said to be *static*. When the limb size of the integer exceeds the maximum value ``SSize``, the storage
- * type becomes *dynamic*. The transition from static to dynamic storage happens transparently whenever the integer
- * value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly.
- * For values of ``SSize`` of 1 and 2, optimised implementations of basic arithmetic operations are employed,
- * if supported by the target architecture and if the storage type is static. For larger values of ``SSize``,
- * the ``mpn_`` low-level functions of the GMP API are used if the storage type is static. If the storage type is
- * dynamic, the usual ``mpz_`` functions from the GMP API are used.
- *
- * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
- * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
- * and it provides overloaded :ref:`operators <integer_operators>`. Differently from the builtin types,
- * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
- * from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
- *
- * .. code-block:: c++
- *
- *    integer<1> n = 5;
- *    int m = n;
- *
- * will not work, and direct initialization should be used instead:
- *
- * .. code-block:: c++
- *
- *    integer<1> n{5};
- *    int m{n};
- *
- * Most of the functionality is exposed via plain :ref:`functions <integer_functions>`, with the
- * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpz_``
- * prefix. For instance, the GMP call
- *
- * .. code-block:: c++
- *
- *    mpz_add(rop,a,b);
- *
- * that writes the result of ``a + b`` into ``rop`` becomes simply
- *
- * .. code-block:: c++
- *
- *    add(rop,a,b);
- *
- * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
- * are allowed, unless noted otherwise.
- *
- * Multiple overloads of the same functionality are often available.
- * Binary functions in GMP are usually implemented via three-arguments functions, in which the first
- * argument is a reference to the return value. The exponentiation function ``mpz_pow_ui()``, for instance,
- * takes three arguments: the return value, the base and the exponent. There are two overloads of the corresponding
- * :ref:`exponentiation <integer_exponentiation>` function for :cpp:class:`~mppp::integer`:
- *
- * * a ternary overload semantically equivalent to ``mpz_pow_ui()``,
- * * a binary overload taking as inputs the base and the exponent, and returning the result
- *   of the exponentiation.
- *
- * This allows to avoid having to set up a return value for one-off invocations of ``pow_ui()`` (the binary overload
- * will do it for you). For example:
- *
- * .. code-block:: c++
- *
- *    integer<1> r1, r2, n{3};
- *    pow_ui(r1,n,2);   // Ternary pow_ui(): computes n**2 and stores
- *                      // the result in r1.
- *    r2 = pow_ui(n,2); // Binary pow_ui(): returns n**2, which is then
- *                      // assigned to r2.
- *
- * In case of unary functions, there are often three overloads available:
- *
- * * a binary overload taking as first parameter a reference to the return value (GMP style),
- * * a unary overload returning the result of the operation,
- * * a nullary member function that modifies the calling object in-place.
- *
- * For instance, here are three possible ways of computing the absolute value:
- *
- * .. code-block:: c++
- *
- *    integer<1> r1, r2, n{-5};
- *    abs(r1,n);   // Binary abs(): computes and stores the absolute value
- *                 // of n into r1.
- *    r2 = abs(n); // Unary abs(): returns the absolute value of n, which is
- *                 // then assigned to r2.
- *    n.abs();     // Member function abs(): replaces the value of n with its
- *                 // absolute value.
- *
- * Note that at this time a subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
- *
- * Various :ref:`overloaded operators <integer_operators>` are provided.
- * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
- * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
- * is a C++ integral, the result will be of type :cpp:class:`~mppp::integer`, if the other argument is a C++
- * floating-point the result will be of the same floating-point type. For example:
- *
- * .. code-block:: c++
- *
- *    integer<1> n1{1}, n2{2};
- *    auto res1 = n1 + n2; // res1 is an integer
- *    auto res2 = n1 * 2; // res2 is an integer
- *    auto res3 = 2 - n2; // res3 is an integer
- *    auto res4 = n1 / 2.f; // res4 is a float
- *    auto res5 = 12. / n1; // res5 is a double
- *
- * The modulo operator ``%`` and the bitwise logic operators accept only :cpp:class:`~mppp::integer`
- * and :cpp:concept:`~mppp::CppIntegralInteroperable` types as arguments,
- * and they always return :cpp:class:`~mppp::integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
- * only :cpp:concept:`~mppp::CppIntegralInteroperable` types as shift arguments, and they always return
- * :cpp:class:`~mppp::integer` as result.
- *
- * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
- * before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
- * promoted to :cpp:class:`~mppp::integer` if they are both integral types, otherwise they are promoted to the type
- * of the floating-point argument).
- *
- * Several facilities for interfacing with the GMP library are provided. Specifically, :cpp:class:`~mppp::integer`
- * features:
- *
- * * a constructor and an assignment operator from the GMP integer type ``mpz_t``,
- * * a :cpp:func:`~mppp::integer::get_mpz_t()` member function that promotes ``this`` to dynamic
- *   storage and returns a pointer to the internal ``mpz_t`` instance,
- * * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::integer::get_mpz_view()`
- *   member function, which allows to use :cpp:class:`~mppp::integer` in the GMP API as a drop-in replacement for
- *   ``const mpz_t`` function arguments.
- *
- * The ``mpz_view`` class represent a read-only view of an integer object which is implicitly convertible to the type
- * ``const mpz_t`` and which is thus usable as an argument to GMP functions. For example:
- *
- * .. code-block:: c++
- *
- *    mpz_t m;
- *    mpz_init_set_si(m,1); // Create an mpz_t with the value 1.
- *    integer<1> n{1}; // Initialize an integer with the value 1.
- *    mpz_add(m,m,n.get_mpz_view()); // Compute the result of n + m and store
- *                                   // it in m using the GMP API.
- *
- * See the documentation of :cpp:func:`~mppp::integer::get_mpz_view()` for more details about the ``mpz_view`` class.
- * Via the GMP interfacing facilities, it is thus possible to use directly the GMP C API with
- * :cpp:class:`~mppp::integer` objects whenever necessary (e.g., if a GMP function has not been wrapped yet by mp++).
- *
- * The :cpp:class:`~mppp::integer` class supports a simple binary serialisation API, through member functions
- * such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the
- * corresponding :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the
- * :ref:`integer tutorial <tutorial_integer_s11n>`.
- * \endrststar
- */
+// Multiprecision integer class.
 template <std::size_t SSize>
 class integer
 {
@@ -1298,95 +1149,19 @@ class integer
     friend class rational;
 
 public:
-    /// Alias for the template parameter \p SSize.
+    // Alias for the template parameter SSize.
     static constexpr std::size_t ssize = SSize;
-    /// Default constructor.
-    /**
-     * The default constructor initialises an integer with static storage type and value 0.
-     */
+    // Default constructor.
     integer() = default;
-    /// Copy constructor.
-    /**
-     * The copy constructor deep-copies \p other into \p this, copying the original storage type as well.
-     *
-     * @param other the object that will be copied into \p this.
-     */
-    integer(const integer &other) = default;
-    /// Move constructor.
-    /**
-     * The move constructor will leave \p other in an unspecified but valid state. The storage type
-     * of \p this will be the same as <tt>other</tt>'s.
-     *
-     * @param other the object that will be moved into \p this.
-     */
+    // Copy constructor.
+    integer(const integer &) = default;
+    // Move constructor.
     integer(integer &&other) = default;
-    /// Constructor from an array of limbs.
-    /**
-     * \rststar
-     * This constructor will initialise ``this`` with the content of the array
-     * sized ``size`` starting at ``p``. The array is expected to contain
-     * the limbs of the desired value for ``this``, ordered from the least significant
-     * to the most significant.
-     *
-     * For instance, the following code:
-     *
-     * .. code-block:: c++
-     *
-     *    ::mp_limb_t arr[] = {5,6,7};
-     *    integer<1> n{arr, 3};
-     *
-     * will initialise ``n`` to the value :math:`5 + 6 \times 2^{N} + 7 \times 2^{2N}`,
-     * where :math:`N` is the compile-time GMP constant ``GMP_NUMB_BITS`` representing the number of
-     * value bits in a limb (typically 64 or 32, depending on the platform).
-     *
-     * This constructor always initialises ``this`` to a non-negative value,
-     * and it requires the most significant limb of ``p`` to be nonzero. It also requires
-     * every member of the input array not to be greater than the ``GMP_NUMB_MAX`` GMP constant.
-     * If ``size`` is zero, ``this`` will be initialised to zero without ever dereferencing ``p``.
-     *
-     * .. seealso::
-     *    https://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions
-     *
-     * \endrststar
-     *
-     * @param p a pointer to the beginning of the limbs array.
-     * @param size the size of the limbs array.
-     *
-     * @throws std::invalid_argument if the last element of the ``p`` array is zero, or if at least
-     * one element of the ``p`` array is greater than ``GMP_NUMB_MAX``.
-     * @throws std::overflow_error if ``size`` is larger than an implementation-defined limit.
-     */
+    // Constructor from an array of limbs.
     explicit integer(const ::mp_limb_t *p, std::size_t size) : m_int(p, size) {}
-    /// Constructor from number of bits.
-    /**
-     * \rststar
-     * This constructor will initialise ``this`` to zero, allocating enough memory
-     * to represent a value with a magnitude of ``nbits`` binary digits. The storage type will be static if ``nbits``
-     * is small enough, dynamic otherwise. For instance, the code
-     *
-     * .. code-block:: c++
-     *
-     *    integer n{integer_bitcnt_t(64)};
-     *
-     * will initialise an integer ``n`` with value zero and enough storage for a 64-bit value.
-     * \endrststar
-     *
-     * @param nbits the number of bits of storage that will be allocated.
-     *
-     * @throws std::overflow_error if the value of ``nbits`` is larger than an implementation-defined limit.
-     */
+    // Constructor from number of bits.
     explicit integer(integer_bitcnt_t nbits) : m_int(nbits) {}
-    /// Generic constructor from a C++ fundamental type.
-    /**
-     * This constructor will initialize an integer with the value of \p x. The initialization is always
-     * successful if \p x is an integral value (construction from \p bool yields 1 for \p true, 0 for \p false).
-     * If \p x is a floating-point value, the construction will fail if \p x is not finite. Construction from a
-     * floating-point type yields the truncated counterpart of the input value.
-     *
-     * @param x value that will be used to initialize \p this.
-     *
-     * @throws std::domain_error if \p x is a non-finite floating-point value.
-     */
+    // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -1395,20 +1170,7 @@ public:
     explicit integer(const T &x) : m_int(x)
     {
     }
-    /// Generic constructor from a C++ complex type.
-    /**
-     * \rststar
-     * .. versionadded:: 0.19
-     *
-     * This constructor will initialize an integer with the value of ``c``. The initialization is
-     * successful only if the imaginary part of ``c`` is zero and the real part of ``c`` is finite.
-     * \endrststar
-     *
-     * @param c value that will be used to initialize \p this.
-     *
-     * @throws std::domain_error if the imaginary part of \p c is not zero or if
-     * the real part of \p c is not finite.
-     */
+    // Generic constructor from a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
@@ -1434,29 +1196,9 @@ private:
     {
     }
 #endif
+
 public:
-    /// Constructor from string.
-    /**
-     * \rststar
-     * This constructor will initialize ``this`` from the :cpp:concept:`~mppp::StringType` ``s``, which must represent
-     * an integer value in base ``base``. The expected format is the same as specified by the ``mpz_set_str()``
-     * GMP function. ``base`` may vary from 2 to 62, or be zero. In the latter case, the base is inferred
-     * from the leading characters of the string.
-     * \endrststar
-     *
-     * @param s the input string.
-     * @param base the base used in the string representation.
-     *
-     * @throws std::invalid_argument if the \p base parameter is invalid or if \p s is not a valid string representation
-     * of an integer in the specified base.
-     * @throws unspecified any exception thrown by memory errors in standard containers.
-     *
-     * \rststar
-     * .. seealso::
-     *
-     *    https://gmplib.org/manual/Assigning-Integers.html
-     * \endrststar
-     */
+    // Constructor from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -1465,82 +1207,18 @@ public:
     explicit integer(const T &s, int base = 10) : integer(ptag{}, s, base)
     {
     }
-    /// Constructor from range of characters.
-    /**
-     * This constructor will initialise \p this from the content of the input half-open range,
-     * which is interpreted as the string representation of an integer in base \p base.
-     *
-     * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from string.
-     *
-     * @param begin the begin of the input range.
-     * @param end the end of the input range.
-     * @param base the base used in the string representation.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, or by memory
-     * allocation errors in standard containers.
-     */
+    // Constructor from range of characters.
     explicit integer(const char *begin, const char *end, int base = 10) : m_int(begin, end, base) {}
-    /// Copy constructor from \p mpz_t.
-    /**
-     * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
-     * will be static if \p n fits in the static storage, otherwise it will be dynamic.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     */
+    // Copy constructor from \p mpz_t.
     explicit integer(const ::mpz_t n) : m_int(n) {}
 #if !defined(_MSC_VER)
-    /// Move constructor from \p mpz_t.
-    /**
-     * This constructor will initialize \p this with the value of the GMP integer \p n, transferring the state
-     * of \p n into \p this. The storage type of \p this
-     * will be static if \p n fits in the static storage, otherwise it will be dynamic.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     *
-     *    Additionally, the user must ensure that, after construction, ``mpz_clear()`` is never
-     *    called on ``n``: the resources previously owned by ``n`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     *
-     * .. note::
-     *
-     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     */
+    // Move constructor from \p mpz_t.
     explicit integer(::mpz_t &&n) : m_int(std::move(n)) {}
 #endif
-    /// Copy assignment operator.
-    /**
-     * This operator will perform a deep copy of \p other, copying its storage type as well.
-     *
-     * @param other the assignment argument.
-     *
-     * @return a reference to \p this.
-     */
-    integer &operator=(const integer &other) = default;
-    /// Move assignment operator.
-    /**
-     * After the move, \p other will be in an unspecified but valid state, and the storage type of \p this will be
-     * <tt>other</tt>'s original storage type.
-     *
-     * @param other the assignment argument.
-     *
-     * @return a reference to \p this.
-     */
-    integer &operator=(integer &&other) = default;
+    // Copy assignment operator.
+    integer &operator=(const integer &) = default;
+    // Move assignment operator.
+    integer &operator=(integer &&) = default;
 
 private:
     // Implementation of the assignment from unsigned C++ integral.
@@ -1682,21 +1360,7 @@ private:
 #endif
 
 public:
-    /// Generic assignment operator from a fundamental C++ type.
-    /**
-     * \rststar
-     * This operator will assign ``x`` to ``this``. The storage type of ``this`` after the assignment
-     * will depend only on the value of ``x`` (that is, the storage type will be static if the value of ``x``
-     * is small enough, dynamic otherwise). Assignment from floating-point types will assign the truncated
-     * counterpart of ``x``.
-     * \endrststar
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if ``x`` is a non-finite floating-point value.
-     */
+    // Generic assignment operator from a fundamental C++ type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -1707,24 +1371,7 @@ public:
         dispatch_assignment(x);
         return *this;
     }
-    /// Generic assignment operator from a complex C++ type.
-    /**
-     * \rststar
-     * .. versionadded:: 0.19
-     *
-     * This operator will assign ``c`` to ``this``. The storage type of ``this`` after the assignment
-     * will depend only on the value of ``c`` (that is, the storage type will be static if the value of ``c``
-     * is small enough, dynamic otherwise). The assignment will be successful only if
-     * the imaginary part of ``c`` is zero and the real part of ``c`` is finite.
-     * \endrststar
-     *
-     * @param c the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if the imaginary part of \p c is not zero or if
-     * the real part of \p c is not finite.
-     */
+    // Generic assignment operator from a complex C++ type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
@@ -1738,25 +1385,7 @@ public:
         }
         return *this = c.real();
     }
-    /// Assignment from string.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = integer{s};
-     *
-     * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
-     * ``s`` and it is then move-assigned to ``this``.
-     * \endrststar
-     *
-     * @param s the string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string.
-     */
+    // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -1766,24 +1395,7 @@ public:
     {
         return *this = integer{s};
     }
-    /// Copy assignment from \p mpz_t.
-    /**
-     * This assignment operator will copy into \p this the value of the GMP integer \p n. The storage type of \p this
-     * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed: the data in ``n``
-     *    must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of ``this`` then
-     *    it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     *
-     * @return a reference to \p this.
-     */
+    // Copy assignment from mpz_t.
     integer &operator=(const ::mpz_t n)
     {
         const auto asize = detail::get_mpz_size(n);
@@ -1815,32 +1427,7 @@ public:
         return *this;
     }
 #if !defined(_MSC_VER)
-    /// Move assignment from \p mpz_t.
-    /**
-     * This assignment operator will move into \p this the GMP integer \p n. The storage type of \p this
-     * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed: the data in ``n``
-     *    must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of ``this`` then
-     *    it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
-     *
-     *    Additionally, the user must ensure that, after the assignment, ``mpz_clear()`` is never
-     *    called on ``n``: the resources previously owned by ``n`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     *
-     * .. note::
-     *
-     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     *
-     * @return a reference to \p this.
-     */
+    // Move assignment from mpz_t.
     integer &operator=(::mpz_t &&n)
     {
         const auto asize = detail::get_mpz_size(n);
@@ -1876,18 +1463,7 @@ public:
         return *this;
     }
 #endif
-    /// Set to zero.
-    /**
-     * After calling this member function, the storage type of \p this will be static and its value will be zero.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This is a specialised higher-performance alternative to the assignment operator.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+    // Set to zero.
     integer &set_zero()
     {
         if (is_static()) {
@@ -1920,70 +1496,27 @@ private:
     }
 
 public:
-    /// Set to one.
-    /**
-     * After calling this member function, the storage type of \p this will be static and its value will be one.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This is a specialised higher-performance alternative to the assignment operator.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+    // Set to one.
     integer &set_one()
     {
         return set_one_impl<true>();
     }
-    /// Set to minus one.
-    /**
-     * After calling this member function, the storage type of \p this will be static and its value will be minus one.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This is a specialised higher-performance alternative to the assignment operator.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+    // Set to minus one.
     integer &set_negative_one()
     {
         return set_one_impl<false>();
     }
-    /// Test for static storage.
-    /**
-     * @return \p true if the storage type is static, \p false otherwise.
-     */
+    // Test for static storage.
     bool is_static() const
     {
         return m_int.is_static();
     }
-    /// Check for dynamic storage.
-    /**
-     * @return \p true if the storage type is dynamic, \p false otherwise.
-     */
+    // Test for dynamic storage.
     bool is_dynamic() const
     {
         return m_int.is_dynamic();
     }
-    /// Conversion to string.
-    /**
-     * This member function will convert \p this into a string in base \p base using the GMP function \p mpz_get_str().
-     *
-     * @param base the desired base.
-     *
-     * @return a string representation of \p this.
-     *
-     * @throws std::invalid_argument if \p base is smaller than 2 or greater than 62.
-     *
-     * \rststar
-     * .. seealso::
-     *
-     *    https://gmplib.org/manual/Converting-Integers.html
-     * \endrststar
-     */
+    // Conversion to string.
     std::string to_string(int base = 10) const
     {
         if (mppp_unlikely(base < 2 || base > 62)) {
@@ -2211,21 +1744,7 @@ private:
     }
 
 public:
-    /// Generic conversion operator to a C++ fundamental type.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type.
-     * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
-     * ``true`` otherwise. Conversion to other integral types yields the exact result, if representable by the target
-     * :cpp:concept:`~mppp::CppInteroperable` type. Conversion to floating-point types might yield inexact values and
-     * infinities.
-     * \endrststar
-     *
-     * @return \p this converted to the target type.
-     *
-     * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be
-     * represented by it.
-     */
+    // Generic conversion operator to a C++ fundamental type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -2240,17 +1759,7 @@ public:
         }
         return std::move(retval.second);
     }
-    /// Generic conversion operator to a C++ complex type.
-    /**
-     * \rststar
-     * .. versionadded:: 0.19
-     *
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppComplex` type.
-     * The conversion might yield inexact values and infinities.
-     * \endrststar
-     *
-     * @return \p this converted to the target type.
-     */
+    // Generic conversion operator to a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
@@ -2260,22 +1769,7 @@ public:
     {
         return T(static_cast<typename T::value_type>(*this));
     }
-    /// Generic conversion member function to a C++ fundamental type.
-    /**
-     * \rststar
-     * This member function, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``. Differently
-     * from the conversion operator, this member function does not raise any exception: if the conversion is successful,
-     * the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
-     * fails,
-     * ``rop`` will not be altered.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
-     * a C++ integral which cannot represent the value of ``this``.
-     */
+    // Generic conversion member function to a C++ fundamental type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -2290,21 +1784,7 @@ public:
         }
         return false;
     }
-    /// Generic conversion member function to a C++ complex type.
-    /**
-     * \rststar
-     * .. versionadded:: 0.19
-     *
-     * This member function, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::CppComplex` type, storing the result of the conversion into ``rop``.
-     * The conversion is always successful, and this member function
-     * will always return ``true``.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true``.
-     */
+    // Generic conversion member function to a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
@@ -2315,13 +1795,7 @@ public:
         rop = static_cast<T>(*this);
         return true;
     }
-    /// Promote to dynamic storage.
-    /**
-     * This member function will promote the storage type of \p this from static to dynamic.
-     *
-     * @return \p false if the storage type of \p this is already dynamic and no promotion takes place, \p true
-     * otherwise.
-     */
+    // Promote to dynamic storage.
     bool promote()
     {
         if (is_static()) {
@@ -2330,13 +1804,7 @@ public:
         }
         return false;
     }
-    /// Demote to static storage.
-    /**
-     * This member function will demote the storage type of \p this from dynamic to static.
-     *
-     * @return \p false if the storage type of \p this is already static and no demotion takes place, or if the current
-     * value of \p this does not fit in static storage, \p true otherwise.
-     */
+    // Demote to static storage.
     bool demote()
     {
         if (is_dynamic()) {
@@ -2344,12 +1812,7 @@ public:
         }
         return false;
     }
-    /// Size in bits.
-    /**
-     * @return the number of bits needed to represent \p this. If \p this is zero, zero will be returned.
-     *
-     * @throws std::overflow_error if the size in bits of \p this is larger than an implementation-defined value.
-     */
+    // Size in bits.
     std::size_t nbits() const
     {
         const std::size_t ls = size();
@@ -2368,10 +1831,7 @@ public:
         const std::size_t idx = ls - 1u;
         return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS) + detail::limb_size_nbits(lptr[idx]));
     }
-    /// Size in limbs.
-    /**
-     * @return the number of limbs needed to represent \p this. If \p this is zero, zero will be returned.
-     */
+    // Size in limbs.
     std::size_t size() const
     {
         // NOTE: the idea here is that, regardless of what mpz_size_t is exactly, the
@@ -2380,63 +1840,24 @@ public:
         return (m_int.m_st._mp_size) >= 0 ? static_cast<std::size_t>(m_int.m_st._mp_size)
                                           : static_cast<std::size_t>(detail::nint_abs(m_int.m_st._mp_size));
     }
-    /// Sign.
-    /**
-     * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
-     */
+    // Sign.
     int sgn() const
     {
         // NOTE: size is part of the common initial sequence.
         return detail::integral_sign(m_int.m_st._mp_size);
     }
-    /// Get an \p mpz_t view.
-    /**
-     * This member function will return an object of an unspecified type \p mpz_view which is implicitly convertible
-     * to a const pointer to an \p mpz_t struct (and which can thus be used as a <tt>const mpz_t</tt>
-     * parameter in GMP functions). In addition to the implicit conversion operator, the <tt>const mpz_t</tt>
-     * object can also be retrieved via the <tt>%get()</tt> member function of the \p mpz_view class.
-     * The view provides a read-only GMP-compatible representation of the integer stored in \p this.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   It is important to keep in mind the following facts about the returned ``mpz_view`` object:
-     *
-     *   * ``mpz_view`` objects are strictly read-only: it is impossible to alter ``this`` through an ``mpz_view``, and
-     *     ``mpz_view`` objects can be used in the GMP API only where a ``const mpz_t`` parameter is expected;
-     *   * ``mpz_view`` objects can only be move-constructed (the other constructors and the assignment operators
-     *     are disabled);
-     *   * the returned object and the pointer returned by its ``get()`` member function might reference internal data
-     *     belonging to ``this``, and they can thus be used safely only during the lifetime of ``this``;
-     *   * the lifetime of the pointer returned by the ``get()`` member function is tied to the lifetime of the
-     *     ``mpz_view`` object (that is, if the ``mpz_view`` object is destroyed, any pointer previously returned by
-     *     ``get()`` becomes invalid);
-     *   * any modification to ``this`` will also invalidate the view and the pointer.
-     * \endrststar
-     *
-     * @return an \p mpz view of \p this.
-     */
+    // Get an mpz_t view.
     mpz_view get_mpz_view() const
     {
         return mpz_view(*this);
     }
-    /// Negate in-place.
-    /**
-     * This member function will set \p this to <tt>-this</tt>.
-     *
-     * @return a reference to \p this.
-     */
+    // Negate in-place.
     integer &neg()
     {
         m_int.neg();
         return *this;
     }
-    /// In-place absolute value.
-    /**
-     * This member function will set \p this to its absolute value.
-     *
-     * @return a reference to \p this.
-     */
+    // In-place absolute value.
     integer &abs()
     {
         if (is_static()) {
@@ -2448,29 +1869,13 @@ public:
         }
         return *this;
     }
-    /// Compute next prime number (in-place version).
-    /**
-     * This member function will set \p this to the first prime number greater than the current value.
-     *
-     * @return a reference to \p this.
-     */
+    // Compute next prime number (in-place version).
     integer &nextprime()
     {
         detail::nextprime_impl(*this, *this);
         return *this;
     }
-    /// Test primality.
-    /**
-     * This member function will run a series of probabilistic tests to determine if \p this is a prime number.
-     * It will return \p 2 if \p this is definitely a prime, \p 1 if \p this is probably a prime and \p 0 if \p this
-     * is definitely not-prime.
-     *
-     * @param reps the number of tests to run.
-     *
-     * @return an integer indicating if \p this is a prime.
-     *
-     * @throws std::invalid_argument if \p reps is less than 1 or if \p this is negative.
-     */
+    // Test primality.
     int probab_prime_p(int reps = 25) const
     {
         if (mppp_unlikely(reps < 1)) {
@@ -2482,32 +1887,17 @@ public:
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
     }
-    /// Integer square root (in-place version).
-    /**
-     * This member function will set \p this to its integer square root.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if \p this is negative.
-     */
+    // Integer square root (in-place version).
     integer &sqrt()
     {
         return mppp::sqrt(*this, *this);
     }
-    /// Integer squaring (in-place version).
-    /**
-     * This member function will set \p this to its square.
-     *
-     * @return a reference to \p this.
-     */
+    // Integer squaring (in-place version).
     integer &sqr()
     {
         return mppp::sqr(*this, *this);
     }
-    /// Test if value is odd.
-    /**
-     * @return \p true if \p this is odd, \p false otherwise.
-     */
+    // Test if value is odd.
     bool odd_p() const
     {
         if (is_static()) {
@@ -2522,60 +1912,28 @@ public:
         }
         return mpz_odd_p(&m_int.g_dy());
     }
-    /// Test if value is even.
-    /**
-     * @return \p true if \p this is even, \p false otherwise.
-     */
+    // Test if value is even.
     bool even_p() const
     {
         return !odd_p();
     }
-    /// Return a reference to the internal union.
-    /**
-     * This member function returns a reference to the union used internally to implement the integer class.
-     *
-     * @return a reference to the internal union member.
-     */
+    // Return a reference to the internal union.
     detail::integer_union<SSize> &_get_union()
     {
         return m_int;
     }
-    /// Return a const reference to the internal union.
-    /**
-     * This member function returns a const reference to the union used internally to implement the integer class.
-     *
-     * @return a const reference to the internal union member.
-     */
+    // Return a const reference to the internal union.
     const detail::integer_union<SSize> &_get_union() const
     {
         return m_int;
     }
-    /// Get a pointer to the dynamic storage.
-    /**
-     * This member function will first promote \p this to dynamic storage (if \p this is not already employing dynamic
-     * storage), and it will then return a pointer to the internal \p mpz_t structure. The returned pointer can be used
-     * as an argument for the functions of the GMP API.
-     *
-     * \rststar
-     * .. note::
-     *
-     *    The returned pointer is a raw, non-owning pointer tied to the lifetime of ``this``. Calling
-     *    :cpp:func:`~mppp::integer::demote()` or
-     *    assigning an :cpp:class:`~mppp::integer` with static storage to ``this`` will invalidate the returned
-     *    pointer.
-     * \endrststar
-     *
-     * @return a pointer to the internal \p mpz_t structure.
-     */
+    // Get a pointer to the dynamic storage.
     std::remove_extent<::mpz_t>::type *get_mpz_t()
     {
         promote();
         return &m_int.g_dy();
     }
-    /// Test if the value is zero.
-    /**
-     * @return \p true if the value represented by \p this is zero, \p false otherwise.
-     */
+    // Test if the value is zero.
     bool is_zero() const
     {
         return m_int.m_st._mp_size == 0;
@@ -2595,18 +1953,12 @@ private:
     }
 
 public:
-    /// Test if the value is equal to one.
-    /**
-     * @return \p true if the value represented by \p this is 1, \p false otherwise.
-     */
+    // Test if the value is equal to one.
     bool is_one() const
     {
         return is_one_impl<1>();
     }
-    /// Test if the value is equal to minus one.
-    /**
-     * @return \p true if the value represented by \p this is -1, \p false otherwise.
-     */
+    // Test if the value is equal to minus one.
     bool is_negative_one() const
     {
         return is_one_impl<-1>();
@@ -2617,20 +1969,7 @@ private:
     static const char binary_size_errmsg[];
 
 public:
-    /// Size of the serialised binary representation.
-    /**
-     * \rststar
-     * This member function will return a value representing the number of bytes necessary
-     * to serialise ``this`` into a memory buffer in binary format via one of the available
-     * :cpp:func:`~mppp::integer::binary_save()` overloads. The returned value
-     * is platform-dependent.
-     * \endrststar
-     *
-     * @return the number of bytes needed for the binary serialisation of ``this``.
-     *
-     * @throws std::overflow_error if the size in limbs of ``this`` is larger than an
-     * implementation-defined limit.
-     */
+    // Size of the serialised binary representation.
     std::size_t binary_size() const
     {
         const auto asize = size();
@@ -2661,64 +2000,14 @@ private:
     }
 
 public:
-    /// Serialise into a memory buffer.
-    /**
-     * \rststar
-     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this member function can be read back with one of the
-     * :cpp:func:`~mppp::integer::binary_load()` overloads.
-     *
-     * ``dest`` must point to a memory area whose size is at least equal to the value returned
-     * by :cpp:func:`~mppp::integer::binary_size()`, otherwise the behaviour will be undefined.
-     * ``dest`` does not have any special alignment requirements.
-     *
-     * .. warning::
-     *
-     *    The binary representation produced by this member function is compiler, platform and architecture
-     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
-     *    it should not be used as an exchange format or for long-term data storage.
-     * \endrststar
-     *
-     * @param dest a pointer to a memory buffer into which the serialised representation of ``this``
-     * will be written.
-     *
-     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size()).
-     *
-     * @throws unspecified any exception thrown by binary_size().
-     */
+    // Serialise into a memory buffer.
     std::size_t binary_save(char *dest) const
     {
         const auto bs = binary_size();
         binary_save_impl(dest, bs);
         return bs;
     }
-    /// Serialise into a ``std::vector<char>``.
-    /**
-     * \rststar
-     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this member function can be read back with one of the
-     * :cpp:func:`~mppp::integer::binary_load()` overloads.
-     *
-     * The size of ``dest`` must be at least equal to the value returned by
-     * :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, ``dest`` will be resized
-     * to :cpp:func:`~mppp::integer::binary_size()`.
-     *
-     * .. warning::
-     *
-     *    The binary representation produced by this member function is compiler, platform and architecture
-     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
-     *    it should not be used as an exchange format or for long-term data storage.
-     * \endrststar
-     *
-     * @param dest a vector that will hold the serialised representation of ``this``.
-     *
-     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size()).
-     *
-     * @throws std::overflow_error if the binary size of ``this`` is larger than an
-     * implementation-defined limit.
-     * @throws unspecified any exception thrown by binary_size(), or by memory errors in
-     * standard containers.
-     */
+    // Serialise into a ``std::vector<char>``.
     std::size_t binary_save(std::vector<char> &dest) const
     {
         const auto bs = binary_size();
@@ -2728,31 +2017,7 @@ public:
         binary_save_impl(dest.data(), bs);
         return bs;
     }
-    /// Serialise into a ``std::array<char>``.
-    /**
-     * \rststar
-     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this member function can be read back with one of the
-     * :cpp:func:`~mppp::integer::binary_load()` overloads.
-     *
-     * The size of ``dest`` must be at least equal to the value returned by
-     * :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, no data
-     * will be written to ``dest`` and zero will be returned.
-     *
-     * .. warning::
-     *
-     *    The binary representation produced by this member function is compiler, platform and architecture
-     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
-     *    it should not be used as an exchange format or for long-term data storage.
-     * \endrststar
-     *
-     * @param dest an array that will hold the serialised representation of ``this``.
-     *
-     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size() if ``dest``
-     * provides enough storage to store ``this``, zero otherwise).
-     *
-     * @throws unspecified any exception thrown by binary_size().
-     */
+    // Serialise into a ``std::array<char>``.
     template <std::size_t S>
     std::size_t binary_save(std::array<char, S> &dest) const
     {
@@ -2763,33 +2028,7 @@ public:
         binary_save_impl(dest.data(), bs);
         return bs;
     }
-    /// Serialise into a ``std::ostream``.
-    /**
-     * \rststar
-     * This member function will write into the output stream ``dest`` a binary representation of ``this``, starting
-     * from the current stream position. The serialised representation produced by this member function can be read back
-     * with one of the :cpp:func:`~mppp::integer::binary_load()` overloads.
-     *
-     * If the serialisation is successful (that is, no stream error state is ever detected in ``dest`` after write
-     * operations), then the binary size of ``this`` (that is, the number of bytes written into ``dest``) will be
-     * returned. Otherwise, zero will be returned. Note that a return value of zero does not necessarily imply that no
-     * bytes were written into ``dest``, just that an error occurred at some point during the serialisation process.
-     *
-     * .. warning::
-     *
-     *    The binary representation produced by this member function is compiler, platform and architecture
-     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
-     *    it should not be used as an exchange format or for long-term data storage.
-     * \endrststar
-     *
-     * @param dest the destination stream.
-     *
-     * @return the output of binary_size() if the serialisation was successful, zero otherwise.
-     *
-     * @throws std::overflow_error in case of internal overflows.
-     * @throws unspecified any exception thrown by binary_size(), or by the public interface
-     * of ``std::ostream``.
-     */
+    // Serialise into a ``std::ostream``.
     std::size_t binary_save(std::ostream &dest) const
     {
         const auto bs = binary_size();
@@ -2934,31 +2173,7 @@ private:
     }
 
 public:
-    /// Load a value from a memory buffer.
-    /**
-     * \rststar
-     * This member function will load into ``this`` the content of the memory buffer starting
-     * at ``src``, which must contain the serialised representation of an :cpp:class:`~mppp::integer`
-     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
-     *
-     * ``dest`` does not have any special alignment requirements.
-     *
-     * .. warning::
-     *
-     *    Although this member function performs a few consistency checks on the data in ``src``,
-     *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this member function only with trusted data.
-     * \endrststar
-     *
-     * @param src the source memory buffer.
-     *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
-     * into ``this`` has successfully completed).
-     *
-     * @throws std::overflow_error if the computation of the size of the serialised value leads
-     * to overflow.
-     * @throws std::invalid_argument if invalid data is detected in ``src``.
-     */
+    // Load a value from a memory buffer.
     std::size_t binary_load(const char *src)
     {
         // NOTE: disable the use of structured bindings
@@ -3010,104 +2225,18 @@ private:
     }
 
 public:
-    /// Load a value from a ``std::vector<char>``.
-    /**
-     * \rststar
-     * This member function will load into ``this`` the content of ``src``,
-     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
-     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
-     *
-     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
-     * the beginning of ``src``, but it can end before the end of ``src``. Data
-     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
-     * will be ignored.
-     *
-     * .. warning::
-     *
-     *    Although this member function performs a few consistency checks on the data in ``src``,
-     *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this member function only with trusted data.
-     * \endrststar
-     *
-     * @param src the source ``std::vector<char>``.
-     *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
-     * into ``this`` has successfully completed).
-     *
-     * @throws std::overflow_error if the computation of the size of the serialised value leads
-     * to overflow.
-     * @throws std::invalid_argument if invalid data is detected in ``src``.
-     */
+    // Load a value from a vector.
     std::size_t binary_load(const std::vector<char> &src)
     {
         return binary_load_vector(src, "std::vector");
     }
-    /// Load a value from a ``std::array<char>``.
-    /**
-     * \rststar
-     * This member function will load into ``this`` the content of ``src``,
-     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
-     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
-     *
-     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
-     * the beginning of ``src``, but it can end before the end of ``src``. Data
-     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
-     * will be ignored.
-     *
-     * .. warning::
-     *
-     *    Although this member function performs a few consistency checks on the data in ``src``,
-     *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this member function only with trusted data.
-     * \endrststar
-     *
-     * @param src the source ``std::array<char>``.
-     *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
-     * into ``this`` has successfully completed).
-     *
-     * @throws std::overflow_error if the computation of the size of the serialised value leads
-     * to overflow.
-     * @throws std::invalid_argument if invalid data is detected in ``src``.
-     */
+    // Load a value from an array.
     template <std::size_t S>
     std::size_t binary_load(const std::array<char, S> &src)
     {
         return binary_load_vector(src, "std::array");
     }
-    /// Load a value from a ``std::istream``.
-    /**
-     * \rststar
-     * This member function will load into ``this`` the content of ``src``,
-     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
-     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
-     *
-     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
-     * the current position of ``src``, but ``src`` can contain other data before and after
-     * the serialised :cpp:class:`~mppp::integer` value. Data
-     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
-     * will be ignored. If a stream error state is detected at any point of the deserialisation
-     * process after a read operation, zero will be returned and ``this`` will not have been modified.
-     * Note that a return value of zero does not necessarily imply that no
-     * bytes were read from ``src``, just that an error occurred at some point during the serialisation process.
-     *
-     * .. warning::
-     *
-     *    Although this member function performs a few consistency checks on the data in ``src``,
-     *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this member function only with trusted data.
-     * \endrststar
-     *
-     * @param src the source ``std::istream``.
-     *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
-     * into ``this`` has successfully completed), or zero if a stream error occurs.
-     *
-     * @throws std::overflow_error in case of internal overflows.
-     * @throws std::invalid_argument if invalid data is detected in ``src``.
-     * @throws unspecified any exception thrown by memory errors in standard containers,
-     * the public interface of ``std::istream``, or binary_size().
-     */
+    // Load a value from a stream.
     std::size_t binary_load(std::istream &src)
     {
         // Let's start by reading size/asize.
@@ -3358,10 +2487,6 @@ MPPP_CONCEPT_DECL IntegerIntegralOpTypes = are_integer_integral_op_types<T, U>::
 #else
 using integer_integral_op_types_enabler = detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int>;
 #endif
-
-/** @defgroup integer_arithmetic integer_arithmetic
- *  @{
- */
 
 namespace detail
 {
@@ -3649,16 +2774,7 @@ inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, 
 }
 } // namespace detail
 
-/// Ternary \link mppp::integer integer\endlink addition.
-/**
- * This function will set \p rop to <tt>op1 + op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition.
 template <std::size_t SSize>
 inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -3924,20 +3040,7 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
 
 } // namespace detail
 
-/// Ternary \link mppp::integer integer\endlink addition with C++ unsigned integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` addition function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition with C++ unsigned integral types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, CppUnsignedIntegralInteroperable T>
 inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
@@ -3949,20 +3052,7 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, co
     return detail::add_ui_impl(rop, op1, op2);
 }
 
-/// Ternary \link mppp::integer integer\endlink addition with C++ signed integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` addition function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition with C++ signed integral types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, CppSignedIntegralInteroperable T>
 inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
@@ -3977,16 +3067,7 @@ inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, co
     return sub_ui(rop, op1, detail::nint_abs(op2));
 }
 
-/// Ternary \link mppp::integer integer\endlink subtraction.
-/**
- * This function will set \p rop to <tt>op1 - op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction.
 template <std::size_t SSize>
 inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -4058,20 +3139,7 @@ inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op
 
 } // namespace detail
 
-/// Ternary \link mppp::integer integer\endlink subtraction with C++ unsigned integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` subtraction function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction with C++ unsigned integral types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, CppUnsignedIntegralInteroperable T>
 inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
@@ -4083,20 +3151,7 @@ inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, co
     return detail::sub_ui_impl(rop, op1, op2);
 }
 
-/// Ternary \link mppp::integer integer\endlink subtraction with C++ signed integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` subtraction function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction with C++ signed integral types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, CppSignedIntegralInteroperable T>
 inline integer<SSize> &sub_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
@@ -4315,16 +3370,7 @@ inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &o
 }
 } // namespace detail
 
-/// Ternary multiplication.
-/**
- * This function will set \p rop to <tt>op1 * op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiplication.
 template <std::size_t SSize>
 inline integer<SSize> &mul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -4546,16 +3592,7 @@ inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSi
 }
 } // namespace detail
 
-/// Ternary multiply–add.
-/**
- * This function will set \p rop to <tt>rop + op1 * op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiply–add.
 template <std::size_t SSize>
 inline integer<SSize> &addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -4575,16 +3612,7 @@ inline integer<SSize> &addmul(integer<SSize> &rop, const integer<SSize> &op1, co
     return rop;
 }
 
-/// Ternary multiply–sub.
-/**
- * This function will set \p rop to <tt>rop - op1 * op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiply–sub.
 template <std::size_t SSize>
 inline integer<SSize> &submul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -4782,18 +3810,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
 }
 } // namespace detail
 
-/// Ternary left shift.
-/**
- * This function will set \p rop to \p n multiplied by <tt>2**s</tt>.
- *
- * @param rop the return value.
- * @param n the multiplicand.
- * @param s the bit shift value.
- *
- * @return a reference to \p rop.
- *
- * @throws std::overflow_error if \p s is larger than an implementation-defined limit.
- */
+// Ternary left shift.
 template <std::size_t SSize>
 inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
@@ -5185,15 +4202,7 @@ inline integer<SSize> sqrm(const integer<SSize> &op, const integer<SSize> &mod)
 
 #endif
 
-/// Binary negation.
-/**
- * This function will set \p rop to <tt>-n</tt>.
- *
- * @param rop the return value.
- * @param n the integer that will be negated.
- *
- * @return a reference to \p rop.
- */
+// Binary negation.
 template <std::size_t SSize>
 inline integer<SSize> &neg(integer<SSize> &rop, const integer<SSize> &n)
 {
@@ -5201,12 +4210,7 @@ inline integer<SSize> &neg(integer<SSize> &rop, const integer<SSize> &n)
     return rop.neg();
 }
 
-/// Unary negation.
-/**
- * @param n the integer that will be negated.
- *
- * @return <tt>-n</tt>.
- */
+// Unary negation.
 template <std::size_t SSize>
 inline integer<SSize> neg(const integer<SSize> &n)
 {
@@ -5215,15 +4219,7 @@ inline integer<SSize> neg(const integer<SSize> &n)
     return ret;
 }
 
-/// Binary absolute value.
-/**
- * This function will set \p rop to the absolute value of \p n.
- *
- * @param rop the return value.
- * @param n the argument.
- *
- * @return a reference to \p rop.
- */
+// Binary absolute value.
 template <std::size_t SSize>
 inline integer<SSize> &abs(integer<SSize> &rop, const integer<SSize> &n)
 {
@@ -5231,12 +4227,7 @@ inline integer<SSize> &abs(integer<SSize> &rop, const integer<SSize> &n)
     return rop.abs();
 }
 
-/// Unary absolute value.
-/**
- * @param n the argument.
- *
- * @return the absolute value of \p n.
- */
+// Unary absolute value.
 template <std::size_t SSize>
 inline integer<SSize> abs(const integer<SSize> &n)
 {
@@ -5244,12 +4235,6 @@ inline integer<SSize> abs(const integer<SSize> &n)
     ret.abs();
     return ret;
 }
-
-/** @} */
-
-/** @defgroup integer_division integer_division
- *  @{
- */
 
 namespace detail
 {
@@ -5462,19 +4447,7 @@ inline void static_tdiv_qr(static_int<SSize> &q, static_int<SSize> &r, const sta
 }
 } // namespace detail
 
-/// Ternary truncated division with remainder.
-/**
- * This function will set \p q to the truncated quotient <tt>n / d</tt> and \p r to
- * <tt>n % d</tt>. The remainder \p r has the same sign as \p n. \p q and \p r must be two distinct objects.
- *
- * @param q the quotient.
- * @param r the remainder.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @throws std::invalid_argument if \p q and \p r are the same object.
- * @throws zero_division_error if \p d is zero.
- */
+// Truncated division with remainder.
 template <std::size_t SSize>
 inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -5620,18 +4593,7 @@ inline void static_tdiv_q(static_int<SSize> &q, const static_int<SSize> &op1, co
 }
 } // namespace detail
 
-/// Ternary truncated division without remainder.
-/**
- * This function will set \p q to the truncated quotient <tt>n / d</tt>.
- *
- * @param q the quotient.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return a reference to ``q``.
- *
- * @throws zero_division_error if \p d is zero.
- */
+// Truncated division without remainder.
 template <std::size_t SSize>
 inline integer<SSize> &tdiv_q(integer<SSize> &q, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -5755,22 +4717,7 @@ inline void static_divexact(static_int<SSize> &q, const static_int<SSize> &op1, 
 }
 } // namespace detail
 
-/// Exact division (ternary version).
-/**
- * This function will set \p rop to the quotient of \p n and \p d.
- *
- * \rststar
- * .. warning::
- *
- *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
- * \endrststar
- *
- * @param rop the return value.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return a reference to \p rop.
- */
+// Exact division (ternary version).
 template <std::size_t SSize>
 inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -5790,19 +4737,7 @@ inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, co
     return rop;
 }
 
-/// Exact division (binary version).
-/**
- * \rststar
- * .. warning::
- *
- *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
- * \endrststar
- *
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return the quotient of \p n and \p d.
- */
+// Exact division (binary version).
 template <std::size_t SSize>
 inline integer<SSize> divexact(const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -5834,22 +4769,7 @@ inline void static_divexact_gcd(static_int<SSize> &q, const static_int<SSize> &o
 }
 } // namespace detail
 
-/// Exact division with positive divisor (ternary version).
-/**
- * This function will set \p rop to the quotient of \p n and \p d.
- *
- * \rststar
- * .. warning::
- *
- *    If ``d`` does not divide ``n`` exactly, or if ``d`` is not strictly positive, the behaviour will be undefined.
- * \endrststar
- *
- * @param rop the return value.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return a reference to \p rop.
- */
+// Exact division with positive divisor (ternary version).
 template <std::size_t SSize>
 inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -5872,19 +4792,7 @@ inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n
     return rop;
 }
 
-/// Exact division with positive divisor (binary version).
-/**
- * \rststar
- * .. warning::
- *
- *    If ``d`` does not divide ``n`` exactly, or if ``d`` is not strictly positive, the behaviour will be undefined.
- * \endrststar
- *
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return the quotient of \p n and \p d.
- */
+// Exact division with positive divisor (binary version).
 template <std::size_t SSize>
 inline integer<SSize> divexact_gcd(const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -6007,17 +4915,7 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
 }
 } // namespace detail
 
-/// Ternary right shift.
-/**
- * This function will set \p rop to \p n divided by <tt>2**s</tt>. \p rop will be the truncated result of the
- * division.
- *
- * @param rop the return value.
- * @param n the dividend.
- * @param s the bit shift value.
- *
- * @return a reference to \p rop.
- */
+// Ternary right shift.
 template <std::size_t SSize>
 inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
@@ -6035,12 +4933,6 @@ inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n,
     ::mpz_tdiv_q_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
     return rop;
 }
-
-/** @} */
-
-/** @defgroup integer_comparison integer_comparison
- *  @{
- */
 
 namespace detail
 {
@@ -6110,14 +5002,7 @@ inline int static_cmp(const static_int<2> &n1, const static_int<2> &n2)
 }
 } // namespace detail
 
-/// Comparison function for integer.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
- * <tt>op1 > op2</tt>.
- */
+// Comparison function.
 template <std::size_t SSize>
 inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -6128,83 +5013,47 @@ inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
     return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
 }
 
-/// Sign function.
-/**
- * @param n the integer whose sign will be computed.
- *
- * @return 0 if \p n is zero, 1 if \p n is positive, -1 if \p n is negative.
- */
+// Sign function.
 template <std::size_t SSize>
 inline int sgn(const integer<SSize> &n)
 {
     return n.sgn();
 }
 
-/// Test if integer is odd.
-/**
- * @param n the argument.
- *
- * @return \p true if \p n is odd, \p false otherwise.
- */
+// Test if integer is odd.
 template <std::size_t SSize>
 inline bool odd_p(const integer<SSize> &n)
 {
     return n.odd_p();
 }
 
-/// Test if integer is even.
-/**
- * @param n the argument.
- *
- * @return \p true if \p n is even, \p false otherwise.
- */
+// Test if integer is even.
 template <std::size_t SSize>
 inline bool even_p(const integer<SSize> &n)
 {
     return n.even_p();
 }
 
-/// Test if an integer is zero.
-/**
- * @param n the integer to be tested.
- *
- * @return \p true if \p n is zero, \p false otherwise.
- */
+// Test if an integer is zero.
 template <std::size_t SSize>
 inline bool is_zero(const integer<SSize> &n)
 {
     return n.is_zero();
 }
 
-/// Test if an integer is equal to one.
-/**
- * @param n the integer to be tested.
- *
- * @return \p true if \p n is equal to 1, \p false otherwise.
- */
+// Test if an integer is equal to one.
 template <std::size_t SSize>
 inline bool is_one(const integer<SSize> &n)
 {
     return n.is_one();
 }
 
-/// Test if an integer is equal to minus one.
-/**
- * @param n the integer to be tested.
- *
- * @return \p true if \p n is equal to -1, \p false otherwise.
- */
+// Test if an integer is equal to minus one.
 template <std::size_t SSize>
 inline bool is_negative_one(const integer<SSize> &n)
 {
     return n.is_negative_one();
 }
-
-/** @} */
-
-/** @defgroup integer_logic integer_logic
- *  @{
- */
 
 namespace detail
 {
@@ -6304,16 +5153,7 @@ inline bool static_not(static_int<SSize> &rop, const static_int<SSize> &op)
 }
 } // namespace detail
 
-/// Bitwise NOT for \link mppp::integer integer\endlink.
-/**
- * This function will set ``rop`` to the bitwise NOT (i.e., the one's complement) of ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to ``rop``.
- */
+// Bitwise NOT.
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_not(integer<SSize> &rop, const integer<SSize> &op)
 {
@@ -6570,17 +5410,7 @@ inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, con
 }
 } // namespace detail
 
-/// Bitwise OR for \link mppp::integer integer\endlink.
-/**
- * This function will set ``rop`` to the bitwise OR of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return a reference to ``rop``.
- */
+// Bitwise OR.
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_ior(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -6821,17 +5651,7 @@ inline bool static_and(static_int<SSize> &rop, const static_int<SSize> &op1, con
 }
 } // namespace detail
 
-/// Bitwise AND for \link mppp::integer integer\endlink.
-/**
- * This function will set ``rop`` to the bitwise AND of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return a reference to ``rop``.
- */
+// Bitwise AND.
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_and(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -7083,17 +5903,7 @@ inline bool static_xor(static_int<SSize> &rop, const static_int<SSize> &op1, con
 }
 } // namespace detail
 
-/// Bitwise XOR for \link mppp::integer integer\endlink.
-/**
- * This function will set ``rop`` to the bitwise XOR of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return a reference to ``rop``.
- */
+// Bitwise XOR.
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -7114,12 +5924,6 @@ inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op
     ::mpz_xor(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
-
-/** @} */
-
-/** @defgroup integer_ntheory integer_ntheory
- *  @{
- */
 
 namespace detail
 {
@@ -7232,17 +6036,7 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
 }
 } // namespace detail
 
-/// GCD (ternary version).
-/**
- * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always nonnegative.
- * If both operands are zero, zero is returned.
- *
- * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return a reference to \p rop.
- */
+// GCD (ternary version).
 template <std::size_t SSize>
 inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -7261,13 +6055,7 @@ inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const
     return rop;
 }
 
-/// GCD (binary version).
-/**
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return the GCD of \p op1 and \p op2.
- */
+// GCD (binary version).
 template <std::size_t SSize>
 inline integer<SSize> gcd(const integer<SSize> &op1, const integer<SSize> &op2)
 {
@@ -7276,17 +6064,7 @@ inline integer<SSize> gcd(const integer<SSize> &op1, const integer<SSize> &op2)
     return retval;
 }
 
-/// Factorial.
-/**
- * This function will set \p rop to the factorial of \p n.
- *
- * @param rop the return value.
- * @param n the argument for the factorial.
- *
- * @return a reference to \p rop.
- *
- * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
- */
+// Factorial.
 template <std::size_t SSize>
 inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
 {
@@ -7306,17 +6084,7 @@ inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
     return rop = &tmp.m_mpz;
 }
 
-/// Binomial coefficient (ternary version).
-/**
- * This function will set \p rop to the binomial coefficient of \p n and \p k. Negative values of \p n are
- * supported.
- *
- * @param rop the return value.
- * @param n the top argument.
- * @param k the bottom argument.
- *
- * @return a reference to \p rop.
- */
+// Binomial coefficient (ternary version).
 template <std::size_t SSize>
 inline integer<SSize> &bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
 {
@@ -7325,13 +6093,7 @@ inline integer<SSize> &bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsi
     return rop = &tmp.m_mpz;
 }
 
-/// Binomial coefficient (binary version).
-/**
- * @param n the top argument.
- * @param k the bottom argument.
- *
- * @return the binomial coefficient of \p n and \p k.
- */
+// Binomial coefficient (binary version).
 template <std::size_t SSize>
 inline integer<SSize> bin_ui(const integer<SSize> &n, unsigned long k)
 {
@@ -7419,34 +6181,15 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 }
 } // namespace detail
 
-/// Generic binomial coefficient.
-/**
- * \rststar
- * This function will compute the binomial coefficient :math:`{{n}\choose{k}}`, supporting integral input values.
- * The implementation can handle positive and negative values for both the top and the bottom argument.
- *
- * The return type is always an :cpp:class:`~mppp::integer`.
- *
- * .. seealso::
- *
- *    https://arxiv.org/abs/1105.3689/
- *
- * \endrststar
- *
- * @param n the top argument.
- * @param k the bottom argument.
- *
- * @return \f$ {{n}\choose{k}} \f$.
- *
- * @throws std::overflow_error if \p k is outside an implementation-defined range.
- */
+// Generic binomial coefficient.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto binomial(const T &n, const U &k)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> binomial(const T &n, const U &k)
+inline detail::integer_common_t<T, U>
 #endif
+binomial(const T &n, const U &k)
 {
     return detail::binomial_impl(n, k);
 }
@@ -7463,16 +6206,7 @@ inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
 }
 } // namespace detail
 
-/// Compute next prime number (binary version).
-/**
- * This function will set \p rop to the first prime number greater than \p n.
- * Note that for negative values of \p n this function always returns 2.
- *
- * @param rop the return value.
- * @param n the integer argument.
- *
- * @return a reference to \p rop.
- */
+// Compute next prime number (binary version).
 template <std::size_t SSize>
 inline integer<SSize> &nextprime(integer<SSize> &rop, const integer<SSize> &n)
 {
@@ -7481,12 +6215,7 @@ inline integer<SSize> &nextprime(integer<SSize> &rop, const integer<SSize> &n)
     return rop;
 }
 
-/// Compute next prime number (unary version).
-/**
- * @param n the integer argument.
- *
- * @return the first prime number greater than \p n.
- */
+// Compute next prime number (unary version).
 template <std::size_t SSize>
 inline integer<SSize> nextprime(const integer<SSize> &n)
 {
@@ -7495,26 +6224,12 @@ inline integer<SSize> nextprime(const integer<SSize> &n)
     return retval;
 }
 
-/// Test primality.
-/**
- * \rststar
- * This is the free-function version of :cpp:func:`mppp::integer::probab_prime_p()`.
- * \endrststar
- *
- * @param n the integer whose primality will be tested.
- * @param reps the number of tests to run.
- *
- * @return an integer indicating if \p n is a prime.
- *
- * @throws unspecified any exception thrown by integer::probab_prime_p().
- */
+// Test primality.
 template <std::size_t SSize>
 inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
 {
     return n.probab_prime_p(reps);
 }
-
-/** @} */
 
 // Ternary exponentiation.
 template <std::size_t SSize>
@@ -7889,23 +6604,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
     return detail::integer_stream_operator_impl(os, n.get_mpz_view(), n.sgn());
 }
 
-/** @defgroup integer_s11n integer_s11n
- *  @{
- */
-
-/// Binary size of an \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This function is the free function equivalent of the
- * :cpp:func:`mppp::integer::binary_size()` member function.
- * \endrststar
- *
- * @param n the target \link mppp::integer integer\endlink.
- *
- * @return the output of mppp::integer::binary_size() called on ``n``.
- *
- * @throws unspecified any exception thrown by mppp::integer::binary_size().
- */
+// Binary size.
 template <std::size_t SSize>
 inline std::size_t binary_size(const integer<SSize> &n)
 {
@@ -7949,22 +6648,7 @@ using integer_binary_load_enabler = detail::enable_if_t<detail::has_integer_bina
 
 #endif
 
-/// Save an \link mppp::integer integer\endlink in binary format.
-/**
- * \rststar
- * This function is the free function equivalent of all the
- * :cpp:func:`mppp::integer::binary_save()` overloads.
- * \endrststar
- *
- * @param n the target \link mppp::integer integer\endlink.
- * @param dest the object into which the binary representation of ``n`` will
- * be written.
- *
- * @return the output of the invoked mppp::integer::binary_save() overload called on ``n``
- * with ``dest`` as argument.
- *
- * @throws unspecified any exception thrown by the invoked mppp::integer::binary_save() overload.
- */
+// Save in binary format.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, IntegerBinarySaveDest<SSize> T>
 #else
@@ -7975,22 +6659,7 @@ inline std::size_t binary_save(const integer<SSize> &n, T &&dest)
     return n.binary_save(std::forward<T>(dest));
 }
 
-/// Load an \link mppp::integer integer\endlink in binary format.
-/**
- * \rststar
- * This function is the free function equivalent of all the
- * :cpp:func:`mppp::integer::binary_load()` overloads.
- * \endrststar
- *
- * @param n the target \link mppp::integer integer\endlink.
- * @param src the object containing the \link mppp::integer integer\endlink binary
- * representation that will be loaded into ``n``.
- *
- * @return the output of the invoked mppp::integer::binary_load() overload called on ``n``
- * with ``src`` as argument.
- *
- * @throws unspecified any exception thrown by the invoked mppp::integer::binary_load() overload.
- */
+// Load in binary format.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, IntegerBinaryLoadSrc<SSize> T>
 #else
@@ -8001,26 +6670,7 @@ inline std::size_t binary_load(integer<SSize> &n, T &&src)
     return n.binary_load(std::forward<T>(src));
 }
 
-/** @} */
-
-/** @defgroup integer_other integer_other
- *  @{
- */
-
-/// Hash value.
-/**
- * \rststar
- * This function will return a hash value for ``n``. The hash value depends only on the value of ``n``
- * (and *not* on its storage type).
- *
- * A :ref:`specialisation <integer_std_specialisations>` of the standard ``std::hash`` functor is also provided, so that
- * it is possible to use :cpp:class:`~mppp::integer` in standard unordered associative containers out of the box.
- * \endrststar
- *
- * @param n the integer whose hash value will be computed.
- *
- * @return a hash value for \p n.
- */
+// Hash value.
 template <std::size_t SSize>
 inline std::size_t hash(const integer<SSize> &n)
 {
@@ -8040,27 +6690,8 @@ inline std::size_t hash(const integer<SSize> &n)
     return retval;
 }
 
-/// Free the \link mppp::integer integer\endlink caches.
-/**
- * \rststar
- * On some platforms, :cpp:class:`~mppp::integer` manages thread-local caches
- * to speed-up the allocation/deallocation of small objects. These caches are automatically
- * freed on program shutdown or when a thread exits. In certain situations, however,
- * it may be desirable to manually free the memory in use by the caches before
- * the program's end or a thread's exit. This function does exactly that.
- *
- * On platforms where thread local storage is not supported, this funcion will be a no-op.
- *
- * It is safe to call this function concurrently from different threads.
- * \endrststar
- */
+// Free the caches.
 MPPP_DLL_PUBLIC void free_integer_caches();
-
-/** @} */
-
-/** @defgroup integer_operators integer_operators
- *  @{
- */
 
 namespace detail
 {
@@ -8146,12 +6777,7 @@ inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 
 } // namespace detail
 
-/// Identity operator.
-/**
- * @param n the integer that will be copied.
- *
- * @return a copy of \p n.
- */
+// Identity operator.
 template <std::size_t SSize>
 inline integer<SSize> operator+(const integer<SSize> &n)
 {
@@ -8162,22 +6788,7 @@ inline integer<SSize> operator+(const integer<SSize> &n)
     return n;
 }
 
-/// Binary addition operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
- * \endrststar
- *
- * @param op1 the first summand.
- * @param op2 the second summand.
- *
- * @return <tt>op1 + op2</tt>.
- */
+// Binary addition.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires IntegerOpTypes<T, U> inline auto
@@ -8189,16 +6800,7 @@ operator+(const T &op1, const U &op2)
     return detail::dispatch_binary_add(op1, op2);
 }
 
-/// In-place addition operator.
-/**
- * @param rop the augend.
- * @param op the addend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::integer integer\endlink.
- */
+// In-place addition operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -8211,14 +6813,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Prefix increment.
-/**
- * This operator will increment \p n by one.
- *
- * @param n the integer that will be increased.
- *
- * @return a reference to \p n after the increment.
- */
+// Prefix increment.
 template <std::size_t SSize>
 inline integer<SSize> &operator++(integer<SSize> &n)
 {
@@ -8226,14 +6821,7 @@ inline integer<SSize> &operator++(integer<SSize> &n)
     return n;
 }
 
-/// Suffix increment.
-/**
- * This operator will increment \p n by one and return a copy of \p n as it was before the increment.
- *
- * @param n the integer that will be increased.
- *
- * @return a copy of \p n before the increment.
- */
+// Suffix increment.
 template <std::size_t SSize>
 inline integer<SSize> operator++(integer<SSize> &n, int)
 {
@@ -8327,12 +6915,7 @@ inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
 
 } // namespace detail
 
-/// Negated copy.
-/**
- * @param n the integer that will be negated.
- *
- * @return a negated copy of \p n.
- */
+// Negated copy.
 template <std::size_t SSize>
 integer<SSize> operator-(const integer<SSize> &n)
 {
@@ -8341,22 +6924,7 @@ integer<SSize> operator-(const integer<SSize> &n)
     return retval;
 }
 
-/// Binary subtraction operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return <tt>op1 - op2</tt>.
- */
+// Binary subtraction.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires IntegerOpTypes<T, U> inline auto
@@ -8368,16 +6936,7 @@ operator-(const T &op1, const U &op2)
     return detail::dispatch_binary_sub(op1, op2);
 }
 
-/// In-place subtraction operator.
-/**
- * @param rop the minuend.
- * @param op the subtrahend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::integer integer\endlink.
- */
+// In-place subtraction operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -8390,14 +6949,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Prefix decrement.
-/**
- * This operator will decrement \p n by one.
- *
- * @param n the integer that will be decreased.
- *
- * @return a reference to \p n after the decrement.
- */
+// Prefix decrement.
 template <std::size_t SSize>
 inline integer<SSize> &operator--(integer<SSize> &n)
 {
@@ -8405,14 +6957,7 @@ inline integer<SSize> &operator--(integer<SSize> &n)
     return n;
 }
 
-/// Suffix decrement.
-/**
- * This operator will decrement \p n by one and return a copy of \p n as it was before the decrement.
- *
- * @param n the integer that will be decreased.
- *
- * @return a copy of \p n before the decrement.
- */
+// Suffix decrement.
 template <std::size_t SSize>
 inline integer<SSize> operator--(integer<SSize> &n, int)
 {
@@ -8493,22 +7038,7 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 
 } // namespace detail
 
-/// Binary multiplication operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
- * \endrststar
- *
- * @param op1 the first factor.
- * @param op2 the second factor.
- *
- * @return <tt>op1 * op2</tt>.
- */
+// Binary multiplication.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires IntegerOpTypes<T, U> inline auto
@@ -8520,16 +7050,7 @@ operator*(const T &op1, const U &op2)
     return detail::dispatch_binary_mul(op1, op2);
 }
 
-/// In-place multiplication operator.
-/**
- * @param rop the multiplicand.
- * @param op the multiplicator.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::integer integer\endlink.
- */
+// In-place multiplication operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -8658,24 +7179,7 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 }
 } // namespace detail
 
-/// Binary division operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
- * \endrststar
- *
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return <tt>n / d</tt>.
- *
- * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
- */
+// Binary division.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires IntegerOpTypes<T, U> inline auto
@@ -8687,17 +7191,7 @@ operator/(const T &n, const U &d)
     return detail::dispatch_binary_div(n, d);
 }
 
-/// In-place division operator.
-/**
- * @param rop the dividend.
- * @param op the divisor.
- *
- * @return a reference to \p rop.
- *
- * @throws zero_division_error if \p op is zero and only integral types are involved in the division.
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::integer integer\endlink.
- */
+// In-place division operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -8710,40 +7204,20 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Binary modulo operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is always an :cpp:class:`~mppp::integer`.
- * \endrststar
- *
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return <tt>n % d</tt>.
- *
- * @throws zero_division_error if \p d is zero.
- */
+// Binary modulo operator for \link mppp::integer integer\endlink.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto operator%(const T &n, const U &d)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> operator%(const T &n, const U &d)
+inline detail::integer_common_t<T, U>
 #endif
+operator%(const T &n, const U &d)
 {
     return detail::dispatch_binary_mod(n, d);
 }
 
-/// In-place modulo operator.
-/**
- * @param rop the dividend.
- * @param op the divisor.
- *
- * @return a reference to \p rop.
- *
- * @throws zero_division_error if \p op is zero.
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
+// In-place modulo operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U>
@@ -8756,15 +7230,7 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Binary left shift operator.
-/**
- * @param n the multiplicand.
- * @param s the bit shift value.
- *
- * @return \p n times <tt>2**s</tt>.
- *
- * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
- */
+// Binary left shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
 #else
@@ -8777,15 +7243,7 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
     return retval;
 }
 
-/// In-place left shift operator.
-/**
- * @param rop the multiplicand.
- * @param s the bit shift value.
- *
- * @return a reference to \p rop.
- *
- * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
- */
+// In-place left shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
 #else
@@ -8797,15 +7255,7 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
     return rop;
 }
 
-/// Binary right shift operator.
-/**
- * @param n the dividend.
- * @param s the bit shift value.
- *
- * @return \p n divided <tt>2**s</tt>.
- *
- * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
- */
+// Binary right shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
 #else
@@ -8818,15 +7268,7 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
     return retval;
 }
 
-/// In-place right shift operator.
-/**
- * @param rop the dividend.
- * @param s the bit shift value.
- *
- * @return a reference to \p rop.
- *
- * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
- */
+// In-place right shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
 #else
@@ -9066,13 +7508,7 @@ inline bool dispatch_less_than(T x, const integer<SSize> &a)
 }
 } // namespace detail
 
-/// Equality operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
- */
+// Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -9084,13 +7520,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return detail::dispatch_equality(op1, op2);
 }
 
-/// Inequality operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
- */
+// Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -9102,13 +7532,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return !(op1 == op2);
 }
 
-/// Less-than operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
- */
+// Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerRealOpTypes<T, U>
@@ -9120,13 +7544,7 @@ template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
     return detail::dispatch_less_than(op1, op2);
 }
 
-/// Less-than or equal operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
- */
+// Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerRealOpTypes<T, U>
@@ -9138,13 +7556,7 @@ template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
     return !(op1 > op2);
 }
 
-/// Greater-than operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
- */
+// Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerRealOpTypes<T, U>
@@ -9156,13 +7568,7 @@ template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
     return detail::dispatch_greater_than(op1, op2);
 }
 
-/// Greater-than or equal operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
- */
+// Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerRealOpTypes<T, U>
@@ -9174,17 +7580,7 @@ template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
     return !(op1 < op2);
 }
 
-/// Unary bitwise NOT operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator returns the bitwise NOT (i.e., the one's complement) of ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- * \endrststar
- *
- * @param op the operand.
- *
- * @return the bitwise NOT of ``op``.
- */
+// Unary bitwise NOT.
 template <std::size_t SSize>
 integer<SSize> operator~(const integer<SSize> &op)
 {
@@ -9237,45 +7633,20 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
 }
 } // namespace detail
 
-/// Binary bitwise OR operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator returns the bitwise OR of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * The return type is always an :cpp:class:`~mppp::integer`.
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return the bitwise OR of ``op1`` and ``op2``.
- */
+// Binary bitwise OR operator
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto operator|(const T &op1, const U &op2)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> operator|(const T &op1, const U &op2)
+inline detail::integer_common_t<T, U>
 #endif
+operator|(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_or(op1, op2);
 }
 
-/// In-place bitwise OR operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator will set ``rop`` to the bitwise OR of ``rop`` and ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- * \endrststar
- *
- * @param rop the first operand.
- * @param op the second operand.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
+// In-place bitwise OR operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U>
@@ -9332,45 +7703,20 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
 }
 } // namespace detail
 
-/// Binary bitwise AND operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator returns the bitwise AND of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * The return type is always an :cpp:class:`~mppp::integer`.
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return the bitwise AND of ``op1`` and ``op2``.
- */
+// Binary bitwise AND operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto operator&(const T &op1, const U &op2)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> operator&(const T &op1, const U &op2)
+inline detail::integer_common_t<T, U>
 #endif
+operator&(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_and(op1, op2);
 }
 
-/// In-place bitwise AND operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator will set ``rop`` to the bitwise AND of ``rop`` and ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- * \endrststar
- *
- * @param rop the first operand.
- * @param op the second operand.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
+// In-place bitwise AND operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U>
@@ -9427,45 +7773,20 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
 }
 } // namespace detail
 
-/// Binary bitwise XOR operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator returns the bitwise XOR of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * The return type is always an :cpp:class:`~mppp::integer`.
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return the bitwise XOR of ``op1`` and ``op2``.
- */
+// Binary bitwise XOR operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto operator^(const T &op1, const U &op2)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> operator^(const T &op1, const U &op2)
+inline detail::integer_common_t<T, U>
 #endif
+operator^(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_xor(op1, op2);
 }
 
-/// In-place bitwise XOR operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator will set ``rop`` to the bitwise XOR of ``rop`` and ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- * \endrststar
- *
- * @param rop the first operand.
- * @param op the second operand.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
+// In-place bitwise XOR operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U>
@@ -9477,8 +7798,6 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
     detail::dispatch_in_place_xor(rop, op);
     return rop;
 }
-
-/** @} */
 
 } // namespace mppp
 
@@ -9501,6 +7820,7 @@ struct hash<mppp::integer<SSize>> {
         return mppp::hash(n);
     }
 };
+
 } // namespace std
 
 #if defined(_MSC_VER)
