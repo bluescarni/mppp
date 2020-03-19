@@ -996,37 +996,19 @@ namespace detail
 namespace
 {
 
-// Shortcut for the size of the real_2_112 constant. We just need
-// 1 bit of precision for this, but make sure we don't go outside
-// the allowed precision range.
-constexpr ::mpfr_prec_t size_real_2_112 = clamp_mpfr_prec(1);
-
-// A bare real with static memory allocation, represented as
-// an mpfr_struct_t paired to storage for the limbs.
-template <::mpfr_prec_t Prec>
-using static_real = std::pair<mpfr_struct_t,
-                              // Use std::array as storage for the limbs.
-                              std::array<::mp_limb_t, mpfr_custom_get_size(Prec) / sizeof(::mp_limb_t)
-                                                          + mpfr_custom_get_size(Prec) % sizeof(::mp_limb_t)>>;
-
-// Create a static real with value 2**112. This represents the "hidden bit"
+// Helper to create a real with the value 2**112. This represents the "hidden bit"
 // of the significand of a quadruple-precision FP.
-// NOTE: this could be instantiated as a global static instead of being re-computed every time.
-// However, since this is not constexpr, there's a high risk of static order initialization screwups
-// (e.g., if initing a static real from a real128), so for the time being let's keep things basic.
-// We can determine in the future if we can make this constexpr somehow and have a 2**112 instance
-// inited during constant initialization.
-static_real<size_real_2_112> get_real_2_112()
+real real_2_112()
 {
-    // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
-    static_real<size_real_2_112> retval;
-    // Init the limbs first, as indicated by the mpfr docs.
-    mpfr_custom_init(retval.second.data(), size_real_2_112);
-    // Do the custom init with a zero value, exponent 0 (unused), precision matching the previous call,
-    // and the limbs storage pointer.
-    mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, size_real_2_112, retval.second.data());
-    // Set the actual value.
-    ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
+    // NOTE: we need only 1 bit of precision,
+    // but make sure that we don't choose a value
+    // too small.
+    real retval{1, clamp_mpfr_prec(1)};
+
+    // NOTE: do the computation using the MPFR API,
+    // in order to avoid mp++'s precision management.
+    ::mpfr_mul_2ui(retval._get_mpfr_t(), retval.get_mpfr_t(), 112u, MPFR_RNDN);
+
     return retval;
 }
 
@@ -1082,8 +1064,8 @@ void real::assign_real128(const real128 &x)
         // Write the significand into this.
         write_significand();
         // Add the hidden bit on top.
-        const auto r_2_112 = detail::get_real_2_112();
-        ::mpfr_add(&m_mpfr, &m_mpfr, &r_2_112.first, MPFR_RNDN);
+        const MPPP_MAYBE_TLS real r_2_112 = detail::real_2_112();
+        ::mpfr_add(&m_mpfr, &m_mpfr, r_2_112.get_mpfr_t(), MPFR_RNDN);
         // Multiply by 2 raised to the adjusted exponent.
         ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);
     }

@@ -21,8 +21,8 @@ The real128 class
 
    This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
    (which features up to 36 decimal digits of precision).
-   The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available in GCC
-   and recent Clang versions on most modern platforms, on top of which it provides the following additions:
+   The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available on GCC,
+   Clang and the Intel compiler on most modern platforms, on top of which it provides the following additions:
 
    * interoperability with other mp++ classes,
    * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
@@ -154,7 +154,7 @@ The real128 class
 
       .. note::
 
-        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+        This operator is ``constexpr`` only if at least C++14 is being used.
 
       Assignment from a :cpp:type:`__float128`.
 
@@ -166,7 +166,7 @@ The real128 class
 
       .. note::
 
-        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+        This operator is ``constexpr`` only if at least C++14 is being used.
 
       Assignment from interoperable types.
 
@@ -224,7 +224,7 @@ The real128 class
 
       .. note::
 
-        This member function is marked as ``constexpr`` only if at least C++14 is being used.
+        This member function is ``constexpr`` only if at least C++14 is being used.
 
       Conversion member function to interoperable types.
 
@@ -287,6 +287,11 @@ The real128 class
 
    .. cpp:function:: constexpr int fpclassify() const
 
+      .. note::
+
+         This function is not ``constexpr`` if the Intel C++ compiler
+         is being used.
+
       Categorise the floating point value.
 
       This member function will categorise the floating-point value of ``this`` into the 5 categories,
@@ -304,6 +309,11 @@ The real128 class
    .. cpp:function:: constexpr bool isinf() const
    .. cpp:function:: constexpr bool finite() const
 
+      .. note::
+
+         These functions are not ``constexpr`` if the Intel C++ compiler
+         is being used.
+
       Detect NaN, infinity or finite value.
 
       :return: ``true`` is the value of ``this`` is, respectively,
@@ -313,7 +323,12 @@ The real128 class
 
       .. note::
 
-        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+        This function is ``constexpr`` only if at least C++14 is being used.
+
+      .. note::
+
+         This function is not ``constexpr`` if the Intel C++ compiler
+         is being used.
 
       In-place absolute value.
 
@@ -440,7 +455,8 @@ Types
 
 .. cpp:type:: __float128
 
-   A quadruple-precision floating-point type available in recent versions of the GCC and Clang compilers.
+   A quadruple-precision floating-point type available on GCC, Clang and
+   the Intel compiler.
    This is the type wrapped by the :cpp:class:`~mppp::real128` class.
 
    .. seealso::
@@ -457,8 +473,8 @@ Concepts
 
    * ``T`` is :cpp:class:`~mppp::integer`, or
    * ``T`` is :cpp:class:`~mppp::rational`, or
-   * on GCC and Clang>=7, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable` or it
-     is ``long double``, or
+   * on GCC, the Intel compiler and Clang>=7, ``T`` satisfies
+     :cpp:concept:`mppp::CppInteroperable` or it is ``long double``, or
    * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable`, except if
      ``T`` is ``long double``.
 
@@ -485,7 +501,7 @@ Conversion
 
    .. note::
 
-     This function is marked as ``constexpr`` only if at least C++14 is being used.
+     This function is ``constexpr`` only if at least C++14 is being used.
 
    Conversion function.
 
@@ -537,6 +553,11 @@ Arithmetic
 
 .. cpp:function:: constexpr mppp::real128 mppp::abs(const mppp::real128 &x)
 
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
+
    Absolute value.
 
    :param x: the :cpp:class:`~mppp::real128` whose absolute value will be computed.
@@ -568,6 +589,11 @@ Comparison
 
 .. cpp:function:: constexpr int mppp::fpclassify(const mppp::real128 &x)
 
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
+
    Categorise a :cpp:class:`~mppp::real128`.
 
    :param x: the value whose floating-point category will be returned.
@@ -577,6 +603,11 @@ Comparison
 .. cpp:function:: constexpr bool mppp::isnan(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::isinf(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::finite(const mppp::real128 &x)
+
+   .. note::
+
+      These functions are not ``constexpr`` if the Intel C++ compiler
+      is being used.
 
    Detect special values.
 
@@ -593,6 +624,11 @@ Comparison
    :return: a boolean flag indicating if *x* is NaN, an infinity or a finite value.
 
 .. cpp:function:: constexpr bool mppp::real128_equal_to(const mppp::real128 &x, const mppp::real128 &y)
+
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
 
    Equality predicate with special NaN handling.
 
@@ -611,6 +647,11 @@ Comparison
 
 .. cpp:function:: constexpr bool mppp::real128_lt(const mppp::real128 &x, const mppp::real128 &y)
 
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
+
    Less-than predicate with special NaN handling.
 
    If both *x* and *y* are not NaN, this function is identical to the less-than operator.
@@ -628,6 +669,11 @@ Comparison
      ``false`` otherwise.
 
 .. cpp:function:: constexpr bool mppp::real128_gt(const mppp::real128 &x, const mppp::real128 &y)
+
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
 
    Greater-than predicate with special NaN handling.
 
@@ -887,7 +933,7 @@ Mathematical operators
 
    .. note::
 
-      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+      These operators are ``constexpr`` only if at least C++14 is being used.
 
    Prefix increment and decrement.
 
@@ -900,7 +946,7 @@ Mathematical operators
 
    .. note::
 
-      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+      These operators are ``constexpr`` only if at least C++14 is being used.
 
    Suffix increment and decrement.
 
@@ -937,7 +983,7 @@ Mathematical operators
 
    .. note::
 
-      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+      These operators are ``constexpr`` only if at least C++14 is being used.
 
    In-place arithmetic operators.
 

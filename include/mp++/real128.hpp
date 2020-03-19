@@ -214,7 +214,11 @@ MPPP_CONCEPT_DECL Real128OpTypes = are_real128_op_types<T, U>::value;
 #endif
 
 // Fwd declare the abs() function.
-constexpr real128 abs(const real128 &);
+#if !defined(__INTEL_COMPILER)
+constexpr
+#endif
+    real128
+    abs(const real128 &);
 
 // For the future:
 // - finish wrapping up the quadmath API
@@ -618,7 +622,11 @@ public:
     // Sign bit.
     bool signbit() const;
     // Categorise the floating point value.
-    constexpr int fpclassify() const
+#if !defined(__INTEL_COMPILER)
+    constexpr
+#endif
+        int
+        fpclassify() const
     {
         // NOTE: according to the docs the builtin accepts generic floating-point types:
         // https://gcc.gnu.org/onlinedocs/gcc-7.2.0/gcc/Other-Builtins.html
@@ -627,23 +635,38 @@ public:
         return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value);
     }
     // Detect NaN.
-    constexpr bool isnan() const
+#if !defined(__INTEL_COMPILER)
+    constexpr
+#endif
+        bool
+        isnan() const
     {
         return fpclassify() == FP_NAN;
     }
     // Detect infinity.
-    constexpr bool isinf() const
+#if !defined(__INTEL_COMPILER)
+    constexpr
+#endif
+        bool
+        isinf() const
     {
         return fpclassify() == FP_INFINITE;
     }
     // Detect finite value.
-    constexpr bool finite() const
+#if !defined(__INTEL_COMPILER)
+    constexpr
+#endif
+        bool
+        finite() const
     {
         return !isnan() && !isinf();
     }
 
     // In-place absolute value.
-    MPPP_CONSTEXPR_14 real128 &abs()
+#if !defined(__INTEL_COMPILER)
+    MPPP_CONSTEXPR_14
+#endif
+    real128 &abs()
     {
         return *this = mppp::abs(*this);
     }
@@ -717,7 +740,13 @@ MPPP_DLL_PUBLIC real128 frexp(const real128 &, int *);
 MPPP_DLL_PUBLIC real128 fma(const real128 &, const real128 &, const real128 &);
 
 // Absolute value.
-constexpr real128 abs(const real128 &x)
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    real128
+    abs(const real128 &x)
 {
     return x.fpclassify() == FP_NAN
                ? x
@@ -745,37 +774,73 @@ inline bool signbit(const real128 &x)
 }
 
 // Categorisation.
-constexpr int fpclassify(const real128 &x)
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    int
+    fpclassify(const real128 &x)
 {
     return x.fpclassify();
 }
 
 // Detect NaN.
-constexpr bool isnan(const real128 &x)
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    bool
+    isnan(const real128 &x)
 {
     return x.isnan();
 }
 
 // Detect infinity.
-constexpr bool isinf(const real128 &x)
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    bool
+    isinf(const real128 &x)
 {
     return x.isinf();
 }
 
 // Detect finite value.
-constexpr bool finite(const real128 &x)
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    bool
+    finite(const real128 &x)
 {
     return x.finite();
 }
 
 // Equality predicate with special NaN handling.
-constexpr bool real128_equal_to(const real128 &, const real128 &);
+#if !defined(__INTEL_COMPILER)
+constexpr
+#endif
+    bool
+    real128_equal_to(const real128 &, const real128 &);
 
 // Less-than predicate with special NaN handling.
-constexpr bool real128_lt(const real128 &, const real128 &);
+#if !defined(__INTEL_COMPILER)
+constexpr
+#endif
+    bool
+    real128_lt(const real128 &, const real128 &);
 
 // Greater-than predicate with special NaN handling.
-constexpr bool real128_gt(const real128 &, const real128 &);
+#if !defined(__INTEL_COMPILER)
+constexpr
+#endif
+    bool
+    real128_gt(const real128 &, const real128 &);
 
 // Unary square root.
 inline real128 sqrt(real128 x)
@@ -1737,13 +1802,13 @@ constexpr real128 real128_denorm_min()
 // Positive inf.
 constexpr real128 real128_inf()
 {
-#if !defined(__GNUC__) || __GNUC__ < 7
+#if defined(__INTEL_COMPILER) || !defined(__GNUC__) || __GNUC__ < 7
     // NOTE: it seems like there's no way to arithmetically construct infinity in constexpr.
     // I tried 1/0 and repeated multiplications by a large int, but it always ends up in
     // a 'not a constant expression' error message.
     return real128{std::numeric_limits<double>::infinity()};
 #else
-    // This builtin is constexpr only in GCC 7 and later.
+    // This builtin is constexpr only on GCC 7 and later.
     // https://gcc.gnu.org/onlinedocs/gcc/x86-Built-in-Functions.html
     // Note that this and the nan builtins are arch-specific, but it seems they
     // might be available everywhere __float128 is available.
@@ -1754,12 +1819,12 @@ constexpr real128 real128_inf()
 // NaN.
 constexpr real128 real128_nan()
 {
-#if !defined(__GNUC__) || __GNUC__ < 7
+#if defined(__INTEL_COMPILER) || !defined(__GNUC__) || __GNUC__ < 7
     // Same as above - GCC would accept arithmetic generation of NaN,
     // but Clang does not.
     return real128{std::numeric_limits<double>::quiet_NaN()};
 #else
-    // This builtin is constexpr only in GCC 7 and later.
+    // This builtin is constexpr only on GCC 7 and later.
     return real128{__builtin_nanq("")};
 #endif
 }
@@ -1855,12 +1920,24 @@ inline std::size_t hash(const real128 &x)
 }
 
 // NOTE: put these definitions here, as we need the comparison operators to be available.
-constexpr bool real128_equal_to(const real128 &x, const real128 &y)
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    bool
+    real128_equal_to(const real128 &x, const real128 &y)
 {
     return (!x.isnan() && !y.isnan()) ? (x == y) : (x.isnan() && y.isnan());
 }
 
-constexpr bool real128_lt(const real128 &x, const real128 &y)
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    bool
+    real128_lt(const real128 &x, const real128 &y)
 {
     // NOTE: in case at least one op is NaN, we have the following possibilities:
     // - NaN vs NaN -> false,
@@ -1869,7 +1946,13 @@ constexpr bool real128_lt(const real128 &x, const real128 &y)
     return (!x.isnan() && !y.isnan()) ? (x < y) : !x.isnan();
 }
 
-constexpr bool real128_gt(const real128 &x, const real128 &y)
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    bool
+    real128_gt(const real128 &x, const real128 &y)
 {
     // NOTE: in case at least one op is NaN, we have the following possibilities:
     // - NaN vs NaN -> false,
