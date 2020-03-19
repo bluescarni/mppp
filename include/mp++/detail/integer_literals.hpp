@@ -244,7 +244,7 @@ inline integer<SSize> integer_literal_impl()
         constexpr char arr[]
         = {Chars..., '\0'};
 
-#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
+#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__)) && !defined(__INTEL_COMPILER)
     // Run the checks on the char sequence, and determine the base.
     constexpr auto base = integer_literal_check_str(arr);
     static_assert(base == 2 || base == 8 || base == 10 || base == 16);

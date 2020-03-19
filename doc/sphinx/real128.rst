@@ -287,6 +287,11 @@ The real128 class
 
    .. cpp:function:: constexpr int fpclassify() const
 
+      .. note::
+
+         This function is not ``constexpr`` if the Intel C++ compiler
+         is being used.
+
       Categorise the floating point value.
 
       This member function will categorise the floating-point value of ``this`` into the 5 categories,
@@ -304,6 +309,11 @@ The real128 class
    .. cpp:function:: constexpr bool isinf() const
    .. cpp:function:: constexpr bool finite() const
 
+      .. note::
+
+         These functions are not ``constexpr`` if the Intel C++ compiler
+         is being used.
+
       Detect NaN, infinity or finite value.
 
       :return: ``true`` is the value of ``this`` is, respectively,
@@ -313,7 +323,12 @@ The real128 class
 
       .. note::
 
-        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+        This function is marked as ``constexpr`` only if at least C++14 is being used.
+
+      .. note::
+
+         This function is not ``constexpr`` if the Intel C++ compiler
+         is being used.
 
       In-place absolute value.
 
@@ -537,6 +552,11 @@ Arithmetic
 
 .. cpp:function:: constexpr mppp::real128 mppp::abs(const mppp::real128 &x)
 
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
+
    Absolute value.
 
    :param x: the :cpp:class:`~mppp::real128` whose absolute value will be computed.
@@ -568,6 +588,11 @@ Comparison
 
 .. cpp:function:: constexpr int mppp::fpclassify(const mppp::real128 &x)
 
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
+
    Categorise a :cpp:class:`~mppp::real128`.
 
    :param x: the value whose floating-point category will be returned.
@@ -577,6 +602,11 @@ Comparison
 .. cpp:function:: constexpr bool mppp::isnan(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::isinf(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::finite(const mppp::real128 &x)
+
+   .. note::
+
+      These functions are not ``constexpr`` if the Intel C++ compiler
+      is being used.
 
    Detect special values.
 
@@ -593,6 +623,11 @@ Comparison
    :return: a boolean flag indicating if *x* is NaN, an infinity or a finite value.
 
 .. cpp:function:: constexpr bool mppp::real128_equal_to(const mppp::real128 &x, const mppp::real128 &y)
+
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
 
    Equality predicate with special NaN handling.
 
@@ -611,6 +646,11 @@ Comparison
 
 .. cpp:function:: constexpr bool mppp::real128_lt(const mppp::real128 &x, const mppp::real128 &y)
 
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
+
    Less-than predicate with special NaN handling.
 
    If both *x* and *y* are not NaN, this function is identical to the less-than operator.
@@ -628,6 +668,11 @@ Comparison
      ``false`` otherwise.
 
 .. cpp:function:: constexpr bool mppp::real128_gt(const mppp::real128 &x, const mppp::real128 &y)
+
+   .. note::
+
+      This function is not ``constexpr`` if the Intel C++ compiler
+      is being used.
 
    Greater-than predicate with special NaN handling.
 

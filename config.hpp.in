@@ -148,7 +148,7 @@
 
 #define MPPP_FALLTHROUGH [[fallthrough]]
 
-#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 7
+#elif !defined(__INTEL_COMPILER) && !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 7
 
 // On GCC>=7, if we are not using C++17 we can use
 // an alternative attribute:
