@@ -1741,7 +1741,7 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
    :param n: the multiplicand/dividend.
    :param s: the bit shift value.
 
-   :return: :math:`n \times 2^s` and :math:`\frac{n}{2^s}` respectively.
+   :return: :math:`n \times 2^s` and :math:`n \operatorname{div} 2^s` respectively.
 
    :exception std\:\:overflow_error: if *s* is negative or larger than an implementation-defined value.
 
