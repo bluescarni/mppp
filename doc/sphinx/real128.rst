@@ -154,7 +154,7 @@ The real128 class
 
       .. note::
 
-        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+        This operator is ``constexpr`` only if at least C++14 is being used.
 
       Assignment from a :cpp:type:`__float128`.
 
@@ -166,7 +166,7 @@ The real128 class
 
       .. note::
 
-        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+        This operator is ``constexpr`` only if at least C++14 is being used.
 
       Assignment from interoperable types.
 
@@ -224,7 +224,7 @@ The real128 class
 
       .. note::
 
-        This member function is marked as ``constexpr`` only if at least C++14 is being used.
+        This member function is ``constexpr`` only if at least C++14 is being used.
 
       Conversion member function to interoperable types.
 
@@ -323,7 +323,7 @@ The real128 class
 
       .. note::
 
-        This function is marked as ``constexpr`` only if at least C++14 is being used.
+        This function is ``constexpr`` only if at least C++14 is being used.
 
       .. note::
 
@@ -501,7 +501,7 @@ Conversion
 
    .. note::
 
-     This function is marked as ``constexpr`` only if at least C++14 is being used.
+     This function is ``constexpr`` only if at least C++14 is being used.
 
    Conversion function.
 
@@ -933,7 +933,7 @@ Mathematical operators
 
    .. note::
 
-      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+      These operators are ``constexpr`` only if at least C++14 is being used.
 
    Prefix increment and decrement.
 
@@ -946,7 +946,7 @@ Mathematical operators
 
    .. note::
 
-      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+      These operators are ``constexpr`` only if at least C++14 is being used.
 
    Suffix increment and decrement.
 
@@ -983,7 +983,7 @@ Mathematical operators
 
    .. note::
 
-      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+      These operators are ``constexpr`` only if at least C++14 is being used.
 
    In-place arithmetic operators.
 
