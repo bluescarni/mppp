@@ -273,6 +273,9 @@
 <div class="section" id="new">
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>mp++ now works with the Intel compiler
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/224">#224</a>,
+tested with <code class="docutils literal notranslate"><span class="pre">icpc</span> <span class="pre">(ICC)</span> <span class="pre">19.1.0.166</span></code>).</p></li>
 <li><p>The interoperability of <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> with
 <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> has been improved: it is now supported
 also on Clang (since version 7) and it does not require
@@ -296,6 +299,8 @@ to <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>Fix a bug in the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> test suite
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/224">#224</a>).</p></li>
 <li><p>Fix a bug in the test suite in
 release mode
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/219">#219</a>).</p></li>
@@ -436,7 +441,7 @@ compiling the Catch main function
 <h3>Fix<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Workaround a constexpr issue involving <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
-in GCC 9
+on GCC 9
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/197">#197</a>).</p></li>
 <li><p>Fix C++17 builds with MSVC 2015
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/191">#191</a>).</p></li>

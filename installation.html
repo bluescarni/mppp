@@ -176,7 +176,7 @@ at least C++11 (mp++ will also use features from C++14 and C++17,
 if supported by the compiler). The library is regularly tested on
 a comprehensive continuous integration pipeline, which includes:</p>
 <ul class="simple">
-<li><p>various versions of the three major compilers (GCC, Clang and MSVC),</p></li>
+<li><p>various versions of the three major compilers (GCC, Clang and MSVC <a class="footnote-reference brackets" href="#f1" id="id2">1</a>),</p></li>
 <li><p>various versions of the three major operating systems
 (Linux, Windows and OSX),</p></li>
 <li><p>x86, ARM and PowerPC processors.</p></li>
@@ -200,6 +200,13 @@ only in the benchmarking suite.</p></li>
 </ul>
 <p>Additionally, <a class="reference external" href="https://cmake.org/">CMake</a> is the build system used by mp++ and it must also be available when
 installing from source (the minimum required version is 3.3).</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dd><p>The Intel compiler is also occasionally tested, but it is not part of the continuous
+integration setup.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="installation-from-source">
 <h2>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h2>
@@ -224,13 +231,14 @@ of a dynamic library (off by default),</p></li>
 when using MSVC, off by default).</p></li>
 </ul>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only
-using GCC (all the supported versions) and Clang
-(since version 3.9). When this option is active,
+using GCC (all the supported versions), Clang
+(since version 3.9) and the Intel compiler. When this option is active,
 mp++ needs access at build time to both the quadmath header
 <code class="docutils literal notranslate"><span class="pre">quadmath.h</span></code> and the quadmath library
 <code class="docutils literal notranslate"><span class="pre">libquadmath.so</span></code>, which may be installed in
 non-standard locations. While GCC is typically
-able to resolve the correct paths automatically, Clang might need assistance
+able to resolve the correct paths automatically, the other compilers
+might need assistance
 in order to identify the correct locations of these files.</p>
 <p>To build mp++, you can run the following CMake command from the
 build directory:</p>
@@ -387,10 +395,26 @@ of the dynamic runtime when building mp++ as a static library by
 turning on the <code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME</span></code>
 advanced CMake option.</p></li>
 </ul>
+<p>Clang:</p>
+<ul class="simple">
+<li><p>On Clang&lt;7, <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> cannot be used in mixed-mode
+operations with <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>. Accordingly,
+<a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> will disable interoperability with
+<code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> if Clang&lt;7 is being used.</p></li>
+</ul>
+<p>Intel compiler:</p>
+<ul class="simple">
+<li><p>The Intel compiler does not implement certain <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>
+floating-point primitives
+as constant expressions. As a result, a few <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+functions which are <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> on GCC and Clang are not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code>
+when using the Intel compiler. These occurrences are marked in the API
+reference.</p></li>
+</ul>
 <p>MinGW:</p>
 <ul class="simple">
 <li><p>Due to a compiler bug in the implementation of <code class="docutils literal notranslate"><span class="pre">thread_local</span></code>
-storage <a class="footnote-reference brackets" href="#mingw-tls" id="id2">1</a>,
+storage <a class="footnote-reference brackets" href="#mingw-tls" id="id3">2</a>,
 certain performance optimisations are disabled
 when compiling with MinGW.</p></li>
 </ul>
@@ -409,14 +433,14 @@ functions are compile-time constants, the compiler
 <em>may</em> decide (depending on the optimisation level) to actually compute the
 result at compile time using full <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> precision.
 This behaviour can lead to subtle inconsistencies, and it results in one
-test case from the mp++ test suite failing on FreeBSD <a class="footnote-reference brackets" href="#freebsd-mppp-bug" id="id3">2</a>.</p></li>
+test case from the mp++ test suite failing on FreeBSD <a class="footnote-reference brackets" href="#freebsd-mppp-bug" id="id4">3</a>.</p></li>
 </ul>
 <p class="rubric">Footnotes</p>
 <dl class="footnote brackets">
-<dt class="label" id="mingw-tls"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dt class="label" id="mingw-tls"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
 <dd><p><a class="reference external" href="https://sourceforge.net/p/mingw-w64/bugs/445/">https://sourceforge.net/p/mingw-w64/bugs/445/</a></p>
 </dd>
-<dt class="label" id="freebsd-mppp-bug"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
+<dt class="label" id="freebsd-mppp-bug"><span class="brackets"><a class="fn-backref" href="#id4">3</a></span></dt>
 <dd><p><a class="reference external" href="https://github.com/bluescarni/mppp/issues/132">https://github.com/bluescarni/mppp/issues/132</a></p>
 </dd>
 </dl>

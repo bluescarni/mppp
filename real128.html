@@ -212,8 +212,8 @@ with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_
 <dd><p>Quadruple-precision floating-point class.</p>
 <p>This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
 (which features up to 36 decimal digits of precision).
-The class is a thin wrapper around the <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> type and the quadmath library, available in GCC
-and recent Clang versions on most modern platforms, on top of which it provides the following additions:</p>
+The class is a thin wrapper around the <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> type and the quadmath library, available on GCC,
+Clang and the Intel compiler on most modern platforms, on top of which it provides the following additions:</p>
 <ul class="simple">
 <li><p>interoperability with other mp++ classes,</p></li>
 <li><p>consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
@@ -374,7 +374,7 @@ move assignable.</p>
 <span id="_CPPv3N4mppp7real128aSERK10__float128"></span><span id="_CPPv2N4mppp7real128aSERK10__float128"></span><span id="mppp::real128::assign-operator____float128CRCE"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv410__float128" title="__float128">__float128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real128aSERK10__float128" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This operator is marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p>This operator is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <p>Assignment from a <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>.</p>
 <dl class="field-list simple">
@@ -392,7 +392,7 @@ move assignable.</p>
 <span id="_CPPv3I_20Real128InteroperableEN4mppp7real128aSERK1T"></span><span id="_CPPv2I_20Real128InteroperableEN4mppp7real128aSERK1T"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp20Real128InteroperableE" title="mppp::Real128Interoperable">Real128Interoperable</a> <code class="sig-name descname">T</code>&gt;<br /><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I_20Real128InteroperableEN4mppp7real128aSER7real128RK1T" title="mppp::real128::operator=::T">T</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_20Real128InteroperableEN4mppp7real128aSER7real128RK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This operator is marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p>This operator is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <p>Assignment from interoperable types.</p>
 <dl class="field-list simple">
@@ -468,7 +468,7 @@ is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7i
 <span id="_CPPv3I_20Real128InteroperableENK4mppp7real1283getER1T"></span><span id="_CPPv2I_20Real128InteroperableENK4mppp7real1283getER1T"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp20Real128InteroperableE" title="mppp::Real128Interoperable">Real128Interoperable</a> <code class="sig-name descname">T</code>&gt;<br /><em class="property">constexpr</em> bool <code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_20Real128InteroperableENK4mppp7real1283getEbR1T" title="mppp::real128::get::T">T</a> &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_20Real128InteroperableENK4mppp7real1283getEbR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This member function is marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p>This member function is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <p>Conversion member function to interoperable types.</p>
 <p>This member function, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
@@ -551,7 +551,12 @@ If <code class="docutils literal notranslate"><span class="pre">this</span></cod
 <dl class="function">
 <dt id="_CPPv4NK4mppp7real12810fpclassifyEv">
 <span id="_CPPv3NK4mppp7real12810fpclassifyEv"></span><span id="_CPPv2NK4mppp7real12810fpclassifyEv"></span><span id="mppp::real128::fpclassifyCCE"></span><em class="property">constexpr</em> int <code class="sig-name descname">fpclassify</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7real12810fpclassifyEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Categorise the floating point value.</p>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
+</div>
+<p>Categorise the floating point value.</p>
 <p>This member function will categorise the floating-point value of <code class="docutils literal notranslate"><span class="pre">this</span></code> into the 5 categories,
 represented as <code class="docutils literal notranslate"><span class="pre">int</span></code> values, defined by the standard:</p>
 <ul class="simple">
@@ -581,7 +586,12 @@ represented as <code class="docutils literal notranslate"><span class="pre">int<
 <dl class="function">
 <dt id="_CPPv4NK4mppp7real1286finiteEv">
 <span id="_CPPv3NK4mppp7real1286finiteEv"></span><span id="_CPPv2NK4mppp7real1286finiteEv"></span><span id="mppp::real128::finiteCCE"></span><em class="property">constexpr</em> bool <code class="sig-name descname">finite</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7real1286finiteEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Detect NaN, infinity or finite value.</p>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These functions are not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
+</div>
+<p>Detect NaN, infinity or finite value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> is the value of <code class="docutils literal notranslate"><span class="pre">this</span></code> is, respectively,
@@ -595,7 +605,12 @@ NaN, an infinity or finite, <code class="docutils literal notranslate"><span cla
 <span id="_CPPv3N4mppp7real1283absEv"></span><span id="_CPPv2N4mppp7real1283absEv"></span><span id="mppp::real128::absCE"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="sig-name descname">abs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1283absEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This operator is marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p>This function is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
 </div>
 <p>In-place absolute value.</p>
 <p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its absolute value.</p>
@@ -808,7 +823,8 @@ where <span class="math notranslate nohighlight">\(x\)</span> is the current val
 <dl class="type">
 <dt id="_CPPv410__float128">
 <span id="_CPPv310__float128"></span><span id="_CPPv210__float128"></span><span id="__float128"></span><em class="property">type </em><code class="sig-name descname">__float128</code><a class="headerlink" href="#_CPPv410__float128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>A quadruple-precision floating-point type available in recent versions of the GCC and Clang compilers.
+<dd><p>A quadruple-precision floating-point type available on GCC, Clang and
+the Intel compiler.
 This is the type wrapped by the <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -827,8 +843,8 @@ Specifically, this concept is satisfied if either:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, or</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>, or</p></li>
-<li><p>on GCC and Clang&gt;=7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a> or it
-is <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>, or</p></li>
+<li><p>on GCC, the Intel compiler and Clang&gt;=7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a> or it is <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>, or</p></li>
 <li><p>on Clang&lt;7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a>, except if
 <code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>.</p></li>
 </ul>
@@ -856,7 +872,7 @@ involving <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mpp
 <span id="_CPPv3I_N4mppp20Real128InteroperableEEN4mppp3getER1TRKN4mppp7real128E"></span><span id="_CPPv2I_N4mppp20Real128InteroperableEEN4mppp3getER1TRKN4mppp7real128E"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp20Real128InteroperableE" title="mppp::Real128Interoperable">Real128Interoperable</a> <code class="sig-name descname">T</code>&gt;<br /><em class="property">constexpr</em> bool <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp20Real128InteroperableEEN4mppp3getEbR1TRKN4mppp7real128E" title="mppp::get::T">T</a> &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp20Real128InteroperableEEN4mppp3getEbR1TRKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This function is marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p>This function is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <p>Conversion function.</p>
 <p>This function will convert the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> <em>x</em> to a
@@ -927,7 +943,12 @@ rounded once.</p>
 <dl class="function">
 <dt id="_CPPv4N4mppp3absERKN4mppp7real128E">
 <span id="_CPPv3N4mppp3absERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3absERKN4mppp7real128E"></span><span id="mppp::abs__mppp::real128CRCE"></span><em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">abs</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3absERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Absolute value.</p>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
+</div>
+<p>Absolute value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>x</strong> – the <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> whose absolute value will be computed.</p>
@@ -980,7 +1001,12 @@ rounded once.</p>
 <dl class="function">
 <dt id="_CPPv4N4mppp10fpclassifyERKN4mppp7real128E">
 <span id="_CPPv3N4mppp10fpclassifyERKN4mppp7real128E"></span><span id="_CPPv2N4mppp10fpclassifyERKN4mppp7real128E"></span><span id="mppp::fpclassify__mppp::real128CRCE"></span><em class="property">constexpr</em> int <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">fpclassify</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp10fpclassifyERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Categorise a <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
+</div>
+<p>Categorise a <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>x</strong> – the value whose floating-point category will be returned.</p>
@@ -1004,7 +1030,12 @@ rounded once.</p>
 <dl class="function">
 <dt id="_CPPv4N4mppp6finiteERKN4mppp7real128E">
 <span id="_CPPv3N4mppp6finiteERKN4mppp7real128E"></span><span id="_CPPv2N4mppp6finiteERKN4mppp7real128E"></span><span id="mppp::finite__mppp::real128CRCE"></span><em class="property">constexpr</em> bool <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">finite</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6finiteERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Detect special values.</p>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These functions are not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
+</div>
+<p>Detect special values.</p>
 <p>These functions will return <code class="docutils literal notranslate"><span class="pre">true</span></code> is <em>x</em> is, respectively:</p>
 <ul class="simple">
 <li><p>NaN,</p></li>
@@ -1025,7 +1056,12 @@ rounded once.</p>
 <dl class="function">
 <dt id="_CPPv4N4mppp16real128_equal_toERKN4mppp7real128ERKN4mppp7real128E">
 <span id="_CPPv3N4mppp16real128_equal_toERKN4mppp7real128ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp16real128_equal_toERKN4mppp7real128ERKN4mppp7real128E"></span><span id="mppp::real128_equal_to__mppp::real128CR.mppp::real128CRCE"></span><em class="property">constexpr</em> bool <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">real128_equal_to</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp16real128_equal_toERKN4mppp7real128ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Equality predicate with special NaN handling.</p>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
+</div>
+<p>Equality predicate with special NaN handling.</p>
 <p>If both <em>x</em> and <em>y</em> are not NaN, this function is identical to the equality operator.
 Otherwise, this function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>
 if both operands are NaN, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
@@ -1048,7 +1084,12 @@ values equal to each other.</p>
 <dl class="function">
 <dt id="_CPPv4N4mppp10real128_ltERKN4mppp7real128ERKN4mppp7real128E">
 <span id="_CPPv3N4mppp10real128_ltERKN4mppp7real128ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp10real128_ltERKN4mppp7real128ERKN4mppp7real128E"></span><span id="mppp::real128_lt__mppp::real128CR.mppp::real128CRCE"></span><em class="property">constexpr</em> bool <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">real128_lt</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp10real128_ltERKN4mppp7real128ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Less-than predicate with special NaN handling.</p>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
+</div>
+<p>Less-than predicate with special NaN handling.</p>
 <p>If both <em>x</em> and <em>y</em> are not NaN, this function is identical to the less-than operator.
 If at least one operand is NaN, this function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>
 if <em>x</em> is not NaN, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
@@ -1072,7 +1113,12 @@ standard library (e.g., <code class="docutils literal notranslate"><span class="
 <dl class="function">
 <dt id="_CPPv4N4mppp10real128_gtERKN4mppp7real128ERKN4mppp7real128E">
 <span id="_CPPv3N4mppp10real128_gtERKN4mppp7real128ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp10real128_gtERKN4mppp7real128ERKN4mppp7real128E"></span><span id="mppp::real128_gt__mppp::real128CR.mppp::real128CRCE"></span><em class="property">constexpr</em> bool <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">real128_gt</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp10real128_gtERKN4mppp7real128ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Greater-than predicate with special NaN handling.</p>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> if the Intel C++ compiler
+is being used.</p>
+</div>
+<p>Greater-than predicate with special NaN handling.</p>
 <p>If both <em>x</em> and <em>y</em> are not NaN, this function is identical to the greater-than operator.
 If at least one operand is NaN, this function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>
 if <em>y</em> is not NaN, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
@@ -1462,7 +1508,7 @@ guarantees that <code class="docutils literal notranslate"><span class="pre">x</
 <span id="_CPPv3N4mpppmmERN4mppp7real128E"></span><span id="_CPPv2N4mpppmmERN4mppp7real128E"></span><span id="mppp::dec-operator__mppp::real128RCE"></span><em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator--</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmmERN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>These operators are marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p>These operators are <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <p>Prefix increment and decrement.</p>
 <dl class="field-list simple">
@@ -1485,7 +1531,7 @@ guarantees that <code class="docutils literal notranslate"><span class="pre">x</
 <span id="_CPPv3N4mpppmmERN4mppp7real128Ei"></span><span id="_CPPv2N4mpppmmERN4mppp7real128Ei"></span><span id="mppp::dec-operator__mppp::real128R.iCE"></span><em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator--</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmmERN4mppp7real128Ei" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>These operators are marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p>These operators are <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <p>Suffix increment and decrement.</p>
 <dl class="field-list simple">
@@ -1561,7 +1607,7 @@ from mp++ types.</p>
 <span id="_CPPv3I0_N4mppp14Real128OpTypesI1TEEEN4mpppdVER1TRK1U"></span><span id="_CPPv2I0_N4mppp14Real128OpTypesI1TEEEN4mpppdVER1TRK1U"></span>template&lt;typename <code class="sig-name descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp14Real128OpTypesE" title="mppp::Real128OpTypes">Real128OpTypes</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp14Real128OpTypesI1TEEEN4mpppdVER1TR1TRK1U" title="mppp::operator/=::T">T</a>&gt; <code class="sig-name descname">U</code>&gt;<br /><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv4I0_N4mppp14Real128OpTypesI1TEEEN4mpppdVER1TR1TRK1U" title="mppp::operator/=::T">T</a> &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator/=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp14Real128OpTypesI1TEEEN4mpppdVER1TR1TRK1U" title="mppp::operator/=::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp14Real128OpTypesI1TEEEN4mpppdVER1TR1TRK1U" title="mppp::operator/=::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp14Real128OpTypesI1TEEEN4mpppdVER1TR1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>These operators are marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p>These operators are <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <p>In-place arithmetic operators.</p>
 <p>These operators will set <em>x</em> to, respectively:</p>
