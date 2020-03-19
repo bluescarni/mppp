@@ -204,32 +204,32 @@ on curly brackets. Using the same syntax, it is possible to:</p>
 <p>In the code above, we are creating a multiprecision integer <code class="docutils literal notranslate"><span class="pre">n</span></code> from the C++ <code class="docutils literal notranslate"><span class="pre">int</span></code> literal <code class="docutils literal notranslate"><span class="pre">42</span></code>. We are then converting
 <code class="docutils literal notranslate"><span class="pre">n</span></code> back to <code class="docutils literal notranslate"><span class="pre">int</span></code>, and checking that the converted value is the original one. As a general rule, mp++ will strive
 to preserve the exact input value during construction and conversion. If this is not possible, what happens next depends
-on the types and values involved. For instance, initialising an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
+on the types and values involved. For instance, initialising an <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
 with a floating-point value results in truncation:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mf">1.23</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In a similar fashion, initialising an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> with a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> also
+<p>In a similar fashion, initialising an <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> with a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> also
 results in truncation:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">}};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
-<p><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> cannot represent non-finite values, thus construction
+<p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> cannot represent non-finite values, thus construction
 from such values will raise an exception:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">infinity</span><span class="p">()};</span>  <span class="c1">// Raises std::domain_error.</span>
 <span class="n">rat_t</span> <span class="n">q</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">quiet_NaN</span><span class="p">()};</span> <span class="c1">// Raises std::domain_error.</span>
 </pre></div>
 </div>
-<p>Construction of C++ integrals from <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> might fail
+<p>Construction of C++ integrals from <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> might fail
 in case of overflow, and it will produce the truncated value when constructing from <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">n</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="mi">1024</span><span class="p">};</span>         <span class="c1">// int construction from very large value,</span>
                                  <span class="c1">// raises std::overflow_error.</span>
 <span class="n">assert</span><span class="p">((</span><span class="kt">int</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">}}</span> <span class="o">==</span> <span class="mi">1</span><span class="p">));</span> <span class="c1">// int construction from rational truncates.</span>
 </pre></div>
 </div>
-<p>On the other hand, conversion of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> objects to C++ floating-point types does not raise any error
+<p>On the other hand, conversion of <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects to C++ floating-point types does not raise any error
 even if it does not preserve the exact value:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="n">f</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;32327737199221993919239912&quot;</span><span class="p">}};</span> <span class="c1">// Constructs a single-precision approximation</span>
                                               <span class="c1">// of the original integer.</span>

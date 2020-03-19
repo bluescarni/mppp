@@ -176,10 +176,10 @@
             
   <div class="section" id="rational-tutorial">
 <span id="tutorial-rational"></span><h1>Rational tutorial<a class="headerlink" href="#rational-tutorial" title="Permalink to this headline">¶</a></h1>
-<p><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> is a class that builds upon <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> to provide
+<p><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> is a class that builds upon <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> to provide
 an implementation of rational numbers represented as a numerator-denominator
-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> pairs.</p>
-<p>Like <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> is parametrised over
+<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> pairs.</p>
+<p>Like <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> is parametrised over
 an integral value <code class="docutils literal notranslate"><span class="pre">SSize</span></code> which represents the number of limbs that will be
 stored directly within both the numerator and the denominator before resorting to dynamic memory allocation
 (see the <a class="reference internal" href="tutorial_integer.html#tutorial-integer"><span class="std std-ref">integer tutorial</span></a> for a detailed explanation of the meaning
@@ -205,11 +205,11 @@ of arguments representing the numerator and the denominator:</p>
 </pre></div>
 </div>
 </li>
-<li><p>it is possible to get const and mutable references to the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> objects
+<li><p>it is possible to get const and mutable references to the <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
 representing the numerator and the denominator via the <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational7get_numEv" title="mppp::rational::get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::get_num()</span></code></a>,
 <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational7get_denEv" title="mppp::rational::get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::get_den()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::_get_num()</span></code></a> and
 <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::_get_den()</span></code></a> member functions. These accessors allow to use
-any function from the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> API on the numerator and on the denominator:</p>
+any function from the <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> API on the numerator and on the denominator:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="n">get_num</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">);</span> <span class="c1">// Const access to numerator and denominator.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="n">get_den</span><span class="p">()</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
@@ -236,14 +236,14 @@ unless the numerator or the denominator have been changed manually via the mutab
 functions are available;</p></li>
 <li><p>a few <a class="reference internal" href="rational.html#rational-exponentiation"><span class="std std-ref">exponentiation</span></a> and <a class="reference internal" href="rational.html#rational-ntheory"><span class="std std-ref">number-theoretic</span></a>
 functions are available;</p></li>
-<li><p>like <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> also provides a <a class="reference internal" href="rational.html#rational-std-specialisations"><span class="std std-ref">specialisation</span></a>
+<li><p>like <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> also provides a <a class="reference internal" href="rational.html#rational-std-specialisations"><span class="std std-ref">specialisation</span></a>
 of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code> for use in the standard unordered containers.</p></li>
 </ul>
 <p>Many of these features, which are documented in detail in the <a class="reference internal" href="rational.html#rational-reference"><span class="std std-ref">rational reference</span></a>, are available
 in multiple overloads, often both as free and member functions.</p>
 <div class="section" id="interacting-with-the-gmp-api">
 <h2>Interacting with the GMP API<a class="headerlink" href="#interacting-with-the-gmp-api" title="Permalink to this headline">¶</a></h2>
-<p>Like <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> provides facilities for interfacing
+<p>Like <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> provides facilities for interfacing
 with the <a class="reference external" href="https://gmplib.org/">GMP</a> library. Currently, the interoperability is limited to
 <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> objects being able to be constructed and assigned from both <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code>
 and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> objects:</p>
