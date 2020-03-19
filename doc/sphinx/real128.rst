@@ -908,15 +908,10 @@ Mathematical operators
 
    :return: a copy of *x* before the increment/decrement.
 
-.. cpp:function:: template <typename T, typename U> constexpr mppp::real128 mppp::operator+(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr mppp::real128 mppp::operator-(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr mppp::real128 mppp::operator*(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr mppp::real128 mppp::operator/(const T &x, const U &y)
-
-   .. note::
-
-      These operators participate in overload resolution only if ``T`` and ``U`` satisfy
-      the :cpp:concept:`~mppp::Real128OpTypes` concept.
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr mppp::real128 mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr mppp::real128 mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr mppp::real128 mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr mppp::real128 mppp::operator/(const T &x, const U &y)
 
    Binary arithmetic operators.
 
@@ -935,15 +930,10 @@ Mathematical operators
    :exception unspecified: any exception thrown by the constructor of :cpp:class:`~mppp::real128`
      from mp++ types.
 
-.. cpp:function:: template <typename T, typename U> constexpr T &mppp::operator+=(T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr T &mppp::operator-=(T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr T &mppp::operator*=(T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr T &mppp::operator/=(T &x, const U &y)
-
-   .. note::
-
-      These operators participate in overload resolution only if ``T`` and ``U`` satisfy
-      the :cpp:concept:`~mppp::Real128OpTypes` concept.
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr T &mppp::operator+=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr T &mppp::operator-=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr T &mppp::operator*=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr T &mppp::operator/=(T &x, const U &y)
 
    .. note::
 

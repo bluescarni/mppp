@@ -6800,16 +6800,7 @@ operator+(const T &op1, const U &op2)
     return detail::dispatch_binary_add(op1, op2);
 }
 
-/// In-place addition operator.
-/**
- * @param rop the augend.
- * @param op the addend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::integer integer\endlink.
- */
+// In-place addition operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -6822,14 +6813,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Prefix increment.
-/**
- * This operator will increment \p n by one.
- *
- * @param n the integer that will be increased.
- *
- * @return a reference to \p n after the increment.
- */
+// Prefix increment.
 template <std::size_t SSize>
 inline integer<SSize> &operator++(integer<SSize> &n)
 {
@@ -6837,14 +6821,7 @@ inline integer<SSize> &operator++(integer<SSize> &n)
     return n;
 }
 
-/// Suffix increment.
-/**
- * This operator will increment \p n by one and return a copy of \p n as it was before the increment.
- *
- * @param n the integer that will be increased.
- *
- * @return a copy of \p n before the increment.
- */
+// Suffix increment.
 template <std::size_t SSize>
 inline integer<SSize> operator++(integer<SSize> &n, int)
 {
@@ -6959,16 +6936,7 @@ operator-(const T &op1, const U &op2)
     return detail::dispatch_binary_sub(op1, op2);
 }
 
-/// In-place subtraction operator.
-/**
- * @param rop the minuend.
- * @param op the subtrahend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::integer integer\endlink.
- */
+// In-place subtraction operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -6981,14 +6949,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Prefix decrement.
-/**
- * This operator will decrement \p n by one.
- *
- * @param n the integer that will be decreased.
- *
- * @return a reference to \p n after the decrement.
- */
+// Prefix decrement.
 template <std::size_t SSize>
 inline integer<SSize> &operator--(integer<SSize> &n)
 {
@@ -6996,14 +6957,7 @@ inline integer<SSize> &operator--(integer<SSize> &n)
     return n;
 }
 
-/// Suffix decrement.
-/**
- * This operator will decrement \p n by one and return a copy of \p n as it was before the decrement.
- *
- * @param n the integer that will be decreased.
- *
- * @return a copy of \p n before the decrement.
- */
+// Suffix decrement.
 template <std::size_t SSize>
 inline integer<SSize> operator--(integer<SSize> &n, int)
 {
@@ -7096,16 +7050,7 @@ operator*(const T &op1, const U &op2)
     return detail::dispatch_binary_mul(op1, op2);
 }
 
-/// In-place multiplication operator.
-/**
- * @param rop the multiplicand.
- * @param op the multiplicator.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::integer integer\endlink.
- */
+// In-place multiplication operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -7246,17 +7191,7 @@ operator/(const T &n, const U &d)
     return detail::dispatch_binary_div(n, d);
 }
 
-/// In-place division operator.
-/**
- * @param rop the dividend.
- * @param op the divisor.
- *
- * @return a reference to \p rop.
- *
- * @throws zero_division_error if \p op is zero and only integral types are involved in the division.
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::integer integer\endlink.
- */
+// In-place division operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -7269,40 +7204,20 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Binary modulo operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is always an :cpp:class:`~mppp::integer`.
- * \endrststar
- *
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return <tt>n % d</tt>.
- *
- * @throws zero_division_error if \p d is zero.
- */
+// Binary modulo operator for \link mppp::integer integer\endlink.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto operator%(const T &n, const U &d)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> operator%(const T &n, const U &d)
+inline detail::integer_common_t<T, U>
 #endif
+operator%(const T &n, const U &d)
 {
     return detail::dispatch_binary_mod(n, d);
 }
 
-/// In-place modulo operator.
-/**
- * @param rop the dividend.
- * @param op the divisor.
- *
- * @return a reference to \p rop.
- *
- * @throws zero_division_error if \p op is zero.
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
+// In-place modulo operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U>
@@ -7315,15 +7230,7 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Binary left shift operator.
-/**
- * @param n the multiplicand.
- * @param s the bit shift value.
- *
- * @return \p n times <tt>2**s</tt>.
- *
- * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
- */
+// Binary left shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
 #else
@@ -7336,15 +7243,7 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
     return retval;
 }
 
-/// In-place left shift operator.
-/**
- * @param rop the multiplicand.
- * @param s the bit shift value.
- *
- * @return a reference to \p rop.
- *
- * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
- */
+// In-place left shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
 #else
@@ -7356,15 +7255,7 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
     return rop;
 }
 
-/// Binary right shift operator.
-/**
- * @param n the dividend.
- * @param s the bit shift value.
- *
- * @return \p n divided <tt>2**s</tt>.
- *
- * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
- */
+// Binary right shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
 #else
@@ -7377,15 +7268,7 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
     return retval;
 }
 
-/// In-place right shift operator.
-/**
- * @param rop the dividend.
- * @param s the bit shift value.
- *
- * @return a reference to \p rop.
- *
- * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
- */
+// In-place right shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
 #else
@@ -7625,13 +7508,7 @@ inline bool dispatch_less_than(T x, const integer<SSize> &a)
 }
 } // namespace detail
 
-/// Equality operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
- */
+// Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -7643,13 +7520,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return detail::dispatch_equality(op1, op2);
 }
 
-/// Inequality operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
- */
+// Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerOpTypes<T, U>
@@ -7661,13 +7532,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return !(op1 == op2);
 }
 
-/// Less-than operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
- */
+// Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerRealOpTypes<T, U>
@@ -7679,13 +7544,7 @@ template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
     return detail::dispatch_less_than(op1, op2);
 }
 
-/// Less-than or equal operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
- */
+// Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerRealOpTypes<T, U>
@@ -7697,13 +7556,7 @@ template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
     return !(op1 > op2);
 }
 
-/// Greater-than operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
- */
+// Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerRealOpTypes<T, U>
@@ -7715,13 +7568,7 @@ template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
     return detail::dispatch_greater_than(op1, op2);
 }
 
-/// Greater-than or equal operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
- */
+// Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerRealOpTypes<T, U>
@@ -7733,17 +7580,7 @@ template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
     return !(op1 < op2);
 }
 
-/// Unary bitwise NOT operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator returns the bitwise NOT (i.e., the one's complement) of ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- * \endrststar
- *
- * @param op the operand.
- *
- * @return the bitwise NOT of ``op``.
- */
+// Unary bitwise NOT.
 template <std::size_t SSize>
 integer<SSize> operator~(const integer<SSize> &op)
 {
@@ -7796,45 +7633,20 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
 }
 } // namespace detail
 
-/// Binary bitwise OR operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator returns the bitwise OR of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * The return type is always an :cpp:class:`~mppp::integer`.
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return the bitwise OR of ``op1`` and ``op2``.
- */
+// Binary bitwise OR operator
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto operator|(const T &op1, const U &op2)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> operator|(const T &op1, const U &op2)
+inline detail::integer_common_t<T, U>
 #endif
+operator|(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_or(op1, op2);
 }
 
-/// In-place bitwise OR operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator will set ``rop`` to the bitwise OR of ``rop`` and ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- * \endrststar
- *
- * @param rop the first operand.
- * @param op the second operand.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
+// In-place bitwise OR operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U>
@@ -7891,45 +7703,20 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
 }
 } // namespace detail
 
-/// Binary bitwise AND operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator returns the bitwise AND of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * The return type is always an :cpp:class:`~mppp::integer`.
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return the bitwise AND of ``op1`` and ``op2``.
- */
+// Binary bitwise AND operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto operator&(const T &op1, const U &op2)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> operator&(const T &op1, const U &op2)
+inline detail::integer_common_t<T, U>
 #endif
+operator&(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_and(op1, op2);
 }
 
-/// In-place bitwise AND operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator will set ``rop`` to the bitwise AND of ``rop`` and ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- * \endrststar
- *
- * @param rop the first operand.
- * @param op the second operand.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
+// In-place bitwise AND operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U>
@@ -7986,45 +7773,20 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
 }
 } // namespace detail
 
-/// Binary bitwise XOR operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator returns the bitwise XOR of ``op1`` and ``op2``. Negative operands
- * are treated as-if they were represented using two's complement.
- *
- * The return type is always an :cpp:class:`~mppp::integer`.
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return the bitwise XOR of ``op1`` and ``op2``.
- */
+// Binary bitwise XOR operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto operator^(const T &op1, const U &op2)
+requires IntegerIntegralOpTypes<T, U> inline auto
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline detail::integer_common_t<T, U> operator^(const T &op1, const U &op2)
+inline detail::integer_common_t<T, U>
 #endif
+operator^(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_xor(op1, op2);
 }
 
-/// In-place bitwise XOR operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This operator will set ``rop`` to the bitwise XOR of ``rop`` and ``op``. Negative operands
- * are treated as-if they were represented using two's complement.
- * \endrststar
- *
- * @param rop the first operand.
- * @param op the second operand.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
+// In-place bitwise XOR operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U>
@@ -8058,6 +7820,7 @@ struct hash<mppp::integer<SSize>> {
         return mppp::hash(n);
     }
 };
+
 } // namespace std
 
 #if defined(_MSC_VER)

@@ -1296,12 +1296,7 @@ Number theoretic functions
 
    :return: :math:`{n \choose k}`.
 
-.. cpp:function:: template <typename T, typename U> auto mppp::binomial(const T &n, const U &k)
-
-   .. note::
-
-      This function participates in overload resolution only if ``T`` and ``U``
-      satisfy the :cpp:concept:`~mppp::IntegerIntegralOpTypes` concept.
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::binomial(const T &n, const U &k)
 
    Generic binomial coefficient.
 
@@ -1382,12 +1377,7 @@ Exponentiation
 
    :return: ``base**exp``.
 
-.. cpp:function:: template <typename T, typename U> auto mppp::pow(const T &base, const U &exp)
-
-   .. note::
-
-      This function participates in overload resolution only if ``T`` and ``U`` satisfy
-      the :cpp:concept:`~mppp::IntegerOpTypes` concept.
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::pow(const T &base, const U &exp)
 
    Generic binary :cpp:class:`~mppp::integer` exponentiation.
 
@@ -1648,15 +1638,10 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :return: :math:`n` and :math:`-n` respectively.
 
-.. cpp:function:: template <typename T, typename U> auto mppp::operator+(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> auto mppp::operator-(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> auto mppp::operator*(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> auto mppp::operator/(const T &x, const U &y)
-
-   .. note::
-
-      These operators participate in overload resolution only if ``T`` and ``U``
-      satisfy the :cpp:concept:`~mppp::IntegerOpTypes` concept.
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::operator/(const T &x, const U &y)
 
    Binary arithmetic operators.
 
@@ -1680,6 +1665,168 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :exception mppp\:\:zero_division_error: if, in a division, *y* is zero and only integral
      types are involved.
+
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> T &mppp::operator+=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> T &mppp::operator-=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> T &mppp::operator*=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> T &mppp::operator/=(T &x, const U &y)
+
+   In-place arithmetic operators.
+
+   These operators will set *x* to, respectively:
+
+   * :math:`x+y`,
+   * :math:`x-y`,
+   * :math:`x \times y`,
+   * :math:`x \operatorname{div} y`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *x*.
+
+   :exception unspecified: any exception thrown by the assignment/conversion operators
+     of :cpp:class:`~mppp::integer`.
+   :exception mppp\:\:zero_division_error: if, in a division, *y* is zero and only integral
+     types are involved.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::operator++(mppp::integer<SSize> &n)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::operator--(mppp::integer<SSize> &n)
+
+   Prefix increment/decrement.
+
+   :param n: the input argument.
+
+   :return: a reference to *n* after the increment/decrement.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::operator++(mppp::integer<SSize> &n, int)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::operator--(mppp::integer<SSize> &n, int)
+
+   Suffix increment/decrement.
+
+   :param n: the input argument.
+
+   :return: a copy of *n* before the increment/decrement.
+
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::operator%(const T &n, const U &d)
+
+   Binary modulo operator.
+
+   The return type is always :cpp:class:`~mppp::integer`.
+
+   :param n: the dividend.
+   :param d: the divisor.
+
+   :return: :math:`n \bmod d`.
+
+   :exception mppp\:\:zero_division_error: if *d* is zero.
+
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> T &mppp::operator%=(T &rop, const U &op)
+
+   In-place modulo operator.
+
+   :param rop: the dividend.
+   :param op: the divisor.
+
+   :return: a reference to *rop*.
+
+   :exception mppp\:\:zero_division_error: if *op* is zero.
+   :exception unspecified: any exception thrown by the conversion operator of :cpp:class:`~mppp::integer`.
+
+.. cpp:function:: template <mppp::CppIntegralInteroperable T, std::size_t SSize> mppp::integer<SSize> mppp::operator<<(const mppp::integer<SSize> &n, T s)
+.. cpp:function:: template <mppp::CppIntegralInteroperable T, std::size_t SSize> mppp::integer<SSize> mppp::operator>>(const mppp::integer<SSize> &n, T s)
+
+   Binary left/right shift operators.
+
+   :param n: the multiplicand/dividend.
+   :param s: the bit shift value.
+
+   :return: :math:`n \times 2^s` and :math:`\frac{n}{2^s}` respectively.
+
+   :exception std\:\:overflow_error: if *s* is negative or larger than an implementation-defined value.
+
+.. cpp:function:: template <mppp::CppIntegralInteroperable T, std::size_t SSize> mppp::integer<SSize> &mppp::operator<<=(mppp::integer<SSize> &rop, T s)
+.. cpp:function:: template <mppp::CppIntegralInteroperable T, std::size_t SSize> mppp::integer<SSize> &mppp::operator>>=(mppp::integer<SSize> &rop, T s)
+
+   In-place left/right shift operators.
+
+   :param rop: the multiplicand/dividend.
+   :param s: the bit shift value.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:overflow_error: if *s* is negative or larger than an implementation-defined value.
+
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator==(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator!=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator<(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator<=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator>(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator>=(const T &op1, const U &op2)
+
+   Binary comparison operators.
+
+   :param op1: first argument.
+   :param op2: second argument.
+
+   :return: the result of the comparison.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::operator~(const mppp::integer<SSize> &op)
+
+   Unary bitwise NOT.
+
+   This operator returns the bitwise NOT (i.e., the one's complement) of *op*. Negative operands
+   are treated as-if they were represented using two's complement.
+
+   :param op: the operand.
+
+   :return: the bitwise NOT of *op*.
+
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::operator|(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::operator&(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::operator^(const T &op1, const U &op2)
+
+   Binary bitwise operators.
+
+   These operators will return, respectively:
+
+   * the bitwise OR,
+   * the bitwise AND,
+   * the bitwise XOR,
+
+   of *op1* and *op2*.
+
+   Negative operands are treated as-if they were represented using two's complement.
+
+   The return type is always :cpp:class:`~mppp::integer`.
+
+   :param op1: the first operand.
+   :param op2: the second operand.
+
+   :return: the result of the bitwise operation.
+
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> T &mppp::operator|=(T &rop, const U &op)
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> T &mppp::operator&=(T &rop, const U &op)
+.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> T &mppp::operator^=(T &rop, const U &op)
+
+   In-place bitwise operators.
+
+   These operators will set *rop* to, respectively:
+
+   * the bitwise OR,
+   * the bitwise AND,
+   * the bitwise XOR,
+
+   of *rop* and *op*.
+
+   Negative operands are treated as-if they were represented using two's complement.
+
+   :param rop: the first operand.
+   :param op: the second operand.
+
+   :return: a reference to *rop*.
+
+   :exception unspecified: any exception thrown by the conversion operator of :cpp:class:`~mppp::integer`.
 
 .. _integer_std_specialisations:
 
