@@ -7,7 +7,7 @@ Changelog
 New
 ~~~
 
-- mp++ now builds using the Intel compiler
+- mp++ now works with the Intel compiler
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__,
   tested with ``icpc (ICC) 19.1.0.166``).
 - The interoperability of :cpp:class:`~mppp::real128` with
