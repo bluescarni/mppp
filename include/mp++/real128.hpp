@@ -1808,7 +1808,7 @@ constexpr real128 real128_inf()
     // a 'not a constant expression' error message.
     return real128{std::numeric_limits<double>::infinity()};
 #else
-    // This builtin is constexpr only in GCC 7 and later.
+    // This builtin is constexpr only on GCC 7 and later.
     // https://gcc.gnu.org/onlinedocs/gcc/x86-Built-in-Functions.html
     // Note that this and the nan builtins are arch-specific, but it seems they
     // might be available everywhere __float128 is available.
@@ -1824,7 +1824,7 @@ constexpr real128 real128_nan()
     // but Clang does not.
     return real128{std::numeric_limits<double>::quiet_NaN()};
 #else
-    // This builtin is constexpr only in GCC 7 and later.
+    // This builtin is constexpr only on GCC 7 and later.
     return real128{__builtin_nanq("")};
 #endif
 }

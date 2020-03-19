@@ -21,8 +21,8 @@ The real128 class
 
    This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
    (which features up to 36 decimal digits of precision).
-   The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available in GCC
-   and recent Clang versions on most modern platforms, on top of which it provides the following additions:
+   The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available on GCC,
+   Clang and the Intel compiler on most modern platforms, on top of which it provides the following additions:
 
    * interoperability with other mp++ classes,
    * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
@@ -455,7 +455,8 @@ Types
 
 .. cpp:type:: __float128
 
-   A quadruple-precision floating-point type available in recent versions of the GCC and Clang compilers.
+   A quadruple-precision floating-point type available on GCC, Clang and
+   the Intel compiler.
    This is the type wrapped by the :cpp:class:`~mppp::real128` class.
 
    .. seealso::
@@ -472,8 +473,8 @@ Concepts
 
    * ``T`` is :cpp:class:`~mppp::integer`, or
    * ``T`` is :cpp:class:`~mppp::rational`, or
-   * on GCC and Clang>=7, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable` or it
-     is ``long double``, or
+   * on GCC, the Intel compiler and Clang>=7, ``T`` satisfies
+     :cpp:concept:`mppp::CppInteroperable` or it is ``long double``, or
    * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable`, except if
      ``T`` is ``long double``.
 
