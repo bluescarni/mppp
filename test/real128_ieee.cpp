@@ -46,7 +46,7 @@ TEST_CASE("real128 get_ieee()")
     REQUIRE(!lo);
     std::tie(sign, exp, hi, lo) = real128_nan().get_ieee();
     REQUIRE(exp == 32767ul);
-    REQUIRE((!hi || !lo));
+    REQUIRE((hi || lo));
     std::tie(sign, exp, hi, lo) = real128_inf().get_ieee();
     REQUIRE(!sign);
     REQUIRE(exp == 32767ul);
