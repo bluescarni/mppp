@@ -1553,16 +1553,82 @@ Serialisation
 
 .. versionadded:: 0.7
 
-.. doxygengroup:: integer_s11n
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> std::size_t mppp::binary_size(const mppp::integer<SSize> &n)
+
+   Binary size.
+
+   This function is the free function equivalent of the
+   :cpp:func:`mppp::integer::binary_size()` member function.
+
+   :param n: the input argument.
+
+   :return: the output of :cpp:func:`mppp::integer::binary_size()` called on *n*.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::integer::binary_size()`.
+
+.. cpp:function:: template <std::size_t SSize, mppp::IntegerBinarySaveDest<SSize> T> std::size_t mppp::binary_save(const mppp::integer<SSize> &n, T &&dest)
+
+   Serialisation.
+
+   This function is the free function equivalent of the
+   :cpp:func:`mppp::integer::binary_save()` overloads.
+
+   :param n: the input argument.
+   :param dest: the object into which *n* will be serialised.
+
+   :return: the output of the invoked :cpp:func:`mppp::integer::binary_save()`
+     overload called on *n* with *dest* as argument.
+
+   :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::integer::binary_save()` overload.
+
+.. cpp:function:: template <std::size_t SSize, mppp::IntegerBinaryLoadSrc<SSize> T> std::size_t mppp::binary_load(mppp::integer<SSize> &n, T &&src)
+
+   Deserialisation.
+
+   This function is the free function equivalent of the
+   :cpp:func:`mppp::integer::binary_load()` overloads.
+
+   :param n: the output argument.
+   :param src: the object containing the serialised :cpp:class:`~mppp::integer`
+     that will be loaded into *n*.
+
+   :return: the output of the invoked :cpp:func:`mppp::integer::binary_load()`
+     overload called on *n* with *src* as argument.
+
+   :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::integer::binary_load()` overload.
 
 .. _integer_other:
 
 Other
 ~~~~~
 
-.. doxygengroup:: integer_other
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> std::size_t mppp::hash(const mppp::integer<SSize> &n)
+
+   Hash value.
+
+   This function will return a hash value for *n*. The hash value depends only on the value of *n*
+   (and *not* on its storage type).
+
+   A :ref:`specialisation <integer_std_specialisations>` of the standard ``std::hash`` functor is also provided, so that
+   it is possible to use :cpp:class:`~mppp::integer` in standard unordered associative containers out of the box.
+
+   :param n: the input value.
+
+   :return: a hash value for *n*.
+
+.. cpp:function:: void mppp::free_integer_caches()
+
+   Free the :cpp:class:`~mppp::integer` caches.
+
+   On some platforms, :cpp:class:`~mppp::integer` manages thread-local caches
+   to speed-up the allocation/deallocation of small objects. These caches are automatically
+   freed on program shutdown or when a thread exits. In certain situations, however,
+   it may be desirable to manually free the memory in use by the caches before
+   the program's end or a thread's exit. This function does exactly that.
+
+   On platforms where thread local storage is not supported, this funcion will be a no-op.
+
+   It is safe to call this function concurrently from different threads.
 
 .. _integer_operators:
 
@@ -1573,8 +1639,47 @@ Overloaded operators are provided for convenience.
 Their interface is generic, and their implementation
 is typically built on top of basic :ref:`functions <integer_functions>`.
 
-.. doxygengroup:: integer_operators
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::operator+(const mppp::integer<SSize> &n)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::operator-(const mppp::integer<SSize> &n)
+
+   Identity and negation operators.
+
+   :param n: the input argument.
+
+   :return: :math:`n` and :math:`-n` respectively.
+
+.. cpp:function:: template <typename T, typename U> auto mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> auto mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> auto mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> auto mppp::operator/(const T &x, const U &y)
+
+   .. note::
+
+      These operators participate in overload resolution only if ``T`` and ``U``
+      satisfy the :cpp:concept:`~mppp::IntegerOpTypes` concept.
+
+   Binary arithmetic operators.
+
+   These operators will return, respectively:
+
+   * :math:`x+y`,
+   * :math:`x-y`,
+   * :math:`x \times y`,
+   * :math:`x \operatorname{div} y`.
+
+   The return type is determined as follows:
+
+   * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex value, then the
+     type of the result is floating-point or complex; otherwise,
+   * the type of the result is :cpp:class:`~mppp::integer`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the result of the arithmetic operation.
+
+   :exception mppp\:\:zero_division_error: if, in a division, *y* is zero and only integral
+     types are involved.
 
 .. _integer_std_specialisations:
 

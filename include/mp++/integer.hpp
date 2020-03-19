@@ -6604,23 +6604,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
     return detail::integer_stream_operator_impl(os, n.get_mpz_view(), n.sgn());
 }
 
-/** @defgroup integer_s11n integer_s11n
- *  @{
- */
-
-/// Binary size of an \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This function is the free function equivalent of the
- * :cpp:func:`mppp::integer::binary_size()` member function.
- * \endrststar
- *
- * @param n the target \link mppp::integer integer\endlink.
- *
- * @return the output of mppp::integer::binary_size() called on ``n``.
- *
- * @throws unspecified any exception thrown by mppp::integer::binary_size().
- */
+// Binary size.
 template <std::size_t SSize>
 inline std::size_t binary_size(const integer<SSize> &n)
 {
@@ -6664,22 +6648,7 @@ using integer_binary_load_enabler = detail::enable_if_t<detail::has_integer_bina
 
 #endif
 
-/// Save an \link mppp::integer integer\endlink in binary format.
-/**
- * \rststar
- * This function is the free function equivalent of all the
- * :cpp:func:`mppp::integer::binary_save()` overloads.
- * \endrststar
- *
- * @param n the target \link mppp::integer integer\endlink.
- * @param dest the object into which the binary representation of ``n`` will
- * be written.
- *
- * @return the output of the invoked mppp::integer::binary_save() overload called on ``n``
- * with ``dest`` as argument.
- *
- * @throws unspecified any exception thrown by the invoked mppp::integer::binary_save() overload.
- */
+// Save in binary format.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, IntegerBinarySaveDest<SSize> T>
 #else
@@ -6690,22 +6659,7 @@ inline std::size_t binary_save(const integer<SSize> &n, T &&dest)
     return n.binary_save(std::forward<T>(dest));
 }
 
-/// Load an \link mppp::integer integer\endlink in binary format.
-/**
- * \rststar
- * This function is the free function equivalent of all the
- * :cpp:func:`mppp::integer::binary_load()` overloads.
- * \endrststar
- *
- * @param n the target \link mppp::integer integer\endlink.
- * @param src the object containing the \link mppp::integer integer\endlink binary
- * representation that will be loaded into ``n``.
- *
- * @return the output of the invoked mppp::integer::binary_load() overload called on ``n``
- * with ``src`` as argument.
- *
- * @throws unspecified any exception thrown by the invoked mppp::integer::binary_load() overload.
- */
+// Load in binary format.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, IntegerBinaryLoadSrc<SSize> T>
 #else
@@ -6716,26 +6670,7 @@ inline std::size_t binary_load(integer<SSize> &n, T &&src)
     return n.binary_load(std::forward<T>(src));
 }
 
-/** @} */
-
-/** @defgroup integer_other integer_other
- *  @{
- */
-
-/// Hash value.
-/**
- * \rststar
- * This function will return a hash value for ``n``. The hash value depends only on the value of ``n``
- * (and *not* on its storage type).
- *
- * A :ref:`specialisation <integer_std_specialisations>` of the standard ``std::hash`` functor is also provided, so that
- * it is possible to use :cpp:class:`~mppp::integer` in standard unordered associative containers out of the box.
- * \endrststar
- *
- * @param n the integer whose hash value will be computed.
- *
- * @return a hash value for \p n.
- */
+// Hash value.
 template <std::size_t SSize>
 inline std::size_t hash(const integer<SSize> &n)
 {
@@ -6755,27 +6690,8 @@ inline std::size_t hash(const integer<SSize> &n)
     return retval;
 }
 
-/// Free the \link mppp::integer integer\endlink caches.
-/**
- * \rststar
- * On some platforms, :cpp:class:`~mppp::integer` manages thread-local caches
- * to speed-up the allocation/deallocation of small objects. These caches are automatically
- * freed on program shutdown or when a thread exits. In certain situations, however,
- * it may be desirable to manually free the memory in use by the caches before
- * the program's end or a thread's exit. This function does exactly that.
- *
- * On platforms where thread local storage is not supported, this funcion will be a no-op.
- *
- * It is safe to call this function concurrently from different threads.
- * \endrststar
- */
+// Free the caches.
 MPPP_DLL_PUBLIC void free_integer_caches();
-
-/** @} */
-
-/** @defgroup integer_operators integer_operators
- *  @{
- */
 
 namespace detail
 {
@@ -6861,12 +6777,7 @@ inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 
 } // namespace detail
 
-/// Identity operator.
-/**
- * @param n the integer that will be copied.
- *
- * @return a copy of \p n.
- */
+// Identity operator.
 template <std::size_t SSize>
 inline integer<SSize> operator+(const integer<SSize> &n)
 {
@@ -6877,22 +6788,7 @@ inline integer<SSize> operator+(const integer<SSize> &n)
     return n;
 }
 
-/// Binary addition operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
- * \endrststar
- *
- * @param op1 the first summand.
- * @param op2 the second summand.
- *
- * @return <tt>op1 + op2</tt>.
- */
+// Binary addition.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires IntegerOpTypes<T, U> inline auto
@@ -7042,12 +6938,7 @@ inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
 
 } // namespace detail
 
-/// Negated copy.
-/**
- * @param n the integer that will be negated.
- *
- * @return a negated copy of \p n.
- */
+// Negated copy.
 template <std::size_t SSize>
 integer<SSize> operator-(const integer<SSize> &n)
 {
@@ -7056,22 +6947,7 @@ integer<SSize> operator-(const integer<SSize> &n)
     return retval;
 }
 
-/// Binary subtraction operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return <tt>op1 - op2</tt>.
- */
+// Binary subtraction.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires IntegerOpTypes<T, U> inline auto
@@ -7208,22 +7084,7 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 
 } // namespace detail
 
-/// Binary multiplication operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
- * \endrststar
- *
- * @param op1 the first factor.
- * @param op2 the second factor.
- *
- * @return <tt>op1 * op2</tt>.
- */
+// Binary multiplication.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires IntegerOpTypes<T, U> inline auto
@@ -7373,24 +7234,7 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 }
 } // namespace detail
 
-/// Binary division operator for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
- * \endrststar
- *
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return <tt>n / d</tt>.
- *
- * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
- */
+// Binary division.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires IntegerOpTypes<T, U> inline auto
@@ -8192,8 +8036,6 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
     detail::dispatch_in_place_xor(rop, op);
     return rop;
 }
-
-/** @} */
 
 } // namespace mppp
 
