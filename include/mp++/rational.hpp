@@ -126,98 +126,10 @@ struct is_same_ssize_rational<rational<SSize>, rational<SSize>> : std::true_type
 // (due to the use of const_cast() within the mpz view machinery).
 template <std::size_t SSize>
 mpq_struct_t get_mpq_view(const rational<SSize> &);
+
 } // namespace detail
 
-/// Multiprecision rational class.
-/**
- * \rststar
- * This class represents arbitrary-precision rationals. Internally, the class stores a pair of
- * :cpp:class:`integers <mppp::integer>` with static size ``SSize`` as the numerator and denominator.
- * Rational numbers are represented in the usual canonical form:
- *
- * * numerator and denominator are coprime,
- * * the denominator is always strictly positive.
- *
- * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
- * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list)
- * and with :cpp:class:`integers <mppp::integer>` with static size ``SSize``,
- * and it provides overloaded :ref:`operators <rational_operators>`. Differently from the builtin types,
- * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
- * from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
- *
- * .. code-block:: c++
- *
- *    rational<1> q = 5;
- *    int m = q;
- *
- * will not work, and direct initialization should be used instead:
- *
- * .. code-block:: c++
- *
- *    rational<1> q{5};
- *    int m{q};
- *
- * Most of the functionality is exposed via plain :ref:`functions <rational_functions>`, with the
- * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpq_``
- * prefix. For instance, the GMP call
- *
- * .. code-block:: c++
- *
- *    mpq_add(rop,a,b);
- *
- * that writes the result of ``a + b`` into ``rop`` becomes simply
- *
- * .. code-block:: c++
- *
- *    add(rop,a,b);
- *
- * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
- * are allowed, unless noted otherwise. In a similar way to the :cpp:class:`~mppp::integer` class, various convenience
- * overloads are provided for the same functionality. For instance, here are three possible ways of computing the
- * absolute value:
- *
- * .. code-block:: c++
- *
- *    rational<1> q1, q2, q{-5};
- *    abs(q1,q);   // Binary abs(): computes and stores the absolute value
- *                 // of q into q1.
- *    q2 = abs(q); // Unary abs(): returns the absolute value of q, which is
- *                 // then assigned to q2.
- *    q.abs();     // Member function abs(): replaces the value of q with its
- *                 // absolute value.
- *
- * Various :ref:`overloaded operators <rational_operators>` are provided.
- * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
- * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
- * is a C++ integral or an :cpp:class:`~mppp::integer`, the result will be of type :cpp:class:`~mppp::rational`, if the
- * other argument is a C++ floating-point the result will be of the same floating-point type. For example:
- *
- * .. code-block:: c++
- *
- *    rational<1> q1{1}, q2{2};
- *    integer<1> n{2};
- *    auto res1 = q1 + q2; // res1 is a rational
- *    auto res2 = q1 * 2; // res2 is a rational
- *    auto res3 = q1 * n; // res3 is a rational
- *    auto res4 = 2 - q2; // res4 is a rational
- *    auto res5 = q1 / 2.f; // res5 is a float
- *    auto res6 = 12. / q1; // res6 is a double
- *
- * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
- * before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
- * promoted to :cpp:class:`~mppp::rational` if no floating-point types are involved, otherwise they are promoted to the
- * type of the floating-point argument).
- *
- * The :cpp:class:`~mppp::rational` class allows to access and manipulate directly the numerator and denominator
- * via the :cpp:func:`~mppp::rational::get_num()`, :cpp:func:`~mppp::rational::get_den()`,
- * :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` member functions, so that it is
- * possible to use :cpp:class:`~mppp::integer` functions directly on numerator and denominator. The mutable getters'
- * names :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` are prefixed with an
- * underscore ``_`` to highlight their potentially dangerous nature: it is the user's responsibility to ensure that the
- * canonical form of the rational is preserved after altering the numerator and/or the denominator via the mutable
- * getters.
- * \endrststar
- */
+// Multiprecision rational class.
 // NOTEs:
 // - not clear if the NewRop flag helps at all. Needs to be benchmarked. If it does, its usage could
 //   be expanded in mul/div.
@@ -230,33 +142,19 @@ template <std::size_t SSize>
 class rational
 {
 public:
-    /// Underlying integral type.
-    /**
-     * \rststar
-     * This is the :cpp:class:`~mppp::integer` type used for the representation of numerator and
-     * denominator.
-     * \endrststar
-     */
+    // Underlying integral type.
 #if defined(MPPP_DOXYGEN_INVOKED)
     typedef integer<SSize> int_t;
 #else
     using int_t = integer<SSize>;
 #endif
-    /// Alias for the template parameter \p SSize.
+    // Alias for the template parameter SSize.
     static constexpr std::size_t ssize = SSize;
-    /// Default constructor.
-    /**
-     * The default constructor will initialize ``this`` to 0 (represented as 0/1).
-     */
+    // Default constructor.
     rational() : m_den(1u) {}
-    /// Defaulted copy constructor.
+    // Defaulted copy constructor.
     rational(const rational &) = default;
-    /// Move constructor.
-    /**
-     * The move constructor will leave \p other in an unspecified but valid state.
-     *
-     * @param other the construction argument.
-     */
+    // Move constructor.
     rational(rational &&other) noexcept : m_num(std::move(other.m_num)), m_den(std::move(other.m_den))
     {
         // NOTE: the aim of this is to have other in a valid state. One reason is that,
@@ -333,20 +231,7 @@ private:
     }
 
 public:
-    /// Generic constructor.
-    /**
-     * \rststar
-     * This constructor will initialize a rational with the value ``x``. The construction will fail if either:
-     * * ``x`` is a non-finite floating-point value, or,
-     * * ``x`` is a complex value whose imaginary part is not zero
-     *   or whose real part is not finite.
-     * \endrststar
-     *
-     * @param x the value that will be used to initialize \p this.
-     *
-     * @throws std::domain_error if \p x is a non-finite floating-point value, or
-     * a complex value with non-zero imaginary part or non-finite real part.
-     */
+    // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalCvrInteroperable<SSize> T>
 #else
@@ -355,29 +240,7 @@ public:
     explicit rational(T &&x) : rational(ptag{}, std::forward<T>(x))
     {
     }
-    /// Constructor from numerator and denominator.
-    /**
-     * \rststar
-     * This constructor is enabled only if both ``T`` and ``U`` satisfy the
-     * :cpp:concept:`~mppp::RationalCvrIntegralInteroperable` concept. The input value ``n`` will be used to initialise
-     * the numerator, while ``d`` will be used to initialise the denominator. If ``make_canonical`` is ``true`` (the
-     * default), then :cpp:func:`~mppp::rational::canonicalise()` will be called after the construction of numerator and
-     * denominator.
-     *
-     * .. warning::
-     *
-     *    If this constructor is called with ``make_canonical`` set to ``false``, it will be the user's responsibility
-     *    to ensure that ``this`` is canonicalised before using it with other mp++ functions. Failure to do
-     *    so will result in undefined behaviour.
-     * \endrststar
-     *
-     * @param n the numerator.
-     * @param d the denominator.
-     * @param make_canonical if \p true, the rational will be canonicalised after the construction
-     * of numerator and denominator.
-     *
-     * @throws zero_division_error if the denominator is zero.
-     */
+    // Constructor from numerator and denominator.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalCvrIntegralInteroperable<SSize> T, RationalCvrIntegralInteroperable<SSize> U>
 #else
@@ -428,23 +291,7 @@ private:
 #endif
 
 public:
-    /// Constructor from string.
-    /**
-     * \rststar
-     * This constructor will initialize ``this`` from the :cpp:concept:`~mppp::StringType` ``s``, which must represent
-     * a rational value in base ``base``. The expected format is either a numerator-denominator pair separated
-     * by the division operator ``/``, or just a numerator (in which case the denominator will be set to one).
-     * The format for numerator and denominator is described in the documentation of the constructor from string
-     * of :cpp:class:`~mppp::integer`.
-     * \endrststar
-     *
-     * @param s the input string.
-     * @param base the base used in the string representation.
-     *
-     * @throws zero_division_error if the denominator is zero.
-     * @throws unspecified any exception thrown by the string constructor of mppp::integer, or by
-     * memory errors in standard containers.
-     */
+    // Constructor from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -453,21 +300,7 @@ public:
     explicit rational(const T &s, int base = 10) : rational(ptag{}, s, base)
     {
     }
-    /// Constructor from range of characters.
-    /**
-     * This constructor will initialise \p this from the content of the input half-open range,
-     * which is interpreted as the string representation of a rational in base \p base.
-     *
-     * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from string.
-     *
-     * @param begin the begin of the input range.
-     * @param end the end of the input range.
-     * @param base the base used in the string representation.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, or by
-     * memory errors in standard containers.
-     */
+    // Constructor from range of characters.
     explicit rational(const char *begin, const char *end, int base = 10) : m_den(1u)
     {
         // Copy the range into a local buffer.
@@ -476,80 +309,19 @@ public:
         buffer.emplace_back('\0');
         dispatch_c_string_ctor(buffer.data(), base);
     }
-    /// Constructor from \p mpz_t.
-    /**
-     * This constructor will initialise the numerator of \p this with the input GMP integer \p n,
-     * and the denominator to 1.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     */
+    // Constructor from mpz_t.
     explicit rational(const ::mpz_t n) : m_num(n), m_den(1u) {}
-    /// Copy constructor from \p mpq_t.
-    /**
-     * This constructor will initialise the numerator and denominator of \p this with those of the GMP rational \p q.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``q`` results in undefined behaviour.
-     *
-     *    This constructor will **not**
-     *    canonicalise ``this``: numerator and denominator are constructed as-is from ``q``.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     */
+    // Constructor from mpq_t.
     explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q)) {}
 #if !defined(_MSC_VER)
-    /// Move constructor from \p mpq_t.
-    /**
-     * This constructor will move the numerator and denominator of the GMP rational \p q into \p this.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``q`` results in undefined behaviour.
-     *
-     *    This constructor will **not**
-     *    canonicalise ``this``: numerator and denominator are constructed as-is from ``q``.
-     *
-     *    The user must ensure that, after construction, ``mpq_clear()`` is never
-     *    called on ``q``: the resources previously owned by ``q`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     *
-     * .. note::
-     *
-     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     */
+    // Move constructor from \p mpq_t.
     explicit rational(::mpq_t &&q) : m_num(::mpz_t{*mpq_numref(q)}), m_den(::mpz_t{*mpq_denref(q)}) {}
 #endif
-    /// Defaulted copy-assignment operator.
-    /**
-     * @return a reference to ``this``.
-     */
+    // Copy-assignment operator.
     // NOTE: as long as copy assignment of integer cannot
     // throw, the default is good.
     rational &operator=(const rational &) = default;
-    /// Defaulted move assignment operator.
-    /**
-     * After the assignment, \p other is left in an unspecified but valid state.
-     *
-     * @param other the assignment argument.
-     *
-     * @return a reference to ``this``.
-     */
+    // Move assignment operator.
     rational &operator=(rational &&other) noexcept
     {
         // NOTE: see the rationale in the move ctor about why we don't want
@@ -581,18 +353,7 @@ private:
     }
 
 public:
-    /// Generic assignment operator.
-    /**
-     * \rststar
-     * This operator will assign ``x`` to ``this``.
-     * \endrststar
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to ``this``.
-     *
-     * @throws unspecified any exception thrown by the generic constructor.
-     */
+    // Generic assignment operator.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalCvrInteroperable<SSize> T>
 #else
@@ -604,24 +365,7 @@ public:
                             std::integral_constant<bool, is_rational_cvr_integral_interoperable<T, SSize>::value>{});
         return *this;
     }
-    /// Assignment from string.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = rational{s};
-     *
-     * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
-     * \endrststar
-     *
-     * @param s the string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string.
-     */
+    // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -631,54 +375,14 @@ public:
     {
         return *this = rational{s};
     }
-    /// Assignment from \p mpz_t.
-    /**
-     * \rststar
-     * This assignment operator will copy into the numerator of ``this`` the value of the GMP integer ``n``,
-     * and it will set the denominator to 1 via :cpp:func:`mppp::integer::set_one()`.
-     *
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     *
-     *    No aliasing is allowed:
-     *    the data in ``n`` must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of
-     *    the numerator of ``this`` then it might point to internal data of ``this``, and the behaviour of this operator
-     *    will thus be undefined).
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     *
-     * @return a reference to \p this.
-     */
+    // Assignment from mpz_t.
     rational &operator=(const ::mpz_t n)
     {
         m_num = n;
         m_den.set_one();
         return *this;
     }
-    /// Copy assignment from \p mpq_t.
-    /**
-     * This assignment operator will copy into \p this the value of the GMP rational \p q.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``q`` results in undefined behaviour.
-     *
-     *    This operator will **not** canonicalise
-     *    the assigned value: numerator and denominator are assigned as-is from ``q``.
-     *
-     *    No aliasing is allowed:
-     *    the data in ``q`` must be completely distinct from the data in ``this``.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     *
-     * @return a reference to \p this.
-     */
+    // Assignment from mpq_t.
     rational &operator=(const ::mpq_t q)
     {
         m_num = mpq_numref(q);
@@ -686,35 +390,7 @@ public:
         return *this;
     }
 #if !defined(_MSC_VER)
-    /// Move assignment from \p mpq_t.
-    /**
-     * This assignment operator will move the GMP rational \p q into \p this.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``q`` results in undefined behaviour.
-     *
-     *    This operator will **not** canonicalise
-     *    the assigned value: numerator and denominator are assigned as-is from ``q``.
-     *
-     *    No aliasing is allowed:
-     *    the data in ``q`` must be completely distinct from the data in ``this``.
-     *
-     *    The user must ensure that, after the assignment, ``mpq_clear()`` is never
-     *    called on ``q``: the resources previously owned by ``q`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     *
-     * .. note::
-     *
-     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     *
-     * @return a reference to \p this.
-     */
+    // Move assignment from mpq_t.
     rational &operator=(::mpq_t &&q)
     {
         m_num = ::mpz_t{*mpq_numref(q)};
