@@ -314,6 +314,131 @@ The rational class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: std::string to_string(int base = 10) const
+
+      Convert to string.
+
+      This operator will return a string representation of ``this`` in base *base*.
+      The string format consists of the numerator, followed by the division operator ``/`` and the
+      denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be
+      represented in the returned string.
+
+      :param base: the desired base for the string representation.
+
+      :return: a string representation for ``this``.
+
+      :exception unspecified: any exception thrown by :cpp:func:`mppp::integer::to_string()`.
+
+   .. cpp:function:: template <RationalInteroperable<SSize> T> explicit operator T() const
+
+      Generic conversion operator.
+
+      This operator will convert ``this`` to ``T``.
+      Conversion to ``bool`` yields ``false`` if ``this`` is zero,
+      ``true`` otherwise. Conversion to other integral types and to :cpp:type:`~mppp::rational::int_t`
+      yields the result of the truncated division of the numerator by the denominator, if representable by the target
+      type. Conversion to floating-point and complex types might yield inexact values and infinities.
+
+      :return: ``this`` converted to the target type.
+
+      :exception std\:\:overflow_error: if the target type is an integral type and the
+        value of ``this`` overflows its range.
+
+   .. cpp:function:: template <RationalInteroperable<SSize> T> bool get(T &rop) const
+
+      Generic conversion member function.
+
+      This member function, similarly to the conversion operator, will convert ``this`` to
+      ``T``, storing the result of the conversion into *rop*. Differently
+      from the conversion operator, this member function does not raise any exception: if the conversion is successful,
+      the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
+      fails, *rop* will not be altered.
+
+      :param rop: the variable which will store the result of the conversion.
+
+      :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if *rop* is
+         a C++ integral which cannot represent the truncated value of ``this``.
+
+   .. cpp:function:: const int_t &get_num() const
+   .. cpp:function:: const int_t &get_den() const
+   .. cpp:function:: int_t &_get_num()
+   .. cpp:function:: int_t &_get_den()
+
+      Getters for numerator and denominator.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that, after changing the numerator
+         or denominator via one of the mutable getters, the rational is kept in canonical form.
+
+      :return: a (const) reference to the numerator or denominator.
+
+   .. cpp:function:: rational &canonicalise()
+
+      Canonicalise.
+
+      This member function will put ``this`` in canonical form. In particular, this member function
+      will make sure that:
+
+      * the numerator and denominator are coprime (dividing them by their GCD,
+        if necessary),
+      * the denominator is strictly positive.
+
+      In general, it is not necessary to call explicitly this member function, as the public
+      API of :cpp:class:`~mppp::rational` ensures that rationals are kept in canonical
+      form. Calling this member function, however, might be necessary if the numerator and/or denominator
+      are modified manually, or when constructing/assigning from non-canonical :cpp:type:`mpq_t`
+      values.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: bool is_canonical() const
+
+      Check canonical form.
+
+      :return: ``true`` if ``this`` is the canonical form for rational numbers, ``false`` otherwise.
+
+   .. cpp:function:: int sgn() const
+
+      Sign function.
+
+      :return: 0 if ``this`` is zero, 1 if ``this`` is positive, -1 if ``this`` is negation.
+
+   .. cpp:function:: rational &neg()
+
+      Negate in-place.
+
+      This function will set ``this`` to its negative.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: rational &abs()
+
+      In-place absolute value.
+
+      This function will set ``this`` to its absolute value.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: rational &inv()
+
+      Invert in-place.
+
+      This function will set ``this`` to its inverse.
+
+      :return: a reference to ``this``.
+
+      :exception zero_division_error: if ``this`` is zero.
+
+   .. cpp:function:: bool is_zero() const
+   .. cpp:function:: bool is_one() const
+   .. cpp:function:: bool is_negative_one() const
+
+      Test for special values.
+
+      :return: ``true`` if ``this`` is, respectively, :math:`0`, :math:`1` or :math:`-1`,
+        ``false`` otherwise.
+
 Types
 -----
 

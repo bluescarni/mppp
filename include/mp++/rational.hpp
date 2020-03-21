@@ -398,21 +398,7 @@ public:
         return *this;
     }
 #endif
-    /// Convert to string.
-    /**
-     * \rststar
-     * This operator will return a string representation of ``this`` in base ``base``.
-     * The string format consists of the numerator, followed by the division operator ``/`` and the
-     * denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be
-     * represented in the returned string.
-     * \endrststar
-     *
-     * @param base the desired base for the string representation.
-     *
-     * @return a string representation for ``this``.
-     *
-     * @throws unspecified any exception thrown by mppp::integer::to_string().
-     */
+    // Convert to string.
     std::string to_string(int base = 10) const
     {
         if (m_den.is_one()) {
@@ -470,22 +456,7 @@ private:
     }
 
 public:
-    /// Generic conversion operator.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::RationalInteroperable` type.
-     * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
-     * ``true`` otherwise. Conversion to other integral types and to :cpp:type:`~mppp::rational::int_t`
-     * yields the result of the truncated division of the numerator by the denominator, if representable by the target
-     * :cpp:concept:`~mppp::RationalInteroperable` type. Conversion to floating-point and complex types
-     * might yield inexact values and infinities.
-     * \endrststar
-     *
-     * @return \p this converted to the target type.
-     *
-     * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be
-     * represented by it.
-     */
+    // Generic conversion operator.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalInteroperable<SSize> T>
 #else
@@ -520,21 +491,7 @@ private:
     }
 
 public:
-    /// Generic conversion member function.
-    /**
-     * \rststar
-     * This member function, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into ``rop``. Differently
-     * from the conversion operator, this member function does not raise any exception: if the conversion is successful,
-     * the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
-     * fails, ``rop`` will not be altered.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
-     * a C++ integral which cannot represent the truncated value of ``this``.
-     */
+    // Generic conversion member function.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalInteroperable<SSize> T>
 #else
@@ -544,76 +501,27 @@ public:
     {
         return dispatch_get(rop);
     }
-    /// Const numerator getter.
-    /**
-     * @return a const reference to the numerator.
-     */
+    // Const numerator getter.
     const int_t &get_num() const
     {
         return m_num;
     }
-    /// Const denominator getter.
-    /**
-     * @return a const reference to the denominator.
-     */
+    // Const denominator getter.
     const int_t &get_den() const
     {
         return m_den;
     }
-    /// Mutable numerator getter.
-    /**
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that, after changing the numerator
-     *    via this getter, the rational is kept in canonical form.
-     * \endrststar
-     *
-     * @return a mutable reference to the numerator.
-     */
+    // Mutable numerator getter.
     int_t &_get_num()
     {
         return m_num;
     }
-    /// Mutable denominator getter.
-    /**
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that, after changing the denominator
-     *    via this getter, the rational is kept in canonical form.
-     * \endrststar
-     *
-     * @return a mutable reference to the denominator.
-     */
+    // Mutable denominator getter.
     int_t &_get_den()
     {
         return m_den;
     }
-    /// Canonicalise.
-    /**
-     * \rststar
-     * This member function will put ``this`` in canonical form. In particular, this member function
-     * will make sure that:
-     *
-     * * the numerator and denominator are coprime (dividing them by their GCD,
-     *   if necessary),
-     * * the denominator is strictly positive.
-     *
-     * In general, it is not necessary to call explicitly this member function, as the public
-     * API of :cpp:class:`~mppp::rational` ensures that rationals are kept in canonical
-     * form. Calling this member function, however, might be necessary if the numerator and/or denominator
-     * are modified manually, or when constructing/assigning from non-canonical ``mpq_t``
-     * values.
-     *
-     * .. warning::
-     *
-     *    Calling this member function with on a rational with null denominator will
-     *    result in undefined behaviour.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+    // Canonicalise.
     rational &canonicalise()
     {
         if (m_num.is_zero()) {
@@ -639,10 +547,7 @@ public:
         // NOTE: consider attempting demoting num/den. Let's KIS for now.
         return *this;
     }
-    /// Check canonical form.
-    /**
-     * @return \p true if \p this is the canonical form for rational numbers, \p false otherwise.
-     */
+    // Check canonical form.
     bool is_canonical() const
     {
         if (m_num.is_zero()) {
@@ -662,44 +567,24 @@ public:
         gcd(g, m_num, m_den);
         return g.is_one();
     }
-    /// Sign.
-    /**
-     * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
-     */
+    // Sign.
     int sgn() const
     {
         return mppp::sgn(m_num);
     }
-    /// Negate in-place.
-    /**
-     * This member function will set \p this to <tt>-this</tt>.
-     *
-     * @return a reference to \p this.
-     */
+    // Negate in-place.
     rational &neg()
     {
         m_num.neg();
         return *this;
     }
-    /// In-place absolute value.
-    /**
-     * This member function will set \p this to its absolute value.
-     *
-     * @return a reference to \p this.
-     */
+    // In-place absolute value.
     rational &abs()
     {
         m_num.abs();
         return *this;
     }
-    /// In-place inversion.
-    /**
-     * This member function will set \p this to its inverse.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws zero_division_error if \p this is zero.
-     */
+    // In-place inversion.
     rational &inv()
     {
         if (mppp_unlikely(is_zero())) {
@@ -709,26 +594,17 @@ public:
         detail::fix_den_sign(*this);
         return *this;
     }
-    /// Test if the value is zero.
-    /**
-     * @return \p true if the value represented by \p this is 0, \p false otherwise.
-     */
+    // Test if the value is zero.
     bool is_zero() const
     {
         return mppp::is_zero(m_num);
     }
-    /// Test if the value is one.
-    /**
-     * @return \p true if the value represented by \p this is 1, \p false otherwise.
-     */
+    // Test if the value is one.
     bool is_one() const
     {
         return mppp::is_one(m_num) && mppp::is_one(m_den);
     }
-    /// Test if the value is minus one.
-    /**
-     * @return \p true if the value represented by \p this is -1, \p false otherwise.
-     */
+    // Test if the value is minus one.
     bool is_negative_one() const
     {
         return mppp::is_negative_one(m_num) && mppp::is_one(m_den);
