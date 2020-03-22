@@ -321,13 +321,13 @@ to provide various additional special functions for
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>).</p></li>
 <li><p>Implement squaring for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>).</p></li>
-<li><p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
+<li><p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
 can now interact with <code class="docutils literal notranslate"><span class="pre">std::complex</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/214">#214</a>).</p></li>
 <li><p>mp++’s multiprecision classes now support pretty-printing in the
 <a class="reference external" href="https://github.com/jupyter-xeus/xeus-cling">xeus-cling notebook</a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/213">#213</a>).</p></li>
-<li><p>Implement user-defined literals for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>,
+<li><p>Implement user-defined literals for <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>,
 <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/213">#213</a>).</p></li>
 </ul>
@@ -494,7 +494,7 @@ one <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mpp
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/180">#180</a>).</p></li>
 <li><p>Implement a specialised version of the <code class="docutils literal notranslate"><span class="pre">swap()</span></code> primitive
 for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and
-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/174">#174</a>).</p></li>
+<a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/174">#174</a>).</p></li>
 <li><p>Improve the implementation of the less than/greater than operators for
 <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>. Together with the <code class="docutils literal notranslate"><span class="pre">swap()</span></code> improvements,
 this change leads to a ~9% decrease in runtime for the
@@ -525,7 +525,7 @@ marked as visible
 <ul class="simple">
 <li><p>The <a class="reference internal" href="utilities.html#_CPPv4I0EN4mppp9type_nameENSt6stringEv" title="mppp::type_name"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">type_name()</span></code></a> function is now part of the public API
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/169">#169</a>).</p></li>
-<li><p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> now respect the format
+<li><p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> now respect the format
 flags in output streams (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/161">#161</a>).</p></li>
 </ul>
 </div>
@@ -770,7 +770,7 @@ addition and multiplication
 <h3>New<a class="headerlink" href="#id50" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Implement additional <code class="docutils literal notranslate"><span class="pre">get()</span></code> conversion functions for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/96">#96</a>).</p></li>
-<li><p>Implement the increment and decrement operators for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</p></li>
+<li><p>Implement the increment and decrement operators for <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</p></li>
 <li><p>Implement support for <code class="docutils literal notranslate"><span class="pre">__int128_t</span></code> and <code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/90">#90</a>).</p></li>
 <li><p>Implement the bitwise logic operators for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</p></li>
 <li><p>Initial implementation of the <a class="reference internal" href="tutorial_pybind11.html#tutorial-pybind11"><span class="std std-ref">pybind11 integration utilities</span></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/81">#81</a>).</p></li>
@@ -817,15 +817,15 @@ addition and multiplication
 <li><p>Add non-throwing GMP-style conversion functions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/59">#59</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/61">#61</a>).</p></li>
 <li><p>Implement move constructors and move assignment operators from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
-and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/57">#57</a>).</p></li>
+and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/57">#57</a>).</p></li>
 <li><p>Implement a cache for the allocation of limbs arrays in small <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/55">#55</a>).</p></li>
 <li><p>Implement the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>).</p></li>
 <li><p>Implement the <code class="docutils literal notranslate"><span class="pre">sub_ui()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</p></li>
 <li><p>Add a CI build testing against the latest unstable GMP branch (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/34">#34</a>).</p></li>
-<li><p>Add assignment operators from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
+<li><p>Add assignment operators from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/32">#32</a>).</p></li>
-<li><p>Add the possibility of constructing non-canonical <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> objects from numerator/denominator pairs
+<li><p>Add the possibility of constructing non-canonical <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects from numerator/denominator pairs
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>).</p></li>
 </ul>
 </div>
@@ -833,14 +833,14 @@ and <code class="xref cpp cpp-class docutils literal notranslate"><span class="p
 <h3>Changes<a class="headerlink" href="#id55" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Use the sphinx bootstrap theme for the html documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/71">#71</a>).</p></li>
-<li><p>Various simplifications in the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> API (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/66">#66</a>).</p></li>
+<li><p>Various simplifications in the <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/66">#66</a>).</p></li>
 <li><p>Introduce a <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> concept and use it to reduce the number of overloads in the
 constructors/assignment operators from string (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/63">#63</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/64">#64</a>).</p></li>
 <li><p>The <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> functions accepting the return value as a parameter will now
 demote a return value with dynamic storage to static storage if the other arguments all have static storage
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/58">#58</a>).</p></li>
-<li><p>The free functions for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> now return a reference
+<li><p>The free functions for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> now return a reference
 to the return value, rather than <code class="docutils literal notranslate"><span class="pre">void</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/56">#56</a>).</p></li>
 <li><p>Performance improvements and code simplifications for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> division
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/55">#55</a>).</p></li>
@@ -855,7 +855,7 @@ and the exception raised by the bit shifting operators is not any more
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</p></li>
 <li><p>Update the internal copy of Catch to the latest version, 1.9.7 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/36">#36</a>).</p></li>
 <li><p>Bump up the minimum required CMake version to 3.3 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>).</p></li>
-<li><p>Performance improvements and simplifications in the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> constructors and assignment operators
+<li><p>Performance improvements and simplifications in the <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> constructors and assignment operators
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/32">#32</a>).</p></li>
 </ul>
 </div>
@@ -866,11 +866,11 @@ and the exception raised by the bit shifting operators is not any more
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/54">#54</a>).</p></li>
 <li><p>Fix the compilation of the tests on Clang 5 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/43">#43</a>).</p></li>
 <li><p>Fix too lax constraints in the implementation of in-place operators for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and
-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</p></li>
+<a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</p></li>
 <li><p>Fix the PDF build of the documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/39">#39</a>).</p></li>
 <li><p>Fix a few missing <code class="docutils literal notranslate"><span class="pre">inline</span></code> specifiers (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/38">#38</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</p></li>
 <li><p>Fix C++ version detection on MSVC (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/36">#36</a>).</p></li>
-<li><p>Fix missing tests for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> hashing (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/29">#29</a>).</p></li>
+<li><p>Fix missing tests for <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> hashing (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/29">#29</a>).</p></li>
 <li><p>Fix some MSVC warnings when compiling the tests in release mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>).</p></li>
 <li><p>Various minor documentation fixes.</p></li>
 </ul>
@@ -882,8 +882,8 @@ and the exception raised by the bit shifting operators is not any more
 <h3>New<a class="headerlink" href="#id58" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Implement the constructors from a range of characters and from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
-and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</p></li>
-<li><p>Implement the assignment operator and the constructor from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
+and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</p></li>
+<li><p>Implement the assignment operator and the constructor from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/19">#19</a>).</p></li>
 </ul>
 </div>
@@ -917,7 +917,7 @@ in the implementation of basic arithmetic for the 1/2-limb specialisations (<a c
 <div class="section" id="id62">
 <h3>New<a class="headerlink" href="#id62" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Implement the multiprecision <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>).</p></li>
+<li><p>Implement the multiprecision <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>).</p></li>
 <li><p>Implement fast assignment functions to zero and plus/minus one for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</p></li>
 <li><p>Add assignment operators from string for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</p></li>
 <li><p>Implement the <code class="docutils literal notranslate"><span class="pre">submul()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</p></li>

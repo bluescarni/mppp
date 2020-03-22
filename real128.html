@@ -450,7 +450,7 @@ and it is then move-assigned to <code class="docutils literal notranslate"><span
 <p>This operator will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a <a class="reference internal" href="#_CPPv4I0EN4mppp20Real128InteroperableE" title="mppp::Real128Interoperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">Real128Interoperable</span></code></a> type.</p>
 <p>Conversion to C++ types is implemented via direct cast, and thus no checks are
 performed to ensure that the value of <code class="docutils literal notranslate"><span class="pre">this</span></code> can be represented by the target type.</p>
-<p>Conversion to <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>, if successful, is exact.</p>
+<p>Conversion to <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, if successful, is exact.</p>
 <p>Conversion to integral types will produce the truncated counterpart of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -458,7 +458,7 @@ performed to ensure that the value of <code class="docutils literal notranslate"
 </dd>
 <dt class="field-even">Throws</dt>
 <dd class="field-even"><p><strong>std::domain_error</strong> – if <code class="docutils literal notranslate"><span class="pre">this</span></code> represents a non-finite value and <code class="docutils literal notranslate"><span class="pre">T</span></code>
-is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p>
+is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -476,7 +476,7 @@ is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7i
 Differently from the conversion operator, this function does not raise any exception: if the conversion is
 successful, the function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the
 conversion fails, <em>rop</em> will not be altered. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code> is either
-<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>, and <code class="docutils literal notranslate"><span class="pre">this</span></code> represents a non-finite value.</p>
+<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, and <code class="docutils literal notranslate"><span class="pre">this</span></code> represents a non-finite value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>rop</strong> – the variable which will store the result of the conversion.</p>
@@ -842,7 +842,7 @@ This is the type wrapped by the <a class="reference internal" href="#_CPPv4N4mpp
 Specifically, this concept is satisfied if either:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, or</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>, or</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> is <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, or</p></li>
 <li><p>on GCC, the Intel compiler and Clang&gt;=7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies
 <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a> or it is <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>, or</p></li>
 <li><p>on Clang&lt;7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a>, except if
@@ -880,7 +880,7 @@ involving <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mpp
 If the conversion is successful, the function
 will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <em>rop</em> will
 not be altered. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code>
-is either <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>, and <em>x</em>
+is either <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, and <em>x</em>
 represents a non-finite value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

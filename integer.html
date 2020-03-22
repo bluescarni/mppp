@@ -774,8 +774,8 @@ fails, <em>rop</em> will not be altered.</p>
 <dd class="field-odd"><p><strong>rop</strong> – the variable which will store the result of the conversion.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <em>rop</em> is
-a C++ integral which cannot represent the value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code> is
+a C++ integral type which cannot represent the value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1376,8 +1376,8 @@ not be altered.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <em>rop</em> is
-a C++ integral which cannot represent the value of <em>n</em>.</p>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code> is
+a C++ integral type which cannot represent the value of <em>n</em>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2590,10 +2590,10 @@ types are involved.</p>
 </dd>
 <dt class="field-odd">Throws</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>unspecified</strong> – any exception thrown by the assignment/conversion operators
-of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</p></li>
 <li><p><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><strong>mppp::zero_division_error</strong></a> – if, in a division, <em>y</em> is zero and only integral
 types are involved.</p></li>
+<li><p><strong>unspecified</strong> – any exception thrown by the assignment/conversion operators
+of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
