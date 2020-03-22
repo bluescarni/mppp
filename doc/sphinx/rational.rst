@@ -808,6 +808,62 @@ is typically built on top of basic :ref:`functions <rational_functions>`.
    :exception mppp\:\:zero_division_error: if, in a division not involving floating-point or complex values,
      *y* is zero.
 
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator+=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator-=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator*=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator/=(T &x, const U &y)
+
+   In-place arithmetic operators.
+
+   These operators will set *x* to, respectively:
+
+   * :math:`x+y`,
+   * :math:`x-y`,
+   * :math:`x \times y`,
+   * :math:`\frac{x}{y}`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *x*.
+
+   :exception mppp\:\:zero_division_error: if, in a division not involving floating-point or complex values,
+     *y* is zero.
+   :exception unspecified: any exception thrown by the assignment/conversion operators
+     of :cpp:class:`~mppp::rational`.
+
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::operator++(mppp::rational<SSize> &q)
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::operator--(mppp::rational<SSize> &q)
+
+   Prefix increment/decrement.
+
+   :param q: the input argument.
+
+   :return: a reference to *q* after the increment/decrement.
+
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> mppp::operator++(mppp::rational<SSize> &q, int)
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> mppp::operator--(mppp::rational<SSize> &q, int)
+
+   Suffix increment/decrement.
+
+   :param q: the input argument.
+
+   :return: a copy of *q* before the increment/decrement.
+
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator==(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator!=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator<(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator<=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator>(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator>=(const T &op1, const U &op2)
+
+   Binary comparison operators.
+
+   :param op1: first argument.
+   :param op2: second argument.
+
+   :return: the result of the comparison.
+
 .. _rational_std_specialisations:
 
 Standard library specialisations

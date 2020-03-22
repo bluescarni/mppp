@@ -1210,16 +1210,7 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
 
 } // namespace detail
 
-/// In-place addition operator.
-/**
- * @param rop the augend.
- * @param op the addend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::rational rational\endlink.
- */
+// In-place addition operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalOpTypes<T, U>
@@ -1232,14 +1223,7 @@ template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Prefix increment for \link mppp::rational rational\endlink.
-/**
- * This operator will increment \p q by one.
- *
- * @param q the \link mppp::rational rational\endlink that will be increased.
- *
- * @return a reference to \p q after the increment.
- */
+// Prefix increment.
 template <std::size_t SSize>
 inline rational<SSize> &operator++(rational<SSize> &q)
 {
@@ -1247,14 +1231,7 @@ inline rational<SSize> &operator++(rational<SSize> &q)
     return q;
 }
 
-/// Suffix increment for \link mppp::rational rational\endlink.
-/**
- * This operator will increment \p q by one and return a copy of \p q as it was before the increment.
- *
- * @param q the \link mppp::rational rational\endlink that will be increased.
- *
- * @return a copy of \p q before the increment.
- */
+// Suffix increment.
 template <std::size_t SSize>
 inline rational<SSize> operator++(rational<SSize> &q, int)
 {
@@ -1387,16 +1364,7 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
 
 } // namespace detail
 
-/// In-place subtraction operator.
-/**
- * @param rop the minuend.
- * @param op the subtrahend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::rational rational\endlink.
- */
+// In-place subtraction operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalOpTypes<T, U>
@@ -1409,14 +1377,7 @@ template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Prefix decrement for \link mppp::rational rational\endlink.
-/**
- * This operator will decrement \p q by one.
- *
- * @param q the \link mppp::rational rational\endlink that will be decreased.
- *
- * @return a reference to \p q after the decrement.
- */
+// Prefix decrement.
 template <std::size_t SSize>
 inline rational<SSize> &operator--(rational<SSize> &q)
 {
@@ -1424,14 +1385,7 @@ inline rational<SSize> &operator--(rational<SSize> &q)
     return q;
 }
 
-/// Suffix decrement for \link mppp::rational rational\endlink.
-/**
- * This operator will decrement \p q by one and return a copy of \p q as it was before the decrement.
- *
- * @param q the \link mppp::rational rational\endlink that will be decreased.
- *
- * @return a copy of \p q before the decrement.
- */
+// Suffix decrement.
 template <std::size_t SSize>
 inline rational<SSize> operator--(rational<SSize> &q, int)
 {
@@ -1574,16 +1528,7 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
 
 } // namespace detail
 
-/// In-place multiplication operator.
-/**
- * @param rop the multiplicand.
- * @param op the multiplicator.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::rational rational\endlink.
- */
+// In-place multiplication operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalOpTypes<T, U>
@@ -1773,17 +1718,7 @@ inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
 
 } // namespace detail
 
-/// In-place division operator.
-/**
- * @param rop the dividend.
- * @param op the divisor.
- *
- * @return a reference to \p rop.
- *
- * @throws zero_division_error if \p op is zero and only integral types are involved in the division.
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::rational rational\endlink.
- */
+// In-place division operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalOpTypes<T, U>
@@ -1833,13 +1768,7 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Equality operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
- */
+// Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalOpTypes<T, U>
@@ -1851,13 +1780,7 @@ template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
     return detail::dispatch_equality(op1, op2);
 }
 
-/// Inequality operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
- */
+// Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalOpTypes<T, U>
@@ -1966,13 +1889,7 @@ inline bool dispatch_less_than(T x, const rational<SSize> &a)
 }
 } // namespace detail
 
-/// Less-than operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
- */
+// Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalRealOpTypes<T, U>
@@ -1984,13 +1901,7 @@ template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
     return detail::dispatch_less_than(op1, op2);
 }
 
-/// Less-than or equal operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
- */
+// Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalRealOpTypes<T, U>
@@ -2002,13 +1913,7 @@ template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
     return !(op1 > op2);
 }
 
-/// Greater-than operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
- */
+// Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalRealOpTypes<T, U>
@@ -2020,13 +1925,7 @@ template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
     return detail::dispatch_greater_than(op1, op2);
 }
 
-/// Greater-than or equal operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
- */
+// Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RationalRealOpTypes<T, U>

@@ -1685,10 +1685,10 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :return: a reference to *x*.
 
-   :exception unspecified: any exception thrown by the assignment/conversion operators
-     of :cpp:class:`~mppp::integer`.
    :exception mppp\:\:zero_division_error: if, in a division, *y* is zero and only integral
      types are involved.
+   :exception unspecified: any exception thrown by the assignment/conversion operators
+     of :cpp:class:`~mppp::integer`.
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::operator++(mppp::integer<SSize> &n)
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::operator--(mppp::integer<SSize> &n)
