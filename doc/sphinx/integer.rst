@@ -471,8 +471,8 @@ The integer class
 
       :param rop: the variable which will store the result of the conversion.
 
-      :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if *rop* is
-        a C++ integral which cannot represent the value of ``this``.
+      :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
+        a C++ integral type which cannot represent the value of ``this``.
 
    .. cpp:function:: template <CppComplex T> bool get(T &rop) const
 
@@ -911,8 +911,8 @@ Conversion
    :param rop: the variable which will store the result of the conversion.
    :param n: the input :cpp:class:`~mppp::integer`.
 
-   :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if *rop* is
-     a C++ integral which cannot represent the value of *n*.
+   :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
+     a C++ integral type which cannot represent the value of *n*.
 
 .. cpp:function:: template <mppp::CppComplex T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
 
@@ -1685,10 +1685,10 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :return: a reference to *x*.
 
-   :exception unspecified: any exception thrown by the assignment/conversion operators
-     of :cpp:class:`~mppp::integer`.
    :exception mppp\:\:zero_division_error: if, in a division, *y* is zero and only integral
      types are involved.
+   :exception unspecified: any exception thrown by the assignment/conversion operators
+     of :cpp:class:`~mppp::integer`.
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::operator++(mppp::integer<SSize> &n)
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::operator--(mppp::integer<SSize> &n)
