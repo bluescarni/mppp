@@ -844,20 +844,7 @@ inline bool get(T &rop, const rational<SSize> &q)
     return q.get(rop);
 }
 
-/** @defgroup rational_arithmetic rational_arithmetic
- *  @{
- */
-
-/// Ternary addition.
-/**
- * This function will set \p rop to <tt>op1 + op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition.
 template <std::size_t SSize>
 inline rational<SSize> &add(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -865,16 +852,7 @@ inline rational<SSize> &add(rational<SSize> &rop, const rational<SSize> &op1, co
     return rop;
 }
 
-/// Ternary subtraction.
-/**
- * This function will set \p rop to <tt>op1 - op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction.
 template <std::size_t SSize>
 inline rational<SSize> &sub(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -954,16 +932,7 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
 }
 } // namespace detail
 
-/// Ternary multiplication.
-/**
- * This function will set \p rop to <tt>op1 * op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiplication.
 template <std::size_t SSize>
 inline rational<SSize> &mul(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -971,18 +940,7 @@ inline rational<SSize> &mul(rational<SSize> &rop, const rational<SSize> &op1, co
     return rop;
 }
 
-/// Ternary division.
-/**
- * This function will set \p rop to <tt>op1 / op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- *
- * @throws zero_division_error if \p op2 is zero.
- */
+// Ternary division.
 template <std::size_t SSize>
 inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -1067,15 +1025,7 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
     return rop;
 }
 
-/// Binary negation.
-/**
- * This member function will set \p rop to <tt>-q</tt>.
- *
- * @param rop the return value.
- * @param q the rational that will be negated.
- *
- * @return a reference to \p rop.
- */
+// Binary negation.
 template <std::size_t SSize>
 inline rational<SSize> &neg(rational<SSize> &rop, const rational<SSize> &q)
 {
@@ -1083,12 +1033,7 @@ inline rational<SSize> &neg(rational<SSize> &rop, const rational<SSize> &q)
     return rop.neg();
 }
 
-/// Unary negation.
-/**
- * @param q the rational that will be negated.
- *
- * @return <tt>-q</tt>.
- */
+// Unary negation.
 template <std::size_t SSize>
 inline rational<SSize> neg(const rational<SSize> &q)
 {
@@ -1097,15 +1042,7 @@ inline rational<SSize> neg(const rational<SSize> &q)
     return ret;
 }
 
-/// Binary absolute value.
-/**
- * This function will set \p rop to the absolute value of \p q.
- *
- * @param rop the return value.
- * @param q the argument.
- *
- * @return a reference to \p rop.
- */
+// Binary absolute value.
 template <std::size_t SSize>
 inline rational<SSize> &abs(rational<SSize> &rop, const rational<SSize> &q)
 {
@@ -1113,12 +1050,7 @@ inline rational<SSize> &abs(rational<SSize> &rop, const rational<SSize> &q)
     return rop.abs();
 }
 
-/// Unary absolute value.
-/**
- * @param q the argument.
- *
- * @return the absolute value of \p q.
- */
+// Unary absolute value.
 template <std::size_t SSize>
 inline rational<SSize> abs(const rational<SSize> &q)
 {
@@ -1127,17 +1059,7 @@ inline rational<SSize> abs(const rational<SSize> &q)
     return ret;
 }
 
-/// Binary inversion.
-/**
- * This function will set \p rop to the inverse of \p q.
- *
- * @param rop the return value.
- * @param q the argument.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by mppp::rational::inv().
- */
+// Binary inversion.
 template <std::size_t SSize>
 inline rational<SSize> &inv(rational<SSize> &rop, const rational<SSize> &q)
 {
@@ -1145,14 +1067,7 @@ inline rational<SSize> &inv(rational<SSize> &rop, const rational<SSize> &q)
     return rop.inv();
 }
 
-/// Unary inversion.
-/**
- * @param q the argument.
- *
- * @return the inverse of \p q.
- *
- * @throws unspecified any exception thrown by mppp::rational::inv().
- */
+// Unary inversion.
 template <std::size_t SSize>
 inline rational<SSize> inv(const rational<SSize> &q)
 {
@@ -1160,8 +1075,6 @@ inline rational<SSize> inv(const rational<SSize> &q)
     ret.inv();
     return ret;
 }
-
-/** @} */
 
 namespace detail
 {
@@ -1179,16 +1092,7 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
                                                  q.get_den().is_one());
 }
 
-/** @defgroup rational_operators rational_operators
- *  @{
- */
-
-/// Identity operator.
-/**
- * @param q the rational that will be copied.
- *
- * @return a copy of \p q.
- */
+// Identity operator.
 template <std::size_t SSize>
 inline rational<SSize> operator+(const rational<SSize> &q)
 {
@@ -1253,22 +1157,7 @@ inline T dispatch_binary_add(T x, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Binary addition operator.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is a :cpp:class:`~mppp::rational`.
- *
- * \endrststar
- *
- * @param op1 the first summand.
- * @param op2 the second summand.
- *
- * @return <tt>op1 + op2</tt>.
- */
+// Binary addition operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires RationalOpTypes<T, U> inline auto
@@ -1374,12 +1263,7 @@ inline rational<SSize> operator++(rational<SSize> &q, int)
     return retval;
 }
 
-/// Negated copy.
-/**
- * @param q the rational that will be negated.
- *
- * @return a negated copy of \p q.
- */
+// Negated copy.
 template <std::size_t SSize>
 inline rational<SSize> operator-(const rational<SSize> &q)
 {
@@ -1450,22 +1334,7 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Binary subtraction operator.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is a :cpp:class:`~mppp::rational`.
- *
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return <tt>op1 - op2</tt>.
- */
+// Binary subtraction operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires RationalOpTypes<T, U> inline auto
@@ -1640,22 +1509,7 @@ inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Binary multiplication operator.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is a :cpp:class:`~mppp::rational`.
- *
- * \endrststar
- *
- * @param op1 the first factor.
- * @param op2 the second factor.
- *
- * @return <tt>op1 * op2</tt>.
- */
+// Binary multiplication operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires RationalOpTypes<T, U> inline auto
@@ -1847,24 +1701,7 @@ inline T dispatch_binary_div(T x, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Binary division operator.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is a :cpp:class:`~mppp::rational`.
- *
- * \endrststar
- *
- * @param op1 the dividend.
- * @param op2 the divisor.
- *
- * @return <tt>op1 / op2</tt>.
- *
- * @throws zero_division_error if the division does not involve floating-point types and \p op2 is zero.
- */
+// Binary division operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 requires RationalOpTypes<T, U> inline auto
@@ -2201,20 +2038,7 @@ template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
     return !(op1 < op2);
 }
 
-/** @} */
-
-/** @defgroup rational_comparison rational_comparison
- *  @{
- */
-
-/// Comparison function for rationals.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
- * <tt>op1 > op2</tt>.
- */
+// Comparison function for rationals.
 template <std::size_t SSize>
 inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -2232,14 +2056,7 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
     return ::mpq_cmp(&v1, &v2);
 }
 
-/// Comparison function for rational/integer arguments.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
- * <tt>op1 > op2</tt>.
- */
+// Comparison function for rational/integer arguments.
 template <std::size_t SSize>
 inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
 {
@@ -2249,14 +2066,7 @@ inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
     return mpq_cmp_z(&v1, op2.get_mpz_view());
 }
 
-/// Comparison function for integer/rational arguments.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
- * <tt>op1 > op2</tt>.
- */
+// Comparison function for integer/rational arguments.
 template <std::size_t SSize>
 inline int cmp(const integer<SSize> &op1, const rational<SSize> &op2)
 {
@@ -2269,59 +2079,33 @@ inline int cmp(const integer<SSize> &op1, const rational<SSize> &op2)
     return -detail::integral_sign(cmp(op2, op1));
 }
 
-/// Sign function.
-/**
- * @param q the rational whose sign will be computed.
- *
- * @return 0 if \p q is zero, 1 if \p q is positive, -1 if \p q is negative.
- */
+// Sign function.
 template <std::size_t SSize>
 int sgn(const rational<SSize> &q)
 {
     return q.sgn();
 }
 
-/// Test if a rational is one.
-/**
- * @param q the rational to be tested.
- *
- * @return \p true if \p q is 1, \p false otherwise.
- */
+// Test if a rational is one.
 template <std::size_t SSize>
 inline bool is_one(const rational<SSize> &q)
 {
     return q.is_one();
 }
 
-/// Test if a rational is minus one.
-/**
- * @param q the rational to be tested.
- *
- * @return \p true if \p q is -1, \p false otherwise.
- */
+// Test if a rational is minus one.
 template <std::size_t SSize>
 inline bool is_negative_one(const rational<SSize> &q)
 {
     return q.is_negative_one();
 }
 
-/// Test if a rational is zero.
-/**
- * @param q the rational to be tested.
- *
- * @return \p true if \p q is 0, \p false otherwise.
- */
+// Test if a rational is zero.
 template <std::size_t SSize>
 inline bool is_zero(const rational<SSize> &q)
 {
     return q.is_zero();
 }
-
-/** @} */
-
-/** @defgroup rational_ntheory rational_ntheory
- *  @{
- */
 
 namespace detail
 {
@@ -2362,41 +2146,19 @@ inline rational<SSize> rational_binomial_impl(const rational<SSize> &t, const T 
 {
     return rational_binomial_impl(t, integer<SSize>{b});
 }
+
 } // namespace detail
 
-/// Binomial coefficient for \link mppp::rational rational\endlink.
-/**
- * \rststar
- * This function will compute the binomial coefficient :math:`{x \choose y}`. If ``x``
- * represents an integral value, the calculation is forwarded to the implementation of
- * the binomial coefficient for :cpp:class:`~mppp::integer`. Otherwise, an implementation
- * based on the falling factorial is employed.
- * \endrststar
- *
- * @param x the top value.
- * @param y the bottom value.
- *
- * @return \f$ {x \choose y} \f$.
- *
- * @throws unspecified any exception thrown by the implementation of
- * the binomial coefficient for \link mppp::integer integer\endlink.
- */
+// Binomial coefficient for \link mppp::rational rational\endlink.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize, typename T>
-requires RationalIntegralInteroperable<T, SSize> inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
+template <std::size_t SSize, RationalIntegralInteroperable<SSize> T>
 #else
 template <std::size_t SSize, typename T, rational_integral_interoperable_enabler<T, SSize> = 0>
-inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
 #endif
+inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
 {
     return detail::rational_binomial_impl(x, y);
 }
-
-/** @} */
-
-/** @defgroup rational_exponentiation rational_exponentiation
- *  @{
- */
 
 namespace detail
 {
@@ -2482,75 +2244,27 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
 
 } // namespace detail
 
-/// Binary exponentiation.
-/**
- * \rststar
- * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
- * is a floating-point or complex value, then the result will be computed via ``std::pow()`` and it will also be a
- * floating-point or complex value. Otherwise, the result will be a :cpp:class:`~mppp::rational`.
- *
- * When floating-point and complex types are not involved, the implementation is based on the integral exponentiation
- * of numerator and denominator. Thus, if ``exp`` is a rational value, the exponentiation will be successful
- * only in a few special cases (e.g., unitary base, zero exponent, etc.).
- * \endrststar
- *
- * @param base the base.
- * @param exp the exponent.
- *
- * @return <tt>base**exp</tt>.
- *
- * @throws zero_division_error if floating-point or complex types are not involved, \p base is zero and \p exp is
- * negative.
- * @throws std::domain_error if floating-point or complex types are not involved and \p exp is a rational value (except
- * in a handful of special cases).
- */
+// Binary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline auto pow(const T &base, const U &exp)
+requires RationalOpTypes<T, U> inline auto
 #else
 template <typename T, typename U>
-inline detail::rational_common_t<T, U> pow(const T &base, const U &exp)
+inline detail::rational_common_t<T, U>
 #endif
+pow(const T &base, const U &exp)
 {
     return detail::pow_impl(base, exp);
 }
 
-/** @} */
-
-/** @defgroup rational_other rational_other
- *  @{
- */
-
-/// Canonicalise.
-/**
- * \rststar
- * This function will put ``rop`` in canonical form. Internally, this function will employ
- * :cpp:func:`mppp::rational::canonicalise()`.
- * \endrststar
- *
- * @param rop the rational that will be canonicalised.
- *
- * @return a reference to \p rop.
- */
+// Canonicalise.
 template <std::size_t SSize>
 inline rational<SSize> &canonicalise(rational<SSize> &rop)
 {
     return rop.canonicalise();
 }
 
-/// Hash value.
-/**
- * \rststar
- * This function will return a hash value for ``q``.
- *
- * A :ref:`specialisation <rational_std_specialisations>` of the standard ``std::hash`` functor is also provided, so
- * that it is possible to use :cpp:class:`~mppp::rational` in standard unordered associative containers out of the box.
- * \endrststar
- *
- * @param q the rational whose hash value will be computed.
- *
- * @return a hash value for \p q.
- */
+// Hash value.
 template <std::size_t SSize>
 inline std::size_t hash(const rational<SSize> &q)
 {
@@ -2559,8 +2273,6 @@ inline std::size_t hash(const rational<SSize> &q)
     // decent hashing on the rational as well.
     return hash(q.get_num()) + hash(q.get_den());
 }
-
-/** @} */
 
 } // namespace mppp
 

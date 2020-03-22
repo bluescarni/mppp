@@ -559,16 +559,109 @@ Conversion
 Arithmetic
 ~~~~~~~~~~
 
-.. doxygengroup:: rational_arithmetic
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::add(mppp::rational<SSize> &rop, const mppp::rational<SSize> &x, const mppp::rational<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::sub(mppp::rational<SSize> &rop, const mppp::rational<SSize> &x, const mppp::rational<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::mul(mppp::rational<SSize> &rop, const mppp::rational<SSize> &x, const mppp::rational<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::div(mppp::rational<SSize> &rop, const mppp::rational<SSize> &x, const mppp::rational<SSize> &y)
+
+   Ternary arithmetic primitives.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`x + y`,
+   * :math:`x - y`,
+   * :math:`x \times y`,
+   * :math:`\frac{x}{y}`.
+
+   :param rop: the return value.
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *rop*.
+
+   :exception mppp::zero_division_error: if, in a division operation, *y* is zero.
+
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::neg(mppp::rational<SSize> &rop, const mppp::rational<SSize> &x)
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::abs(mppp::rational<SSize> &rop, const mppp::rational<SSize> &x)
+
+   Binary negation and absolute value.
+
+   These functions will set *rop* to, respectively, :math:`-x` and :math:`\left| x \right|`.
+
+   :param rop: the return value.
+   :param x: the input value.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> mppp::neg(const mppp::rational<SSize> &x)
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> mppp::abs(const mppp::rational<SSize> &x)
+
+   Unary negation and absolute value.
+
+   :param x: the input value.
+
+   :return: :math:`-x` and :math:`\left| x \right|` respectively.
+
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::inv(mppp::rational<SSize> &rop, const mppp::rational<SSize> &x)
+
+   Binary inversion.
+
+   This function will set *rop* to :math:`x^{-1}`.
+
+   :param rop: the return value.
+   :param x: the input value.
+
+   :return: a reference to *rop*.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::rational::inv()`.
+
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> mppp::inv(const mppp::rational<SSize> &x)
+
+   Unary inversion.
+
+   :param x: the input value.
+
+   :return: :math:`x^{-1}`.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::rational::inv()`.
 
 .. _rational_comparison:
 
 Comparison
 ~~~~~~~~~~
 
-.. doxygengroup:: rational_comparison
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> int mppp::cmp(const mppp::rational<SSize> &x, const mppp::rational<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> int mppp::cmp(const mppp::rational<SSize> &x, const mppp::integer<SSize> &y)
+.. cpp:function:: template <std::size_t SSize> int mppp::cmp(const mppp::integer<SSize> &x, const mppp::rational<SSize> &y)
+
+   Three-way comparisons.
+
+   These functions will return 0 if :math:`x=y`, a negative value if :math:`x<y`
+   and a positive value if :math:`x>y`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the result of the comparison.
+
+.. cpp:function:: template <std::size_t SSize> int mppp::sgn(const mppp::rational<SSize> &q)
+
+   Sign function.
+
+   :param q: the input argument.
+
+   :return: 0 if *q* is zero, 1 if *q* is positive, -1 if *q* is negative.
+
+.. cpp:function:: template <std::size_t SSize> bool mppp::is_zero(const mppp::rational<SSize> &q)
+.. cpp:function:: template <std::size_t SSize> bool mppp::is_one(const mppp::rational<SSize> &q)
+.. cpp:function:: template <std::size_t SSize> bool mppp::is_negative_one(const mppp::rational<SSize> &q)
+
+   Test for special values.
+
+   :param q: the input argument.
+
+   :return: ``true`` if, respectively, :math:`q=0`, :math:`q=1` or :math:`q=-1`, ``false``
+     otherwise.
 
 .. _rational_ntheory:
 
@@ -577,16 +670,49 @@ Number theoretic functions
 
 .. versionadded:: 0.8
 
-.. doxygengroup:: rational_ntheory
-   :content-only:
+.. cpp:function:: template <std::size_t SSize, mppp::RationalIntegralInteroperable<SSize> T> mppp::rational<SSize> mppp::binomial(const mppp::rational<SSize> &x, const T &y)
+
+   Binomial coefficient.
+
+   This function will compute the binomial coefficient :math:`{x \choose y}`. If *x*
+   represents an integral value, the calculation is forwarded to the implementation of
+   the binomial coefficient for :cpp:class:`~mppp::integer`. Otherwise, an implementation
+   based on the falling factorial is employed.
+
+   :param x: the top value.
+   :param y: the bottom value.
+
+   :return: :math:`{x \choose y}`.
+
+   :exception unspecified: any exception thrown by the implementation of
+     the binomial coefficient for :cpp:class:`~mppp::integer`.
 
 .. _rational_exponentiation:
 
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. doxygengroup:: rational_exponentiation
-   :content-only:
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::pow(const T &x, const U &y)
+
+   Exponentiation.
+
+   This function will return :math:`x^y`. If one of the arguments
+   is a floating-point or complex value, then the result will be computed via ``std::pow()`` and it will also be a
+   floating-point or complex value. Otherwise, the result will be a :cpp:class:`~mppp::rational`.
+
+   When floating-point and complex types are not involved, the implementation is based on the integral exponentiation
+   of numerator and denominator. Thus, if *y* is a rational value, the exponentiation will be successful
+   only in a few special cases (e.g., unitary base, zero exponent, etc.).
+
+   :param x: the base.
+   :param y: the exponent.
+
+   :return: :math:`x^y`.
+
+   :exception mppp\:\:zero_division_error: if floating-point or complex types are not involved, and
+     *x* is zero and *y* negative.
+   :exception std\:\:domain_error: if floating-point or complex types are not involved and *y* is a rational value (except
+     in a handful of special cases).
 
 .. _rational_io:
 
@@ -612,8 +738,29 @@ Input/Output
 Other
 ~~~~~
 
-.. doxygengroup:: rational_other
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> &mppp::canonicalise(mppp::rational<SSize> &rop)
+
+   Canonicalise.
+
+   This function will put *rop* in canonical form. Internally, this function will employ
+   :cpp:func:`mppp::rational::canonicalise()`.
+
+   :param rop: the rational that will be canonicalised.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> std::size_t mppp::hash(const mppp::rational<SSize> &q)
+
+   Hash value.
+
+   This function will return a hash value for *q*.
+
+   A :ref:`specialisation <rational_std_specialisations>` of the standard ``std::hash`` functor is also provided, so
+   that it is possible to use :cpp:class:`~mppp::rational` in standard unordered associative containers out of the box.
+
+   :param q: the rational whose hash value will be computed.
+
+   :return: a hash value for *q*.
 
 .. _rational_operators:
 
@@ -624,8 +771,42 @@ Overloaded operators are provided for convenience. Their interface is generic,
 and their implementation
 is typically built on top of basic :ref:`functions <rational_functions>`.
 
-.. doxygengroup:: rational_operators
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> mppp::operator+(const mppp::rational<SSize> &q)
+.. cpp:function:: template <std::size_t SSize> mppp::rational<SSize> mppp::operator-(const mppp::rational<SSize> &q)
+
+   Identity and negation operators.
+
+   :param q: the input value.
+
+   :return: :math:`q` and :math:`-q` respectively.
+
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator/(const T &x, const U &y)
+
+   Binary arithmetic operators.
+
+   These operators will return, respectively:
+
+   * :math:`x+y`,
+   * :math:`x-y`,
+   * :math:`x \times y`,
+   * :math:`\frac{x}{y}`.
+
+   The return type of these operators is determined as follows:
+
+   * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex value, then the
+     type of the result is floating-point or complex; otherwise,
+   * the type of the result is :cpp:class:`~mppp::rational`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the result of the operation.
+
+   :exception mppp\:\:zero_division_error: if, in a division not involving floating-point or complex values,
+     *y* is zero.
 
 .. _rational_std_specialisations:
 
