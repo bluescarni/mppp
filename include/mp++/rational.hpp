@@ -833,38 +833,16 @@ MPPP_CONCEPT_DECL RationalRealOpTypes = are_rational_real_op_types<T, U>::value;
 using rational_real_op_types_enabler = detail::enable_if_t<are_rational_real_op_types<T, U>::value, int>;
 #endif
 
-/** @defgroup rational_conversion rational_conversion
- *  @{
- */
-
-/// Generic conversion function for \link mppp::rational rational\endlink.
-/**
- * \rststar
- * This function will convert the input :cpp:class:`~mppp::rational` ``q`` to a
- * :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into ``rop``.
- * If the conversion is successful, the function
- * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
- * not be altered.
- * \endrststar
- *
- * @param rop the variable which will store the result of the conversion.
- * @param q the input \link mppp::rational rational\endlink.
- *
- * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
- * a C++ integral which cannot represent the truncated value of ``q``.
- */
+// Generic conversion function.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, std::size_t SSize>
-requires RationalInteroperable<T, SSize>
+template <std::size_t SSize, RationalInteroperable<SSize> T>
 #else
 template <typename T, std::size_t SSize, rational_interoperable_enabler<T, SSize> = 0>
 #endif
-    inline bool get(T &rop, const rational<SSize> &q)
+inline bool get(T &rop, const rational<SSize> &q)
 {
     return q.get(rop);
 }
-
-/** @} */
 
 /** @defgroup rational_arithmetic rational_arithmetic
  *  @{
@@ -1193,20 +1171,7 @@ MPPP_DLL_PUBLIC std::ostream &rational_stream_operator_impl(std::ostream &, cons
 
 }
 
-/// Output stream operator.
-/**
- * \rststar
- * This operator will print to the stream ``os`` the :cpp:class:`~mppp::rational` ``q`` in base 10.
- * The printing format is described in :cpp:func:`mppp::rational::to_string()`.
- * \endrststar
- *
- * @param os the target stream.
- * @param q the input rational.
- *
- * @return a reference to \p os.
- *
- * @throws unspecified any exception thrown by mppp::rational::to_string().
- */
+// Output stream operator.
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {

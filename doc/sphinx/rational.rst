@@ -356,8 +356,8 @@ The rational class
 
       :param rop: the variable which will store the result of the conversion.
 
-      :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if *rop* is
-         a C++ integral which cannot represent the truncated value of ``this``.
+      :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
+         a C++ integral type which cannot represent the truncated value of ``this``.
 
    .. cpp:function:: const int_t &get_num() const
    .. cpp:function:: const int_t &get_den() const
@@ -538,8 +538,21 @@ Assignment
 Conversion
 ~~~~~~~~~~
 
-.. doxygengroup:: rational_conversion
-   :content-only:
+.. cpp:function:: template <std::size_t SSize, mppp::RationalInteroperable<SSize> T> bool mppp::get(T &rop, const mppp::rational<SSize> &q)
+
+   Generic conversion function.
+
+   This function will convert the input :cpp:class:`~mppp::rational` *q* to a
+   :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into *rop*.
+   If the conversion is successful, the function
+   will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
+   not be altered.
+
+   :param rop: the variable which will store the result of the conversion.
+   :param q: the input argument.
+
+   :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
+     a C++ integral type which cannot represent the truncated value of *q*.
 
 .. _rational_arithmetic:
 
