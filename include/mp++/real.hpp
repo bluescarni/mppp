@@ -224,130 +224,11 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 // - see if it's needed to provide alternate interoperable function/operators that do *not* promote
 //   the non-real to real (there's a bunch of functions for direct interface with GMP and cpp types
 //   in the MPFR API: arithmetic, comparison, etc.).
+// - it seems like we might be do multiple roundings when cting from real128.
+//   See if we can implement with only a single rounding, perhaps via an integer
+//   and mpfr_set_z_2exp()?
 
-/// Multiprecision floating-point class.
-/**
- * \rststar
- * This class represents arbitrary-precision real values encoded in a binary floating-point format.
- * It acts as a wrapper around the MPFR ``mpfr_t`` type, pairing a multiprecision significand
- * (whose size can be set at runtime) to a fixed-size exponent. In other words, :cpp:class:`~mppp::real`
- * values can have an arbitrary number of binary digits of precision (limited only by the available memory),
- * but the exponent range is limited.
- *
- * :cpp:class:`~mppp::real` aims to behave like a C++ floating-point type whose precision is a runtime property
- * of the class instances rather than a compile-time property of the type. Because of this, the way precision
- * is handled in :cpp:class:`~mppp::real` differs from the way it is managed in MPFR. The most important difference
- * is that in operations involving :cpp:class:`~mppp::real` the precision of the result is usually determined
- * by the precision of the operands, whereas in MPFR the precision of the operation is determined by the precision
- * of the return value (which is always passed as the first function parameter in the MPFR API). For instance,
- * in the following code,
- *
- * .. code-block:: c++
- *
- *    auto x = real{5,200} + real{6,150};
- *
- * the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
- * 150 bits. The precision of the result ``x`` (and the precision at which the addition is computed) will be
- * the maximum precision among the two operands, that is, :math:`\mathrm{max}\left(200,150\right)=200` bits.
- *
- * The precision of a :cpp:class:`~mppp::real` can be set at construction, or it can be changed later via functions and
- * methods such as :cpp:func:`mppp::real::set_prec()`, :cpp:func:`mppp::real::prec_round()`, etc. By default,
- * the precision of a :cpp:class:`~mppp::real` is automatically deduced upon construction following a set of heuristics
- * aimed at ensuring that the constructed :cpp:class:`~mppp::real` represents exactly the value used for initialisation.
- * For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
- * :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered either by specifying explicitly
- * the desired precision value, or by setting a global default precision via :cpp:func:`~mppp::real_set_default_prec()`.
- *
- * This class has the look and feel of a C++ builtin type: it can interact with all of C++'s integral and
- * floating-point primitive types, :cpp:class:`~mppp::integer`, :cpp:class:`~mppp::rational` and
- * :cpp:class:`~mppp::real128` (see the :cpp:concept:`~mppp::RealInteroperable` concept), and it provides overloaded
- * :ref:`operators <real_operators>`. Differently from the builtin types, however, this class does not allow any
- * implicit conversion to/from other types (apart from ``bool``): construction from and conversion to primitive types
- * must always be requested explicitly. As a side effect, syntax such as
- *
- * .. code-block:: c++
- *
- *    real r = 5;
- *    int m = r;
- *
- * will not work, and direct initialization should be used instead:
- *
- * .. code-block:: c++
- *
- *    real r{5};
- *    int m{r};
- *
- * Most of the functionality is exposed via plain :ref:`functions <real_functions>`, with the
- * general convention that the functions are named after the corresponding MPFR functions minus the leading ``mpfr_``
- * prefix. For instance, the MPFR call
- *
- * .. code-block:: c++
- *
- *    mpfr_add(rop,a,b,MPFR_RNDN);
- *
- * that writes the result of ``a + b``, rounded to nearest, into ``rop``, becomes simply
- *
- * .. code-block:: c++
- *
- *    add(rop,a,b);
- *
- * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
- * are allowed, unless noted otherwise. Unless otherwise specified, the :cpp:class:`~mppp::real` API always
- * rounds to nearest (that is, the ``MPFR_RNDN`` rounding mode is used).
- *
- * Multiple overloads of the same functionality are often available.
- * Binary functions in MPFR are usually implemented via three-operands functions, in which the first
- * operand is a reference to the return value. The exponentiation function ``mpfr_pow()``, for instance,
- * takes three operands: the return value, the base and the exponent. There are two overloads of the corresponding
- * :ref:`exponentiation <real_exponentiation>` function for :cpp:class:`~mppp::real`:
- *
- * * a ternary overload similar to ``mpfr_pow()``,
- * * a binary overload taking as inputs the base and the exponent, and returning the result
- *   of the exponentiation.
- *
- * This allows to avoid having to set up a return value for one-off invocations of ``pow()`` (the binary overload
- * will do it for you). For example:
- *
- * .. code-block:: c++
- *
- *    real r1, r2, r3{3}, r4{2};
- *    pow(r1,r3,r4);   // Ternary pow(): computes 3**2 and stores
- *                     // the result in r1.
- *    r2 = pow(r3,r4); // Binary pow(): returns 3**2, which is then
- *                     // assigned to r2.
- *
- * In case of unary functions, there are often three overloads available:
- *
- * * a binary overload taking as first parameter a reference to the return value (MPFR style),
- * * a unary overload returning the result of the operation,
- * * a nullary member function that modifies the calling object in-place.
- *
- * For instance, here are three possible ways of computing the absolute value:
- *
- * .. code-block:: c++
- *
- *    real r1, r2, r3{-5};
- *    abs(r1,r3);   // Binary abs(): computes and stores the absolute value
- *                  // of r3 into r1.
- *    r2 = abs(r3); // Unary abs(): returns the absolute value of r3, which is
- *                  // then assigned to r2.
- *    r3.abs();     // Member function abs(): replaces the value of r3 with its
- *                  // absolute value.
- *
- * Note that at this time a subset of the MPFR API has been wrapped by :cpp:class:`~mppp::real`.
- *
- * Various :ref:`overloaded operators <real_operators>` are provided. The arithmetic operators always return
- * a :cpp:class:`~mppp::real` result. The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will
- * promote non-:cpp:class:`~mppp::real` arguments to :cpp:class:`~mppp::real` before performing the comparison.
- * Alternative comparison functions
- * treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
- * are needed).
- *
- * Member functions are provided to access directly the internal ``mpfr_t`` instance (see
- * :cpp:func:`mppp::real::get_mpfr_t()` and :cpp:func:`mppp::real::_get_mpfr_t()`), so that
- * it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
- * \endrststar
- */
+// Multiprecision floating-point class.
 class MPPP_DLL_PUBLIC real
 {
 #if !defined(MPPP_DOXYGEN_INVOKED)
@@ -385,19 +266,7 @@ private:
 public:
     // Copy constructor.
     real(const real &);
-    // Copy constructor with custom precision.
-    explicit real(const real &, ::mpfr_prec_t);
-    /// Move constructor.
-    /**
-     * \rststar
-     * .. warning::
-     *    The only valid operations on the moved-from ``other`` object are
-     *    destruction, copy/move assignment and the invocation of the :cpp:func:`~mppp::real::is_valid()`
-     *    member function. After re-assignment, ``other`` can be used normally again.
-     * \endrststar
-     *
-     * @param other the \link mppp::real real\endlink that will be moved.
-     */
+    // Move constructor.
     real(real &&other) noexcept
     {
         // Shallow copy other.
@@ -405,6 +274,10 @@ public:
         // Mark the other as moved-from.
         other.m_mpfr._mpfr_d = nullptr;
     }
+
+    // Copy constructor with custom precision.
+    explicit real(const real &, ::mpfr_prec_t);
+
     // Constructor from a special value, sign and precision.
     explicit real(real_kind, int, ::mpfr_prec_t);
     // Constructor from a special value and precision.

@@ -493,13 +493,7 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 
 } // namespace detail
 
-/// Default constructor.
-/**
- * \rststar
- * The value will be initialised to positive zero. The precision of ``this`` will be
- * the value returned by :cpp:func:`~mppp::real_prec_min()`.
- * \endrststar
- */
+// Default constructor.
 real::real()
 {
     ::mpfr_init2(&m_mpfr, real_prec_min());
@@ -516,26 +510,10 @@ real::real(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
     ::mpfr_init2(&m_mpfr, p);
 }
 
-/// Copy constructor.
-/**
- * The copy constructor performs an exact deep copy of the input object.
- *
- * @param other the \link mppp::real real\endlink that will be copied.
- */
+// Copy constructor.
 real::real(const real &other) : real(&other.m_mpfr) {}
 
-/// Copy constructor with custom precision.
-/**
- * This constructor will set \p this to a copy of \p other with precision \p p. If \p p
- * is smaller than the precision of \p other, a rounding operation will be performed,
- * otherwise the value will be copied exactly.
- *
- * @param other the \link mppp::real real\endlink that will be copied.
- * @param p the desired precision.
- *
- * @throws std::invalid_argument if \p p is outside the range established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
- */
+// Copy constructor with custom precision.
 real::real(const real &other, ::mpfr_prec_t p)
 {
     // Init with custom precision, and then set.
@@ -662,24 +640,7 @@ real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
  */
 real::real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
 
-/// Constructor from a special value, sign and precision.
-/**
- * \rststar
- * This constructor will initialise ``this`` with one of the special values
- * specified by the :cpp:type:`~mppp::real_kind` enum. The precision of ``this``
- * will be ``p``.
- *
- * If ``k`` is not NaN, the sign bit will be set to positive if ``sign``
- * is nonnegative, negative otherwise.
- * \endrststar
- *
- * @param k the desired special value.
- * @param sign the desired sign for \p this.
- * @param p the desired precision for \p this.
- *
- * @throws std::invalid_argument if \p p is not within the bounds established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
- */
+// Constructor from a special value, sign and precision.
 real::real(real_kind k, int sign, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
@@ -707,16 +668,7 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
     }
 }
 
-/// Constructor from a special value and precision.
-/**
- * This constructor is equivalent to the constructor from a special value, sign and precision
- * with a hard-coded sign of 0.
- *
- * @param k the desired special value.
- * @param p the desired precision for \p this.
- *
- * @throws unspecified any exception thrown by the constructor from a special value, sign and precision.
- */
+// Constructor from a special value and precision.
 real::real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
 
 /// Copy constructor from ``mpfr_t``.

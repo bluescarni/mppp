@@ -10,19 +10,143 @@ Multiprecision floats
 
 *#include <mp++/real.hpp>*
 
-The ``real`` class
-------------------
+The real class
+--------------
 
-.. doxygenclass:: mppp::real
-   :members:
+.. cpp:class:: mppp::real
+
+   Multiprecision floating-point class.
+
+   This class represents arbitrary-precision real values encoded in a binary floating-point format.
+   It acts as a wrapper around the MPFR :cpp:type:`mpfr_t` type, pairing a multiprecision significand
+   (whose size can be set at runtime) to a fixed-size exponent. In other words, :cpp:class:`~mppp::real`
+   values can have an arbitrary number of binary digits of precision (limited only by the available memory),
+   but the exponent range is limited.
+
+   :cpp:class:`~mppp::real` aims to behave like a C++ floating-point type whose precision is a runtime property
+   of the class instances rather than a compile-time property of the type. Because of this, the way precision
+   is handled in :cpp:class:`~mppp::real` differs from the way it is managed in MPFR. The most important difference
+   is that in operations involving :cpp:class:`~mppp::real` the precision of the result is usually determined
+   by the precision of the operands, whereas in MPFR the precision of the operation is determined by the precision
+   of the return value (which is always passed as the first function parameter in the MPFR API). For instance,
+   in the following code,
+
+   .. code-block:: c++
+
+      auto x = real{5,200} + real{6,150};
+
+   the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
+   150 bits. The precision of the result ``x`` (and the precision at which the addition is computed) will be
+   the maximum precision among the two operands, that is, 200 bits.
+
+   The precision of a :cpp:class:`~mppp::real` can be set at construction, or it can be changed later via functions
+   such as :cpp:func:`mppp::real::set_prec()`, :cpp:func:`mppp::real::prec_round()`, etc. By default,
+   the precision of a :cpp:class:`~mppp::real` is automatically deduced upon construction following a set of heuristics
+   aimed at ensuring that the constructed :cpp:class:`~mppp::real` represents exactly the value used for initialisation.
+   For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
+   :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered by specifying explicitly
+   the desired precision value.
+
+   Most of the functionality is exposed via plain :ref:`functions <real_functions>`, with the
+   general convention that the functions are named after the corresponding MPFR functions minus the leading ``mpfr_``
+   prefix. For instance, the MPFR call
+
+   .. code-block:: c++
+
+      mpfr_add(rop,a,b,MPFR_RNDN);
+
+   that writes the result of ``a + b``, rounded to nearest, into ``rop``, becomes simply
+
+   .. code-block:: c++
+
+      add(rop,a,b);
+
+   where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
+   are allowed, unless noted otherwise. Unless otherwise specified, the :cpp:class:`~mppp::real` API always
+   rounds to nearest (that is, the ``MPFR_RNDN`` rounding mode is used).
+
+   Various :ref:`overloaded operators <real_operators>` are provided. The arithmetic operators always return
+   a :cpp:class:`~mppp::real` result. The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will
+   promote non-:cpp:class:`~mppp::real` arguments to :cpp:class:`~mppp::real` before performing the comparison.
+   Alternative comparison functions
+   treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
+   are needed).
+
+   Member functions are provided to access directly the internal ``mpfr_t`` instance (see
+   :cpp:func:`mppp::real::get_mpfr_t()` and :cpp:func:`mppp::real::_get_mpfr_t()`), so that
+   it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
+
+   .. cpp:function:: real()
+
+      Default constructor.
+
+      The value will be initialised to positive zero, the precision will be
+      the value returned by :cpp:func:`mppp::real_prec_min()`.
+
+   .. cpp:function:: real(const real &other)
+   .. cpp:function:: real(real &&other) noexcept
+
+      Copy and move constructors.
+
+      The copy constructor performs an exact deep copy of the input object.
+
+      After move construction, the only valid operations on *other* are
+      destruction, copy/move assignment and the invocation of the :cpp:func:`~mppp::real::is_valid()`
+      member function. After re-assignment, *other* can be used normally again.
+
+      :param other: the construction argument.
+
+   .. cpp:function:: explicit real(const real &other, mpfr_prec_t p)
+
+      Copy constructor with custom precision.
+
+      This constructor will set *this* to a copy of *other* with precision *p*. If *p*
+      is smaller than the precision of *other*, a rounding operation will be performed,
+      otherwise the value will be copied exactly.
+
+      :param other: the construction argument.
+      :param p: the desired precision.
+
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
+   .. cpp:function:: explicit real(real_kind k, int sign, mpfr_prec_t p)
+   .. cpp:function:: explicit real(real_kind k, mpfr_prec_t p)
+
+      Constructors from a special value, sign and precision.
+
+      This constructor will initialise ``this`` with one of the special values
+      specified by the :cpp:type:`mppp::real_kind` enum. The precision of ``this``
+      will be *p*.
+
+      If *k* is not NaN, the sign bit will be set to positive if *sign*
+      is nonnegative, negative otherwise.
+
+      The second overload invokes the first one with a *sign* of zero.
+
+      :param k: the desired special value.
+      :param sign: the desired sign for ``this``.
+      :param p: the desired precision for ``this``.
+
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
 Types
 -----
 
-.. cpp:type:: mppp::mpfr_struct_t = std::remove_extent<mpfr_t>::type
+.. cpp:type:: mpfr_t
+
+   This is the type used by the MPFR library to represent multiprecision floats.
+   It is defined as an array of size 1 of an unspecified structure.
+
+   .. seealso::
+
+      https://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
+
+.. cpp:type:: mppp::mpfr_struct_t = std::remove_extent_t<mpfr_t>
 
    The C structure used by MPFR to represent arbitrary-precision floats.
-   The MPFR type ``mpfr_t`` is defined as an array of size 1 of this structure.
+   The MPFR type :cpp:type:`mpfr_t` is defined as an array of size 1 of this structure.
 
 .. cpp:type:: mpfr_prec_t
 
@@ -68,7 +192,7 @@ Concepts
 .. cpp:concept:: template <typename... Args> mppp::RealSetArgs
 
    This concept is satisfied if the types in the parameter pack ``Args``
-   can be used as argument types in one of the :cpp:func:`mppp::real::set()` method overloads.
+   can be used as argument types in one of the :cpp:func:`mppp::real::set()` member function overloads.
    In other words, this concept is satisfied if the expression
 
    .. code-block:: c++

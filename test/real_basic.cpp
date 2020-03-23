@@ -161,6 +161,18 @@ TEST_CASE("real constructors")
         REQUIRE(!::mpfr_equal_p(r6.get_mpfr_t(), real{1.3}.get_mpfr_t()));
         REQUIRE(r6.get_prec() == 12);
     }
+    REQUIRE_THROWS_PREDICATE((real{real{4}, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of -1: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{real{4}, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
     if (real_prec_min() > 1) {
         REQUIRE_THROWS_PREDICATE((real{real{4}, 1}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
@@ -475,6 +487,18 @@ TEST_CASE("real kind constructors")
     REQUIRE_THROWS_PREDICATE((real{real_kind::nan, -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot init a real with a precision of -100: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{real_kind::nan, 0, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{real_kind::nan, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                       + detail::to_string(real_prec_min());
     });
