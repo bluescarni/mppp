@@ -455,8 +455,8 @@ private:
     // A tag to call private ctors.
     struct ptag {
     };
-    // Init a real with precision p, setting its value to n. No precision
-    // checking is performed.
+    // Private ctor that sets to NaN with a certain precision,
+    // without checking the input precision value.
     explicit real(const ptag &, ::mpfr_prec_t, bool);
 
 public:

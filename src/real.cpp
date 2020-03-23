@@ -524,7 +524,7 @@ real::real()
     ::mpfr_set_zero(&m_mpfr, 1);
 }
 
-// Init a real with precision p, setting its value to n. No precision
+// Init a real with precision p, setting its value to nan. No precision
 // checking is performed.
 real::real(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
 {
