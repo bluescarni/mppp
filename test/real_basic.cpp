@@ -79,57 +79,15 @@ constexpr bool ppc_arch =
 #endif
     ;
 
-TEST_CASE("real default prec")
-{
-    REQUIRE(real_get_default_prec() == 0);
-    real_set_default_prec(0);
-    REQUIRE(real_get_default_prec() == 0);
-    real_set_default_prec(100);
-    REQUIRE(real_get_default_prec() == 100);
-    real_reset_default_prec();
-    REQUIRE(real_get_default_prec() == 0);
-    REQUIRE_THROWS_PREDICATE(real_set_default_prec(-1), std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what()
-               == "Cannot set the default precision to -1: the value must be either zero or between "
-                      + detail::to_string(real_prec_min()) + " and " + detail::to_string(real_prec_max());
-    });
-    if (real_prec_min() > 1) {
-        REQUIRE_THROWS_PREDICATE(real_set_default_prec(1), std::invalid_argument, [](const std::invalid_argument &ex) {
-            return ex.what()
-                   == "Cannot set the default precision to 1: the value must be either zero or between "
-                          + detail::to_string(real_prec_min()) + " and " + detail::to_string(real_prec_max());
-        });
-    }
-    if (real_prec_max() < detail::nl_max<::mpfr_prec_t>()) {
-        REQUIRE_THROWS_PREDICATE(real_set_default_prec(detail::nl_max<::mpfr_prec_t>()), std::invalid_argument,
-                                 [](const std::invalid_argument &ex) {
-                                     return ex.what()
-                                            == "Cannot set the default precision to "
-                                                   + detail::to_string(detail::nl_max<::mpfr_prec_t>())
-                                                   + ": the value must be either zero or between "
-                                                   + detail::to_string(real_prec_min()) + " and "
-                                                   + detail::to_string(real_prec_max());
-                                 });
-    }
-    REQUIRE(real_get_default_prec() == 0);
-}
-
 struct int_ctor_tester {
     template <typename T>
     void operator()(const T &) const
     {
-        real_reset_default_prec();
         REQUIRE(real{T(0)}.zero_p());
         REQUIRE(!real{T(0)}.signbit());
         REQUIRE(real{T(0)}.get_prec() == detail::nl_digits<T>() + detail::is_signed<T>::value);
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
-        real_set_default_prec(101);
-        REQUIRE(real{T(0)}.zero_p());
-        REQUIRE(real{T(0)}.get_prec() == 101);
-        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
-        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
-        real_reset_default_prec();
         auto int_dist = integral_minmax_dist<T>{};
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
@@ -137,9 +95,6 @@ struct int_ctor_tester {
                                    real{detail::to_string(n), 10, detail::nl_digits<T>()}.get_mpfr_t()));
             REQUIRE(::mpfr_equal_p(real{n, detail::nl_digits<T>() + 100}.get_mpfr_t(),
                                    real{detail::to_string(n), 10, detail::nl_digits<T>()}.get_mpfr_t()));
-            real_set_default_prec(100);
-            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{detail::to_string(n), 10, 0}.get_mpfr_t()));
-            real_reset_default_prec();
         }
     }
 };
@@ -148,7 +103,6 @@ struct fp_ctor_tester {
     template <typename T>
     void operator()(const T &) const
     {
-        real_reset_default_prec();
         REQUIRE(real{T(0)}.zero_p());
         if (std::numeric_limits<T>::radix == 2) {
             REQUIRE(real{T(0)}.get_prec() == detail::nl_digits<T>());
@@ -165,12 +119,6 @@ struct fp_ctor_tester {
         }
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
-        real_set_default_prec(101);
-        REQUIRE(real{T(0)}.zero_p());
-        REQUIRE(real{T(0)}.get_prec() == 101);
-        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
-        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
-        real_reset_default_prec();
         if (std::numeric_limits<T>::radix != 2 || (ppc_arch && std::is_same<T, long double>::value)) {
             return;
         }
@@ -180,9 +128,6 @@ struct fp_ctor_tester {
             REQUIRE(::mpfr_equal_p(real{x}.get_mpfr_t(), real{f2str(x), 10, detail::nl_digits<T>()}.get_mpfr_t()));
             REQUIRE(::mpfr_equal_p(real{x, detail::nl_digits<T>() + 100}.get_mpfr_t(),
                                    real{f2str(x), 10, detail::nl_digits<T>()}.get_mpfr_t()));
-            real_set_default_prec(detail::c_max(100, detail::nl_digits<T>()));
-            REQUIRE(::mpfr_equal_p(real{x}.get_mpfr_t(), real{f2str(x), 10, detail::nl_digits<T>()}.get_mpfr_t()));
-            real_reset_default_prec();
         }
     }
 };
@@ -199,12 +144,6 @@ TEST_CASE("real constructors")
     REQUIRE(r1.get_prec() == real_prec_min());
     REQUIRE(r1.zero_p());
     REQUIRE(!r1.signbit());
-    real_set_default_prec(100);
-    real r1a;
-    REQUIRE(r1a.get_prec() == 100);
-    REQUIRE(r1a.zero_p());
-    REQUIRE(!r1a.signbit());
-    real_reset_default_prec();
     // Copy ctor.
     real r3{real{4}};
     REQUIRE(r3.is_valid());
@@ -258,14 +197,10 @@ TEST_CASE("real constructors")
     REQUIRE(!r8a.is_valid());
     REQUIRE(r8.is_valid());
     // String constructors.
-    REQUIRE(real_get_default_prec() == 0);
     REQUIRE((::mpfr_equal_p(real{"123", 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"123", 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((real{"123", 100}.get_prec() == 100));
     REQUIRE((real{std::string{"123"}, 111}.get_prec() == 111));
-    real_set_default_prec(800);
-    REQUIRE((real{std::string{"123"}, 111}.get_prec() == 111));
-    real_reset_default_prec();
     REQUIRE((::mpfr_equal_p(real{std::string{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
 #if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
@@ -300,34 +235,11 @@ TEST_CASE("real constructors")
     REQUIRE((::mpfr_equal_p(real{"-11120", 3, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"-11120", 3, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"1111011", 2, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
-    real_set_default_prec(150);
-    REQUIRE((::mpfr_equal_p(real{"123"}.get_mpfr_t(), real{123}.get_mpfr_t())));
-    REQUIRE((::mpfr_equal_p(real{std::string{"123"}}.get_mpfr_t(), real{123}.get_mpfr_t())));
-    REQUIRE((real{"123"}.get_prec() == 150));
-    REQUIRE((real{std::string{"123"}}.get_prec() == 150));
-    REQUIRE((::mpfr_equal_p(real{"-11120", 3, 0}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-    REQUIRE((::mpfr_equal_p(real{std::string{"-11120"}, 3, 0}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-#if defined(MPPP_HAVE_STRING_VIEW)
-    REQUIRE((::mpfr_equal_p(real{std::string_view{"-11120"}, 3, 0}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-    REQUIRE((::mpfr_equal_p(real{std::string_view{"-123"}}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-    REQUIRE((real{std::string_view{"-123"}}.get_prec() == 150));
-#endif
-    REQUIRE((real{"-11120", 3, 0}.get_prec() == 150));
-    REQUIRE((::mpfr_equal_p(real{"123", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
-    REQUIRE((::mpfr_equal_p(real{"0b1111011", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
-    REQUIRE((::mpfr_equal_p(real{"-0B1111011", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-    REQUIRE((::mpfr_equal_p(real{"0x7B", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
-    REQUIRE((::mpfr_equal_p(real{std::string{"0x7B"}, int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((real{"nan", 10, 42}.nan_p()));
     REQUIRE((real{"inf", 10, 42}.inf_p()));
     REQUIRE((real{"-inf", 10, 42}.inf_p()));
     REQUIRE((real{"inf", 10, 42}.sgn() > 0));
     REQUIRE((real{"-inf", 10, 42}.sgn() < 0));
-#if defined(MPPP_HAVE_STRING_VIEW)
-    REQUIRE((
-        ::mpfr_equal_p(real{std::string_view{"0x7B"}, int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
-#endif
-    REQUIRE((::mpfr_equal_p(real{"-0X7B", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE_THROWS_PREDICATE((real{"12", -1, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == std::string("Cannot construct a real from a string in base -1: the base must either be zero or in "
@@ -361,16 +273,11 @@ TEST_CASE("real constructors")
                        "Cannot construct a real from a string in base 80: the base must either be zero or in "
                        "the [2,62] range");
         });
-    real_reset_default_prec();
     REQUIRE_THROWS_PREDICATE((real{"12", 10, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
-               == std::string("Cannot construct a real from a string if the precision is not explicitly "
-                              "specified and no default precision has been set");
-    });
-    REQUIRE_THROWS_PREDICATE((real{std::string{"12"}}), std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what()
-               == std::string("Cannot construct a real from a string if the precision is not explicitly "
-                              "specified and no default precision has been set");
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
     });
     REQUIRE_THROWS_PREDICATE((real{"123", 10, -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
@@ -405,21 +312,9 @@ TEST_CASE("real constructors")
     REQUIRE((::mpfr_equal_p(real{vc.data() + 1, vc.data() + 5, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((real{vc.data() + 1, vc.data() + 5, 100}.get_prec() == 100));
     REQUIRE((real{vc.data() + 2, vc.data() + 6, 100}.get_prec() == 100));
-    real_set_default_prec(121);
-    REQUIRE((::mpfr_equal_p(real{vc.data() + 2, vc.data() + 6}.get_mpfr_t(), real{1234}.get_mpfr_t())));
-    REQUIRE((::mpfr_equal_p(real{vc.data() + 1, vc.data() + 5}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-    REQUIRE((real{vc.data() + 1, vc.data() + 5}.get_prec() == 121));
-    REQUIRE((real{vc.data() + 2, vc.data() + 6}.get_prec() == 121));
-    real_reset_default_prec();
     REQUIRE_THROWS_PREDICATE(
         (real{vc.data(), vc.data() + 6, 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what() == std::string("The string ',-1234' does not represent a valid real in base 10");
-        });
-    REQUIRE_THROWS_PREDICATE(
-        (real{vc.data(), vc.data() + 6}), std::invalid_argument, [](const std::invalid_argument &ex) {
-            return ex.what()
-                   == std::string("Cannot construct a real from a string if the precision is not explicitly "
-                                  "specified and no default precision has been set");
         });
 #if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 2, 4}, 10, 100}.get_mpfr_t(), real{1234}.get_mpfr_t())));
@@ -460,11 +355,6 @@ TEST_CASE("real constructors")
     r0 = real{int_t{-42} << GMP_NUMB_BITS};
     ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
-    real_set_default_prec(100);
-    REQUIRE(real{int_t{}}.zero_p());
-    REQUIRE(real{int_t{}}.get_prec() == 100);
-    REQUIRE(real{int_t{1}}.get_prec() == 100);
-    real_reset_default_prec();
     // Construction from rational.
     REQUIRE(real{rat_t{}}.zero_p());
     REQUIRE(real{rat_t{}}.get_prec() == GMP_NUMB_BITS);
@@ -486,11 +376,6 @@ TEST_CASE("real constructors")
     ::mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 3);
-    real_set_default_prec(100);
-    REQUIRE(real{rat_t{}}.zero_p());
-    REQUIRE(real{rat_t{}}.get_prec() == 100);
-    REQUIRE(real{rat_t{1}}.get_prec() == 100);
-    real_reset_default_prec();
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE(real{real128{}}.zero_p());
     REQUIRE(real{-real128{}}.zero_p());
@@ -524,15 +409,6 @@ TEST_CASE("real constructors")
                            real{"3.40917866435610111081769936359662259e-2", 10, 64}.get_mpfr_t()));
     REQUIRE(::mpfr_equal_p(real{-real128{"3.40917866435610111081769936359662259e-2"}, 64}.get_mpfr_t(),
                            real{"-3.40917866435610111081769936359662259e-2", 10, 64}.get_mpfr_t()));
-    // Change default precision.
-    real_set_default_prec(100);
-    REQUIRE((real{real128{"3.40917866435610111081769936359662259e-2"}}).get_prec() == 100);
-    REQUIRE((real{real128{"-3.40917866435610111081769936359662259e-2"}}).get_prec() == 100);
-    REQUIRE(::mpfr_equal_p(real{real128{"3.40917866435610111081769936359662259e-2"}}.get_mpfr_t(),
-                           real{"3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
-    REQUIRE(::mpfr_equal_p(real{-real128{"3.40917866435610111081769936359662259e-2"}}.get_mpfr_t(),
-                           real{"-3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
-    real_reset_default_prec();
 #endif
     // Constructor from mpfr_t.
     ::mpfr_t m;
@@ -563,11 +439,6 @@ TEST_CASE("real kind constructors")
     r0 = real{real_kind::nan, -1, 10};
     REQUIRE(r0.nan_p());
     REQUIRE(r0.get_prec() == 10);
-    real_set_default_prec(9);
-    r0 = real{real_kind::nan};
-    REQUIRE(r0.nan_p());
-    REQUIRE(r0.get_prec() == 9);
-    real_reset_default_prec();
     // Ctor from inf.
     r0 = real{real_kind::inf, 12};
     REQUIRE(r0.inf_p());
@@ -581,12 +452,6 @@ TEST_CASE("real kind constructors")
     REQUIRE(r0.inf_p());
     REQUIRE(r0.get_prec() == 10);
     REQUIRE(!r0.signbit());
-    real_set_default_prec(9);
-    r0 = real{real_kind::inf};
-    REQUIRE(r0.inf_p());
-    REQUIRE(r0.get_prec() == 9);
-    REQUIRE(!r0.signbit());
-    real_reset_default_prec();
     // Ctor from zero.
     r0 = real{real_kind::zero, 12};
     REQUIRE(r0.zero_p());
@@ -600,12 +465,6 @@ TEST_CASE("real kind constructors")
     REQUIRE(r0.zero_p());
     REQUIRE(r0.get_prec() == 10);
     REQUIRE(!r0.signbit());
-    real_set_default_prec(9);
-    r0 = real{real_kind::zero};
-    REQUIRE(r0.zero_p());
-    REQUIRE(r0.get_prec() == 9);
-    REQUIRE(!r0.signbit());
-    real_reset_default_prec();
     // Error handling.
     REQUIRE_THROWS_PREDICATE((real{real_kind::nan, 0, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
@@ -618,11 +477,6 @@ TEST_CASE("real kind constructors")
                == "Cannot init a real with a precision of -100: the maximum allowed precision is "
                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                       + detail::to_string(real_prec_min());
-    });
-    REQUIRE_THROWS_PREDICATE((real{real_kind::nan}), std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what()
-               == std::string{"Cannot init a real with an automatically-deduced precision if "
-                              "the global default precision has not been set"};
     });
     // Wrong value for the real_kind enum.
     REQUIRE_THROWS_PREDICATE(
@@ -645,7 +499,6 @@ struct int_ass_tester {
     template <typename T>
     void operator()(const T &) const
     {
-        real_reset_default_prec();
         real r{12};
         r.set_prec(123);
         r = T(0);
@@ -655,12 +508,6 @@ struct int_ass_tester {
         r = T(42);
         REQUIRE(r.get_prec() == detail::nl_digits<T>() + detail::is_signed<T>::value);
         REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"42", 10, 100}.get_mpfr_t()));
-        real_set_default_prec(200);
-        r.set_prec(123);
-        r = T(43);
-        REQUIRE(r.get_prec() == 200);
-        REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"43", 10, 100}.get_mpfr_t()));
-        real_reset_default_prec();
         auto int_dist = integral_minmax_dist<T>{};
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
@@ -675,7 +522,6 @@ struct fp_ass_tester {
     template <typename T>
     void operator()(const T &) const
     {
-        real_reset_default_prec();
         real r{12};
         r.set_prec(123);
         r = T(0);
@@ -697,11 +543,6 @@ struct fp_ass_tester {
             r = std::numeric_limits<T>::quiet_NaN();
             REQUIRE(r.nan_p());
         }
-        real_set_default_prec(101);
-        r = T(0);
-        REQUIRE(r.zero_p());
-        REQUIRE(r.get_prec() == 101);
-        real_reset_default_prec();
         if (std::numeric_limits<T>::radix != 2 || (ppc_arch && std::is_same<T, long double>::value)) {
             return;
         }
@@ -760,14 +601,6 @@ TEST_CASE("real assignment")
     r7 = true;
     REQUIRE(::mpfr_cmp_ui(r7.get_mpfr_t(), 1ul) == 0);
     REQUIRE(r7.get_prec() == detail::c_max(::mpfr_prec_t(detail::nl_digits<bool>()), real_prec_min()));
-    real_set_default_prec(101);
-    r7 = false;
-    REQUIRE(r7.zero_p());
-    REQUIRE(r7.get_prec() == 101);
-    r7 = true;
-    REQUIRE(::mpfr_cmp_ui(r7.get_mpfr_t(), 1ul) == 0);
-    REQUIRE(r7.get_prec() == 101);
-    real_reset_default_prec();
     // Assignment from integer.
     real r8;
     r8 = int_t{};
@@ -794,13 +627,6 @@ TEST_CASE("real assignment")
     r8 = int_t{-42} << GMP_NUMB_BITS;
     ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r8.get_mpfr_t())));
-    real_set_default_prec(100);
-    r8 = int_t{};
-    REQUIRE(r8.zero_p());
-    REQUIRE(r8.get_prec() == 100);
-    r8 = int_t{1};
-    REQUIRE(r8.get_prec() == 100);
-    real_reset_default_prec();
     // Assignment from rational.
     r8 = rat_t{};
     REQUIRE(r8.zero_p());
@@ -829,13 +655,6 @@ TEST_CASE("real assignment")
     ::mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r8.get_mpfr_t())));
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 3);
-    real_set_default_prec(100);
-    r8 = rat_t{};
-    REQUIRE(r8.zero_p());
-    REQUIRE(r8.get_prec() == 100);
-    r8 = rat_t{1};
-    REQUIRE(r8.get_prec() == 100);
-    real_reset_default_prec();
 #if defined(MPPP_WITH_QUADMATH)
     r8 = real128{};
     REQUIRE(r8.zero_p());
@@ -873,17 +692,6 @@ TEST_CASE("real assignment")
     r8 = -real128{"3.40917866435610111081769936359662259e-4957"};
     REQUIRE(
         ::mpfr_equal_p(r8.get_mpfr_t(), real{"-3.40917866435610111081769936359662259e-4957", 10, 113}.get_mpfr_t()));
-    // Change default precision.
-    real_set_default_prec(100);
-    r8 = real128{"3.40917866435610111081769936359662259e-2"};
-    REQUIRE((r8).get_prec() == 100);
-    r8 = -real128{"3.40917866435610111081769936359662259e-2"};
-    REQUIRE((r8).get_prec() == 100);
-    r8 = real128{"3.40917866435610111081769936359662259e-2"};
-    REQUIRE(::mpfr_equal_p(r8.get_mpfr_t(), real{"3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
-    r8 = -real128{"3.40917866435610111081769936359662259e-2"};
-    REQUIRE(::mpfr_equal_p(r8.get_mpfr_t(), real{"-3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
-    real_reset_default_prec();
 #endif
     // The setter function.
     r8.set_prec(212);
@@ -924,56 +732,6 @@ TEST_CASE("real assignment")
     REQUIRE(r8.get_prec() == 185);
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -456l) == 0);
 #endif
-    // Assignment from string.
-    real_reset_default_prec();
-    REQUIRE_THROWS_PREDICATE(r8 = "1223", std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what() == std::string("Cannot assign a string to a real if a default precision is not set");
-    });
-    REQUIRE_THROWS_PREDICATE(r8 = std::string("1223"), std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what() == std::string("Cannot assign a string to a real if a default precision is not set");
-    });
-#if defined(MPPP_HAVE_STRING_VIEW)
-    REQUIRE_THROWS_PREDICATE(r8 = std::string_view("1223"), std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what() == std::string("Cannot assign a string to a real if a default precision is not set");
-    });
-#endif
-    real_set_default_prec(100);
-    r8.set_prec(150);
-    r8 = "1223";
-    REQUIRE(r8.get_prec() == 100);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1223l) == 0);
-    r8.set_prec(150);
-    r8 = std::string{"1224"};
-    REQUIRE(r8.get_prec() == 100);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1224l) == 0);
-#if defined(MPPP_HAVE_STRING_VIEW)
-    r8.set_prec(150);
-    r8 = std::string_view{"1224"};
-    REQUIRE(r8.get_prec() == 100);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1224l) == 0);
-#endif
-    REQUIRE_THROWS_PREDICATE(r8 = "hell-o", std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what()
-               == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
-    });
-    REQUIRE(r8.nan_p());
-    r8 = 56;
-    REQUIRE_THROWS_PREDICATE(r8 = std::string{"hell-o"}, std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what()
-               == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
-    });
-    REQUIRE(r8.nan_p());
-    r8 = 56;
-#if defined(MPPP_HAVE_STRING_VIEW)
-    REQUIRE_THROWS_PREDICATE(
-        r8 = std::string_view{"hell-o"}, std::invalid_argument, [](const std::invalid_argument &ex) {
-            return ex.what()
-                   == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
-        });
-    REQUIRE(r8.nan_p());
-    r8 = 56;
-#endif
-    real_reset_default_prec();
     // Setter from string.
     r8.set_prec(123);
     r8.set("-4.321e3");

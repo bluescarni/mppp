@@ -33,16 +33,6 @@ TEST_CASE("real pi")
                == "Cannot init a real constant with a precision of -100: the value must be either zero or between "
                       + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max());
     });
-    REQUIRE_THROWS_PREDICATE(r0 = real_pi(), std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what()
-               == std::string{"Cannot init a real constant with an automatically-deduced precision if "
-                              "the global default precision has not been set"};
-    });
-    real_set_default_prec(42);
-    r0 = real_pi();
-    REQUIRE(r0.get_prec() == 42);
-    REQUIRE((r0 == real{"3.14159265359012", 42}));
-    real_reset_default_prec();
     r0.set_prec(86);
     REQUIRE(real_pi(r0).get_prec() == 86);
     REQUIRE((r0 == real{"3.141592653589793238462643402", 86}));

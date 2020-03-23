@@ -14,7 +14,6 @@
 #if defined(MPPP_WITH_MPFR)
 
 #include <algorithm>
-#include <atomic>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -70,7 +69,7 @@ inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
     static_assert(nl_digits<T>() < nl_max<::mpfr_prec_t>(), "Overflow error.");
     // NOTE: for signed integers, include the sign bit as well.
-    return static_cast<::mpfr_prec_t>(nl_digits<T>()) + is_signed<T>::value;
+    return clamp_mpfr_prec(static_cast<::mpfr_prec_t>(nl_digits<T>()) + is_signed<T>::value);
 }
 
 // Utility function to determine the number of base-2 digits of the significand
@@ -89,7 +88,8 @@ template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
     static_assert(nl_digits<T>() <= nl_max<::mpfr_prec_t>(), "Overflow error.");
-    return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(nl_digits<T>()) : dig2mpfr_prec<T>();
+    return clamp_mpfr_prec(std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(nl_digits<T>())
+                                                              : dig2mpfr_prec<T>());
 }
 
 template <std::size_t SSize>
@@ -103,7 +103,7 @@ inline ::mpfr_prec_t real_deduce_precision(const integer<SSize> &n)
         throw std::overflow_error("The deduced precision for a real from an integer is too large");
     }
     // LCOV_EXCL_STOP
-    return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
+    return clamp_mpfr_prec(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS));
 }
 
 template <std::size_t SSize>
@@ -122,7 +122,7 @@ inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
         throw std::overflow_error("The deduced precision for a real from a rational is too large");
     }
     // LCOV_EXCL_STOP
-    return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
+    return clamp_mpfr_prec(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS));
 }
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -131,15 +131,12 @@ inline ::mpfr_prec_t real_deduce_precision(const real128 &)
 {
     // The significand precision in bits is 113 for real128. Let's double-check it.
     static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
-    return 113;
+    return clamp_mpfr_prec(113);
 }
 
 #endif
 
 #endif
-
-// Default precision value.
-MPPP_DLL_PUBLIC extern std::atomic<::mpfr_prec_t> real_default_prec;
 
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
@@ -205,80 +202,6 @@ template <typename... Args>
 using cvr_real_enabler
     = detail::enable_if_t<detail::conjunction<std::is_same<detail::uncvref_t<Args>, real>...>::value, int>;
 #endif
-
-/// Get the default precision for \link mppp::real real\endlink objects.
-/**
- * \ingroup real_prec
- * \rststar
- * This function returns the value of the precision used during the construction of
- * :cpp:class:`~mppp::real` objects when an explicit precision value
- * is **not** specified . On program startup, the value returned by this function
- * is zero, meaning that the precision of a :cpp:class:`~mppp::real` object will be chosen
- * automatically according to heuristics depending on the specific situation, if possible.
- *
- * The default precision is stored in a global variable, and its value can be changed via
- * :cpp:func:`~mppp::real_set_default_prec()`. It is safe to read and modify concurrently
- * from multiple threads the default precision.
- * \endrststar
- *
- * @return the value of the default precision for \link mppp::real real\endlink objects.
- */
-inline mpfr_prec_t real_get_default_prec()
-{
-    return detail::real_default_prec.load(std::memory_order_relaxed);
-}
-
-/// Set the default precision for \link mppp::real real\endlink objects.
-/**
- * \ingroup real_prec
- * \rststar
- * See :cpp:func:`~mppp::real_get_default_prec()` for an explanation of how the default precision value
- * is used.
- * \endrststar
- *
- * @param p the desired value for the default precision for \link mppp::real real\endlink objects.
- *
- * @throws std::invalid_argument if \p p is nonzero and not in the range established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
- */
-inline void real_set_default_prec(::mpfr_prec_t p)
-{
-    if (mppp_unlikely(p && !detail::real_prec_check(p))) {
-        throw std::invalid_argument("Cannot set the default precision to " + detail::to_string(p)
-                                    + ": the value must be either zero or between " + detail::to_string(real_prec_min())
-                                    + " and " + detail::to_string(real_prec_max()));
-    }
-    detail::real_default_prec.store(p, std::memory_order_relaxed);
-}
-
-/// Reset the default precision for \link mppp::real real\endlink objects.
-/**
- * \ingroup real_prec
- * \rststar
- * This function will reset the default precision value to zero (i.e., the same value assigned
- * on program startup). See :cpp:func:`~mppp::real_get_default_prec()` for an explanation of how the default precision
- * value is used.
- * \endrststar
- */
-inline void real_reset_default_prec()
-{
-    detail::real_default_prec.store(0, std::memory_order_relaxed);
-}
-
-namespace detail
-{
-
-// Get the default precision, if set, otherwise the clamped deduced precision for x.
-template <typename T>
-inline ::mpfr_prec_t real_dd_prec(const T &x)
-{
-    // NOTE: this is guaranteed to be a valid precision value.
-    const auto dp = real_get_default_prec();
-    // Return default precision if nonzero, otherwise return the clamped deduced precision.
-    return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
-}
-
-} // namespace detail
 
 // Doxygen gets confused by this.
 #if !defined(MPPP_DOXYGEN_INVOKED)
@@ -484,41 +407,23 @@ public:
     }
     // Constructor from a special value, sign and precision.
     explicit real(real_kind, int, ::mpfr_prec_t);
-    /// Constructor from a special value and precision.
-    /**
-     * This constructor is equivalent to the constructor from a special value, sign and precision
-     * with a hard-coded sign of 0.
-     *
-     * @param k the desired special value.
-     * @param p the desired precision for \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from a special value, sign and precision.
-     */
-    explicit real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
-    /// Constructor from a special value.
-    /**
-     * This constructor is equivalent to the constructor from a special value, sign and precision
-     * with a hard-coded sign of 0 and hard-coded precision of 0.
-     *
-     * @param k the desired special value.
-     *
-     * @throws unspecified any exception thrown by the constructor from a special value, sign and precision.
-     */
-    explicit real(real_kind k) : real(k, 0, 0) {}
+    // Constructor from a special value and precision.
+    explicit real(real_kind, ::mpfr_prec_t);
 
 private:
     // A helper to determine the precision to use in the generic constructors. The precision
-    // can be manually provided, taken from the default global value, or deduced according
+    // can be manually provided, or deduced according
     // to the properties of the type/value.
     template <typename T>
     static ::mpfr_prec_t compute_init_precision(::mpfr_prec_t provided, const T &x)
     {
         if (provided) {
-            // Provided precision trumps everything. Check it and return it.
+            // The precision was explicitly provided: check it and return it.
             return check_init_prec(provided);
+        } else {
+            // Return the deduced precision.
+            return detail::real_deduce_precision(x);
         }
-        // Return the default or deduced precision.
-        return detail::real_dd_prec(x);
     }
 
     // Construction from FPs.
@@ -597,11 +502,7 @@ public:
      * If ``p`` is nonzero, then ``this`` will be initialised exactly to a precision of ``p``, and
      * a rounding operation might occurr.
      *
-     * If ``p`` is zero, the constructor will first fetch the default precision ``dp`` via
-     * :cpp:func:`~mppp::real_get_default_prec()`. If ``dp`` is nonzero, then ``dp`` will be used
-     * as precision for ``this`` and a rounding operation might occurr.
-     *
-     * Otherwise, if ``dp`` is zero, the precision of ``this`` will be set according to the following
+     * If ``p`` is zero, the precision of ``this`` will be set according to the following
      * heuristics:
      *
      * * if ``x`` is a C++ integral type ``I``, then the precision is set to the bit width of ``I``;
@@ -654,8 +555,7 @@ public:
      * documentation of the MPFR function ``mpfr_set_str()``. Note that leading whitespaces are ignored, but trailing
      * whitespaces will raise an error.
      *
-     * The precision of ``this`` will be ``p`` if ``p`` is nonzero, the default precision otherwise. If ``p`` is zero
-     * and no default precision has been set, an error will be raised.
+     * The precision of ``this`` will be set to ``p``.
      *
      * .. seealso::
      *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
@@ -667,8 +567,7 @@ public:
      *
      * @throws std::invalid_argument in the following cases:
      * - \p base is not zero and not in the [2,62] range,
-     * - \p p is either outside the valid bounds for a precision value, or it is zero and no
-     *   default precision value has been set,
+     * - \p p outside the valid bounds for a precision value,
      * - \p s cannot be interpreted as a floating-point number.
      * @throws unspecified any exception thrown by memory errors in standard containers.
      */
@@ -697,29 +596,10 @@ public:
     explicit real(const T &s, ::mpfr_prec_t p) : real(s, 10, p)
     {
     }
-    /// Constructor from string.
-    /**
-     * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10
-     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
-     *
-     * @param s the input string.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, base and precision.
-     */
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
-#else
-    template <typename T, string_type_enabler<T> = 0>
-#endif
-    explicit real(const T &s) : real(s, 10, 0)
-    {
-    }
     // Constructor from range of characters, base and precision.
     explicit real(const char *, const char *, int, ::mpfr_prec_t);
     // Constructor from range of characters and precision.
     explicit real(const char *, const char *, ::mpfr_prec_t);
-    // Constructor from range of characters.
-    explicit real(const char *, const char *);
     // Copy constructor from ``mpfr_t``.
     explicit real(const ::mpfr_t);
     /// Move constructor from ``mpfr_t``.
@@ -774,7 +654,7 @@ private:
     void dispatch_fp_assignment(const Func &func, const T &x)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(x));
+            set_prec_impl<false>(detail::real_deduce_precision(x));
         }
         func(&m_mpfr, x, MPFR_RNDN);
     }
@@ -798,7 +678,7 @@ private:
     void dispatch_integral_ass_prec(const T &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(n));
+            set_prec_impl<false>(detail::real_deduce_precision(n));
         }
     }
     // Special casing for bool.
@@ -834,7 +714,7 @@ private:
     void dispatch_assignment(const integer<SSize> &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(n));
+            set_prec_impl<false>(detail::real_deduce_precision(n));
         }
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
@@ -842,7 +722,7 @@ private:
     void dispatch_assignment(const rational<SSize> &q)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(q));
+            set_prec_impl<false>(detail::real_deduce_precision(q));
         }
         const auto v = detail::get_mpq_view(q);
         ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
@@ -852,7 +732,7 @@ private:
     void dispatch_assignment(const real128 &x)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(x));
+            set_prec_impl<false>(detail::real_deduce_precision(x));
         }
         assign_real128(x);
     }
@@ -864,11 +744,7 @@ public:
      * \rststar
      * The generic assignment operator will set ``this`` to the value of ``x``.
      *
-     * The operator will first fetch the default precision ``dp`` via
-     * :cpp:func:`~mppp::real_get_default_prec()`. If ``dp`` is nonzero, then ``dp`` will be used
-     * as a new precision for ``this`` and a rounding operation might occurr during the assignment.
-     *
-     * Otherwise, if ``dp`` is zero, the precision of ``this`` will be set according to the same
+     * The precision of ``this`` will be set according to the same
      * heuristics described in the generic constructor.
      * \endrststar
      *
@@ -889,44 +765,6 @@ public:
         return *this;
     }
 
-private:
-    // Implementation of the assignment from string.
-    MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
-    // Dispatching for string assignment.
-    real &string_assignment(const char *);
-    real &string_assignment(const std::string &);
-#if defined(MPPP_HAVE_STRING_VIEW)
-    real &string_assignment(const std::string_view &);
-#endif
-
-public:
-    /// Assignment from string.
-    /**
-     * \rststar
-     * This operator will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which is
-     * interpreted as a floating-point number in base 10. The precision of ``this`` will be set to the value returned by
-     * :cpp:func:`~mppp::real_get_default_prec()`. If no default precision has been set, an error will be raised. If
-     * ``s`` is not a valid representation of a floating-point number in base 10, ``this`` will be set to NaN and an
-     * error will be raised.
-     * \endrststar
-     *
-     * @param s the string that will be assigned to \p this.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if a default precision has not been set, or if \p s cannot be parsed
-     * as a floating-point value in base 10.
-     * @throws unspecified any exception thrown by memory allocation errors in standard containers.
-     */
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
-#else
-    template <typename T, string_type_enabler<T> = 0>
-#endif
-    real &operator=(const T &s)
-    {
-        return string_assignment(s);
-    }
     // Copy assignment from ``mpfr_t``.
     real &operator=(const ::mpfr_t);
 
@@ -1007,6 +845,7 @@ public:
 
 private:
     // Implementation of string setters.
+    MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
     real &set_impl(const char *, int);
     real &set_impl(const std::string &, int);
 #if defined(MPPP_HAVE_STRING_VIEW)
@@ -1019,10 +858,8 @@ public:
      * \rststar
      * This method will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which will
      * be interpreted as a floating-point number in base ``base``. ``base`` must be either 0 (in which case the base is
-     * automatically deduced), or a value in the [2,62] range. Contrary to the assignment operator from string,
-     * the global default precision is ignored and the precision of the assignment is dictated by the precision of
-     * ``this``. Consequently, the precision of ``this`` will not be altered by the assignment, and a rounding might
-     * occur, depending on the operands.
+     * automatically deduced), or a value in the [2,62] range. The precision of the assignment is dictated by the
+     * precision of ``this``, and a rounding might thus occur.
      *
      * If ``s`` is not a valid representation of a floating-point number in base ``base``, ``this``
      * will be set to NaN and an error will be raised.
@@ -3285,25 +3122,7 @@ MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
  *  @{
  */
 
-/// \link mppp::real Real\endlink \f$\pi\f$ constant.
-/**
- * \rststar
- * This function will return a :cpp:class:`~mppp::real` :math:`\pi`
- * with a precision of ``p``. If ``p`` is zero, the precision
- * will be set to the value returned by :cpp:func:`~mppp::real_get_default_prec()`.
- * If ``p`` is zero and no default precision has been set, an error will be raised.
- * \endrststar
- *
- * @param p the desired precision.
- *
- * @return a \link mppp::real real\endlink \f$\pi\f$.
- *
- * @throws std::invalid_argument if \p p is not within the bounds established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
- * or if \p p is zero but no default precision has been set.
- */
-MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t p = 0);
-
+MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_pi(real &);
 
 /** @} */

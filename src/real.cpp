@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <array>
-#include <atomic>
 #include <cassert>
 #include <cstddef>
 #include <iostream>
@@ -492,35 +491,18 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
     }
 }
 
-// NOTE: the use of ATOMIC_VAR_INIT ensures that the initialisation of default_prec
-// is constant initialisation:
-//
-// http://en.cppreference.com/w/cpp/atomic/ATOMIC_VAR_INIT
-//
-// This essentially means that this initialisation happens before other types of
-// static initialisation:
-//
-// http://en.cppreference.com/w/cpp/language/initialization
-//
-// This ensures that static reals, which are subject to dynamic initialization, are initialised
-// when this variable has already been constructed, and thus access to it will be safe.
-std::atomic<::mpfr_prec_t> real_default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
-
 } // namespace detail
 
 /// Default constructor.
 /**
  * \rststar
  * The value will be initialised to positive zero. The precision of ``this`` will be
- * either the default precision, if set, or the value returned by :cpp:func:`~mppp::real_prec_min()`
- * otherwise.
+ * the value returned by :cpp:func:`~mppp::real_prec_min()`.
  * \endrststar
  */
 real::real()
 {
-    // Init with minimum or default precision.
-    const auto dp = real_get_default_prec();
-    ::mpfr_init2(&m_mpfr, dp ? dp : real_prec_min());
+    ::mpfr_init2(&m_mpfr, real_prec_min());
     ::mpfr_set_zero(&m_mpfr, 1);
 }
 
@@ -620,12 +602,7 @@ void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
         throw std::invalid_argument("Cannot construct a real from a string in base " + detail::to_string(base)
                                     + ": the base must either be zero or in the [2,62] range");
     }
-    const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
-    if (mppp_unlikely(!prec)) {
-        throw std::invalid_argument("Cannot construct a real from a string if the precision is not explicitly "
-                                    "specified and no default precision has been set");
-    }
-    ::mpfr_init2(&m_mpfr, prec);
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
     const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
     if (mppp_unlikely(ret == -1)) {
         ::mpfr_clear(&m_mpfr);
@@ -685,25 +662,12 @@ real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
  */
 real::real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
 
-/// Constructor from range of characters.
-/**
- * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
- * to 10 and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
- *
- * @param begin the start of the input range.
- * @param end the end of the input range.
- *
- * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
- */
-real::real(const char *begin, const char *end) : real(begin, end, 10, 0) {}
-
 /// Constructor from a special value, sign and precision.
 /**
  * \rststar
  * This constructor will initialise ``this`` with one of the special values
  * specified by the :cpp:type:`~mppp::real_kind` enum. The precision of ``this``
- * will be ``p``. If ``p`` is zero, the precision will be set to the default
- * precision (as indicated by :cpp:func:`~mppp::real_get_default_prec()`).
+ * will be ``p``.
  *
  * If ``k`` is not NaN, the sign bit will be set to positive if ``sign``
  * is nonnegative, negative otherwise.
@@ -714,23 +678,11 @@ real::real(const char *begin, const char *end) : real(begin, end, 10, 0) {}
  * @param p the desired precision for \p this.
  *
  * @throws std::invalid_argument if \p p is not within the bounds established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
- * or if \p p is zero but no default precision has been set.
+ * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
  */
 real::real(real_kind k, int sign, ::mpfr_prec_t p)
 {
-    ::mpfr_prec_t prec;
-    if (p) {
-        prec = check_init_prec(p);
-    } else {
-        const auto dp = real_get_default_prec();
-        if (mppp_unlikely(!dp)) {
-            throw std::invalid_argument("Cannot init a real with an automatically-deduced precision if "
-                                        "the global default precision has not been set");
-        }
-        prec = dp;
-    }
-    ::mpfr_init2(&m_mpfr, prec);
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
     // NOTE: handle all cases explicitly, in order to avoid
     // compiler warnings.
     switch (k) {
@@ -754,6 +706,18 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
                 + " and 'zero'=" + std::to_string(static_cast<kind_cast_t>(real_kind::zero)) + ")");
     }
 }
+
+/// Constructor from a special value and precision.
+/**
+ * This constructor is equivalent to the constructor from a special value, sign and precision
+ * with a hard-coded sign of 0.
+ *
+ * @param k the desired special value.
+ * @param p the desired precision for \p this.
+ *
+ * @throws unspecified any exception thrown by the constructor from a special value, sign and precision.
+ */
+real::real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
 
 /// Copy constructor from ``mpfr_t``.
 /**
@@ -816,33 +780,6 @@ void real::string_assignment_impl(const char *s, int base)
                                     + detail::to_string(base));
     }
 }
-
-// Dispatching for string assignment.
-real &real::string_assignment(const char *s)
-{
-    const auto dp = real_get_default_prec();
-    if (mppp_unlikely(!dp)) {
-        throw std::invalid_argument("Cannot assign a string to a real if a default precision is not set");
-    }
-    set_prec_impl<false>(dp);
-    string_assignment_impl(s, 10);
-    return *this;
-}
-
-real &real::string_assignment(const std::string &s)
-{
-    return string_assignment(s.c_str());
-}
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-real &real::string_assignment(const std::string_view &s)
-{
-    MPPP_MAYBE_TLS std::vector<char> buffer;
-    buffer.assign(s.begin(), s.end());
-    buffer.emplace_back('\0');
-    return string_assignment(buffer.data());
-}
-#endif
 
 /// Copy assignment from ``mpfr_t``.
 /**
@@ -2239,31 +2176,32 @@ namespace detail
 template <typename F>
 inline real real_constant(const F &f, ::mpfr_prec_t p)
 {
-    ::mpfr_prec_t prec;
-    if (p) {
-        if (mppp_unlikely(!real_prec_check(p))) {
-            throw std::invalid_argument("Cannot init a real constant with a precision of " + detail::to_string(p)
-                                        + ": the value must be either zero or between "
-                                        + detail::to_string(real_prec_min()) + " and "
-                                        + detail::to_string(real_prec_max()));
-        }
-        prec = p;
-    } else {
-        const auto dp = real_get_default_prec();
-        if (mppp_unlikely(!dp)) {
-            throw std::invalid_argument("Cannot init a real constant with an automatically-deduced precision if "
-                                        "the global default precision has not been set");
-        }
-        prec = dp;
+    if (mppp_unlikely(!real_prec_check(p))) {
+        throw std::invalid_argument("Cannot init a real constant with a precision of " + detail::to_string(p)
+                                    + ": the value must be either zero or between " + detail::to_string(real_prec_min())
+                                    + " and " + detail::to_string(real_prec_max()));
     }
-    real retval{real::ptag{}, prec, true};
+
+    real retval{real::ptag{}, p, true};
     f(retval._get_mpfr_t(), MPFR_RNDN);
     return retval;
 }
 
 } // namespace detail
 
-// pi constant.
+/// \link mppp::real Real\endlink \f$\pi\f$ constant.
+/**
+ * \rststar
+ * This function will return a :cpp:class:`~mppp::real` :math:`\pi`
+ * with a precision of ``p``.
+ *
+ * @param p the desired precision.
+ *
+ * @return a \link mppp::real real\endlink \f$\pi\f$.
+ *
+ * @throws std::invalid_argument if \p p is not within the bounds established by
+ * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
+ */
 real real_pi(::mpfr_prec_t p)
 {
     return detail::real_constant(::mpfr_const_pi, p);
