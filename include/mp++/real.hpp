@@ -397,9 +397,9 @@ public:
     // Constructor from range of characters and precision.
     explicit real(const char *, const char *, ::mpfr_prec_t);
 
-    // Copy constructor from ``mpfr_t``.
+    // Copy constructor from mpfr_t.
     explicit real(const ::mpfr_t);
-    // Move constructor from ``mpfr_t``.
+    // Move constructor from mpfr_t.
     explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
 
     // Destructor.
@@ -408,12 +408,7 @@ public:
     // Copy assignment operator.
     real &operator=(const real &);
 
-    /// Move assignment operator.
-    /**
-     * @param other the \link mppp::real real\endlink that will be moved into \p this.
-     *
-     * @return a reference to \p this.
-     */
+    // Move assignment operator.
     real &operator=(real &&other) noexcept
     {
         // NOTE: for generic code, std::swap() is not a particularly good way of implementing
@@ -454,6 +449,7 @@ private:
     {
         dispatch_fp_assignment<SetPrec>(::mpfr_set_ld, x);
     }
+
     // Assignment from integral types.
     template <bool SetPrec, typename T>
     void dispatch_integral_ass_prec(const T &n)
@@ -491,6 +487,8 @@ private:
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
+
+    // Assignment from integer.
     template <bool SetPrec, std::size_t SSize>
     void dispatch_assignment(const integer<SSize> &n)
     {
@@ -499,6 +497,8 @@ private:
         }
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
+
+    // Assignment from rational.
     template <bool SetPrec, std::size_t SSize>
     void dispatch_assignment(const rational<SSize> &q)
     {
@@ -508,7 +508,9 @@ private:
         const auto v = detail::get_mpq_view(q);
         ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
     }
+
 #if defined(MPPP_WITH_QUADMATH)
+    // Assignment from real128.
     template <bool SetPrec>
     void dispatch_assignment(const real128 &x)
     {
@@ -520,21 +522,7 @@ private:
 #endif
 
 public:
-    /// Generic assignment operator.
-    /**
-     * \rststar
-     * The generic assignment operator will set ``this`` to the value of ``x``.
-     *
-     * The precision of ``this`` will be set according to the same
-     * heuristics described in the generic constructor.
-     * \endrststar
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::overflow_error if an overflow occurs in the computation of the automatically-deduced precision.
-     */
+    // Generic assignment operator.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
@@ -546,46 +534,13 @@ public:
         return *this;
     }
 
-    // Copy assignment from ``mpfr_t``.
+    // Copy assignment from mpfr_t.
     real &operator=(const ::mpfr_t);
 
-    /// Move assignment from ``mpfr_t``.
-    /**
-     * This operator will set ``this`` to a shallow copy of ``x``.
-     *
-     * \rststar
-     * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
-     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
-     *    and :cpp:func:`~mppp::real_prec_max()`.
-     *
-     *    Additionally, the user must ensure that, after the assignment, ``mpfr_clear()`` is never
-     *    called on ``x``: the resources previously owned by ``x`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     * \endrststar
-     *
-     * @param x the ``mpfr_t`` that will be moved.
-     *
-     * @return a reference to \p this.
-     */
-    real &operator=(::mpfr_t &&x)
-    {
-        // Clear this.
-        ::mpfr_clear(&m_mpfr);
-        // Shallow copy x.
-        m_mpfr = *x;
-        return *this;
-    }
+    // Move assignment from mpfr_t.
+    real &operator=(::mpfr_t &&);
 
-    /// Check validity.
-    /**
-     * \rststar
-     * A :cpp:class:`~mppp::real` becomes invalid after it is used
-     * as an argument to the move constructor.
-     * \endrststar
-     *
-     * @return ``true`` if ``this`` is valid, ``false`` otherwise.
-     */
+    // Check validity.
     bool is_valid() const noexcept
     {
         return m_mpfr._mpfr_d != nullptr;
@@ -594,25 +549,7 @@ public:
     // Set to another real.
     real &set(const real &);
 
-    /// Generic setter.
-    /**
-     * \rststar
-     * This method will set ``this`` to the value of ``x``. Contrary to the generic assignment operator,
-     * the precision of the assignment is dictated by the precision of ``this``, rather than
-     * being deduced from the type and value of ``x``. Consequently, the precision of ``this`` will not be altered
-     * by the assignment, and a rounding might occur, depending on the operands.
-     *
-     * This method is a thin wrapper around various ``mpfr_set_*()``
-     * assignment functions from the MPFR API.
-     *
-     * .. seealso ::
-     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param x the value to which \p this will be set.
-     *
-     * @return a reference to \p this.
-     */
+    // Generic setter.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else

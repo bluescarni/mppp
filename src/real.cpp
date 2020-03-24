@@ -650,14 +650,7 @@ real::real(const ::mpfr_t x)
     ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
 }
 
-/// Copy assignment operator.
-/**
- * The operator will deep-copy \p other into \p this.
- *
- * @param other the \link mppp::real real\endlink that will be copied into \p this.
- *
- * @return a reference to \p this.
- */
+// Copy assignment operator.
 real &real::operator=(const real &other)
 {
     if (mppp_likely(this != &other)) {
@@ -692,21 +685,7 @@ void real::string_assignment_impl(const char *s, int base)
     }
 }
 
-/// Copy assignment from ``mpfr_t``.
-/**
- * This operator will set ``this`` to a deep copy of ``x``.
- *
- * \rststar
- * .. warning::
- *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
- *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
- *    and :cpp:func:`~mppp::real_prec_max()`.
- * \endrststar
- *
- * @param x the ``mpfr_t`` that will be copied.
- *
- * @return a reference to \p this.
- */
+// Copy assignment from mpfr_t.
 real &real::operator=(const ::mpfr_t x)
 {
     // Set the precision, assuming the prec of x is valid.
@@ -716,25 +695,17 @@ real &real::operator=(const ::mpfr_t x)
     return *this;
 }
 
-/// Set to another \link mppp::real real\endlink value.
-/**
- * \rststar
- * This method will set ``this`` to the value of ``other``. Contrary to the copy assignment operator,
- * the precision of the assignment is dictated by the precision of ``this``, rather than
- * the precision of ``other``. Consequently, the precision of ``this`` will not be altered by the
- * assignment, and a rounding might occur, depending on the values
- * and the precisions of the operands.
- *
- * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
- *
- * .. seealso ::
- *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
- * \endrststar
- *
- * @param other the value to which \p this will be set.
- *
- * @return a reference to \p this.
- */
+// Move assignment from mpfr_t.
+real &real::operator=(::mpfr_t &&x)
+{
+    // Clear this.
+    ::mpfr_clear(&m_mpfr);
+    // Shallow copy x.
+    m_mpfr = *x;
+    return *this;
+}
+
+// Set to another real.
 real &real::set(const real &other)
 {
     return set(&other.m_mpfr);

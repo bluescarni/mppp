@@ -182,6 +182,7 @@ The real class
       The second constructor calls the first one with a *base* value of 10.
 
       .. seealso::
+
          https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
 
       :param s: the input string.
@@ -252,6 +253,114 @@ The real class
    .. cpp:function:: ~real()
 
       Destructor.
+
+   .. cpp:function:: real &operator=(const real &other)
+   .. cpp:function:: real &operator=(real &&other) noexcept
+
+      Copy and move assignment operators.
+
+      :param other: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: template <RealInteroperable T> real &operator=(const T &x)
+
+      The generic assignment operator will set ``this`` to the value of *x*.
+
+      The precision of ``this`` will be set according to the same
+      heuristics described in the generic constructor.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:overflow_error: if an overflow occurs in the computation of
+        the automatically-deduced precision.
+
+   .. cpp:function:: real &operator=(const mpfr_t x)
+
+      Copy assignment from :cpp:type:`mpfr_t`.
+
+      This operator will set ``this`` to a deep copy of *x*.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *x* has been correctly initialised
+         with a precision within the bounds established by :cpp:func:`mppp::real_prec_min()`
+         and :cpp:func:`mppp::real_prec_max()`.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &operator=(mpfr_t &&x)
+
+      Move assignment from :cpp:type:`mpfr_t`.
+
+      This operator will set ``this`` to a shallow copy of *x*.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *x* has been correctly initialised
+         with a precision within the bounds established by :cpp:func:`mppp::real_prec_min()`
+         and :cpp:func:`mppp::real_prec_max()`.
+
+         Additionally, the user must ensure that, after the assignment, ``mpfr_clear()`` is never
+         called on *x*: the resources previously owned by *x* are now owned by ``this``, which
+         will take care of releasing them when the destructor is called.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: bool is_valid() const noexcept
+
+      Check validity.
+
+      A :cpp:class:`~mppp::real` becomes invalid after it is used
+      as an argument to the move constructor.
+
+      :return: ``true`` if ``this`` is valid, ``false`` otherwise.
+
+   .. cpp:function:: real &set(const real &other)
+
+      Set to another :cpp:class:`~mppp::real`.
+
+      This method will set ``this`` to the value of *other*. Contrary to the copy assignment operator,
+      the precision of the assignment is dictated by the precision of ``this``, rather than
+      the precision of *other*. Consequently, the precision of ``this`` will not be altered by the
+      assignment, and a rounding might occur, depending on the values
+      and the precisions of the operands.
+
+      This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
+
+      .. seealso::
+
+         https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+
+      :param other: the value to which ``this`` will be set.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: template <RealInteroperable T> real &set(const T &x)
+
+      Generic setter.
+
+      This method will set ``this`` to the value of *x*. Contrary to the generic assignment operator,
+      the precision of the assignment is dictated by the precision of ``this``, rather than
+      being deduced from the type and value of *x*. Consequently, the precision of ``this`` will not be altered
+      by the assignment, and a rounding might occur, depending on the operands.
+
+      This method is a thin wrapper around various ``mpfr_set_*()``
+      assignment functions from the MPFR API.
+
+      .. seealso::
+
+         https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+
+      :param x: the value to which ``this`` will be set.
+
+      :return: a reference to ``this``.
 
 Types
 -----
