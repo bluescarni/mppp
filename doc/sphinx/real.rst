@@ -219,7 +219,7 @@ The real class
 
    .. cpp:function:: explicit real(const mpfr_t x)
 
-      Constructor from a :cpp:type:`mpfr_t`.
+      Constructor from an :cpp:type:`mpfr_t`.
 
       This constructor will initialise ``this`` with an exact deep copy of *x*.
 
@@ -233,7 +233,7 @@ The real class
 
    .. cpp:function:: explicit real(mpfr_t &&x)
 
-      Move constructor from a :cpp:type:`mpfr_t`.
+      Move constructor from an :cpp:type:`mpfr_t`.
 
       This constructor will initialise ``this`` with a shallow copy of *x*.
 
@@ -301,7 +301,7 @@ Concepts
    This concept is satisfied if the type ``T`` can interoperate with :cpp:class:`~mppp::real`.
    Specifically, this concept will be ``true`` if ``T`` is either:
 
-   * a :cpp:concept:`CppInteroperable` type, or
+   * a :cpp:concept:`~mppp::CppInteroperable` type, or
    * an :cpp:class:`~mppp::integer`, or
    * a :cpp:class:`~mppp::rational`, or
    * :cpp:class:`~mppp::real128`.
