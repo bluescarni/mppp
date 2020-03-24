@@ -131,6 +131,128 @@ The real class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
+   .. cpp:function:: template <RealInteroperable T> explicit real(const T &x, mpfr_prec_t p)
+   .. cpp:function:: template <RealInteroperable T> explicit real(const T &x)
+
+      Generic constructors.
+
+      The generic constructors will set ``this`` to the value of *x*.
+
+      The variant with the *p* argument will set the precision of ``this``
+      exactly to *p*.
+
+      The variant without the *p* argument will set the
+      precision of ``this`` according to the following
+      heuristics:
+
+      * if *x* is a C++ integral type ``I``, then the precision is set to the bit width of ``I``;
+      * if *x* is a C++ floating-point type ``F``, then the precision is set to the number of binary digits
+        in the significand of ``F``;
+      * if *x* is :cpp:class:`~mppp::integer`, then the precision is set to the number of bits in use by
+        *x* (rounded up to the next multiple of the limb type's bit width);
+      * if *x* is :cpp:class:`~mppp::rational`, then the precision is set to the sum of the number of bits
+        used by numerator and denominator (as established by the previous heuristic for :cpp:class:`~mppp::integer`);
+      * if *x* is :cpp:class:`~mppp::real128`, then the precision is set to 113.
+
+      These heuristics aim at preserving the value of *x* in the constructed :cpp:class:`~mppp::real`.
+
+      Construction from ``bool`` will initialise ``this`` to 1 for ``true``, and 0 for ``false``.
+
+      :param x: the construction argument.
+      :param p: the desired precision.
+
+      :exception std\:\:overflow_error: if an overflow occurs in the computation of the automatically-deduced precision.
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
+   .. cpp:function:: template <StringType T> explicit real(const T &s, int base, mpfr_prec_t p)
+   .. cpp:function:: template <StringType T> explicit real(const T &s, mpfr_prec_t p)
+
+      Constructors from string, base and precision.
+
+      The first constructor will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` *s*, which
+      is interpreted as a floating-point number in base *base*. *base* must be either zero (in which case the base
+      will be automatically deduced) or a number in the :math:`\left[ 2,62 \right]` range.
+      The valid string formats are detailed in the
+      documentation of the MPFR function ``mpfr_set_str()``. Note that leading whitespaces are ignored, but trailing
+      whitespaces will raise an error.
+
+      The precision of ``this`` will be set to *p*.
+
+      The second constructor calls the first one with a *base* value of 10.
+
+      .. seealso::
+         https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+
+      :param s: the input string.
+      :param base: the base used in the string representation.
+      :param p: the desired precision.
+
+      :exception std\:\:invalid_argument: in the following cases:
+
+         * *base* is not zero and not in the [2,62] range,
+         * *p* is outside the valid bounds for a precision value,
+         * *s* cannot be interpreted as a floating-point number.
+
+      :exception unspecified: any exception thrown by memory errors in standard containers.
+
+   .. cpp:function:: explicit real(const char *begin, const char *end, int base, mpfr_prec_t p)
+   .. cpp:function:: explicit real(const char *begin, const char *end, mpfr_prec_t p)
+
+      Constructors from range of characters, base and precision.
+
+      The first constructor will initialise ``this`` from the content of the input half-open range,
+      which is interpreted as the string representation of a floating-point value in base ``base``.
+
+      Internally, the constructor will copy the content of the range to a local buffer, add a
+      string terminator, and invoke the constructor from string, base and precision.
+
+      The second constructor calls the first one with a *base* value of 10.
+
+      :param begin: the start of the input range.
+      :param end: the end of the input range.
+      :param base: the base used in the string representation.
+      :param p: the desired precision.
+
+      :exception unspecified: any exception thrown by the constructor from string, or by memory
+        allocation errors in standard containers.
+
+   .. cpp:function:: explicit real(const mpfr_t x)
+
+      Constructor from a :cpp:type:`mpfr_t`.
+
+      This constructor will initialise ``this`` with an exact deep copy of *x*.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *x* has been correctly initialised
+         with a precision within the bounds established by :cpp:func:`mppp::real_prec_min()`
+         and :cpp:func:`mppp::real_prec_max()`.
+
+      :param x: the :cpp:type:`mpfr_t` that will be deep-copied.
+
+   .. cpp:function:: explicit real(mpfr_t &&x)
+
+      Move constructor from a :cpp:type:`mpfr_t`.
+
+      This constructor will initialise ``this`` with a shallow copy of *x*.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *x* has been correctly initialised
+         with a precision within the bounds established by :cpp:func:`mppp::real_prec_min()`
+         and :cpp:func:`mppp::real_prec_max()`.
+
+         Additionally, the user must ensure that, after construction, ``mpfr_clear()`` is never
+         called on *x*: the resources previously owned by *x* are now owned by ``this``, which
+         will take care of releasing them when the destructor is called.
+
+      :param x: the :cpp:type:`mpfr_t` that will be moved.
+
+   .. cpp:function:: ~real()
+
+      Destructor.
+
 Types
 -----
 

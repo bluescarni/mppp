@@ -523,55 +523,51 @@ real::real(const real &other, ::mpfr_prec_t p)
 
 // Construction from FPs.
 template <typename Func, typename T>
-void real::dispatch_fp_construction(const Func &func, const T &x, ::mpfr_prec_t p)
+void real::dispatch_fp_construction(const Func &func, const T &x)
 {
-    ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
     func(&m_mpfr, x, MPFR_RNDN);
 }
 
-void real::dispatch_construction(const float &x, ::mpfr_prec_t p)
+void real::dispatch_construction(const float &x)
 {
-    dispatch_fp_construction(::mpfr_set_flt, x, p);
+    dispatch_fp_construction(::mpfr_set_flt, x);
 }
 
-void real::dispatch_construction(const double &x, ::mpfr_prec_t p)
+void real::dispatch_construction(const double &x)
 {
-    dispatch_fp_construction(::mpfr_set_d, x, p);
+    dispatch_fp_construction(::mpfr_set_d, x);
 }
 
-void real::dispatch_construction(const long double &x, ::mpfr_prec_t p)
+void real::dispatch_construction(const long double &x)
 {
-    dispatch_fp_construction(::mpfr_set_ld, x, p);
+    dispatch_fp_construction(::mpfr_set_ld, x);
 }
 
 // Special casing for bool, otherwise MSVC warns if we fold this into the
 // constructor from unsigned.
-void real::dispatch_construction(const bool &b, ::mpfr_prec_t p)
+void real::dispatch_construction(const bool &b)
 {
-    dispatch_integral_init(p, b);
     ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
 }
 
-#if defined(MPPP_WITH_QUADMATH)
-void real::dispatch_construction(const real128 &x, ::mpfr_prec_t p)
+void real::dispatch_mpz_construction(const ::mpz_t n)
 {
-    // Init the value.
-    ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
-    assign_real128(x);
-}
-#endif
-
-void real::dispatch_mpz_construction(const ::mpz_t n, ::mpfr_prec_t p)
-{
-    ::mpfr_init2(&m_mpfr, p);
     ::mpfr_set_z(&m_mpfr, n, MPFR_RNDN);
 }
 
-void real::dispatch_mpq_construction(const ::mpq_t q, ::mpfr_prec_t p)
+void real::dispatch_mpq_construction(const ::mpq_t q)
 {
-    ::mpfr_init2(&m_mpfr, p);
     ::mpfr_set_q(&m_mpfr, q, MPFR_RNDN);
 }
+
+#if defined(MPPP_WITH_QUADMATH)
+
+void real::dispatch_construction(const real128 &x)
+{
+    assign_real128(x);
+}
+
+#endif
 
 // Various helpers and constructors from string-like entities.
 void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
@@ -603,22 +599,7 @@ real::real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p)
 }
 #endif
 
-/// Constructor from range of characters, base and precision.
-/**
- * This constructor will initialise \p this from the content of the input half-open range,
- * which is interpreted as the string representation of a floating-point value in base \p base.
- *
- * Internally, the constructor will copy the content of the range to a local buffer, add a
- * string terminator, and invoke the constructor from string, base and precision.
- *
- * @param begin the start of the input range.
- * @param end the end of the input range.
- * @param base the base used in the string representation.
- * @param p the desired precision.
- *
- * @throws unspecified any exception thrown by the constructor from string, or by memory
- * allocation errors in standard containers.
- */
+// Constructor from range of characters, base and precision.
 real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
 {
     MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -627,17 +608,7 @@ real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
     construct_from_c_string(buffer.data(), base, p);
 }
 
-/// Constructor from range of characters and precision.
-/**
- * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
- * to 10.
- *
- * @param begin the start of the input range.
- * @param end the end of the input range.
- * @param p the desired precision.
- *
- * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
- */
+// Constructor from range of characters and precision.
 real::real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
 
 // Constructor from a special value, sign and precision.
@@ -671,19 +642,7 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
 // Constructor from a special value and precision.
 real::real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
 
-/// Copy constructor from ``mpfr_t``.
-/**
- * This constructor will initialise ``this`` with an exact deep copy of ``x``.
- *
- * \rststar
- * .. warning::
- *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
- *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
- *    and :cpp:func:`~mppp::real_prec_max()`.
- * \endrststar
- *
- * @param x the ``mpfr_t`` that will be deep-copied.
- */
+// Copy constructor from mpfr_t.
 real::real(const ::mpfr_t x)
 {
     // Init with the same precision as other, and then set.
@@ -1123,10 +1082,7 @@ const mpfr_global_cleanup mpfr_global_cleanup_inst;
 
 } // namespace detail
 
-/// Destructor.
-/**
- * The destructor will free any resource held by the internal ``mpfr_t`` instance.
- */
+// Destructor.
 real::~real()
 {
 #if defined(MPPP_HAVE_THREAD_LOCAL)

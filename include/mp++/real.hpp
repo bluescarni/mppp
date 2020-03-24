@@ -284,42 +284,21 @@ public:
     explicit real(real_kind, ::mpfr_prec_t);
 
 private:
-    // A helper to determine the precision to use in the generic constructors. The precision
-    // can be manually provided, or deduced according
-    // to the properties of the type/value.
-    template <typename T>
-    static ::mpfr_prec_t compute_init_precision(::mpfr_prec_t provided, const T &x)
-    {
-        if (provided) {
-            // The precision was explicitly provided: check it and return it.
-            return check_init_prec(provided);
-        } else {
-            // Return the deduced precision.
-            return detail::real_deduce_precision(x);
-        }
-    }
-
     // Construction from FPs.
     template <typename Func, typename T>
-    MPPP_DLL_LOCAL void dispatch_fp_construction(const Func &, const T &, ::mpfr_prec_t);
-    void dispatch_construction(const float &, ::mpfr_prec_t);
-    void dispatch_construction(const double &, ::mpfr_prec_t);
-    void dispatch_construction(const long double &, ::mpfr_prec_t);
+    MPPP_DLL_LOCAL void dispatch_fp_construction(const Func &, const T &);
+    void dispatch_construction(const float &);
+    void dispatch_construction(const double &);
+    void dispatch_construction(const long double &);
 
     // Construction from integral types.
-    template <typename T>
-    void dispatch_integral_init(::mpfr_prec_t p, const T &n)
-    {
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, n));
-    }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
-    void dispatch_construction(const bool &, ::mpfr_prec_t);
+    void dispatch_construction(const bool &);
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>>::value, int> = 0>
-    void dispatch_construction(const T &n, ::mpfr_prec_t p)
+    void dispatch_construction(const T &n)
     {
-        dispatch_integral_init(p, n);
         if (n <= detail::nl_max<unsigned long>()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
@@ -330,9 +309,8 @@ private:
     }
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
-    void dispatch_construction(const T &n, ::mpfr_prec_t p)
+    void dispatch_construction(const T &n)
     {
-        dispatch_integral_init(p, n);
         if (n <= detail::nl_max<long>() && n >= detail::nl_min<long>()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
@@ -341,73 +319,50 @@ private:
     }
 
     // Construction from mppp::integer.
-    void dispatch_mpz_construction(const ::mpz_t, ::mpfr_prec_t);
+    void dispatch_mpz_construction(const ::mpz_t);
     template <std::size_t SSize>
-    void dispatch_construction(const integer<SSize> &n, ::mpfr_prec_t p)
+    void dispatch_construction(const integer<SSize> &n)
     {
-        dispatch_mpz_construction(n.get_mpz_view(), compute_init_precision(p, n));
+        dispatch_mpz_construction(n.get_mpz_view());
     }
 
     // Construction from mppp::rational.
-    void dispatch_mpq_construction(const ::mpq_t, ::mpfr_prec_t);
+    void dispatch_mpq_construction(const ::mpq_t);
     template <std::size_t SSize>
-    void dispatch_construction(const rational<SSize> &q, ::mpfr_prec_t p)
+    void dispatch_construction(const rational<SSize> &q)
     {
         // NOTE: get_mpq_view() returns an mpq_struct, whose
         // address we then need to use.
         const auto v = detail::get_mpq_view(q);
-        dispatch_mpq_construction(&v, compute_init_precision(p, q));
+        dispatch_mpq_construction(&v);
     }
 
 #if defined(MPPP_WITH_QUADMATH)
-    void dispatch_construction(const real128 &, ::mpfr_prec_t);
+    void dispatch_construction(const real128 &);
     // NOTE: split this off from the dispatch_construction() overload, so we can re-use it in the
     // generic assignment.
     void assign_real128(const real128 &);
 #endif
 
 public:
-    /// Generic constructor.
-    /**
-     * \rststar
-     * The generic constructor will set ``this`` to the value of ``x`` with a precision of ``p``.
-     *
-     * If ``p`` is nonzero, then ``this`` will be initialised exactly to a precision of ``p``, and
-     * a rounding operation might occurr.
-     *
-     * If ``p`` is zero, the precision of ``this`` will be set according to the following
-     * heuristics:
-     *
-     * * if ``x`` is a C++ integral type ``I``, then the precision is set to the bit width of ``I``;
-     * * if ``x`` is a C++ floating-point type ``F``, then the precision is set to the number of binary digits
-     *   in the significand of ``F``;
-     * * if ``x`` is :cpp:class:`~mppp::integer`, then the precision is set to the number of bits in use by
-     *   ``x`` (rounded up to the next multiple of the limb type's bit width);
-     * * if ``x`` is :cpp:class:`~mppp::rational`, then the precision is set to the sum of the number of bits
-     *   used by numerator and denominator (as established by the previous heuristic for :cpp:class:`~mppp::integer`);
-     * * if ``x`` is :cpp:class:`~mppp::real128`, then the precision is set to 113.
-     *
-     * These heuristics aim at ensuring that, whatever the type of ``x``, its value is preserved exactly in the
-     * constructed :cpp:class:`~mppp::real`.
-     *
-     * Construction from ``bool`` will initialise ``this`` to 1 for ``true``, and 0 for ``false``.
-     * \endrststar
-     *
-     * @param x the construction argument.
-     * @param p the desired precision.
-     *
-     * @throws std::overflow_error if an overflow occurs in the computation of the automatically-deduced precision.
-     * @throws std::invalid_argument if \p p is nonzero and outside the range established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
-     */
+    // Generic constructors.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
     template <typename T, real_interoperable_enabler<T> = 0>
 #endif
-    explicit real(const T &x, ::mpfr_prec_t p = 0)
+    explicit real(const T &x) : real(ptag{}, detail::real_deduce_precision(x), true)
     {
-        dispatch_construction(x, p);
+        dispatch_construction(x);
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <RealInteroperable T>
+#else
+    template <typename T, real_interoperable_enabler<T> = 0>
+#endif
+    explicit real(const T &x, ::mpfr_prec_t p) : real(ptag{}, check_init_prec(p), true)
+    {
+        dispatch_construction(x);
     }
 
 private:
@@ -419,31 +374,7 @@ private:
 #endif
 
 public:
-    /// Constructor from string, base and precision.
-    /**
-     * \rststar
-     * This constructor will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which
-     * is interpreted as a floating-point number in base ``base``. ``base`` must be either zero (in which case the base
-     * will be automatically deduced) or a number in the [2,62] range. The valid string formats are detailed in the
-     * documentation of the MPFR function ``mpfr_set_str()``. Note that leading whitespaces are ignored, but trailing
-     * whitespaces will raise an error.
-     *
-     * The precision of ``this`` will be set to ``p``.
-     *
-     * .. seealso::
-     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param s the input string.
-     * @param base the base used in the string representation.
-     * @param p the desired precision.
-     *
-     * @throws std::invalid_argument in the following cases:
-     * - \p base is not zero and not in the [2,62] range,
-     * - \p p outside the valid bounds for a precision value,
-     * - \p s cannot be interpreted as a floating-point number.
-     * @throws unspecified any exception thrown by memory errors in standard containers.
-     */
+    // Constructor from string, base and precision.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -452,15 +383,7 @@ public:
     explicit real(const T &s, int base, ::mpfr_prec_t p) : real(ptag{}, s, base, p)
     {
     }
-    /// Constructor from string and precision.
-    /**
-     * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10.
-     *
-     * @param s the input string.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, base and precision.
-     */
+    // Constructor from string and precision.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -473,25 +396,10 @@ public:
     explicit real(const char *, const char *, int, ::mpfr_prec_t);
     // Constructor from range of characters and precision.
     explicit real(const char *, const char *, ::mpfr_prec_t);
+
     // Copy constructor from ``mpfr_t``.
     explicit real(const ::mpfr_t);
-    /// Move constructor from ``mpfr_t``.
-    /**
-     * This constructor will initialise ``this`` with a shallow copy of ``x``.
-     *
-     * \rststar
-     * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
-     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
-     *    and :cpp:func:`~mppp::real_prec_max()`.
-     *
-     *    Additionally, the user must ensure that, after construction, ``mpfr_clear()`` is never
-     *    called on ``x``: the resources previously owned by ``x`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     * \endrststar
-     *
-     * @param x the ``mpfr_t`` that will be moved.
-     */
+    // Move constructor from ``mpfr_t``.
     explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
 
     // Destructor.

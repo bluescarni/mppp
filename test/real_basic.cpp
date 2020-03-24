@@ -88,6 +88,19 @@ struct int_ctor_tester {
         REQUIRE(real{T(0)}.get_prec() == detail::nl_digits<T>() + detail::is_signed<T>::value);
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
+        REQUIRE_THROWS_PREDICATE((real{T(0), 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                          + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + detail::to_string(real_prec_min());
+        });
+        REQUIRE_THROWS_PREDICATE((real{T(0), -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == "Cannot init a real with a precision of -1: the maximum allowed precision is "
+                          + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + detail::to_string(real_prec_min());
+        });
+
         auto int_dist = integral_minmax_dist<T>{};
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
@@ -119,6 +132,19 @@ struct fp_ctor_tester {
         }
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
+        REQUIRE_THROWS_PREDICATE((real{T(0), 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                          + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + detail::to_string(real_prec_min());
+        });
+        REQUIRE_THROWS_PREDICATE((real{T(0), -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == "Cannot init a real with a precision of -1: the maximum allowed precision is "
+                          + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + detail::to_string(real_prec_min());
+        });
+
         if (std::numeric_limits<T>::radix != 2 || (ppc_arch && std::is_same<T, long double>::value)) {
             return;
         }
@@ -297,6 +323,18 @@ TEST_CASE("real constructors")
                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                       + detail::to_string(real_prec_min());
     });
+    REQUIRE_THROWS_PREDICATE((real{"123", -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of -100: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{"123", 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
     REQUIRE_THROWS_PREDICATE((real{"hell-o", 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what() == std::string("The string 'hell-o' does not represent a valid real in base 10");
     });
@@ -347,6 +385,12 @@ TEST_CASE("real constructors")
     REQUIRE((real{false, ::mpfr_prec_t(128)}.get_prec() == 128));
     REQUIRE(::mpfr_cmp_ui((real{true, ::mpfr_prec_t(128)}).get_mpfr_t(), 1ul) == 0);
     REQUIRE((real{true, ::mpfr_prec_t(128)}.get_prec() == 128));
+    REQUIRE_THROWS_PREDICATE((real{false, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
     // Construction from integer.
     REQUIRE(real{int_t{}}.zero_p());
     REQUIRE(real{int_t{}}.get_prec() == real_prec_min());
@@ -367,6 +411,19 @@ TEST_CASE("real constructors")
     r0 = real{int_t{-42} << GMP_NUMB_BITS};
     ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
+    REQUIRE_THROWS_PREDICATE((real{int_t{}, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{int_t{}, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of -1: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+
     // Construction from rational.
     REQUIRE(real{rat_t{}}.zero_p());
     REQUIRE(real{rat_t{}}.get_prec() == GMP_NUMB_BITS);
@@ -388,6 +445,19 @@ TEST_CASE("real constructors")
     ::mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 3);
+    REQUIRE_THROWS_PREDICATE((real{rat_t{}, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{rat_t{}, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of -1: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE(real{real128{}}.zero_p());
     REQUIRE(real{-real128{}}.zero_p());
@@ -421,6 +491,18 @@ TEST_CASE("real constructors")
                            real{"3.40917866435610111081769936359662259e-2", 10, 64}.get_mpfr_t()));
     REQUIRE(::mpfr_equal_p(real{-real128{"3.40917866435610111081769936359662259e-2"}, 64}.get_mpfr_t(),
                            real{"-3.40917866435610111081769936359662259e-2", 10, 64}.get_mpfr_t()));
+    REQUIRE_THROWS_PREDICATE((real{real128{}, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{real128{}, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of -1: the maximum allowed precision is "
+                      + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + detail::to_string(real_prec_min());
+    });
 #endif
     // Constructor from mpfr_t.
     ::mpfr_t m;
