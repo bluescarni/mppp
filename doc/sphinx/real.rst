@@ -66,9 +66,7 @@ The real class
    rounds to nearest (that is, the ``MPFR_RNDN`` rounding mode is used).
 
    Various :ref:`overloaded operators <real_operators>` are provided. The arithmetic operators always return
-   a :cpp:class:`~mppp::real` result. The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will
-   promote non-:cpp:class:`~mppp::real` arguments to :cpp:class:`~mppp::real` before performing the comparison.
-   Alternative comparison functions
+   a :cpp:class:`~mppp::real` result. Alternative comparison functions
    treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
    are needed).
 
@@ -478,6 +476,7 @@ The real class
    .. cpp:function:: bool number_p() const
    .. cpp:function:: bool zero_p() const
    .. cpp:function:: bool regular_p() const
+   .. cpp:function:: bool integer_p() const
    .. cpp:function:: bool is_one() const
 
       Detect special values.
@@ -489,6 +488,7 @@ The real class
       * a finite number,
       * zero,
       * a regular number (i.e., not NaN, infinity or zero),
+      * an integral value,
       * one.
 
       :return: the result of the detection.
@@ -600,6 +600,256 @@ The real class
 
       :exception std\:\:invalid_argument: if *base* is not in the :math:`\left[ 2,62 \right]` range.
       :exception std\:\:runtime_error: if the call to the ``mpfr_get_str()`` function of the MPFR API fails.
+
+   .. cpp:function:: real &neg()
+   .. cpp:function:: real &abs()
+
+      In-place negation and absolute value.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &sqrt()
+   .. cpp:function:: real &rec_sqrt()
+   .. cpp:function:: real &sqrt1pm1()
+   .. cpp:function:: real &cbrt()
+
+      .. note::
+
+         The :cpp:func:`~mppp::real::sqrt1pm1()` function is available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
+
+      In-place roots.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sqrt{x}`,
+      * :math:`\frac{1}{\sqrt{x}}`,
+      * :math:`\sqrt{1+x}-1`,
+      * :math:`\sqrt[3]{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.12
+
+         The :cpp:func:`~mppp::real::rec_sqrt()` and
+         :cpp:func:`~mppp::real::cbrt()` functions.
+
+      .. versionadded:: 0.19
+
+         The :cpp:func:`~mppp::real::sqrt1pm1()` function.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+        fails because of (unlikely) overflow conditions.
+
+   .. cpp:function:: real &sqr()
+
+      .. versionadded:: 0.19
+
+      Square ``this`` in place.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &sin()
+   .. cpp:function:: real &cos()
+   .. cpp:function:: real &tan()
+   .. cpp:function:: real &sec()
+   .. cpp:function:: real &csc()
+   .. cpp:function:: real &cot()
+   .. cpp:function:: real &sin_pi()
+   .. cpp:function:: real &cos_pi()
+   .. cpp:function:: real &tan_pi()
+   .. cpp:function:: real &cot_pi()
+   .. cpp:function:: real &sinc()
+   .. cpp:function:: real &sinc_pi()
+
+      .. note::
+
+         The :cpp:func:`~mppp::real::sin_pi()`, :cpp:func:`~mppp::real::cos_pi()`,
+         :cpp:func:`~mppp::real::tan_pi()`, :cpp:func:`~mppp::real::cot_pi()`,
+         :cpp:func:`~mppp::real::sinc()` and :cpp:func:`~mppp::real::sinc_pi()`
+         functions are available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
+
+      In-place trigonometric functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sin{x}`,
+      * :math:`\cos{x}`,
+      * :math:`\tan{x}`,
+      * :math:`\sec{x}`,
+      * :math:`\csc{x}`,
+      * :math:`\cot{x}`,
+      * :math:`\sin\left( \pi x \right)`,
+      * :math:`\cos\left( \pi x \right)`,
+      * :math:`\tan\left( \pi x \right)`,
+      * :math:`\cot\left( \pi x \right)`,
+      * :math:`\frac{\sin\left( x \right)}{x}`,
+      * :math:`\frac{\sin\left( \pi x \right)}{\pi x}`.
+
+      where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.19
+
+         The :cpp:func:`~mppp::real::sin_pi()`, :cpp:func:`~mppp::real::cos_pi()`,
+         :cpp:func:`~mppp::real::tan_pi()`, :cpp:func:`~mppp::real::cot_pi()`,
+         :cpp:func:`~mppp::real::sinc()` and :cpp:func:`~mppp::real::sinc_pi()`
+         functions.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+        fails because of (unlikely) overflow conditions.
+
+   .. cpp:function:: real &acos()
+   .. cpp:function:: real &asin()
+   .. cpp:function:: real &atan()
+
+      In-place inverse trigonometric functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\arccos{x}`,
+      * :math:`\arcsin{x}`,
+      * :math:`\arctan{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &sinh()
+   .. cpp:function:: real &cosh()
+   .. cpp:function:: real &tanh()
+   .. cpp:function:: real &sech()
+   .. cpp:function:: real &csch()
+   .. cpp:function:: real &coth()
+
+      In-place hyperbolic functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sinh{x}`,
+      * :math:`\cosh{x}`,
+      * :math:`\tanh{x}`,
+      * :math:`\operatorname{sech}{x}`,
+      * :math:`\operatorname{csch}{x}`,
+      * :math:`\coth{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &acosh()
+   .. cpp:function:: real &asinh()
+   .. cpp:function:: real &atanh()
+
+      In-place inverse hyperbolic functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\operatorname{arccosh}{x}`,
+      * :math:`\operatorname{arcsinh}{x}`,
+      * :math:`\operatorname{arctanh}{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &exp()
+   .. cpp:function:: real &exp2()
+   .. cpp:function:: real &exp10()
+   .. cpp:function:: real &expm1()
+   .. cpp:function:: real &log()
+   .. cpp:function:: real &log2()
+   .. cpp:function:: real &log10()
+   .. cpp:function:: real &log1p()
+
+      In-place exponentials and logarithms.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`e^x`,
+      * :math:`2^x`,
+      * :math:`10^x`,
+      * :math:`e^x-1`,
+      * :math:`\log x`,
+      * :math:`\log_2 x`,
+      * :math:`\log_{10} x`,
+      * :math:`\log\left( 1+x\right)`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &gamma()
+   .. cpp:function:: real &lngamma()
+   .. cpp:function:: real &lgamma()
+   .. cpp:function:: real &digamma()
+
+      In-place gamma functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\Gamma\left( x \right)`,
+      * :math:`\log \Gamma\left( x \right)`,
+      * :math:`\log \left|\Gamma\left( x \right)\right|`,
+      * :math:`\psi\left( x \right)`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &j0()
+   .. cpp:function:: real &j1()
+   .. cpp:function:: real &y0()
+   .. cpp:function:: real &y1()
+
+      In-place Bessel functions of the first and second kind.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`J_0\left( x \right)`,
+      * :math:`J_1\left( x \right)`,
+      * :math:`Y_0\left( x \right)`,
+      * :math:`Y_1\left( x \right)`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &eint()
+   .. cpp:function:: real &li2()
+   .. cpp:function:: real &zeta()
+   .. cpp:function:: real &erf()
+   .. cpp:function:: real &erfc()
+   .. cpp:function:: real &ai()
+
+      Other special functions, in-place variants.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\operatorname{Ei}\left( x \right)`,
+      * :math:`\operatorname{Li}_2\left( x \right)`,
+      * :math:`\zeta\left( x \right)`,
+      * :math:`\operatorname{erf}\left( x \right)`,
+      * :math:`\operatorname{erfc}\left( x \right)`,
+      * :math:`\operatorname{Ai}\left( x \right)`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &trunc()
+
+      In-place truncation.
+
+      This member function will set ``this`` to its truncated counterpart.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:domain_error: if ``this`` represents a NaN value.
 
 Types
 -----

@@ -630,6 +630,8 @@ public:
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
+    // Detect integer.
+    bool integer_p() const;
     // Detect one.
     bool is_one() const;
 
@@ -963,15 +965,12 @@ public:
 
     // In-place square root.
     real &sqrt();
-
     // In-place reciprocal square root.
     real &rec_sqrt();
-
 #if defined(MPPP_WITH_ARB)
     // In-place sqrt1pm1.
     real &sqrt1pm1();
 #endif
-
     // In-place cubic root.
     real &cbrt();
 
@@ -980,24 +979,17 @@ public:
 
     // In-place sine.
     real &sin();
-
     // In-place cosine.
     real &cos();
-
     // In-place tangent.
     real &tan();
-
     // In-place secant.
     real &sec();
-
     // In-place cosecant.
     real &csc();
-
     // In-place cotangent.
     real &cot();
-
 #if defined(MPPP_WITH_ARB)
-
     // Trig functions from Arb.
     real &sin_pi();
     real &cos_pi();
@@ -1005,113 +997,82 @@ public:
     real &cot_pi();
     real &sinc();
     real &sinc_pi();
-
 #endif
 
     // In-place arccosine.
     real &acos();
-
     // In-place arcsine.
     real &asin();
-
     // In-place arctangent.
     real &atan();
 
     // In-place hyperbolic cosine.
     real &cosh();
-
     // In-place hyperbolic sine.
     real &sinh();
-
     // In-place hyperbolic tangent.
     real &tanh();
-
     // In-place hyperbolic secant.
     real &sech();
-
     // In-place hyperbolic cosecant.
     real &csch();
-
     // In-place hyperbolic cotangent.
     real &coth();
 
     // In-place inverse hyperbolic cosine.
     real &acosh();
-
     // In-place inverse hyperbolic sine.
     real &asinh();
-
     // In-place inverse hyperbolic tangent.
     real &atanh();
 
     // In-place exponential.
     real &exp();
-
     // In-place base-2 exponential.
     real &exp2();
-
     // In-place base-10 exponential.
     real &exp10();
-
     // In-place exponential minus 1.
     real &expm1();
-
     // In-place logarithm.
     real &log();
-
     // In-place base-2 logarithm.
     real &log2();
-
     // In-place base-10 logarithm.
     real &log10();
-
     // In-place augmented logarithm.
     real &log1p();
 
     // In-place Gamma function.
     real &gamma();
-
     // In-place logarithm of the Gamma function.
     real &lngamma();
-
     // In-place logarithm of the absolute value of the Gamma function.
     real &lgamma();
-
     // In-place Digamma function.
     real &digamma();
 
     // In-place Bessel function of the first kind of order 0.
     real &j0();
-
     // In-place Bessel function of the first kind of order 1.
     real &j1();
-
     // In-place Bessel function of the second kind of order 0.
     real &y0();
-
     // In-place Bessel function of the second kind of order 1.
     real &y1();
 
     // In-place exponential integral.
     real &eint();
-
     // In-place dilogarithm.
     real &li2();
-
     // In-place Riemann Zeta function.
     real &zeta();
-
     // In-place error function.
     real &erf();
-
     // In-place complementary error function.
     real &erfc();
-
     // In-place Airy function.
     real &ai();
-
-    // Check if the value is an integer.
-    bool integer_p() const;
 
     // In-place truncation.
     real &trunc();

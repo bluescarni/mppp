@@ -1066,192 +1066,98 @@ real &real::self_mpfr_unary_nornd(T &&f)
     return *this;
 }
 
-/// In-place Gamma function.
-/**
- * This method will set ``this`` to its Gamma function.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place Gamma function.
 real &real::gamma()
 {
     return self_mpfr_unary(::mpfr_gamma);
 }
 
-/// In-place logarithm of the Gamma function.
-/**
- * This method will set ``this`` to the logarithm of its Gamma function.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place logarithm of the Gamma function.
 real &real::lngamma()
 {
     return self_mpfr_unary(::mpfr_lngamma);
 }
 
-/// In-place logarithm of the absolute value of the Gamma function.
-/**
- * This method will set ``this`` to the logarithm of the absolute value of its Gamma function.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place logarithm of the absolute value of the Gamma function.
 real &real::lgamma()
 {
     detail::real_lgamma_wrapper(&m_mpfr, &m_mpfr, MPFR_RNDN);
     return *this;
 }
 
-/// In-place Digamma function.
-/**
- * This method will set ``this`` to its Digamma function.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place Digamma function.
 real &real::digamma()
 {
     return self_mpfr_unary(::mpfr_digamma);
 }
 
-/// In-place Bessel function of the first kind of order 0.
-/**
- * This method will set ``this`` to its Bessel function of the first kind of order 0.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place Bessel function of the first kind of order 0.
 real &real::j0()
 {
     return self_mpfr_unary(::mpfr_j0);
 }
 
-/// In-place Bessel function of the first kind of order 1.
-/**
- * This method will set ``this`` to its Bessel function of the first kind of order 1.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place Bessel function of the first kind of order 1.
 real &real::j1()
 {
     return self_mpfr_unary(::mpfr_j1);
 }
 
-/// In-place Bessel function of the second kind of order 0.
-/**
- * This method will set ``this`` to its Bessel function of the second kind of order 0.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place Bessel function of the second kind of order 0.
 real &real::y0()
 {
     return self_mpfr_unary(::mpfr_y0);
 }
 
-/// In-place Bessel function of the second kind of order 1.
-/**
- * This method will set ``this`` to its Bessel function of the second kind of order 1.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place Bessel function of the second kind of order 1.
 real &real::y1()
 {
     return self_mpfr_unary(::mpfr_y1);
 }
 
-/// In-place exponential integral.
-/**
- * This method will set ``this`` to its exponential integral.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place exponential integral.
 real &real::eint()
 {
     return self_mpfr_unary(::mpfr_eint);
 }
 
-/// In-place dilogarithm.
-/**
- * This method will set ``this`` to its dilogarithm.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place dilogarithm.
 real &real::li2()
 {
     return self_mpfr_unary(detail::real_li2_wrapper);
 }
 
-/// In-place Riemann Zeta function.
-/**
- * This method will set ``this`` to its Riemann Zeta function.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place Riemann Zeta function.
 real &real::zeta()
 {
     return self_mpfr_unary(::mpfr_zeta);
 }
 
-/// In-place error function.
-/**
- * This method will set ``this`` to its error function.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place error function.
 real &real::erf()
 {
     return self_mpfr_unary(::mpfr_erf);
 }
 
-/// In-place complementary error function.
-/**
- * This method will set ``this`` to its complementary error function.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place complementary error function.
 real &real::erfc()
 {
     return self_mpfr_unary(::mpfr_erfc);
 }
 
-/// In-place Airy function.
-/**
- * This method will set ``this`` to its Airy function.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place Airy function.
 real &real::ai()
 {
     return self_mpfr_unary(::mpfr_ai);
 }
 
-/// Negate in-place.
-/**
- * This method will set ``this`` to ``-this``.
- *
- * @return a reference to ``this``.
- */
+// Negate in-place.
 real &real::neg()
 {
     return self_mpfr_unary(::mpfr_neg);
 }
 
-/// In-place absolute value.
-/**
- * This method will set ``this`` to its absolute value.
- *
- * @return a reference to ``this``.
- */
+// In-place absolute value.
 real &real::abs()
 {
     return self_mpfr_unary(::mpfr_abs);
@@ -1279,13 +1185,7 @@ std::string real::to_string(int base) const
     return oss.str();
 }
 
-/// In-place square root.
-/**
- * This method will set ``this`` to its square root.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place square root.
 real &real::sqrt()
 {
     return self_mpfr_unary(::mpfr_sqrt);
@@ -1293,27 +1193,7 @@ real &real::sqrt()
 
 #if defined(MPPP_WITH_ARB)
 
-/// In-place sqrt1pm1.
-/**
- * \rststar
- * .. versionadded:: 0.19
- *
- * .. note::
- *    This member function is available only if mp++ was
- *    configured with the ``MPPP_WITH_ARB`` option enabled.
- *
- * This member function will set ``this`` to :math:`\sqrt{1+x}-1`,
- * where :math:`x` is the original value of ``this``.
- * This function will be more accurate than using the square
- * root when :math:`x \approx 1`.
- * The precision of ``this`` will not be altered.
- * \endrststar
- *
- * @return a reference to ``this``.
- *
- * @throws std::invalid_argument if the conversion between Arb and MPFR types
- * fails because of (unlikely) overflow conditions.
- */
+// In-place sqrt1pm1.
 real &real::sqrt1pm1()
 {
     return self_mpfr_unary_nornd(detail::arb_sqrt1pm1);
@@ -1321,117 +1201,55 @@ real &real::sqrt1pm1()
 
 #endif
 
-/// In-place reciprocal square root.
-/**
- * This method will set ``this`` to its reciprocal square root.
- * The precision of ``this`` will not be altered.
- *
- * If ``this`` is zero, the result will be a positive infinity (regardless of the sign of ``this``).
- * If ``this`` is a positive infinity, the result will be +0. If ``this`` is negative,
- * the result will be NaN.
- *
- * @return a reference to ``this``.
- */
+// In-place reciprocal square root.
 real &real::rec_sqrt()
 {
     return self_mpfr_unary(::mpfr_rec_sqrt);
 }
 
-/// In-place cubic root.
-/**
- * This method will set ``this`` to its cubic root.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place cubic root.
 real &real::cbrt()
 {
     return self_mpfr_unary(::mpfr_cbrt);
 }
 
-/// In-place squaring.
-/**
- * \rststar
- * .. versionadded:: 0.19
- *
- * This method will set ``this`` to its square.
- * The precision of ``this`` will not be altered.
- * \endrststar
- *
- * @return a reference to ``this``.
- */
+// In-place squaring.
 real &real::sqr()
 {
     return self_mpfr_unary(::mpfr_sqr);
 }
 
-/// In-place sine.
-/**
- * This method will set ``this`` to its sine.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place sine.
 real &real::sin()
 {
     return self_mpfr_unary(::mpfr_sin);
 }
 
-/// In-place cosine.
-/**
- * This method will set ``this`` to its cosine.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place cosine.
 real &real::cos()
 {
     return self_mpfr_unary(::mpfr_cos);
 }
 
-/// In-place tangent.
-/**
- * This method will set ``this`` to its tangent.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place tangent.
 real &real::tan()
 {
     return self_mpfr_unary(::mpfr_tan);
 }
 
-/// In-place secant.
-/**
- * This method will set ``this`` to its secant.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place secant.
 real &real::sec()
 {
     return self_mpfr_unary(::mpfr_sec);
 }
 
-/// In-place cosecant.
-/**
- * This method will set ``this`` to its cosecant.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place cosecant.
 real &real::csc()
 {
     return self_mpfr_unary(::mpfr_csc);
 }
 
-/// In-place cotangent.
-/**
- * This method will set ``this`` to its cotangent.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place cotangent.
 real &real::cot()
 {
     return self_mpfr_unary(::mpfr_cot);
@@ -1439,145 +1257,37 @@ real &real::cot()
 
 #if defined(MPPP_WITH_ARB)
 
-/// In-place sin_pi.
-/**
- * \rststar
- * .. versionadded:: 0.19
- *
- * .. note::
- *    This member function is available only if mp++ was
- *    configured with the ``MPPP_WITH_ARB`` option enabled.
- *
- * This member function will set ``this`` to :math:`\sin\left(\pi x\right)`,
- * where :math:`x` is the original value of ``this``.
- * The precision of ``this`` will not be altered.
- * \endrststar
- *
- * @return a reference to ``this``.
- *
- * @throws std::invalid_argument if the conversion between Arb and MPFR types
- * fails because of (unlikely) overflow conditions.
- */
+// In-place sin_pi.
 real &real::sin_pi()
 {
     return self_mpfr_unary_nornd(detail::arb_sin_pi);
 }
 
-/// In-place cos_pi.
-/**
- * \rststar
- * .. versionadded:: 0.19
- *
- * .. note::
- *    This member function is available only if mp++ was
- *    configured with the ``MPPP_WITH_ARB`` option enabled.
- *
- * This member function will set ``this`` to :math:`\cos\left(\pi x\right)`,
- * where :math:`x` is the original value of ``this``.
- * The precision of ``this`` will not be altered.
- * \endrststar
- *
- * @return a reference to ``this``.
- *
- * @throws std::invalid_argument if the conversion between Arb and MPFR types
- * fails because of (unlikely) overflow conditions.
- */
+// In-place cos_pi.
 real &real::cos_pi()
 {
     return self_mpfr_unary_nornd(detail::arb_cos_pi);
 }
 
-/// In-place tan_pi.
-/**
- * \rststar
- * .. versionadded:: 0.19
- *
- * .. note::
- *    This member function is available only if mp++ was
- *    configured with the ``MPPP_WITH_ARB`` option enabled.
- *
- * This member function will set ``this`` to :math:`\tan\left(\pi x\right)`,
- * where :math:`x` is the original value of ``this``.
- * The precision of ``this`` will not be altered.
- * \endrststar
- *
- * @return a reference to ``this``.
- *
- * @throws std::invalid_argument if the conversion between Arb and MPFR types
- * fails because of (unlikely) overflow conditions.
- */
+// In-place tan_pi.
 real &real::tan_pi()
 {
     return self_mpfr_unary_nornd(detail::arb_tan_pi);
 }
 
-/// In-place cot_pi.
-/**
- * \rststar
- * .. versionadded:: 0.19
- *
- * .. note::
- *    This member function is available only if mp++ was
- *    configured with the ``MPPP_WITH_ARB`` option enabled.
- *
- * This member function will set ``this`` to :math:`\cot\left(\pi x\right)`,
- * where :math:`x` is the original value of ``this``.
- * The precision of ``this`` will not be altered.
- * \endrststar
- *
- * @return a reference to ``this``.
- *
- * @throws std::invalid_argument if the conversion between Arb and MPFR types
- * fails because of (unlikely) overflow conditions.
- */
+// In-place cot_pi.
 real &real::cot_pi()
 {
     return self_mpfr_unary_nornd(detail::arb_cot_pi);
 }
 
-/// In-place sinc.
-/**
- * \rststar
- * .. versionadded:: 0.19
- *
- * .. note::
- *    This member function is available only if mp++ was
- *    configured with the ``MPPP_WITH_ARB`` option enabled.
- *
- * This member function will set ``this`` to :math:`\frac{\sin\left(x\right)}{x}`,
- * where :math:`x` is the original value of ``this``.
- * The precision of ``this`` will not be altered.
- * \endrststar
- *
- * @return a reference to ``this``.
- *
- * @throws std::invalid_argument if the conversion between Arb and MPFR types
- * fails because of (unlikely) overflow conditions.
- */
+// In-place sinc.
 real &real::sinc()
 {
     return self_mpfr_unary_nornd(detail::arb_sinc);
 }
 
-/// In-place sinc_pi.
-/**
- * \rststar
- * .. versionadded:: 0.19
- *
- * .. note::
- *    This member function is available only if mp++ was
- *    configured with the ``MPPP_WITH_ARB`` option enabled.
- *
- * This member function will set ``this`` to :math:`\frac{\sin\left(\pi x\right)}{\pi x}`,
- * where :math:`x` is the original value of ``this``.
- * The precision of ``this`` will not be altered.
- * \endrststar
- *
- * @return a reference to ``this``.
- *
- * @throws std::invalid_argument if the conversion between Arb and MPFR types
- * fails because of (unlikely) overflow conditions.
- */
+// In-place sinc_pi.
 real &real::sinc_pi()
 {
     return self_mpfr_unary_nornd(detail::arb_sinc_pi);
@@ -1585,264 +1295,133 @@ real &real::sinc_pi()
 
 #endif
 
-/// In-place arccosine.
-/**
- * This method will set ``this`` to its arccosine.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place arccosine.
 real &real::acos()
 {
     return self_mpfr_unary(::mpfr_acos);
 }
 
-/// In-place arcsine.
-/**
- * This method will set ``this`` to its arcsine.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place arcsine.
 real &real::asin()
 {
     return self_mpfr_unary(::mpfr_asin);
 }
 
-/// In-place arctangent.
-/**
- * This method will set ``this`` to its arctangent.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place arctangent.
 real &real::atan()
 {
     return self_mpfr_unary(::mpfr_atan);
 }
 
-/// In-place hyperbolic cosine.
-/**
- * This method will set ``this`` to its hyperbolic cosine.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place hyperbolic cosine.
 real &real::cosh()
 {
     return self_mpfr_unary(::mpfr_cosh);
 }
 
-/// In-place hyperbolic sine.
-/**
- * This method will set ``this`` to its hyperbolic sine.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place hyperbolic sine.
 real &real::sinh()
 {
     return self_mpfr_unary(::mpfr_sinh);
 }
 
-/// In-place hyperbolic tangent.
-/**
- * This method will set ``this`` to its hyperbolic tangent.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place hyperbolic tangent.
 real &real::tanh()
 {
     return self_mpfr_unary(::mpfr_tanh);
 }
 
-/// In-place hyperbolic secant.
-/**
- * This method will set ``this`` to its hyperbolic secant.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place hyperbolic secant.
 real &real::sech()
 {
     return self_mpfr_unary(::mpfr_sech);
 }
 
-/// In-place hyperbolic cosecant.
-/**
- * This method will set ``this`` to its hyperbolic cosecant.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place hyperbolic cosecant.
 real &real::csch()
 {
     return self_mpfr_unary(::mpfr_csch);
 }
 
-/// In-place hyperbolic cotangent.
-/**
- * This method will set ``this`` to its hyperbolic cotangent.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place hyperbolic cotangent.
 real &real::coth()
 {
     return self_mpfr_unary(::mpfr_coth);
 }
 
-/// In-place inverse hyperbolic cosine.
-/**
- * This method will set ``this`` to its inverse hyperbolic cosine.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place inverse hyperbolic cosine.
 real &real::acosh()
 {
     return self_mpfr_unary(::mpfr_acosh);
 }
 
-/// In-place inverse hyperbolic sine.
-/**
- * This method will set ``this`` to its inverse hyperbolic sine.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place inverse hyperbolic sine.
 real &real::asinh()
 {
     return self_mpfr_unary(::mpfr_asinh);
 }
 
-/// In-place inverse hyperbolic tangent.
-/**
- * This method will set ``this`` to its inverse hyperbolic tangent.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place inverse hyperbolic tangent.
 real &real::atanh()
 {
     return self_mpfr_unary(::mpfr_atanh);
 }
 
-/// In-place exponential.
-/**
- * This method will set ``this`` to its exponential.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place exponential.
 real &real::exp()
 {
     return self_mpfr_unary(::mpfr_exp);
 }
 
-/// In-place base-2 exponential.
-/**
- * This method will set ``this`` to ``2**this``.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place base-2 exponential.
 real &real::exp2()
 {
     return self_mpfr_unary(::mpfr_exp2);
 }
 
-/// In-place base-10 exponential.
-/**
- * This method will set ``this`` to ``10**this``.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place base-10 exponential.
 real &real::exp10()
 {
     return self_mpfr_unary(::mpfr_exp10);
 }
 
-/// In-place exponential minus 1.
-/**
- * This method will set ``this`` to its exponential minus one.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place exponential minus 1.
 real &real::expm1()
 {
     return self_mpfr_unary(::mpfr_expm1);
 }
 
-/// In-place logarithm.
-/**
- * This method will set ``this`` to its logarithm.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place logarithm.
 real &real::log()
 {
     return self_mpfr_unary(::mpfr_log);
 }
 
-/// In-place base-2 logarithm.
-/**
- * This method will set ``this`` to its base-2 logarithm.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place base-2 logarithm.
 real &real::log2()
 {
     return self_mpfr_unary(::mpfr_log2);
 }
 
-/// In-place base-10 logarithm.
-/**
- * This method will set ``this`` to its base-10 logarithm.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place base-10 logarithm.
 real &real::log10()
 {
     return self_mpfr_unary(::mpfr_log10);
 }
 
-/// In-place augmented logarithm.
-/**
- * This method will set ``this`` the logarithm of ``this + 1``.
- * The precision of ``this`` will not be altered.
- *
- * @return a reference to ``this``.
- */
+// In-place augmented logarithm.
 real &real::log1p()
 {
     return self_mpfr_unary(::mpfr_log1p);
 }
 
-/// Check if the value is an integer.
-/**
- * @return ``true`` if ``this`` represents an integer value, ``false`` otherwise.
- */
+// Check if the value is an integer.
 bool real::integer_p() const
 {
     return ::mpfr_integer_p(&m_mpfr) != 0;
 }
 
-/// In-place truncation.
-/**
- * This method will set ``this`` to its truncated counterpart. The precision of ``this``
- * will not be altered.
- *
- * @return a reference to ``this``.
- *
- * @throws std::domain_error if ``this`` represents a NaN value.
- */
+// In-place truncation.
 real &real::trunc()
 {
     detail::real_check_trunc_arg(*this);
