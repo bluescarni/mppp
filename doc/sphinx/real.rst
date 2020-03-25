@@ -191,7 +191,7 @@ The real class
 
       :exception std\:\:invalid_argument: in the following cases:
 
-         * *base* is not zero and not in the [2,62] range,
+         * *base* is not zero and not in the :math:`\left[ 2,62 \right]` range,
          * *p* is outside the valid bounds for a precision value,
          * *s* cannot be interpreted as a floating-point number.
 
@@ -326,13 +326,13 @@ The real class
 
       Set to another :cpp:class:`~mppp::real`.
 
-      This method will set ``this`` to the value of *other*. Contrary to the copy assignment operator,
+      This member function will set ``this`` to the value of *other*. Contrary to the copy assignment operator,
       the precision of the assignment is dictated by the precision of ``this``, rather than
       the precision of *other*. Consequently, the precision of ``this`` will not be altered by the
       assignment, and a rounding might occur, depending on the values
       and the precisions of the operands.
 
-      This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
+      This function is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
 
       .. seealso::
 
@@ -346,12 +346,12 @@ The real class
 
       Generic setter.
 
-      This method will set ``this`` to the value of *x*. Contrary to the generic assignment operator,
+      This member function will set ``this`` to the value of *x*. Contrary to the generic assignment operator,
       the precision of the assignment is dictated by the precision of ``this``, rather than
       being deduced from the type and value of *x*. Consequently, the precision of ``this`` will not be altered
       by the assignment, and a rounding might occur, depending on the operands.
 
-      This method is a thin wrapper around various ``mpfr_set_*()``
+      This function is a thin wrapper around various ``mpfr_set_*()``
       assignment functions from the MPFR API.
 
       .. seealso::
@@ -361,6 +361,245 @@ The real class
       :param x: the value to which ``this`` will be set.
 
       :return: a reference to ``this``.
+
+   .. cpp:function:: template <StringType T> real &set(const T &s, int base = 10)
+
+      Setter to string.
+
+      This member function will set ``this`` to the value represented by *s*, which will
+      be interpreted as a floating-point number in base *base*. *base* must be either 0 (in which case the base is
+      automatically deduced), or a value in the :math:`\left[ 2,62 \right]` range.
+      The precision of the assignment is dictated by the
+      precision of ``this``, and a rounding might thus occur.
+
+      If *s* is not a valid representation of a floating-point number in base *base*, ``this``
+      will be set to NaN and an error will be raised.
+
+      This function is a thin wrapper around the ``mpfr_set_str()`` assignment function from the MPFR API.
+
+      .. seealso::
+
+         https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+
+      :param s: the string to which ``this`` will be set.
+      :param base: the base used in the string representation.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if *s* cannot be parsed as a floating-point value, or if the value
+        of *base* is invalid.
+      :exception unspecified: any exception thrown by memory allocation errors in standard containers.
+
+   .. cpp:function:: real &set(const char *begin, const char *end, int base = 10)
+
+      Set to character range.
+
+      This setter will set ``this`` to the content of the input half-open range,
+      which is interpreted as the string representation of a floating-point value in base *base*.
+
+      Internally, the setter will copy the content of the range to a local buffer, add a
+      string terminator, and invoke the setter to string.
+
+      :param begin: the start of the input range.
+      :param end: the end of the input range.
+      :param base: the base used in the string representation.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the setter to string, or by memory
+        allocation errors in standard containers.
+
+   .. cpp:function:: real &set(const mpfr_t x)
+
+      Set to an :cpp:type:`mpfr_t`.
+
+      This member function will set ``this`` to the value of *x*. Contrary to the corresponding assignment operator,
+      the precision of the assignment is dictated by the precision of ``this``, rather than
+      the precision of *x*. Consequently, the precision of ``this`` will not be altered by the
+      assignment, and a rounding might occur, depending on the values
+      and the precisions of the operands.
+
+      This function is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *x* has been correctly initialised.
+
+      .. seealso::
+
+         https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real &set_nan()
+   .. cpp:function:: real &set_inf(int sign = 0)
+   .. cpp:function:: real &set_zero(int sign = 0)
+
+      Set to special values.
+
+      These member functions will set ``this`` to, respectively:
+
+      * NaN (with an unspecified sign bit),
+      * infinity (with positive sign if *sign* is nonnegative,
+        negative sign otherwise),
+      * zero (with positive sign if *sign* is nonnegative,
+        negative sign otherwise).
+
+      The precision of ``this`` will not be altered.
+
+      :param sign: the sign of the special value (positive if *sign* is nonnegative,
+        negative otherwise).
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: const mpfr_struct_t *get_mpfr_t() const
+   .. cpp:function:: mpfr_struct_t *_get_mpfr_t()
+
+      Getters for the internal :cpp:type:`mpfr_t` instance.
+
+      These member functions will return a const or mutable pointer
+      to the internal :cpp:type:`mpfr_t` instance.
+
+      .. warning::
+
+         When using the mutable getter, it is the user's responsibility to ensure
+         that the internal MPFR structure is kept in a state which respects the invariants
+         of the :cpp:class:`~mppp::real` class. Specifically, the precision value
+         must be in the bounds established by :cpp:func:`mppp::real_prec_min()` and
+         :cpp:func:`mppp::real_prec_max()`, and upon destruction a :cpp:class:`~mppp::real`
+         object must contain a valid :cpp:type:`mpfr_t` object.
+
+      :return: a const or mutable pointer to the internal MPFR structure.
+
+   .. cpp:function:: bool nan_p() const
+   .. cpp:function:: bool inf_p() const
+   .. cpp:function:: bool number_p() const
+   .. cpp:function:: bool zero_p() const
+   .. cpp:function:: bool regular_p() const
+   .. cpp:function:: bool is_one() const
+
+      Detect special values.
+
+      These member functions will return ``true`` if ``this`` is, respectively:
+
+      * NaN,
+      * an infinity,
+      * a finite number,
+      * zero,
+      * a regular number (i.e., not NaN, infinity or zero),
+      * one.
+
+      :return: the result of the detection.
+
+   .. cpp:function:: int sgn() const
+
+      Sign detection.
+
+      :return: a positive value if ``this`` is positive, zero if ``this`` is zero,
+        a negative value if ``this`` is negative.
+
+      :exception std\:\:domain_error: if ``this`` is NaN.
+
+   .. cpp:function:: bool signbit() const
+
+      Get the sign bit.
+
+      The sign bit is set if ``this`` is negative, -0, or a NaN whose representation has its sign bit set.
+
+      :return: the sign bit of ``this``.
+
+   .. cpp:function:: mpfr_prec_t get_prec() const
+
+      Precision getter.
+
+      :return: the precision of ``this``.
+
+   .. cpp:function:: real &set_prec(mpfr_prec_t p)
+
+      Destructively set the precision
+
+      This member function will set the precision of ``this`` to exactly *p* bits. The value
+      of ``this`` will be set to NaN.
+
+      :param p: the desired precision.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
+   .. cpp:function:: real &prec_round(mpfr_prec_t p)
+
+      Set the precision maintaining the current value.
+
+      This member function will set the precision of ``this`` to exactly *p* bits. If *p*
+      is smaller than the current precision of ``this``, a rounding operation will be performed,
+      otherwise the current value will be preserved exactly.
+
+      :param p: the desired precision.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
+   .. cpp:function:: template <RealInteroperable T> explicit operator T() const
+
+      Generic conversion operator.
+
+      This operator will convert ``this`` to ``T``. The conversion
+      proceeds as follows:
+
+      * if ``T`` is ``bool``, then the conversion returns ``false`` if ``this`` is zero, ``true`` otherwise
+        (including if ``this`` is NaN);
+      * if ``T`` is a C++ integral type other than ``bool``, the conversion will yield the truncated counterpart
+        of ``this`` (i.e., the conversion rounds to zero). The conversion may fail due to overflow or domain errors
+        (i.e., when trying to convert non-finite values);
+      * if ``T`` if a C++ floating-point type, the conversion calls directly the low-level MPFR functions (e.g.,
+        ``mpfr_get_d()``), and might yield infinities for finite input values;
+      * if ``T`` is :cpp:class:`~mppp::integer`, the conversion rounds to zero and might fail due to domain errors,
+        but it will never overflow;
+      * if ``T`` is :cpp:class:`~mppp::rational`, the conversion may fail if ``this`` is not finite or if the
+        conversion produces an overflow in the manipulation of the exponent of ``this`` (that is, if
+        the absolute value of ``this`` is very large or very small). If the conversion succeeds, it will be exact;
+      * if ``T`` is :cpp:class:`~mppp::real128`, the conversion might yield infinities for finite input values.
+
+      :return: ``this`` converted to ``T``.
+
+      :exception std\:\:domain_error: if ``this`` is not finite and the target type cannot represent non-finite numbers.
+      :exception std\:\:overflow_error: if the conversion results in overflow.
+
+   .. cpp:function:: template <RealInteroperable T> bool get(T &rop) const
+
+      Generic conversion function.
+
+      This member function, similarly to the conversion operator, will convert ``this`` to
+      ``T``, storing the result of the conversion into *rop*. Differently
+      from the conversion operator, this function does not raise any exception: if the conversion is successful, the
+      function will return ``true``, otherwise the function will return ``false``. If the conversion fails,
+      *rop* will not be altered.
+
+      :param rop: the variable which will store the result of the conversion.
+
+      :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
+        specified in the documentation of the conversion operator.
+
+   .. cpp:function:: std::string to_string(int base = 10) const
+
+      Conversion to string.
+
+      This member function will convert ``this`` to a string representation in base *base*. The returned string is guaranteed
+      to produce exactly the original value when used in one of the constructors from string of
+      :cpp:class:`~mppp::real` (provided that the original precision and base are used in the construction).
+
+      :param base: the base to be used for the string representation.
+
+      :return: ``this`` converted to a string.
+
+      :exception std\:\:invalid_argument: if *base* is not in the :math:`\left[ 2,62 \right]` range.
+      :exception std\:\:runtime_error: if the call to the ``mpfr_get_str()`` function of the MPFR API fails.
 
 Types
 -----

@@ -739,41 +739,14 @@ real &real::set(const char *begin, const char *end, int base)
     return set(buffer.data(), base);
 }
 
-/// Set to an ``mpfr_t``.
-/**
- * \rststar
- * This method will set ``this`` to the value of ``x``. Contrary to the corresponding assignment operator,
- * the precision of the assignment is dictated by the precision of ``this``, rather than
- * the precision of ``x``. Consequently, the precision of ``this`` will not be altered by the
- * assignment, and a rounding might occur, depending on the values
- * and the precisions of the operands.
- *
- * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
- *
- * .. warning::
- *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
- *
- * .. seealso ::
- *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
- * \endrststar
- *
- * @param x the ``mpfr_t`` to which \p this will be set.
- *
- * @return a reference to \p this.
- */
+// Set to an mpfr_t.
 real &real::set(const ::mpfr_t x)
 {
     ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
     return *this;
 }
 
-/// Set to NaN.
-/**
- * This setter will set \p this to NaN with an unspecified sign bit. The precision of \p this
- * will not be altered.
- *
- * @return a reference to \p this.
- */
+// Set to NaN.
 real &real::set_nan()
 {
     ::mpfr_set_nan(&m_mpfr);
@@ -794,10 +767,7 @@ real &real::set_zero(int sign)
     return *this;
 }
 
-/// Detect one.
-/**
- * @return \p true if \p this is exactly equal to 1, \p false otherwise.
- */
+// Detect one.
 bool real::is_one() const
 {
     // NOTE: preempt calling the comparison function, if this is NaN
@@ -1287,41 +1257,14 @@ real &real::abs()
     return self_mpfr_unary(::mpfr_abs);
 }
 
-/// Destructively set the precision.
-/**
- * \rststar
- * This method will set the precision of ``this`` to exactly ``p`` bits. The value
- * of ``this`` will be set to NaN.
- * \endrststar
- *
- * @param p the desired precision.
- *
- * @return a reference to \p this.
- *
- * @throws std::invalid_argument if the value of \p p is not in the range established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
- */
+// Destructively set the precision.
 real &real::set_prec(::mpfr_prec_t p)
 {
     set_prec_impl<true>(p);
     return *this;
 }
 
-/// Set the precision maintaining the current value.
-/**
- * \rststar
- * This method will set the precision of ``this`` to exactly ``p`` bits. If ``p``
- * is smaller than the current precision of ``this``, a rounding operation will be performed,
- * otherwise the value will be preserved exactly.
- * \endrststar
- *
- * @param p the desired precision.
- *
- * @return a reference to \p this.
- *
- * @throws std::invalid_argument if the value of \p p is not in the range established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
- */
+// Set the precision maintaining the current value.
 real &real::prec_round(::mpfr_prec_t p)
 {
     prec_round_impl<true>(p);

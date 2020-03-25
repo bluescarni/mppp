@@ -571,33 +571,7 @@ private:
 #endif
 
 public:
-    /// Setter to string.
-    /**
-     * \rststar
-     * This method will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which will
-     * be interpreted as a floating-point number in base ``base``. ``base`` must be either 0 (in which case the base is
-     * automatically deduced), or a value in the [2,62] range. The precision of the assignment is dictated by the
-     * precision of ``this``, and a rounding might thus occur.
-     *
-     * If ``s`` is not a valid representation of a floating-point number in base ``base``, ``this``
-     * will be set to NaN and an error will be raised.
-     *
-     * This method is a thin wrapper around the ``mpfr_set_str()`` assignment function from the MPFR API.
-     *
-     * .. seealso ::
-     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param s the string to which \p this will be set.
-     * @param base the base used in the string representation.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if \p s cannot be parsed as a floating-point value in base 10, or if the value
-     * of \p base is invalid.
-     * @throws unspecified any exception thrown by memory
-     * allocation errors in standard containers.
-     */
+    // Setter to string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -607,24 +581,7 @@ public:
     {
         return set_impl(s, base);
     }
-
-    /// Set to character range.
-    /**
-     * This setter will set \p this to the content of the input half-open range,
-     * which is interpreted as the string representation of a floating-point value in base \p base.
-     *
-     * Internally, the setter will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the setter to string.
-     *
-     * @param begin the start of the input range.
-     * @param end the end of the input range.
-     * @param base the base used in the string representation.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the setter to string, or by memory
-     * allocation errors in standard containers.
-     */
+    // Set to character range.
     real &set(const char *begin, const char *end, int base = 10);
 
     // Set to an mpfr_t.
@@ -632,119 +589,51 @@ public:
 
     // Set to NaN.
     real &set_nan();
-
-    /// Set to infinity.
-    /**
-     * This setter will set \p this to infinity. The sign bit will be positive if \p sign
-     * is nonnegative, negative otherwise. The precision of \p this will not be altered.
-     *
-     * @param sign the sign of the infinity to which \p this will be set.
-     *
-     * @return a reference to \p this.
-     */
+    // Set to infinity.
     real &set_inf(int sign = 0);
-
-    /// Set to zero.
-    /**
-     * This setter will set \p this to zero. The sign bit will be positive if \p sign
-     * is nonnegative, negative otherwise. The precision of \p this will not be altered.
-     *
-     * @param sign the sign of the zero to which \p this will be set.
-     *
-     * @return a reference to \p this.
-     */
+    // Set to zero.
     real &set_zero(int sign = 0);
 
-    /// Const reference to the internal <tt>mpfr_t</tt>.
-    /**
-     * This method will return a const pointer to the internal MPFR structure used
-     * to represent the value of \p this. The returned object can be used as a
-     * <tt>const mpfr_t</tt> function parameter in the MPFR API.
-     *
-     * @return a const reference to the internal MPFR structure.
-     */
+    // Const reference to the internal mpfr_t.
     const mpfr_struct_t *get_mpfr_t() const
     {
         return &m_mpfr;
     }
-    /// Mutable reference to the internal <tt>mpfr_t</tt>.
-    /**
-     * This method will return a mutable pointer to the internal MPFR structure used
-     * to represent the value of \p this. The returned object can be used as an
-     * <tt>mpfr_t</tt> function parameter in the MPFR API.
-     *
-     * \rststar
-     * .. warning::
-     *    When using this mutable getter, it is the user's responsibility to ensure
-     *    that the internal MPFR structure is kept in a state which respects the invariants
-     *    of the :cpp:class:`~mppp::real` class. Specifically, the precision value
-     *    must be in the bounds established by :cpp:func:`~mppp::real_prec_min()` and
-     *    :cpp:func:`~mppp::real_prec_max()`, and upon destruction a :cpp:class:`~mppp::real`
-     *    object must contain a valid ``mpfr_t`` object.
-     * \endrststar
-     *
-     * @return a mutable reference to the internal MPFR structure.
-     */
+    // Mutable reference to the internal mpfr_t.
     mpfr_struct_t *_get_mpfr_t()
     {
         return &m_mpfr;
     }
 
-    /// Detect NaN.
-    /**
-     * @return \p true if \p this is NaN, \p false otherwise.
-     */
+    // Detect NaN.
     bool nan_p() const
     {
         return mpfr_nan_p(&m_mpfr) != 0;
     }
-
-    /// Detect infinity.
-    /**
-     * @return \p true if \p this is an infinity, \p false otherwise.
-     */
+    // Detect infinity.
     bool inf_p() const
     {
         return mpfr_inf_p(&m_mpfr) != 0;
     }
-
-    /// Detect finite number.
-    /**
-     * @return \p true if \p this is a finite number (i.e., not NaN or infinity), \p false otherwise.
-     */
+    // Detect finite number.
     bool number_p() const
     {
         return mpfr_number_p(&m_mpfr) != 0;
     }
-
-    /// Detect zero.
-    /**
-     * @return \p true if \p this is zero, \p false otherwise.
-     */
+    // Detect zero.
     bool zero_p() const
     {
         return mpfr_zero_p(&m_mpfr) != 0;
     }
-
-    /// Detect regular number.
-    /**
-     * @return \p true if \p this is a regular number (i.e., not NaN, infinity or zero), \p false otherwise.
-     */
+    // Detect regular number.
     bool regular_p() const
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
-
     // Detect one.
     bool is_one() const;
 
-    /// Detect sign.
-    /**
-     * @return a positive value if \p this is positive, zero if \p this is zero, a negative value if \p this
-     * is negative.
-     *
-     * @throws std::domain_error if \p this is NaN.
-     */
+    // Detect sign.
     int sgn() const
     {
         if (mppp_unlikely(nan_p())) {
@@ -754,38 +643,17 @@ public:
         }
         return mpfr_sgn(&m_mpfr);
     }
-
-    /// Get the sign bit.
-    /**
-     * The sign bit is set if ``this`` is negative, -0, or a NaN whose representation has its sign bit set.
-     *
-     * @return the sign bit of \p this.
-     */
+    // Get the sign bit.
     bool signbit() const
     {
         return mpfr_signbit(&m_mpfr) != 0;
     }
 
-    /// Get the precision of \p this.
-    /**
-     * @return the current precision (i.e., the number of binary digits in the significand) of \p this.
-     */
+    // Get the precision of this.
     ::mpfr_prec_t get_prec() const
     {
         return mpfr_get_prec(&m_mpfr);
     }
-
-private:
-    template <typename T>
-    MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
-    template <typename T>
-    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&);
-
-public:
-    // Negate in-place.
-    real &neg();
-    // In-place absolute value.
-    real &abs();
 
 private:
     // Utility function to check precision in set_prec().
@@ -1001,33 +869,7 @@ private:
 #endif
 
 public:
-    /// Generic conversion operator.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::RealInteroperable` type. The conversion
-     * proceeds as follows:
-     *
-     * - if ``T`` is ``bool``, then the conversion returns ``false`` if ``this`` is zero, ``true`` otherwise
-     *   (including if ``this`` is NaN);
-     * - if ``T`` is a C++ integral type other than ``bool``, the conversion will yield the truncated counterpart
-     *   of ``this`` (i.e., the conversion rounds to zero). The conversion may fail due to overflow or domain errors
-     *   (i.e., when trying to convert non-finite values);
-     * - if ``T`` if a C++ floating-point type, the conversion calls directly the low-level MPFR functions (e.g.,
-     *   ``mpfr_get_d()``), and might yield infinities for finite input values;
-     * - if ``T`` is :cpp:class:`~mppp::integer`, the conversion rounds to zero and might fail due to domain errors,
-     *   but it will never overflow;
-     * - if ``T`` is :cpp:class:`~mppp::rational`, the conversion may fail if ``this`` is not finite or if the
-     *   conversion produces an overflow in the manipulation of the exponent of ``this`` (that is, if
-     *   the absolute value of ``this`` is very large or very small). If the conversion succeeds, it will be exact;
-     * - if ``T`` is :cpp:class:`~mppp::real128`, the conversion might yield infinities for finite input values.
-     *
-     * \endrststar
-     *
-     * @return \p this converted to \p T.
-     *
-     * @throws std::domain_error if \p this is not finite and the target type cannot represent non-finite numbers.
-     * @throws std::overflow_error if the conversion results in overflow.
-     */
+    // Generic conversion operator.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
@@ -1093,21 +935,7 @@ private:
 #endif
 
 public:
-    /// Generic conversion method.
-    /**
-     * \rststar
-     * This method, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::RealInteroperable` type, storing the result of the conversion into ``rop``. Differently
-     * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
-     * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
-     * ``rop`` will not be altered.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
-     * specified in the documentation of the conversion operator.
-     */
+    // Generic conversion function.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
@@ -1117,22 +945,21 @@ public:
     {
         return dispatch_get(rop);
     }
-    /// Convert to string.
-    /**
-     * \rststar
-     * This method will convert ``this`` to a string representation in base ``base``. The returned string is guaranteed
-     * to produce exactly the original value when used in one of the constructors from string of
-     * :cpp:class:`~mppp::real` (provided that the original precision and base are used in the construction).
-     * \endrststar
-     *
-     * @param base the base to be used for the string representation.
-     *
-     * @return \p this converted to a string.
-     *
-     * @throws std::invalid_argument if \p base is not in the [2,62] range.
-     * @throws std::runtime_error if the call to the ``mpfr_get_str()`` function of the MPFR API fails.
-     */
+
+    // Convert to string.
     std::string to_string(int base = 10) const;
+
+private:
+    template <typename T>
+    MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
+    template <typename T>
+    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&);
+
+public:
+    // Negate in-place.
+    real &neg();
+    // In-place absolute value.
+    real &abs();
 
     // In-place square root.
     real &sqrt();
