@@ -953,16 +953,93 @@ Functions
 Precision handling
 ~~~~~~~~~~~~~~~~~~
 
-.. doxygengroup:: real_prec
-   :content-only:
+.. cpp:function:: mpfr_prec_t mppp::get_prec(const mppp::real &r)
+
+   Get the precision of a :cpp:class:`~mppp::real`.
+
+   :param r: the input argument.
+
+   :return: the precision of *r*.
+
+.. cpp:function:: void mppp::set_prec(mppp::real &r, mpfr_prec_t p)
+.. cpp:function:: void mppp::prec_round(mppp::real &r, mpfr_prec_t p)
+
+   Set the precision of a :cpp:class:`~mppp::real`.
+
+   The first variant will set the precision of *r* to exactly *p* bits. The value
+   of *r* will be set to NaN.
+
+   The second variant will preserve the current value of *r*, performing
+   a rounding operation if *p* is less than the current precision of *r*.
+
+   :param r: the input argument.
+   :param p: the desired precision.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::real::set_prec()`
+     or :cpp:func:`mppp::real::prec_round()`.
+
 
 .. _real_assignment:
 
 Assignment
 ~~~~~~~~~~
 
-.. doxygengroup:: real_assignment
-   :content-only:
+.. cpp:function:: template <mppp::RealSetArgs... Args> mppp::real &mppp::set(mppp::real &r, const Args &... args)
+
+   Generic setter.
+
+   This function will use the arguments *args* to set the value of the :cpp:class:`~mppp::real` *r*,
+   using one of the available :cpp:func:`mppp::real::set()` overloads. That is,
+   the body of this function is equivalent to
+
+   .. code-block:: c++
+
+      return r.set(args...);
+
+   The input arguments must satisfy the :cpp:concept:`mppp::RealSetArgs` concept.
+
+   :param r: the return value.
+   :param args: the arguments that will be passed to :cpp:func:`mppp::real::set()`.
+
+   :return: a reference to *r*.
+
+   :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::real::set()` overload.
+
+.. cpp:function:: template <std::size_t SSize> mppp::real &mppp::set_z_2exp(mppp::real &r, const mppp::integer<SSize> &n, mpfr_exp_t e)
+
+   Set to :math:`n\times 2^e`.
+
+   This function will set *r* to :math:`n\times 2^e`. The precision of *r*
+   will not be altered. If *n* is zero, the result will be positive zero.
+
+   :param r: the return value.
+   :param n: input :cpp:class:`~mppp::integer`.
+   :param e: the exponent.
+
+   :return: a reference to *r*.
+
+.. cpp:function:: mppp::real &mppp::set_nan(mppp::real &r)
+.. cpp:function:: mppp::real &mppp::set_inf(mppp::real &r, int sign = 0)
+.. cpp:function:: mppp::real &mppp::set_zero(mppp::real &r, int sign = 0)
+
+   Set to NaN, infinity or zero.
+
+   The precision of *r* will not be altered. When setting to infinity
+   or zero, the sign bit will be positive if *sign*
+   is nonnegative, negative otherwise. When setting to NaN, the sign
+   bit is unspecified.
+
+   :param r: the input argument.
+   :param sign: the sign of the infinity or zero to which *r* will be set.
+
+   :return: a reference to *r*.
+
+.. cpp:function:: void mppp::swap(mppp::real &a, mppp::real &b) noexcept
+
+   Swap efficiently *a* and *b*.
+
+   :param a: the first argument.
+   :param b: the second argument.
 
 .. _real_conversion:
 

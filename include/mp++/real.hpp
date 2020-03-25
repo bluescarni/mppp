@@ -1105,51 +1105,19 @@ using real_in_place_op_types_enabler = detail::enable_if_t<
     detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value, int>;
 #endif
 
-/// Destructively set the precision of a \link mppp::real real\endlink.
-/**
- * \ingroup real_prec
- * \rststar
- * This function will set the precision of ``r`` to exactly ``p`` bits. The value
- * of ``r`` will be set to NaN.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink whose precision will be set.
- * @param p the desired precision.
- *
- * @throws unspecified any exception thrown by mppp::real::set_prec().
- */
+// Destructively set the precision.
 inline void set_prec(real &r, ::mpfr_prec_t p)
 {
     r.set_prec(p);
 }
 
-/// Set the precision of a \link mppp::real real\endlink maintaining the current value.
-/**
- * \ingroup real_prec
- * \rststar
- * This function will set the precision of ``r`` to exactly ``p`` bits. If ``p``
- * is smaller than the current precision of ``r``, a rounding operation will be performed,
- * otherwise the value will be preserved exactly.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink whose precision will be set.
- * @param p the desired precision.
- *
- * @throws unspecified any exception thrown by mppp::real::prec_round().
- */
+// Set the precision.
 inline void prec_round(real &r, ::mpfr_prec_t p)
 {
     r.prec_round(p);
 }
 
-/// Get the precision of a \link mppp::real real\endlink.
-/**
- * \ingroup real_prec
- *
- * @param r the \link mppp::real real\endlink whose precision will be returned.
- *
- * @return the precision of \p r.
- */
+// Get the precision.
 inline mpfr_prec_t get_prec(const real &r)
 {
     return r.get_prec();
@@ -1162,10 +1130,6 @@ template <typename... Args>
 using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &>()...));
 }
 
-/** @defgroup real_assignment real_assignment
- *  @{
- */
-
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
 template <typename... Args>
@@ -1177,27 +1141,7 @@ using real_set_args_enabler = detail::enable_if_t<detail::is_detected<detail::re
 
 #endif
 
-/// Generic setter for \link mppp::real real\endlink.
-/**
- * \rststar
- * This function will use the arguments ``args`` to set the value of the :cpp:class:`~mppp::real` ``r``,
- * using one of the available :cpp:func:`mppp::real::set()` overloads. That is,
- * the body of this function is equivalent to
- *
- * .. code-block:: c++
- *
- *    return r.set(args...);
- *
- * The input arguments must satisfy the :cpp:concept:`~mppp::RealSetArgs` concept.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink that will be set.
- * @param args the arguments that will be passed to mppp::real::set().
- *
- * @return a reference to \p r.
- *
- * @throws unspecified any exception thrown by the invoked mppp::real::set() overload.
- */
+// Generic setter.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <RealSetArgs... Args>
 #else
@@ -1208,17 +1152,7 @@ inline real &set(real &r, const Args &... args)
     return r.set(args...);
 }
 
-/// Set \link mppp::real real\endlink to \f$n\times 2^e\f$.
-/**
- * This function will set ``r`` to \f$n\times 2^e\f$. The precision of ``r``
- * will not be altered. If ``n`` is zero, the result will be positive zero.
- *
- * @param r the \link mppp::real real\endlink argument.
- * @param n the \link mppp::integer integer\endlink multiplier.
- * @param e the exponent.
- *
- * @return a reference to ``r``.
- */
+// Set n*2**e.
 template <std::size_t SSize>
 inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
 {
@@ -1226,63 +1160,29 @@ inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
     return r;
 }
 
-/// Set \link mppp::real real\endlink to NaN.
-/**
- * This function will set \p r to NaN with an unspecified sign bit. The precision of \p r
- * will not be altered.
- *
- * @param r the \link mppp::real real\endlink argument.
- *
- * @return a reference to \p r.
- */
+// Set to NaN.
 inline real &set_nan(real &r)
 {
     return r.set_nan();
 }
 
-/// Set \link mppp::real real\endlink to infinity.
-/**
- * This function will set \p r to infinity. The sign bit will be positive if \p sign
- * is nonnegative, negative otherwise. The precision of \p r will not be altered.
- *
- * @param r the \link mppp::real real\endlink argument.
- * @param sign the sign of the infinity to which \p r will be set.
- *
- * @return a reference to \p r.
- */
+// Set to infinity.
 inline real &set_inf(real &r, int sign = 0)
 {
     return r.set_inf(sign);
 }
 
-/// Set \link mppp::real real\endlink to zero.
-/**
- * This function will set \p r to zero. The sign bit will be positive if \p sign
- * is nonnegative, negative otherwise. The precision of \p r will not be altered.
- *
- * @param r the \link mppp::real real\endlink argument.
- * @param sign the sign of the zero to which \p r will be set.
- *
- * @return a reference to \p r.
- */
+// Set to zero.
 inline real &set_zero(real &r, int sign = 0)
 {
     return r.set_zero(sign);
 }
 
-/// Swap \link mppp::real real\endlink objects.
-/**
- * This function will efficiently swap the content of \p a and \p b.
- *
- * @param a the first operand.
- * @param b the second operand.
- */
+// Swap.
 inline void swap(real &a, real &b) noexcept
 {
     ::mpfr_swap(a._get_mpfr_t(), b._get_mpfr_t());
 }
-
-/** @} */
 
 /** @defgroup real_conversion real_conversion
  *  @{
