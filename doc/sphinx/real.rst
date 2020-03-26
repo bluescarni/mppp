@@ -1046,8 +1046,39 @@ Assignment
 Conversion
 ~~~~~~~~~~
 
-.. doxygengroup:: real_conversion
-   :content-only:
+.. cpp:function:: template <mppp::RealInteroperable T> bool mppp::get(T &rop, const mppp::real &x)
+
+   Generic conversion function.
+
+   This function will convert the input :cpp:class:`~mppp::real` *x* to
+   `T`, storing the result of the conversion into *rop*.
+   If the conversion is successful, the function
+   will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
+   not be altered.
+
+   :param rop :the variable which will store the result of the conversion.
+   :param x: the input argument.
+
+   :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
+      specified in the documentation of the conversion operator for :cpp:class:`~mppp::real`.
+
+.. cpp:function:: template <std::size_t SSize> mpfr_exp_t mppp::get_z_2exp(mppp::integer<SSize> &n, const mppp::real &r)
+
+   Extract significand and exponent.
+
+   This function will extract the scaled significand of *r* into *n*, and return the
+   exponent *e* such that :math:`r = n\times 2^e`.
+
+   If *r* is not finite, an error will be raised.
+
+   :param n: the :cpp:class:`~mppp::integer` that will contain the scaled significand of *r*.
+   :param r: the input argument.
+
+   :return: the exponent *e* such that :math:`r = n\times 2^e`.
+
+   :exception std\:\:domain_error: if *r* is not finite.
+   :exception std\:\:overflow_error: if the output exponent is larger than an implementation-defined
+     value.
 
 .. _real_arithmetic:
 
@@ -1066,7 +1097,7 @@ Arithmetic
    * :math:`a+b`,
    * :math:`a-b`,
    * :math:`a \times b`,
-   * :math:`a/b`.
+   * :math:`\frac{a}{b}`.
 
    The precision of the result will be set to the largest precision among the operands.
 
@@ -1211,8 +1242,101 @@ Arithmetic
 Comparison
 ~~~~~~~~~~
 
-.. doxygengroup:: real_comparison
-   :content-only:
+.. cpp:function:: bool mppp::nan_p(const mppp::real &r)
+.. cpp:function:: bool mppp::inf_p(const mppp::real &r)
+.. cpp:function:: bool mppp::number_p(const mppp::real &r)
+.. cpp:function:: bool mppp::zero_p(const mppp::real &r)
+.. cpp:function:: bool mppp::regular_p(const mppp::real &r)
+.. cpp:function:: bool mppp::integer_p(const mppp::real &r)
+.. cpp:function:: bool mppp::is_one(const mppp::real &r)
+
+   Detect special values.
+
+   These functions will return ``true`` if *r* is, respectively:
+
+   * NaN,
+   * an infinity,
+   * a finite number,
+   * zero,
+   * a regular number (i.e., not NaN, infinity or zero),
+   * an integral value,
+   * one.
+
+   :param r: the input argument.
+
+   :return: the result of the detection.
+
+.. cpp:function:: int mppp::sgn(const mppp::real &r)
+.. cpp:function:: bool mppp::signbit(const mppp::real &r)
+
+   Detect sign or sign bit.
+
+   The sign is returned as a positive value if *r* is positive,
+   zero if *r* is zero, a negative value if *r* is negative.
+
+   The sign bit is ``true`` if *r* is negative, -0, or a NaN whose representation
+   has its sign bit set, ``false`` otherwise.
+
+   :param r: the input argument.
+
+   :return: the sign or sign bit of *r*.
+
+   :exception unspecified: any exception raised by :cpp:func:`mppp::real::sgn()`.
+
+.. cpp:function:: int mppp::cmp(const mppp::real &a, const mppp::real &b)
+
+   Three-way comparison.
+
+   This function will compare *a* and *b*, returning:
+
+   * zero if :math:`a=b`,
+   * a negative value if :math:`a<b`,
+   * a positive value if :math:`a>b`.
+
+   If at least one NaN value is involved in the comparison, an error will be raised.
+
+   This function is useful to distinguish the three possible cases. The comparison operators
+   are recommended instead if it is needed to distinguish only two cases.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: an integral value expressing how *a* compares to *b*.
+
+   :exception std\:\:domain_error: if at least one of the operands is NaN.
+
+.. cpp:function:: bool mppp::real_equal_to(const mppp::real &a, const mppp::real &b)
+
+   Equality predicate with special handling for NaN.
+
+   If both *a* and *b* are not NaN, this function is identical to the equality operator for
+   :cpp:class:`~mppp::real`. If at least one operand is NaN, this function will return ``true``
+   if both operands are NaN, ``false`` otherwise.
+
+   In other words, this function behaves like an equality operator which considers all NaN
+   values equal to each other.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: ``true`` if :math:`a = b` (including the case in which both operands are NaN),
+     ``false`` otherwise.
+
+.. cpp:function:: bool mppp::real_lt(const mppp::real &a, const mppp::real &b)
+.. cpp:function:: bool mppp::real_gt(const mppp::real &a, const mppp::real &b)
+
+   Comparison predicates with special handling for NaN and moved-from :cpp:class:`~mppp::real`.
+
+   These functions behave like less/greater-than operators which consider NaN values
+   greater than non-NaN values, and moved-from objects greater than both NaN and non-NaN values.
+   These functions can be used as comparators in various facilities of the
+   standard library (e.g., ``std::sort()``, ``std::set``, etc.).
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: ``true`` if :math:`a < b` (respectively, :math:`a > b`), following the rules detailed above
+    regarding NaN values and moved-from objects, ``false`` otherwise.
 
 .. _real_roots:
 

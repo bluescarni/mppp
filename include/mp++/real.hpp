@@ -227,6 +227,8 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 // - it seems like we might be do multiple roundings when cting from real128.
 //   See if we can implement with only a single rounding, perhaps via an integer
 //   and mpfr_set_z_2exp()?
+// - Do we need real_equal_to() to work also on invalid reals, the way
+//   real_lt/gt() do?
 
 // Multiprecision floating-point class.
 class MPPP_DLL_PUBLIC real
@@ -1184,26 +1186,7 @@ inline void swap(real &a, real &b) noexcept
     ::mpfr_swap(a._get_mpfr_t(), b._get_mpfr_t());
 }
 
-/** @defgroup real_conversion real_conversion
- *  @{
- */
-
-/// Generic conversion function for \link mppp::real real\endlink.
-/**
- * \rststar
- * This function will convert the input :cpp:class:`~mppp::real` ``x`` to a
- * :cpp:concept:`~mppp::RealInteroperable` type, storing the result of the conversion into ``rop``.
- * If the conversion is successful, the function
- * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
- * not be altered.
- * \endrststar
- *
- * @param rop the variable which will store the result of the conversion.
- * @param x the input \link mppp::real real\endlink.
- *
- * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
- * specified in the documentation of the conversion operator for \link mppp::real real\endlink.
- */
+// Generic conversion function.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <RealInteroperable T>
 #else
@@ -1214,23 +1197,7 @@ inline bool get(T &rop, const real &x)
     return x.get(rop);
 }
 
-/// Extract the significand and the exponent of a \link mppp::real real\endlink.
-/**
- * This function will extract the scaled significand of ``r`` into ``n``, and return the
- * exponent ``e`` such that ``r`` equals \f$n\times 2^e\f$.
- *
- * If ``r`` is not finite, an error will be raised.
- *
- * @param n the \link mppp::integer integer\endlink that will contain the scaled
- * significand of ``r``.
- * @param r the input \link mppp::real real\endlink.
- *
- * @return the exponent ``e`` such that ``r`` equals \f$n\times 2^e\f$.
- *
- * @throws std::domain_error if ``r`` is not finite.
- * @throws std::overflow_error if the output exponent is larger than an implementation-defined
- * value.
- */
+// Extract significand and exponent.
 template <std::size_t SSize>
 inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
 {
@@ -1250,8 +1217,6 @@ inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
     n = &m.m_mpz;
     return retval;
 }
-
-/** @} */
 
 namespace detail
 {
@@ -1685,98 +1650,55 @@ inline real &div_2si(real &rop, T &&x, long n)
     return detail::mpfr_nary_op_impl<true>(0, div_2si_wrapper, rop, std::forward<T>(x));
 }
 
-/** @defgroup real_comparison real_comparison
- *  @{
- */
-
-/// Detect if a \link mppp::real real\endlink is NaN.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is NaN, \p false otherwise.
- */
+// Detect NaN.
 inline bool nan_p(const real &r)
 {
     return r.nan_p();
 }
 
-/// Detect if a \link mppp::real real\endlink is infinity.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is an infinity, \p false otherwise.
- */
+// Detect inf.
 inline bool inf_p(const real &r)
 {
     return r.inf_p();
 }
 
-/// Detect if \link mppp::real real\endlink is a finite number.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is a finite number (i.e., not NaN or infinity), \p false otherwise.
- */
+// Detect finite.
 inline bool number_p(const real &r)
 {
     return r.number_p();
 }
 
-/// Detect if a \link mppp::real real\endlink is zero.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is zero, \p false otherwise.
- */
+// Detect zero.
 inline bool zero_p(const real &r)
 {
     return r.zero_p();
 }
 
-/// Detect if a \link mppp::real real\endlink is a regular number.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is a regular number (i.e., not NaN, infinity or zero), \p false otherwise.
- */
+// Detect regular number.
 inline bool regular_p(const real &r)
 {
     return r.regular_p();
 }
 
-/// Detect if a \link mppp::real real\endlink is one.
-/**
- * @param r the \link mppp::real real\endlink to be checked.
- *
- * @return \p true if \p r is exactly 1, \p false otherwise.
- */
+// Detect integral value.
+inline bool integer_p(const real &r)
+{
+    return r.integer_p();
+}
+
+// Detect one.
 inline bool is_one(const real &r)
 {
     return r.is_one();
 }
 
-/// Detect the sign of a \link mppp::real real\endlink.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return a positive value if \p r is positive, zero if \p r is zero, a negative value if \p this
- * is negative.
- *
- * @throws unspecified any exception thrown by mppp::real::sgn().
- */
+// Detect the sign.
 inline int sgn(const real &r)
 {
     return r.sgn();
 }
 
-/// Get the sign bit of a \link mppp::real real\endlink.
-/**
- * The sign bit is set if ``r`` is negative, -0, or a NaN whose representation has its sign bit set.
- *
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return the sign bit of \p r.
- */
+// Get the sign bit.
 inline bool signbit(const real &r)
 {
     return r.signbit();
@@ -1793,8 +1715,6 @@ MPPP_DLL_PUBLIC bool real_lt(const real &, const real &);
 
 // Greater-than predicate with special NaN and moved-from handling.
 MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
-
-/** @} */
 
 // Square root.
 MPPP_REAL_MPFR_UNARY_RETVAL(sqrt, ::mpfr_sqrt)
@@ -2536,17 +2456,6 @@ MPPP_DLL_PUBLIC real &real_pi(real &);
 /** @defgroup real_intrem real_intrem
  *  @{
  */
-
-/// Detect if a \link mppp::real real\endlink is an integer.
-/**
- * @param r the input \link mppp::real real\endlink.
- *
- * @return ``true`` if ``r`` represents an integral value, ``false`` otherwise.
- */
-inline bool integer_p(const real &r)
-{
-    return r.integer_p();
-}
 
 /// Binary \link mppp::real real\endlink truncation.
 /**
