@@ -44,36 +44,32 @@ endfunction()
 
 # Enable conditionally a CXX flag, if supported by the compiler.
 # This is for flags intended to be enabled in all configurations.
-# NOTE: we use macros and go through temporary private variables
-# because it's apparently impossible to append to an internal
+# NOTE: we use macros because it's apparently impossible to append to an internal
 # CACHEd list.
 macro(_YACMA_CHECK_ENABLE_CXX_FLAG flag)
     set(CMAKE_REQUIRED_QUIET TRUE)
-    check_cxx_compiler_flag("${flag}" YACMA_CHECK_CXX_FLAG)
+    check_cxx_compiler_flag("${flag}" YACMA_CHECK_CXX_FLAG::${flag})
     unset(CMAKE_REQUIRED_QUIET)
-    if(YACMA_CHECK_CXX_FLAG)
+    if(YACMA_CHECK_CXX_FLAG::${flag})
         message(STATUS "'${flag}': flag is supported by the compiler, enabling.")
         list(APPEND _YACMA_CXX_FLAGS "${flag}")
     else()
         message(STATUS "'${flag}': flag is not supported by the compiler.")
     endif()
-    # NOTE: check_cxx_compiler stores variables in the cache.
-    unset(YACMA_CHECK_CXX_FLAG CACHE)
 endmacro()
 
 # Enable conditionally a debug CXX flag, is supported by the compiler.
 # This is for flags intended to be enabled in debug mode.
 macro(_YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG flag)
     set(CMAKE_REQUIRED_QUIET TRUE)
-    check_cxx_compiler_flag("${flag}" YACMA_CHECK_DEBUG_CXX_FLAG)
+    check_cxx_compiler_flag("${flag}" YACMA_CHECK_DEBUG_CXX_FLAG::${flag})
     unset(CMAKE_REQUIRED_QUIET)
-    if(YACMA_CHECK_DEBUG_CXX_FLAG)
+    if(YACMA_CHECK_DEBUG_CXX_FLAG::${flag})
         message(STATUS "'${flag}': debug flag is supported by the compiler, enabling.")
         list(APPEND _YACMA_CXX_FLAGS_DEBUG "${flag}")
     else()
         message(STATUS "'${flag}': debug flag is not supported by the compiler.")
     endif()
-    unset(YACMA_CHECK_DEBUG_CXX_FLAG CACHE)
 endmacro()
 
 # What we want to avoid is to re-run the expensive flag checks. We will set cache variables
