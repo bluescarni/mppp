@@ -1477,26 +1477,7 @@ bool real_gt(const real &a, const real &b)
     return (!a.nan_p() && !b_nan) ? (::mpfr_greater_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : !b_nan;
 }
 
-/// Output stream operator for \link mppp::real real\endlink objects.
-/**
- * \rststar
- * This operator will insert into the stream ``os`` a string representation of ``r``
- * in base 10 (as returned by :cpp:func:`mppp::real::to_string()`).
- *
- * .. warning::
- *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
- *    flags. For the time being, users are encouraged to use the ``mpfr_get_str()`` function from the MPFR
- *    library if precise and forward-compatible control on the printing format is needed.
- *
- * \endrststar
- *
- * @param os the target stream.
- * @param r the \link mppp::real real\endlink that will be directed to \p os.
- *
- * @return a reference to \p os.
- *
- * @throws unspecified any exception thrown by mppp::real::to_string().
- */
+// Output stream operator.
 std::ostream &operator<<(std::ostream &os, const real &r)
 {
     detail::mpfr_to_stream(r.get_mpfr_t(), os, 10);
@@ -1525,33 +1506,13 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
 
 } // namespace detail
 
-/// \link mppp::real Real\endlink \f$\pi\f$ constant.
-/**
- * \rststar
- * This function will return a :cpp:class:`~mppp::real` :math:`\pi`
- * with a precision of ``p``.
- *
- * @param p the desired precision.
- *
- * @return a \link mppp::real real\endlink \f$\pi\f$.
- *
- * @throws std::invalid_argument if \p p is not within the bounds established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
- */
+// Pi constant.
 real real_pi(::mpfr_prec_t p)
 {
     return detail::real_constant(::mpfr_const_pi, p);
 }
 
-/// Set \link mppp::real real\endlink to \f$\pi\f$.
-/**
- * This function will set \p rop to \f$\pi\f$. The precision
- * of \p rop will not be altered.
- *
- * @param rop the \link mppp::real real\endlink that will be set to \f$\pi\f$.
- *
- * @return a reference to \p rop.
- */
+// Set to pi.
 real &real_pi(real &rop)
 {
     ::mpfr_const_pi(rop._get_mpfr_t(), MPFR_RNDN);

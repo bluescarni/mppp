@@ -20,7 +20,12 @@ allows to use C++ functions and classes from Python.
 
 The API for the pybind11 integration currently includes a single function in the ``mppp_pybind11`` namespace:
 
-.. doxygenfunction:: mppp_pybind11::init()
+.. cpp:function:: void mppp_pybind11::init()
+
+   Initialisation function for the pybind11 integration.
+
+   This function should be called in the definition of a pybind11 extension module, right after the
+   ``PYBIND11_MODULE()`` invocation.
 
 .. note::
 

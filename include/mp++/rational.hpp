@@ -2048,7 +2048,7 @@ inline rational<SSize> rational_binomial_impl(const rational<SSize> &t, const T 
 
 } // namespace detail
 
-// Binomial coefficient for \link mppp::rational rational\endlink.
+// Binomial coefficient.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, RationalIntegralInteroperable<SSize> T>
 #else

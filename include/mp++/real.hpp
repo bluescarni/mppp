@@ -2435,41 +2435,14 @@ inline real agm(T &&x, U &&y)
 
 #endif
 
-/** @defgroup real_io real_io
- *  @{
- */
-
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
 
-/** @} */
-
-/** @defgroup real_constants real_constants
- *  @{
- */
-
+// Constants.
 MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_pi(real &);
 
-/** @} */
-
-/** @defgroup real_intrem real_intrem
- *  @{
- */
-
-/// Binary \link mppp::real real\endlink truncation.
-/**
- * This function will truncate ``op`` and store the result
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- *
- * @throws std::domain_error if ``op`` is NaN.
- */
+// Binary truncation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2481,18 +2454,7 @@ inline real &trunc(real &rop, T &&op)
     return detail::mpfr_nary_op_impl<false>(0, ::mpfr_trunc, rop, std::forward<T>(op));
 }
 
-/// Unary \link mppp::real real\endlink truncation.
-/**
- * This function will return the truncated counterpart of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the truncated counterpart of ``r``.
- *
- * @throws std::domain_error if ``r`` is NaN.
- */
+// Unary truncation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2504,22 +2466,7 @@ inline real trunc(T &&r)
     return detail::mpfr_nary_op_return_impl<false>(0, ::mpfr_trunc, std::forward<T>(r));
 }
 
-/** @} */
-
-/** @defgroup real_operators real_operators
- *  @{
- */
-
-/// Identity operator for \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will return a copy of the input :cpp:class:`~mppp::real` ``r``.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink that will be copied.
- *
- * @return a copy of \p r.
- */
+// Identity operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2559,26 +2506,7 @@ inline real dispatch_binary_add(const T &x, U &&a)
 }
 } // namespace detail
 
-/// Binary addition involving \link mppp::real real\endlink.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \f$a+b\f$.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -2665,34 +2593,7 @@ inline void dispatch_in_place_add(T &x, U &&a)
 }
 } // namespace detail
 
-/// In-place addition involving \link mppp::real real\endlink.
-/**
- * \rststar
- * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
- * to the expression:
- *
- * .. code-block:: c++
- *
- *    a = a + b;
- *
- * Otherwise, this operator is equivalent to the expression:
- *
- * .. code-block:: c++
- *
- *    a = static_cast<T>(a + b);
- *
- * That is, the operation is always performed via the corresponding binary operator
- * and the result is assigned back to ``a``, after a conversion if necessary.
- * \endrststar
- *
- * @param a the augend.
- * @param b the addend.
- *
- * @return a reference to \p a.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator,
- * or by the generic conversion operator of \link mppp::real real\endlink.
- */
+// In-place addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealInPlaceOpTypes<T, U>
@@ -2705,27 +2606,13 @@ template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
     return a;
 }
 
-/// Prefix increment for \link mppp::real real\endlink.
-/**
- * This operator will increment \p x by one.
- *
- * @param x the \link mppp::real real\endlink that will be increased.
- *
- * @return a reference to \p x after the increment.
- */
+// Prefix increment.
 inline real &operator++(real &x)
 {
     return x += 1;
 }
 
-/// Suffix increment for \link mppp::real real\endlink.
-/**
- * This operator will increment \p x by one and return a copy of \p x as it was before the increment.
- *
- * @param x the \link mppp::real real\endlink that will be increased.
- *
- * @return a copy of \p x before the increment.
- */
+// Suffix increment.
 inline real operator++(real &x, int)
 {
     auto retval(x);
@@ -2733,16 +2620,7 @@ inline real operator++(real &x, int)
     return retval;
 }
 
-/// Negated copy for \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will return a negated copy of the input :cpp:class:`~mppp::real` ``r``.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink that will be negated.
- *
- * @return a negated copy of \p r.
- */
+// Negated copy.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2784,26 +2662,7 @@ inline real dispatch_binary_sub(const T &x, U &&a)
 }
 } // namespace detail
 
-/// Binary subtraction involving \link mppp::real real\endlink.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \f$a-b\f$.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -2862,34 +2721,7 @@ inline void dispatch_in_place_sub(T &x, U &&a)
 }
 } // namespace detail
 
-/// In-place subtraction involving \link mppp::real real\endlink.
-/**
- * \rststar
- * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
- * to the expression:
- *
- * .. code-block:: c++
- *
- *    a = a - b;
- *
- * Otherwise, this operator is equivalent to the expression:
- *
- * .. code-block:: c++
- *
- *    a = static_cast<T>(a - b);
- *
- * That is, the operation is always performed via the corresponding binary operator
- * and the result is assigned back to ``a``, after a conversion if necessary.
- * \endrststar
- *
- * @param a the minuend.
- * @param b the subtrahend.
- *
- * @return a reference to \p a.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator,
- * or by the generic conversion operator of \link mppp::real real\endlink.
- */
+// In-place subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealInPlaceOpTypes<T, U>
@@ -2931,27 +2763,13 @@ inline real dispatch_binary_mul(const T &x, U &&a)
 }
 } // namespace detail
 
-/// Prefix decrement for \link mppp::real real\endlink.
-/**
- * This operator will decrement \p x by one.
- *
- * @param x the \link mppp::real real\endlink that will be decreased.
- *
- * @return a reference to \p x after the decrement.
- */
+// Prefix decrement.
 inline real &operator--(real &x)
 {
     return x -= 1;
 }
 
-/// Suffix decrement for \link mppp::real real\endlink.
-/**
- * This operator will decrement \p x by one and return a copy of \p x as it was before the decrement.
- *
- * @param x the \link mppp::real real\endlink that will be decreased.
- *
- * @return a copy of \p x before the decrement.
- */
+// Suffix decrement.
 inline real operator--(real &x, int)
 {
     auto retval(x);
@@ -2959,26 +2777,7 @@ inline real operator--(real &x, int)
     return retval;
 }
 
-/// Binary multiplication involving \link mppp::real real\endlink.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \f$a\times b\f$.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3037,34 +2836,7 @@ inline void dispatch_in_place_mul(T &x, U &&a)
 }
 } // namespace detail
 
-/// In-place multiplication involving \link mppp::real real\endlink.
-/**
- * \rststar
- * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
- * to the expression:
- *
- * .. code-block:: c++
- *
- *    a = a * b;
- *
- * Otherwise, this operator is equivalent to the expression:
- *
- * .. code-block:: c++
- *
- *    a = static_cast<T>(a * b);
- *
- * That is, the operation is always performed via the corresponding binary operator
- * and the result is assigned back to ``a``, after a conversion if necessary.
- * \endrststar
- *
- * @param a the multiplicand.
- * @param b the multiplicator.
- *
- * @return a reference to \p a.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator,
- * or by the generic conversion operator of \link mppp::real real\endlink.
- */
+// In-place multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealInPlaceOpTypes<T, U>
@@ -3106,26 +2878,7 @@ inline real dispatch_binary_div(const T &x, U &&a)
 }
 } // namespace detail
 
-/// Binary division involving \link mppp::real real\endlink.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \f$a / b\f$.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename U, RealOpTypes<U> T>
 #else
@@ -3183,34 +2936,7 @@ inline void dispatch_in_place_div(T &x, U &&a)
 }
 } // namespace detail
 
-/// In-place division involving \link mppp::real real\endlink.
-/**
- * \rststar
- * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
- * to the expression:
- *
- * .. code-block:: c++
- *
- *    a = a / b;
- *
- * Otherwise, this operator is equivalent to the expression:
- *
- * .. code-block:: c++
- *
- *    a = static_cast<T>(a / b);
- *
- * That is, the operation is always performed via the corresponding binary operator
- * and the result is assigned back to ``a``, after a conversion if necessary.
- * \endrststar
- *
- * @param a the dividend.
- * @param b the divisor.
- *
- * @return a reference to \p a.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator,
- * or by the generic conversion operator of \link mppp::real real\endlink.
- */
+// In-place division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealInPlaceOpTypes<T, U>
@@ -3250,33 +2976,7 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
 }
 } // namespace detail
 
-/// Equality operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * equal to ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_equal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real_equal_to()`
- *    for an equality predicate that handles NaN specially.
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is equal to ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3288,33 +2988,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_equal_p, a, b);
 }
 
-/// Inequality operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * different from ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_equal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real_equal_to()`
- *    for an equality predicate that handles NaN specially.
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is different from ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3326,34 +3000,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return !(a == b);
 }
 
-/// Greater-than operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * greater than ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_greater_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    greater than any value, and no value is greater than NaN).
- *    See :cpp:func:`mppp::real_gt()` for a greater-than predicate that handles
- *    NaN specially.
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is greater than ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3365,32 +3012,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_greater_p, a, b);
 }
 
-/// Greater-than or equal operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * greater than or equal to ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_greaterequal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    greater than or equal to any value, and no value is greater than or equal to NaN).
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is greater than or equal to ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3402,34 +3024,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_greaterequal_p, a, b);
 }
 
-/// Less-than operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * less than ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_less_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    less than any value, and no value is less than NaN).
- *    See :cpp:func:`mppp::real_lt()` for a less-than predicate that handles
- *    NaN specially.
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is less than ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3441,32 +3036,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_less_p, a, b);
 }
 
-/// Less-than or equal operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * less than or equal to ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_lessequal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    less than or equal to any value, and no value is less than or equal to NaN).
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is less than or equal to ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3478,7 +3048,6 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_lessequal_p, a, b);
 }
 
-/** @} */
 } // namespace mppp
 
 #include <mp++/detail/real_literals.hpp>

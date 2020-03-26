@@ -7204,7 +7204,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-// Binary modulo operator for \link mppp::integer integer\endlink.
+// Binary modulo operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U> inline auto

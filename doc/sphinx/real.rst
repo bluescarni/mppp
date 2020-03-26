@@ -70,7 +70,7 @@ The real class
    treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
    are needed).
 
-   Member functions are provided to access directly the internal ``mpfr_t`` instance (see
+   Member functions are provided to access directly the internal :cpp:type:`mpfr_t` instance (see
    :cpp:func:`mppp::real::get_mpfr_t()` and :cpp:func:`mppp::real::_get_mpfr_t()`), so that
    it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
 
@@ -489,7 +489,9 @@ The real class
       * zero,
       * a regular number (i.e., not NaN, infinity or zero),
       * an integral value,
-      * one.
+      * one,
+
+      ``false`` otherwise.
 
       :return: the result of the detection.
 
@@ -870,12 +872,12 @@ Types
 
 .. cpp:type:: mpfr_prec_t
 
-   An integral type defined by the MPFR library, used to represent the precision of ``mpfr_t``
+   An integral type defined by the MPFR library, used to represent the precision of :cpp:type:`mpfr_t`
    and (by extension) :cpp:class:`~mppp::real` objects.
 
 .. cpp:type:: mpfr_exp_t
 
-   An integral type defined by the MPFR library, used to represent the exponent of ``mpfr_t``
+   An integral type defined by the MPFR library, used to represent the exponent of :cpp:type:`mpfr_t`
    and (by extension) :cpp:class:`~mppp::real` objects.
 
 .. cpp:enum-class:: mppp::real_kind
@@ -978,6 +980,17 @@ Precision handling
    :exception unspecified: any exception thrown by :cpp:func:`mppp::real::set_prec()`
      or :cpp:func:`mppp::real::prec_round()`.
 
+.. cpp:function:: constexpr mpfr_prec_t mppp::real_prec_min()
+.. cpp:function:: constexpr mpfr_prec_t mppp::real_prec_max()
+
+   Minimum/maximum precisions for a :cpp:class:`~mppp::real`.
+
+   These compile-time constants represent the minimum/maximum valid precisions
+   for a :cpp:class:`~mppp::real`. The returned values are guaranteed to be, respectively,
+   not less than the ``MPFR_PREC_MIN`` MPFR constant and not greater than
+   the ``MPFR_PREC_MAX`` MPFR constant.
+
+   :return: the minimum/maximum valid precisions for a :cpp:class:`~mppp::real`.
 
 .. _real_assignment:
 
@@ -1260,7 +1273,9 @@ Comparison
    * zero,
    * a regular number (i.e., not NaN, infinity or zero),
    * an integral value,
-   * one.
+   * one,
+
+   ``false`` otherwise.
 
    :param r: the input argument.
 
@@ -1543,7 +1558,7 @@ Exponentiation
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, typename U> mppp::real pow(T &&op1, U &&op2)
+.. cpp:function:: template <typename T, typename U> mppp::real mppp::pow(T &&op1, U &&op2)
 
    .. note::
 
@@ -1558,9 +1573,7 @@ Exponentiation
    Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
    before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
    to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
-   :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
-   precision, if set, or it is automatically deduced depending on the type and value of the
-   operand to be converted.
+   :cpp:class:`~mppp::real`.
 
    :param op1: the base.
    :param op2: the exponent.
@@ -1770,9 +1783,7 @@ Trigonometry
    Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
    before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
    to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
-   either the default precision, if set, or it is automatically deduced depending on the type
-   and value of the operand to be converted.
+   operator of :cpp:class:`~mppp::real`.
 
    :param y: the sine argument.
    :param x: the cosine argument.
@@ -1995,9 +2006,7 @@ Logarithms and exponentials
    Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
    before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
    to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
-   either the default precision, if set, or it is automatically deduced depending on the type
-   and value of the operand to be converted.
+   operator of :cpp:class:`~mppp::real`.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2116,9 +2125,7 @@ Gamma functions
    Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
    before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
    to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
-   either the default precision, if set, or it is automatically deduced depending on the type
-   and value of the operand to be converted.
+   operator of :cpp:class:`~mppp::real`.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2289,9 +2296,7 @@ Other special functions
    Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
    before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
    to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
-   either the default precision, if set, or it is automatically deduced depending on the type
-   and value of the operand to be converted.
+   operator of :cpp:class:`~mppp::real`.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2322,9 +2327,7 @@ Other special functions
    Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
    before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
    to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
-   either the default precision, if set, or it is automatically deduced depending on the type
-   and value of the operand to be converted.
+   operator of :cpp:class:`~mppp::real`.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2355,9 +2358,7 @@ Other special functions
    Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
    before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
    to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
-   either the default precision, if set, or it is automatically deduced depending on the type
-   and value of the operand to be converted.
+   operator of :cpp:class:`~mppp::real`.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2371,32 +2372,218 @@ Other special functions
 Integer and remainder related functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. doxygengroup:: real_intrem
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::trunc(mppp::real &rop, T &&op)
+
+   Binary truncation.
+
+   This function will truncate *op* and store the result
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:domain_error: if *op* is NaN.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::trunc(T &&r)
+
+   Unary truncation.
+
+   This function will return the truncated counterpart of *r*.
+   The precision of the result will be equal to the precision
+   of *r*.
+
+   :param r: the operand.
+
+   :return: the truncated counterpart of *r*.
+
+   :exception std\:\:domain_error: if *r* is NaN.
 
 .. _real_io:
 
 Input/Output
 ~~~~~~~~~~~~
 
-.. doxygengroup:: real_io
-   :content-only:
+.. cpp:function:: std::ostream &mppp::operator<<(std::ostream &os, const mppp::real &r)
+
+   Output stream operator.
+
+   This operator will insert into the stream *os* a string representation of *r*
+   in base 10 (as returned by :cpp:func:`mppp::real::to_string()`).
+
+   .. warning::
+
+      In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+      flags. For the time being, users are encouraged to use the ``mpfr_get_str()`` function from the MPFR
+      library if precise and forward-compatible control on the printing format is needed.
+
+   :param os: the target stream.
+   :param r: the input argument.
+
+   :return: a reference to *os*.
+
+   :exception unspecified: any exception thrown by :cpp:func`mppp::real::to_string()`.
 
 .. _real_operators:
 
 Mathematical operators
 ----------------------
 
-.. doxygengroup:: real_operators
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::operator+(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::operator-(T &&r)
+
+   Identity and negation operators.
+
+   :param r: the input argument.
+
+   :return: :math:`r` and :math:`-r` respectively.
+
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::operator+(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::operator-(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::operator*(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::operator/(T &&a, U &&b)
+
+   Binary arithmetic operators.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+   :cpp:class:`~mppp::real`.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: the result of the binary operation.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+
+.. cpp:function:: template <typename U, mppp::RealInPlaceOpTypes<U> T> T &mppp::operator+=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::RealInPlaceOpTypes<U> T> T &mppp::operator-=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::RealInPlaceOpTypes<U> T> T &mppp::operator*=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::RealInPlaceOpTypes<U> T> T &mppp::operator/=(T &a, U &&b)
+
+   In-place arithmetic operators.
+
+   If *a* is a :cpp:class:`~mppp::real`, then these operators are equivalent, respectively,
+   to the expressions:
+
+   .. code-block:: c++
+
+      a = a + b;
+      a = a - b;
+      a = a * b;
+      a = a / b;
+
+   Otherwise, these operators are equivalent to the expressions:
+
+   .. code-block:: c++
+
+      a = static_cast<T>(a + b);
+      a = static_cast<T>(a - b);
+      a = static_cast<T>(a * b);
+      a = static_cast<T>(a / b);
+
+   That is, the operation is performed via the corresponding binary operator
+   and the result is assigned back to *a*, after a conversion if necessary.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: a reference to *a*.
+
+   :exception unspecified: any exception thrown by the corresponding binary operator,
+     or by the generic conversion operator of :cpp:class:`~mppp::real`.
+
+.. cpp:function:: mppp::real &mppp::operator++(mppp::real &x)
+.. cpp:function:: mppp::real &mppp::operator--(mppp::real &x)
+
+   Prefix increment/decrement.
+
+   :param x: the input argument.
+
+   :return: a reference to *x* after the increment/decrement.
+
+.. cpp:function:: mppp::real mppp::operator++(mppp::real &x, int)
+.. cpp:function:: mppp::real mppp::operator--(mppp::real &x, int)
+
+   Suffix increment/decrement.
+
+   :param x: the input argument.
+
+   :return: a copy of *x* before the increment/decrement.
+
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator==(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator!=(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator<(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator<=(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator>(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator>=(const T &a, const U &b)
+
+   Comparison operators.
+
+   These operators will compare *a* and *b*, returning ``true`` if, respectively:
+
+   * :math:`a=b`,
+   * :math:`a \neq b`,
+   * :math:`a<b`,
+   * :math:`a \leq b`,
+   * :math:`a>b`,
+   * :math:`a \geq b`,
+
+   and ``false`` otherwise.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
+   The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+   :cpp:class:`~mppp::real`.
+
+   .. note::
+
+      These operators handle NaN in the same way specified by the IEEE floating-point
+      standard. :ref:`Alternative comparison functions <real_comparison>` treating NaN
+      specially are available.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: the result of the comparison.
+
+   :exception unspecified: any exception thrown by the generic assignment operator
+     of :cpp:class:`~mppp::real`.
 
 .. _real_constants:
 
 Constants
 ---------
 
-.. doxygengroup:: real_constants
-   :content-only:
+.. cpp:function:: mppp::real mppp::real_pi(mpfr_prec_t p)
+
+   :math:`\pi` constant.
+
+   This function will return a :cpp:class:`~mppp::real` :math:`\pi`
+   with a precision of *p*.
+
+   :param p: the desired precision.
+
+   :return: an approximation of :math:`\pi`.
+
+   :exception std\:\:invalid_argument: if *p* is outside the range established by
+     :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
+.. cpp:function:: mppp::real &mppp::real_pi(mppp::real &rop)
+
+   Set to :math:`\pi`.
+
+   This function will set *rop* to :math:`\pi`. The precision
+   of *rop* will not be altered.
+
+   :param rop: the return value.
+
+   :return: a reference to *rop*.
 
 .. _real_literals:
 
