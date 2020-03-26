@@ -1558,12 +1558,7 @@ Exponentiation
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, typename U> mppp::real mppp::pow(T &&op1, U &&op2)
-
-   .. note::
-
-      This function participates in overload resolution only if ``T`` and ``U`` satisfy
-      the :cpp:concept:`~mppp::RealOpTypes` concept.
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::pow(T &&op1, U &&op2)
 
    Binary exponentiation.
 
@@ -1985,7 +1980,7 @@ Logarithms and exponentials
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
-.. cpp:function:: template <typename T, typename U> mppp::real mppp::log_hypot(T &&x, U &&y)
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::log_hypot(T &&x, U &&y)
 
    .. versionadded:: 0.19
 
@@ -1993,11 +1988,6 @@ Logarithms and exponentials
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
-
-   .. note::
-
-      This function participates in overload resolution only if ``T`` and ``U`` satisfy
-      the :cpp:concept:`~mppp::RealOpTypes` concept.
 
    Binary log hypot function.
 
