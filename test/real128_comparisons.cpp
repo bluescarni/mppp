@@ -46,6 +46,12 @@ using is_eq_comparable = std::integral_constant<bool, std::is_same<detail::detec
 template <typename T, typename U>
 using is_ineq_comparable = std::integral_constant<bool, std::is_same<detail::detected_t<inequal_t, T, U>, bool>::value>;
 
+#if defined(__INTEL_COMPILER)
+#define MPPP_INTEL_CONSTEXPR const
+#else
+#define MPPP_INTEL_CONSTEXPR constexpr
+#endif
+
 TEST_CASE("real128 equality")
 {
     REQUIRE((std::is_same<decltype(real128{} == real128{}), bool>::value));
@@ -58,13 +64,13 @@ TEST_CASE("real128 equality")
     REQUIRE((!is_ineq_comparable<std::string, real128>::value));
     constexpr bool c0 = real128{} == real128{};
     constexpr bool c0a = real128{} != real128{};
-    constexpr bool c0b = real128_equal_to(real128{}, real128{});
+    MPPP_INTEL_CONSTEXPR bool c0b = real128_equal_to(real128{}, real128{});
     REQUIRE(c0);
     REQUIRE(!c0a);
     REQUIRE(c0b);
     constexpr bool c1 = real128{-1} == real128{1};
     constexpr bool c1a = real128{-1} != real128{1};
-    constexpr bool c1b = real128_equal_to(real128{-1}, real128{1});
+    MPPP_INTEL_CONSTEXPR bool c1b = real128_equal_to(real128{-1}, real128{1});
     REQUIRE(!c1);
     REQUIRE(c1a);
     REQUIRE(!c1b);
@@ -158,11 +164,11 @@ TEST_CASE("real128 lt")
     REQUIRE((!is_lt_comparable<real128, std::string>::value));
     REQUIRE((!is_lt_comparable<std::string, real128>::value));
     constexpr bool c0 = real128{} < real128{};
-    constexpr bool c0b = real128_lt(real128{}, real128{});
+    MPPP_INTEL_CONSTEXPR bool c0b = real128_lt(real128{}, real128{});
     REQUIRE(!c0);
     REQUIRE(!c0b);
     constexpr bool c1 = real128{-1} < real128{1};
-    constexpr bool c1b = real128_lt(real128{-1}, real128{1});
+    MPPP_INTEL_CONSTEXPR bool c1b = real128_lt(real128{-1}, real128{1});
     REQUIRE(c1);
     REQUIRE(c1b);
     constexpr bool c2 = real128{1} < -1;
@@ -301,11 +307,11 @@ TEST_CASE("real128 gt")
     REQUIRE((!is_gt_comparable<real128, std::string>::value));
     REQUIRE((!is_gt_comparable<std::string, real128>::value));
     constexpr bool c0 = real128{} > real128{};
-    constexpr bool c0b = real128_gt(real128{}, real128{});
+    MPPP_INTEL_CONSTEXPR bool c0b = real128_gt(real128{}, real128{});
     REQUIRE(!c0);
     REQUIRE(!c0b);
     constexpr bool c1 = real128{-1} > real128{1};
-    constexpr bool c1b = real128_gt(real128{-1}, real128{1});
+    MPPP_INTEL_CONSTEXPR bool c1b = real128_gt(real128{-1}, real128{1});
     REQUIRE(!c1);
     REQUIRE(!c1b);
     constexpr bool c2 = real128{1} > -1;

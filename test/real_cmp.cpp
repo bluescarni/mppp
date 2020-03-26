@@ -43,30 +43,6 @@ TEST_CASE("real naninf")
     REQUIRE(zero_p(real{}));
     REQUIRE(!real{}.regular_p());
     REQUIRE(!regular_p(real{}));
-
-    real_set_default_prec(128);
-    REQUIRE(real{"nan"}.nan_p());
-    REQUIRE(nan_p(real{"nan"}));
-    REQUIRE(!real{"nan"}.inf_p());
-    REQUIRE(!inf_p(real{"nan"}));
-    REQUIRE(!real{"nan"}.number_p());
-    REQUIRE(!number_p(real{"nan"}));
-    REQUIRE(!real{"nan"}.zero_p());
-    REQUIRE(!zero_p(real{"nan"}));
-    REQUIRE(!real{"nan"}.regular_p());
-    REQUIRE(!regular_p(real{"nan"}));
-
-    REQUIRE(!real{"inf"}.nan_p());
-    REQUIRE(!nan_p(real{"inf"}));
-    REQUIRE(real{"inf"}.inf_p());
-    REQUIRE(inf_p(real{"-inf"}));
-    REQUIRE(!real{"inf"}.number_p());
-    REQUIRE(!number_p(real{"inf"}));
-    REQUIRE(!real{"inf"}.zero_p());
-    REQUIRE(!zero_p(real{"inf"}));
-    REQUIRE(!real{"inf"}.regular_p());
-    REQUIRE(!regular_p(real{"-inf"}));
-    real_reset_default_prec();
 }
 
 TEST_CASE("real sign")
@@ -86,31 +62,12 @@ TEST_CASE("real sign")
     REQUIRE(sgn(real{-2}) < 0);
     REQUIRE(signbit(real{-2}));
 
-    real_set_default_prec(128);
-
-    REQUIRE(real{"-0"}.sgn() == 0);
-    REQUIRE(real{"-0"}.signbit());
-    REQUIRE(sgn(real{"-0"}) == 0);
-    REQUIRE(signbit(real{"-0"}));
-
-    REQUIRE(real{"inf"}.sgn() > 0);
-    REQUIRE(!real{"inf"}.signbit());
-    REQUIRE(sgn(real{"inf"}) > 0);
-    REQUIRE(!signbit(real{"inf"}));
-
-    REQUIRE(real{"-inf"}.sgn() < 0);
-    REQUIRE(real{"-inf"}.signbit());
-    REQUIRE(sgn(real{"-inf"}) < 0);
-    REQUIRE(signbit(real{"-inf"}));
-
-    REQUIRE_THROWS_PREDICATE(real{"nan"}.sgn(), std::domain_error, [](const std::domain_error &ex) {
+    REQUIRE_THROWS_PREDICATE((real{"nan", real_prec_min()}).sgn(), std::domain_error, [](const std::domain_error &ex) {
         return ex.what() == std::string("Cannot determine the sign of a real NaN");
     });
-    REQUIRE_THROWS_PREDICATE(sgn(real{"nan"}), std::domain_error, [](const std::domain_error &ex) {
+    REQUIRE_THROWS_PREDICATE(sgn((real{"nan", real_prec_min()})), std::domain_error, [](const std::domain_error &ex) {
         return ex.what() == std::string("Cannot determine the sign of a real NaN");
     });
-
-    real_reset_default_prec();
 }
 
 TEST_CASE("real cmp")

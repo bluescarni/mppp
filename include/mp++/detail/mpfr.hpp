@@ -35,43 +35,19 @@
 namespace mppp
 {
 
-/** @defgroup real_prec real_prec
- *  @{
- */
-
-/// Minimum precision for a \link mppp::real real\endlink.
-/**
- * \rststar
- * This compile-time constant represents the minimum valid precision
- * for a :cpp:class:`~mppp::real`. The returned value is guaranteed to be
- * not less than the ``MPFR_PREC_MIN`` MPFR constant.
- * \endrststar
- *
- * @return the minimum valid precision for a \link mppp::real real\endlink.
- */
+// Minimum precision for a real.
 constexpr ::mpfr_prec_t real_prec_min()
 {
     return MPFR_PREC_MIN;
 }
 
-/// Maximum precision for a \link mppp::real real\endlink.
-/**
- * \rststar
- * This compile-time constant represents the maximum valid precision
- * for a :cpp:class:`~mppp::real`. The returned value is guaranteed to be
- * not greater than the ``MPFR_PREC_MAX`` MPFR constant.
- * \endrststar
- *
- * @return the maximum valid precision for a \link mppp::real real\endlink.
- */
+// Maximum precision for a real.
 constexpr ::mpfr_prec_t real_prec_max()
 {
     // For the max precision, we remove 7 bits from the MPFR_PREC_MAX value (as the MPFR docs warn
     // to never set the precision "close" to the max value).
     return MPFR_PREC_MAX >> 7;
 }
-
-/** @} */
 
 // The MPFR structure underlying mpfr_t.
 using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;

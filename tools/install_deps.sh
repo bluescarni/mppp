@@ -28,7 +28,7 @@ if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
     conda_pkgs="cmake<3.16 gmp mpfr arb libflint"
 
     if [[ "${MPPP_BUILD}" == Documentation ]]; then
-        conda_pkgs="$conda_pkgs graphviz doxygen pip"
+        conda_pkgs="$conda_pkgs pip"
     fi
 
     if [[ "${MPPP_BUILD}" == ReleaseGCC48 ]]; then

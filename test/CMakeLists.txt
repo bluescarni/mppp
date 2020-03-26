@@ -12,6 +12,7 @@ target_compile_options(mp++_test PRIVATE
   "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
   "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
 )
+
 # Let's setup the target C++ standard, but only if the user did not provide it manually.
 if(NOT CMAKE_CXX_STANDARD)
   if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
@@ -24,6 +25,17 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 set_property(TARGET mp++_test PROPERTY CXX_STANDARD_REQUIRED YES)
 set_property(TARGET mp++_test PROPERTY CXX_EXTENSIONS NO)
+
+# Enable the "-Wno-psabi" flag on GCC to silence ABI-related
+# warnings in the tests when using std::complex.
+if(YACMA_COMPILER_IS_GNUCXX)
+  message(STATUS "Activating the '-Wno-psabi' flag for the unit tests.")
+  # NOTE: because we are within an add_subdirectory()
+  # command, altering these variables has no influence
+  # in the parent scope.
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-Wno-psabi")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-Wno-psabi")
+endif()
 
 function(ADD_MPPP_TESTCASE arg1)
   if(MPPP_TEST_NSPLIT)
