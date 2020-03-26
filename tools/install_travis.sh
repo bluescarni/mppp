@@ -90,7 +90,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Move out the resulting documentation.
     mv _build/html /home/travis/sphinx;
     # Checkout a new copy of the repo, for pushing to gh-pages.
-    cd ../../../;
+    cd ../../;
     git config --global push.default simple
     git config --global user.name "Travis CI"
     git config --global user.email "bluescarni@gmail.com"
