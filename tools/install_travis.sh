@@ -54,19 +54,18 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Run the configure step to create the doc config files.
     CXX=g++-5 CC=gcc-5 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes ../;
 
-    cd ..;
-    cd doc/doxygen;
-    export DOXYGEN_OUTPUT=`doxygen 2>&1 >/dev/null`;
-    if [[ "${DOXYGEN_OUTPUT}" != "" ]]; then
-        echo "Doxygen encountered some problem:";
-        echo "${DOXYGEN_OUTPUT}";
-        exit 1;
-    fi
+    # Install sphinx.
+    pip install --user requests[security] sphinx
+
+    # Install the GIT head of the guzzle theme.
+    git clone https://github.com/guzzle/guzzle_sphinx_theme.git
+    cd guzzle_sphinx_theme
+    python setup.py install --user
+    cd ..
+
     cd ../sphinx;
-    pip install --user breathe requests[security] sphinx sphinx-rtd-theme
-    # There are some warnings in real128 and in the sphinx code currently.
-    # Ignore them.
-    export SPHINX_OUTPUT=`make html linkcheck 2>&1 | grep -v "Duplicate declaration" | grep -v "is deprecated" >/dev/null`;
+    # Ignore some warnings.
+    export SPHINX_OUTPUT=`make html linkcheck 2>&1 | grep -v "is deprecated" >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
         echo "${SPHINX_OUTPUT}";
