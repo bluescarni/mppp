@@ -1654,6 +1654,11 @@ Trigonometry
 
    The precision of the result will be equal to the precision of *x*.
 
+   .. versionadded:: 0.19
+
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()``.
+
    :param rop: the return value.
    :param x: the argument.
 
@@ -1661,11 +1666,6 @@ Trigonometry
 
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
-
-   .. versionadded:: 0.19
-
-      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
-      ``cot_pi()``, ``sinc()`` and ``sinc_pi()``.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin(T &&x)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos(T &&x)
@@ -1706,17 +1706,17 @@ Trigonometry
 
    The precision of the result will be equal to the precision of *x*.
 
+   .. versionadded:: 0.19
+
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()``.
+
    :param x: the argument.
 
    :return: the trigonometric function of *x*.
 
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
-
-   .. versionadded:: 0.19
-
-      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
-      ``cot_pi()``, ``sinc()`` and ``sinc_pi()``.
 
 .. cpp:function:: template <mppp::CvrReal T> void mppp::sin_cos(mppp::real &sop, mppp::real &cop, T &&op)
 
