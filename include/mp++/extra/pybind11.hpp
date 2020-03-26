@@ -109,11 +109,7 @@ inline void cleanup()
 }
 } // namespace detail
 
-/// Initialisation function for the pybind11 integration.
-/**
- * This function should be called in the definition of a pybind11 extension module, right after the
- * ``PYBIND11_MODULE()`` invocation.
- */
+// Initialisation function for the pybind11 integration.
 inline void init()
 {
     if (detail::globals::inited) {

@@ -6,8 +6,6 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 #include <mp++/config.hpp>
 
 #include <ostream>
@@ -283,5 +281,3 @@ std::ostream &operator<<(std::ostream &os, const real128 &x)
 }
 
 } // namespace mppp
-
-#endif

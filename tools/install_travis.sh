@@ -54,19 +54,18 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Run the configure step to create the doc config files.
     CXX=g++-5 CC=gcc-5 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes ../;
 
-    cd ..;
-    cd doc/doxygen;
-    export DOXYGEN_OUTPUT=`doxygen 2>&1 >/dev/null`;
-    if [[ "${DOXYGEN_OUTPUT}" != "" ]]; then
-        echo "Doxygen encountered some problem:";
-        echo "${DOXYGEN_OUTPUT}";
-        exit 1;
-    fi
-    cd ../sphinx;
-    pip install --user breathe requests[security] sphinx sphinx-rtd-theme
-    # There are some warnings in real128 and in the sphinx code currently.
-    # Ignore them.
-    export SPHINX_OUTPUT=`make html linkcheck 2>&1 | grep -v "Duplicate declaration" | grep -v "is deprecated" >/dev/null`;
+    # Install sphinx.
+    pip install --user requests[security] sphinx
+
+    # Install the GIT head of the guzzle theme.
+    git clone https://github.com/guzzle/guzzle_sphinx_theme.git
+    cd guzzle_sphinx_theme
+    python setup.py install --user
+    cd ..
+
+    cd ../doc;
+    # Ignore some warnings.
+    export SPHINX_OUTPUT=`make html linkcheck 2>&1 | grep -v "is deprecated" >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
         echo "${SPHINX_OUTPUT}";
@@ -91,7 +90,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Move out the resulting documentation.
     mv _build/html /home/travis/sphinx;
     # Checkout a new copy of the repo, for pushing to gh-pages.
-    cd ../../../;
+    cd ../../;
     git config --global push.default simple
     git config --global user.name "Travis CI"
     git config --global user.email "bluescarni@gmail.com"

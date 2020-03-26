@@ -77,48 +77,24 @@ TEST_CASE("real pow")
     REQUIRE(pow(3, real{2}) == real{9});
     REQUIRE(pow(real{3}, 2).get_prec() == detail::nl_digits<int>() + 1);
     REQUIRE(pow(3, real{2}).get_prec() == detail::nl_digits<int>() + 1);
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, 2) == real{9});
-    REQUIRE(pow(real{3, 5}, 2).get_prec() == 10);
-    REQUIRE(pow(3, real{2, 5}) == real{9});
-    REQUIRE(pow(3, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
     REQUIRE(pow(r0, 2u) == real{9});
     REQUIRE(pow(3u, r1) == real{9});
     REQUIRE(pow(real{3}, 2u) == real{9});
     REQUIRE(pow(3u, real{2}) == real{9});
     REQUIRE(pow(real{3}, 2u).get_prec() == detail::nl_digits<unsigned>());
     REQUIRE(pow(3u, real{2}).get_prec() == detail::nl_digits<unsigned>());
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, 2u) == real{9});
-    REQUIRE(pow(real{3, 5}, 2u).get_prec() == 10);
-    REQUIRE(pow(3u, real{2, 5}) == real{9});
-    REQUIRE(pow(3u, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
     REQUIRE(pow(r0, 2ll) == real{9});
     REQUIRE(pow(3ll, r1) == real{9});
     REQUIRE(pow(real{3}, 2ll) == real{9});
     REQUIRE(pow(3ll, real{2}) == real{9});
     REQUIRE(pow(real{3}, 2ll).get_prec() == detail::nl_digits<long long>() + 1);
     REQUIRE(pow(3ll, real{2}).get_prec() == detail::nl_digits<long long>() + 1);
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, 2ll) == real{9});
-    REQUIRE(pow(real{3, 5}, 2ll).get_prec() == 10);
-    REQUIRE(pow(3ll, real{2, 5}) == real{9});
-    REQUIRE(pow(3ll, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
     REQUIRE(pow(r0, 2ull) == real{9});
     REQUIRE(pow(3ull, r1) == real{9});
     REQUIRE(pow(real{3}, 2ull) == real{9});
     REQUIRE(pow(3ull, real{2}) == real{9});
     REQUIRE(pow(real{3}, 2ull).get_prec() == detail::nl_digits<unsigned long long>());
     REQUIRE(pow(3ull, real{2}).get_prec() == detail::nl_digits<unsigned long long>());
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, 2ull) == real{9});
-    REQUIRE(pow(real{3, 5}, 2ull).get_prec() == 10);
-    REQUIRE(pow(3ull, real{2, 5}) == real{9});
-    REQUIRE(pow(3ull, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
     REQUIRE(pow(r0, 2.f) == real{9});
     REQUIRE(pow(3.f, r1) == real{9});
     REQUIRE(pow(real{3}, 2.f) == real{9});
@@ -127,12 +103,6 @@ TEST_CASE("real pow")
             == std::max<::mpfr_prec_t>(detail::dig2mpfr_prec<float>(), detail::nl_digits<int>() + 1));
     REQUIRE(pow(3.f, real{2}).get_prec()
             == std::max<::mpfr_prec_t>(detail::dig2mpfr_prec<float>(), detail::nl_digits<int>() + 1));
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, 2.f) == real{9});
-    REQUIRE(pow(real{3, 5}, 2.f).get_prec() == 10);
-    REQUIRE(pow(3.f, real{2, 5}) == real{9});
-    REQUIRE(pow(3.f, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
     REQUIRE(pow(r0, 2.) == real{9});
     REQUIRE(pow(3., r1) == real{9});
     REQUIRE(pow(real{3}, 2.) == real{9});
@@ -141,12 +111,6 @@ TEST_CASE("real pow")
             == std::max<::mpfr_prec_t>(detail::dig2mpfr_prec<double>(), detail::nl_digits<int>() + 1));
     REQUIRE(pow(3., real{2}).get_prec()
             == std::max<::mpfr_prec_t>(detail::dig2mpfr_prec<double>(), detail::nl_digits<int>() + 1));
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, 2.) == real{9});
-    REQUIRE(pow(real{3, 5}, 2.).get_prec() == 10);
-    REQUIRE(pow(3., real{2, 5}) == real{9});
-    REQUIRE(pow(3., real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
     REQUIRE(pow(r0, 2.l) == real{9});
     REQUIRE(pow(3.l, r1) == real{9});
     REQUIRE(pow(real{3}, 2.l) == real{9});
@@ -155,24 +119,12 @@ TEST_CASE("real pow")
             == std::max<::mpfr_prec_t>(detail::dig2mpfr_prec<long double>(), detail::nl_digits<int>() + 1));
     REQUIRE(pow(3.l, real{2}).get_prec()
             == std::max<::mpfr_prec_t>(detail::dig2mpfr_prec<long double>(), detail::nl_digits<int>() + 1));
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, 2.l) == real{9});
-    REQUIRE(pow(real{3, 5}, 2.l).get_prec() == 10);
-    REQUIRE(pow(3.l, real{2, 5}) == real{9});
-    REQUIRE(pow(3.l, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
     REQUIRE(pow(r0, int_t{2}) == real{9});
     REQUIRE(pow(int_t{3}, r1) == real{9});
     REQUIRE(pow(real{3}, int_t{2}) == real{9});
     REQUIRE(pow(int_t{3}, real{2}) == real{9});
     REQUIRE(pow(real{3}, int_t{2}).get_prec() == std::max<::mpfr_prec_t>(GMP_NUMB_BITS, detail::nl_digits<int>() + 1));
     REQUIRE(pow(int_t{3}, real{2}).get_prec() == std::max<::mpfr_prec_t>(GMP_NUMB_BITS, detail::nl_digits<int>() + 1));
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, int_t{2}) == real{9});
-    REQUIRE(pow(real{3, 5}, int_t{2}).get_prec() == 10);
-    REQUIRE(pow(int_t{3}, real{2, 5}) == real{9});
-    REQUIRE(pow(int_t{3}, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
     REQUIRE(pow(r0, rat_t{2}) == real{9});
     REQUIRE(pow(rat_t{3}, r1) == real{9});
     REQUIRE(pow(real{3}, rat_t{2}) == real{9});
@@ -181,12 +133,6 @@ TEST_CASE("real pow")
             == std::max<::mpfr_prec_t>(GMP_NUMB_BITS * 2, detail::nl_digits<int>() + 1));
     REQUIRE(pow(rat_t{3}, real{2}).get_prec()
             == std::max<::mpfr_prec_t>(GMP_NUMB_BITS * 2, detail::nl_digits<int>() + 1));
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, rat_t{2}) == real{9});
-    REQUIRE(pow(real{3, 5}, rat_t{2}).get_prec() == 10);
-    REQUIRE(pow(rat_t{3}, real{2, 5}) == real{9});
-    REQUIRE(pow(rat_t{3}, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE(pow(r0, real128{2}) == real{9});
     REQUIRE(pow(real128{3}, r1) == real{9});
@@ -194,12 +140,6 @@ TEST_CASE("real pow")
     REQUIRE(pow(real128{3}, real{2}) == real{9});
     REQUIRE(pow(real{3}, real128{2}).get_prec() == std::max<::mpfr_prec_t>(113, detail::nl_digits<int>() + 1));
     REQUIRE(pow(real128{3}, real{2}).get_prec() == std::max<::mpfr_prec_t>(113, detail::nl_digits<int>() + 1));
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, real128{2}) == real{9});
-    REQUIRE(pow(real{3, 5}, real128{2}).get_prec() == 10);
-    REQUIRE(pow(real128{3}, real{2, 5}) == real{9});
-    REQUIRE(pow(real128{3}, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(pow(r0, __int128_t{2}) == real{9});
@@ -208,12 +148,6 @@ TEST_CASE("real pow")
     REQUIRE(pow(__uint128_t{3}, r1) == real{9});
     REQUIRE(pow(real{3}, __int128_t{2}).get_prec() == 128);
     REQUIRE(pow(__uint128_t{3}, real{2}).get_prec() == 128);
-    real_set_default_prec(10);
-    REQUIRE(pow(real{3, 5}, __int128_t{2}) == real{9});
-    REQUIRE(pow(real{3, 5}, __int128_t{2}).get_prec() == 10);
-    REQUIRE(pow(__uint128_t{3}, real{2, 5}) == real{9});
-    REQUIRE(pow(__uint128_t{3}, real{2, 5}).get_prec() == 10);
-    real_reset_default_prec();
 #endif
 }
 

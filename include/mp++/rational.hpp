@@ -143,11 +143,7 @@ class rational
 {
 public:
     // Underlying integral type.
-#if defined(MPPP_DOXYGEN_INVOKED)
-    typedef integer<SSize> int_t;
-#else
     using int_t = integer<SSize>;
-#endif
     // Alias for the template parameter SSize.
     static constexpr std::size_t ssize = SSize;
     // Default constructor.
@@ -2048,7 +2044,7 @@ inline rational<SSize> rational_binomial_impl(const rational<SSize> &t, const T 
 
 } // namespace detail
 
-// Binomial coefficient for \link mppp::rational rational\endlink.
+// Binomial coefficient.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, RationalIntegralInteroperable<SSize> T>
 #else

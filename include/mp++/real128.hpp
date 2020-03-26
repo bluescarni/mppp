@@ -9,8 +9,6 @@
 #ifndef MPPP_REAL128_HPP
 #define MPPP_REAL128_HPP
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 #include <mp++/config.hpp>
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -2072,8 +2070,6 @@ inline nlohmann::json mime_bundle_repr(const real128 &x)
 #else
 
 #error The real128.hpp header was included but mp++ was not configured with the MPPP_WITH_QUADMATH option.
-
-#endif
 
 #endif
 

@@ -3960,8 +3960,6 @@ inline std::size_t static_sqr(static_int<SSize> &rop, const static_int<SSize> &o
 
 } // namespace detail
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 // Binary squaring.
 template <std::size_t SSize>
 inline integer<SSize> &sqr(integer<SSize> &rop, const integer<SSize> &n)
@@ -3994,8 +3992,6 @@ inline integer<SSize> sqr(const integer<SSize> &n)
     sqr(retval, n);
     return retval;
 }
-
-#endif
 
 namespace detail
 {
@@ -4155,8 +4151,6 @@ inline void static_sqrm(static_int<SSize> &rop, const static_int<SSize> &op, con
 
 } // namespace detail
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 // Ternary modular squaring.
 template <std::size_t SSize>
 inline integer<SSize> &sqrm(integer<SSize> &rop, const integer<SSize> &op, const integer<SSize> &mod)
@@ -4199,8 +4193,6 @@ inline integer<SSize> sqrm(const integer<SSize> &op, const integer<SSize> &mod)
     sqrm(retval, op, mod);
     return retval;
 }
-
-#endif
 
 // Binary negation.
 template <std::size_t SSize>
@@ -6630,8 +6622,6 @@ using has_integer_binary_load = is_detected<integer_binary_load_t, T, integer<SS
 
 } // namespace detail
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
 MPPP_CONCEPT_DECL IntegerBinarySaveDest = detail::has_integer_binary_save<T, SSize>::value;
@@ -6644,8 +6634,6 @@ template <typename T, std::size_t SSize>
 MPPP_CONCEPT_DECL IntegerBinaryLoadSrc = detail::has_integer_binary_load<T, SSize>::value;
 #else
 using integer_binary_load_enabler = detail::enable_if_t<detail::has_integer_binary_load<T, SSize>::value, int>;
-#endif
-
 #endif
 
 // Save in binary format.
@@ -7204,7 +7192,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-// Binary modulo operator for \link mppp::integer integer\endlink.
+// Binary modulo operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires IntegerIntegralOpTypes<T, U> inline auto

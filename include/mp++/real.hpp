@@ -14,7 +14,6 @@
 #if defined(MPPP_WITH_MPFR)
 
 #include <algorithm>
-#include <atomic>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -62,15 +61,13 @@ constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 // Helper function to print an mpfr to stream in a given base.
 MPPP_DLL_PUBLIC void mpfr_to_stream(const ::mpfr_t, std::ostream &, int);
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 // Helpers to deduce the precision when constructing/assigning a real via another type.
 template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
     static_assert(nl_digits<T>() < nl_max<::mpfr_prec_t>(), "Overflow error.");
     // NOTE: for signed integers, include the sign bit as well.
-    return static_cast<::mpfr_prec_t>(nl_digits<T>()) + is_signed<T>::value;
+    return clamp_mpfr_prec(static_cast<::mpfr_prec_t>(nl_digits<T>()) + is_signed<T>::value);
 }
 
 // Utility function to determine the number of base-2 digits of the significand
@@ -89,7 +86,8 @@ template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
     static_assert(nl_digits<T>() <= nl_max<::mpfr_prec_t>(), "Overflow error.");
-    return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(nl_digits<T>()) : dig2mpfr_prec<T>();
+    return clamp_mpfr_prec(std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(nl_digits<T>())
+                                                              : dig2mpfr_prec<T>());
 }
 
 template <std::size_t SSize>
@@ -103,7 +101,7 @@ inline ::mpfr_prec_t real_deduce_precision(const integer<SSize> &n)
         throw std::overflow_error("The deduced precision for a real from an integer is too large");
     }
     // LCOV_EXCL_STOP
-    return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
+    return clamp_mpfr_prec(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS));
 }
 
 template <std::size_t SSize>
@@ -122,7 +120,7 @@ inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
         throw std::overflow_error("The deduced precision for a real from a rational is too large");
     }
     // LCOV_EXCL_STOP
-    return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
+    return clamp_mpfr_prec(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS));
 }
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -131,15 +129,10 @@ inline ::mpfr_prec_t real_deduce_precision(const real128 &)
 {
     // The significand precision in bits is 113 for real128. Let's double-check it.
     static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
-    return 113;
+    return clamp_mpfr_prec(113);
 }
 
 #endif
-
-#endif
-
-// Default precision value.
-MPPP_DLL_PUBLIC extern std::atomic<::mpfr_prec_t> real_default_prec;
 
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
@@ -206,91 +199,12 @@ using cvr_real_enabler
     = detail::enable_if_t<detail::conjunction<std::is_same<detail::uncvref_t<Args>, real>...>::value, int>;
 #endif
 
-/// Get the default precision for \link mppp::real real\endlink objects.
-/**
- * \ingroup real_prec
- * \rststar
- * This function returns the value of the precision used during the construction of
- * :cpp:class:`~mppp::real` objects when an explicit precision value
- * is **not** specified . On program startup, the value returned by this function
- * is zero, meaning that the precision of a :cpp:class:`~mppp::real` object will be chosen
- * automatically according to heuristics depending on the specific situation, if possible.
- *
- * The default precision is stored in a global variable, and its value can be changed via
- * :cpp:func:`~mppp::real_set_default_prec()`. It is safe to read and modify concurrently
- * from multiple threads the default precision.
- * \endrststar
- *
- * @return the value of the default precision for \link mppp::real real\endlink objects.
- */
-inline mpfr_prec_t real_get_default_prec()
-{
-    return detail::real_default_prec.load(std::memory_order_relaxed);
-}
-
-/// Set the default precision for \link mppp::real real\endlink objects.
-/**
- * \ingroup real_prec
- * \rststar
- * See :cpp:func:`~mppp::real_get_default_prec()` for an explanation of how the default precision value
- * is used.
- * \endrststar
- *
- * @param p the desired value for the default precision for \link mppp::real real\endlink objects.
- *
- * @throws std::invalid_argument if \p p is nonzero and not in the range established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
- */
-inline void real_set_default_prec(::mpfr_prec_t p)
-{
-    if (mppp_unlikely(p && !detail::real_prec_check(p))) {
-        throw std::invalid_argument("Cannot set the default precision to " + detail::to_string(p)
-                                    + ": the value must be either zero or between " + detail::to_string(real_prec_min())
-                                    + " and " + detail::to_string(real_prec_max()));
-    }
-    detail::real_default_prec.store(p, std::memory_order_relaxed);
-}
-
-/// Reset the default precision for \link mppp::real real\endlink objects.
-/**
- * \ingroup real_prec
- * \rststar
- * This function will reset the default precision value to zero (i.e., the same value assigned
- * on program startup). See :cpp:func:`~mppp::real_get_default_prec()` for an explanation of how the default precision
- * value is used.
- * \endrststar
- */
-inline void real_reset_default_prec()
-{
-    detail::real_default_prec.store(0, std::memory_order_relaxed);
-}
-
-namespace detail
-{
-
-// Get the default precision, if set, otherwise the clamped deduced precision for x.
-template <typename T>
-inline ::mpfr_prec_t real_dd_prec(const T &x)
-{
-    // NOTE: this is guaranteed to be a valid precision value.
-    const auto dp = real_get_default_prec();
-    // Return default precision if nonzero, otherwise return the clamped deduced precision.
-    return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
-}
-
-} // namespace detail
-
-// Doxygen gets confused by this.
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 // Special initialisation tags for real.
 enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
     nan = MPFR_NAN_KIND,
     inf = MPFR_INF_KIND,
     zero = MPFR_ZERO_KIND
 };
-
-#endif
 
 // For the future:
 // - construction from/conversion to interoperables can probably be improved performance wise, especially
@@ -301,133 +215,15 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 // - see if it's needed to provide alternate interoperable function/operators that do *not* promote
 //   the non-real to real (there's a bunch of functions for direct interface with GMP and cpp types
 //   in the MPFR API: arithmetic, comparison, etc.).
+// - it seems like we might be do multiple roundings when cting from real128.
+//   See if we can implement with only a single rounding, perhaps via an integer
+//   and mpfr_set_z_2exp()?
+// - Do we need real_equal_to() to work also on invalid reals, the way
+//   real_lt/gt() do?
 
-/// Multiprecision floating-point class.
-/**
- * \rststar
- * This class represents arbitrary-precision real values encoded in a binary floating-point format.
- * It acts as a wrapper around the MPFR ``mpfr_t`` type, pairing a multiprecision significand
- * (whose size can be set at runtime) to a fixed-size exponent. In other words, :cpp:class:`~mppp::real`
- * values can have an arbitrary number of binary digits of precision (limited only by the available memory),
- * but the exponent range is limited.
- *
- * :cpp:class:`~mppp::real` aims to behave like a C++ floating-point type whose precision is a runtime property
- * of the class instances rather than a compile-time property of the type. Because of this, the way precision
- * is handled in :cpp:class:`~mppp::real` differs from the way it is managed in MPFR. The most important difference
- * is that in operations involving :cpp:class:`~mppp::real` the precision of the result is usually determined
- * by the precision of the operands, whereas in MPFR the precision of the operation is determined by the precision
- * of the return value (which is always passed as the first function parameter in the MPFR API). For instance,
- * in the following code,
- *
- * .. code-block:: c++
- *
- *    auto x = real{5,200} + real{6,150};
- *
- * the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
- * 150 bits. The precision of the result ``x`` (and the precision at which the addition is computed) will be
- * the maximum precision among the two operands, that is, :math:`\mathrm{max}\left(200,150\right)=200` bits.
- *
- * The precision of a :cpp:class:`~mppp::real` can be set at construction, or it can be changed later via functions and
- * methods such as :cpp:func:`mppp::real::set_prec()`, :cpp:func:`mppp::real::prec_round()`, etc. By default,
- * the precision of a :cpp:class:`~mppp::real` is automatically deduced upon construction following a set of heuristics
- * aimed at ensuring that the constructed :cpp:class:`~mppp::real` represents exactly the value used for initialisation.
- * For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
- * :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered either by specifying explicitly
- * the desired precision value, or by setting a global default precision via :cpp:func:`~mppp::real_set_default_prec()`.
- *
- * This class has the look and feel of a C++ builtin type: it can interact with all of C++'s integral and
- * floating-point primitive types, :cpp:class:`~mppp::integer`, :cpp:class:`~mppp::rational` and
- * :cpp:class:`~mppp::real128` (see the :cpp:concept:`~mppp::RealInteroperable` concept), and it provides overloaded
- * :ref:`operators <real_operators>`. Differently from the builtin types, however, this class does not allow any
- * implicit conversion to/from other types (apart from ``bool``): construction from and conversion to primitive types
- * must always be requested explicitly. As a side effect, syntax such as
- *
- * .. code-block:: c++
- *
- *    real r = 5;
- *    int m = r;
- *
- * will not work, and direct initialization should be used instead:
- *
- * .. code-block:: c++
- *
- *    real r{5};
- *    int m{r};
- *
- * Most of the functionality is exposed via plain :ref:`functions <real_functions>`, with the
- * general convention that the functions are named after the corresponding MPFR functions minus the leading ``mpfr_``
- * prefix. For instance, the MPFR call
- *
- * .. code-block:: c++
- *
- *    mpfr_add(rop,a,b,MPFR_RNDN);
- *
- * that writes the result of ``a + b``, rounded to nearest, into ``rop``, becomes simply
- *
- * .. code-block:: c++
- *
- *    add(rop,a,b);
- *
- * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
- * are allowed, unless noted otherwise. Unless otherwise specified, the :cpp:class:`~mppp::real` API always
- * rounds to nearest (that is, the ``MPFR_RNDN`` rounding mode is used).
- *
- * Multiple overloads of the same functionality are often available.
- * Binary functions in MPFR are usually implemented via three-operands functions, in which the first
- * operand is a reference to the return value. The exponentiation function ``mpfr_pow()``, for instance,
- * takes three operands: the return value, the base and the exponent. There are two overloads of the corresponding
- * :ref:`exponentiation <real_exponentiation>` function for :cpp:class:`~mppp::real`:
- *
- * * a ternary overload similar to ``mpfr_pow()``,
- * * a binary overload taking as inputs the base and the exponent, and returning the result
- *   of the exponentiation.
- *
- * This allows to avoid having to set up a return value for one-off invocations of ``pow()`` (the binary overload
- * will do it for you). For example:
- *
- * .. code-block:: c++
- *
- *    real r1, r2, r3{3}, r4{2};
- *    pow(r1,r3,r4);   // Ternary pow(): computes 3**2 and stores
- *                     // the result in r1.
- *    r2 = pow(r3,r4); // Binary pow(): returns 3**2, which is then
- *                     // assigned to r2.
- *
- * In case of unary functions, there are often three overloads available:
- *
- * * a binary overload taking as first parameter a reference to the return value (MPFR style),
- * * a unary overload returning the result of the operation,
- * * a nullary member function that modifies the calling object in-place.
- *
- * For instance, here are three possible ways of computing the absolute value:
- *
- * .. code-block:: c++
- *
- *    real r1, r2, r3{-5};
- *    abs(r1,r3);   // Binary abs(): computes and stores the absolute value
- *                  // of r3 into r1.
- *    r2 = abs(r3); // Unary abs(): returns the absolute value of r3, which is
- *                  // then assigned to r2.
- *    r3.abs();     // Member function abs(): replaces the value of r3 with its
- *                  // absolute value.
- *
- * Note that at this time a subset of the MPFR API has been wrapped by :cpp:class:`~mppp::real`.
- *
- * Various :ref:`overloaded operators <real_operators>` are provided. The arithmetic operators always return
- * a :cpp:class:`~mppp::real` result. The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will
- * promote non-:cpp:class:`~mppp::real` arguments to :cpp:class:`~mppp::real` before performing the comparison.
- * Alternative comparison functions
- * treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
- * are needed).
- *
- * Member functions are provided to access directly the internal ``mpfr_t`` instance (see
- * :cpp:func:`mppp::real::get_mpfr_t()` and :cpp:func:`mppp::real::_get_mpfr_t()`), so that
- * it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
- * \endrststar
- */
+// Multiprecision floating-point class.
 class MPPP_DLL_PUBLIC real
 {
-#if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking prec setting funcs.
     template <bool, typename F, typename Arg0, typename... Args>
     friend real &detail::mpfr_nary_op_impl(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
@@ -435,7 +231,6 @@ class MPPP_DLL_PUBLIC real
     friend real detail::mpfr_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
     template <typename F>
     friend real detail::real_constant(const F &, ::mpfr_prec_t);
-#endif
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
@@ -455,26 +250,14 @@ private:
     // A tag to call private ctors.
     struct ptag {
     };
-    // Init a real with precision p, setting its value to n. No precision
-    // checking is performed.
+    // Private ctor that sets to NaN with a certain precision,
+    // without checking the input precision value.
     explicit real(const ptag &, ::mpfr_prec_t, bool);
 
 public:
     // Copy constructor.
     real(const real &);
-    // Copy constructor with custom precision.
-    explicit real(const real &, ::mpfr_prec_t);
-    /// Move constructor.
-    /**
-     * \rststar
-     * .. warning::
-     *    The only valid operations on the moved-from ``other`` object are
-     *    destruction, copy/move assignment and the invocation of the :cpp:func:`~mppp::real::is_valid()`
-     *    member function. After re-assignment, ``other`` can be used normally again.
-     * \endrststar
-     *
-     * @param other the \link mppp::real real\endlink that will be moved.
-     */
+    // Move constructor.
     real(real &&other) noexcept
     {
         // Shallow copy other.
@@ -482,66 +265,31 @@ public:
         // Mark the other as moved-from.
         other.m_mpfr._mpfr_d = nullptr;
     }
+
+    // Copy constructor with custom precision.
+    explicit real(const real &, ::mpfr_prec_t);
+
     // Constructor from a special value, sign and precision.
     explicit real(real_kind, int, ::mpfr_prec_t);
-    /// Constructor from a special value and precision.
-    /**
-     * This constructor is equivalent to the constructor from a special value, sign and precision
-     * with a hard-coded sign of 0.
-     *
-     * @param k the desired special value.
-     * @param p the desired precision for \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from a special value, sign and precision.
-     */
-    explicit real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
-    /// Constructor from a special value.
-    /**
-     * This constructor is equivalent to the constructor from a special value, sign and precision
-     * with a hard-coded sign of 0 and hard-coded precision of 0.
-     *
-     * @param k the desired special value.
-     *
-     * @throws unspecified any exception thrown by the constructor from a special value, sign and precision.
-     */
-    explicit real(real_kind k) : real(k, 0, 0) {}
+    // Constructor from a special value and precision.
+    explicit real(real_kind, ::mpfr_prec_t);
 
 private:
-    // A helper to determine the precision to use in the generic constructors. The precision
-    // can be manually provided, taken from the default global value, or deduced according
-    // to the properties of the type/value.
-    template <typename T>
-    static ::mpfr_prec_t compute_init_precision(::mpfr_prec_t provided, const T &x)
-    {
-        if (provided) {
-            // Provided precision trumps everything. Check it and return it.
-            return check_init_prec(provided);
-        }
-        // Return the default or deduced precision.
-        return detail::real_dd_prec(x);
-    }
-
     // Construction from FPs.
     template <typename Func, typename T>
-    MPPP_DLL_LOCAL void dispatch_fp_construction(const Func &, const T &, ::mpfr_prec_t);
-    void dispatch_construction(const float &, ::mpfr_prec_t);
-    void dispatch_construction(const double &, ::mpfr_prec_t);
-    void dispatch_construction(const long double &, ::mpfr_prec_t);
+    MPPP_DLL_LOCAL void dispatch_fp_construction(const Func &, const T &);
+    void dispatch_construction(const float &);
+    void dispatch_construction(const double &);
+    void dispatch_construction(const long double &);
 
     // Construction from integral types.
-    template <typename T>
-    void dispatch_integral_init(::mpfr_prec_t p, const T &n)
-    {
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, n));
-    }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
-    void dispatch_construction(const bool &, ::mpfr_prec_t);
+    void dispatch_construction(const bool &);
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>>::value, int> = 0>
-    void dispatch_construction(const T &n, ::mpfr_prec_t p)
+    void dispatch_construction(const T &n)
     {
-        dispatch_integral_init(p, n);
         if (n <= detail::nl_max<unsigned long>()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
@@ -552,9 +300,8 @@ private:
     }
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
-    void dispatch_construction(const T &n, ::mpfr_prec_t p)
+    void dispatch_construction(const T &n)
     {
-        dispatch_integral_init(p, n);
         if (n <= detail::nl_max<long>() && n >= detail::nl_min<long>()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
@@ -563,77 +310,50 @@ private:
     }
 
     // Construction from mppp::integer.
-    void dispatch_mpz_construction(const ::mpz_t, ::mpfr_prec_t);
+    void dispatch_mpz_construction(const ::mpz_t);
     template <std::size_t SSize>
-    void dispatch_construction(const integer<SSize> &n, ::mpfr_prec_t p)
+    void dispatch_construction(const integer<SSize> &n)
     {
-        dispatch_mpz_construction(n.get_mpz_view(), compute_init_precision(p, n));
+        dispatch_mpz_construction(n.get_mpz_view());
     }
 
     // Construction from mppp::rational.
-    void dispatch_mpq_construction(const ::mpq_t, ::mpfr_prec_t);
+    void dispatch_mpq_construction(const ::mpq_t);
     template <std::size_t SSize>
-    void dispatch_construction(const rational<SSize> &q, ::mpfr_prec_t p)
+    void dispatch_construction(const rational<SSize> &q)
     {
         // NOTE: get_mpq_view() returns an mpq_struct, whose
         // address we then need to use.
         const auto v = detail::get_mpq_view(q);
-        dispatch_mpq_construction(&v, compute_init_precision(p, q));
+        dispatch_mpq_construction(&v);
     }
 
 #if defined(MPPP_WITH_QUADMATH)
-    void dispatch_construction(const real128 &, ::mpfr_prec_t);
+    void dispatch_construction(const real128 &);
     // NOTE: split this off from the dispatch_construction() overload, so we can re-use it in the
     // generic assignment.
     void assign_real128(const real128 &);
 #endif
 
 public:
-    /// Generic constructor.
-    /**
-     * \rststar
-     * The generic constructor will set ``this`` to the value of ``x`` with a precision of ``p``.
-     *
-     * If ``p`` is nonzero, then ``this`` will be initialised exactly to a precision of ``p``, and
-     * a rounding operation might occurr.
-     *
-     * If ``p`` is zero, the constructor will first fetch the default precision ``dp`` via
-     * :cpp:func:`~mppp::real_get_default_prec()`. If ``dp`` is nonzero, then ``dp`` will be used
-     * as precision for ``this`` and a rounding operation might occurr.
-     *
-     * Otherwise, if ``dp`` is zero, the precision of ``this`` will be set according to the following
-     * heuristics:
-     *
-     * * if ``x`` is a C++ integral type ``I``, then the precision is set to the bit width of ``I``;
-     * * if ``x`` is a C++ floating-point type ``F``, then the precision is set to the number of binary digits
-     *   in the significand of ``F``;
-     * * if ``x`` is :cpp:class:`~mppp::integer`, then the precision is set to the number of bits in use by
-     *   ``x`` (rounded up to the next multiple of the limb type's bit width);
-     * * if ``x`` is :cpp:class:`~mppp::rational`, then the precision is set to the sum of the number of bits
-     *   used by numerator and denominator (as established by the previous heuristic for :cpp:class:`~mppp::integer`);
-     * * if ``x`` is :cpp:class:`~mppp::real128`, then the precision is set to 113.
-     *
-     * These heuristics aim at ensuring that, whatever the type of ``x``, its value is preserved exactly in the
-     * constructed :cpp:class:`~mppp::real`.
-     *
-     * Construction from ``bool`` will initialise ``this`` to 1 for ``true``, and 0 for ``false``.
-     * \endrststar
-     *
-     * @param x the construction argument.
-     * @param p the desired precision.
-     *
-     * @throws std::overflow_error if an overflow occurs in the computation of the automatically-deduced precision.
-     * @throws std::invalid_argument if \p p is nonzero and outside the range established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
-     */
+    // Generic constructors.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
     template <typename T, real_interoperable_enabler<T> = 0>
 #endif
-    explicit real(const T &x, ::mpfr_prec_t p = 0)
+    explicit real(const T &x) : real(ptag{}, detail::real_deduce_precision(x), true)
     {
-        dispatch_construction(x, p);
+        dispatch_construction(x);
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <RealInteroperable T>
+#else
+    template <typename T, real_interoperable_enabler<T> = 0>
+#endif
+    explicit real(const T &x, ::mpfr_prec_t p) : real(ptag{}, check_init_prec(p), true)
+    {
+        dispatch_construction(x);
     }
 
 private:
@@ -645,33 +365,7 @@ private:
 #endif
 
 public:
-    /// Constructor from string, base and precision.
-    /**
-     * \rststar
-     * This constructor will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which
-     * is interpreted as a floating-point number in base ``base``. ``base`` must be either zero (in which case the base
-     * will be automatically deduced) or a number in the [2,62] range. The valid string formats are detailed in the
-     * documentation of the MPFR function ``mpfr_set_str()``. Note that leading whitespaces are ignored, but trailing
-     * whitespaces will raise an error.
-     *
-     * The precision of ``this`` will be ``p`` if ``p`` is nonzero, the default precision otherwise. If ``p`` is zero
-     * and no default precision has been set, an error will be raised.
-     *
-     * .. seealso::
-     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param s the input string.
-     * @param base the base used in the string representation.
-     * @param p the desired precision.
-     *
-     * @throws std::invalid_argument in the following cases:
-     * - \p base is not zero and not in the [2,62] range,
-     * - \p p is either outside the valid bounds for a precision value, or it is zero and no
-     *   default precision value has been set,
-     * - \p s cannot be interpreted as a floating-point number.
-     * @throws unspecified any exception thrown by memory errors in standard containers.
-     */
+    // Constructor from string, base and precision.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -680,15 +374,7 @@ public:
     explicit real(const T &s, int base, ::mpfr_prec_t p) : real(ptag{}, s, base, p)
     {
     }
-    /// Constructor from string and precision.
-    /**
-     * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10.
-     *
-     * @param s the input string.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, base and precision.
-     */
+    // Constructor from string and precision.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -697,48 +383,14 @@ public:
     explicit real(const T &s, ::mpfr_prec_t p) : real(s, 10, p)
     {
     }
-    /// Constructor from string.
-    /**
-     * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10
-     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
-     *
-     * @param s the input string.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, base and precision.
-     */
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
-#else
-    template <typename T, string_type_enabler<T> = 0>
-#endif
-    explicit real(const T &s) : real(s, 10, 0)
-    {
-    }
     // Constructor from range of characters, base and precision.
     explicit real(const char *, const char *, int, ::mpfr_prec_t);
     // Constructor from range of characters and precision.
     explicit real(const char *, const char *, ::mpfr_prec_t);
-    // Constructor from range of characters.
-    explicit real(const char *, const char *);
-    // Copy constructor from ``mpfr_t``.
+
+    // Copy constructor from mpfr_t.
     explicit real(const ::mpfr_t);
-    /// Move constructor from ``mpfr_t``.
-    /**
-     * This constructor will initialise ``this`` with a shallow copy of ``x``.
-     *
-     * \rststar
-     * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
-     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
-     *    and :cpp:func:`~mppp::real_prec_max()`.
-     *
-     *    Additionally, the user must ensure that, after construction, ``mpfr_clear()`` is never
-     *    called on ``x``: the resources previously owned by ``x`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     * \endrststar
-     *
-     * @param x the ``mpfr_t`` that will be moved.
-     */
+    // Move constructor from mpfr_t.
     explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
 
     // Destructor.
@@ -747,12 +399,7 @@ public:
     // Copy assignment operator.
     real &operator=(const real &);
 
-    /// Move assignment operator.
-    /**
-     * @param other the \link mppp::real real\endlink that will be moved into \p this.
-     *
-     * @return a reference to \p this.
-     */
+    // Move assignment operator.
     real &operator=(real &&other) noexcept
     {
         // NOTE: for generic code, std::swap() is not a particularly good way of implementing
@@ -774,7 +421,7 @@ private:
     void dispatch_fp_assignment(const Func &func, const T &x)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(x));
+            set_prec_impl<false>(detail::real_deduce_precision(x));
         }
         func(&m_mpfr, x, MPFR_RNDN);
     }
@@ -793,12 +440,13 @@ private:
     {
         dispatch_fp_assignment<SetPrec>(::mpfr_set_ld, x);
     }
+
     // Assignment from integral types.
     template <bool SetPrec, typename T>
     void dispatch_integral_ass_prec(const T &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(n));
+            set_prec_impl<false>(detail::real_deduce_precision(n));
         }
     }
     // Special casing for bool.
@@ -830,54 +478,42 @@ private:
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
+
+    // Assignment from integer.
     template <bool SetPrec, std::size_t SSize>
     void dispatch_assignment(const integer<SSize> &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(n));
+            set_prec_impl<false>(detail::real_deduce_precision(n));
         }
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
+
+    // Assignment from rational.
     template <bool SetPrec, std::size_t SSize>
     void dispatch_assignment(const rational<SSize> &q)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(q));
+            set_prec_impl<false>(detail::real_deduce_precision(q));
         }
         const auto v = detail::get_mpq_view(q);
         ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
     }
+
 #if defined(MPPP_WITH_QUADMATH)
+    // Assignment from real128.
     template <bool SetPrec>
     void dispatch_assignment(const real128 &x)
     {
         if (SetPrec) {
-            set_prec_impl<false>(detail::real_dd_prec(x));
+            set_prec_impl<false>(detail::real_deduce_precision(x));
         }
         assign_real128(x);
     }
 #endif
 
 public:
-    /// Generic assignment operator.
-    /**
-     * \rststar
-     * The generic assignment operator will set ``this`` to the value of ``x``.
-     *
-     * The operator will first fetch the default precision ``dp`` via
-     * :cpp:func:`~mppp::real_get_default_prec()`. If ``dp`` is nonzero, then ``dp`` will be used
-     * as a new precision for ``this`` and a rounding operation might occurr during the assignment.
-     *
-     * Otherwise, if ``dp`` is zero, the precision of ``this`` will be set according to the same
-     * heuristics described in the generic constructor.
-     * \endrststar
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::overflow_error if an overflow occurs in the computation of the automatically-deduced precision.
-     */
+    // Generic assignment operator.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
@@ -889,84 +525,13 @@ public:
         return *this;
     }
 
-private:
-    // Implementation of the assignment from string.
-    MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
-    // Dispatching for string assignment.
-    real &string_assignment(const char *);
-    real &string_assignment(const std::string &);
-#if defined(MPPP_HAVE_STRING_VIEW)
-    real &string_assignment(const std::string_view &);
-#endif
-
-public:
-    /// Assignment from string.
-    /**
-     * \rststar
-     * This operator will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which is
-     * interpreted as a floating-point number in base 10. The precision of ``this`` will be set to the value returned by
-     * :cpp:func:`~mppp::real_get_default_prec()`. If no default precision has been set, an error will be raised. If
-     * ``s`` is not a valid representation of a floating-point number in base 10, ``this`` will be set to NaN and an
-     * error will be raised.
-     * \endrststar
-     *
-     * @param s the string that will be assigned to \p this.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if a default precision has not been set, or if \p s cannot be parsed
-     * as a floating-point value in base 10.
-     * @throws unspecified any exception thrown by memory allocation errors in standard containers.
-     */
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
-#else
-    template <typename T, string_type_enabler<T> = 0>
-#endif
-    real &operator=(const T &s)
-    {
-        return string_assignment(s);
-    }
-    // Copy assignment from ``mpfr_t``.
+    // Copy assignment from mpfr_t.
     real &operator=(const ::mpfr_t);
 
-    /// Move assignment from ``mpfr_t``.
-    /**
-     * This operator will set ``this`` to a shallow copy of ``x``.
-     *
-     * \rststar
-     * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
-     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
-     *    and :cpp:func:`~mppp::real_prec_max()`.
-     *
-     *    Additionally, the user must ensure that, after the assignment, ``mpfr_clear()`` is never
-     *    called on ``x``: the resources previously owned by ``x`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     * \endrststar
-     *
-     * @param x the ``mpfr_t`` that will be moved.
-     *
-     * @return a reference to \p this.
-     */
-    real &operator=(::mpfr_t &&x)
-    {
-        // Clear this.
-        ::mpfr_clear(&m_mpfr);
-        // Shallow copy x.
-        m_mpfr = *x;
-        return *this;
-    }
+    // Move assignment from mpfr_t.
+    real &operator=(::mpfr_t &&);
 
-    /// Check validity.
-    /**
-     * \rststar
-     * A :cpp:class:`~mppp::real` becomes invalid after it is used
-     * as an argument to the move constructor.
-     * \endrststar
-     *
-     * @return ``true`` if ``this`` is valid, ``false`` otherwise.
-     */
+    // Check validity.
     bool is_valid() const noexcept
     {
         return m_mpfr._mpfr_d != nullptr;
@@ -975,25 +540,7 @@ public:
     // Set to another real.
     real &set(const real &);
 
-    /// Generic setter.
-    /**
-     * \rststar
-     * This method will set ``this`` to the value of ``x``. Contrary to the generic assignment operator,
-     * the precision of the assignment is dictated by the precision of ``this``, rather than
-     * being deduced from the type and value of ``x``. Consequently, the precision of ``this`` will not be altered
-     * by the assignment, and a rounding might occur, depending on the operands.
-     *
-     * This method is a thin wrapper around various ``mpfr_set_*()``
-     * assignment functions from the MPFR API.
-     *
-     * .. seealso ::
-     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param x the value to which \p this will be set.
-     *
-     * @return a reference to \p this.
-     */
+    // Generic setter.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
@@ -1007,6 +554,7 @@ public:
 
 private:
     // Implementation of string setters.
+    MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
     real &set_impl(const char *, int);
     real &set_impl(const std::string &, int);
 #if defined(MPPP_HAVE_STRING_VIEW)
@@ -1014,35 +562,7 @@ private:
 #endif
 
 public:
-    /// Setter to string.
-    /**
-     * \rststar
-     * This method will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which will
-     * be interpreted as a floating-point number in base ``base``. ``base`` must be either 0 (in which case the base is
-     * automatically deduced), or a value in the [2,62] range. Contrary to the assignment operator from string,
-     * the global default precision is ignored and the precision of the assignment is dictated by the precision of
-     * ``this``. Consequently, the precision of ``this`` will not be altered by the assignment, and a rounding might
-     * occur, depending on the operands.
-     *
-     * If ``s`` is not a valid representation of a floating-point number in base ``base``, ``this``
-     * will be set to NaN and an error will be raised.
-     *
-     * This method is a thin wrapper around the ``mpfr_set_str()`` assignment function from the MPFR API.
-     *
-     * .. seealso ::
-     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param s the string to which \p this will be set.
-     * @param base the base used in the string representation.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if \p s cannot be parsed as a floating-point value in base 10, or if the value
-     * of \p base is invalid.
-     * @throws unspecified any exception thrown by memory
-     * allocation errors in standard containers.
-     */
+    // Setter to string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -1052,24 +572,7 @@ public:
     {
         return set_impl(s, base);
     }
-
-    /// Set to character range.
-    /**
-     * This setter will set \p this to the content of the input half-open range,
-     * which is interpreted as the string representation of a floating-point value in base \p base.
-     *
-     * Internally, the setter will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the setter to string.
-     *
-     * @param begin the start of the input range.
-     * @param end the end of the input range.
-     * @param base the base used in the string representation.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the setter to string, or by memory
-     * allocation errors in standard containers.
-     */
+    // Set to character range.
     real &set(const char *begin, const char *end, int base = 10);
 
     // Set to an mpfr_t.
@@ -1077,119 +580,53 @@ public:
 
     // Set to NaN.
     real &set_nan();
-
-    /// Set to infinity.
-    /**
-     * This setter will set \p this to infinity. The sign bit will be positive if \p sign
-     * is nonnegative, negative otherwise. The precision of \p this will not be altered.
-     *
-     * @param sign the sign of the infinity to which \p this will be set.
-     *
-     * @return a reference to \p this.
-     */
+    // Set to infinity.
     real &set_inf(int sign = 0);
-
-    /// Set to zero.
-    /**
-     * This setter will set \p this to zero. The sign bit will be positive if \p sign
-     * is nonnegative, negative otherwise. The precision of \p this will not be altered.
-     *
-     * @param sign the sign of the zero to which \p this will be set.
-     *
-     * @return a reference to \p this.
-     */
+    // Set to zero.
     real &set_zero(int sign = 0);
 
-    /// Const reference to the internal <tt>mpfr_t</tt>.
-    /**
-     * This method will return a const pointer to the internal MPFR structure used
-     * to represent the value of \p this. The returned object can be used as a
-     * <tt>const mpfr_t</tt> function parameter in the MPFR API.
-     *
-     * @return a const reference to the internal MPFR structure.
-     */
+    // Const reference to the internal mpfr_t.
     const mpfr_struct_t *get_mpfr_t() const
     {
         return &m_mpfr;
     }
-    /// Mutable reference to the internal <tt>mpfr_t</tt>.
-    /**
-     * This method will return a mutable pointer to the internal MPFR structure used
-     * to represent the value of \p this. The returned object can be used as an
-     * <tt>mpfr_t</tt> function parameter in the MPFR API.
-     *
-     * \rststar
-     * .. warning::
-     *    When using this mutable getter, it is the user's responsibility to ensure
-     *    that the internal MPFR structure is kept in a state which respects the invariants
-     *    of the :cpp:class:`~mppp::real` class. Specifically, the precision value
-     *    must be in the bounds established by :cpp:func:`~mppp::real_prec_min()` and
-     *    :cpp:func:`~mppp::real_prec_max()`, and upon destruction a :cpp:class:`~mppp::real`
-     *    object must contain a valid ``mpfr_t`` object.
-     * \endrststar
-     *
-     * @return a mutable reference to the internal MPFR structure.
-     */
+    // Mutable reference to the internal mpfr_t.
     mpfr_struct_t *_get_mpfr_t()
     {
         return &m_mpfr;
     }
 
-    /// Detect NaN.
-    /**
-     * @return \p true if \p this is NaN, \p false otherwise.
-     */
+    // Detect NaN.
     bool nan_p() const
     {
         return mpfr_nan_p(&m_mpfr) != 0;
     }
-
-    /// Detect infinity.
-    /**
-     * @return \p true if \p this is an infinity, \p false otherwise.
-     */
+    // Detect infinity.
     bool inf_p() const
     {
         return mpfr_inf_p(&m_mpfr) != 0;
     }
-
-    /// Detect finite number.
-    /**
-     * @return \p true if \p this is a finite number (i.e., not NaN or infinity), \p false otherwise.
-     */
+    // Detect finite number.
     bool number_p() const
     {
         return mpfr_number_p(&m_mpfr) != 0;
     }
-
-    /// Detect zero.
-    /**
-     * @return \p true if \p this is zero, \p false otherwise.
-     */
+    // Detect zero.
     bool zero_p() const
     {
         return mpfr_zero_p(&m_mpfr) != 0;
     }
-
-    /// Detect regular number.
-    /**
-     * @return \p true if \p this is a regular number (i.e., not NaN, infinity or zero), \p false otherwise.
-     */
+    // Detect regular number.
     bool regular_p() const
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
-
+    // Detect integer.
+    bool integer_p() const;
     // Detect one.
     bool is_one() const;
 
-    /// Detect sign.
-    /**
-     * @return a positive value if \p this is positive, zero if \p this is zero, a negative value if \p this
-     * is negative.
-     *
-     * @throws std::domain_error if \p this is NaN.
-     */
+    // Detect sign.
     int sgn() const
     {
         if (mppp_unlikely(nan_p())) {
@@ -1199,38 +636,17 @@ public:
         }
         return mpfr_sgn(&m_mpfr);
     }
-
-    /// Get the sign bit.
-    /**
-     * The sign bit is set if ``this`` is negative, -0, or a NaN whose representation has its sign bit set.
-     *
-     * @return the sign bit of \p this.
-     */
+    // Get the sign bit.
     bool signbit() const
     {
         return mpfr_signbit(&m_mpfr) != 0;
     }
 
-    /// Get the precision of \p this.
-    /**
-     * @return the current precision (i.e., the number of binary digits in the significand) of \p this.
-     */
+    // Get the precision of this.
     ::mpfr_prec_t get_prec() const
     {
         return mpfr_get_prec(&m_mpfr);
     }
-
-private:
-    template <typename T>
-    MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
-    template <typename T>
-    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&);
-
-public:
-    // Negate in-place.
-    real &neg();
-    // In-place absolute value.
-    real &abs();
 
 private:
     // Utility function to check precision in set_prec().
@@ -1446,33 +862,7 @@ private:
 #endif
 
 public:
-    /// Generic conversion operator.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::RealInteroperable` type. The conversion
-     * proceeds as follows:
-     *
-     * - if ``T`` is ``bool``, then the conversion returns ``false`` if ``this`` is zero, ``true`` otherwise
-     *   (including if ``this`` is NaN);
-     * - if ``T`` is a C++ integral type other than ``bool``, the conversion will yield the truncated counterpart
-     *   of ``this`` (i.e., the conversion rounds to zero). The conversion may fail due to overflow or domain errors
-     *   (i.e., when trying to convert non-finite values);
-     * - if ``T`` if a C++ floating-point type, the conversion calls directly the low-level MPFR functions (e.g.,
-     *   ``mpfr_get_d()``), and might yield infinities for finite input values;
-     * - if ``T`` is :cpp:class:`~mppp::integer`, the conversion rounds to zero and might fail due to domain errors,
-     *   but it will never overflow;
-     * - if ``T`` is :cpp:class:`~mppp::rational`, the conversion may fail if ``this`` is not finite or if the
-     *   conversion produces an overflow in the manipulation of the exponent of ``this`` (that is, if
-     *   the absolute value of ``this`` is very large or very small). If the conversion succeeds, it will be exact;
-     * - if ``T`` is :cpp:class:`~mppp::real128`, the conversion might yield infinities for finite input values.
-     *
-     * \endrststar
-     *
-     * @return \p this converted to \p T.
-     *
-     * @throws std::domain_error if \p this is not finite and the target type cannot represent non-finite numbers.
-     * @throws std::overflow_error if the conversion results in overflow.
-     */
+    // Generic conversion operator.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
@@ -1538,21 +928,7 @@ private:
 #endif
 
 public:
-    /// Generic conversion method.
-    /**
-     * \rststar
-     * This method, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::RealInteroperable` type, storing the result of the conversion into ``rop``. Differently
-     * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
-     * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
-     * ``rop`` will not be altered.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
-     * specified in the documentation of the conversion operator.
-     */
+    // Generic conversion function.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
@@ -1562,34 +938,30 @@ public:
     {
         return dispatch_get(rop);
     }
-    /// Convert to string.
-    /**
-     * \rststar
-     * This method will convert ``this`` to a string representation in base ``base``. The returned string is guaranteed
-     * to produce exactly the original value when used in one of the constructors from string of
-     * :cpp:class:`~mppp::real` (provided that the original precision and base are used in the construction).
-     * \endrststar
-     *
-     * @param base the base to be used for the string representation.
-     *
-     * @return \p this converted to a string.
-     *
-     * @throws std::invalid_argument if \p base is not in the [2,62] range.
-     * @throws std::runtime_error if the call to the ``mpfr_get_str()`` function of the MPFR API fails.
-     */
+
+    // Convert to string.
     std::string to_string(int base = 10) const;
+
+private:
+    template <typename T>
+    MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
+    template <typename T>
+    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&);
+
+public:
+    // Negate in-place.
+    real &neg();
+    // In-place absolute value.
+    real &abs();
 
     // In-place square root.
     real &sqrt();
-
     // In-place reciprocal square root.
     real &rec_sqrt();
-
 #if defined(MPPP_WITH_ARB)
     // In-place sqrt1pm1.
     real &sqrt1pm1();
 #endif
-
     // In-place cubic root.
     real &cbrt();
 
@@ -1598,24 +970,17 @@ public:
 
     // In-place sine.
     real &sin();
-
     // In-place cosine.
     real &cos();
-
     // In-place tangent.
     real &tan();
-
     // In-place secant.
     real &sec();
-
     // In-place cosecant.
     real &csc();
-
     // In-place cotangent.
     real &cot();
-
 #if defined(MPPP_WITH_ARB)
-
     // Trig functions from Arb.
     real &sin_pi();
     real &cos_pi();
@@ -1623,113 +988,82 @@ public:
     real &cot_pi();
     real &sinc();
     real &sinc_pi();
-
 #endif
 
     // In-place arccosine.
     real &acos();
-
     // In-place arcsine.
     real &asin();
-
     // In-place arctangent.
     real &atan();
 
     // In-place hyperbolic cosine.
     real &cosh();
-
     // In-place hyperbolic sine.
     real &sinh();
-
     // In-place hyperbolic tangent.
     real &tanh();
-
     // In-place hyperbolic secant.
     real &sech();
-
     // In-place hyperbolic cosecant.
     real &csch();
-
     // In-place hyperbolic cotangent.
     real &coth();
 
     // In-place inverse hyperbolic cosine.
     real &acosh();
-
     // In-place inverse hyperbolic sine.
     real &asinh();
-
     // In-place inverse hyperbolic tangent.
     real &atanh();
 
     // In-place exponential.
     real &exp();
-
     // In-place base-2 exponential.
     real &exp2();
-
     // In-place base-10 exponential.
     real &exp10();
-
     // In-place exponential minus 1.
     real &expm1();
-
     // In-place logarithm.
     real &log();
-
     // In-place base-2 logarithm.
     real &log2();
-
     // In-place base-10 logarithm.
     real &log10();
-
     // In-place augmented logarithm.
     real &log1p();
 
     // In-place Gamma function.
     real &gamma();
-
     // In-place logarithm of the Gamma function.
     real &lngamma();
-
     // In-place logarithm of the absolute value of the Gamma function.
     real &lgamma();
-
     // In-place Digamma function.
     real &digamma();
 
     // In-place Bessel function of the first kind of order 0.
     real &j0();
-
     // In-place Bessel function of the first kind of order 1.
     real &j1();
-
     // In-place Bessel function of the second kind of order 0.
     real &y0();
-
     // In-place Bessel function of the second kind of order 1.
     real &y1();
 
     // In-place exponential integral.
     real &eint();
-
     // In-place dilogarithm.
     real &li2();
-
     // In-place Riemann Zeta function.
     real &zeta();
-
     // In-place error function.
     real &erf();
-
     // In-place complementary error function.
     real &erfc();
-
     // In-place Airy function.
     real &ai();
-
-    // Check if the value is an integer.
-    bool integer_p() const;
 
     // In-place truncation.
     real &trunc();
@@ -1762,51 +1096,19 @@ using real_in_place_op_types_enabler = detail::enable_if_t<
     detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value, int>;
 #endif
 
-/// Destructively set the precision of a \link mppp::real real\endlink.
-/**
- * \ingroup real_prec
- * \rststar
- * This function will set the precision of ``r`` to exactly ``p`` bits. The value
- * of ``r`` will be set to NaN.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink whose precision will be set.
- * @param p the desired precision.
- *
- * @throws unspecified any exception thrown by mppp::real::set_prec().
- */
+// Destructively set the precision.
 inline void set_prec(real &r, ::mpfr_prec_t p)
 {
     r.set_prec(p);
 }
 
-/// Set the precision of a \link mppp::real real\endlink maintaining the current value.
-/**
- * \ingroup real_prec
- * \rststar
- * This function will set the precision of ``r`` to exactly ``p`` bits. If ``p``
- * is smaller than the current precision of ``r``, a rounding operation will be performed,
- * otherwise the value will be preserved exactly.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink whose precision will be set.
- * @param p the desired precision.
- *
- * @throws unspecified any exception thrown by mppp::real::prec_round().
- */
+// Set the precision.
 inline void prec_round(real &r, ::mpfr_prec_t p)
 {
     r.prec_round(p);
 }
 
-/// Get the precision of a \link mppp::real real\endlink.
-/**
- * \ingroup real_prec
- *
- * @param r the \link mppp::real real\endlink whose precision will be returned.
- *
- * @return the precision of \p r.
- */
+// Get the precision.
 inline mpfr_prec_t get_prec(const real &r)
 {
     return r.get_prec();
@@ -1819,12 +1121,6 @@ template <typename... Args>
 using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &>()...));
 }
 
-/** @defgroup real_assignment real_assignment
- *  @{
- */
-
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 template <typename... Args>
 #if defined(MPPP_HAVE_CONCEPTS)
 MPPP_CONCEPT_DECL RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
@@ -1832,29 +1128,7 @@ MPPP_CONCEPT_DECL RealSetArgs = detail::is_detected<detail::real_set_t, Args...>
 using real_set_args_enabler = detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int>;
 #endif
 
-#endif
-
-/// Generic setter for \link mppp::real real\endlink.
-/**
- * \rststar
- * This function will use the arguments ``args`` to set the value of the :cpp:class:`~mppp::real` ``r``,
- * using one of the available :cpp:func:`mppp::real::set()` overloads. That is,
- * the body of this function is equivalent to
- *
- * .. code-block:: c++
- *
- *    return r.set(args...);
- *
- * The input arguments must satisfy the :cpp:concept:`~mppp::RealSetArgs` concept.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink that will be set.
- * @param args the arguments that will be passed to mppp::real::set().
- *
- * @return a reference to \p r.
- *
- * @throws unspecified any exception thrown by the invoked mppp::real::set() overload.
- */
+// Generic setter.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <RealSetArgs... Args>
 #else
@@ -1865,17 +1139,7 @@ inline real &set(real &r, const Args &... args)
     return r.set(args...);
 }
 
-/// Set \link mppp::real real\endlink to \f$n\times 2^e\f$.
-/**
- * This function will set ``r`` to \f$n\times 2^e\f$. The precision of ``r``
- * will not be altered. If ``n`` is zero, the result will be positive zero.
- *
- * @param r the \link mppp::real real\endlink argument.
- * @param n the \link mppp::integer integer\endlink multiplier.
- * @param e the exponent.
- *
- * @return a reference to ``r``.
- */
+// Set n*2**e.
 template <std::size_t SSize>
 inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
 {
@@ -1883,84 +1147,31 @@ inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
     return r;
 }
 
-/// Set \link mppp::real real\endlink to NaN.
-/**
- * This function will set \p r to NaN with an unspecified sign bit. The precision of \p r
- * will not be altered.
- *
- * @param r the \link mppp::real real\endlink argument.
- *
- * @return a reference to \p r.
- */
+// Set to NaN.
 inline real &set_nan(real &r)
 {
     return r.set_nan();
 }
 
-/// Set \link mppp::real real\endlink to infinity.
-/**
- * This function will set \p r to infinity. The sign bit will be positive if \p sign
- * is nonnegative, negative otherwise. The precision of \p r will not be altered.
- *
- * @param r the \link mppp::real real\endlink argument.
- * @param sign the sign of the infinity to which \p r will be set.
- *
- * @return a reference to \p r.
- */
+// Set to infinity.
 inline real &set_inf(real &r, int sign = 0)
 {
     return r.set_inf(sign);
 }
 
-/// Set \link mppp::real real\endlink to zero.
-/**
- * This function will set \p r to zero. The sign bit will be positive if \p sign
- * is nonnegative, negative otherwise. The precision of \p r will not be altered.
- *
- * @param r the \link mppp::real real\endlink argument.
- * @param sign the sign of the zero to which \p r will be set.
- *
- * @return a reference to \p r.
- */
+// Set to zero.
 inline real &set_zero(real &r, int sign = 0)
 {
     return r.set_zero(sign);
 }
 
-/// Swap \link mppp::real real\endlink objects.
-/**
- * This function will efficiently swap the content of \p a and \p b.
- *
- * @param a the first operand.
- * @param b the second operand.
- */
+// Swap.
 inline void swap(real &a, real &b) noexcept
 {
     ::mpfr_swap(a._get_mpfr_t(), b._get_mpfr_t());
 }
 
-/** @} */
-
-/** @defgroup real_conversion real_conversion
- *  @{
- */
-
-/// Generic conversion function for \link mppp::real real\endlink.
-/**
- * \rststar
- * This function will convert the input :cpp:class:`~mppp::real` ``x`` to a
- * :cpp:concept:`~mppp::RealInteroperable` type, storing the result of the conversion into ``rop``.
- * If the conversion is successful, the function
- * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
- * not be altered.
- * \endrststar
- *
- * @param rop the variable which will store the result of the conversion.
- * @param x the input \link mppp::real real\endlink.
- *
- * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
- * specified in the documentation of the conversion operator for \link mppp::real real\endlink.
- */
+// Generic conversion function.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <RealInteroperable T>
 #else
@@ -1971,23 +1182,7 @@ inline bool get(T &rop, const real &x)
     return x.get(rop);
 }
 
-/// Extract the significand and the exponent of a \link mppp::real real\endlink.
-/**
- * This function will extract the scaled significand of ``r`` into ``n``, and return the
- * exponent ``e`` such that ``r`` equals \f$n\times 2^e\f$.
- *
- * If ``r`` is not finite, an error will be raised.
- *
- * @param n the \link mppp::integer integer\endlink that will contain the scaled
- * significand of ``r``.
- * @param r the input \link mppp::real real\endlink.
- *
- * @return the exponent ``e`` such that ``r`` equals \f$n\times 2^e\f$.
- *
- * @throws std::domain_error if ``r`` is not finite.
- * @throws std::overflow_error if the output exponent is larger than an implementation-defined
- * value.
- */
+// Extract significand and exponent.
 template <std::size_t SSize>
 inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
 {
@@ -2008,12 +1203,8 @@ inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
     return retval;
 }
 
-/** @} */
-
 namespace detail
 {
-
-#if !defined(MPPP_DOXYGEN_INVOKED)
 
 // A small helper to init the pairs in the functions below. We need this because
 // we cannot take the address of a const real as a real *.
@@ -2173,8 +1364,6 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
                            args.get_mpfr_t()...);
     return retval;
 }
-
-#endif
 
 } // namespace detail
 
@@ -2442,98 +1631,55 @@ inline real &div_2si(real &rop, T &&x, long n)
     return detail::mpfr_nary_op_impl<true>(0, div_2si_wrapper, rop, std::forward<T>(x));
 }
 
-/** @defgroup real_comparison real_comparison
- *  @{
- */
-
-/// Detect if a \link mppp::real real\endlink is NaN.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is NaN, \p false otherwise.
- */
+// Detect NaN.
 inline bool nan_p(const real &r)
 {
     return r.nan_p();
 }
 
-/// Detect if a \link mppp::real real\endlink is infinity.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is an infinity, \p false otherwise.
- */
+// Detect inf.
 inline bool inf_p(const real &r)
 {
     return r.inf_p();
 }
 
-/// Detect if \link mppp::real real\endlink is a finite number.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is a finite number (i.e., not NaN or infinity), \p false otherwise.
- */
+// Detect finite.
 inline bool number_p(const real &r)
 {
     return r.number_p();
 }
 
-/// Detect if a \link mppp::real real\endlink is zero.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is zero, \p false otherwise.
- */
+// Detect zero.
 inline bool zero_p(const real &r)
 {
     return r.zero_p();
 }
 
-/// Detect if a \link mppp::real real\endlink is a regular number.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is a regular number (i.e., not NaN, infinity or zero), \p false otherwise.
- */
+// Detect regular number.
 inline bool regular_p(const real &r)
 {
     return r.regular_p();
 }
 
-/// Detect if a \link mppp::real real\endlink is one.
-/**
- * @param r the \link mppp::real real\endlink to be checked.
- *
- * @return \p true if \p r is exactly 1, \p false otherwise.
- */
+// Detect integral value.
+inline bool integer_p(const real &r)
+{
+    return r.integer_p();
+}
+
+// Detect one.
 inline bool is_one(const real &r)
 {
     return r.is_one();
 }
 
-/// Detect the sign of a \link mppp::real real\endlink.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return a positive value if \p r is positive, zero if \p r is zero, a negative value if \p this
- * is negative.
- *
- * @throws unspecified any exception thrown by mppp::real::sgn().
- */
+// Detect the sign.
 inline int sgn(const real &r)
 {
     return r.sgn();
 }
 
-/// Get the sign bit of a \link mppp::real real\endlink.
-/**
- * The sign bit is set if ``r`` is negative, -0, or a NaN whose representation has its sign bit set.
- *
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return the sign bit of \p r.
- */
+// Get the sign bit.
 inline bool signbit(const real &r)
 {
     return r.signbit();
@@ -2550,8 +1696,6 @@ MPPP_DLL_PUBLIC bool real_lt(const real &, const real &);
 
 // Greater-than predicate with special NaN and moved-from handling.
 MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
-
-/** @} */
 
 // Square root.
 MPPP_REAL_MPFR_UNARY_RETVAL(sqrt, ::mpfr_sqrt)
@@ -3272,70 +2416,14 @@ inline real agm(T &&x, U &&y)
 
 #endif
 
-/** @defgroup real_io real_io
- *  @{
- */
-
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
 
-/** @} */
-
-/** @defgroup real_constants real_constants
- *  @{
- */
-
-/// \link mppp::real Real\endlink \f$\pi\f$ constant.
-/**
- * \rststar
- * This function will return a :cpp:class:`~mppp::real` :math:`\pi`
- * with a precision of ``p``. If ``p`` is zero, the precision
- * will be set to the value returned by :cpp:func:`~mppp::real_get_default_prec()`.
- * If ``p`` is zero and no default precision has been set, an error will be raised.
- * \endrststar
- *
- * @param p the desired precision.
- *
- * @return a \link mppp::real real\endlink \f$\pi\f$.
- *
- * @throws std::invalid_argument if \p p is not within the bounds established by
- * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
- * or if \p p is zero but no default precision has been set.
- */
-MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t p = 0);
-
+// Constants.
+MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_pi(real &);
 
-/** @} */
-
-/** @defgroup real_intrem real_intrem
- *  @{
- */
-
-/// Detect if a \link mppp::real real\endlink is an integer.
-/**
- * @param r the input \link mppp::real real\endlink.
- *
- * @return ``true`` if ``r`` represents an integral value, ``false`` otherwise.
- */
-inline bool integer_p(const real &r)
-{
-    return r.integer_p();
-}
-
-/// Binary \link mppp::real real\endlink truncation.
-/**
- * This function will truncate ``op`` and store the result
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- *
- * @throws std::domain_error if ``op`` is NaN.
- */
+// Binary truncation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -3347,18 +2435,7 @@ inline real &trunc(real &rop, T &&op)
     return detail::mpfr_nary_op_impl<false>(0, ::mpfr_trunc, rop, std::forward<T>(op));
 }
 
-/// Unary \link mppp::real real\endlink truncation.
-/**
- * This function will return the truncated counterpart of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the truncated counterpart of ``r``.
- *
- * @throws std::domain_error if ``r`` is NaN.
- */
+// Unary truncation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -3370,22 +2447,7 @@ inline real trunc(T &&r)
     return detail::mpfr_nary_op_return_impl<false>(0, ::mpfr_trunc, std::forward<T>(r));
 }
 
-/** @} */
-
-/** @defgroup real_operators real_operators
- *  @{
- */
-
-/// Identity operator for \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will return a copy of the input :cpp:class:`~mppp::real` ``r``.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink that will be copied.
- *
- * @return a copy of \p r.
- */
+// Identity operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -3425,26 +2487,7 @@ inline real dispatch_binary_add(const T &x, U &&a)
 }
 } // namespace detail
 
-/// Binary addition involving \link mppp::real real\endlink.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \f$a+b\f$.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3531,34 +2574,7 @@ inline void dispatch_in_place_add(T &x, U &&a)
 }
 } // namespace detail
 
-/// In-place addition involving \link mppp::real real\endlink.
-/**
- * \rststar
- * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
- * to the expression:
- *
- * .. code-block:: c++
- *
- *    a = a + b;
- *
- * Otherwise, this operator is equivalent to the expression:
- *
- * .. code-block:: c++
- *
- *    a = static_cast<T>(a + b);
- *
- * That is, the operation is always performed via the corresponding binary operator
- * and the result is assigned back to ``a``, after a conversion if necessary.
- * \endrststar
- *
- * @param a the augend.
- * @param b the addend.
- *
- * @return a reference to \p a.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator,
- * or by the generic conversion operator of \link mppp::real real\endlink.
- */
+// In-place addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealInPlaceOpTypes<T, U>
@@ -3571,27 +2587,13 @@ template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
     return a;
 }
 
-/// Prefix increment for \link mppp::real real\endlink.
-/**
- * This operator will increment \p x by one.
- *
- * @param x the \link mppp::real real\endlink that will be increased.
- *
- * @return a reference to \p x after the increment.
- */
+// Prefix increment.
 inline real &operator++(real &x)
 {
     return x += 1;
 }
 
-/// Suffix increment for \link mppp::real real\endlink.
-/**
- * This operator will increment \p x by one and return a copy of \p x as it was before the increment.
- *
- * @param x the \link mppp::real real\endlink that will be increased.
- *
- * @return a copy of \p x before the increment.
- */
+// Suffix increment.
 inline real operator++(real &x, int)
 {
     auto retval(x);
@@ -3599,16 +2601,7 @@ inline real operator++(real &x, int)
     return retval;
 }
 
-/// Negated copy for \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will return a negated copy of the input :cpp:class:`~mppp::real` ``r``.
- * \endrststar
- *
- * @param r the \link mppp::real real\endlink that will be negated.
- *
- * @return a negated copy of \p r.
- */
+// Negated copy.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -3650,26 +2643,7 @@ inline real dispatch_binary_sub(const T &x, U &&a)
 }
 } // namespace detail
 
-/// Binary subtraction involving \link mppp::real real\endlink.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \f$a-b\f$.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3728,34 +2702,7 @@ inline void dispatch_in_place_sub(T &x, U &&a)
 }
 } // namespace detail
 
-/// In-place subtraction involving \link mppp::real real\endlink.
-/**
- * \rststar
- * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
- * to the expression:
- *
- * .. code-block:: c++
- *
- *    a = a - b;
- *
- * Otherwise, this operator is equivalent to the expression:
- *
- * .. code-block:: c++
- *
- *    a = static_cast<T>(a - b);
- *
- * That is, the operation is always performed via the corresponding binary operator
- * and the result is assigned back to ``a``, after a conversion if necessary.
- * \endrststar
- *
- * @param a the minuend.
- * @param b the subtrahend.
- *
- * @return a reference to \p a.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator,
- * or by the generic conversion operator of \link mppp::real real\endlink.
- */
+// In-place subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealInPlaceOpTypes<T, U>
@@ -3797,27 +2744,13 @@ inline real dispatch_binary_mul(const T &x, U &&a)
 }
 } // namespace detail
 
-/// Prefix decrement for \link mppp::real real\endlink.
-/**
- * This operator will decrement \p x by one.
- *
- * @param x the \link mppp::real real\endlink that will be decreased.
- *
- * @return a reference to \p x after the decrement.
- */
+// Prefix decrement.
 inline real &operator--(real &x)
 {
     return x -= 1;
 }
 
-/// Suffix decrement for \link mppp::real real\endlink.
-/**
- * This operator will decrement \p x by one and return a copy of \p x as it was before the decrement.
- *
- * @param x the \link mppp::real real\endlink that will be decreased.
- *
- * @return a copy of \p x before the decrement.
- */
+// Suffix decrement.
 inline real operator--(real &x, int)
 {
     auto retval(x);
@@ -3825,26 +2758,7 @@ inline real operator--(real &x, int)
     return retval;
 }
 
-/// Binary multiplication involving \link mppp::real real\endlink.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \f$a\times b\f$.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -3903,34 +2817,7 @@ inline void dispatch_in_place_mul(T &x, U &&a)
 }
 } // namespace detail
 
-/// In-place multiplication involving \link mppp::real real\endlink.
-/**
- * \rststar
- * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
- * to the expression:
- *
- * .. code-block:: c++
- *
- *    a = a * b;
- *
- * Otherwise, this operator is equivalent to the expression:
- *
- * .. code-block:: c++
- *
- *    a = static_cast<T>(a * b);
- *
- * That is, the operation is always performed via the corresponding binary operator
- * and the result is assigned back to ``a``, after a conversion if necessary.
- * \endrststar
- *
- * @param a the multiplicand.
- * @param b the multiplicator.
- *
- * @return a reference to \p a.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator,
- * or by the generic conversion operator of \link mppp::real real\endlink.
- */
+// In-place multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealInPlaceOpTypes<T, U>
@@ -3972,26 +2859,7 @@ inline real dispatch_binary_div(const T &x, U &&a)
 }
 } // namespace detail
 
-/// Binary division involving \link mppp::real real\endlink.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \f$a / b\f$.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename U, RealOpTypes<U> T>
 #else
@@ -4049,34 +2917,7 @@ inline void dispatch_in_place_div(T &x, U &&a)
 }
 } // namespace detail
 
-/// In-place division involving \link mppp::real real\endlink.
-/**
- * \rststar
- * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
- * to the expression:
- *
- * .. code-block:: c++
- *
- *    a = a / b;
- *
- * Otherwise, this operator is equivalent to the expression:
- *
- * .. code-block:: c++
- *
- *    a = static_cast<T>(a / b);
- *
- * That is, the operation is always performed via the corresponding binary operator
- * and the result is assigned back to ``a``, after a conversion if necessary.
- * \endrststar
- *
- * @param a the dividend.
- * @param b the divisor.
- *
- * @return a reference to \p a.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator,
- * or by the generic conversion operator of \link mppp::real real\endlink.
- */
+// In-place division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealInPlaceOpTypes<T, U>
@@ -4116,33 +2957,7 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
 }
 } // namespace detail
 
-/// Equality operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * equal to ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_equal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real_equal_to()`
- *    for an equality predicate that handles NaN specially.
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is equal to ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -4154,33 +2969,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_equal_p, a, b);
 }
 
-/// Inequality operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * different from ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_equal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real_equal_to()`
- *    for an equality predicate that handles NaN specially.
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is different from ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -4192,34 +2981,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return !(a == b);
 }
 
-/// Greater-than operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * greater than ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_greater_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    greater than any value, and no value is greater than NaN).
- *    See :cpp:func:`mppp::real_gt()` for a greater-than predicate that handles
- *    NaN specially.
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is greater than ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -4231,32 +2993,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_greater_p, a, b);
 }
 
-/// Greater-than or equal operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * greater than or equal to ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_greaterequal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    greater than or equal to any value, and no value is greater than or equal to NaN).
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is greater than or equal to ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -4268,34 +3005,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_greaterequal_p, a, b);
 }
 
-/// Less-than operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * less than ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_less_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    less than any value, and no value is less than NaN).
- *    See :cpp:func:`mppp::real_lt()` for a less-than predicate that handles
- *    NaN specially.
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is less than ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -4307,32 +3017,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_less_p, a, b);
 }
 
-/// Less-than or equal operator involving \link mppp::real real\endlink.
-/**
- * \rststar
- * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
- * less than or equal to ``b``, ``false`` otherwise. The comparison is performed via the
- * ``mpfr_lessequal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
- * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
- * The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    less than or equal to any value, and no value is less than or equal to NaN).
- *
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return ``true`` if ``a`` is less than or equal to ``b``, ``false`` otherwise.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires RealOpTypes<T, U>
@@ -4344,7 +3029,6 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
     return detail::dispatch_real_comparison(::mpfr_lessequal_p, a, b);
 }
 
-/** @} */
 } // namespace mppp
 
 #include <mp++/detail/real_literals.hpp>
