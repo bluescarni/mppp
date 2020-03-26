@@ -366,6 +366,22 @@ TEST_CASE("real constructors")
         (real{vc.data(), vc.data() + 6, 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what() == std::string("The string ',-1234' does not represent a valid real in base 10");
         });
+
+    const std::vector<char> vc2 = {'1', '2', '3', '4'};
+    REQUIRE_THROWS_PREDICATE(
+        (real{vc2.data(), vc2.data() + 4, 10, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == "Cannot init a real with a precision of 0: the maximum allowed precision is "
+                          + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + detail::to_string(real_prec_min());
+        });
+    REQUIRE_THROWS_PREDICATE(
+        (real{vc2.data(), vc2.data() + 4, -10}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == "Cannot init a real with a precision of -10: the maximum allowed precision is "
+                          + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + detail::to_string(real_prec_min());
+        });
 #if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 2, 4}, 10, 100}.get_mpfr_t(), real{1234}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 1, 4}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));

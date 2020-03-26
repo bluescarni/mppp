@@ -23,14 +23,19 @@ TEST_CASE("real pi")
     auto r0 = real_pi(12);
     REQUIRE(r0.get_prec() == 12);
     REQUIRE((r0 == real{"3.1416", 12}));
+    REQUIRE_THROWS_PREDICATE(r0 = real_pi(0), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real constant with a precision of 0: the value must be between "
+                      + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max());
+    });
     REQUIRE_THROWS_PREDICATE(r0 = real_pi(-1), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
-               == "Cannot init a real constant with a precision of -1: the value must be either zero or between "
+               == "Cannot init a real constant with a precision of -1: the value must be between "
                       + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max());
     });
     REQUIRE_THROWS_PREDICATE(r0 = real_pi(-100), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
-               == "Cannot init a real constant with a precision of -100: the value must be either zero or between "
+               == "Cannot init a real constant with a precision of -100: the value must be between "
                       + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max());
     });
     r0.set_prec(86);

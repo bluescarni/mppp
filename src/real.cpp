@@ -1495,8 +1495,8 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
 {
     if (mppp_unlikely(!real_prec_check(p))) {
         throw std::invalid_argument("Cannot init a real constant with a precision of " + detail::to_string(p)
-                                    + ": the value must be either zero or between " + detail::to_string(real_prec_min())
-                                    + " and " + detail::to_string(real_prec_max()));
+                                    + ": the value must be between " + detail::to_string(real_prec_min()) + " and "
+                                    + detail::to_string(real_prec_max()));
     }
 
     real retval{real::ptag{}, p, true};
