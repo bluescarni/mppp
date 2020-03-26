@@ -63,7 +63,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     python setup.py install --user
     cd ..
 
-    cd ../sphinx;
+    cd ../doc;
     # Ignore some warnings.
     export SPHINX_OUTPUT=`make html linkcheck 2>&1 | grep -v "is deprecated" >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then

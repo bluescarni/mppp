@@ -26,6 +26,17 @@ New
 Changes
 ~~~~~~~
 
+- **BREAKING**: the global precision setting mechanism has been
+  removed from :cpp:class:`~mppp::real`. As a result,
+  the API and behaviour of the :cpp:class:`~mppp::real`
+  class have undergone a few backwards-incompatible changes
+  (`#227 <https://github.com/bluescarni/mppp/pull/227>`__).
+- The documentation is now using sphinx exclusively,
+  doxygen is not involved any more
+  (`#227 <https://github.com/bluescarni/mppp/pull/227>`__,
+  `#225 <https://github.com/bluescarni/mppp/pull/225>`__,
+  `#223 <https://github.com/bluescarni/mppp/pull/223>`__,
+  `#221 <https://github.com/bluescarni/mppp/pull/221>`__).
 - Various internal simplifications and improvements
   to :cpp:class:`~mppp::real128`
   (`#221 <https://github.com/bluescarni/mppp/pull/221>`__).
