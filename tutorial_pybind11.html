@@ -1,91 +1,67 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
   
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Extra: integration with pybind11 &mdash; mp++ 0.20 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <title>Extra: integration with pybind11 &#8212; mp++ 0.20 documentation</title>
+    <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Reference" href="reference.html" />
-    <link rel="prev" title="Multiprecision float tutorial" href="tutorial_real.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
+    <link rel="prev" title="Multiprecision float tutorial" href="tutorial_real.html" />
+  
    
-  <div class="wy-grid-for-nav">
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="reference.html" title="Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tutorial_real.html" title="Multiprecision float tutorial"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tutorial.html" accesskey="U">Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar"><a href="
+    index.html" class="text-logo">mp++</a>
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="index.html" class="icon icon-home"> mp++
-          
-
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                0.20
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <ul class="current">
+    
+      <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
@@ -106,75 +82,44 @@
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">mp++</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="tutorial.html">Tutorial</a> &raquo;</li>
-        
-      <li>Extra: integration with pybind11</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/tutorial_pybind11.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="index.html">Docs</a></li>
+              
+                <li><a href="tutorial.html">Tutorial</a></li>
+              
+              <li>Extra: integration with pybind11</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
             
   <div class="section" id="extra-integration-with-pybind11">
 <span id="tutorial-pybind11"></span><h1>Extra: integration with pybind11<a class="headerlink" href="#extra-integration-with-pybind11" title="Permalink to this headline">¶</a></h1>
 <div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The functionality described in this section is experimental, and it may be
+<p class="first admonition-title">Warning</p>
+<p class="last">The functionality described in this section is experimental, and it may be
 subject to API changes in future versions.</p>
 </div>
 <div class="versionadded">
@@ -189,14 +134,15 @@ allows to use C++ functions and classes from Python.</p>
 <p>The API for the pybind11 integration currently includes a single function in the <code class="docutils literal notranslate"><span class="pre">mppp_pybind11</span></code> namespace:</p>
 <dl class="function">
 <dt id="_CPPv4N13mppp_pybind114initEv">
-<span id="_CPPv3N13mppp_pybind114initEv"></span><span id="_CPPv2N13mppp_pybind114initEv"></span><span id="mppp_pybind11::init"></span><span class="target" id="pybind11_8hpp_1a227e4e3e2a5b5da704f1907627e3de04"></span>void <code class="sig-prename descclassname">mppp_pybind11<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13mppp_pybind114initEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Initialisation function for the pybind11 integration. </p>
-<p>This function should be called in the definition of a pybind11 extension module, right after the <code class="docutils literal notranslate"><span class="pre">PYBIND11_MODULE()</span></code> invocation. </p>
+<span id="_CPPv3N13mppp_pybind114initEv"></span><span id="_CPPv2N13mppp_pybind114initEv"></span><span id="mppp_pybind11::init"></span>void <code class="descclassname">mppp_pybind11<code class="descclassname">::</code></code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N13mppp_pybind114initEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Initialisation function for the pybind11 integration.</p>
+<p>This function should be called in the definition of a pybind11 extension module, right after the
+<code class="docutils literal notranslate"><span class="pre">PYBIND11_MODULE()</span></code> invocation.</p>
 </dd></dl>
 
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Do <strong>not</strong> forget to invoke the <a class="reference internal" href="#_CPPv4N13mppp_pybind114initEv" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp_pybind11::init()</span></code></a> function! Failure to do so will result
+<p class="first admonition-title">Note</p>
+<p class="last">Do <strong>not</strong> forget to invoke the <a class="reference internal" href="#_CPPv4N13mppp_pybind114initEv" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp_pybind11::init()</span></code></a> function! Failure to do so will result
 in unpredictable runtime errors.</p>
 </div>
 <p>Including the <code class="docutils literal notranslate"><span class="pre">mp++/extra/pybind11.hpp</span></code> header and invoking the <a class="reference internal" href="#_CPPv4N13mppp_pybind114initEv" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp_pybind11::init()</span></code></a> function will register
@@ -204,9 +150,9 @@ in unpredictable runtime errors.</p>
 that will automatically translate to/from Python mp++ objects used as arguments and return values in
 functions exposed from C++. The translation rules are the following:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects are converted to/from Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">integers</span></code></a>,</p></li>
-<li><p><a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects are converted to/from Python <a class="reference external" href="https://docs.python.org/3/library/fractions.html#fractions.Fraction" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">fractions</span></code></a>,</p></li>
-<li><p><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> objects are translated to/from <a class="reference external" href="http://mpmath.org/">mpmath’s mpf objects</a>.</p></li>
+<li><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects are converted to/from Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">integers</span></code></a>,</li>
+<li><a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects are converted to/from Python <a class="reference external" href="https://docs.python.org/3/library/fractions.html#fractions.Fraction" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">fractions</span></code></a>,</li>
+<li><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> objects are translated to/from <a class="reference external" href="http://mpmath.org/">mpmath’s mpf objects</a>.</li>
 </ul>
 <p>If the mpmath library is not installed, the translations for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> will be disabled
 at runtime.</p>
@@ -386,52 +332,47 @@ exception is translated to Python’s <a class="reference external" href="https:
 </div>
 
 
-           </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="reference.html" class="btn btn-neutral float-right" title="Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="tutorial_real.html" class="btn btn-neutral float-left" title="Multiprecision float tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2016-2020, Francesco Biscani
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
+            
+  <div class="footer-relations">
     
-   
-
-</body>
+      <div class="pull-left">
+        <a class="btn btn-default" href="tutorial_real.html" title="previous chapter (use the left arrow)">Multiprecision float tutorial</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="reference.html" title="next chapter (use the right arrow)">Reference</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="reference.html" title="Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tutorial_real.html" title="Multiprecision float tutorial"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tutorial.html" >Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2016-2020, Francesco Biscani. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
 </html>

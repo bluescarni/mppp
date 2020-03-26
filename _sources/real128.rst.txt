@@ -728,12 +728,7 @@ Roots
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. cpp:function:: template <typename T, typename U> mppp::real128 mppp::pow(const T &x, const U &y)
-
-   .. note::
-
-      This function participates in overload resolution only if ``T`` and ``U`` satisfy
-      the :cpp:concept:`~mppp::Real128OpTypes` concept.
+.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> mppp::real128 mppp::pow(const T &x, const U &y)
 
    This function will compute :math:`x^y`. Internally,
    the implementation uses the ``powq()`` function from the quadmath library,

@@ -1,91 +1,67 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
   
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Integer tutorial &mdash; mp++ 0.20 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <title>Integer tutorial &#8212; mp++ 0.20 documentation</title>
+    <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Rational tutorial" href="tutorial_rational.html" />
-    <link rel="prev" title="API overview" href="tutorial_api.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
+    <link rel="prev" title="API overview" href="tutorial_api.html" />
+  
    
-  <div class="wy-grid-for-nav">
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tutorial_rational.html" title="Rational tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tutorial_api.html" title="API overview"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tutorial.html" accesskey="U">Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar"><a href="
+    index.html" class="text-logo">mp++</a>
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="index.html" class="icon icon-home"> mp++
-          
-
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                0.20
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <ul class="current">
+    
+      <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
@@ -111,69 +87,38 @@
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">mp++</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="tutorial.html">Tutorial</a> &raquo;</li>
-        
-      <li>Integer tutorial</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/tutorial_integer.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="index.html">Docs</a></li>
+              
+                <li><a href="tutorial.html">Tutorial</a></li>
+              
+              <li>Integer tutorial</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
             
   <div class="section" id="integer-tutorial">
 <span id="tutorial-integer"></span><h1>Integer tutorial<a class="headerlink" href="#integer-tutorial" title="Permalink to this headline">¶</a></h1>
@@ -192,9 +137,9 @@ use cases.</p>
 <p>In addition to the <a class="reference internal" href="tutorial_commonops.html#tutorial-commonops"><span class="std std-ref">common operators</span></a> available for all of mp++’s multiprecision classes,
 <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> supports the following additional operators:</p>
 <ul class="simple">
-<li><p>the modulo operator <code class="docutils literal notranslate"><span class="pre">%</span></code>, which computes the remainder of integer division,</p></li>
-<li><p>the bitshifting operators <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>,</p></li>
-<li><p>the bitwise logical operators <code class="docutils literal notranslate"><span class="pre">~</span></code>, <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>, <code class="docutils literal notranslate"><span class="pre">|</span></code> and <code class="docutils literal notranslate"><span class="pre">^</span></code>.</p></li>
+<li>the modulo operator <code class="docutils literal notranslate"><span class="pre">%</span></code>, which computes the remainder of integer division,</li>
+<li>the bitshifting operators <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>,</li>
+<li>the bitwise logical operators <code class="docutils literal notranslate"><span class="pre">~</span></code>, <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>, <code class="docutils literal notranslate"><span class="pre">|</span></code> and <code class="docutils literal notranslate"><span class="pre">^</span></code>.</li>
 </ul>
 <p>In addition to the binary versions of these operators, the in-place versions are also available. Lower level ternary
 primitives (e.g., <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp8mul_2expERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE11mp_bitcnt_t" title="mppp::mul_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mul_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp11tdiv_q_2expERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE11mp_bitcnt_t" title="mppp::tdiv_q_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">tdiv_q_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp11bitwise_iorERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::bitwise_ior"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">bitwise_ior()</span></code></a>, etc.)
@@ -206,17 +151,17 @@ operators behave as-if <a class="reference internal" href="integer.html#_CPPv4I_
 a sign-magnitude representation is used instead).</p>
 <p>Among the features specific to <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> we find:</p>
 <ul class="simple">
-<li><p>specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with C++ unsigned
-integrals, …),</p></li>
-<li><p>prime numbers functions (<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp14probab_prime_pEiRKN4mppp7integerI5SSizeEEi" title="mppp::probab_prime_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">probab_prime_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp9nextprimeERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::nextprime"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">nextprime()</span></code></a>, …),</p></li>
-<li><p>parity detection (<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6even_pEbRKN4mppp7integerI5SSizeEE" title="mppp::even_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">even_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp5odd_pEbRKN4mppp7integerI5SSizeEE" title="mppp::odd_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">odd_p()</span></code></a>),</p></li>
-<li><p>several additional <a class="reference internal" href="integer.html#integer-division"><span class="std std-ref">division functions</span></a>,</p></li>
-<li><p><a class="reference internal" href="integer.html#integer-ntheory"><span class="std std-ref">number-theoretic functions</span></a> (GCD, factorial, binomial coefficient, …),</p></li>
-<li><p>integer <a class="reference internal" href="integer.html#integer-roots"><span class="std std-ref">roots</span></a> and <a class="reference internal" href="integer.html#integer-exponentiation"><span class="std std-ref">exponentiation</span></a>,</p></li>
-<li><p>hashing (including a <a class="reference internal" href="integer.html#integer-std-specialisations"><span class="std std-ref">specialisation</span></a> of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code>, so that it is possible to use
-<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> in standard unordered containers out of the box),</p></li>
-<li><p>binary <a class="reference internal" href="#tutorial-integer-s11n"><span class="std std-ref">serialisation</span></a>,</p></li>
-<li><p>various utility functions (detect size in bits/limbs, detect and/or promote/demote storage type, …).</p></li>
+<li>specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with C++ unsigned
+integrals, …),</li>
+<li>prime numbers functions (<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp14probab_prime_pEiRKN4mppp7integerI5SSizeEEi" title="mppp::probab_prime_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">probab_prime_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp9nextprimeERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::nextprime"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">nextprime()</span></code></a>, …),</li>
+<li>parity detection (<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6even_pEbRKN4mppp7integerI5SSizeEE" title="mppp::even_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">even_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp5odd_pEbRKN4mppp7integerI5SSizeEE" title="mppp::odd_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">odd_p()</span></code></a>),</li>
+<li>several additional <a class="reference internal" href="integer.html#integer-division"><span class="std std-ref">division functions</span></a>,</li>
+<li><a class="reference internal" href="integer.html#integer-ntheory"><span class="std std-ref">number-theoretic functions</span></a> (GCD, factorial, binomial coefficient, …),</li>
+<li>integer <a class="reference internal" href="integer.html#integer-roots"><span class="std std-ref">roots</span></a> and <a class="reference internal" href="integer.html#integer-exponentiation"><span class="std std-ref">exponentiation</span></a>,</li>
+<li>hashing (including a <a class="reference internal" href="integer.html#integer-std-specialisations"><span class="std std-ref">specialisation</span></a> of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code>, so that it is possible to use
+<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> in standard unordered containers out of the box),</li>
+<li>binary <a class="reference internal" href="#tutorial-integer-s11n"><span class="std std-ref">serialisation</span></a>,</li>
+<li>various utility functions (detect size in bits/limbs, detect and/or promote/demote storage type, …).</li>
 </ul>
 <p>Many of these features, which are documented in detail in the <a class="reference internal" href="integer.html#integer-reference"><span class="std std-ref">integer reference</span></a>, are available
 in multiple overloads, often both as free and member functions.</p>
@@ -225,8 +170,8 @@ in multiple overloads, often both as free and member functions.</p>
 <p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> provides a variety of ways for interfacing with the <a class="reference external" href="https://gmplib.org/">GMP</a> library.
 There are a few reasons why one would want to use <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> in conjunction with the GMP API, such as:</p>
 <ul class="simple">
-<li><p>the necessity of using functions from the GMP API which have not (yet) been wrapped/implemented by mp++,</p></li>
-<li><p>passing data from/to mp++ to/from another GMP-based multiprecision library.</p></li>
+<li>the necessity of using functions from the GMP API which have not (yet) been wrapped/implemented by mp++,</li>
+<li>passing data from/to mp++ to/from another GMP-based multiprecision library.</li>
 </ul>
 <p>To start with, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is constructible and assignable from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> objects:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
@@ -361,12 +306,12 @@ the <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer11bina
 </div>
 <p>A couple of important points about the serialisation API need to be emphasised:</p>
 <ul class="simple">
-<li><p>although mp++ does run some consistency checks during deserialisation, the API is not built to protect
-against maliciously-crafted data. Users are thus advised not to load data from untrusted sources;</p></li>
-<li><p>the current binary serialisation format is compiler, platform and architecture specific, it is not portable
+<li>although mp++ does run some consistency checks during deserialisation, the API is not built to protect
+against maliciously-crafted data. Users are thus advised not to load data from untrusted sources;</li>
+<li>the current binary serialisation format is compiler, platform and architecture specific, it is not portable
 and it might be subject to changes in future versions of mp++. Users are thus advised not to use
 the binary serialisation format for long-term persistence or as a data exchange format: for such
-purposes, it is better to use the string representation of <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects.</p></li>
+purposes, it is better to use the string representation of <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects.</li>
 </ul>
 </div>
 <div class="section" id="user-defined-literals">
@@ -400,59 +345,54 @@ binary, octal, decimal and hexadecimal representations:</p>
 </pre></div>
 </div>
 <div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
 </div>
 </div>
 </div>
 
 
-           </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="tutorial_rational.html" class="btn btn-neutral float-right" title="Rational tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="tutorial_api.html" class="btn btn-neutral float-left" title="API overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2016-2020, Francesco Biscani
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
+            
+  <div class="footer-relations">
     
-   
-
-</body>
+      <div class="pull-left">
+        <a class="btn btn-default" href="tutorial_api.html" title="previous chapter (use the left arrow)">API overview</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="tutorial_rational.html" title="next chapter (use the right arrow)">Rational tutorial</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tutorial_rational.html" title="Rational tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tutorial_api.html" title="API overview"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tutorial.html" >Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2016-2020, Francesco Biscani. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
 </html>

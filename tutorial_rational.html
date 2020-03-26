@@ -1,91 +1,67 @@
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
   
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Rational tutorial &mdash; mp++ 0.20 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <title>Rational tutorial &#8212; mp++ 0.20 documentation</title>
+    <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quadruple-precision float tutorial" href="tutorial_real128.html" />
-    <link rel="prev" title="Integer tutorial" href="tutorial_integer.html" /> 
-</head>
-
-<body class="wy-body-for-nav">
-
+    <link rel="prev" title="Integer tutorial" href="tutorial_integer.html" />
+  
    
-  <div class="wy-grid-for-nav">
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tutorial_real128.html" title="Quadruple-precision float tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tutorial_integer.html" title="Integer tutorial"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tutorial.html" accesskey="U">Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar"><a href="
+    index.html" class="text-logo">mp++</a>
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-          
-
-          
-            <a href="index.html" class="icon icon-home"> mp++
-          
-
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                0.20
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <ul class="current">
+    
+      <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
@@ -110,69 +86,38 @@
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">mp++</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="tutorial.html">Tutorial</a> &raquo;</li>
-        
-      <li>Rational tutorial</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/tutorial_rational.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="index.html">Docs</a></li>
+              
+                <li><a href="tutorial.html">Tutorial</a></li>
+              
+              <li>Rational tutorial</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
             
   <div class="section" id="rational-tutorial">
 <span id="tutorial-rational"></span><h1>Rational tutorial<a class="headerlink" href="#rational-tutorial" title="Permalink to this headline">¶</a></h1>
@@ -186,8 +131,8 @@ stored directly within both the numerator and the denominator before resorting t
 of the <code class="docutils literal notranslate"><span class="pre">SSize</span></code> parameter).</p>
 <p>The <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class adopts the usual <em>canonical</em> representation of rational numbers:</p>
 <ul class="simple">
-<li><p>numerator and denominator are coprime,</p></li>
-<li><p>the denominator is always strictly positive.</p></li>
+<li>numerator and denominator are coprime,</li>
+<li>the denominator is always strictly positive.</li>
 </ul>
 <p>This representation is usually enforced automatically by the <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API (however,
 a couple of low-level functions are available to access and mutate directly the numerator and the denominator
@@ -195,7 +140,7 @@ in performance-critical scenarios).</p>
 <p>In addition to the features common to all mp++ classes, the <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API provides
 a few additional capabilities:</p>
 <ul>
-<li><p>it is possible to construct a <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> from an integral pair
+<li><p class="first">it is possible to construct a <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> from an integral pair
 of arguments representing the numerator and the denominator:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>                <span class="c1">// Construction from int numerator and denominator.</span>
 
@@ -205,7 +150,7 @@ of arguments representing the numerator and the denominator:</p>
 </pre></div>
 </div>
 </li>
-<li><p>it is possible to get const and mutable references to the <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
+<li><p class="first">it is possible to get const and mutable references to the <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
 representing the numerator and the denominator via the <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational7get_numEv" title="mppp::rational::get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::get_num()</span></code></a>,
 <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational7get_denEv" title="mppp::rational::get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::get_den()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::_get_num()</span></code></a> and
 <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::_get_den()</span></code></a> member functions. These accessors allow to use
@@ -220,7 +165,7 @@ any function from the <a class="reference internal" href="integer.html#_CPPv4I_N
 </pre></div>
 </div>
 </li>
-<li><p>the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::canonicalise()</span></code></a> member function (and its free function counterpart)
+<li><p class="first">the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::canonicalise()</span></code></a> member function (and its free function counterpart)
 can be used to canonicalise a <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>. This is normally not necessary,
 unless the numerator or the denominator have been changed manually via the mutable getters:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">};</span>
@@ -232,12 +177,15 @@ unless the numerator or the denominator have been changed manually via the mutab
 </pre></div>
 </div>
 </li>
-<li><p>a few additional <a class="reference internal" href="rational.html#rational-arithmetic"><span class="std std-ref">arithmetic</span></a> and <a class="reference internal" href="rational.html#rational-comparison"><span class="std std-ref">comparison</span></a>
-functions are available;</p></li>
-<li><p>a few <a class="reference internal" href="rational.html#rational-exponentiation"><span class="std std-ref">exponentiation</span></a> and <a class="reference internal" href="rational.html#rational-ntheory"><span class="std std-ref">number-theoretic</span></a>
-functions are available;</p></li>
-<li><p>like <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> also provides a <a class="reference internal" href="rational.html#rational-std-specialisations"><span class="std std-ref">specialisation</span></a>
-of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code> for use in the standard unordered containers.</p></li>
+<li><p class="first">a few additional <a class="reference internal" href="rational.html#rational-arithmetic"><span class="std std-ref">arithmetic</span></a> and <a class="reference internal" href="rational.html#rational-comparison"><span class="std std-ref">comparison</span></a>
+functions are available;</p>
+</li>
+<li><p class="first">a few <a class="reference internal" href="rational.html#rational-exponentiation"><span class="std std-ref">exponentiation</span></a> and <a class="reference internal" href="rational.html#rational-ntheory"><span class="std std-ref">number-theoretic</span></a>
+functions are available;</p>
+</li>
+<li><p class="first">like <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> also provides a <a class="reference internal" href="rational.html#rational-std-specialisations"><span class="std std-ref">specialisation</span></a>
+of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code> for use in the standard unordered containers.</p>
+</li>
 </ul>
 <p>Many of these features, which are documented in detail in the <a class="reference internal" href="rational.html#rational-reference"><span class="std std-ref">rational reference</span></a>, are available
 in multiple overloads, often both as free and member functions.</p>
@@ -305,59 +253,54 @@ binary, octal, decimal and hexadecimal representations:</p>
 <p>Note that, due to language limitations, only values with unitary denominator
 can be constructed via these literals.</p>
 <div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
 </div>
 </div>
 </div>
 
 
-           </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="tutorial_real128.html" class="btn btn-neutral float-right" title="Quadruple-precision float tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="tutorial_integer.html" class="btn btn-neutral float-left" title="Integer tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2016-2020, Francesco Biscani
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-  
-  
+            
+  <div class="footer-relations">
     
-   
-
-</body>
+      <div class="pull-left">
+        <a class="btn btn-default" href="tutorial_integer.html" title="previous chapter (use the left arrow)">Integer tutorial</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="tutorial_real128.html" title="next chapter (use the right arrow)">Quadruple-precision float tutorial</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tutorial_real128.html" title="Quadruple-precision float tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tutorial_integer.html" title="Integer tutorial"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tutorial.html" >Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2016-2020, Francesco Biscani. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
 </html>
