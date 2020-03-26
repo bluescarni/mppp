@@ -143,11 +143,7 @@ class rational
 {
 public:
     // Underlying integral type.
-#if defined(MPPP_DOXYGEN_INVOKED)
-    typedef integer<SSize> int_t;
-#else
     using int_t = integer<SSize>;
-#endif
     // Alias for the template parameter SSize.
     static constexpr std::size_t ssize = SSize;
     // Default constructor.

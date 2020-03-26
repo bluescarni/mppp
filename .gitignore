@@ -2,13 +2,9 @@
 build*
 
 # Documentation.
-doc/doxygen/html/
-doc/doxygen/latex/
-doc/doxygen/xml/
-doc/sphinx/_build/
-# These are auto-generated.
-doc/doxygen/Doxyfile
-doc/sphinx/conf.py
+doc/_build/
+# This is auto-generated.
+doc/conf.py
 
 # Temp files.
 *~

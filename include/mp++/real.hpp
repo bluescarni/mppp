@@ -61,8 +61,6 @@ constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 // Helper function to print an mpfr to stream in a given base.
 MPPP_DLL_PUBLIC void mpfr_to_stream(const ::mpfr_t, std::ostream &, int);
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 // Helpers to deduce the precision when constructing/assigning a real via another type.
 template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
@@ -136,8 +134,6 @@ inline ::mpfr_prec_t real_deduce_precision(const real128 &)
 
 #endif
 
-#endif
-
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
 real &mpfr_nary_op_impl(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
@@ -203,17 +199,12 @@ using cvr_real_enabler
     = detail::enable_if_t<detail::conjunction<std::is_same<detail::uncvref_t<Args>, real>...>::value, int>;
 #endif
 
-// Doxygen gets confused by this.
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 // Special initialisation tags for real.
 enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
     nan = MPFR_NAN_KIND,
     inf = MPFR_INF_KIND,
     zero = MPFR_ZERO_KIND
 };
-
-#endif
 
 // For the future:
 // - construction from/conversion to interoperables can probably be improved performance wise, especially
@@ -233,7 +224,6 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 // Multiprecision floating-point class.
 class MPPP_DLL_PUBLIC real
 {
-#if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking prec setting funcs.
     template <bool, typename F, typename Arg0, typename... Args>
     friend real &detail::mpfr_nary_op_impl(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
@@ -241,7 +231,6 @@ class MPPP_DLL_PUBLIC real
     friend real detail::mpfr_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
     template <typename F>
     friend real detail::real_constant(const F &, ::mpfr_prec_t);
-#endif
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
@@ -1132,15 +1121,11 @@ template <typename... Args>
 using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &>()...));
 }
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
 template <typename... Args>
 #if defined(MPPP_HAVE_CONCEPTS)
 MPPP_CONCEPT_DECL RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
 #else
 using real_set_args_enabler = detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int>;
-#endif
-
 #endif
 
 // Generic setter.
@@ -1220,8 +1205,6 @@ inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
 
 namespace detail
 {
-
-#if !defined(MPPP_DOXYGEN_INVOKED)
 
 // A small helper to init the pairs in the functions below. We need this because
 // we cannot take the address of a const real as a real *.
@@ -1381,8 +1364,6 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
                            args.get_mpfr_t()...);
     return retval;
 }
-
-#endif
 
 } // namespace detail
 
