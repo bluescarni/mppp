@@ -166,9 +166,9 @@ The integer class
       :exception std\:\:overflow_error: if the value of *nbits* is larger than an
         implementation-defined limit.
 
-   .. cpp:function:: template <CppInteroperable T> explicit integer(const T &x)
+   .. cpp:function:: template <integer_cpp_arithmetic T> explicit integer(const T &x)
 
-      Generic constructor from a C++ fundamental type.
+      Generic constructor from C++ arithmetic types.
 
       This constructor will initialize an integer with the value of *x*.
       The initialization is always successful if *x* is an integral value
@@ -181,11 +181,11 @@ The integer class
 
       :exception std\:\:domain_error: if *x* is a non-finite floating-point value.
 
-   .. cpp:function:: template <CppComplex T> explicit integer(const T &c)
+   .. cpp:function:: template <integer_cpp_complex T> explicit integer(const T &c)
 
       .. versionadded:: 0.19
 
-      Generic constructor from a C++ complex type.
+      Generic constructor from C++ complex types.
 
       This constructor will initialize an integer with the value of *c*. The initialization is
       successful only if the imaginary part of *c* is zero and the real part of *c* is finite.
@@ -195,11 +195,11 @@ The integer class
       :exception std\:\:domain_error: if the imaginary part of *c* is not zero or if
         the real part of *c* is not finite.
 
-   .. cpp:function:: template <StringType T> explicit integer(const T &s, int base = 10)
+   .. cpp:function:: template <string_type T> explicit integer(const T &s, int base = 10)
 
       Constructor from string.
 
-      This constructor will initialize ``this`` from the :cpp:concept:`~mppp::StringType` *s*, which must represent
+      This constructor will initialize ``this`` from *s*, which must represent
       an integer value in base *base*. The expected format is the same as specified by the ``mpz_set_str()``
       GMP function. *base* may vary from 2 to 62, or be zero. In the latter case, the base is inferred
       from the leading characters of the string.
@@ -297,9 +297,9 @@ The integer class
 
       :return: a reference to ``this``.
 
-   .. cpp:function:: template <CppInteroperable T> integer &operator=(const T &x)
+   .. cpp:function:: template <integer_cpp_arithmetic T> integer &operator=(const T &x)
 
-      Generic assignment operator from a fundamental C++ type.
+      Generic assignment operator from C++ arithmetic types.
 
       This operator will assign *x* to ``this``. The storage type of ``this`` after the assignment
       will depend only on the value of *x* (that is, the storage type will be static if the value of *x*
@@ -312,11 +312,11 @@ The integer class
 
       :exception std\:\:domain_error: if *x* is a non-finite floating-point value.
 
-   .. cpp:function:: template <CppComplex T> integer &operator=(const T &c)
+   .. cpp:function:: template <integer_cpp_complex T> integer &operator=(const T &c)
 
       .. versionadded:: 0.19
 
-      Generic assignment operator from a complex C++ type.
+      Generic assignment operator from C++ complex types.
 
       This operator will assign *c* to ``this``. The storage type of ``this`` after the assignment
       will depend only on the value of *c* (that is, the storage type will be static if the value of *c*
@@ -330,7 +330,7 @@ The integer class
       :exception std\:\:domain_error: if the imaginary part of *c* is not zero or if
         the real part of *c* is not finite.
 
-   .. cpp:function:: template <StringType T> integer &operator=(const T &s)
+   .. cpp:function:: template <string_type T> integer &operator=(const T &s)
 
       Assignment from string.
 
@@ -340,7 +340,7 @@ The integer class
 
          return *this = integer{s};
 
-      That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
+      That is, a temporary integer is constructed from
       *s* and it is then move-assigned to ``this``.
 
       :param s: the string that will be used for the assignment.
@@ -433,14 +433,14 @@ The integer class
 
       :exception std\:\:invalid_argument: if *base* is smaller than 2 or greater than 62.
 
-   .. cpp:function:: template <CppInteroperable T> explicit operator T() const
+   .. cpp:function:: template <integer_cpp_arithmetic T> explicit operator T() const
 
-      Generic conversion operator to a C++ fundamental type.
+      Generic conversion operator to C++ arithmetic types.
 
-      This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type.
+      This operator will convert ``this`` to ``T``.
       Conversion to ``bool`` yields ``false`` if ``this`` is zero,
       ``true`` otherwise. Conversion to other integral types yields the exact result, if representable by the target
-      :cpp:concept:`~mppp::CppInteroperable` type. Conversion to floating-point types might yield inexact values and
+      type. Conversion to floating-point types might yield inexact values and
       infinities.
 
       :return: ``this`` converted to the target type.
@@ -448,23 +448,23 @@ The integer class
       :exception std\:\:overflow_error: if the target type is an integral type and the value of
         ``this`` cannot be represented by it.
 
-   .. cpp:function:: template <CppComplex T> explicit operator T() const
+   .. cpp:function:: template <integer_cpp_complex T> explicit operator T() const
 
       .. versionadded:: 0.19
 
-      Generic conversion operator to a C++ complex type.
+      Generic conversion operator to C++ complex types.
 
-      This operator will convert ``this`` to a :cpp:concept:`~mppp::CppComplex` type.
+      This operator will convert ``this`` to ``T``.
       The conversion might yield inexact values and infinities.
 
       :return: ``this`` converted to the target type.
 
-   .. cpp:function:: template <CppInteroperable T> bool get(T &rop) const
+   .. cpp:function:: template <integer_cpp_arithmetic T> bool get(T &rop) const
 
-      Generic conversion member function to a C++ fundamental type.
+      Generic conversion member function to C++ arithmetic types.
 
-      This member function, similarly to the conversion operator, will convert ``this`` to a
-      :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into *rop*. Differently
+      This member function, similarly to the conversion operator, will convert ``this``
+      to ``T``, storing the result of the conversion into *rop*. Differently
       from the conversion operator, this member function does not raise any exception: if the conversion is successful,
       the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
       fails, *rop* will not be altered.
@@ -474,14 +474,14 @@ The integer class
       :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
         a C++ integral type which cannot represent the value of ``this``.
 
-   .. cpp:function:: template <CppComplex T> bool get(T &rop) const
+   .. cpp:function:: template <intger_cpp_complex T> bool get(T &rop) const
 
       .. versionadded:: 0.19
 
-      Generic conversion member function to a C++ complex type.
+      Generic conversion member function to C++ complex types.
 
-      This member function, similarly to the conversion operator, will convert ``this`` to a
-      :cpp:concept:`~mppp::CppComplex` type, storing the result of the conversion into *rop*.
+      This member function, similarly to the conversion operator, will convert ``this``
+      to ``T``, storing the result of the conversion into *rop*.
       The conversion is always successful, and this member function
       will always return ``true``.
 
@@ -799,6 +799,23 @@ Types
 
 Concepts
 --------
+
+.. cpp:concept:: template <typename T> mppp::integer_cpp_arithmetic
+
+   This concept is satisfied if ``T`` is a C++ arithmetic type compatible with :cpp:class:`~mppp::integer`.
+
+   Specifically, this concept is equivalent to :cpp:concept:`~mppp::cpp_arithmetic` if mp++
+   was built with the ``MPPP_WITH_MPFR`` option enabled (see the :ref:`installation instructions <installation>`).
+   Otherwise, this concept is equivalent to :cpp:concept:`~mppp::cpp_arithmetic` minus the ``long double`` type.
+
+.. cpp:concept:: template <typename T> mppp::integer_cpp_complex
+
+   This concept is satisfied if ``T`` is a C++ complex type compatible with :cpp:class:`~mppp::integer`.
+
+   Specifically, this concept is equivalent to :cpp:concept:`~mppp::cpp_complex` if mp++
+   was built with the ``MPPP_WITH_MPFR`` option enabled (see the :ref:`installation instructions <installation>`).
+   Otherwise, this concept is equivalent to :cpp:concept:`~mppp::cpp_complex` minus the
+   ``std::complex<long double>`` type.
 
 .. cpp:concept:: template <typename T, typename U> mppp::IntegerOpTypes
 

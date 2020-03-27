@@ -19,6 +19,7 @@
 #include <cassert>
 #include <cinttypes>
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -998,6 +999,38 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 
 }
 
+// Detect C++ arithmetic types compatible with integer.
+template <typename T>
+using is_integer_cpp_arithmetic = detail::conjunction<is_cpp_arithmetic<T>
+#if !defined(MPPP_WITH_MPFR)
+                                                      ,
+                                                      detail::negation<std::is_same<T, long double>>
+#endif
+                                                      >;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL integer_cpp_arithmetic = is_integer_cpp_arithmetic<T>::value;
+
+#endif
+
+// Detect C++ complex types compatible with integer.
+template <typename T>
+using is_integer_cpp_complex = detail::conjunction<is_cpp_complex<T>
+#if !defined(MPPP_WITH_MPFR)
+                                                   ,
+                                                   detail::negation<std::is_same<T, std::complex<long double>>>
+#endif
+                                                   >;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL integer_cpp_complex = is_integer_cpp_complex<T>::value;
+
+#endif
+
 // NOTE: a few misc future directions:
 // - re-visit at one point the issue of the estimators when we need to promote from static to dynamic
 //   in arithmetic ops. Currently they are not 100% optimal since they rely on the information coming out
@@ -1163,18 +1196,18 @@ public:
     explicit integer(integer_bitcnt_t nbits) : m_int(nbits) {}
     // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppInteroperable T>
+    template <integer_cpp_arithmetic T>
 #else
-    template <typename T, cpp_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
 #endif
     explicit integer(const T &x) : m_int(x)
     {
     }
     // Generic constructor from a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppComplex T>
+    template <integer_cpp_complex T>
 #else
-    template <typename T, cpp_complex_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
 #endif
     explicit integer(const T &c)
         : integer(c.imag() == 0
@@ -1200,9 +1233,9 @@ private:
 public:
     // Constructor from string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     explicit integer(const T &s, int base = 10) : integer(ptag{}, s, base)
     {
@@ -1362,9 +1395,9 @@ private:
 public:
     // Generic assignment operator from a fundamental C++ type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppInteroperable T>
+    template <integer_cpp_arithmetic T>
 #else
-    template <typename T, cpp_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
 #endif
     integer &operator=(const T &x)
     {
@@ -1373,9 +1406,9 @@ public:
     }
     // Generic assignment operator from a complex C++ type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppComplex T>
+    template <integer_cpp_complex T>
 #else
-    template <typename T, cpp_complex_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
 #endif
     integer &operator=(const T &c)
     {
@@ -1387,9 +1420,9 @@ public:
     }
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     integer &operator=(const T &s)
     {
@@ -1746,9 +1779,9 @@ private:
 public:
     // Generic conversion operator to a C++ fundamental type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppInteroperable T>
+    template <integer_cpp_arithmetic T>
 #else
-    template <typename T, cpp_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
 #endif
     explicit operator T() const
     {
@@ -1761,9 +1794,9 @@ public:
     }
     // Generic conversion operator to a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppComplex T>
+    template <integer_cpp_complex T>
 #else
-    template <typename T, cpp_complex_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
 #endif
     explicit operator T() const
     {
@@ -1771,9 +1804,9 @@ public:
     }
     // Generic conversion member function to a C++ fundamental type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppInteroperable T>
+    template <integer_cpp_arithmetic T>
 #else
-    template <typename T, cpp_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
 #endif
     bool get(T &rop) const
     {
@@ -1786,9 +1819,9 @@ public:
     }
     // Generic conversion member function to a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppComplex T>
+    template <intger_cpp_complex T>
 #else
-    template <typename T, cpp_complex_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
 #endif
     bool get(T &rop) const
     {

@@ -196,6 +196,14 @@ MPPP_CONCEPT_DECL StringType = is_string_type<T>::value;
 #else
 using string_type_enabler = detail::enable_if_t<is_string_type<T>::value, int>;
 #endif
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+// TODO move up.
+template <typename T>
+MPPP_CONCEPT_DECL string_type = is_string_type<T>::value;
+
+#endif
 } // namespace mppp
 
 #endif
