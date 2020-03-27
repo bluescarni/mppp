@@ -1819,7 +1819,7 @@ public:
     }
     // Generic conversion member function to a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <intger_cpp_complex T>
+    template <integer_cpp_complex T>
 #else
     template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
 #endif
