@@ -817,32 +817,26 @@ Concepts
    Otherwise, this concept is equivalent to :cpp:concept:`~mppp::cpp_complex` minus the
    ``std::complex<long double>`` type.
 
-.. cpp:concept:: template <typename T, typename U> mppp::IntegerOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::integer_op_types
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic binary :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
    involving :cpp:class:`~mppp::integer`. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
-   * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppInteroperable`
-     or :cpp:concept:`~mppp::CppComplex` type.
+   * one type is an :cpp:class:`~mppp::integer` and the other is an :cpp:concept:`~mppp::integer_cpp_arithmetic`
+     or an :cpp:concept:`~mppp::integer_cpp_complex` type.
 
    Note that the modulo, bit-shifting and bitwise logic operators have additional restrictions.
 
-   A corresponding boolean type trait called ``are_integer_op_types`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T, typename U> mppp::IntegerRealOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::integer_real_op_types
 
    This concept will be ``true`` if:
 
-   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`, and
-   * neither ``T`` nor ``U`` satisfy :cpp:concept:`~mppp::CppComplex`.
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::integer_op_types`, and
+   * neither ``T`` nor ``U`` satisfy :cpp:concept:`~mppp::integer_cpp_complex`.
 
-   A corresponding boolean type trait called ``are_integer_real_op_types`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T, typename U> mppp::IntegerIntegralOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::integer_integral_op_types
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic binary :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
@@ -850,18 +844,15 @@ Concepts
    if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size, or
-   * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppIntegralInteroperable` type.
+   * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::cpp_integral` type.
 
-   A corresponding boolean type trait called ``are_integer_integral_op_types`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerBinarySaveDest
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::integer_binary_save_dest
 
    This concept is satisfied if ``T`` is a type into which the serialised binary representation of an
    :cpp:class:`~mppp::integer` with static size ``SSize`` can be written. In other words, the concept is satisfied if
    an object of type ``T`` can be passed as an argument to one of the :cpp:func:`mppp::integer::binary_save()` overloads.
 
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerBinaryLoadSrc
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::integer_binary_load_src
 
    This concept is satisfied if ``T`` is a type from which the serialised binary representation of an
    :cpp:class:`~mppp::integer` with static size ``SSize`` can be loaded. In other words, the concept is satisfied if
@@ -915,12 +906,12 @@ Assignment
 Conversion
 ~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CppInteroperable T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
+.. cpp:function:: template <mppp::integer_cpp_arithmetic T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
 
-   Generic conversion function from :cpp:class:`~mppp::integer` to C++ fundamental types.
+   Generic conversion function from :cpp:class:`~mppp::integer` to C++ arithmetic types.
 
-   This function will convert the input :cpp:class:`~mppp::integer` *n* to a
-   :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into *rop*.
+   This function will convert the input :cpp:class:`~mppp::integer` *n* to ``T``,
+   storing the result of the conversion into *rop*.
    If the conversion is successful, the function
    will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
    not be altered.
@@ -931,14 +922,14 @@ Conversion
    :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
      a C++ integral type which cannot represent the value of *n*.
 
-.. cpp:function:: template <mppp::CppComplex T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
+.. cpp:function:: template <mppp::integer_cpp_complex T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
 
    .. versionadded:: 0.19
 
    Generic conversion function from :cpp:class:`~mppp::integer` to C++ complex types.
 
-   This function will convert the input :cpp:class:`~mppp::integer` *n* to a
-   :cpp:concept:`~mppp::CppComplex` type, storing the result of the conversion into *rop*.
+   This function will convert the input :cpp:class:`~mppp::integer` *n* to ``T``,
+   storing the result of the conversion into *rop*.
    The conversion is always successful, and this function will always return ``true``.
 
    :param rop: the variable which will store the result of the conversion.
@@ -969,10 +960,10 @@ Arithmetic
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <std::size_t SSize, mppp::CppUnsignedIntegralInteroperable T> mppp::integer<SSize> &mppp::add_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
-.. cpp:function:: template <std::size_t SSize, mppp::CppSignedIntegralInteroperable T> mppp::integer<SSize> &mppp::add_si(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
-.. cpp:function:: template <std::size_t SSize, mppp::CppUnsignedIntegralInteroperable T> mppp::integer<SSize> &mppp::sub_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
-.. cpp:function:: template <std::size_t SSize, mppp::CppSignedIntegralInteroperable T> mppp::integer<SSize> &mppp::sub_si(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
+.. cpp:function:: template <std::size_t SSize, mppp::cpp_unsigned_integral T> mppp::integer<SSize> &mppp::add_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
+.. cpp:function:: template <std::size_t SSize, mppp::cpp_signed_integral T> mppp::integer<SSize> &mppp::add_si(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
+.. cpp:function:: template <std::size_t SSize, mppp::cpp_unsigned_integral T> mppp::integer<SSize> &mppp::sub_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
+.. cpp:function:: template <std::size_t SSize, mppp::cpp_signed_integral T> mppp::integer<SSize> &mppp::sub_si(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
 
    Ternary addition/subtraction primitives with C++ integral types.
 
@@ -1313,7 +1304,7 @@ Number theoretic functions
 
    :return: :math:`{n \choose k}`.
 
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::binomial(const T &n, const U &k)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> auto mppp::binomial(const T &n, const U &k)
 
    Generic binomial coefficient.
 
@@ -1394,7 +1385,7 @@ Exponentiation
 
    :return: ``base**exp``.
 
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::pow(const T &base, const U &exp)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> auto mppp::pow(const T &base, const U &exp)
 
    Generic binary :cpp:class:`~mppp::integer` exponentiation.
 
@@ -1573,7 +1564,7 @@ Serialisation
 
    :exception unspecified: any exception thrown by :cpp:func:`mppp::integer::binary_size()`.
 
-.. cpp:function:: template <std::size_t SSize, mppp::IntegerBinarySaveDest<SSize> T> std::size_t mppp::binary_save(const mppp::integer<SSize> &n, T &&dest)
+.. cpp:function:: template <std::size_t SSize, mppp::integer_binary_save_dest<SSize> T> std::size_t mppp::binary_save(const mppp::integer<SSize> &n, T &&dest)
 
    Serialisation.
 
@@ -1588,7 +1579,7 @@ Serialisation
 
    :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::integer::binary_save()` overload.
 
-.. cpp:function:: template <std::size_t SSize, mppp::IntegerBinaryLoadSrc<SSize> T> std::size_t mppp::binary_load(mppp::integer<SSize> &n, T &&src)
+.. cpp:function:: template <std::size_t SSize, mppp::integer_binary_load_src<SSize> T> std::size_t mppp::binary_load(mppp::integer<SSize> &n, T &&src)
 
    Deserialisation.
 
@@ -1655,10 +1646,10 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :return: :math:`n` and :math:`-n` respectively.
 
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::operator+(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::operator-(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::operator*(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> auto mppp::operator/(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> auto mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> auto mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> auto mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> auto mppp::operator/(const T &x, const U &y)
 
    Binary arithmetic operators.
 
@@ -1683,10 +1674,10 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
    :exception mppp\:\:zero_division_error: if, in a division, *y* is zero and only integral
      types are involved.
 
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> T &mppp::operator+=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> T &mppp::operator-=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> T &mppp::operator*=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> T &mppp::operator/=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> T &mppp::operator+=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> T &mppp::operator-=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> T &mppp::operator*=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> T &mppp::operator/=(T &x, const U &y)
 
    In-place arithmetic operators.
 
@@ -1725,7 +1716,7 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :return: a copy of *n* before the increment/decrement.
 
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::operator%(const T &n, const U &d)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> auto mppp::operator%(const T &n, const U &d)
 
    Binary modulo operator.
 
@@ -1738,7 +1729,7 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :exception mppp\:\:zero_division_error: if *d* is zero.
 
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> T &mppp::operator%=(T &rop, const U &op)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> T &mppp::operator%=(T &rop, const U &op)
 
    In-place modulo operator.
 
@@ -1750,8 +1741,8 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
    :exception mppp\:\:zero_division_error: if *op* is zero.
    :exception unspecified: any exception thrown by the conversion operator of :cpp:class:`~mppp::integer`.
 
-.. cpp:function:: template <mppp::CppIntegralInteroperable T, std::size_t SSize> mppp::integer<SSize> mppp::operator<<(const mppp::integer<SSize> &n, T s)
-.. cpp:function:: template <mppp::CppIntegralInteroperable T, std::size_t SSize> mppp::integer<SSize> mppp::operator>>(const mppp::integer<SSize> &n, T s)
+.. cpp:function:: template <mppp::cpp_integral T, std::size_t SSize> mppp::integer<SSize> mppp::operator<<(const mppp::integer<SSize> &n, T s)
+.. cpp:function:: template <mppp::cpp_integral T, std::size_t SSize> mppp::integer<SSize> mppp::operator>>(const mppp::integer<SSize> &n, T s)
 
    Binary left/right shift operators.
 
@@ -1762,8 +1753,8 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :exception std\:\:overflow_error: if *s* is negative or larger than an implementation-defined value.
 
-.. cpp:function:: template <mppp::CppIntegralInteroperable T, std::size_t SSize> mppp::integer<SSize> &mppp::operator<<=(mppp::integer<SSize> &rop, T s)
-.. cpp:function:: template <mppp::CppIntegralInteroperable T, std::size_t SSize> mppp::integer<SSize> &mppp::operator>>=(mppp::integer<SSize> &rop, T s)
+.. cpp:function:: template <mppp::cpp_integral T, std::size_t SSize> mppp::integer<SSize> &mppp::operator<<=(mppp::integer<SSize> &rop, T s)
+.. cpp:function:: template <mppp::cpp_integral T, std::size_t SSize> mppp::integer<SSize> &mppp::operator>>=(mppp::integer<SSize> &rop, T s)
 
    In-place left/right shift operators.
 
@@ -1774,12 +1765,12 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :exception std\:\:overflow_error: if *s* is negative or larger than an implementation-defined value.
 
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator==(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator!=(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator<(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator<=(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator>(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::IntegerOpTypes<T> U> bool mppp::operator>=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> bool mppp::operator==(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> bool mppp::operator!=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> bool mppp::operator<(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> bool mppp::operator<=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> bool mppp::operator>(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_op_types<T> U> bool mppp::operator>=(const T &op1, const U &op2)
 
    Binary comparison operators.
 
@@ -1799,9 +1790,9 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :return: the bitwise NOT of *op*.
 
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::operator|(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::operator&(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> auto mppp::operator^(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> auto mppp::operator|(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> auto mppp::operator&(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> auto mppp::operator^(const T &op1, const U &op2)
 
    Binary bitwise operators.
 
@@ -1822,9 +1813,9 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
    :return: the result of the bitwise operation.
 
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> T &mppp::operator|=(T &rop, const U &op)
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> T &mppp::operator&=(T &rop, const U &op)
-.. cpp:function:: template <typename T, mppp::IntegerIntegralOpTypes<T> U> T &mppp::operator^=(T &rop, const U &op)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> T &mppp::operator|=(T &rop, const U &op)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> T &mppp::operator&=(T &rop, const U &op)
+.. cpp:function:: template <typename T, mppp::integer_integral_op_types<T> U> T &mppp::operator^=(T &rop, const U &op)
 
    In-place bitwise operators.
 
