@@ -134,8 +134,7 @@
 <p>All of mp++’s multiprecision classes support a uniform style of initialisastion and conversion based
 on curly brackets. Using the same syntax, it is possible to:</p>
 <ul class="simple">
-<li>initialise multiprecision objects from objects of (most of) C++’s numerical types (see the
-<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> concept for a full list),</li>
+<li>initialise multiprecision objects from objects of C++’s numerical types,</li>
 <li>initialise multiprecision objects from multiprecision objects of a different type,</li>
 <li>initialise C++ numerical objects from multiprecision objects.</li>
 </ul>
@@ -182,7 +181,7 @@ even if it does not preserve the exact value:</p>
 </div>
 <p>The documentation of the multiprecision classes explains in detail the behaviour during construction and conversion.</p>
 <p>All of mp++’s multiprecision classes can also be initialised from string-like entities (see the
-<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> concept for a full list). By default, string input is interpreted as the base-10 representation
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11string_typeE" title="mppp::string_type"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">string_type</span></code></a> concept for a full list). By default, string input is interpreted as the base-10 representation
 of the desired value, and parsing follows (hopefully) intuitive rules:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-42&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">rat_t</span><span class="p">{</span><span class="s">&quot;3/2&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="mf">1.5</span><span class="p">)</span>

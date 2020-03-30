@@ -26,6 +26,10 @@ New
 Changes
 ~~~~~~~
 
+- For consistency with C++20, mp++'s concepts now
+  use snake case notation. The concept hierarchy has also been
+  simplified and streamlined
+  (`#228 <https://github.com/bluescarni/mppp/pull/228>`__).
 - **BREAKING**: the global precision setting mechanism has been
   removed from :cpp:class:`~mppp::real`. As a result,
   the API and behaviour of the :cpp:class:`~mppp::real`
@@ -393,7 +397,7 @@ New
 Changes
 ~~~~~~~
 
-- The :cpp:concept:`mppp::StringType` concept is now satisfied by cv qualified types as well
+- The :cpp:concept:`mppp::string_type` concept is now satisfied by cv qualified types as well
   (`#127 <https://github.com/bluescarni/mppp/pull/127>`__).
 
 - Add a leading ``mppp::`` to the names of mp++'s classes in the pybind11 custom type casters
@@ -459,7 +463,7 @@ New
 
 - Add builds based on MSVC 2017 in Appveyor (`#110 <https://github.com/bluescarni/mppp/pull/110>`__).
 
-- Extend the :cpp:concept:`~mppp::CppInteroperable` concept to include all C++ integral types
+- Extend the ``mppp::CppInteroperable`` concept to include all C++ integral types
   (`#104 <https://github.com/bluescarni/mppp/pull/104>`__).
 
 - Add left bit shift benchmarks for :cpp:class:`~mppp::integer` (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
@@ -589,7 +593,7 @@ Changes
 
 - Various simplifications in the :cpp:class:`~mppp::rational` API (`#66 <https://github.com/bluescarni/mppp/pull/66>`__).
 
-- Introduce a :cpp:concept:`~mppp::StringType` concept and use it to reduce the number of overloads in the
+- Introduce a :cpp:concept:`~mppp::string_type` concept and use it to reduce the number of overloads in the
   constructors/assignment operators from string (`#63 <https://github.com/bluescarni/mppp/pull/63>`__,
   `#64 <https://github.com/bluescarni/mppp/pull/64>`__).
 

@@ -129,8 +129,8 @@ The real class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
-   .. cpp:function:: template <RealInteroperable T> explicit real(const T &x, mpfr_prec_t p)
-   .. cpp:function:: template <RealInteroperable T> explicit real(const T &x)
+   .. cpp:function:: template <real_interoperable T> explicit real(const T &x, mpfr_prec_t p)
+   .. cpp:function:: template <real_interoperable T> explicit real(const T &x)
 
       Generic constructors.
 
@@ -163,12 +163,12 @@ The real class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
-   .. cpp:function:: template <StringType T> explicit real(const T &s, int base, mpfr_prec_t p)
-   .. cpp:function:: template <StringType T> explicit real(const T &s, mpfr_prec_t p)
+   .. cpp:function:: template <string_type T> explicit real(const T &s, int base, mpfr_prec_t p)
+   .. cpp:function:: template <string_type T> explicit real(const T &s, mpfr_prec_t p)
 
       Constructors from string, base and precision.
 
-      The first constructor will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` *s*, which
+      The first constructor will set ``this`` to the value represented by the :cpp:concept:`~mppp::string_type` *s*, which
       is interpreted as a floating-point number in base *base*. *base* must be either zero (in which case the base
       will be automatically deduced) or a number in the :math:`\left[ 2,62 \right]` range.
       The valid string formats are detailed in the
@@ -261,7 +261,7 @@ The real class
 
       :return: a reference to ``this``.
 
-   .. cpp:function:: template <RealInteroperable T> real &operator=(const T &x)
+   .. cpp:function:: template <real_interoperable T> real &operator=(const T &x)
 
       The generic assignment operator will set ``this`` to the value of *x*.
 
@@ -340,7 +340,7 @@ The real class
 
       :return: a reference to ``this``.
 
-   .. cpp:function:: template <RealInteroperable T> real &set(const T &x)
+   .. cpp:function:: template <real_interoperable T> real &set(const T &x)
 
       Generic setter.
 
@@ -360,7 +360,7 @@ The real class
 
       :return: a reference to ``this``.
 
-   .. cpp:function:: template <StringType T> real &set(const T &s, int base = 10)
+   .. cpp:function:: template <string_type T> real &set(const T &s, int base = 10)
 
       Setter to string.
 
@@ -547,7 +547,7 @@ The real class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
-   .. cpp:function:: template <RealInteroperable T> explicit operator T() const
+   .. cpp:function:: template <real_interoperable T> explicit operator T() const
 
       Generic conversion operator.
 
@@ -573,7 +573,7 @@ The real class
       :exception std\:\:domain_error: if ``this`` is not finite and the target type cannot represent non-finite numbers.
       :exception std\:\:overflow_error: if the conversion results in overflow.
 
-   .. cpp:function:: template <RealInteroperable T> bool get(T &rop) const
+   .. cpp:function:: template <real_interoperable T> bool get(T &rop) const
 
       Generic conversion function.
 
@@ -896,22 +896,22 @@ Types
 Concepts
 --------
 
-.. cpp:concept:: template <typename T> mppp::RealInteroperable
+.. cpp:concept:: template <typename T> mppp::real_interoperable
 
    This concept is satisfied if the type ``T`` can interoperate with :cpp:class:`~mppp::real`.
    Specifically, this concept will be ``true`` if ``T`` is either:
 
-   * a :cpp:concept:`~mppp::CppInteroperable` type, or
+   * a :cpp:concept:`~mppp::cpp_arithmetic` type, or
    * an :cpp:class:`~mppp::integer`, or
    * a :cpp:class:`~mppp::rational`, or
    * :cpp:class:`~mppp::real128`.
 
-.. cpp:concept:: template <typename T> mppp::CvrReal
+.. cpp:concept:: template <typename T> mppp::cvr_real
 
    This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
    is the same as :cpp:class:`mppp::real`.
 
-.. cpp:concept:: template <typename... Args> mppp::RealSetArgs
+.. cpp:concept:: template <typename... Args> mppp::real_set_args
 
    This concept is satisfied if the types in the parameter pack ``Args``
    can be used as argument types in one of the :cpp:func:`mppp::real::set()` member function overloads.
@@ -924,25 +924,22 @@ Concepts
    is valid (where ``r`` is a non-const :cpp:class:`~mppp::real` and ``x``, ``y``, ``z``, etc. are const
    references to the types in ``Args``).
 
-.. cpp:concept:: template <typename T, typename U> mppp::RealOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::real_op_types
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic binary :ref:`operators <real_operators>` and :ref:`functions <real_functions>`
    involving :cpp:class:`~mppp::real`. Specifically, the concept will be ``true`` if either:
 
-   * ``T`` and ``U`` both satisfy :cpp:concept:`~mppp::CvrReal`,
-   * one type satisfies :cpp:concept:`~mppp::CvrReal` and the other type, after the removal of reference
-     and cv qualifiers, satisfies :cpp:concept:`~mppp::RealInteroperable`.
+   * ``T`` and ``U`` both satisfy :cpp:concept:`~mppp::cvr_real`,
+   * one type satisfies :cpp:concept:`~mppp::cvr_real` and the other type, after the removal of reference
+     and cv qualifiers, satisfies :cpp:concept:`~mppp::real_interoperable`.
 
-   A corresponding boolean type trait called ``are_real_op_types`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T, typename U> mppp::RealInPlaceOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::real_in_place_op_types
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic in-place :ref:`operators <real_operators>`
    involving :cpp:class:`~mppp::real`. Specifically, the concept will be ``true`` if
-   ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RealOpTypes` and ``T``, after the removal
+   ``T`` and ``U`` satisfy :cpp:concept:`~mppp::real_op_types` and ``T``, after the removal
    of reference, is not const.
 
 .. _real_functions:
@@ -997,7 +994,7 @@ Precision handling
 Assignment
 ~~~~~~~~~~
 
-.. cpp:function:: template <mppp::RealSetArgs... Args> mppp::real &mppp::set(mppp::real &r, const Args &... args)
+.. cpp:function:: template <mppp::real_set_args... Args> mppp::real &mppp::set(mppp::real &r, const Args &... args)
 
    Generic setter.
 
@@ -1009,7 +1006,7 @@ Assignment
 
       return r.set(args...);
 
-   The input arguments must satisfy the :cpp:concept:`mppp::RealSetArgs` concept.
+   The input arguments must satisfy the :cpp:concept:`mppp::real_set_args` concept.
 
    :param r: the return value.
    :param args: the arguments that will be passed to :cpp:func:`mppp::real::set()`.
@@ -1059,7 +1056,7 @@ Assignment
 Conversion
 ~~~~~~~~~~
 
-.. cpp:function:: template <mppp::RealInteroperable T> bool mppp::get(T &rop, const mppp::real &x)
+.. cpp:function:: template <mppp::real_interoperable T> bool mppp::get(T &rop, const mppp::real &x)
 
    Generic conversion function.
 
@@ -1098,10 +1095,10 @@ Conversion
 Arithmetic
 ~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::add(mppp::real &rop, T &&a, U &&b)
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::sub(mppp::real &rop, T &&a, U &&b)
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::mul(mppp::real &rop, T &&a, U &&b)
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::div(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::add(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::sub(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::mul(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::div(mppp::real &rop, T &&a, U &&b)
 
    Ternary basic :cpp:class:`~mppp::real` arithmetics.
 
@@ -1120,8 +1117,8 @@ Arithmetic
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real &mppp::fma(mppp::real &rop, T &&a, U &&b, V &&c)
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real &mppp::fms(mppp::real &rop, T &&a, U &&b, V &&c)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U, mppp::cvr_real V> mppp::real &mppp::fma(mppp::real &rop, T &&a, U &&b, V &&c)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U, mppp::cvr_real V> mppp::real &mppp::fms(mppp::real &rop, T &&a, U &&b, V &&c)
 
    Quaternary :cpp:class:`~mppp::real` multiply-add/sub.
 
@@ -1139,8 +1136,8 @@ Arithmetic
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real mppp::fma(T &&a, U &&b, V &&c)
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real mppp::fms(T &&a, U &&b, V &&c)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U, mppp::cvr_real V> mppp::real mppp::fma(T &&a, U &&b, V &&c)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U, mppp::cvr_real V> mppp::real mppp::fms(T &&a, U &&b, V &&c)
 
    Ternary :cpp:class:`~mppp::real` multiply-add/sub.
 
@@ -1157,7 +1154,7 @@ Arithmetic
 
    :return: :math:`a \times b \pm c`.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::neg(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::neg(mppp::real &rop, T &&x)
 
    Binary :cpp:class:`~mppp::real` negation.
 
@@ -1169,7 +1166,7 @@ Arithmetic
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::neg(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::neg(T &&x)
 
    Unary :cpp:class:`~mppp::real` negation.
 
@@ -1180,7 +1177,7 @@ Arithmetic
 
    :return: :math:`-x`.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::abs(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::abs(mppp::real &rop, T &&x)
 
    Binary :cpp:class:`~mppp::real` absolute value.
 
@@ -1192,7 +1189,7 @@ Arithmetic
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::abs(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::abs(T &&x)
 
    Unary :cpp:class:`~mppp::real` absolute value.
 
@@ -1203,10 +1200,10 @@ Arithmetic
 
    :return: :math:`\left| x \right|`.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::mul_2ui(mppp::real &rop, T &&x, unsigned long n)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::mul_2si(mppp::real &rop, T &&x, long n)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::div_2ui(mppp::real &rop, T &&x, unsigned long n)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::div_2si(mppp::real &rop, T &&x, long n)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::mul_2ui(mppp::real &rop, T &&x, unsigned long n)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::mul_2si(mppp::real &rop, T &&x, long n)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::div_2ui(mppp::real &rop, T &&x, unsigned long n)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::div_2si(mppp::real &rop, T &&x, long n)
 
    .. versionadded:: 0.19
 
@@ -1227,10 +1224,10 @@ Arithmetic
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::mul_2ui(T &&x, unsigned long n)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::mul_2si(T &&x, long n)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::div_2ui(T &&x, unsigned long n)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::div_2si(T &&x, long n)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::mul_2ui(T &&x, unsigned long n)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::mul_2si(T &&x, long n)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::div_2ui(T &&x, unsigned long n)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::div_2si(T &&x, long n)
 
    .. versionadded:: 0.19
 
@@ -1358,7 +1355,7 @@ Comparison
 Roots
 ~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sqrt(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sqrt(mppp::real &rop, T &&op)
 
    Binary :cpp:class:`~mppp::real` square root.
 
@@ -1373,7 +1370,7 @@ Roots
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqrt(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sqrt(T &&r)
 
    Unary :cpp:class:`~mppp::real` square root.
 
@@ -1386,7 +1383,7 @@ Roots
 
    :return: the square root of *r*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sqrt1pm1(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sqrt1pm1(mppp::real &rop, T &&op)
 
    .. versionadded:: 0.19
 
@@ -1409,7 +1406,7 @@ Roots
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqrt1pm1(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sqrt1pm1(T &&r)
 
    .. versionadded:: 0.19
 
@@ -1431,7 +1428,7 @@ Roots
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::rec_sqrt(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::rec_sqrt(mppp::real &rop, T &&op)
 
    .. versionadded:: 0.12
 
@@ -1448,7 +1445,7 @@ Roots
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::rec_sqrt(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::rec_sqrt(T &&r)
 
    .. versionadded:: 0.12
 
@@ -1465,7 +1462,7 @@ Roots
 
    :return: the reciprocal square root of *r*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cbrt(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::cbrt(mppp::real &rop, T &&op)
 
    .. versionadded:: 0.12
 
@@ -1480,7 +1477,7 @@ Roots
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cbrt(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::cbrt(T &&r)
 
    .. versionadded:: 0.12
 
@@ -1493,7 +1490,7 @@ Roots
 
    :return: the cubic root of *r*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::rootn_ui(mppp::real &rop, T &&op, unsigned long k)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::rootn_ui(mppp::real &rop, T &&op, unsigned long k)
 
    .. versionadded:: 0.12
 
@@ -1517,7 +1514,7 @@ Roots
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::rootn_ui(T &&r, unsigned long k)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::rootn_ui(T &&r, unsigned long k)
 
    .. versionadded:: 0.12
 
@@ -1545,7 +1542,7 @@ Roots
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::pow(mppp::real &rop, T &&op1, U &&op2)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::pow(mppp::real &rop, T &&op1, U &&op2)
 
    Ternary exponentiation.
 
@@ -1558,7 +1555,7 @@ Exponentiation
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::pow(T &&op1, U &&op2)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::pow(T &&op1, U &&op2)
 
    Binary exponentiation.
 
@@ -1577,7 +1574,7 @@ Exponentiation
 
    :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
 
    .. versionadded:: 0.19
 
@@ -1592,7 +1589,7 @@ Exponentiation
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqr(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sqr(T &&r)
 
    .. versionadded:: 0.19
 
@@ -1610,18 +1607,18 @@ Exponentiation
 Trigonometry
 ~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sec(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::csc(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin_pi(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos_pi(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan_pi(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot_pi(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sinc(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sinc_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sin(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::cos(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::tan(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sec(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::csc(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::cot(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sin_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::cos_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::tan_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::cot_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sinc(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sinc_pi(mppp::real &rop, T &&x)
 
    .. note::
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
@@ -1662,18 +1659,18 @@ Trigonometry
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sec(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::csc(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin_pi(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos_pi(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan_pi(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot_pi(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sinc(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sinc_pi(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sin(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::cos(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::tan(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sec(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::csc(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::cot(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sin_pi(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::cos_pi(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::tan_pi(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::cot_pi(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sinc(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sinc_pi(T &&x)
 
    .. note::
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
@@ -1713,7 +1710,7 @@ Trigonometry
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
-.. cpp:function:: template <mppp::CvrReal T> void mppp::sin_cos(mppp::real &sop, mppp::real &cop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> void mppp::sin_cos(mppp::real &sop, mppp::real &cop, T &&op)
 
    Simultaneous sine and cosine.
 
@@ -1727,9 +1724,9 @@ Trigonometry
 
    :exception std\:\:invalid_argument: if *sop* and *cop* are the same object.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::asin(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::acos(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::atan(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::asin(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::acos(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::atan(mppp::real &rop, T &&op)
 
    Binary basic inverse trigonometric functions.
 
@@ -1742,9 +1739,9 @@ Trigonometry
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::asin(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::acos(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::atan(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::asin(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::acos(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::atan(T &&r)
 
    Unary basic inverse trigonometric functions.
 
@@ -1756,7 +1753,7 @@ Trigonometry
 
    :return: the arcsine, arccosine or arctangent of *r*.
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::atan2(mppp::real &rop, T &&y, U &&x)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::atan2(mppp::real &rop, T &&y, U &&x)
 
    Ternary arctangent-2.
 
@@ -1769,7 +1766,7 @@ Trigonometry
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::atan2(T &&y, U &&x)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::atan2(T &&y, U &&x)
 
    Binary arctangent-2.
 
@@ -1792,12 +1789,12 @@ Trigonometry
 Hyperbolic functions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sinh(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cosh(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tanh(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sech(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::csch(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::coth(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sinh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::cosh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::tanh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sech(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::csch(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::coth(mppp::real &rop, T &&op)
 
    Binary basic hyperbolic functions.
 
@@ -1810,12 +1807,12 @@ Hyperbolic functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sinh(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cosh(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tanh(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sech(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::csch(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::coth(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sinh(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::cosh(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::tanh(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sech(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::csch(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::coth(T &&r)
 
    Unary basic hyperbolic functions.
 
@@ -1827,7 +1824,7 @@ Hyperbolic functions
 
    :return: the hyperbolic sine, cosine, tangent, secant, cosecant or cotangent of *r*.
 
-.. cpp:function:: template <mppp::CvrReal T> void mppp::sinh_cosh(mppp::real &sop, mppp::real &cop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> void mppp::sinh_cosh(mppp::real &sop, mppp::real &cop, T &&op)
 
    Simultaneous hyperbolic sine and cosine.
 
@@ -1841,9 +1838,9 @@ Hyperbolic functions
 
    :exception std\:\:invalid_argument: if *sop* and *cop* are the same object.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::asinh(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::acosh(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::atanh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::asinh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::acosh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::atanh(mppp::real &rop, T &&op)
 
    Binary basic inverse hyperbolic functions.
 
@@ -1856,9 +1853,9 @@ Hyperbolic functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::asinh(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::acosh(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::atanh(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::asinh(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::acosh(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::atanh(T &&r)
 
    Unary basic inverse hyperbolic functions.
 
@@ -1875,10 +1872,10 @@ Hyperbolic functions
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp2(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp10(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::expm1(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::exp(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::exp2(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::exp10(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::expm1(mppp::real &rop, T &&x)
 
    Binary exponentials.
 
@@ -1896,10 +1893,10 @@ Logarithms and exponentials
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp2(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp10(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::expm1(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::exp(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::exp2(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::exp10(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::expm1(T &&x)
 
    Unary exponentials.
 
@@ -1916,10 +1913,10 @@ Logarithms and exponentials
 
    :return: the exponential of *x*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log2(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log10(mppp::real &rop, T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log1p(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::log(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::log2(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::log10(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::log1p(mppp::real &rop, T &&x)
 
    Binary logarithms.
 
@@ -1937,10 +1934,10 @@ Logarithms and exponentials
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log2(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log10(T &&x)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log1p(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log2(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log10(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log1p(T &&x)
 
    Unary logarithms.
 
@@ -1957,7 +1954,7 @@ Logarithms and exponentials
 
    :return: the logarithm of *x*.
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::log_hypot(mppp::real &rop, T &&x, U &&y)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::log_hypot(mppp::real &rop, T &&x, U &&y)
 
    .. versionadded:: 0.19
 
@@ -1980,7 +1977,7 @@ Logarithms and exponentials
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::log_hypot(T &&x, U &&y)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::log_hypot(T &&x, U &&y)
 
    .. versionadded:: 0.19
 
@@ -2010,7 +2007,7 @@ Logarithms and exponentials
 Polylogarithms
 ~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::li2(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::li2(mppp::real &rop, T &&x)
 
    Binary dilogarithm.
 
@@ -2023,7 +2020,7 @@ Polylogarithms
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::li2(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::li2(T &&x)
 
    Unary dilogarithm.
 
@@ -2040,10 +2037,10 @@ Polylogarithms
 Gamma functions
 ~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::gamma(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::lngamma(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::lgamma(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::digamma(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::gamma(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::lngamma(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::lgamma(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::digamma(mppp::real &rop, T &&op)
 
    Binary gamma functions.
 
@@ -2061,10 +2058,10 @@ Gamma functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::gamma(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::lngamma(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::lgamma(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::digamma(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::gamma(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::lngamma(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::lgamma(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::digamma(T &&r)
 
    Unary gamma functions.
 
@@ -2083,7 +2080,7 @@ Gamma functions
      logarithm of the absolute value of the Gamma function, or the
      Digamma function of *r*.
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::gamma_inc(mppp::real &rop, T &&x, U &&y)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::gamma_inc(mppp::real &rop, T &&x, U &&y)
 
    .. versionadded:: 0.17
 
@@ -2101,7 +2098,7 @@ Gamma functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::gamma_inc(T &&x, U &&y)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::gamma_inc(T &&x, U &&y)
 
    .. versionadded:: 0.17
 
@@ -2131,12 +2128,12 @@ Bessel functions
 
 .. versionadded:: 0.17
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::j0(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::j1(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::jn(mppp::real &rop, long n, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::y0(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::y1(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::yn(mppp::real &rop, long n, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::j0(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::j1(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::jn(mppp::real &rop, long n, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::y0(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::y1(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::yn(mppp::real &rop, long n, T &&op)
 
    Bessel functions.
 
@@ -2156,12 +2153,12 @@ Bessel functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::j0(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::j1(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::jn(long n, T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::y0(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::y1(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::yn(long n, T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::j0(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::j1(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::jn(long n, T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::y0(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::y1(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::yn(long n, T &&r)
 
    Bessel functions.
 
@@ -2185,8 +2182,8 @@ Bessel functions
 Error functions
 ~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::erf(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::erfc(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::erf(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::erfc(mppp::real &rop, T &&op)
 
    Binary error functions.
 
@@ -2199,8 +2196,8 @@ Error functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::erf(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::erfc(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::erf(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::erfc(T &&r)
 
    Unary error functions.
 
@@ -2217,9 +2214,9 @@ Error functions
 Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::eint(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::zeta(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::ai(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::eint(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::zeta(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::ai(mppp::real &rop, T &&op)
 
    Other binary special functions.
 
@@ -2236,9 +2233,9 @@ Other special functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::eint(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::zeta(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::ai(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::eint(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::zeta(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::ai(T &&r)
 
    Other unary special functions.
 
@@ -2254,7 +2251,7 @@ Other special functions
 
    :return: the exponential integral, Riemann Zeta function or Airy function of *r*.
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)
 
    .. versionadded:: 0.17
 
@@ -2272,7 +2269,7 @@ Other special functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::beta(T &&x, U &&y)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::beta(T &&x, U &&y)
 
    .. versionadded:: 0.17
 
@@ -2295,7 +2292,7 @@ Other special functions
 
    :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::hypot(mppp::real &rop, T &&x, U &&y)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::hypot(mppp::real &rop, T &&x, U &&y)
 
    Ternary hypot function.
 
@@ -2308,7 +2305,7 @@ Other special functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::hypot(T &&x, U &&y)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::hypot(T &&x, U &&y)
 
    Binary hypot function.
 
@@ -2326,7 +2323,7 @@ Other special functions
 
    :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
-.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::agm(mppp::real &rop, T &&x, U &&y)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::agm(mppp::real &rop, T &&x, U &&y)
 
    Ternary AGM.
 
@@ -2339,7 +2336,7 @@ Other special functions
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::agm(T &&x, U &&y)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::agm(T &&x, U &&y)
 
    Binary AGM.
 
@@ -2362,7 +2359,7 @@ Other special functions
 Integer and remainder related functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::trunc(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::trunc(mppp::real &rop, T &&op)
 
    Binary truncation.
 
@@ -2377,7 +2374,7 @@ Integer and remainder related functions
 
    :exception std\:\:domain_error: if *op* is NaN.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::trunc(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::trunc(T &&r)
 
    Unary truncation.
 
@@ -2421,8 +2418,8 @@ Input/Output
 Mathematical operators
 ----------------------
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::operator+(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::operator-(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::operator+(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::operator-(T &&r)
 
    Identity and negation operators.
 
@@ -2430,10 +2427,10 @@ Mathematical operators
 
    :return: :math:`r` and :math:`-r` respectively.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::operator+(T &&a, U &&b)
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::operator-(T &&a, U &&b)
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::operator*(T &&a, U &&b)
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::operator/(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::operator+(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::operator-(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::operator*(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::operator/(T &&a, U &&b)
 
    Binary arithmetic operators.
 
@@ -2451,10 +2448,10 @@ Mathematical operators
 
    :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
-.. cpp:function:: template <typename U, mppp::RealInPlaceOpTypes<U> T> T &mppp::operator+=(T &a, U &&b)
-.. cpp:function:: template <typename U, mppp::RealInPlaceOpTypes<U> T> T &mppp::operator-=(T &a, U &&b)
-.. cpp:function:: template <typename U, mppp::RealInPlaceOpTypes<U> T> T &mppp::operator*=(T &a, U &&b)
-.. cpp:function:: template <typename U, mppp::RealInPlaceOpTypes<U> T> T &mppp::operator/=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::real_in_place_op_types<U> T> T &mppp::operator+=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::real_in_place_op_types<U> T> T &mppp::operator-=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::real_in_place_op_types<U> T> T &mppp::operator*=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::real_in_place_op_types<U> T> T &mppp::operator/=(T &a, U &&b)
 
    In-place arithmetic operators.
 
@@ -2506,12 +2503,12 @@ Mathematical operators
 
    :return: a copy of *x* before the increment/decrement.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator==(const T &a, const U &b)
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator!=(const T &a, const U &b)
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator<(const T &a, const U &b)
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator<=(const T &a, const U &b)
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator>(const T &a, const U &b)
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> bool mppp::operator>=(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator==(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator!=(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator<(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator<=(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator>(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator>=(const T &a, const U &b)
 
    Comparison operators.
 

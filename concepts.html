@@ -128,74 +128,52 @@ and refers to concepts in their native C++ form.</p>
 </div>
 <p><em>#include &lt;mp++/concepts.hpp&gt;</em></p>
 <dl class="concept">
-<dt id="_CPPv4I0EN4mppp16CppInteroperableE">
-<span id="_CPPv3I0EN4mppp16CppInteroperableE"></span><span id="_CPPv2I0EN4mppp16CppInteroperableE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">CppInteroperable</code><a class="headerlink" href="#_CPPv4I0EN4mppp16CppInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied by any C++ fundamental type with which the multiprecision classes (such as <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>,
-<a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, etc.) can interoperate. The full list of types satisfying this concept includes:</p>
-<ul class="simple">
-<li>all the fundamental C++ integral types,</li>
-<li><code class="docutils literal notranslate"><span class="pre">float</span></code> and <code class="docutils literal notranslate"><span class="pre">double</span></code>.</li>
-</ul>
-<p><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> is also included, but only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled
-(see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
+<dt id="_CPPv4I0EN4mppp12cpp_integralE">
+<span id="_CPPv3I0EN4mppp12cpp_integralE"></span><span id="_CPPv2I0EN4mppp12cpp_integralE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_integral</code><a class="headerlink" href="#_CPPv4I0EN4mppp12cpp_integralE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a C++ integral type.</p>
 <p>The GCC-style extended 128-bit integral types <code class="docutils literal notranslate"><span class="pre">__int128_t</span></code> and <code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code> are included as well, if supported
 on the current platform/compiler combination (see also the <a class="reference internal" href="definitions.html#c.MPPP_HAVE_GCC_INT128" title="MPPP_HAVE_GCC_INT128"><code class="xref c c-macro docutils literal notranslate"><span class="pre">MPPP_HAVE_GCC_INT128</span></code></a> definition).</p>
-<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_cpp_interoperable</span></code> is also available (even if the compiler does
-not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
-<dt id="_CPPv4I0EN4mppp24CppIntegralInteroperableE">
-<span id="_CPPv3I0EN4mppp24CppIntegralInteroperableE"></span><span id="_CPPv2I0EN4mppp24CppIntegralInteroperableE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">CppIntegralInteroperable</code><a class="headerlink" href="#_CPPv4I0EN4mppp24CppIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is an integral <a class="reference internal" href="#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type.</p>
-<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_cpp_integral_interoperable</span></code> is also available (even if the compiler does
-not support concepts).</p>
+<dt id="_CPPv4I0EN4mppp21cpp_unsigned_integralE">
+<span id="_CPPv3I0EN4mppp21cpp_unsigned_integralE"></span><span id="_CPPv2I0EN4mppp21cpp_unsigned_integralE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_unsigned_integral</code><a class="headerlink" href="#_CPPv4I0EN4mppp21cpp_unsigned_integralE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is an unsigned <a class="reference internal" href="#_CPPv4I0EN4mppp12cpp_integralE" title="mppp::cpp_integral"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">cpp_integral</span></code></a>.</p>
 </dd></dl>
 
 <dl class="concept">
-<dt id="_CPPv4I0EN4mppp32CppUnsignedIntegralInteroperableE">
-<span id="_CPPv3I0EN4mppp32CppUnsignedIntegralInteroperableE"></span><span id="_CPPv2I0EN4mppp32CppUnsignedIntegralInteroperableE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">CppUnsignedIntegralInteroperable</code><a class="headerlink" href="#_CPPv4I0EN4mppp32CppUnsignedIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is an unsigned integral <a class="reference internal" href="#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type.</p>
-<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_cpp_unsigned_integral_interoperable</span></code> is also available (even if the compiler does
-not support concepts).</p>
+<dt id="_CPPv4I0EN4mppp19cpp_signed_integralE">
+<span id="_CPPv3I0EN4mppp19cpp_signed_integralE"></span><span id="_CPPv2I0EN4mppp19cpp_signed_integralE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_signed_integral</code><a class="headerlink" href="#_CPPv4I0EN4mppp19cpp_signed_integralE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a signed <a class="reference internal" href="#_CPPv4I0EN4mppp12cpp_integralE" title="mppp::cpp_integral"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">cpp_integral</span></code></a>.</p>
 </dd></dl>
 
 <dl class="concept">
-<dt id="_CPPv4I0EN4mppp30CppSignedIntegralInteroperableE">
-<span id="_CPPv3I0EN4mppp30CppSignedIntegralInteroperableE"></span><span id="_CPPv2I0EN4mppp30CppSignedIntegralInteroperableE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">CppSignedIntegralInteroperable</code><a class="headerlink" href="#_CPPv4I0EN4mppp30CppSignedIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a signed integral <a class="reference internal" href="#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type.</p>
-<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_cpp_signed_integral_interoperable</span></code> is also available (even if the compiler does
-not support concepts).</p>
+<dt id="_CPPv4I0EN4mppp18cpp_floating_pointE">
+<span id="_CPPv3I0EN4mppp18cpp_floating_pointE"></span><span id="_CPPv2I0EN4mppp18cpp_floating_pointE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_floating_point</code><a class="headerlink" href="#_CPPv4I0EN4mppp18cpp_floating_pointE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a C++ floating-point type.</p>
 </dd></dl>
 
 <dl class="concept">
-<dt id="_CPPv4I0EN4mppp29CppFloatingPointInteroperableE">
-<span id="_CPPv3I0EN4mppp29CppFloatingPointInteroperableE"></span><span id="_CPPv2I0EN4mppp29CppFloatingPointInteroperableE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">CppFloatingPointInteroperable</code><a class="headerlink" href="#_CPPv4I0EN4mppp29CppFloatingPointInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a floating-point <a class="reference internal" href="#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type.</p>
-<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_cpp_floating_point_interoperable</span></code> is also available (even if the compiler does
-not support concepts).</p>
+<dt id="_CPPv4I0EN4mppp14cpp_arithmeticE">
+<span id="_CPPv3I0EN4mppp14cpp_arithmeticE"></span><span id="_CPPv2I0EN4mppp14cpp_arithmeticE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_arithmetic</code><a class="headerlink" href="#_CPPv4I0EN4mppp14cpp_arithmeticE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is either a <a class="reference internal" href="#_CPPv4I0EN4mppp12cpp_integralE" title="mppp::cpp_integral"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">cpp_integral</span></code></a> or
+a <a class="reference internal" href="#_CPPv4I0EN4mppp18cpp_floating_pointE" title="mppp::cpp_floating_point"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">cpp_floating_point</span></code></a> type.</p>
 </dd></dl>
 
 <dl class="concept">
-<dt id="_CPPv4I0EN4mppp10CppComplexE">
-<span id="_CPPv3I0EN4mppp10CppComplexE"></span><span id="_CPPv2I0EN4mppp10CppComplexE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">CppComplex</code><a class="headerlink" href="#_CPPv4I0EN4mppp10CppComplexE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><div class="versionadded">
-<p><span class="versionmodified added">New in version 0.19.</span></p>
-</div>
-<p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is one of the C++ complex types
-supported by mp++:</p>
+<dt id="_CPPv4I0EN4mppp11cpp_complexE">
+<span id="_CPPv3I0EN4mppp11cpp_complexE"></span><span id="_CPPv2I0EN4mppp11cpp_complexE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_complex</code><a class="headerlink" href="#_CPPv4I0EN4mppp11cpp_complexE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is one of the C++ complex types:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">std::complex&lt;float&gt;</span></code>,</li>
 <li><code class="docutils literal notranslate"><span class="pre">std::complex&lt;double&gt;</span></code>,</li>
-<li><code class="docutils literal notranslate"><span class="pre">std::complex&lt;long</span> <span class="pre">double&gt;</span></code> (only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled).</li>
+<li><code class="docutils literal notranslate"><span class="pre">std::complex&lt;long</span> <span class="pre">double&gt;</span></code>.</li>
 </ul>
-<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_cpp_complex</span></code> is also available (even if the compiler does
-not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
-<dt id="_CPPv4I0EN4mppp10StringTypeE">
-<span id="_CPPv3I0EN4mppp10StringTypeE"></span><span id="_CPPv2I0EN4mppp10StringTypeE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">StringType</code><a class="headerlink" href="#_CPPv4I0EN4mppp10StringTypeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I0EN4mppp11string_typeE">
+<span id="_CPPv3I0EN4mppp11string_typeE"></span><span id="_CPPv2I0EN4mppp11string_typeE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">string_type</code><a class="headerlink" href="#_CPPv4I0EN4mppp11string_typeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied by C++ string-like types. Specifically, the concept will be true if <code class="docutils literal notranslate"><span class="pre">T</span></code>,
 after the removal of cv qualifiers, is one of the following types:</p>
 <ul class="simple">
