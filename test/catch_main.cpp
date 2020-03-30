@@ -19,4 +19,6 @@
 // ole main() instead.
 #define DO_NOT_USE_WMAIN
 
+#define CATCH_CONFIG_NO_CPP17_BYTE
+
 #include "catch.hpp"
