@@ -5,7 +5,7 @@ Quadruple-precision float tutorial
 
 The :cpp:class:`~mppp::real128` class is a thin wrapper around
 the :cpp:type:`__float128` type
-available in GCC and (more recently) Clang.
+available on GCC, Clang and the Intel compiler.
 
 :cpp:type:`__float128` is an implementation the
 `quadruple-precision IEEE 754 binary floating-point standard <https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>`__,
@@ -25,7 +25,7 @@ the library is configured with the
 
 .. note::
 
-   In Clang<7, :cpp:type:`__float128` cannot be used in mixed-mode
+   On Clang<7, :cpp:type:`__float128` cannot be used in mixed-mode
    operations with ``long double``. Accordingly,
    :cpp:class:`~mppp::real128` will disable interoperability with
    ``long double`` if Clang<7 is being used.
@@ -42,6 +42,15 @@ Like :cpp:type:`__float128`, :cpp:class:`~mppp::real128` is a
 for ``constexpr`` compile-time computations. Additionally, :cpp:class:`~mppp::real128`
 implements as ``constexpr`` constructs a variety of functions which are not ``constexpr``
 for :cpp:type:`__float128`.
+
+.. note::
+
+   The Intel compiler does not implement certain :cpp:type:`__float128`
+   floating-point primitives
+   as constant expressions. As a result, a few :cpp:class:`~mppp::real128`
+   functions which are ``constexpr`` on GCC and Clang are not ``constexpr``
+   when using the Intel compiler. These occurrences are marked in the API
+   reference.
 
 In addition to the features common to all mp++ classes, the :cpp:class:`~mppp::real128` API provides
 a few additional capabilities:

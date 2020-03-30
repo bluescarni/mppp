@@ -252,7 +252,7 @@ struct mod_tester {
         retval %= __int128_t{2};
         REQUIRE((retval == 0));
 #endif
-        // CppInteroperable on the left.
+        // cpp_arithmetic on the left.
         int n = 3;
         n %= integer{2};
         REQUIRE(n == 1);

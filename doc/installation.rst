@@ -11,7 +11,7 @@ at least C++11 (mp++ will also use features from C++14 and C++17,
 if supported by the compiler). The library is regularly tested on
 a comprehensive continuous integration pipeline, which includes:
 
-* various versions of the three major compilers (GCC, Clang and MSVC),
+* various versions of the three major compilers (GCC, Clang and MSVC [#f1]_),
 * various versions of the three major operating systems
   (Linux, Windows and OSX),
 * x86, ARM and PowerPC processors.
@@ -22,7 +22,8 @@ mp++ has the following dependencies:
   the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
 * the `GNU MPFR <https://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support
-  for the ``long double`` type (MPFR 3 or a later version is required);
+  for the ``long double`` type in :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
+  (MPFR 3 or a later version is required);
 * the `Arb <http://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
   used in the implementation of additional special functions for the
   :cpp:class:`~mppp::real` class;
@@ -35,6 +36,11 @@ mp++ has the following dependencies:
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
 installing from source (the minimum required version is 3.3).
+
+.. rubric:: Footnotes
+
+.. [#f1] The Intel compiler is also occasionally tested, but it is not part of the continuous
+     integration setup.
 
 Installation from source
 ------------------------
@@ -60,13 +66,14 @@ path, etc.). The available configuration options are:
   when using MSVC, off by default).
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
-using GCC (all the supported versions) and Clang
-(since version 3.9). When this option is active,
+using GCC (all the supported versions), Clang
+(since version 3.9) and the Intel compiler. When this option is active,
 mp++ needs access at build time to both the quadmath header
 ``quadmath.h`` and the quadmath library
 ``libquadmath.so``, which may be installed in
 non-standard locations. While GCC is typically
-able to resolve the correct paths automatically, Clang might need assistance
+able to resolve the correct paths automatically, the other compilers
+might need assistance
 in order to identify the correct locations of these files.
 
 To build mp++, you can run the following CMake command from the
@@ -125,6 +132,7 @@ to add ``conda-forge`` to the channels:
 .. code-block:: console
 
    $ conda config --add channels conda-forge
+   $ conda config --set channel_priority strict
    $ conda install mppp
 
 (note that the `conda package <https://anaconda.org/conda-forge/mppp>`__ for mp++ is named ``mppp`` rather than ``mp++``)
@@ -249,6 +257,22 @@ Visual Studio:
   of the dynamic runtime when building mp++ as a static library by
   turning on the ``MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME``
   advanced CMake option.
+
+Clang:
+
+* On Clang<7, :cpp:type:`__float128` cannot be used in mixed-mode
+  operations with ``long double``. Accordingly,
+  :cpp:class:`~mppp::real128` will disable interoperability with
+  ``long double`` if Clang<7 is being used.
+
+Intel compiler:
+
+* The Intel compiler does not implement certain :cpp:type:`__float128`
+  floating-point primitives
+  as constant expressions. As a result, a few :cpp:class:`~mppp::real128`
+  functions which are ``constexpr`` on GCC and Clang are not ``constexpr``
+  when using the Intel compiler. These occurrences are marked in the API
+  reference.
 
 MinGW:
 

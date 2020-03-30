@@ -48,46 +48,43 @@ namespace mppp
 
 template <typename T, std::size_t SSize>
 using is_rational_interoperable
-    = detail::disjunction<is_cpp_interoperable<T>, std::is_same<T, integer<SSize>>, is_cpp_complex<T>>;
+    = detail::disjunction<is_integer_cpp_arithmetic<T>, std::is_same<T, integer<SSize>>, is_integer_cpp_complex<T>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T, std::size_t SSize>
-#if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RationalInteroperable = is_rational_interoperable<T, SSize>::value;
-#else
-using rational_interoperable_enabler = detail::enable_if_t<is_rational_interoperable<T, SSize>::value, int>;
+MPPP_CONCEPT_DECL rational_interoperable = is_rational_interoperable<T, SSize>::value;
+
 #endif
 
 template <typename T, std::size_t SSize>
-using is_rational_integral_interoperable
-    = detail::disjunction<is_cpp_integral_interoperable<T>, std::is_same<T, integer<SSize>>>;
+using is_rational_integral_interoperable = detail::disjunction<is_cpp_integral<T>, std::is_same<T, integer<SSize>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T, std::size_t SSize>
-#if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
-#else
-using rational_integral_interoperable_enabler
-    = detail::enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int>;
+MPPP_CONCEPT_DECL rational_integral_interoperable = is_rational_integral_interoperable<T, SSize>::value;
+
 #endif
 
 template <typename T, std::size_t SSize>
 using is_rational_cvr_interoperable = is_rational_interoperable<detail::uncvref_t<T>, SSize>;
 
-template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RationalCvrInteroperable = is_rational_cvr_interoperable<T, SSize>::value;
-#else
-using rational_cvr_interoperable_enabler = detail::enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int>;
+
+template <typename T, std::size_t SSize>
+MPPP_CONCEPT_DECL rational_cvr_interoperable = is_rational_cvr_interoperable<T, SSize>::value;
+
 #endif
 
 template <typename T, std::size_t SSize>
 using is_rational_cvr_integral_interoperable = is_rational_integral_interoperable<detail::uncvref_t<T>, SSize>;
 
-template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RationalCvrIntegralInteroperable = is_rational_cvr_integral_interoperable<T, SSize>::value;
-#else
-using rational_cvr_integral_interoperable_enabler
-    = detail::enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int>;
+
+template <typename T, std::size_t SSize>
+MPPP_CONCEPT_DECL rational_cvr_integral_interoperable = is_rational_cvr_integral_interoperable<T, SSize>::value;
+
 #endif
 
 namespace detail
@@ -126,98 +123,10 @@ struct is_same_ssize_rational<rational<SSize>, rational<SSize>> : std::true_type
 // (due to the use of const_cast() within the mpz view machinery).
 template <std::size_t SSize>
 mpq_struct_t get_mpq_view(const rational<SSize> &);
+
 } // namespace detail
 
-/// Multiprecision rational class.
-/**
- * \rststar
- * This class represents arbitrary-precision rationals. Internally, the class stores a pair of
- * :cpp:class:`integers <mppp::integer>` with static size ``SSize`` as the numerator and denominator.
- * Rational numbers are represented in the usual canonical form:
- *
- * * numerator and denominator are coprime,
- * * the denominator is always strictly positive.
- *
- * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
- * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list)
- * and with :cpp:class:`integers <mppp::integer>` with static size ``SSize``,
- * and it provides overloaded :ref:`operators <rational_operators>`. Differently from the builtin types,
- * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
- * from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
- *
- * .. code-block:: c++
- *
- *    rational<1> q = 5;
- *    int m = q;
- *
- * will not work, and direct initialization should be used instead:
- *
- * .. code-block:: c++
- *
- *    rational<1> q{5};
- *    int m{q};
- *
- * Most of the functionality is exposed via plain :ref:`functions <rational_functions>`, with the
- * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpq_``
- * prefix. For instance, the GMP call
- *
- * .. code-block:: c++
- *
- *    mpq_add(rop,a,b);
- *
- * that writes the result of ``a + b`` into ``rop`` becomes simply
- *
- * .. code-block:: c++
- *
- *    add(rop,a,b);
- *
- * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
- * are allowed, unless noted otherwise. In a similar way to the :cpp:class:`~mppp::integer` class, various convenience
- * overloads are provided for the same functionality. For instance, here are three possible ways of computing the
- * absolute value:
- *
- * .. code-block:: c++
- *
- *    rational<1> q1, q2, q{-5};
- *    abs(q1,q);   // Binary abs(): computes and stores the absolute value
- *                 // of q into q1.
- *    q2 = abs(q); // Unary abs(): returns the absolute value of q, which is
- *                 // then assigned to q2.
- *    q.abs();     // Member function abs(): replaces the value of q with its
- *                 // absolute value.
- *
- * Various :ref:`overloaded operators <rational_operators>` are provided.
- * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
- * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
- * is a C++ integral or an :cpp:class:`~mppp::integer`, the result will be of type :cpp:class:`~mppp::rational`, if the
- * other argument is a C++ floating-point the result will be of the same floating-point type. For example:
- *
- * .. code-block:: c++
- *
- *    rational<1> q1{1}, q2{2};
- *    integer<1> n{2};
- *    auto res1 = q1 + q2; // res1 is a rational
- *    auto res2 = q1 * 2; // res2 is a rational
- *    auto res3 = q1 * n; // res3 is a rational
- *    auto res4 = 2 - q2; // res4 is a rational
- *    auto res5 = q1 / 2.f; // res5 is a float
- *    auto res6 = 12. / q1; // res6 is a double
- *
- * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
- * before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
- * promoted to :cpp:class:`~mppp::rational` if no floating-point types are involved, otherwise they are promoted to the
- * type of the floating-point argument).
- *
- * The :cpp:class:`~mppp::rational` class allows to access and manipulate directly the numerator and denominator
- * via the :cpp:func:`~mppp::rational::get_num()`, :cpp:func:`~mppp::rational::get_den()`,
- * :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` member functions, so that it is
- * possible to use :cpp:class:`~mppp::integer` functions directly on numerator and denominator. The mutable getters'
- * names :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` are prefixed with an
- * underscore ``_`` to highlight their potentially dangerous nature: it is the user's responsibility to ensure that the
- * canonical form of the rational is preserved after altering the numerator and/or the denominator via the mutable
- * getters.
- * \endrststar
- */
+// Multiprecision rational class.
 // NOTEs:
 // - not clear if the NewRop flag helps at all. Needs to be benchmarked. If it does, its usage could
 //   be expanded in mul/div.
@@ -230,33 +139,15 @@ template <std::size_t SSize>
 class rational
 {
 public:
-    /// Underlying integral type.
-    /**
-     * \rststar
-     * This is the :cpp:class:`~mppp::integer` type used for the representation of numerator and
-     * denominator.
-     * \endrststar
-     */
-#if defined(MPPP_DOXYGEN_INVOKED)
-    typedef integer<SSize> int_t;
-#else
+    // Underlying integral type.
     using int_t = integer<SSize>;
-#endif
-    /// Alias for the template parameter \p SSize.
+    // Alias for the template parameter SSize.
     static constexpr std::size_t ssize = SSize;
-    /// Default constructor.
-    /**
-     * The default constructor will initialize ``this`` to 0 (represented as 0/1).
-     */
+    // Default constructor.
     rational() : m_den(1u) {}
-    /// Defaulted copy constructor.
+    // Defaulted copy constructor.
     rational(const rational &) = default;
-    /// Move constructor.
-    /**
-     * The move constructor will leave \p other in an unspecified but valid state.
-     *
-     * @param other the construction argument.
-     */
+    // Move constructor.
     rational(rational &&other) noexcept : m_num(std::move(other.m_num)), m_den(std::move(other.m_den))
     {
         // NOTE: the aim of this is to have other in a valid state. One reason is that,
@@ -333,53 +224,18 @@ private:
     }
 
 public:
-    /// Generic constructor.
-    /**
-     * \rststar
-     * This constructor will initialize a rational with the value ``x``. The construction will fail if either:
-     * * ``x`` is a non-finite floating-point value, or,
-     * * ``x`` is a complex value whose imaginary part is not zero
-     *   or whose real part is not finite.
-     * \endrststar
-     *
-     * @param x the value that will be used to initialize \p this.
-     *
-     * @throws std::domain_error if \p x is a non-finite floating-point value, or
-     * a complex value with non-zero imaginary part or non-finite real part.
-     */
+    // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RationalCvrInteroperable<SSize> T>
+    template <rational_cvr_interoperable<SSize> T>
 #else
-    template <typename T, rational_cvr_interoperable_enabler<T, SSize> = 0>
+    template <typename T, detail::enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int> = 0>
 #endif
     explicit rational(T &&x) : rational(ptag{}, std::forward<T>(x))
     {
     }
-    /// Constructor from numerator and denominator.
-    /**
-     * \rststar
-     * This constructor is enabled only if both ``T`` and ``U`` satisfy the
-     * :cpp:concept:`~mppp::RationalCvrIntegralInteroperable` concept. The input value ``n`` will be used to initialise
-     * the numerator, while ``d`` will be used to initialise the denominator. If ``make_canonical`` is ``true`` (the
-     * default), then :cpp:func:`~mppp::rational::canonicalise()` will be called after the construction of numerator and
-     * denominator.
-     *
-     * .. warning::
-     *
-     *    If this constructor is called with ``make_canonical`` set to ``false``, it will be the user's responsibility
-     *    to ensure that ``this`` is canonicalised before using it with other mp++ functions. Failure to do
-     *    so will result in undefined behaviour.
-     * \endrststar
-     *
-     * @param n the numerator.
-     * @param d the denominator.
-     * @param make_canonical if \p true, the rational will be canonicalised after the construction
-     * of numerator and denominator.
-     *
-     * @throws zero_division_error if the denominator is zero.
-     */
+    // Constructor from numerator and denominator.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RationalCvrIntegralInteroperable<SSize> T, RationalCvrIntegralInteroperable<SSize> U>
+    template <rational_cvr_integral_interoperable<SSize> T, rational_cvr_integral_interoperable<SSize> U>
 #else
     template <typename T, typename U,
               detail::enable_if_t<detail::conjunction<is_rational_cvr_integral_interoperable<T, SSize>,
@@ -428,46 +284,16 @@ private:
 #endif
 
 public:
-    /// Constructor from string.
-    /**
-     * \rststar
-     * This constructor will initialize ``this`` from the :cpp:concept:`~mppp::StringType` ``s``, which must represent
-     * a rational value in base ``base``. The expected format is either a numerator-denominator pair separated
-     * by the division operator ``/``, or just a numerator (in which case the denominator will be set to one).
-     * The format for numerator and denominator is described in the documentation of the constructor from string
-     * of :cpp:class:`~mppp::integer`.
-     * \endrststar
-     *
-     * @param s the input string.
-     * @param base the base used in the string representation.
-     *
-     * @throws zero_division_error if the denominator is zero.
-     * @throws unspecified any exception thrown by the string constructor of mppp::integer, or by
-     * memory errors in standard containers.
-     */
+    // Constructor from string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     explicit rational(const T &s, int base = 10) : rational(ptag{}, s, base)
     {
     }
-    /// Constructor from range of characters.
-    /**
-     * This constructor will initialise \p this from the content of the input half-open range,
-     * which is interpreted as the string representation of a rational in base \p base.
-     *
-     * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from string.
-     *
-     * @param begin the begin of the input range.
-     * @param end the end of the input range.
-     * @param base the base used in the string representation.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, or by
-     * memory errors in standard containers.
-     */
+    // Constructor from range of characters.
     explicit rational(const char *begin, const char *end, int base = 10) : m_den(1u)
     {
         // Copy the range into a local buffer.
@@ -476,80 +302,19 @@ public:
         buffer.emplace_back('\0');
         dispatch_c_string_ctor(buffer.data(), base);
     }
-    /// Constructor from \p mpz_t.
-    /**
-     * This constructor will initialise the numerator of \p this with the input GMP integer \p n,
-     * and the denominator to 1.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     */
+    // Constructor from mpz_t.
     explicit rational(const ::mpz_t n) : m_num(n), m_den(1u) {}
-    /// Copy constructor from \p mpq_t.
-    /**
-     * This constructor will initialise the numerator and denominator of \p this with those of the GMP rational \p q.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``q`` results in undefined behaviour.
-     *
-     *    This constructor will **not**
-     *    canonicalise ``this``: numerator and denominator are constructed as-is from ``q``.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     */
+    // Constructor from mpq_t.
     explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q)) {}
 #if !defined(_MSC_VER)
-    /// Move constructor from \p mpq_t.
-    /**
-     * This constructor will move the numerator and denominator of the GMP rational \p q into \p this.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``q`` results in undefined behaviour.
-     *
-     *    This constructor will **not**
-     *    canonicalise ``this``: numerator and denominator are constructed as-is from ``q``.
-     *
-     *    The user must ensure that, after construction, ``mpq_clear()`` is never
-     *    called on ``q``: the resources previously owned by ``q`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     *
-     * .. note::
-     *
-     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     */
+    // Move constructor from \p mpq_t.
     explicit rational(::mpq_t &&q) : m_num(::mpz_t{*mpq_numref(q)}), m_den(::mpz_t{*mpq_denref(q)}) {}
 #endif
-    /// Defaulted copy-assignment operator.
-    /**
-     * @return a reference to ``this``.
-     */
+    // Copy-assignment operator.
     // NOTE: as long as copy assignment of integer cannot
     // throw, the default is good.
     rational &operator=(const rational &) = default;
-    /// Defaulted move assignment operator.
-    /**
-     * After the assignment, \p other is left in an unspecified but valid state.
-     *
-     * @param other the assignment argument.
-     *
-     * @return a reference to ``this``.
-     */
+    // Move assignment operator.
     rational &operator=(rational &&other) noexcept
     {
         // NOTE: see the rationale in the move ctor about why we don't want
@@ -581,22 +346,11 @@ private:
     }
 
 public:
-    /// Generic assignment operator.
-    /**
-     * \rststar
-     * This operator will assign ``x`` to ``this``.
-     * \endrststar
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to ``this``.
-     *
-     * @throws unspecified any exception thrown by the generic constructor.
-     */
+    // Generic assignment operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RationalCvrInteroperable<SSize> T>
+    template <rational_cvr_interoperable<SSize> T>
 #else
-    template <typename T, rational_cvr_interoperable_enabler<T, SSize> = 0>
+    template <typename T, detail::enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int> = 0>
 #endif
     rational &operator=(T &&x)
     {
@@ -604,81 +358,24 @@ public:
                             std::integral_constant<bool, is_rational_cvr_integral_interoperable<T, SSize>::value>{});
         return *this;
     }
-    /// Assignment from string.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = rational{s};
-     *
-     * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
-     * \endrststar
-     *
-     * @param s the string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string.
-     */
+    // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     rational &operator=(const T &s)
     {
         return *this = rational{s};
     }
-    /// Assignment from \p mpz_t.
-    /**
-     * \rststar
-     * This assignment operator will copy into the numerator of ``this`` the value of the GMP integer ``n``,
-     * and it will set the denominator to 1 via :cpp:func:`mppp::integer::set_one()`.
-     *
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     *
-     *    No aliasing is allowed:
-     *    the data in ``n`` must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of
-     *    the numerator of ``this`` then it might point to internal data of ``this``, and the behaviour of this operator
-     *    will thus be undefined).
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     *
-     * @return a reference to \p this.
-     */
+    // Assignment from mpz_t.
     rational &operator=(const ::mpz_t n)
     {
         m_num = n;
         m_den.set_one();
         return *this;
     }
-    /// Copy assignment from \p mpq_t.
-    /**
-     * This assignment operator will copy into \p this the value of the GMP rational \p q.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``q`` results in undefined behaviour.
-     *
-     *    This operator will **not** canonicalise
-     *    the assigned value: numerator and denominator are assigned as-is from ``q``.
-     *
-     *    No aliasing is allowed:
-     *    the data in ``q`` must be completely distinct from the data in ``this``.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     *
-     * @return a reference to \p this.
-     */
+    // Assignment from mpq_t.
     rational &operator=(const ::mpq_t q)
     {
         m_num = mpq_numref(q);
@@ -686,35 +383,7 @@ public:
         return *this;
     }
 #if !defined(_MSC_VER)
-    /// Move assignment from \p mpq_t.
-    /**
-     * This assignment operator will move the GMP rational \p q into \p this.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``q`` results in undefined behaviour.
-     *
-     *    This operator will **not** canonicalise
-     *    the assigned value: numerator and denominator are assigned as-is from ``q``.
-     *
-     *    No aliasing is allowed:
-     *    the data in ``q`` must be completely distinct from the data in ``this``.
-     *
-     *    The user must ensure that, after the assignment, ``mpq_clear()`` is never
-     *    called on ``q``: the resources previously owned by ``q`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     *
-     * .. note::
-     *
-     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     *
-     * @return a reference to \p this.
-     */
+    // Move assignment from mpq_t.
     rational &operator=(::mpq_t &&q)
     {
         m_num = ::mpz_t{*mpq_numref(q)};
@@ -722,21 +391,7 @@ public:
         return *this;
     }
 #endif
-    /// Convert to string.
-    /**
-     * \rststar
-     * This operator will return a string representation of ``this`` in base ``base``.
-     * The string format consists of the numerator, followed by the division operator ``/`` and the
-     * denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be
-     * represented in the returned string.
-     * \endrststar
-     *
-     * @param base the desired base for the string representation.
-     *
-     * @return a string representation for ``this``.
-     *
-     * @throws unspecified any exception thrown by mppp::integer::to_string().
-     */
+    // Convert to string.
     std::string to_string(int base = 10) const
     {
         if (m_den.is_one()) {
@@ -794,26 +449,11 @@ private:
     }
 
 public:
-    /// Generic conversion operator.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::RationalInteroperable` type.
-     * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
-     * ``true`` otherwise. Conversion to other integral types and to :cpp:type:`~mppp::rational::int_t`
-     * yields the result of the truncated division of the numerator by the denominator, if representable by the target
-     * :cpp:concept:`~mppp::RationalInteroperable` type. Conversion to floating-point and complex types
-     * might yield inexact values and infinities.
-     * \endrststar
-     *
-     * @return \p this converted to the target type.
-     *
-     * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be
-     * represented by it.
-     */
+    // Generic conversion operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RationalInteroperable<SSize> T>
+    template <rational_interoperable<SSize> T>
 #else
-    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+    template <typename T, detail::enable_if_t<is_rational_interoperable<T, SSize>::value, int> = 0>
 #endif
     explicit operator T() const
     {
@@ -844,100 +484,37 @@ private:
     }
 
 public:
-    /// Generic conversion member function.
-    /**
-     * \rststar
-     * This member function, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into ``rop``. Differently
-     * from the conversion operator, this member function does not raise any exception: if the conversion is successful,
-     * the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
-     * fails, ``rop`` will not be altered.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
-     * a C++ integral which cannot represent the truncated value of ``this``.
-     */
+    // Generic conversion member function.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RationalInteroperable<SSize> T>
+    template <rational_interoperable<SSize> T>
 #else
-    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+    template <typename T, detail::enable_if_t<is_rational_interoperable<T, SSize>::value, int> = 0>
 #endif
     bool get(T &rop) const
     {
         return dispatch_get(rop);
     }
-    /// Const numerator getter.
-    /**
-     * @return a const reference to the numerator.
-     */
+    // Const numerator getter.
     const int_t &get_num() const
     {
         return m_num;
     }
-    /// Const denominator getter.
-    /**
-     * @return a const reference to the denominator.
-     */
+    // Const denominator getter.
     const int_t &get_den() const
     {
         return m_den;
     }
-    /// Mutable numerator getter.
-    /**
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that, after changing the numerator
-     *    via this getter, the rational is kept in canonical form.
-     * \endrststar
-     *
-     * @return a mutable reference to the numerator.
-     */
+    // Mutable numerator getter.
     int_t &_get_num()
     {
         return m_num;
     }
-    /// Mutable denominator getter.
-    /**
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that, after changing the denominator
-     *    via this getter, the rational is kept in canonical form.
-     * \endrststar
-     *
-     * @return a mutable reference to the denominator.
-     */
+    // Mutable denominator getter.
     int_t &_get_den()
     {
         return m_den;
     }
-    /// Canonicalise.
-    /**
-     * \rststar
-     * This member function will put ``this`` in canonical form. In particular, this member function
-     * will make sure that:
-     *
-     * * the numerator and denominator are coprime (dividing them by their GCD,
-     *   if necessary),
-     * * the denominator is strictly positive.
-     *
-     * In general, it is not necessary to call explicitly this member function, as the public
-     * API of :cpp:class:`~mppp::rational` ensures that rationals are kept in canonical
-     * form. Calling this member function, however, might be necessary if the numerator and/or denominator
-     * are modified manually, or when constructing/assigning from non-canonical ``mpq_t``
-     * values.
-     *
-     * .. warning::
-     *
-     *    Calling this member function with on a rational with null denominator will
-     *    result in undefined behaviour.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+    // Canonicalise.
     rational &canonicalise()
     {
         if (m_num.is_zero()) {
@@ -963,10 +540,7 @@ public:
         // NOTE: consider attempting demoting num/den. Let's KIS for now.
         return *this;
     }
-    /// Check canonical form.
-    /**
-     * @return \p true if \p this is the canonical form for rational numbers, \p false otherwise.
-     */
+    // Check canonical form.
     bool is_canonical() const
     {
         if (m_num.is_zero()) {
@@ -986,44 +560,24 @@ public:
         gcd(g, m_num, m_den);
         return g.is_one();
     }
-    /// Sign.
-    /**
-     * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
-     */
+    // Sign.
     int sgn() const
     {
         return mppp::sgn(m_num);
     }
-    /// Negate in-place.
-    /**
-     * This member function will set \p this to <tt>-this</tt>.
-     *
-     * @return a reference to \p this.
-     */
+    // Negate in-place.
     rational &neg()
     {
         m_num.neg();
         return *this;
     }
-    /// In-place absolute value.
-    /**
-     * This member function will set \p this to its absolute value.
-     *
-     * @return a reference to \p this.
-     */
+    // In-place absolute value.
     rational &abs()
     {
         m_num.abs();
         return *this;
     }
-    /// In-place inversion.
-    /**
-     * This member function will set \p this to its inverse.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws zero_division_error if \p this is zero.
-     */
+    // In-place inversion.
     rational &inv()
     {
         if (mppp_unlikely(is_zero())) {
@@ -1033,26 +587,17 @@ public:
         detail::fix_den_sign(*this);
         return *this;
     }
-    /// Test if the value is zero.
-    /**
-     * @return \p true if the value represented by \p this is 0, \p false otherwise.
-     */
+    // Test if the value is zero.
     bool is_zero() const
     {
         return mppp::is_zero(m_num);
     }
-    /// Test if the value is one.
-    /**
-     * @return \p true if the value represented by \p this is 1, \p false otherwise.
-     */
+    // Test if the value is one.
     bool is_one() const
     {
         return mppp::is_one(m_num) && mppp::is_one(m_den);
     }
-    /// Test if the value is minus one.
-    /**
-     * @return \p true if the value represented by \p this is -1, \p false otherwise.
-     */
+    // Test if the value is minus one.
     bool is_negative_one() const
     {
         return mppp::is_negative_one(m_num) && mppp::is_one(m_den);
@@ -1128,24 +673,24 @@ struct rational_common_type<integer<SSize>, rational<SSize>> {
 };
 
 template <std::size_t SSize, typename U>
-struct rational_common_type<rational<SSize>, U, enable_if_t<is_cpp_integral_interoperable<U>::value>> {
+struct rational_common_type<rational<SSize>, U, enable_if_t<is_cpp_integral<U>::value>> {
     using type = rational<SSize>;
 };
 
 template <std::size_t SSize, typename T>
-struct rational_common_type<T, rational<SSize>, enable_if_t<is_cpp_integral_interoperable<T>::value>> {
+struct rational_common_type<T, rational<SSize>, enable_if_t<is_cpp_integral<T>::value>> {
     using type = rational<SSize>;
 };
 
 template <std::size_t SSize, typename U>
 struct rational_common_type<
-    rational<SSize>, U, enable_if_t<disjunction<is_cpp_floating_point_interoperable<U>, is_cpp_complex<U>>::value>> {
+    rational<SSize>, U, enable_if_t<disjunction<is_integer_cpp_floating_point<U>, is_integer_cpp_complex<U>>::value>> {
     using type = U;
 };
 
 template <std::size_t SSize, typename T>
 struct rational_common_type<
-    T, rational<SSize>, enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value>> {
+    T, rational<SSize>, enable_if_t<disjunction<is_integer_cpp_floating_point<T>, is_integer_cpp_complex<T>>::value>> {
     using type = T;
 };
 
@@ -1263,71 +808,37 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
 template <typename T, typename U>
 using are_rational_op_types = detail::is_detected<detail::rational_common_t, T, U>;
 
-template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RationalOpTypes = are_rational_op_types<T, U>::value;
-#else
-using rational_op_types_enabler = detail::enable_if_t<are_rational_op_types<T, U>::value, int>;
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL rational_op_types = are_rational_op_types<T, U>::value;
+
 #endif
 
 template <typename T, typename U>
-using are_rational_real_op_types = detail::conjunction<are_rational_op_types<T, U>, detail::negation<is_cpp_complex<T>>,
-                                                       detail::negation<is_cpp_complex<U>>>;
+using are_rational_real_op_types
+    = detail::conjunction<are_rational_op_types<T, U>, detail::negation<is_integer_cpp_complex<T>>,
+                          detail::negation<is_integer_cpp_complex<U>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RationalRealOpTypes = are_rational_real_op_types<T, U>::value;
-#else
-using rational_real_op_types_enabler = detail::enable_if_t<are_rational_real_op_types<T, U>::value, int>;
+MPPP_CONCEPT_DECL rational_real_op_types = are_rational_real_op_types<T, U>::value;
+
 #endif
 
-/** @defgroup rational_conversion rational_conversion
- *  @{
- */
-
-/// Generic conversion function for \link mppp::rational rational\endlink.
-/**
- * \rststar
- * This function will convert the input :cpp:class:`~mppp::rational` ``q`` to a
- * :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into ``rop``.
- * If the conversion is successful, the function
- * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
- * not be altered.
- * \endrststar
- *
- * @param rop the variable which will store the result of the conversion.
- * @param q the input \link mppp::rational rational\endlink.
- *
- * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
- * a C++ integral which cannot represent the truncated value of ``q``.
- */
+// Generic conversion function.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, std::size_t SSize>
-requires RationalInteroperable<T, SSize>
+template <std::size_t SSize, rational_interoperable<SSize> T>
 #else
-template <typename T, std::size_t SSize, rational_interoperable_enabler<T, SSize> = 0>
+template <typename T, std::size_t SSize, detail::enable_if_t<is_rational_interoperable<T, SSize>::value, int> = 0>
 #endif
-    inline bool get(T &rop, const rational<SSize> &q)
+inline bool get(T &rop, const rational<SSize> &q)
 {
     return q.get(rop);
 }
 
-/** @} */
-
-/** @defgroup rational_arithmetic rational_arithmetic
- *  @{
- */
-
-/// Ternary addition.
-/**
- * This function will set \p rop to <tt>op1 + op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition.
 template <std::size_t SSize>
 inline rational<SSize> &add(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -1335,16 +846,7 @@ inline rational<SSize> &add(rational<SSize> &rop, const rational<SSize> &op1, co
     return rop;
 }
 
-/// Ternary subtraction.
-/**
- * This function will set \p rop to <tt>op1 - op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction.
 template <std::size_t SSize>
 inline rational<SSize> &sub(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -1424,16 +926,7 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
 }
 } // namespace detail
 
-/// Ternary multiplication.
-/**
- * This function will set \p rop to <tt>op1 * op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiplication.
 template <std::size_t SSize>
 inline rational<SSize> &mul(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -1441,18 +934,7 @@ inline rational<SSize> &mul(rational<SSize> &rop, const rational<SSize> &op1, co
     return rop;
 }
 
-/// Ternary division.
-/**
- * This function will set \p rop to <tt>op1 / op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- *
- * @throws zero_division_error if \p op2 is zero.
- */
+// Ternary division.
 template <std::size_t SSize>
 inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -1537,15 +1019,7 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
     return rop;
 }
 
-/// Binary negation.
-/**
- * This member function will set \p rop to <tt>-q</tt>.
- *
- * @param rop the return value.
- * @param q the rational that will be negated.
- *
- * @return a reference to \p rop.
- */
+// Binary negation.
 template <std::size_t SSize>
 inline rational<SSize> &neg(rational<SSize> &rop, const rational<SSize> &q)
 {
@@ -1553,12 +1027,7 @@ inline rational<SSize> &neg(rational<SSize> &rop, const rational<SSize> &q)
     return rop.neg();
 }
 
-/// Unary negation.
-/**
- * @param q the rational that will be negated.
- *
- * @return <tt>-q</tt>.
- */
+// Unary negation.
 template <std::size_t SSize>
 inline rational<SSize> neg(const rational<SSize> &q)
 {
@@ -1567,15 +1036,7 @@ inline rational<SSize> neg(const rational<SSize> &q)
     return ret;
 }
 
-/// Binary absolute value.
-/**
- * This function will set \p rop to the absolute value of \p q.
- *
- * @param rop the return value.
- * @param q the argument.
- *
- * @return a reference to \p rop.
- */
+// Binary absolute value.
 template <std::size_t SSize>
 inline rational<SSize> &abs(rational<SSize> &rop, const rational<SSize> &q)
 {
@@ -1583,12 +1044,7 @@ inline rational<SSize> &abs(rational<SSize> &rop, const rational<SSize> &q)
     return rop.abs();
 }
 
-/// Unary absolute value.
-/**
- * @param q the argument.
- *
- * @return the absolute value of \p q.
- */
+// Unary absolute value.
 template <std::size_t SSize>
 inline rational<SSize> abs(const rational<SSize> &q)
 {
@@ -1597,17 +1053,7 @@ inline rational<SSize> abs(const rational<SSize> &q)
     return ret;
 }
 
-/// Binary inversion.
-/**
- * This function will set \p rop to the inverse of \p q.
- *
- * @param rop the return value.
- * @param q the argument.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by mppp::rational::inv().
- */
+// Binary inversion.
 template <std::size_t SSize>
 inline rational<SSize> &inv(rational<SSize> &rop, const rational<SSize> &q)
 {
@@ -1615,14 +1061,7 @@ inline rational<SSize> &inv(rational<SSize> &rop, const rational<SSize> &q)
     return rop.inv();
 }
 
-/// Unary inversion.
-/**
- * @param q the argument.
- *
- * @return the inverse of \p q.
- *
- * @throws unspecified any exception thrown by mppp::rational::inv().
- */
+// Unary inversion.
 template <std::size_t SSize>
 inline rational<SSize> inv(const rational<SSize> &q)
 {
@@ -1630,8 +1069,6 @@ inline rational<SSize> inv(const rational<SSize> &q)
     ret.inv();
     return ret;
 }
-
-/** @} */
 
 namespace detail
 {
@@ -1641,20 +1078,7 @@ MPPP_DLL_PUBLIC std::ostream &rational_stream_operator_impl(std::ostream &, cons
 
 }
 
-/// Output stream operator.
-/**
- * \rststar
- * This operator will print to the stream ``os`` the :cpp:class:`~mppp::rational` ``q`` in base 10.
- * The printing format is described in :cpp:func:`mppp::rational::to_string()`.
- * \endrststar
- *
- * @param os the target stream.
- * @param q the input rational.
- *
- * @return a reference to \p os.
- *
- * @throws unspecified any exception thrown by mppp::rational::to_string().
- */
+// Output stream operator.
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {
@@ -1662,16 +1086,7 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
                                                  q.get_den().is_one());
 }
 
-/** @defgroup rational_operators rational_operators
- *  @{
- */
-
-/// Identity operator.
-/**
- * @param q the rational that will be copied.
- *
- * @return a copy of \p q.
- */
+// Identity operator.
 template <std::size_t SSize>
 inline rational<SSize> operator+(const rational<SSize> &q)
 {
@@ -1708,27 +1123,27 @@ inline rational<SSize> dispatch_binary_add(const integer<SSize> &op1, const rati
     return dispatch_binary_add(op2, op1);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_add(const rational<SSize> &op1, T n)
 {
     return dispatch_binary_add(op1, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_add(T n, const rational<SSize> &op2)
 {
     return dispatch_binary_add(op2, n);
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_add(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) + x;
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_add(T x, const rational<SSize> &op2)
 {
     return dispatch_binary_add(op2, x);
@@ -1736,25 +1151,10 @@ inline T dispatch_binary_add(T x, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Binary addition operator.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is a :cpp:class:`~mppp::rational`.
- *
- * \endrststar
- *
- * @param op1 the first summand.
- * @param op2 the second summand.
- *
- * @return <tt>op1 + op2</tt>.
- */
+// Binary addition operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires RationalOpTypes<T, U> inline auto
+requires rational_op_types<T, U> inline auto
 #else
 inline detail::rational_common_t<T, U>
 #endif
@@ -1783,14 +1183,14 @@ inline void dispatch_in_place_add(rational<SSize> &retval, const integer<SSize> 
     }
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_add(rational<SSize> &retval, const T &n)
 {
     dispatch_in_place_add(retval, integer<SSize>{n});
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_add(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
@@ -1804,21 +1204,12 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
 
 } // namespace detail
 
-/// In-place addition operator.
-/**
- * @param rop the augend.
- * @param op the addend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::rational rational\endlink.
- */
+// In-place addition operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires rational_op_types<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
     inline T &operator+=(T &rop, const U &op)
 {
@@ -1826,14 +1217,7 @@ template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Prefix increment for \link mppp::rational rational\endlink.
-/**
- * This operator will increment \p q by one.
- *
- * @param q the \link mppp::rational rational\endlink that will be increased.
- *
- * @return a reference to \p q after the increment.
- */
+// Prefix increment.
 template <std::size_t SSize>
 inline rational<SSize> &operator++(rational<SSize> &q)
 {
@@ -1841,14 +1225,7 @@ inline rational<SSize> &operator++(rational<SSize> &q)
     return q;
 }
 
-/// Suffix increment for \link mppp::rational rational\endlink.
-/**
- * This operator will increment \p q by one and return a copy of \p q as it was before the increment.
- *
- * @param q the \link mppp::rational rational\endlink that will be increased.
- *
- * @return a copy of \p q before the increment.
- */
+// Suffix increment.
 template <std::size_t SSize>
 inline rational<SSize> operator++(rational<SSize> &q, int)
 {
@@ -1857,12 +1234,7 @@ inline rational<SSize> operator++(rational<SSize> &q, int)
     return retval;
 }
 
-/// Negated copy.
-/**
- * @param q the rational that will be negated.
- *
- * @return a negated copy of \p q.
- */
+// Negated copy.
 template <std::size_t SSize>
 inline rational<SSize> operator-(const rational<SSize> &q)
 {
@@ -1903,13 +1275,13 @@ inline rational<SSize> dispatch_binary_sub(const integer<SSize> &op1, const rati
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_sub(const rational<SSize> &op1, T n)
 {
     return dispatch_binary_sub(op1, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_sub(T n, const rational<SSize> &op2)
 {
     auto retval = dispatch_binary_sub(op2, n);
@@ -1918,14 +1290,14 @@ inline rational<SSize> dispatch_binary_sub(T n, const rational<SSize> &op2)
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_sub(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) - x;
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
 {
     return -dispatch_binary_sub(op2, x);
@@ -1933,25 +1305,10 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Binary subtraction operator.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is a :cpp:class:`~mppp::rational`.
- *
- * \endrststar
- *
- * @param op1 the first operand.
- * @param op2 the second operand.
- *
- * @return <tt>op1 - op2</tt>.
- */
+// Binary subtraction operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires RationalOpTypes<T, U> inline auto
+requires rational_op_types<T, U> inline auto
 #else
 inline detail::rational_common_t<T, U>
 #endif
@@ -1980,14 +1337,14 @@ inline void dispatch_in_place_sub(rational<SSize> &retval, const integer<SSize> 
     }
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_sub(rational<SSize> &retval, const T &n)
 {
     dispatch_in_place_sub(retval, integer<SSize>{n});
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_sub(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) - x;
@@ -2001,21 +1358,12 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
 
 } // namespace detail
 
-/// In-place subtraction operator.
-/**
- * @param rop the minuend.
- * @param op the subtrahend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::rational rational\endlink.
- */
+// In-place subtraction operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires rational_op_types<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
     inline T &operator-=(T &rop, const U &op)
 {
@@ -2023,14 +1371,7 @@ template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
     return rop;
 }
 
-/// Prefix decrement for \link mppp::rational rational\endlink.
-/**
- * This operator will decrement \p q by one.
- *
- * @param q the \link mppp::rational rational\endlink that will be decreased.
- *
- * @return a reference to \p q after the decrement.
- */
+// Prefix decrement.
 template <std::size_t SSize>
 inline rational<SSize> &operator--(rational<SSize> &q)
 {
@@ -2038,14 +1379,7 @@ inline rational<SSize> &operator--(rational<SSize> &q)
     return q;
 }
 
-/// Suffix decrement for \link mppp::rational rational\endlink.
-/**
- * This operator will decrement \p q by one and return a copy of \p q as it was before the decrement.
- *
- * @param q the \link mppp::rational rational\endlink that will be decreased.
- *
- * @return a copy of \p q before the decrement.
- */
+// Suffix decrement.
 template <std::size_t SSize>
 inline rational<SSize> operator--(rational<SSize> &q, int)
 {
@@ -2095,27 +1429,27 @@ inline rational<SSize> dispatch_binary_mul(const integer<SSize> &op1, const rati
     return dispatch_binary_mul(op2, op1);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_mul(const rational<SSize> &op1, T n)
 {
     return dispatch_binary_mul(op1, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_mul(T n, const rational<SSize> &op2)
 {
     return dispatch_binary_mul(op2, n);
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_mul(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) * x;
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
 {
     return dispatch_binary_mul(op2, x);
@@ -2123,25 +1457,10 @@ inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Binary multiplication operator.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is a :cpp:class:`~mppp::rational`.
- *
- * \endrststar
- *
- * @param op1 the first factor.
- * @param op2 the second factor.
- *
- * @return <tt>op1 * op2</tt>.
- */
+// Binary multiplication operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires RationalOpTypes<T, U> inline auto
+requires rational_op_types<T, U> inline auto
 #else
 inline detail::rational_common_t<T, U>
 #endif
@@ -2182,14 +1501,14 @@ inline void dispatch_in_place_mul(rational<SSize> &retval, const integer<SSize> 
     }
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_mul(rational<SSize> &retval, const T &n)
 {
     dispatch_in_place_mul(retval, integer<SSize>{n});
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_mul(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) * x;
@@ -2203,21 +1522,12 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
 
 } // namespace detail
 
-/// In-place multiplication operator.
-/**
- * @param rop the multiplicand.
- * @param op the multiplicator.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::rational rational\endlink.
- */
+// In-place multiplication operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires rational_op_types<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
     inline T &operator*=(T &rop, const U &op)
 {
@@ -2302,27 +1612,27 @@ inline rational<SSize> dispatch_binary_div(const integer<SSize> &op1, const rati
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_div(const rational<SSize> &op1, T n)
 {
     return dispatch_binary_div(op1, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_div(T n, const rational<SSize> &op2)
 {
     return dispatch_binary_div(integer<SSize>{n}, op2);
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_div(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) / x;
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_div(T x, const rational<SSize> &op2)
 {
     return x / static_cast<T>(op2);
@@ -2330,27 +1640,10 @@ inline T dispatch_binary_div(T x, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Binary division operator.
-/**
- * \rststar
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
- *   type of the result is floating-point or complex; otherwise,
- * * the type of the result is a :cpp:class:`~mppp::rational`.
- *
- * \endrststar
- *
- * @param op1 the dividend.
- * @param op2 the divisor.
- *
- * @return <tt>op1 / op2</tt>.
- *
- * @throws zero_division_error if the division does not involve floating-point types and \p op2 is zero.
- */
+// Binary division operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires RationalOpTypes<T, U> inline auto
+requires rational_op_types<T, U> inline auto
 #else
 inline detail::rational_common_t<T, U>
 #endif
@@ -2398,14 +1691,14 @@ inline void dispatch_in_place_div(rational<SSize> &retval, const integer<SSize> 
     fix_den_sign(retval);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_div(rational<SSize> &retval, const T &n)
 {
     dispatch_in_place_div(retval, integer<SSize>{n});
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_div(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) / x;
@@ -2419,22 +1712,12 @@ inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
 
 } // namespace detail
 
-/// In-place division operator.
-/**
- * @param rop the dividend.
- * @param op the divisor.
- *
- * @return a reference to \p rop.
- *
- * @throws zero_division_error if \p op is zero and only integral types are involved in the division.
- * @throws unspecified any exception thrown by the assignment/conversion operators
- * of \link mppp::rational rational\endlink.
- */
+// In-place division operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires rational_op_types<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
     inline T &operator/=(T &rop, const U &op)
 {
@@ -2464,14 +1747,14 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
 {
     return static_cast<T>(op1) == op2;
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 {
     return dispatch_equality(op2, op1);
@@ -2479,36 +1762,24 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 
 } // namespace detail
 
-/// Equality operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
- */
+// Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires rational_op_types<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator==(const T &op1, const U &op2)
 {
     return detail::dispatch_equality(op1, op2);
 }
 
-/// Inequality operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
- */
+// Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires rational_op_types<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator!=(const T &op1, const U &op2)
 {
@@ -2537,22 +1808,22 @@ inline bool dispatch_less_than(const integer<SSize> &a, const rational<SSize> &b
     return cmp(a, b) < 0;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline bool dispatch_less_than(const rational<SSize> &a, T n)
 {
     return dispatch_less_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 bool dispatch_less_than(T, const rational<SSize> &);
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int> = 0>
 inline bool dispatch_less_than(const rational<SSize> &a, T x)
 {
     return static_cast<T>(a) < x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int> = 0>
 inline bool dispatch_less_than(T, const rational<SSize> &);
 
 // Greater-than operator.
@@ -2574,130 +1845,93 @@ inline bool dispatch_greater_than(const integer<SSize> &a, const rational<SSize>
     return cmp(a, b) > 0;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline bool dispatch_greater_than(const rational<SSize> &a, T n)
 {
     return dispatch_greater_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline bool dispatch_greater_than(T n, const rational<SSize> &a)
 {
     return dispatch_less_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int> = 0>
 inline bool dispatch_greater_than(const rational<SSize> &a, T x)
 {
     return static_cast<T>(a) > x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int> = 0>
 inline bool dispatch_greater_than(T x, const rational<SSize> &a)
 {
     return dispatch_less_than(a, x);
 }
 
 // Implement them here, as we need visibility of dispatch_greater_than().
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int>>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int>>
 inline bool dispatch_less_than(T n, const rational<SSize> &a)
 {
     return dispatch_greater_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int>>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int>>
 inline bool dispatch_less_than(T x, const rational<SSize> &a)
 {
     return dispatch_greater_than(a, x);
 }
 } // namespace detail
 
-/// Less-than operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
- */
+// Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalRealOpTypes<T, U>
+requires rational_real_op_types<T, U>
 #else
-template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator<(const T &op1, const U &op2)
 {
     return detail::dispatch_less_than(op1, op2);
 }
 
-/// Less-than or equal operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
- */
+// Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalRealOpTypes<T, U>
+requires rational_real_op_types<T, U>
 #else
-template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator<=(const T &op1, const U &op2)
 {
     return !(op1 > op2);
 }
 
-/// Greater-than operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
- */
+// Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalRealOpTypes<T, U>
+requires rational_real_op_types<T, U>
 #else
-template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator>(const T &op1, const U &op2)
 {
     return detail::dispatch_greater_than(op1, op2);
 }
 
-/// Greater-than or equal operator.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
- */
+// Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalRealOpTypes<T, U>
+requires rational_real_op_types<T, U>
 #else
-template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_rational_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator>=(const T &op1, const U &op2)
 {
     return !(op1 < op2);
 }
 
-/** @} */
-
-/** @defgroup rational_comparison rational_comparison
- *  @{
- */
-
-/// Comparison function for rationals.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
- * <tt>op1 > op2</tt>.
- */
+// Comparison function for rationals.
 template <std::size_t SSize>
 inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -2715,14 +1949,7 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
     return ::mpq_cmp(&v1, &v2);
 }
 
-/// Comparison function for rational/integer arguments.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
- * <tt>op1 > op2</tt>.
- */
+// Comparison function for rational/integer arguments.
 template <std::size_t SSize>
 inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
 {
@@ -2732,14 +1959,7 @@ inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
     return mpq_cmp_z(&v1, op2.get_mpz_view());
 }
 
-/// Comparison function for integer/rational arguments.
-/**
- * @param op1 first argument.
- * @param op2 second argument.
- *
- * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
- * <tt>op1 > op2</tt>.
- */
+// Comparison function for integer/rational arguments.
 template <std::size_t SSize>
 inline int cmp(const integer<SSize> &op1, const rational<SSize> &op2)
 {
@@ -2752,59 +1972,33 @@ inline int cmp(const integer<SSize> &op1, const rational<SSize> &op2)
     return -detail::integral_sign(cmp(op2, op1));
 }
 
-/// Sign function.
-/**
- * @param q the rational whose sign will be computed.
- *
- * @return 0 if \p q is zero, 1 if \p q is positive, -1 if \p q is negative.
- */
+// Sign function.
 template <std::size_t SSize>
 int sgn(const rational<SSize> &q)
 {
     return q.sgn();
 }
 
-/// Test if a rational is one.
-/**
- * @param q the rational to be tested.
- *
- * @return \p true if \p q is 1, \p false otherwise.
- */
+// Test if a rational is one.
 template <std::size_t SSize>
 inline bool is_one(const rational<SSize> &q)
 {
     return q.is_one();
 }
 
-/// Test if a rational is minus one.
-/**
- * @param q the rational to be tested.
- *
- * @return \p true if \p q is -1, \p false otherwise.
- */
+// Test if a rational is minus one.
 template <std::size_t SSize>
 inline bool is_negative_one(const rational<SSize> &q)
 {
     return q.is_negative_one();
 }
 
-/// Test if a rational is zero.
-/**
- * @param q the rational to be tested.
- *
- * @return \p true if \p q is 0, \p false otherwise.
- */
+// Test if a rational is zero.
 template <std::size_t SSize>
 inline bool is_zero(const rational<SSize> &q)
 {
     return q.is_zero();
 }
-
-/** @} */
-
-/** @defgroup rational_ntheory rational_ntheory
- *  @{
- */
 
 namespace detail
 {
@@ -2845,41 +2039,20 @@ inline rational<SSize> rational_binomial_impl(const rational<SSize> &t, const T 
 {
     return rational_binomial_impl(t, integer<SSize>{b});
 }
+
 } // namespace detail
 
-/// Binomial coefficient for \link mppp::rational rational\endlink.
-/**
- * \rststar
- * This function will compute the binomial coefficient :math:`{x \choose y}`. If ``x``
- * represents an integral value, the calculation is forwarded to the implementation of
- * the binomial coefficient for :cpp:class:`~mppp::integer`. Otherwise, an implementation
- * based on the falling factorial is employed.
- * \endrststar
- *
- * @param x the top value.
- * @param y the bottom value.
- *
- * @return \f$ {x \choose y} \f$.
- *
- * @throws unspecified any exception thrown by the implementation of
- * the binomial coefficient for \link mppp::integer integer\endlink.
- */
+// Binomial coefficient.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize, typename T>
-requires RationalIntegralInteroperable<T, SSize> inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
+template <std::size_t SSize, rational_integral_interoperable<SSize> T>
 #else
-template <std::size_t SSize, typename T, rational_integral_interoperable_enabler<T, SSize> = 0>
-inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
+template <std::size_t SSize, typename T,
+          detail::enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
 #endif
+inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
 {
     return detail::rational_binomial_impl(x, y);
 }
-
-/** @} */
-
-/** @defgroup rational_exponentiation rational_exponentiation
- *  @{
- */
 
 namespace detail
 {
@@ -2949,7 +2122,7 @@ inline rational<SSize> pow_impl(const T &base, const rational<SSize> &exp)
 
 // Rational base, fp/complex exponent.
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T pow_impl(const rational<SSize> &base, const T &exp)
 {
     return std::pow(static_cast<T>(base), exp);
@@ -2957,7 +2130,7 @@ inline T pow_impl(const rational<SSize> &base, const T &exp)
 
 // Fp/complex base, rational exponent.
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T pow_impl(const T &base, const rational<SSize> &exp)
 {
     return std::pow(base, static_cast<T>(exp));
@@ -2965,75 +2138,27 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
 
 } // namespace detail
 
-/// Binary exponentiation.
-/**
- * \rststar
- * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
- * is a floating-point or complex value, then the result will be computed via ``std::pow()`` and it will also be a
- * floating-point or complex value. Otherwise, the result will be a :cpp:class:`~mppp::rational`.
- *
- * When floating-point and complex types are not involved, the implementation is based on the integral exponentiation
- * of numerator and denominator. Thus, if ``exp`` is a rational value, the exponentiation will be successful
- * only in a few special cases (e.g., unitary base, zero exponent, etc.).
- * \endrststar
- *
- * @param base the base.
- * @param exp the exponent.
- *
- * @return <tt>base**exp</tt>.
- *
- * @throws zero_division_error if floating-point or complex types are not involved, \p base is zero and \p exp is
- * negative.
- * @throws std::domain_error if floating-point or complex types are not involved and \p exp is a rational value (except
- * in a handful of special cases).
- */
+// Binary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline auto pow(const T &base, const U &exp)
+requires rational_op_types<T, U> inline auto
 #else
 template <typename T, typename U>
-inline detail::rational_common_t<T, U> pow(const T &base, const U &exp)
+inline detail::rational_common_t<T, U>
 #endif
+pow(const T &base, const U &exp)
 {
     return detail::pow_impl(base, exp);
 }
 
-/** @} */
-
-/** @defgroup rational_other rational_other
- *  @{
- */
-
-/// Canonicalise.
-/**
- * \rststar
- * This function will put ``rop`` in canonical form. Internally, this function will employ
- * :cpp:func:`mppp::rational::canonicalise()`.
- * \endrststar
- *
- * @param rop the rational that will be canonicalised.
- *
- * @return a reference to \p rop.
- */
+// Canonicalise.
 template <std::size_t SSize>
 inline rational<SSize> &canonicalise(rational<SSize> &rop)
 {
     return rop.canonicalise();
 }
 
-/// Hash value.
-/**
- * \rststar
- * This function will return a hash value for ``q``.
- *
- * A :ref:`specialisation <rational_std_specialisations>` of the standard ``std::hash`` functor is also provided, so
- * that it is possible to use :cpp:class:`~mppp::rational` in standard unordered associative containers out of the box.
- * \endrststar
- *
- * @param q the rational whose hash value will be computed.
- *
- * @return a hash value for \p q.
- */
+// Hash value.
 template <std::size_t SSize>
 inline std::size_t hash(const rational<SSize> &q)
 {
@@ -3042,8 +2167,6 @@ inline std::size_t hash(const rational<SSize> &q)
     // decent hashing on the rational as well.
     return hash(q.get_num()) + hash(q.get_den());
 }
-
-/** @} */
 
 } // namespace mppp
 
