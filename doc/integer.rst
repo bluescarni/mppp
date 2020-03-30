@@ -474,7 +474,7 @@ The integer class
       :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
         a C++ integral type which cannot represent the value of ``this``.
 
-   .. cpp:function:: template <intger_cpp_complex T> bool get(T &rop) const
+   .. cpp:function:: template <integer_cpp_complex T> bool get(T &rop) const
 
       .. versionadded:: 0.19
 
@@ -1008,7 +1008,7 @@ Arithmetic
 
    .. versionadded:: 0.18
 
-   Binary :cpp:class:`~mppp::integer` squaring.
+   Binary squaring.
 
    This function will set *rop* to the square of *n*.
 
@@ -1021,7 +1021,7 @@ Arithmetic
 
    .. versionadded:: 0.18
 
-   Unary :cpp:class:`~mppp::integer` squaring.
+   Unary squaring.
 
    This function will return the square of *n*.
 
@@ -1033,7 +1033,7 @@ Arithmetic
 
    .. versionadded:: 0.18
 
-   Ternary modular :cpp:class:`~mppp::integer` squaring.
+   Ternary modular squaring.
 
    This function will set *rop* to the square of *n* modulo *mod*.
 
@@ -1049,7 +1049,7 @@ Arithmetic
 
    .. versionadded:: 0.18
 
-   Binary modular :cpp:class:`~mppp::integer` squaring.
+   Binary modular squaring.
 
    This function will return the square of *n* modulo *mod*.
 
@@ -1366,7 +1366,7 @@ Exponentiation
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::pow_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &base, unsigned long exp)
 
-   Ternary :cpp:class:`~mppp::integer` exponentiation.
+   Ternary integral exponentiation.
 
    This function will set *rop* to ``base**exp``.
 
@@ -1378,7 +1378,7 @@ Exponentiation
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::pow_ui(const mppp::integer<SSize> &base, unsigned long exp)
 
-   Binary :cpp:class:`~mppp::integer` exponentiation.
+   Binary integral exponentiation.
 
    :param base: the base.
    :param exp: the exponent.
@@ -1387,7 +1387,7 @@ Exponentiation
 
 .. cpp:function:: template <typename T, mppp::integer_op_types<T> U> auto mppp::pow(const T &base, const U &exp)
 
-   Generic binary :cpp:class:`~mppp::integer` exponentiation.
+   Generic binary exponentiation.
 
    This function will raise *base* to the power *exp*, and return the result. If one of the arguments
    is a floating-point or complex value, then the result will be computed via ``std::pow()`` and it will
@@ -1411,7 +1411,7 @@ Roots
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::sqrt(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n)
 
-   Binary :cpp:class:`~mppp::integer` square root.
+   Binary square root.
 
    This function will set *rop* to the truncated integer part of the square root of *n*.
 
@@ -1424,7 +1424,7 @@ Roots
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::sqrt(const mppp::integer<SSize> &n)
 
-   Unary :cpp:class:`~mppp::integer` square root.
+   Unary square root.
 
    This function will return the truncated integer part of the square root of *n*.
 
@@ -1438,7 +1438,7 @@ Roots
 
    .. versionadded:: 0.12
 
-   :cpp:class:`~mppp::integer` square root with remainder.
+   Square root with remainder.
 
    This function will set *rop* to the truncated integer part of the square root of *n*, and *rem* to the remainder of the operation.
    That is, *rem* will be equal to ``n-rop*rop``, and it will be zero if *n* is a perfect square.
