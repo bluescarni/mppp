@@ -175,28 +175,31 @@ MPPP_DLL_PUBLIC void arb_sinc_pi(::mpfr_t, const ::mpfr_t);
 void swap(real &, real &) noexcept;
 
 template <typename T>
-using is_real_interoperable = detail::disjunction<is_cpp_interoperable<T>, detail::is_integer<T>, detail::is_rational<T>
+using is_real_interoperable = detail::disjunction<is_cpp_arithmetic<T>, detail::is_integer<T>, detail::is_rational<T>
 #if defined(MPPP_WITH_QUADMATH)
                                                   ,
                                                   std::is_same<T, real128>
 #endif
                                                   >;
 
-template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RealInteroperable = is_real_interoperable<T>::value;
 
-#else
-using real_interoperable_enabler = detail::enable_if_t<is_real_interoperable<T>::value, int>;
+template <typename T>
+MPPP_CONCEPT_DECL real_interoperable = is_real_interoperable<T>::value;
+
 #endif
 
 #if defined(MPPP_HAVE_CONCEPTS)
+
 template <typename T>
-MPPP_CONCEPT_DECL CvrReal = std::is_same<detail::uncvref_t<T>, real>::value;
+MPPP_CONCEPT_DECL cvr_real = std::is_same<detail::uncvref_t<T>, real>::value;
+
 #else
+
 template <typename... Args>
 using cvr_real_enabler
     = detail::enable_if_t<detail::conjunction<std::is_same<detail::uncvref_t<Args>, real>...>::value, int>;
+
 #endif
 
 // Special initialisation tags for real.
@@ -338,18 +341,18 @@ private:
 public:
     // Generic constructors.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RealInteroperable T>
+    template <real_interoperable T>
 #else
-    template <typename T, real_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
     explicit real(const T &x) : real(ptag{}, detail::real_deduce_precision(x), true)
     {
         dispatch_construction(x);
     }
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RealInteroperable T>
+    template <real_interoperable T>
 #else
-    template <typename T, real_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
     explicit real(const T &x, ::mpfr_prec_t p) : real(ptag{}, check_init_prec(p), true)
     {
@@ -367,7 +370,7 @@ private:
 public:
     // Constructor from string, base and precision.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
     template <typename T, string_type_enabler<T> = 0>
 #endif
@@ -515,9 +518,9 @@ private:
 public:
     // Generic assignment operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RealInteroperable T>
+    template <real_interoperable T>
 #else
-    template <typename T, real_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
     real &operator=(const T &x)
     {
@@ -542,9 +545,9 @@ public:
 
     // Generic setter.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RealInteroperable T>
+    template <real_interoperable T>
 #else
-    template <typename T, real_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
     real &set(const T &x)
     {
@@ -564,7 +567,7 @@ private:
 public:
     // Setter to string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
     template <typename T, string_type_enabler<T> = 0>
 #endif
@@ -864,9 +867,9 @@ private:
 public:
     // Generic conversion operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RealInteroperable T>
+    template <real_interoperable T>
 #else
-    template <typename T, real_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
     explicit operator T() const
     {
@@ -930,9 +933,9 @@ private:
 public:
     // Generic conversion function.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RealInteroperable T>
+    template <real_interoperable T>
 #else
-    template <typename T, real_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
     bool get(T &rop) const
     {
@@ -1081,19 +1084,14 @@ using are_real_op_types = detail::disjunction<
     detail::conjunction<std::is_same<real, detail::uncvref_t<T>>, is_real_interoperable<detail::uncvref_t<U>>>,
     detail::conjunction<std::is_same<real, detail::uncvref_t<U>>, is_real_interoperable<detail::uncvref_t<T>>>>;
 
-template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RealOpTypes = are_real_op_types<T, U>::value;
-#else
-using real_op_types_enabler = detail::enable_if_t<are_real_op_types<T, U>::value, int>;
-#endif
 
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RealInPlaceOpTypes = RealOpTypes<T, U> && !std::is_const<detail::unref_t<T>>::value;
-#else
-using real_in_place_op_types_enabler = detail::enable_if_t<
-    detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value, int>;
+MPPP_CONCEPT_DECL real_op_types = are_real_op_types<T, U>::value;
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL real_in_place_op_types = real_op_types<T, U> && !std::is_const<detail::unref_t<T>>::value;
+
 #endif
 
 // Destructively set the precision.
@@ -1121,18 +1119,18 @@ template <typename... Args>
 using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &>()...));
 }
 
-template <typename... Args>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
-#else
-using real_set_args_enabler = detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int>;
+
+template <typename... Args>
+MPPP_CONCEPT_DECL real_set_args = detail::is_detected<detail::real_set_t, Args...>::value;
+
 #endif
 
 // Generic setter.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <RealSetArgs... Args>
+template <real_set_args... Args>
 #else
-template <typename... Args, real_set_args_enabler<Args...> = 0>
+template <typename... Args, detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int> = 0>
 #endif
 inline real &set(real &r, const Args &... args)
 {
@@ -1173,9 +1171,9 @@ inline void swap(real &a, real &b) noexcept
 
 // Generic conversion function.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <RealInteroperable T>
+template <real_interoperable T>
 #else
-template <typename T, real_interoperable_enabler<T> = 0>
+template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
 inline bool get(T &rop, const real &x)
 {
@@ -1385,7 +1383,7 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
     }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-#define MPPP_REAL_MPFR_UNARY_HEADER template <CvrReal T>
+#define MPPP_REAL_MPFR_UNARY_HEADER template <cvr_real T>
 #else
 #define MPPP_REAL_MPFR_UNARY_HEADER template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1408,7 +1406,7 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
 
 // Ternary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -1419,7 +1417,7 @@ inline real &add(real &rop, T &&a, U &&b)
 
 // Ternary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -1430,7 +1428,7 @@ inline real &sub(real &rop, T &&a, U &&b)
 
 // Ternary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -1441,7 +1439,7 @@ inline real &mul(real &rop, T &&a, U &&b)
 
 // Ternary division.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -1452,7 +1450,7 @@ inline real &div(real &rop, T &&a, U &&b)
 
 // Quaternary fused multiply–add.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U, CvrReal V>
+template <cvr_real T, cvr_real U, cvr_real V>
 #else
 template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
@@ -1464,7 +1462,7 @@ inline real &fma(real &rop, T &&a, U &&b, V &&c)
 
 // Quaternary fused multiply–sub.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U, CvrReal V>
+template <cvr_real T, cvr_real U, cvr_real V>
 #else
 template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
@@ -1476,7 +1474,7 @@ inline real &fms(real &rop, T &&a, U &&b, V &&c)
 
 // Ternary fused multiply–add.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U, CvrReal V>
+template <cvr_real T, cvr_real U, cvr_real V>
 #else
 template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
@@ -1488,7 +1486,7 @@ inline real fma(T &&a, U &&b, V &&c)
 
 // Ternary fused multiply–sub.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U, CvrReal V>
+template <cvr_real T, cvr_real U, cvr_real V>
 #else
 template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
@@ -1500,7 +1498,7 @@ inline real fms(T &&a, U &&b, V &&c)
 
 // Binary negation.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1511,7 +1509,7 @@ inline real &neg(real &rop, T &&x)
 
 // Unary negation.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1522,7 +1520,7 @@ inline real neg(T &&x)
 
 // Binary absolute value.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1533,7 +1531,7 @@ inline real &abs(real &rop, T &&x)
 
 // Unary absolute value.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1544,7 +1542,7 @@ inline real abs(T &&x)
 
 // mul2/div2 primitives.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1555,7 +1553,7 @@ inline real mul_2ui(T &&x, unsigned long n)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1566,7 +1564,7 @@ inline real &mul_2ui(real &rop, T &&x, unsigned long n)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1577,7 +1575,7 @@ inline real mul_2si(T &&x, long n)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1588,7 +1586,7 @@ inline real &mul_2si(real &rop, T &&x, long n)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1599,7 +1597,7 @@ inline real div_2ui(T &&x, unsigned long n)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1610,7 +1608,7 @@ inline real &div_2ui(real &rop, T &&x, unsigned long n)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1621,7 +1619,7 @@ inline real div_2si(T &&x, long n)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1721,7 +1719,7 @@ MPPP_REAL_MPFR_UNARY_RETURN(cbrt, ::mpfr_cbrt)
 
 // K-th root.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1732,7 +1730,7 @@ inline real &rootn_ui(real &rop, T &&op, unsigned long k)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1747,7 +1745,7 @@ inline real rootn_ui(T &&r, unsigned long k)
 
 // Ternary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -1789,9 +1787,9 @@ inline real dispatch_pow(const T &x, U &&a)
 // Binary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline real pow(T &&op1, U &&op2)
 {
@@ -1851,10 +1849,10 @@ MPPP_REAL_MPFR_UNARY_RETURN(atan, ::mpfr_atan)
 // sin and cos at the same time.
 // NOTE: we don't have the machinery to steal resources
 // for multiple retvals, thus we do a manual implementation
-// of this function. We keep the signature with CvrReal
+// of this function. We keep the signature with cvr_real
 // for consistency with the other functions.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -1879,7 +1877,7 @@ inline void sin_cos(real &sop, real &cop, T &&op)
 
 // Ternary atan2.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -1921,12 +1919,12 @@ inline real dispatch_atan2(const T &x, U &&a)
 // Binary atan2.
 #if defined(MPPP_HAVE_CONCEPTS)
 // NOTE: written like this, the constraint is equivalent
-// to: requires RealOpTypes<U, T>.
-template <typename T, RealOpTypes<T> U>
+// to: requires real_op_types<U, T>.
+template <typename T, real_op_types<T> U>
 #else
 // NOTE: we flip around T and U in the enabler to keep
 // it consistent with the concept above.
-template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<U, T>::value, int> = 0>
 #endif
 inline real atan2(T &&y, U &&x)
 {
@@ -1965,10 +1963,10 @@ MPPP_REAL_MPFR_UNARY_RETURN(atanh, ::mpfr_atanh)
 // sinh and cosh at the same time.
 // NOTE: we don't have the machinery to steal resources
 // for multiple retvals, thus we do a manual implementation
-// of this function. We keep the signature with CvrReal
+// of this function. We keep the signature with cvr_real
 // for consistency with the other functions.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2035,7 +2033,7 @@ MPPP_REAL_MPFR_UNARY_RETURN(digamma, ::mpfr_digamma)
 
 // Ternary gamma_inc.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -2077,12 +2075,12 @@ inline real dispatch_gamma_inc(const T &x, U &&a)
 // Binary gamma_inc.
 #if defined(MPPP_HAVE_CONCEPTS)
 // NOTE: written like this, the constraint is equivalent
-// to: requires RealOpTypes<U, T>.
-template <typename T, RealOpTypes<T> U>
+// to: requires real_op_types<U, T>.
+template <typename T, real_op_types<T> U>
 #else
 // NOTE: we flip around T and U in the enabler to keep
 // it consistent with the concept above.
-template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<U, T>::value, int> = 0>
 #endif
 inline real gamma_inc(T &&x, U &&y)
 {
@@ -2101,7 +2099,7 @@ MPPP_REAL_MPFR_UNARY_RETURN(j1, ::mpfr_j1)
 
 // Bessel function of the first kind of order n.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2112,7 +2110,7 @@ inline real &jn(real &rop, long n, T &&op)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2130,7 +2128,7 @@ MPPP_REAL_MPFR_UNARY_RETURN(y1, ::mpfr_y1)
 
 // Bessel function of the second kind of order n.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2141,7 +2139,7 @@ inline real &yn(real &rop, long n, T &&op)
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2176,7 +2174,7 @@ MPPP_REAL_MPFR_UNARY_RETURN(ai, ::mpfr_ai)
 
 // Ternary beta.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -2218,12 +2216,12 @@ inline real dispatch_beta(const T &x, U &&a)
 // Binary beta.
 #if defined(MPPP_HAVE_CONCEPTS)
 // NOTE: written like this, the constraint is equivalent
-// to: requires RealOpTypes<U, T>.
-template <typename T, RealOpTypes<T> U>
+// to: requires real_op_types<U, T>.
+template <typename T, real_op_types<T> U>
 #else
 // NOTE: we flip around T and U in the enabler to keep
 // it consistent with the concept above.
-template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<U, T>::value, int> = 0>
 #endif
 inline real beta(T &&x, U &&y)
 {
@@ -2234,7 +2232,7 @@ inline real beta(T &&x, U &&y)
 
 // Ternary hypot.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -2276,12 +2274,12 @@ inline real dispatch_hypot(const T &x, U &&a)
 // Binary hypot.
 #if defined(MPPP_HAVE_CONCEPTS)
 // NOTE: written like this, the constraint is equivalent
-// to: requires RealOpTypes<U, T>.
-template <typename T, RealOpTypes<T> U>
+// to: requires real_op_types<U, T>.
+template <typename T, real_op_types<T> U>
 #else
 // NOTE: we flip around T and U in the enabler to keep
 // it consistent with the concept above.
-template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<U, T>::value, int> = 0>
 #endif
 inline real hypot(T &&x, U &&y)
 {
@@ -2292,7 +2290,7 @@ inline real hypot(T &&x, U &&y)
 
 // Ternary log_hypot.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -2334,9 +2332,9 @@ inline real dispatch_log_hypot(const T &x, U &&a)
 // Binary log_hypot.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline real log_hypot(T &&x, U &&y)
 {
@@ -2347,7 +2345,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 
 // Ternary agm.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U>
+template <cvr_real T, cvr_real U>
 #else
 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
@@ -2389,12 +2387,12 @@ inline real dispatch_agm(const T &x, U &&a)
 // Binary agm.
 #if defined(MPPP_HAVE_CONCEPTS)
 // NOTE: written like this, the constraint is equivalent
-// to: requires RealOpTypes<U, T>.
-template <typename T, RealOpTypes<T> U>
+// to: requires real_op_types<U, T>.
+template <typename T, real_op_types<T> U>
 #else
 // NOTE: we flip around T and U in the enabler to keep
 // it consistent with the concept above.
-template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<U, T>::value, int> = 0>
 #endif
 inline real agm(T &&x, U &&y)
 {
@@ -2425,7 +2423,7 @@ MPPP_DLL_PUBLIC real &real_pi(real &);
 
 // Binary truncation.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2437,7 +2435,7 @@ inline real &trunc(real &rop, T &&op)
 
 // Unary truncation.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2449,7 +2447,7 @@ inline real trunc(T &&r)
 
 // Identity operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2490,9 +2488,9 @@ inline real dispatch_binary_add(const T &x, U &&a)
 // Binary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline real operator+(T &&a, U &&b)
 {
@@ -2577,9 +2575,12 @@ inline void dispatch_in_place_add(T &x, U &&a)
 // In-place addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealInPlaceOpTypes<T, U>
+requires real_in_place_op_types<T, U>
 #else
-template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
+template <typename T, typename U,
+          detail::enable_if_t<
+              detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value,
+              int> = 0>
 #endif
     inline T &operator+=(T &a, U &&b)
 {
@@ -2603,7 +2604,7 @@ inline real operator++(real &x, int)
 
 // Negated copy.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+template <cvr_real T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
@@ -2646,9 +2647,9 @@ inline real dispatch_binary_sub(const T &x, U &&a)
 // Binary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline real operator-(T &&a, U &&b)
 {
@@ -2705,9 +2706,12 @@ inline void dispatch_in_place_sub(T &x, U &&a)
 // In-place subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealInPlaceOpTypes<T, U>
+requires real_in_place_op_types<T, U>
 #else
-template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
+template <typename T, typename U,
+          detail::enable_if_t<
+              detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value,
+              int> = 0>
 #endif
     inline T &operator-=(T &a, U &&b)
 {
@@ -2761,9 +2765,9 @@ inline real operator--(real &x, int)
 // Binary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline real operator*(T &&a, U &&b)
 {
@@ -2820,9 +2824,12 @@ inline void dispatch_in_place_mul(T &x, U &&a)
 // In-place multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealInPlaceOpTypes<T, U>
+requires real_in_place_op_types<T, U>
 #else
-template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
+template <typename T, typename U,
+          detail::enable_if_t<
+              detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value,
+              int> = 0>
 #endif
     inline T &operator*=(T &a, U &&b)
 {
@@ -2861,9 +2868,9 @@ inline real dispatch_binary_div(const T &x, U &&a)
 
 // Binary division.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename U, RealOpTypes<U> T>
+template <typename U, real_op_types<U> T>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
 inline real operator/(T &&a, U &&b)
 {
@@ -2920,9 +2927,12 @@ inline void dispatch_in_place_div(T &x, U &&a)
 // In-place division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealInPlaceOpTypes<T, U>
+requires real_in_place_op_types<T, U>
 #else
-template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
+template <typename T, typename U,
+          detail::enable_if_t<
+              detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value,
+              int> = 0>
 #endif
     inline T &operator/=(T &a, U &&b)
 {
@@ -2960,9 +2970,9 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
 // Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator==(const T &a, const U &b)
 {
@@ -2972,9 +2982,9 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 // Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator!=(const T &a, const U &b)
 {
@@ -2984,9 +2994,9 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 // Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator>(const T &a, const U &b)
 {
@@ -2996,9 +3006,9 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 // Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator>=(const T &a, const U &b)
 {
@@ -3008,9 +3018,9 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 // Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator<(const T &a, const U &b)
 {
@@ -3020,9 +3030,9 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 // Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U>
+requires real_op_types<T, U>
 #else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator<=(const T &a, const U &b)
 {
