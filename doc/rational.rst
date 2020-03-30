@@ -77,7 +77,7 @@ The rational class
 
       :param other: the construction argument.
 
-   .. cpp:function:: template <RationalCvrInteroperable<SSize> T> explicit rational(T &&x)
+   .. cpp:function:: template <rational_cvr_interoperable<SSize> T> explicit rational(T &&x)
 
       Generic constructor.
 
@@ -92,7 +92,7 @@ The rational class
       :exception std\:\:domain_error: if *x* is a non-finite floating-point value, or
         a complex value with non-zero imaginary part or non-finite real part.
 
-   .. cpp:function:: template <RationalCvrIntegralInteroperable<SSize> T, RationalCvrIntegralInteroperable<SSize> U> explicit rational(T &&n, U &&d, bool make_canonical = true)
+   .. cpp:function:: template <rational_cvr_integral_interoperable<SSize> T, rational_cvr_integral_interoperable<SSize> U> explicit rational(T &&n, U &&d, bool make_canonical = true)
 
       Constructor from numerator and denominator.
 
@@ -214,7 +214,7 @@ The rational class
 
       :return: a reference to ``this``.
 
-   .. cpp:function:: template <RationalCvrInteroperable<SSize> T> rational &operator=(T &&x)
+   .. cpp:function:: template <rational_cvr_interoperable<SSize> T> rational &operator=(T &&x)
 
       Generic assignment operator.
 
@@ -329,7 +329,7 @@ The rational class
 
       :exception unspecified: any exception thrown by :cpp:func:`mppp::integer::to_string()`.
 
-   .. cpp:function:: template <RationalInteroperable<SSize> T> explicit operator T() const
+   .. cpp:function:: template <rational_interoperable<SSize> T> explicit operator T() const
 
       Generic conversion operator.
 
@@ -344,7 +344,7 @@ The rational class
       :exception std\:\:overflow_error: if the target type is an integral type and the
         value of ``this`` overflows its range.
 
-   .. cpp:function:: template <RationalInteroperable<SSize> T> bool get(T &rop) const
+   .. cpp:function:: template <rational_interoperable<SSize> T> bool get(T &rop) const
 
       Generic conversion member function.
 
@@ -454,55 +454,46 @@ Types
 Concepts
 --------
 
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalInteroperable
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::rational_interoperable
 
    This concept is satisfied if the type ``T`` can interoperate with a :cpp:class:`~mppp::rational`
    with static size ``SSize``. Specifically, this concept will be ``true`` if ``T`` satisfies
-   :cpp:concept:`~mppp::CppInteroperable` or :cpp:concept:`~mppp::CppComplex`,
+   :cpp:concept:`~mppp::integer_cpp_arithmetic` or :cpp:concept:`~mppp::integer_cpp_complex`,
    or it is an :cpp:class:`~mppp::integer` with static size ``SSize``.
 
-   A corresponding boolean type trait called ``is_rational_interoperable`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalCvrInteroperable
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::rational_cvr_interoperable
 
    This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
-   satisfies :cpp:concept:`~mppp::RationalInteroperable`.
+   satisfies :cpp:concept:`~mppp::rational_interoperable`.
 
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalIntegralInteroperable
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::rational_integral_interoperable
 
    This concept is satisfied if either:
 
-   * ``T`` satisfies :cpp:concept:`~mppp::CppIntegralInteroperable`, or
+   * ``T`` satisfies :cpp:concept:`~mppp::cpp_integral`, or
    * ``T`` is an :cpp:class:`~mppp::integer` with static size ``SSize``.
 
-   A corresponding boolean type trait called ``is_rational_integral_interoperable`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalCvrIntegralInteroperable
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::rational_cvr_integral_interoperable
 
    This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
-   satisfies :cpp:concept:`~mppp::RationalIntegralInteroperable`.
+   satisfies :cpp:concept:`~mppp::rational_integral_interoperable`.
 
-.. cpp:concept:: template <typename T, typename U> mppp::RationalOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::rational_op_types
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic binary :ref:`operators <rational_operators>` and :ref:`functions <rational_functions>`
    involving :cpp:class:`~mppp::rational`. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::rational` with the same static size ``SSize``, or
-   * one type is a :cpp:class:`~mppp::rational` and the other is a :cpp:concept:`~mppp::RationalInteroperable`
+   * one type is a :cpp:class:`~mppp::rational` and the other is a :cpp:concept:`~mppp::rational_interoperable`
      type.
 
-   A corresponding boolean type trait called ``are_rational_op_types`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T, typename U> mppp::RationalRealOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::rational_real_op_types
 
    This concept will be ``true`` if:
 
-   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`, and
-   * neither ``T`` nor ``U`` satisfy :cpp:concept:`~mppp::CppComplex`.
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::rational_op_types`, and
+   * neither ``T`` nor ``U`` satisfy :cpp:concept:`~mppp::integer_cpp_complex`.
 
    A corresponding boolean type trait called ``are_rational_real_op_types`` is also available (even if the compiler does
    not support concepts).
@@ -538,12 +529,12 @@ Assignment
 Conversion
 ~~~~~~~~~~
 
-.. cpp:function:: template <std::size_t SSize, mppp::RationalInteroperable<SSize> T> bool mppp::get(T &rop, const mppp::rational<SSize> &q)
+.. cpp:function:: template <std::size_t SSize, mppp::rational_interoperable<SSize> T> bool mppp::get(T &rop, const mppp::rational<SSize> &q)
 
    Generic conversion function.
 
    This function will convert the input :cpp:class:`~mppp::rational` *q* to a
-   :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into *rop*.
+   :cpp:concept:`~mppp::rational_interoperable` type, storing the result of the conversion into *rop*.
    If the conversion is successful, the function
    will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
    not be altered.
@@ -670,7 +661,7 @@ Number theoretic functions
 
 .. versionadded:: 0.8
 
-.. cpp:function:: template <std::size_t SSize, mppp::RationalIntegralInteroperable<SSize> T> mppp::rational<SSize> mppp::binomial(const mppp::rational<SSize> &x, const T &y)
+.. cpp:function:: template <std::size_t SSize, mppp::rational_integral_interoperable<SSize> T> mppp::rational<SSize> mppp::binomial(const mppp::rational<SSize> &x, const T &y)
 
    Binomial coefficient.
 
@@ -692,7 +683,7 @@ Number theoretic functions
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::pow(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::pow(const T &x, const U &y)
 
    Exponentiation.
 
@@ -780,10 +771,10 @@ is typically built on top of basic :ref:`functions <rational_functions>`.
 
    :return: :math:`q` and :math:`-q` respectively.
 
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator+(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator-(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator*(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator/(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::operator/(const T &x, const U &y)
 
    Binary arithmetic operators.
 
@@ -808,10 +799,10 @@ is typically built on top of basic :ref:`functions <rational_functions>`.
    :exception mppp\:\:zero_division_error: if, in a division not involving floating-point or complex values,
      *y* is zero.
 
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator+=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator-=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator*=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> auto mppp::operator/=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::operator+=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::operator-=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::operator*=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> auto mppp::operator/=(T &x, const U &y)
 
    In-place arithmetic operators.
 
@@ -850,12 +841,12 @@ is typically built on top of basic :ref:`functions <rational_functions>`.
 
    :return: a copy of *q* before the increment/decrement.
 
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator==(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator!=(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator<(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator<=(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator>(const T &op1, const U &op2)
-.. cpp:function:: template <typename T, mppp::RationalOpTypes<T> U> bool mppp::operator>=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> bool mppp::operator==(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> bool mppp::operator!=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> bool mppp::operator<(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> bool mppp::operator<=(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> bool mppp::operator>(const T &op1, const U &op2)
+.. cpp:function:: template <typename T, mppp::rational_op_types<T> U> bool mppp::operator>=(const T &op1, const U &op2)
 
    Binary comparison operators.
 
