@@ -172,6 +172,11 @@ public:
     // Constructor from range of characters.
     explicit complex128(const char *, const char *);
 
+    // Trivial copy assignment operator.
+    complex128 &operator=(const complex128 &) = default;
+    // Trivial move assignment operator.
+    complex128 &operator=(complex128 &&) = default;
+
     // Getters for the real/imaginary parts.
     constexpr real128 real() const
     {

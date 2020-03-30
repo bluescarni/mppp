@@ -9,9 +9,11 @@
 #include <mp++/config.hpp>
 
 #include <complex>
+#include <initializer_list>
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 
@@ -33,6 +35,18 @@
 #include "catch.hpp"
 
 using namespace mppp;
+
+#if MPPP_CPLUSPLUS >= 201402L
+
+constexpr auto test_constexpr_assignment(const complex128 &c)
+{
+    complex128 c2{}, c3{};
+    c2 = c;
+    c3 = std::move(c);
+    return std::make_pair(c2, c3);
+}
+
+#endif
 
 TEST_CASE("basic constructors")
 {
@@ -107,6 +121,8 @@ TEST_CASE("string constructors")
     using namespace std::literals;
 #endif
 
+    std::vector<char> buffer;
+
     // Empty strings.
     REQUIRE_THROWS_MATCHES(complex128{""}, std::invalid_argument,
                            Message("The string '' is not a valid representation of a complex128"));
@@ -114,6 +130,8 @@ TEST_CASE("string constructors")
                            Message("The string ' ' is not a valid representation of a complex128"));
     REQUIRE_THROWS_MATCHES(complex128{"  "}, std::invalid_argument,
                            Message("The string '  ' is not a valid representation of a complex128"));
+    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data()}), std::invalid_argument,
+                           Message("The string '' is not a valid representation of a complex128"));
 
     // Only the real value, no brackets.
     REQUIRE(complex128{"123"}.m_value == 123);
@@ -136,6 +154,14 @@ TEST_CASE("string constructors")
     REQUIRE_THROWS_MATCHES(
         complex128{"  hello world "}, std::invalid_argument,
         Message("The string 'hello world ' does not represent a valid quadruple-precision floating-point value"));
+    buffer = {'1', '2', '3'};
+    REQUIRE(complex128{buffer.data(), buffer.data() + 3}.m_value == 123);
+    buffer = {'1', '2', '3', '4', '5', '6'};
+    REQUIRE(complex128{buffer.data() + 3, buffer.data() + 6}.m_value == 456);
+    buffer = {'1', '2', '3', ' '};
+    REQUIRE_THROWS_MATCHES(
+        (complex128{buffer.data(), buffer.data() + 4}), std::invalid_argument,
+        Message("The string '123 ' does not represent a valid quadruple-precision floating-point value"));
 
     // Strings with brackets and only the real component.
     REQUIRE(complex128{"(123)"}.m_value == 123);
@@ -159,6 +185,13 @@ TEST_CASE("string constructors")
     REQUIRE_THROWS_MATCHES(
         complex128{" (123as)"}, std::invalid_argument,
         Message("The string '123as' does not represent a valid quadruple-precision floating-point value"));
+    buffer = {'(', '1', '2', '3', ')'};
+    REQUIRE(complex128{buffer.data(), buffer.data() + 5}.m_value == 123);
+    buffer = {'(', '1', '2', '3', ')', '5', '6'};
+    REQUIRE(complex128{buffer.data(), buffer.data() + 5}.m_value == 123);
+    buffer = {'(', '2', '3', '4'};
+    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data() + 4}), std::invalid_argument,
+                           Message("The string '(234' is not a valid representation of a complex128"));
 
     // Real and imaginary components.
     REQUIRE(complex128{"(123,12)"}.m_value == cplex128{123, 12});
@@ -208,4 +241,31 @@ TEST_CASE("string constructors")
     REQUIRE_THROWS_MATCHES(
         complex128{"(,)"}, std::invalid_argument,
         Message("The string '' does not represent a valid quadruple-precision floating-point value"));
+    buffer = {'(', '1', '2', '3', ',', '1', '2', ')'};
+    REQUIRE(complex128{buffer.data(), buffer.data() + 8}.m_value == cplex128{123, 12});
+    buffer = {'(', '1', '2', '3', ',', '1', '2', ')', '4', '5'};
+    REQUIRE(complex128{buffer.data(), buffer.data() + 8}.m_value == cplex128{123, 12});
+    buffer = {'(', '1', '2', '3', ',', '1'};
+    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data() + 6}), std::invalid_argument,
+                           Message("The string '(123,1' is not a valid representation of a complex128"));
+}
+
+TEST_CASE("assignment operators")
+{
+    // Trivial copy/move.
+    complex128 a{1, 2}, b, c;
+    b = a;
+    REQUIRE(b.real() == 1);
+    REQUIRE(b.imag() == 2);
+    c = std::move(b);
+    REQUIRE(c.real() == 1);
+    REQUIRE(c.imag() == 2);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_constexpr_assignment(complex128{-1, 3});
+        REQUIRE(tca.first == complex128{-1, 3});
+        REQUIRE(tca.second == complex128{-1, 3});
+    }
+#endif
 }

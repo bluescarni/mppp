@@ -103,6 +103,75 @@ The complex128 class
 
       :exception unspecified: any exception raised by casting ``T`` to :cpp:class:`~mppp::real128`.
 
+   .. cpp:function:: template <complex128_interoperable T, complex128_interoperable U> constexpr explicit complex128(const T &x, const U &y)
+
+      Constructor from real and imaginary parts.
+
+      This constructor will initialise the internal value to :math:`x+\imath y`.
+      Depending on the value and type of *x* and *y*, ``this`` may not be exactly equal
+      to :math:`x+\imath y` after initialisation (e.g., if *x* and *y* are very large
+      :cpp:class:`~mppp::integer` values).
+
+      :param x: the real part of the value that will be used for the initialisation.
+      :param y: the imaginary part of the value that will be used for the initialisation.
+
+      :exception unspecified: any exception raised by casting ``T`` to :cpp:class:`~mppp::real128`.
+
+   .. cpp:function:: template <cpp_complex T> constexpr explicit complex128(const T &c)
+
+      .. note::
+
+        This constructor is ``constexpr`` only if at least C++14 is being used.
+
+      Constructor from ``std::complex``.
+
+      :param x: the complex value that will be used for the initialisation.
+
+   .. cpp:function:: template <string_type T> explicit complex128(const T &s)
+
+      Constructor from string.
+
+      This constructor will initialise ``this`` from the :cpp:concept:`~mppp::string_type` *s*.
+      The accepted string formats are:
+
+      * a single floating-point number (e.g., ``1.234``),
+      * a single floating-point number surrounded by round brackets
+        (e.g., ``(1.234)``),
+      * a pair of floating-point numbers, surrounded by round brackets and
+        separated by a comma (e.g., ``(1.234, 4.567)``).
+
+      The allowed floating-point representations (for both the real and imaginary part)
+      are described in the documentation of the constructor from string of
+      :cpp:class:`~mppp::real128`.
+
+      :param s: the string that will be used to initialise ``this``.
+
+      :exception std\:\:invalid_argument: if *s* does not represent a valid quadruple-precision
+        complex floating-point value.
+      :exception unspecified: any exception thrown by memory errors in standard containers.
+
+   .. cpp:function:: explicit complex128(const char *begin, const char *end)
+
+      Constructor from a range of characters.
+
+      This constructor will initialise ``this`` from the content of the input half-open range, which is interpreted
+      as the string representation of a complex value.
+
+      Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and
+      invoke the constructor from string.
+
+      :param begin: the begin of the input range.
+      :param end: the end of the input range.
+
+      :exception unspecified: any exception thrown by the constructor from string or by memory errors in standard
+        containers.
+
+   .. cpp:function:: complex128 &operator=(const complex128 &) = default
+   .. cpp:function:: complex128 &operator=(complex128 &&) = default
+
+      :cpp:class:`~mppp::complex128` is trivially copy and
+      move assignable.
+
 Types
 -----
 
