@@ -26,6 +26,10 @@ New
 Changes
 ~~~~~~~
 
+- For consistency with C++20, mp++'s concepts now
+  use snake case notation. The concept hierarchy has also been
+  simplified and streamlined
+  (`#228 <https://github.com/bluescarni/mppp/pull/228>`__).
 - **BREAKING**: the global precision setting mechanism has been
   removed from :cpp:class:`~mppp::real`. As a result,
   the API and behaviour of the :cpp:class:`~mppp::real`
