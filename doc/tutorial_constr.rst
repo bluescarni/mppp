@@ -20,8 +20,7 @@ All of mp++'s multiprecision classes default-construct to zero:
 All of mp++'s multiprecision classes support a uniform style of initialisastion and conversion based
 on curly brackets. Using the same syntax, it is possible to:
 
-* initialise multiprecision objects from objects of (most of) C++'s numerical types (see the
-  :cpp:concept:`~mppp::CppInteroperable` concept for a full list),
+* initialise multiprecision objects from objects of C++'s numerical types,
 * initialise multiprecision objects from multiprecision objects of a different type,
 * initialise C++ numerical objects from multiprecision objects.
 
@@ -81,7 +80,7 @@ even if it does not preserve the exact value:
 The documentation of the multiprecision classes explains in detail the behaviour during construction and conversion.
 
 All of mp++'s multiprecision classes can also be initialised from string-like entities (see the
-:cpp:concept:`~mppp::StringType` concept for a full list). By default, string input is interpreted as the base-10 representation
+:cpp:concept:`~mppp::string_type` concept for a full list). By default, string input is interpreted as the base-10 representation
 of the desired value, and parsing follows (hopefully) intuitive rules:
 
 .. code-block:: c++

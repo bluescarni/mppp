@@ -22,7 +22,8 @@ mp++ has the following dependencies:
   the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
 * the `GNU MPFR <https://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support
-  for the ``long double`` type (MPFR 3 or a later version is required);
+  for the ``long double`` type in :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
+  (MPFR 3 or a later version is required);
 * the `Arb <http://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
   used in the implementation of additional special functions for the
   :cpp:class:`~mppp::real` class;
