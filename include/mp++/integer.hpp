@@ -6734,7 +6734,7 @@ inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, const integ
 }
 
 // NOTE: use the add_si/add_ui functions when adding to C++ integrals.
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
 {
     integer<SSize> retval;
@@ -6742,7 +6742,7 @@ inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
 {
     integer<SSize> retval;
@@ -6750,21 +6750,21 @@ inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_add(T n, const integer<SSize> &op2)
 {
     return dispatch_binary_add(op2, n);
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_add(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) + x;
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_add(T x, const integer<SSize> &op2)
 {
     return dispatch_binary_add(op2, x);
@@ -6777,27 +6777,27 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const integer<SSize> &
     add(retval, retval, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
 {
     add_ui(retval, retval, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
 {
     add_si(retval, retval, n);
 }
 
 template <std::size_t SSize, typename T,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_arithmetic<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop + op);
@@ -6870,7 +6870,7 @@ inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
 {
     integer<SSize> retval;
@@ -6878,7 +6878,7 @@ inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
 {
     integer<SSize> retval;
@@ -6886,7 +6886,7 @@ inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_sub(T n, const integer<SSize> &op2)
 {
     auto retval = dispatch_binary_sub(op2, n);
@@ -6895,14 +6895,14 @@ inline integer<SSize> dispatch_binary_sub(T n, const integer<SSize> &op2)
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_sub(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) - x;
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_sub(T x, const integer<SSize> &op2)
 {
     return -dispatch_binary_sub(op2, x);
@@ -6915,27 +6915,27 @@ inline void dispatch_in_place_sub(integer<SSize> &retval, const integer<SSize> &
     sub(retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_in_place_sub(integer<SSize> &retval, const T &n)
 {
     sub_ui(retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_in_place_sub(integer<SSize> &retval, const T &n)
 {
     sub_si(retval, retval, n);
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_sub(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) - x;
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_arithmetic<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop - op);
@@ -7006,7 +7006,7 @@ inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, T n)
 {
     // NOTE: with respect to addition, here we separate the retval
@@ -7017,21 +7017,21 @@ inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_mul(T n, const integer<SSize> &op2)
 {
     return dispatch_binary_mul(op2, n);
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_mul(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) * x;
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_mul(T x, const integer<SSize> &op2)
 {
     return dispatch_binary_mul(op2, x);
@@ -7044,21 +7044,21 @@ inline void dispatch_in_place_mul(integer<SSize> &retval, const integer<SSize> &
     mul(retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_mul(integer<SSize> &retval, const T &n)
 {
     mul(retval, retval, integer<SSize>{n});
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_mul(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) * x;
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_arithmetic<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop * op);
@@ -7103,7 +7103,7 @@ inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, T n)
 {
     integer<SSize> retval;
@@ -7111,7 +7111,7 @@ inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_div(T n, const integer<SSize> &op2)
 {
     integer<SSize> retval;
@@ -7120,14 +7120,14 @@ inline integer<SSize> dispatch_binary_div(T n, const integer<SSize> &op2)
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_div(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) / x;
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_div(T x, const integer<SSize> &op2)
 {
     return x / static_cast<T>(op2);
@@ -7140,21 +7140,21 @@ inline void dispatch_in_place_div(integer<SSize> &retval, const integer<SSize> &
     tdiv_q(retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_div(integer<SSize> &retval, const T &n)
 {
     tdiv_q(retval, retval, integer<SSize>{n});
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_div(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) / x;
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_arithmetic<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_div(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop / op);
@@ -7169,7 +7169,7 @@ inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, T n)
 {
     integer<SSize> q, retval;
@@ -7177,7 +7177,7 @@ inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_mod(T n, const integer<SSize> &op2)
 {
     integer<SSize> q, retval;
@@ -7193,14 +7193,14 @@ inline void dispatch_in_place_mod(integer<SSize> &retval, const integer<SSize> &
     tdiv_qr(q, retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_mod(integer<SSize> &retval, const T &n)
 {
     integer<SSize> q;
     tdiv_qr(q, retval, retval, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop % op);
@@ -7260,9 +7260,9 @@ template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_ty
 
 // Binary left shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CppIntegralInteroperable T, std::size_t SSize>
+template <cpp_integral T, std::size_t SSize>
 #else
-template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
+template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
 #endif
 inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 {
@@ -7273,9 +7273,9 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 
 // In-place left shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CppIntegralInteroperable T, std::size_t SSize>
+template <cpp_integral T, std::size_t SSize>
 #else
-template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
+template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
 #endif
 inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 {
@@ -7285,9 +7285,9 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 
 // Binary right shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CppIntegralInteroperable T, std::size_t SSize>
+template <cpp_integral T, std::size_t SSize>
 #else
-template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
+template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
 #endif
 inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 {
@@ -7298,9 +7298,9 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 
 // In-place right shift operator.
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CppIntegralInteroperable T, std::size_t SSize>
+template <cpp_integral T, std::size_t SSize>
 #else
-template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
+template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
 #endif
 inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 {
@@ -7331,27 +7331,27 @@ inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
     return std::equal(ptr_a, ptr_a + asize, make_uai(ptr_b), limb_cmp);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline bool dispatch_equality(const integer<SSize> &a, T n)
 {
     return dispatch_equality(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline bool dispatch_equality(T n, const integer<SSize> &a)
 {
     return dispatch_equality(a, n);
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(const integer<SSize> &a, T x)
 {
     return static_cast<T>(a) == x;
 }
 
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
+          enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(T x, const integer<SSize> &a)
 {
     return dispatch_equality(a, x);
@@ -7427,22 +7427,22 @@ inline bool dispatch_less_than(const integer<SSize> &op1, const integer<SSize> &
     return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) < 0;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline bool dispatch_less_than(const integer<SSize> &a, T n)
 {
     return dispatch_less_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 bool dispatch_less_than(T, const integer<SSize> &);
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int> = 0>
 inline bool dispatch_less_than(const integer<SSize> &a, T x)
 {
     return static_cast<T>(a) < x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int> = 0>
 bool dispatch_less_than(T, const integer<SSize> &);
 
 // Greater-than operator.
@@ -7498,38 +7498,38 @@ inline bool dispatch_greater_than(const integer<SSize> &op1, const integer<SSize
     return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) > 0;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline bool dispatch_greater_than(const integer<SSize> &a, T n)
 {
     return dispatch_greater_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline bool dispatch_greater_than(T n, const integer<SSize> &a)
 {
     return dispatch_less_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int> = 0>
 inline bool dispatch_greater_than(const integer<SSize> &a, T x)
 {
     return static_cast<T>(a) > x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int> = 0>
 inline bool dispatch_greater_than(T x, const integer<SSize> &a)
 {
     return dispatch_less_than(a, x);
 }
 
 // NOTE: implement these here as we need visibility of dispatch_greater_than().
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int>>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int>>
 inline bool dispatch_less_than(T n, const integer<SSize> &a)
 {
     return dispatch_greater_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int>>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point<T>::value, int>>
 inline bool dispatch_less_than(T x, const integer<SSize> &a)
 {
     return dispatch_greater_than(a, x);
@@ -7629,13 +7629,13 @@ inline integer<SSize> dispatch_operator_or(const integer<SSize> &op1, const inte
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_or(const integer<SSize> &op1, const T &op2)
 {
     return dispatch_operator_or(op1, integer<SSize>{op2});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_or(const T &op1, const integer<SSize> &op2)
 {
     return dispatch_operator_or(op2, op1);
@@ -7648,13 +7648,13 @@ inline void dispatch_in_place_or(integer<SSize> &rop, const integer<SSize> &op)
     bitwise_ior(rop, rop, op);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_or(integer<SSize> &rop, const T &op)
 {
     dispatch_in_place_or(rop, integer<SSize>{op});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop | op);
@@ -7699,13 +7699,13 @@ inline integer<SSize> dispatch_operator_and(const integer<SSize> &op1, const int
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_and(const integer<SSize> &op1, const T &op2)
 {
     return dispatch_operator_and(op1, integer<SSize>{op2});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_and(const T &op1, const integer<SSize> &op2)
 {
     return dispatch_operator_and(op2, op1);
@@ -7718,13 +7718,13 @@ inline void dispatch_in_place_and(integer<SSize> &rop, const integer<SSize> &op)
     bitwise_and(rop, rop, op);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_and(integer<SSize> &rop, const T &op)
 {
     dispatch_in_place_and(rop, integer<SSize>{op});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop & op);
@@ -7769,13 +7769,13 @@ inline integer<SSize> dispatch_operator_xor(const integer<SSize> &op1, const int
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_xor(const integer<SSize> &op1, const T &op2)
 {
     return dispatch_operator_xor(op1, integer<SSize>{op2});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_xor(const T &op1, const integer<SSize> &op2)
 {
     return dispatch_operator_xor(op2, op1);
@@ -7788,13 +7788,13 @@ inline void dispatch_in_place_xor(integer<SSize> &rop, const integer<SSize> &op)
     bitwise_xor(rop, rop, op);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_xor(integer<SSize> &rop, const T &op)
 {
     dispatch_in_place_xor(rop, integer<SSize>{op});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
 inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop ^ op);

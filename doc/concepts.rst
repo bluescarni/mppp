@@ -22,6 +22,14 @@ Common concepts
    The GCC-style extended 128-bit integral types ``__int128_t`` and ``__uint128_t`` are included as well, if supported
    on the current platform/compiler combination (see also the :c:macro:`MPPP_HAVE_GCC_INT128` definition).
 
+.. cpp:concept:: template <typename T> mppp::cpp_unsigned_integral
+
+   This concept is satisfied if ``T`` is an unsigned :cpp:concept:`~mppp::cpp_integral`.
+
+.. cpp:concept:: template <typename T> mppp::cpp_signed_integral
+
+   This concept is satisfied if ``T`` is a signed :cpp:concept:`~mppp::cpp_integral`.
+
 .. cpp:concept:: template <typename T> mppp::cpp_floating_point
 
    This concept is satisfied if ``T`` is a C++ floating-point type.
@@ -40,76 +48,6 @@ Common concepts
    * ``std::complex<long double>``.
 
 .. cpp:concept:: template <typename T> mppp::string_type
-
-   This concept is satisfied by C++ string-like types. Specifically, the concept will be true if ``T``,
-   after the removal of cv qualifiers, is one of the following types:
-
-   * ``std::string``,
-   * a pointer to (possibly cv qualified) ``char``,
-   * a ``char`` array of any size.
-
-   Additionally, if at least C++17 is being used, the concept is satisfied also by ``std::string_view``.
-
-.. cpp:concept:: template <typename T> mppp::CppInteroperable
-
-   This concept is satisfied by any C++ fundamental type with which the multiprecision classes (such as :cpp:class:`~mppp::integer`,
-   :cpp:class:`~mppp::rational`, etc.) can interoperate. The full list of types satisfying this concept includes:
-
-   * all the fundamental C++ integral types,
-   * ``float`` and ``double``.
-
-   ``long double`` is also included, but only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled
-   (see the :ref:`installation instructions <installation>`).
-
-   The GCC-style extended 128-bit integral types ``__int128_t`` and ``__uint128_t`` are included as well, if supported
-   on the current platform/compiler combination (see also the :c:macro:`MPPP_HAVE_GCC_INT128` definition).
-
-   A corresponding boolean type trait called ``is_cpp_interoperable`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T> mppp::CppIntegralInteroperable
-
-   This concept is satisfied if ``T`` is an integral :cpp:concept:`~mppp::CppInteroperable` type.
-
-   A corresponding boolean type trait called ``is_cpp_integral_interoperable`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T> mppp::CppUnsignedIntegralInteroperable
-
-   This concept is satisfied if ``T`` is an unsigned integral :cpp:concept:`~mppp::CppInteroperable` type.
-
-   A corresponding boolean type trait called ``is_cpp_unsigned_integral_interoperable`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T> mppp::CppSignedIntegralInteroperable
-
-   This concept is satisfied if ``T`` is a signed integral :cpp:concept:`~mppp::CppInteroperable` type.
-
-   A corresponding boolean type trait called ``is_cpp_signed_integral_interoperable`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T> mppp::CppFloatingPointInteroperable
-
-   This concept is satisfied if ``T`` is a floating-point :cpp:concept:`~mppp::CppInteroperable` type.
-
-   A corresponding boolean type trait called ``is_cpp_floating_point_interoperable`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T> mppp::CppComplex
-
-   .. versionadded:: 0.19
-
-   This concept is satisfied if ``T`` is one of the C++ complex types
-   supported by mp++:
-
-   * ``std::complex<float>``,
-   * ``std::complex<double>``,
-   * ``std::complex<long double>`` (only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled).
-
-   A corresponding boolean type trait called ``is_cpp_complex`` is also available (even if the compiler does
-   not support concepts).
-
-.. cpp:concept:: template <typename T> mppp::StringType
 
    This concept is satisfied by C++ string-like types. Specifically, the concept will be true if ``T``,
    after the removal of cv qualifiers, is one of the following types:

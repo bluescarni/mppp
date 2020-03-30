@@ -372,16 +372,16 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     explicit real(const T &s, int base, ::mpfr_prec_t p) : real(ptag{}, s, base, p)
     {
     }
     // Constructor from string and precision.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     explicit real(const T &s, ::mpfr_prec_t p) : real(s, 10, p)
     {
@@ -569,7 +569,7 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     real &set(const T &s, int base = 10)
     {
@@ -2518,7 +2518,7 @@ inline void dispatch_in_place_add(real &a, const T &x)
 // NOTE: split this in two parts: for C++ types and real128, we use directly the cast
 // operator, for integer and rational we use the get() function.
 template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_interoperable<T>
+          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
 #if defined(MPPP_WITH_QUADMATH)
                                               ,
                                               std::is_same<T, real128>
@@ -2675,7 +2675,7 @@ inline void dispatch_in_place_sub(real &a, const T &x)
 }
 
 template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_interoperable<T>
+          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
 #if defined(MPPP_WITH_QUADMATH)
                                               ,
                                               std::is_same<T, real128>
@@ -2793,7 +2793,7 @@ inline void dispatch_in_place_mul(real &a, const T &x)
 }
 
 template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_interoperable<T>
+          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
 #if defined(MPPP_WITH_QUADMATH)
                                               ,
                                               std::is_same<T, real128>
@@ -2896,7 +2896,7 @@ inline void dispatch_in_place_div(real &a, const T &x)
 }
 
 template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_interoperable<T>
+          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
 #if defined(MPPP_WITH_QUADMATH)
                                               ,
                                               std::is_same<T, real128>

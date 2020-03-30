@@ -373,7 +373,7 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     explicit real128(const T &s) : real128(ptag{}, s)
     {
@@ -408,7 +408,7 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     real128 &operator=(const T &s)
     {

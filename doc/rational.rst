@@ -114,11 +114,11 @@ The rational class
 
       :exception zero_division_error: if the denominator is zero.
 
-   .. cpp:function:: template <StringType T> explicit rational(const T &s, int base = 10)
+   .. cpp:function:: template <string_type T> explicit rational(const T &s, int base = 10)
 
       Constructor from string.
 
-      This constructor will initialize ``this`` from the :cpp:concept:`~mppp::StringType` *s*, which must represent
+      This constructor will initialize ``this`` from the :cpp:concept:`~mppp::string_type` *s*, which must represent
       a rational value in base *base*. The expected format is either a numerator-denominator pair separated
       by the division operator ``/``, or just a numerator (in which case the denominator will be set to one).
       The format for numerator and denominator is described in the documentation of the constructor from string
@@ -226,7 +226,7 @@ The rational class
 
       :exception unspecified: any exception thrown by the generic constructor.
 
-   .. cpp:function:: template <StringType T> rational &operator=(const T &s)
+   .. cpp:function:: template <string_type T> rational &operator=(const T &s)
 
       Assignment from string.
 
@@ -494,9 +494,6 @@ Concepts
 
    * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::rational_op_types`, and
    * neither ``T`` nor ``U`` satisfy :cpp:concept:`~mppp::integer_cpp_complex`.
-
-   A corresponding boolean type trait called ``are_rational_real_op_types`` is also available (even if the compiler does
-   not support concepts).
 
 .. _rational_functions:
 
