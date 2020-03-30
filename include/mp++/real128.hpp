@@ -90,8 +90,6 @@ MPPP_DLL_PUBLIC __float128 powq(__float128, __float128);
 template <typename T>
 using is_real128_mppp_interoperable = disjunction<is_integer<T>, is_rational<T>>;
 
-} // namespace detail
-
 // Story time!
 //
 // Since 3.9, clang supports the __float128 type. However, interactions between long double and __float128 are disabled.
@@ -159,35 +157,14 @@ using is_real128_mppp_interoperable = disjunction<is_integer<T>, is_rational<T>>
 
 #endif
 
-namespace detail
-{
-
 // For internal use only.
-// NOTE: the idea here is:
-// - if MPPP_FLOAT128_WITH_LONG_DOUBLE is true,
-//   then we *always* want to include long double
-//   (which might or might not be already in
-//   is_cpp_interoperable);
-// - otherwise, we *never* want to include long
-//   double (which might or might not be in
-//   is_cpp_interoperable).
 template <typename T>
-using is_real128_cpp_interoperable =
-#if defined(MPPP_WITH_MPFR) && !defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    // Case 1: long double is in is_cpp_interoperable, but not supported
-    // by __float128. Disable it for real128 interoperability.
-    detail::conjunction<is_cpp_interoperable<T>, detail::negation<std::is_same<T, long double>>>
-#elif !defined(MPPP_WITH_MPFR) && defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    // Case 2: long double is not in is_cpp_interoperable, but it
-    // is supported by __float128. Enable it for real128 interoperability.
-    detail::disjunction<is_cpp_interoperable<T>, std::is_same<T, long double>>
-#else
-    // Cases 3 and 4: long double is (not) in is_cpp_interoperable and it is
-    // (not) supported by __float128. is_real128_cpp_interoperable
-    // and is_cpp_interoperable are the same thing.
-    is_cpp_interoperable<T>
+using is_real128_cpp_interoperable = detail::conjunction<is_cpp_arithmetic<T>
+#if !defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+                                                         ,
+                                                         detail::negation<std::is_same<T, long double>>
 #endif
-    ;
+                                                         >;
 
 } // namespace detail
 
@@ -196,8 +173,10 @@ using is_real128_interoperable
     = detail::disjunction<detail::is_real128_cpp_interoperable<T>, detail::is_real128_mppp_interoperable<T>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
+
 template <typename T>
-MPPP_CONCEPT_DECL Real128Interoperable = is_real128_interoperable<T>::value;
+MPPP_CONCEPT_DECL real128_interoperable = is_real128_interoperable<T>::value;
+
 #endif
 
 template <typename T, typename U>
@@ -207,8 +186,10 @@ using are_real128_op_types
                           detail::conjunction<std::is_same<U, real128>, is_real128_interoperable<T>>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
+
 template <typename T, typename U>
-MPPP_CONCEPT_DECL Real128OpTypes = are_real128_op_types<T, U>::value;
+MPPP_CONCEPT_DECL real128_op_types = are_real128_op_types<T, U>::value;
+
 #endif
 
 // Fwd declare the abs() function.
@@ -369,7 +350,7 @@ private:
 public:
     // Constructor from interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Real128Interoperable T>
+    template <real128_interoperable T>
 #else
     template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
 #endif
@@ -390,7 +371,7 @@ private:
 public:
     // Constructor from string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
     template <typename T, string_type_enabler<T> = 0>
 #endif
@@ -414,7 +395,7 @@ public:
 
     // Assignment from interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Real128Interoperable T>
+    template <real128_interoperable T>
 #else
     template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
 #endif
@@ -425,7 +406,7 @@ public:
 
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
     template <typename T, string_type_enabler<T> = 0>
 #endif
@@ -571,7 +552,7 @@ private:
 public:
     // Conversion operator to interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Real128Interoperable T>
+    template <real128_interoperable T>
 #else
     template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
 #endif
@@ -597,7 +578,7 @@ private:
 public:
     // Conversion member function to interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Real128Interoperable T>
+    template <real128_interoperable T>
 #else
     template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
 #endif
@@ -892,7 +873,7 @@ inline real128 dispatch_pow(const T &x, const real128 &y)
 // Exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1052,7 +1033,7 @@ real128 dispatch_add(const T &, const real128 &);
 // Binary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1113,7 +1094,7 @@ inline void dispatch_in_place_add(T &x, const real128 &y)
 // In-place addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1175,7 +1156,7 @@ real128 dispatch_sub(const T &, const real128 &);
 // Binary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1233,7 +1214,7 @@ inline void dispatch_in_place_sub(T &x, const real128 &y)
 // In-place subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1289,7 +1270,7 @@ real128 dispatch_mul(const T &, const real128 &);
 // Binary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1347,7 +1328,7 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
 // In-place multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1388,7 +1369,7 @@ real128 dispatch_div(const T &, const real128 &);
 // Binary division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1446,7 +1427,7 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
 // In-place division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1487,7 +1468,7 @@ bool dispatch_eq(const T &, const real128 &);
 // Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1516,7 +1497,7 @@ inline bool dispatch_eq(const T &x, const real128 &y)
 // Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1556,7 +1537,7 @@ bool dispatch_lt(const T &, const real128 &);
 // Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1608,7 +1589,7 @@ bool dispatch_lte(const T &, const real128 &);
 // Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1660,7 +1641,7 @@ bool dispatch_gt(const T &, const real128 &);
 // Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1712,7 +1693,7 @@ bool dispatch_gte(const T &, const real128 &);
 // Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Real128OpTypes<T, U>
+requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif

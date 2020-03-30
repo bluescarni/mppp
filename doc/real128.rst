@@ -97,7 +97,7 @@ The real128 class
 
       :param x: the :cpp:type:`__float128` that will be assigned to the internal value.
 
-   .. cpp:function:: template <Real128Interoperable T> constexpr explicit real128(const T &x)
+   .. cpp:function:: template <real128_interoperable T> constexpr explicit real128(const T &x)
 
       Constructor from interoperable types.
 
@@ -110,11 +110,11 @@ The real128 class
 
       :exception std\:\:overflow_error: in case of (unlikely) overflow errors during initialisation.
 
-   .. cpp:function:: template <StringType T> explicit real128(const T &s)
+   .. cpp:function:: template <string_type T> explicit real128(const T &s)
 
       Constructor from string.
 
-      This constructor will initialise ``this`` from the :cpp:concept:`~mppp::StringType` *s*.
+      This constructor will initialise ``this`` from the :cpp:concept:`~mppp::string_type` *s*.
       The accepted string formats are detailed in the quadmath library's documentation
       (see the link below). Leading whitespaces are accepted (and ignored), but trailing whitespaces
       will raise an error.
@@ -162,7 +162,7 @@ The real128 class
 
       :return: a reference to ``this``.
 
-   .. cpp:function:: template <Real128Interoperable T> constexpr real128 &operator=(const T &x)
+   .. cpp:function:: template <real128_interoperable T> constexpr real128 &operator=(const T &x)
 
       .. note::
 
@@ -177,7 +177,7 @@ The real128 class
       :exception unspecified: any exception thrown by the construction of a
         :cpp:class:`~mppp::real128` from *x*.
 
-   .. cpp:function:: template <StringType T> real128 &operator=(const T &s)
+   .. cpp:function:: template <string_type T> real128 &operator=(const T &s)
 
       Assignment from string.
 
@@ -202,11 +202,11 @@ The real128 class
 
       :return: a copy of the :cpp:type:`__float128` value stored internally.
 
-   .. cpp:function:: template <Real128Interoperable T> constexpr explicit operator T() const
+   .. cpp:function:: template <real128_interoperable T> constexpr explicit operator T() const
 
       Conversion operator to interoperable types.
 
-      This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128Interoperable` type.
+      This operator will convert ``this`` to a :cpp:concept:`~mppp::real128_interoperable` type.
 
       Conversion to C++ types is implemented via direct cast, and thus no checks are
       performed to ensure that the value of ``this`` can be represented by the target type.
@@ -220,7 +220,7 @@ The real128 class
       :exception std\:\:domain_error: if ``this`` represents a non-finite value and ``T``
         is :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`.
 
-   .. cpp:function:: template <Real128Interoperable T> constexpr bool get(T &rop) const
+   .. cpp:function:: template <real128_interoperable T> constexpr bool get(T &rop) const
 
       .. note::
 
@@ -229,7 +229,7 @@ The real128 class
       Conversion member function to interoperable types.
 
       This member function, similarly to the conversion operator, will convert ``this`` to a
-      :cpp:concept:`~mppp::Real128Interoperable` type, storing the result of the conversion into *rop*.
+      :cpp:concept:`~mppp::real128_interoperable` type, storing the result of the conversion into *rop*.
       Differently from the conversion operator, this function does not raise any exception: if the conversion is
       successful, the function will return ``true``, otherwise the function will return ``false``. If the
       conversion fails, *rop* will not be altered. The conversion can fail only if ``T`` is either
@@ -466,7 +466,7 @@ Types
 Concepts
 --------
 
-.. cpp:concept:: template <typename T> mppp::Real128Interoperable
+.. cpp:concept:: template <typename T> mppp::real128_interoperable
 
    This concept is satisfied by types that can interoperate with :cpp:class:`~mppp::real128`.
    Specifically, this concept is satisfied if either:
@@ -474,18 +474,18 @@ Concepts
    * ``T`` is :cpp:class:`~mppp::integer`, or
    * ``T`` is :cpp:class:`~mppp::rational`, or
    * on GCC, the Intel compiler and Clang>=7, ``T`` satisfies
-     :cpp:concept:`mppp::CppInteroperable` or it is ``long double``, or
-   * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable`, except if
+     :cpp:concept:`mppp::cpp_arithmetic`, or
+   * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::cpp_arithmetic`, except if
      ``T`` is ``long double``.
 
-.. cpp:concept:: template <typename T, typename U> mppp::Real128OpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::real128_op_types
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic binary :ref:`operators <real128_operators>`
    involving :cpp:class:`~mppp::real128` and other types. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::real128`, or
-   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::Real128Interoperable` type.
+   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::real128_interoperable` type.
 
 .. _real128_functions:
 
@@ -497,7 +497,7 @@ Functions
 Conversion
 ~~~~~~~~~~
 
-.. cpp:function:: template <mppp::Real128Interoperable T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
+.. cpp:function:: template <mppp::real128_interoperable T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
 
    .. note::
 
@@ -506,7 +506,7 @@ Conversion
    Conversion function.
 
    This function will convert the input :cpp:class:`~mppp::real128` *x* to a
-   :cpp:concept:`~mppp::Real128Interoperable` type, storing the result of the conversion into *rop*.
+   :cpp:concept:`~mppp::real128_interoperable` type, storing the result of the conversion into *rop*.
    If the conversion is successful, the function
    will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
    not be altered. The conversion can fail only if ``T``
@@ -728,7 +728,7 @@ Roots
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> mppp::real128 mppp::pow(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::pow(const T &x, const U &y)
 
    This function will compute :math:`x^y`. Internally,
    the implementation uses the ``powq()`` function from the quadmath library,
@@ -949,10 +949,10 @@ Mathematical operators
 
    :return: a copy of *x* before the increment/decrement.
 
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr mppp::real128 mppp::operator+(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr mppp::real128 mppp::operator-(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr mppp::real128 mppp::operator*(const T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr mppp::real128 mppp::operator/(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr mppp::real128 mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr mppp::real128 mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr mppp::real128 mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr mppp::real128 mppp::operator/(const T &x, const U &y)
 
    Binary arithmetic operators.
 
@@ -971,10 +971,10 @@ Mathematical operators
    :exception unspecified: any exception thrown by the constructor of :cpp:class:`~mppp::real128`
      from mp++ types.
 
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr T &mppp::operator+=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr T &mppp::operator-=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr T &mppp::operator*=(T &x, const U &y)
-.. cpp:function:: template <typename T, mppp::Real128OpTypes<T> U> constexpr T &mppp::operator/=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr T &mppp::operator+=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr T &mppp::operator-=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr T &mppp::operator*=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr T &mppp::operator/=(T &x, const U &y)
 
    .. note::
 
