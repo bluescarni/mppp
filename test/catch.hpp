@@ -372,7 +372,7 @@ namespace Catch {
 #  define CATCH_CONFIG_CPP17_VARIANT
 #endif
 
-#if defined(CATCH_INTERNAL_CONFIG_CPP17_BYTE) && !defined(CATCH_CONFIG_NO_CPP17_BYTE) && !defined(CATCH_CONFIG_CPP17_BYTE)
+#if defined(CATCH_INTERNAL_CONFIG_CPP17_BYTE) && !defined(CATCH_CONFIG_NO_CPP17_BYTE) && !defined(CATCH_CONFIG_CPP17_BYTE) && false
 #  define CATCH_CONFIG_CPP17_BYTE
 #endif
 
