@@ -139,7 +139,7 @@ public:
     }
     // Constructor from std::complex.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppComplex T>
+    template <cpp_complex T>
 #else
     template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
 #endif
@@ -162,9 +162,9 @@ private:
 public:
     // Constructor from string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <StringType T>
+    template <string_type T>
 #else
-    template <typename T, string_type_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
     explicit complex128(const T &s) : complex128(ptag{}, s)
     {
@@ -246,7 +246,7 @@ using are_complex128_cmp_op_types
 #if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T, typename U>
-MPPP_CONCEPT_DECL Complex128CmpOpTypes = are_complex128_cmp_op_types<T, U>::value;
+MPPP_CONCEPT_DECL complex128_cmp_op_types = are_complex128_cmp_op_types<T, U>::value;
 
 #endif
 
@@ -284,13 +284,13 @@ inline bool dispatch_eq(const T &y, const complex128 &x)
 }
 
 // complex128-C++.
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_cpp_arithmetic<T>::value, int> = 0>
 constexpr bool dispatch_eq(const complex128 &c, const T &x)
 {
     return c.m_value == x;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_cpp_arithmetic<T>::value, int> = 0>
 constexpr bool dispatch_eq(const T &x, const complex128 &c)
 {
     return dispatch_eq(c, x);
@@ -313,7 +313,7 @@ inline MPPP_CONSTEXPR_14 bool dispatch_eq(const std::complex<T> &c2, const compl
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Complex128CmpOpTypes<T, U>
+requires complex128_cmp_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
 #endif
@@ -324,7 +324,7 @@ template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_type
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Complex128CmpOpTypes<T, U>
+requires complex128_cmp_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
 #endif

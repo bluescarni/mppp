@@ -21,8 +21,8 @@ The complex128 class
 
    This class represents complex numbers as pairs of quadruple-precision IEEE 754
    floating-point values.
-   The class is a thin wrapper around the :cpp:type:`__complex128` type and the quadmath library, available in GCC
-   and recent Clang versions on most modern platforms, on top of which it provides the following additions:
+   The class is a thin wrapper around the :cpp:type:`__complex128` type and the quadmath library, available on GCC,
+   Clang and the Intel compiler on most modern platforms, on top of which it provides the following additions:
 
    * interoperability with other mp++ classes,
    * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
@@ -48,12 +48,19 @@ The complex128 class
 
    where the ``sin()`` function is resolved via argument-dependent lookup.
 
-   Various :ref:`overloaded operators <complex128_operators>` are provided.
-   The common arithmetic operators (``+``, ``-``, ``*`` and ``/``) always return :cpp:class:`~mppp::complex128`
-   as a result, promoting at most one operand to :cpp:class:`~mppp::complex128` before actually performing
-   the computation. Similarly, the relational operators ``==`` and ``!=`` will promote at
-   most one argument to :cpp:class:`~mppp::complex128` before performing the comparison. Alternative comparison functions
-   treating NaNs specially are provided.
+   Various :ref:`overloaded operators <complex128_operators>` are provided. Alternative comparison functions
+   treating NaNs specially are also provided for use in the C++ standard library (and wherever strict weak ordering relations
+   are needed).
+
+   The :cpp:class:`~mppp::complex128` class is a `literal type
+   <https://en.cppreference.com/w/cpp/named_req/LiteralType>`__, and, whenever possible, operations involving
+   :cpp:class:`~mppp::complex128` are marked as ``constexpr``. Some functions which are not ``constexpr`` in the quadmath
+   library have been reimplemented as ``constexpr`` functions via compiler builtins.
+
+   .. seealso::
+      https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+
+      https://gcc.gnu.org/onlinedocs/libquadmath/
 
    .. cpp:member:: __complex128 m_value
 
@@ -117,6 +124,6 @@ Concepts
    with :cpp:class:`~mppp::complex128`. Specifically, this concept is
    satisfied if either:
 
-   * ``T`` satisfies :cpp:concept:`~mppp::Real128Interoperable`, or
+   * ``T`` satisfies :cpp:concept:`~mppp::real128_interoperable`, or
    * ``T`` is :cpp:class:`~mppp::real128`, or
    * ``T`` is :cpp:class:`~mppp::real`.

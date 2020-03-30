@@ -48,12 +48,8 @@ The real128 class
 
    where the ``sin()`` function is resolved via argument-dependent lookup.
 
-   Various :ref:`overloaded operators <real128_operators>` are provided.
-   The common arithmetic operators (``+``, ``-``, ``*`` and ``/``) always return :cpp:class:`~mppp::real128`
-   as a result, promoting at most one operand to :cpp:class:`~mppp::real128` before actually performing
-   the computation. Similarly, the relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote at
-   most one argument to :cpp:class:`~mppp::real128` before performing the comparison. Alternative comparison functions
-   treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
+   Various :ref:`overloaded operators <real128_operators>` are provided. Alternative comparison functions
+   treating NaNs specially are also provided for use in the C++ standard library (and wherever strict weak ordering relations
    are needed).
 
    The :cpp:class:`~mppp::real128` class is a `literal type
