@@ -145,7 +145,7 @@ namespace
 // then the init of this thread_local variable will happen
 // before any dynamic initialisation:
 // https://en.cppreference.com/w/cpp/language/constant_initialization
-thread_local mpz_alloc_cache mpz_alloc_cache_inst;
+MPPP_CONSTINIT thread_local mpz_alloc_cache mpz_alloc_cache_inst;
 
 // Implementation of the init of an mpz from cache.
 bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)

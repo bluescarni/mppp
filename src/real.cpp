@@ -231,7 +231,7 @@ struct flint_cleanup {
 };
 
 // Instantiate a cleanup object for each thread.
-thread_local const flint_cleanup flint_cleanup_inst;
+MPPP_CONSTINIT thread_local const flint_cleanup flint_cleanup_inst;
 
 #endif
 
@@ -979,7 +979,7 @@ struct mpfr_cleanup {
 };
 
 // Instantiate a cleanup object for each thread.
-thread_local const mpfr_cleanup mpfr_cleanup_inst;
+MPPP_CONSTINIT thread_local const mpfr_cleanup mpfr_cleanup_inst;
 
 #else
 
@@ -1008,12 +1008,12 @@ struct mpfr_global_cleanup {
     }
 };
 
-thread_local const mpfr_tl_cleanup mpfr_tl_cleanup_inst;
+MPPP_CONSTINIT thread_local const mpfr_tl_cleanup mpfr_tl_cleanup_inst;
 // NOTE: because the destruction of thread-local objects
 // always happens before the destruction of objects with
 // static storage duration, the global cleanup will always
 // be performed after thread-local cleanup.
-const mpfr_global_cleanup mpfr_global_cleanup_inst;
+MPPP_CONSTINIT const mpfr_global_cleanup mpfr_global_cleanup_inst;
 
 #endif
 
