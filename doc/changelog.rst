@@ -44,6 +44,8 @@ Changes
 - Various internal simplifications and improvements
   to :cpp:class:`~mppp::real128`
   (`#221 <https://github.com/bluescarni/mppp/pull/221>`__).
+- Update Catch to the latest version, 2.11.3
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 
 Fix
 ~~~
