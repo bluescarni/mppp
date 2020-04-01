@@ -41,7 +41,7 @@ Common concepts
 
 .. cpp:concept:: template <typename T> mppp::cpp_complex
 
-   This concept is satisfied if ``T`` is one of the C++ complex types:
+   This concept is satisfied if ``T`` is one of the standard C++ complex types:
 
    * ``std::complex<float>``,
    * ``std::complex<double>``,

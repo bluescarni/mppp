@@ -177,6 +177,24 @@ public:
     // Trivial move assignment operator.
     complex128 &operator=(complex128 &&) = default;
 
+    // Assignment from a __complex128.
+    MPPP_CONSTEXPR_14 complex128 &operator=(const cplex128 &c)
+    {
+        m_value = c;
+        return *this;
+    }
+
+    // Assignment from interoperable types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex128_interoperable T>
+#else
+    template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 complex128 &operator=(const T &x)
+    {
+        return *this = complex128{x};
+    }
+
     // Getters for the real/imaginary parts.
     constexpr real128 real() const
     {

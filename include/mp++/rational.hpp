@@ -169,7 +169,7 @@ public:
     }
 
 private:
-    // A tag for private constrcutors.
+    // A tag for private constructors.
     struct ptag {
     };
     template <typename T,

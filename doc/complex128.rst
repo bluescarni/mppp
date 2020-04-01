@@ -172,6 +172,33 @@ The complex128 class
       :cpp:class:`~mppp::complex128` is trivially copy and
       move assignable.
 
+   .. cpp:function:: constexpr complex128 &operator=(const __complex128 &c)
+
+      .. note::
+
+        This operator is ``constexpr`` only if at least C++14 is being used.
+
+      Assignment operator from :cpp:type:`__complex128`.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function::  template <complex128_interoperable T> constexpr complex128 &operator=(const T &x)
+
+      .. note::
+
+        This operator is ``constexpr`` only if at least C++14 is being used.
+
+      Assignment from interoperable types.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the construction of a
+        :cpp:class:`~mppp::complex128` from *x*.
+
 Types
 -----
 

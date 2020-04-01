@@ -171,7 +171,7 @@ The integer class
       Generic constructor from C++ arithmetic types.
 
       This constructor will initialize an integer with the value of *x*.
-      The initialization is always successful if *x* is an integral value
+      The initialisation is always successful if *x* is an integral value
       (construction from ``bool`` yields 1 for ``true``, 0 for ``false``).
       If *x* is a floating-point value, the construction will fail if *x*
       is not finite. Construction from a floating-point type yields the
@@ -187,7 +187,7 @@ The integer class
 
       Generic constructor from C++ complex types.
 
-      This constructor will initialize an integer with the value of *c*. The initialization is
+      This constructor will initialize an integer with the value of *c*. The initialisation is
       successful only if the imaginary part of *c* is zero and the real part of *c* is finite.
 
       :param c: value that will be used to initialize ``this``.

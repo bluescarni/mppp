@@ -2750,7 +2750,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         //
         // NOTE: this is the implementation for 2 limbs, even if potentially the operands have 1 limb.
         // The idea here is that it's better to do a few computations more rather than paying the branching
-        // cost. 1-limb operands will have the upper limb set to zero from the zero-initialization of
+        // cost. 1-limb operands will have the upper limb set to zero from the zero-initialisation of
         // the limbs of static ints.
         //
         // NOTE: the rop hi limb might spill over either from the addition of the hi limbs

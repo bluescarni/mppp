@@ -38,12 +38,26 @@ using namespace mppp;
 
 #if MPPP_CPLUSPLUS >= 201402L
 
-constexpr auto test_constexpr_assignment(const complex128 &c)
+constexpr auto test_constexpr_cm_assignment(const complex128 &c)
 {
     complex128 c2{}, c3{};
     c2 = c;
     c3 = std::move(c);
     return std::make_pair(c2, c3);
+}
+
+constexpr auto test_constexpr_c128_assignment(const cplex128 &c)
+{
+    complex128 c2{};
+    c2 = c;
+    return c2;
+}
+
+constexpr auto test_constexpr_interop_assignment(int n)
+{
+    complex128 c2{};
+    c2 = n;
+    return c2;
 }
 
 #endif
@@ -72,7 +86,7 @@ TEST_CASE("basic constructors")
     REQUIRE(c5.m_value == -3);
     constexpr complex128 c6{real128{42}};
     REQUIRE(c6.m_value == 42);
-#if !defined(__clang__)
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
     constexpr complex128 c6a{4.l};
     REQUIRE(c6a.m_value == 4);
 #endif
@@ -90,7 +104,7 @@ TEST_CASE("basic constructors")
     REQUIRE(c8.m_value == cplex128{-4, -5});
     constexpr complex128 c9{1, real128{12}};
     REQUIRE(c9.m_value == cplex128{1, 12});
-#if !defined(__clang__)
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
     constexpr complex128 c9a{4.l, 3};
     REQUIRE(c9a.m_value == cplex128{4, 3});
 #endif
@@ -263,9 +277,54 @@ TEST_CASE("assignment operators")
 
 #if MPPP_CPLUSPLUS >= 201402L
     {
-        constexpr auto tca = test_constexpr_assignment(complex128{-1, 3});
+        constexpr auto tca = test_constexpr_cm_assignment(complex128{-1, 3});
         REQUIRE(tca.first == complex128{-1, 3});
         REQUIRE(tca.second == complex128{-1, 3});
+    }
+#endif
+
+    // Assignment from __complex128.
+    c = cplex128{4, -5};
+    REQUIRE(c.real() == 4);
+    REQUIRE(c.imag() == -5);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_constexpr_c128_assignment(cplex128{4, 5});
+        REQUIRE(tca.real() == 4);
+        REQUIRE(tca.imag() == 5);
+    }
+#endif
+
+    // Assignment from interoperable types.
+    c = 4;
+    REQUIRE(c.real() == 4);
+    REQUIRE(c.imag() == 0);
+    c = -25.;
+    REQUIRE(c.real() == -25);
+    REQUIRE(c.imag() == 0);
+    c = 1234_z1;
+    REQUIRE(c.real() == 1234);
+    REQUIRE(c.imag() == 0);
+    c = -4321_q1;
+    REQUIRE(c.real() == -4321);
+    REQUIRE(c.imag() == 0);
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    c = -4321.l;
+    REQUIRE(c.real() == -4321);
+    REQUIRE(c.imag() == 0);
+#endif
+#if defined(MPPP_WITH_MPFR)
+    c = 789_r256;
+    REQUIRE(c.real() == 789);
+    REQUIRE(c.imag() == 0);
+#endif
+
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_constexpr_interop_assignment(42);
+        REQUIRE(tca.real() == 42);
+        REQUIRE(tca.imag() == 0);
     }
 #endif
 }
