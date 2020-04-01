@@ -13,12 +13,9 @@
 #endif
 
 #include <mp++/config.hpp>
-#include <mp++/detail/type_traits.hpp>
-#include <mp++/integer.hpp>
-#include <mp++/rational.hpp>
-#include <mp++/real128.hpp>
 
 #include <ciso646>
+#include <complex>
 #include <cstdint>
 #include <limits>
 #include <random>
@@ -36,6 +33,12 @@
 
 #include <quadmath.h>
 
+#include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
+#include <mp++/real128.hpp>
+
 #include "test_utils.hpp"
 
 #include "catch.hpp"
@@ -52,8 +55,20 @@ static std::mt19937 rng;
 static constexpr auto delta64 = detail::nl_digits<std::uint_least64_t>() - 64;
 static constexpr auto delta49 = detail::nl_digits<std::uint_least64_t>() - 49;
 
+#if MPPP_CPLUSPLUS >= 201402L
+
+constexpr auto test_cexpr_complex(std::complex<double> c)
+{
+    real128 out{c};
+    return out;
+}
+
+#endif
+
 TEST_CASE("real128 constructors")
 {
+    using Catch::Matchers::Message;
+
     REQUIRE(std::is_nothrow_destructible<real128>::value);
     REQUIRE(std::is_nothrow_move_constructible<real128>::value);
     REQUIRE(std::is_nothrow_move_assignable<real128>::value);
@@ -188,6 +203,30 @@ TEST_CASE("real128 constructors")
              == real128{"1.295035023887605022184887791645529310e-4965"}.m_value));
     REQUIRE((real128{rat_t{-1, int_t{1} << 16494}}.m_value
              == real128{"-6.47517511943802511092443895822764655e-4966"}.m_value));
+    // Ctor from complex.
+    REQUIRE(real128{std::complex<float>{-42, 0}} == -42);
+    REQUIRE(real128{std::complex<double>{42, 0}} == 42);
+    REQUIRE_THROWS_MATCHES(
+        (real128{std::complex<double>{42, 5}}), std::domain_error,
+        Message("Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                + detail::to_string(5.)));
+    REQUIRE_THROWS_MATCHES(
+        (real128{std::complex<double>{0, -5}}), std::domain_error,
+        Message("Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                + detail::to_string(-5.)));
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(real128{std::complex<long double>{-42, 0}} == -42);
+    REQUIRE_THROWS_MATCHES(
+        (real128{std::complex<long double>{42, 5}}), std::domain_error,
+        Message("Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                + detail::to_string(5.l)));
+#endif
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_cexpr_complex(std::complex<double>{4, 0});
+        REQUIRE(tca == 4);
+    }
+#endif
     // String ctors.
     REQUIRE((real128{"0"}.m_value == 0));
     REQUIRE((real128{"-0"}.m_value == 0));

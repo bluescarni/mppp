@@ -106,6 +106,22 @@ The real128 class
 
       :exception std\:\:overflow_error: in case of (unlikely) overflow errors during initialisation.
 
+   .. cpp:function:: template <real128_cpp_complex T> constexpr explicit real128(const T &c)
+
+      .. note::
+
+        This constructor is ``constexpr`` only if at least C++14 is being used.
+
+      .. versionadded:: 0.20
+
+      Constructor from C++ complex types.
+
+      The initialisation is is successful only if the imaginary part of *c* is zero.
+
+      :param c: the input complex value.
+
+      :exception std\:\:domain_error: if the imaginary part of *c* is not zero.
+
    .. cpp:function:: template <string_type T> explicit real128(const T &s)
 
       Constructor from string.
@@ -464,7 +480,8 @@ Concepts
 
 .. cpp:concept:: template <typename T> mppp::real128_interoperable
 
-   This concept is satisfied by types that can interoperate with :cpp:class:`~mppp::real128`.
+   This concept is satisfied by real-valued types that can
+   interoperate with :cpp:class:`~mppp::real128`.
    Specifically, this concept is satisfied if either:
 
    * ``T`` is :cpp:class:`~mppp::integer`, or
@@ -473,6 +490,19 @@ Concepts
      :cpp:concept:`mppp::cpp_arithmetic`, or
    * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::cpp_arithmetic`, except if
      ``T`` is ``long double``.
+
+.. cpp:concept:: template <typename T> mppp::real128_cpp_complex
+
+   .. versionadded:: 0.20
+
+   This concept is satisfied by C++ complex types that can
+   interoperate with :cpp:class:`~mppp::real128`.
+   Specifically, this concept is satisfied if either:
+
+   * on GCC, the Intel compiler and Clang>=7, ``T`` satisfies
+     :cpp:concept:`mppp::cpp_complex`, or
+   * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::cpp_complex`, except if
+     ``T`` is ``std::complex<long double>``.
 
 .. cpp:concept:: template <typename T, typename U> mppp::real128_op_types
 

@@ -15,6 +15,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <complex>
 #include <cstdint>
 #include <limits>
 #include <ostream>
@@ -176,6 +177,21 @@ using is_real128_interoperable
 
 template <typename T>
 MPPP_CONCEPT_DECL real128_interoperable = is_real128_interoperable<T>::value;
+
+#endif
+
+template <typename T>
+using is_real128_cpp_complex = detail::conjunction<is_cpp_complex<T>
+#if !defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+                                                   ,
+                                                   detail::negation<std::is_same<T, std::complex<long double>>>
+#endif
+                                                   >;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL real128_cpp_complex = is_real128_cpp_complex<T>::value;
 
 #endif
 
@@ -355,6 +371,20 @@ public:
     template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
 #endif
     constexpr explicit real128(const T &x) : m_value(cast_to_float128(x))
+    {
+    }
+    // Constructor from std::complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 explicit real128(const T &c)
+        : m_value(c.imag() == 0
+                      ? c.real()
+                      : throw std::domain_error(
+                          "Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                          + detail::to_string(c.imag())))
     {
     }
 
