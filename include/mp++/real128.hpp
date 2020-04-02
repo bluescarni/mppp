@@ -434,6 +434,21 @@ public:
         return *this = real128{x};
     }
 
+    // Assignment from C++ complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 real128 &operator=(const T &c)
+    {
+        if (mppp_unlikely(c.imag()) != 0) {
+            throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                    + detail::to_string(c.imag()) + " to a real128");
+        }
+        return *this = c.real();
+    }
+
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>

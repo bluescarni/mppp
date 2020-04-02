@@ -63,6 +63,13 @@ constexpr auto test_cexpr_complex(std::complex<double> c)
     return out;
 }
 
+constexpr auto test_cexpr_complex_ass(std::complex<double> c)
+{
+    real128 out{};
+    out = c;
+    return out;
+}
+
 #endif
 
 TEST_CASE("real128 constructors")
@@ -296,6 +303,27 @@ TEST_CASE("real128 constructors")
     REQUIRE((ra.m_value == -123000));
     ra = std::string("1234");
     REQUIRE((ra.m_value == 1234));
+    ra = std::complex<float>{-5, 0};
+    REQUIRE(ra == -5);
+    ra = std::complex<double>{-6, 0};
+    REQUIRE(ra == -6);
+    REQUIRE_THROWS_PREDICATE((ra = std::complex<double>{-6, 1}), std::domain_error, [](const std::domain_error &ex) {
+        return std::string(ex.what())
+               == "Cannot assign a complex C++ value with a non-zero imaginary part of " + detail::to_string(1.)
+                      + " to a real128";
+    });
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    ra = std::complex<long double>{-7, 0};
+    REQUIRE(ra == -7);
+#else
+    REQUIRE(!std::is_assignable<real128 &, std::complex<long double>>::value);
+#endif
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_cexpr_complex_ass(std::complex<double>{4, 0});
+        REQUIRE(tca == 4);
+    }
+#endif
 #if defined(MPPP_HAVE_STRING_VIEW)
     ra = std::string_view{tmp_char + 6, 5};
     REQUIRE((ra.m_value == -1234));

@@ -189,6 +189,22 @@ The real128 class
       :exception unspecified: any exception thrown by the construction of a
         :cpp:class:`~mppp::real128` from *x*.
 
+   .. cpp:function:: template <real128_cpp_complex T> constexpr real128 &operator=(const T &c)
+
+      .. note::
+
+        This operator is ``constexpr`` only if at least C++14 is being used.
+
+      .. versionadded:: 0.20
+
+      Assignment from C++ complex types.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:domain_error: if the imaginary part of *c* is not zero.
+
    .. cpp:function:: template <string_type T> real128 &operator=(const T &s)
 
       Assignment from string.
