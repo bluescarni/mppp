@@ -139,9 +139,9 @@ public:
     }
     // Constructor from std::complex.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <cpp_complex T>
+    template <real128_cpp_complex T>
 #else
-    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
 #endif
     MPPP_CONSTEXPR_14 explicit complex128(const T &c)
         : m_value{static_cast<__float128>(c.real()), static_cast<__float128>(c.imag())}
@@ -184,7 +184,7 @@ public:
         return *this;
     }
 
-    // Assignment from interoperable types.
+    // Assignment from real-valued interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <complex128_interoperable T>
 #else
@@ -193,6 +193,17 @@ public:
     MPPP_CONSTEXPR_14 complex128 &operator=(const T &x)
     {
         return *this = complex128{x};
+    }
+
+    // Assignment from std::complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 complex128 &operator=(const T &c)
+    {
+        return *this = complex128{c};
     }
 
     // Getters for the real/imaginary parts.
@@ -208,13 +219,36 @@ public:
     // Setters for real/imaginary parts.
     MPPP_CONSTEXPR_14 void set_real(const real128 &re)
     {
-        __real__ m_value = re.m_value;
+        set_real(re.m_value);
     }
     MPPP_CONSTEXPR_14 void set_imag(const real128 &im)
     {
-        __imag__ m_value = im.m_value;
+        set_imag(im.m_value);
     }
 
+private:
+    // Private setters in terms of __float128.
+    MPPP_CONSTEXPR_14 void set_real(const __float128 &re)
+    {
+        // NOTE: use this idiom, instead of setting
+        // directly __real__ m_value, because
+        // GCC does not allow constexpr setting of
+        // real/imaginary parts. Luckily, this idiom
+        // produces identically-efficient code:
+        // https://godbolt.org/z/Pjsx8h
+        // NOTE: because here we are reading
+        // from m_value when fetching the current imaginary
+        // part, we CANNOT use the setters on
+        // uninitialised complex128 objects! (e.g., during
+        // construction).
+        m_value = cplex128{re, __imag__ m_value};
+    }
+    MPPP_CONSTEXPR_14 void set_imag(const __float128 &im)
+    {
+        m_value = cplex128{__real__ m_value, im};
+    }
+
+public:
     // Conversion to string.
     std::string to_string() const;
 };
@@ -263,8 +297,8 @@ using are_complex128_cmp_op_types
     = detail::disjunction<detail::conjunction<std::is_same<T, complex128>, std::is_same<U, complex128>>,
                           detail::conjunction<std::is_same<T, complex128>, is_complex128_interoperable<U>>,
                           detail::conjunction<std::is_same<U, complex128>, is_complex128_interoperable<T>>,
-                          detail::conjunction<std::is_same<T, complex128>, is_cpp_complex<U>>,
-                          detail::conjunction<std::is_same<U, complex128>, is_cpp_complex<T>>>;
+                          detail::conjunction<std::is_same<T, complex128>, is_real128_cpp_complex<U>>,
+                          detail::conjunction<std::is_same<U, complex128>, is_real128_cpp_complex<T>>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 

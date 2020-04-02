@@ -117,7 +117,7 @@ The complex128 class
 
       :exception unspecified: any exception raised by casting ``T`` to :cpp:class:`~mppp::real128`.
 
-   .. cpp:function:: template <cpp_complex T> constexpr explicit complex128(const T &c)
+   .. cpp:function:: template <real128_cpp_complex T> constexpr explicit complex128(const T &c)
 
       .. note::
 
@@ -198,6 +198,18 @@ The complex128 class
 
       :exception unspecified: any exception thrown by the construction of a
         :cpp:class:`~mppp::complex128` from *x*.
+
+   .. cpp:function:: template <real128_cpp_complex T> constexpr complex128 &operator=(const T &c)
+
+      .. note::
+
+        This operator is ``constexpr`` only if at least C++14 is being used.
+
+      Assignment from C++ complex types.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
 
 Types
 -----

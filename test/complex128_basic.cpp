@@ -12,6 +12,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -60,6 +61,21 @@ constexpr auto test_constexpr_interop_assignment(int n)
     return c2;
 }
 
+constexpr auto test_constexpr_cpp_complex_assignment(const std::complex<double> &c)
+{
+    complex128 c2{};
+    c2 = c;
+    return c2;
+}
+
+constexpr auto test_constexpr_setters(double re, double im)
+{
+    complex128 c2{};
+    c2.set_real(real128{re});
+    c2.set_imag(real128{im});
+    return c2;
+}
+
 #endif
 
 TEST_CASE("basic constructors")
@@ -89,6 +105,8 @@ TEST_CASE("basic constructors")
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
     constexpr complex128 c6a{4.l};
     REQUIRE(c6a.m_value == 4);
+#else
+    REQUIRE(!std::is_constructible<complex128, long double>::value);
 #endif
     REQUIRE(complex128{integer<1>{-48}}.m_value == -48);
     REQUIRE(complex128{rational<1>{5, 2}}.m_value == complex128{5}.m_value / 2);
@@ -107,6 +125,8 @@ TEST_CASE("basic constructors")
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
     constexpr complex128 c9a{4.l, 3};
     REQUIRE(c9a.m_value == cplex128{4, 3});
+#else
+    REQUIRE(!std::is_constructible<complex128, long double, int>::value);
 #endif
     REQUIRE(complex128{-48_z1, 66_z1}.m_value == cplex128{-48, 66});
     REQUIRE(complex128{-5_q1 / 2, 3_q1 / 2}.m_value == cplex128{real128{"-2.5"}.m_value, real128{"1.5"}.m_value});
@@ -126,6 +146,12 @@ TEST_CASE("basic constructors")
     REQUIRE(c10.m_value == cplex128{1, 2});
     MPPP_CONSTEXPR_14 complex128 c11{std::complex<float>{-1, -3}};
     REQUIRE(c11.m_value == cplex128{-1, -3});
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    MPPP_CONSTEXPR_14 complex128 c12{std::complex<long double>{1, 2}};
+    REQUIRE(c12.m_value == cplex128{1, 2});
+#else
+    REQUIRE(!std::is_constructible<complex128, std::complex<long double>>::value);
+#endif
 }
 
 TEST_CASE("string constructors")
@@ -275,7 +301,8 @@ TEST_CASE("assignment operators")
     REQUIRE(c.real() == 1);
     REQUIRE(c.imag() == 2);
 
-#if MPPP_CPLUSPLUS >= 201402L
+    // NOTE: icpc ICEs on this test.
+#if MPPP_CPLUSPLUS >= 201402L && !defined(__INTEL_COMPILER)
     {
         constexpr auto tca = test_constexpr_cm_assignment(complex128{-1, 3});
         REQUIRE(tca.first == complex128{-1, 3});
@@ -313,6 +340,8 @@ TEST_CASE("assignment operators")
     c = -4321.l;
     REQUIRE(c.real() == -4321);
     REQUIRE(c.imag() == 0);
+#else
+    REQUIRE(!std::is_assignable<complex128 &, long double>::value);
 #endif
 #if defined(MPPP_WITH_MPFR)
     c = 789_r256;
@@ -325,6 +354,52 @@ TEST_CASE("assignment operators")
         constexpr auto tca = test_constexpr_interop_assignment(42);
         REQUIRE(tca.real() == 42);
         REQUIRE(tca.imag() == 0);
+    }
+#endif
+
+    // Assignment from C++ complex.
+    c = std::complex<float>{4, 5};
+    REQUIRE(c.real() == 4);
+    REQUIRE(c.imag() == 5);
+    c = std::complex<double>{-4, -5};
+    REQUIRE(c.real() == -4);
+    REQUIRE(c.imag() == -5);
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    c = std::complex<long double>{4, -5};
+    REQUIRE(c.real() == 4);
+    REQUIRE(c.imag() == -5);
+#else
+    REQUIRE(!std::is_assignable<complex128 &, std::complex<long double>>::value);
+#endif
+
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_constexpr_cpp_complex_assignment(std::complex<double>{1, 2});
+        REQUIRE(tca.real() == 1);
+        REQUIRE(tca.imag() == 2);
+    }
+#endif
+}
+
+TEST_CASE("setters getters")
+{
+    constexpr auto c1 = complex128{1, 2};
+    constexpr bool b1 = c1.real() == 1;
+    REQUIRE(b1);
+    constexpr bool b2 = c1.imag() == 2;
+    REQUIRE(b2);
+
+    auto c2 = complex128{4, 5};
+    c2.set_real(real128{-4});
+    c2.set_imag(real128{-5});
+    REQUIRE(c2.real() == -4);
+    REQUIRE(c2.imag() == -5);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_constexpr_setters(6., 7.);
+        REQUIRE(tca.real() == 6);
+        REQUIRE(tca.imag() == 7);
     }
 #endif
 }

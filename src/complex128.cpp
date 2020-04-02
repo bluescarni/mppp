@@ -53,6 +53,11 @@ std::string complex128::to_string() const
 // from a null-terminated string.
 void complex128::construct_from_nts(const char *str)
 {
+    // NOTE: set the value to zero before doing
+    // anything else, so that the set_real()/set_imag()
+    // below operate on a well-defined internal value.
+    m_value = 0;
+
     // Small helper to raise an error in case
     // of a malformed string.
     auto raise_error = [str]() {
@@ -99,7 +104,7 @@ void complex128::construct_from_nts(const char *str)
             //
             // Thus, p-1 > s >= s+1.
             set_real(real128{s + 1, p - 1});
-            set_imag(real128{0});
+            set_imag(0);
         } else {
             // We reached a comma, the format must
             // be (real,imag).
@@ -133,7 +138,7 @@ void complex128::construct_from_nts(const char *str)
         // The string does not start with a round
         // bracket, interpret as a real value.
         set_real(real128{s});
-        set_imag(real128{0});
+        set_imag(0);
     }
 }
 
