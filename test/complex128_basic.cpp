@@ -105,8 +105,10 @@ TEST_CASE("basic constructors")
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
     constexpr complex128 c6a{4.l};
     REQUIRE(c6a.m_value == 4);
-#else
-    REQUIRE(!std::is_constructible<complex128, long double>::value);
+    // NOTE: even if MPPP_FLOAT128_WITH_LONG_DOUBLE
+    // is not defined, the construction from long double
+    // will still work because the assignment
+    // from __complex128 is picked up instead.
 #endif
     REQUIRE(complex128{integer<1>{-48}}.m_value == -48);
     REQUIRE(complex128{rational<1>{5, 2}}.m_value == complex128{5}.m_value / 2);
@@ -342,7 +344,7 @@ TEST_CASE("assignment operators")
     REQUIRE(c.imag() == 0);
     // NOTE: even if MPPP_FLOAT128_WITH_LONG_DOUBLE
     // is not defined, the assignment from long double
-    // may still work because the assignment
+    // will still work because the assignment
     // from __complex128 is picked up instead.
 #endif
 #if defined(MPPP_WITH_MPFR)
