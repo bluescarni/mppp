@@ -340,8 +340,10 @@ TEST_CASE("assignment operators")
     c = -4321.l;
     REQUIRE(c.real() == -4321);
     REQUIRE(c.imag() == 0);
-#else
-    REQUIRE(!std::is_assignable<complex128 &, long double>::value);
+    // NOTE: even if MPPP_FLOAT128_WITH_LONG_DOUBLE
+    // is not defined, the assignment from long double
+    // may still work because the assignment
+    // from __complex128 is picked up instead.
 #endif
 #if defined(MPPP_WITH_MPFR)
     c = 789_r256;
