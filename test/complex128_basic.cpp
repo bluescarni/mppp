@@ -26,6 +26,7 @@
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
+#include <mp++/type_name.hpp>
 
 #if defined(MPPP_WITH_MPFR)
 
@@ -334,6 +335,9 @@ TEST_CASE("assignment operators")
     c = -25.;
     REQUIRE(c.real() == -25);
     REQUIRE(c.imag() == 0);
+    c = -1234_rq;
+    REQUIRE(c.real() == -1234);
+    REQUIRE(c.imag() == 0);
     c = 1234_z1;
     REQUIRE(c.real() == 1234);
     REQUIRE(c.imag() == 0);
@@ -423,9 +427,67 @@ TEST_CASE("setters getters")
 
 TEST_CASE("conversions")
 {
+    using Catch::Matchers::Message;
+
     {
+        // To __complex128.
         constexpr auto c = complex128{1, 2};
         constexpr auto cc = static_cast<cplex128>(c);
         REQUIRE(cc == cplex128{1, 2});
+    }
+
+    {
+        // To C++ arithmetic types.
+        constexpr auto c = complex128{-42, 0};
+        constexpr auto ci = static_cast<int>(c);
+        REQUIRE(ci == -42);
+        constexpr auto cd = static_cast<double>(c);
+        REQUIRE(cd == -42);
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+        constexpr auto cld = static_cast<long double>(c);
+        REQUIRE(cld == -42);
+#else
+        REQUIRE(!std::is_convertible<complex128, long double>::value);
+#endif
+
+        // To real128.
+        constexpr auto crq = static_cast<real128>(c);
+        REQUIRE(crq == -42);
+
+        // mp++ types.
+        REQUIRE(static_cast<integer<1>>(complex128{41, 0}) == 41);
+        REQUIRE(static_cast<rational<1>>(complex128{-3, 0}) == -3);
+
+#if defined(MPPP_WITH_MPFR)
+        // To real.
+        auto cr = static_cast<real>(complex128{45, 0});
+        REQUIRE(cr == 45);
+        REQUIRE(cr.get_prec() == 113);
+#endif
+
+        // Failure modes.
+        REQUIRE_THROWS_MATCHES(static_cast<int>(complex128{1, 1}), std::domain_error,
+                               Message("Cannot convert a complex128 with a nonzero imaginary part of "
+                                       + real128{1}.to_string() + " to the real-valued type '" + type_name<int>()
+                                       + "'"));
+        REQUIRE_THROWS_MATCHES(static_cast<integer<1>>(complex128{1, 2}), std::domain_error,
+                               Message("Cannot convert a complex128 with a nonzero imaginary part of "
+                                       + real128{2}.to_string() + " to the real-valued type '" + type_name<integer<1>>()
+                                       + "'"));
+
+        {
+            // To c++ complex.
+            constexpr auto c = complex128{1, 2};
+            MPPP_CONSTEXPR_14 auto cf = static_cast<std::complex<float>>(c);
+            REQUIRE(cf == std::complex<float>{1, 2});
+            MPPP_CONSTEXPR_14 auto cd = static_cast<std::complex<double>>(c);
+            REQUIRE(cd == std::complex<double>{1, 2});
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+            MPPP_CONSTEXPR_14 auto cld = static_cast<std::complex<long double>>(c);
+            REQUIRE(cld == std::complex<long double>{1, 2});
+#else
+            REQUIRE(!std::is_convertible<complex128, std::complex<long double>>::value);
+#endif
+        }
     }
 }

@@ -31,6 +31,7 @@
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
+#include <mp++/type_name.hpp>
 
 #if defined(MPPP_WITH_MPFR)
 
@@ -217,12 +218,6 @@ public:
         return *this = complex128{s};
     }
 
-    // Conversion operator to __complex128.
-    constexpr explicit operator cplex128() const
-    {
-        return m_value;
-    }
-
     // Getters for the real/imaginary parts.
     constexpr real128 real() const
     {
@@ -266,6 +261,39 @@ private:
     }
 
 public:
+    // Conversion operator to __complex128.
+    constexpr explicit operator cplex128() const
+    {
+        return m_value;
+    }
+
+    // Conversion operator to real-valued interoperable types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex128_interoperable T>
+#else
+    template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
+#endif
+    constexpr explicit operator T() const
+    {
+        return imag() == 0 ? static_cast<T>(real())
+                           : throw std::domain_error("Cannot convert a complex128 with a nonzero imaginary part of "
+                                                     + imag().to_string() + " to the real-valued type '"
+                                                     + type_name<T>() + "'");
+    }
+
+    // Conversion to C++ complex types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 explicit operator T() const
+    {
+        using value_t = typename T::value_type;
+
+        return T{static_cast<value_t>(real()), static_cast<value_t>(imag())};
+    }
+
     // Conversion to string.
     std::string to_string() const;
 };
