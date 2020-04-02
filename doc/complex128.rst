@@ -211,6 +211,25 @@ The complex128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: template <string_type T> complex128 &operator=(const T &s)
+
+      Assignment from string.
+
+      The accepted string formats are the same explained in the constructor
+      from string.
+
+      :param s: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the constructor from string.
+
+   .. cpp:function:: constexpr explicit operator __complex128() const
+
+      Conversion to :cpp:type:`__complex128`.
+
+      :return: a copy of :cpp:member:`~mppp::complex128::m_value`.
+
 Types
 -----
 

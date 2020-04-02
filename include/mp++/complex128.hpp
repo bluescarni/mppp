@@ -206,6 +206,23 @@ public:
         return *this = complex128{c};
     }
 
+    // Assignment from string.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <string_type T>
+#else
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
+#endif
+    complex128 &operator=(const T &s)
+    {
+        return *this = complex128{s};
+    }
+
+    // Conversion operator to __complex128.
+    constexpr explicit operator cplex128() const
+    {
+        return m_value;
+    }
+
     // Getters for the real/imaginary parts.
     constexpr real128 real() const
     {

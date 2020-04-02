@@ -294,6 +294,8 @@ TEST_CASE("string constructors")
 
 TEST_CASE("assignment operators")
 {
+    using Catch::Matchers::Message;
+
     // Trivial copy/move.
     complex128 a{1, 2}, b, c;
     b = a;
@@ -383,6 +385,17 @@ TEST_CASE("assignment operators")
         REQUIRE(tca.imag() == 2);
     }
 #endif
+
+    // Assignment from strings.
+    c = "123";
+    REQUIRE(c.m_value == 123);
+    c = "(-123)";
+    REQUIRE(c.m_value == -123);
+    c = "(-123,456)";
+    REQUIRE(c.m_value == cplex128{-123, 456});
+    REQUIRE_THROWS_MATCHES(
+        c = complex128{"123 "}, std::invalid_argument,
+        Message("The string '123 ' does not represent a valid quadruple-precision floating-point value"));
 }
 
 TEST_CASE("setters getters")
@@ -406,4 +419,13 @@ TEST_CASE("setters getters")
         REQUIRE(tca.imag() == 7);
     }
 #endif
+}
+
+TEST_CASE("conversions")
+{
+    {
+        constexpr auto c = complex128{1, 2};
+        constexpr auto cc = static_cast<cplex128>(c);
+        REQUIRE(cc == cplex128{1, 2});
+    }
 }
