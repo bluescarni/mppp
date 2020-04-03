@@ -431,6 +431,9 @@ TEST_CASE("conversions")
 
     // NOTE: not sure why, but clang complains
     // that the conversion here is not a constexpr expression.
+    // This looks like a bug, because a regular
+    // function (instead of the conversion operator)
+    // works fine.
 #if !defined(__clang__)
     {
         // To __complex128.

@@ -12,7 +12,7 @@ available on GCC, Clang and the Intel compiler.
 which provides up to 36 decimal digits of precision.
 On most platforms, :cpp:type:`__float128` is implemented
 in software, and thus it is typically an order of magnitude
-slower than the standard C++ floating-point types. A notable
+slower than the standard floating-point C++ types. A notable
 exception are recent versions of the PowerPC architecture,
 which provide hardware-accelerated quadruple-precision
 floating-point arithmetic.

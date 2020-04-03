@@ -606,6 +606,19 @@ public:
         return dispatch_conversion<T>(detail::is_real128_cpp_interoperable<T>{});
     }
 
+    // Conversion operator to C++ complex types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 explicit operator T() const
+    {
+        using value_t = typename T::value_type;
+
+        return T{static_cast<value_t>(*this), value_t(0)};
+    }
+
 private:
     // get() implementation for C++ types.
     template <typename T>

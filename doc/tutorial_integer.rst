@@ -12,7 +12,7 @@ stored directly within an :cpp:class:`~mppp::integer` object before resorting to
 A limb is the part of a multiprecision integer that fits in a single word-sized unsigned integral type:
 in the same way an integral value in base 10 is represented as a sequence of digits in the :math:`\left[0,9\right]` range,
 an :cpp:class:`~mppp::integer` object is represented internally by an array of 32-bit or 64-bit
-unsigned C++ integral values. Thus, for instance, if ``SSize`` is set to 2 on a 64-bit system,
+unsigned integral C++ values. Thus, for instance, if ``SSize`` is set to 2 on a 64-bit system,
 :cpp:class:`~mppp::integer` is able to represent values in the :math:`\left(-2^{128},2^{128}\right)` range
 without resorting to dynamic memory allocation. In general, an ``SSize`` value of 1 is a good default choice for many
 use cases.
@@ -35,7 +35,7 @@ a sign-magnitude representation is used instead).
 
 Among the features specific to :cpp:class:`~mppp::integer` we find:
 
-* specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with C++ unsigned
+* specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with unsigned C++
   integrals, ...),
 * prime numbers functions (:cpp:func:`~mppp::probab_prime_p()`, :cpp:func:`~mppp::nextprime()`, ...),
 * parity detection (:cpp:func:`~mppp::even_p()`, :cpp:func:`~mppp::odd_p()`),

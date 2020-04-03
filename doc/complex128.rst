@@ -205,7 +205,7 @@ The complex128 class
 
         This operator is ``constexpr`` only if at least C++14 is being used.
 
-      Assignment from C++ complex types.
+      Assignment from complex C++ types.
 
       :param c: the assignment argument.
 
@@ -224,11 +224,49 @@ The complex128 class
 
       :exception unspecified: any exception thrown by the constructor from string.
 
+   .. cpp:function:: constexpr real128 real() const
+   .. cpp:function:: constexpr real128 imag() const
+
+      Getters for the real and imaginary parts.
+
+      :return: a copy of the real or imaginary part of ``this``.
+
+   .. cpp:function:: constexpr void set_real(const real128 &x)
+   .. cpp:function:: constexpr void set_imag(const real128 &x)
+
+      .. note::
+
+        These functions are ``constexpr`` only if at least C++14 is being used.
+
+      Setters for the real and imaginary parts.
+
+      :param x: the desired value for the real or imaginary part of ``this``.
+
    .. cpp:function:: constexpr explicit operator __complex128() const
 
       Conversion to :cpp:type:`__complex128`.
 
       :return: a copy of :cpp:member:`~mppp::complex128::m_value`.
+
+   .. cpp:function:: template <complex128_interoperable T> constexpr explicit operator T() const
+
+      Conversion to real-valued interoperable types.
+
+      :return: ``this`` converted to the type ``T``.
+
+      :exception std\:\:domain_error: if the imaginary part of ``this`` is not zero.
+      :exception unspecified: any exception thrown by the conversion operator of
+        :cpp:class:`~mppp::real128`.
+
+   .. cpp:function:: template <real128_cpp_complex T> constexpr explicit operator T() const
+
+      .. note::
+
+        This operator is ``constexpr`` only if at least C++14 is being used.
+
+      Conversion to complex C++ types.
+
+      :return: ``this`` converted to the type ``T``.
 
 Types
 -----

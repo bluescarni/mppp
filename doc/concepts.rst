@@ -16,7 +16,7 @@ Common concepts
 
 .. cpp:concept:: template <typename T> mppp::cpp_integral
 
-   This concept is satisfied if ``T`` is a C++ integral type.
+   This concept is satisfied if ``T`` is an integral C++ type.
 
    The GCC-style extended 128-bit integral types ``__int128_t`` and ``__uint128_t`` are included as well, if supported
    on the current platform/compiler combination (see also the :c:macro:`MPPP_HAVE_GCC_INT128` definition).
@@ -31,7 +31,7 @@ Common concepts
 
 .. cpp:concept:: template <typename T> mppp::cpp_floating_point
 
-   This concept is satisfied if ``T`` is a C++ floating-point type.
+   This concept is satisfied if ``T`` is a floating-point C++ type.
 
 .. cpp:concept:: template <typename T> mppp::cpp_arithmetic
 
@@ -40,7 +40,7 @@ Common concepts
 
 .. cpp:concept:: template <typename T> mppp::cpp_complex
 
-   This concept is satisfied if ``T`` is one of the standard C++ complex types:
+   This concept is satisfied if ``T`` is one of the standard complex C++ types:
 
    * ``std::complex<float>``,
    * ``std::complex<double>``,

@@ -23,7 +23,7 @@ The real class
    values can have an arbitrary number of binary digits of precision (limited only by the available memory),
    but the exponent range is limited.
 
-   :cpp:class:`~mppp::real` aims to behave like a C++ floating-point type whose precision is a runtime property
+   :cpp:class:`~mppp::real` aims to behave like a floating-point C++ type whose precision is a runtime property
    of the class instances rather than a compile-time property of the type. Because of this, the way precision
    is handled in :cpp:class:`~mppp::real` differs from the way it is managed in MPFR. The most important difference
    is that in operations involving :cpp:class:`~mppp::real` the precision of the result is usually determined
@@ -143,8 +143,8 @@ The real class
       precision of ``this`` according to the following
       heuristics:
 
-      * if *x* is a C++ integral type ``I``, then the precision is set to the bit width of ``I``;
-      * if *x* is a C++ floating-point type ``F``, then the precision is set to the number of binary digits
+      * if *x* is an integral C++ type ``I``, then the precision is set to the bit width of ``I``;
+      * if *x* is a floating-point C++ type ``F``, then the precision is set to the number of binary digits
         in the significand of ``F``;
       * if *x* is :cpp:class:`~mppp::integer`, then the precision is set to the number of bits in use by
         *x* (rounded up to the next multiple of the limb type's bit width);
@@ -556,10 +556,10 @@ The real class
 
       * if ``T`` is ``bool``, then the conversion returns ``false`` if ``this`` is zero, ``true`` otherwise
         (including if ``this`` is NaN);
-      * if ``T`` is a C++ integral type other than ``bool``, the conversion will yield the truncated counterpart
+      * if ``T`` is an integral C++ type other than ``bool``, the conversion will yield the truncated counterpart
         of ``this`` (i.e., the conversion rounds to zero). The conversion may fail due to overflow or domain errors
         (i.e., when trying to convert non-finite values);
-      * if ``T`` if a C++ floating-point type, the conversion calls directly the low-level MPFR functions (e.g.,
+      * if ``T`` if a floating-point C++ type, the conversion calls directly the low-level MPFR functions (e.g.,
         ``mpfr_get_d()``), and might yield infinities for finite input values;
       * if ``T`` is :cpp:class:`~mppp::integer`, the conversion rounds to zero and might fail due to domain errors,
         but it will never overflow;

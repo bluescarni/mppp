@@ -114,7 +114,7 @@ The real128 class
 
       .. versionadded:: 0.20
 
-      Constructor from C++ complex types.
+      Constructor from complex C++ types.
 
       The initialisation is is successful only if the imaginary part of *c* is zero.
 
@@ -197,7 +197,7 @@ The real128 class
 
       .. versionadded:: 0.20
 
-      Assignment from C++ complex types.
+      Assignment from complex C++ types.
 
       :param c: the assignment argument.
 
@@ -247,6 +247,18 @@ The real128 class
 
       :exception std\:\:domain_error: if ``this`` represents a non-finite value and ``T``
         is :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`.
+
+   .. cpp:function:: template <real128_cpp_complex T> constexpr explicit operator T() const
+
+      .. note::
+
+        This operator is ``constexpr`` only if at least C++14 is being used.
+
+      .. versionadded:: 0.20
+
+      Conversion to complex C++ types.
+
+      :return: ``this`` converted to the type ``T``.
 
    .. cpp:function:: template <real128_interoperable T> constexpr bool get(T &rop) const
 
@@ -511,7 +523,7 @@ Concepts
 
    .. versionadded:: 0.20
 
-   This concept is satisfied by C++ complex types that can
+   This concept is satisfied by complex C++ types that can
    interoperate with :cpp:class:`~mppp::real128`.
    Specifically, this concept is satisfied if either:
 

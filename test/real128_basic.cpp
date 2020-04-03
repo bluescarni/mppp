@@ -348,6 +348,8 @@ TEST_CASE("real128 conversions")
     REQUIRE(xld == .1l);
     get(xld, real128{.3l});
     REQUIRE(xld == .3l);
+#else
+    REQUIRE(!std::is_convertible<real128, long double>::value);
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     constexpr __int128_t n128 = static_cast<__int128_t>(real128{4});
@@ -540,6 +542,23 @@ TEST_CASE("real128 conversions")
     REQUIRE(real128{123.456}.get(un128_rop));
     REQUIRE(un128_rop == 123);
 #endif
+
+    // Conversion to C++ complex types.
+    {
+        MPPP_CONSTEXPR_14 auto cf = static_cast<std::complex<float>>(real128{12});
+        REQUIRE(cf.real() == 12);
+        REQUIRE(cf.imag() == 0);
+        MPPP_CONSTEXPR_14 auto cd = static_cast<std::complex<double>>(real128{-12});
+        REQUIRE(cd.real() == -12);
+        REQUIRE(cd.imag() == 0);
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+        MPPP_CONSTEXPR_14 auto cld = static_cast<std::complex<long double>>(real128{-15});
+        REQUIRE(cld.real() == -15);
+        REQUIRE(cld.imag() == 0);
+#else
+        REQUIRE(!std::is_convertible<real128, std::complex<long double>>::value);
+#endif
+    }
 }
 
 TEST_CASE("real128 frexp")

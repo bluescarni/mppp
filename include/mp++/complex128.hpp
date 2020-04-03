@@ -281,7 +281,7 @@ public:
                                                      + type_name<T>() + "'");
     }
 
-    // Conversion to C++ complex types.
+    // Conversion to complex C++ types.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
 #else
