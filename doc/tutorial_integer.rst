@@ -28,7 +28,7 @@ In addition to the binary versions of these operators, the in-place versions are
 primitives (e.g., :cpp:func:`~mppp::mul_2exp()`, :cpp:func:`~mppp::tdiv_q_2exp()`, :cpp:func:`~mppp::bitwise_ior()`, etc.)
 are also provided for those situations in which it is desirable to pass the return value as a function
 parameter, rather than creating a new return value (as explained earlier in the :ref:`API overview <tutorial_api>`).
-For consistency with C++11, the ``%`` operator returns a remainder with the same sign as the dividend. The bit-shifting
+The ``%`` operator returns a remainder with the same sign as the dividend. The bit-shifting
 operators ``<<`` and ``>>`` correspond respectively to multiplication and division by a power of 2. The bitwise logical
 operators behave as-if :cpp:class:`~mppp::integer` used a two's complement representation (even if internally
 a sign-magnitude representation is used instead).
@@ -59,7 +59,7 @@ There are a few reasons why one would want to use :cpp:class:`~mppp::integer` in
 * the necessity of using functions from the GMP API which have not (yet) been wrapped/implemented by mp++,
 * passing data from/to mp++ to/from another GMP-based multiprecision library.
 
-To start with, :cpp:class:`~mppp::integer` is constructible and assignable from ``mpz_t`` objects:
+To start with, :cpp:class:`~mppp::integer` is constructible and assignable from :cpp:type:`mpz_t` objects:
 
 .. code-block:: c++
 
@@ -75,7 +75,7 @@ To start with, :cpp:class:`~mppp::integer` is constructible and assignable from 
 
    mpz_clear(m);            // Clear the mpz_t.
 
-Second, it is possible to get a reference to an ``mpz_t`` from an :cpp:class:`~mppp::integer`
+Second, it is possible to get a reference to an :cpp:type:`mpz_t` from an :cpp:class:`~mppp::integer`
 via the :cpp:func:`~mppp::integer::get_mpz_t()` member function. This member function will
 first switch the calling :cpp:class:`~mppp::integer` to dynamic storage (if the calling
 :cpp:class:`~mppp::integer` is not already employing dynamic storage), and it will then return

@@ -28,7 +28,7 @@ Design non-goals include:
   try `Boost Multiprecision <https://www.boost.org/doc/libs/1_72_0/libs/multiprecision/doc/html/index.html>`__
   instead).
 
-Based on well-known libraries such as `GMP <https://gmplib.org/>`__, `MPFR <https://www.mpfr.org>`__, and others,
+Based on well-known libraries such as `GMP <https://gmplib.org/>`__, `MPFR <https://www.mpfr.org>`__ and others,
 mp++ was initially conceived as a `GMP <https://gmplib.org/>`__ wrapper with a special focus on performance with
 small operands. In particular, a small buffer optimisation and custom
 implementations of basic mathematical primitives are instrumental in
