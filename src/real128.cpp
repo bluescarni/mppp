@@ -93,6 +93,11 @@ __float128 powq(__float128 x, __float128 y)
     return ::powq(x, y);
 }
 
+__float128 fabsq(__float128 x)
+{
+    return ::fabsq(x);
+}
+
 } // namespace detail
 
 // Private string constructors.

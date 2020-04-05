@@ -163,6 +163,7 @@
 
 #endif
 
+// C++20 constinit.
 #if defined(__cpp_constinit)
 
 #define MPPP_CONSTINIT constinit

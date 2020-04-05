@@ -85,6 +85,7 @@ union ieee_float128 {
 MPPP_DLL_PUBLIC __float128 scalbnq(__float128, int);
 MPPP_DLL_PUBLIC __float128 scalblnq(__float128, long);
 MPPP_DLL_PUBLIC __float128 powq(__float128, __float128);
+MPPP_DLL_PUBLIC __float128 fabsq(__float128);
 
 // For internal use only.
 template <typename T>
@@ -727,9 +728,17 @@ constexpr
     real128
     abs(const real128 &x)
 {
-    return x.fpclassify() == FP_NAN
-               ? x
-               : (x.fpclassify() == FP_ZERO ? real128{} : (x.m_value < 0 ? real128{-x.m_value} : x));
+#if defined(__cpp_lib_is_constant_evaluated)
+    if (std::is_constant_evaluated()) {
+#endif
+        return x.fpclassify() == FP_NAN
+                   ? x
+                   : (x.fpclassify() == FP_ZERO ? real128{} : (x.m_value < 0 ? real128{-x.m_value} : x));
+#if defined(__cpp_lib_is_constant_evaluated)
+    } else {
+        return real128{detail::fabsq(x.m_value)};
+    }
+#endif
 }
 
 // Multiply by power of 2.
