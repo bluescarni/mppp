@@ -274,12 +274,14 @@ struct mppp_ass_tester {
         REQUIRE(n == -1);
         n = rational{16, 7};
         REQUIRE(n == 2);
+        REQUIRE(std::is_same<decltype(n = rational{16, 7}), integer &>::value);
 
 #if defined(MPPP_WITH_QUADMATH)
         n = real128{42};
         REQUIRE(n == 42);
         n = real128{"-45.6"};
         REQUIRE(n == -45);
+        REQUIRE(std::is_same<decltype(n = real128{"-45.6"}), integer &>::value);
 #endif
 
 #if defined(MPPP_WITH_MPFR)
@@ -287,6 +289,7 @@ struct mppp_ass_tester {
         REQUIRE(n == -42);
         n = real{"45.1", 100};
         REQUIRE(n == 45);
+        REQUIRE(std::is_same<decltype(n = real{"45.1", 100}), integer &>::value);
 #endif
     }
 };

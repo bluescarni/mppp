@@ -1101,6 +1101,7 @@ struct gen_ass_tester {
         REQUIRE(q == 123);
         q = real128{"-1.5"};
         REQUIRE(q == rational{3, -2});
+        REQUIRE(std::is_same<decltype(q = real128{"-1.5"}), rational &>::value);
 #endif
 
 #if defined(MPPP_WITH_MPFR)
@@ -1108,6 +1109,7 @@ struct gen_ass_tester {
         REQUIRE(q == 42);
         q = real{"-457.5", 100};
         REQUIRE(q == rational{-915, 2});
+        REQUIRE(std::is_same<decltype(q = real{"-457.5", 100}), rational &>::value);
 #endif
     }
 };

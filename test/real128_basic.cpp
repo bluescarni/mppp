@@ -281,6 +281,7 @@ TEST_CASE("real128 constructors")
     REQUIRE(ra < 0);
     ra = real{"nan", 100};
     REQUIRE(isnan(ra));
+    REQUIRE(std::is_same<decltype(ra = real{"nan", 100}), real128 &>::value);
 #endif
 }
 
