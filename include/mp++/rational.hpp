@@ -358,6 +358,16 @@ public:
                             std::integral_constant<bool, is_rational_cvr_integral_interoperable<T, SSize>::value>{});
         return *this;
     }
+
+    // Declaration of the assignments from
+    // other mp++ classes.
+#if defined(MPPP_WITH_QUADMATH)
+    rational &operator=(const real128 &);
+#endif
+#if defined(MPPP_WITH_MPFR)
+    rational &operator=(const real &);
+#endif
+
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
@@ -2166,6 +2176,14 @@ inline std::size_t hash(const rational<SSize> &q)
     // some hashing in the integers, hopefully this is enough to obtain
     // decent hashing on the rational as well.
     return hash(q.get_num()) + hash(q.get_den());
+}
+
+// Implementation of integer's assignment
+// from rational.
+template <std::size_t SSize>
+inline integer<SSize> &integer<SSize>::operator=(const rational<SSize> &q)
+{
+    return *this = static_cast<integer<SSize>>(q);
 }
 
 } // namespace mppp

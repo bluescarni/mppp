@@ -36,6 +36,19 @@
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
+
+#if defined(MPPP_WITH_QUADMATH)
+
+#include <mp++/real128.hpp>
+
+#endif
+
+#if defined(MPPP_WITH_MPFR)
+
+#include <mp++/real.hpp>
+
+#endif
 
 #include "catch.hpp"
 #include "test_utils.hpp"
@@ -239,6 +252,48 @@ struct complex_ass_tester {
 TEST_CASE("complex assignment")
 {
     tuple_for_each(sizes{}, complex_ass_tester{});
+}
+
+struct mppp_ass_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        using rational = rational<S::value>;
+
+        integer n{};
+        n = rational{5};
+        REQUIRE(n == 5);
+        n = rational{-5, 6};
+        REQUIRE(n == 0);
+        n = rational{6, 7};
+        REQUIRE(n == 0);
+        n = rational{8, 7};
+        REQUIRE(n == 1);
+        n = rational{8, -7};
+        REQUIRE(n == -1);
+        n = rational{16, 7};
+        REQUIRE(n == 2);
+
+#if defined(MPPP_WITH_QUADMATH)
+        n = real128{42};
+        REQUIRE(n == 42);
+        n = real128{"-45.6"};
+        REQUIRE(n == -45);
+#endif
+
+#if defined(MPPP_WITH_MPFR)
+        n = real{-42};
+        REQUIRE(n == -42);
+        n = real{"45.1", 100};
+        REQUIRE(n == 45);
+#endif
+    }
+};
+
+TEST_CASE("mp++ assignments")
+{
+    tuple_for_each(sizes{}, mppp_ass_tester{});
 }
 
 struct string_ctor_tester {
