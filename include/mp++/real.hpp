@@ -3039,6 +3039,22 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
     return detail::dispatch_real_comparison(::mpfr_lessequal_p, a, b);
 }
 
+// Implementation of integer's assignment
+// from real.
+template <std::size_t SSize>
+inline integer<SSize> &integer<SSize>::operator=(const real &x)
+{
+    return *this = static_cast<integer<SSize>>(x);
+}
+
+// Implementation of rational's assignment
+// from real.
+template <std::size_t SSize>
+inline rational<SSize> &rational<SSize>::operator=(const real &x)
+{
+    return *this = static_cast<rational<SSize>>(x);
+}
+
 } // namespace mppp
 
 #include <mp++/detail/real_literals.hpp>

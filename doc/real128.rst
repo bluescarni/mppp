@@ -177,6 +177,28 @@ The real128 class
       :exception unspecified: any exception thrown by the construction of a
         :cpp:class:`~mppp::real128` from *x*.
 
+   .. cpp:function:: real128 &operator=(const real &x)
+
+      .. note::
+
+         This operator is available only if mp++ was configured with the
+         ``MPPP_WITH_MPFR`` option enabled.
+
+      .. versionadded:: 0.20
+
+      Assignment operator from :cpp:class:`~mppp::real`.
+
+      This operator is formally equivalent to converting *x* to
+      :cpp:class:`~mppp::real128` and then move-assigning the result
+      to ``this``.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception raised by the conversion of *x*
+        to :cpp:class:`~mppp::real128`.
+
    .. cpp:function:: template <string_type T> real128 &operator=(const T &s)
 
       Assignment from string.

@@ -1432,6 +1432,17 @@ public:
         }
         return *this = c.real();
     }
+
+    // Declaration of the assignments from
+    // other mp++ classes.
+    integer &operator=(const rational<SSize> &);
+#if defined(MPPP_WITH_QUADMATH)
+    integer &operator=(const real128 &);
+#endif
+#if defined(MPPP_WITH_MPFR)
+    integer &operator=(const real &);
+#endif
+
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
