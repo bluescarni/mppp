@@ -226,6 +226,30 @@ The rational class
 
       :exception unspecified: any exception thrown by the generic constructor.
 
+   .. cpp:function:: rational &operator=(const real128 &x)
+   .. cpp:function:: rational &operator=(const real &x)
+
+      .. note::
+
+         These operators
+         are available only if mp++ was configured with, respectively, the ``MPPP_WITH_QUADMATH``
+         and ``MPPP_WITH_MPFR`` options enabled.
+
+      .. versionadded:: 0.20
+
+      Assignment operators from other mp++ classes.
+
+      These operators are formally equivalent to converting *x* to
+      :cpp:class:`~mppp::rational` and then move-assigning the result
+      to ``this``.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception raised by the conversion of *x*
+        to :cpp:class:`~mppp::rational`.
+
    .. cpp:function:: template <string_type T> rational &operator=(const T &s)
 
       Assignment from string.

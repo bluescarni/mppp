@@ -30,6 +30,7 @@
 #endif
 
 #include <mp++/concepts.hpp>
+#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
@@ -39,9 +40,6 @@
 
 namespace mppp
 {
-
-// Fwd declaration.
-class real128;
 
 namespace detail
 {
@@ -448,6 +446,11 @@ public:
         }
         return *this = c.real();
     }
+    // Declaration of the assignments from
+    // other mp++ classes.
+#if defined(MPPP_WITH_MPFR)
+    real128 &operator=(const real &);
+#endif
 
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1997,6 +2000,23 @@ constexpr
     // - not-NaN vs NaN -> false.
     return (!x.isnan() && !y.isnan()) ? (x > y) : !y.isnan();
 }
+
+// Implementation of integer's assignment
+// from real128.
+template <std::size_t SSize>
+inline integer<SSize> &integer<SSize>::operator=(const real128 &x)
+{
+    return *this = static_cast<integer<SSize>>(x);
+}
+
+// Implementation of rational's assignment
+// from real128.
+template <std::size_t SSize>
+inline rational<SSize> &rational<SSize>::operator=(const real128 &x)
+{
+    return *this = static_cast<rational<SSize>>(x);
+}
+
 } // namespace mppp
 
 namespace std

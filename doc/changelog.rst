@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Improve the interoperability between mp++ classes
+  via additional assignment operators
+  (`#229 <https://github.com/bluescarni/mppp/pull/229>`__).
 - mp++ now works with the Intel compiler
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__,
   tested with ``icpc (ICC) 19.1.0.166``). This includes
