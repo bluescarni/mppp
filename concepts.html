@@ -127,7 +127,7 @@ C++ concepts.</p>
 and refers to concepts in their native C++ form.</p>
 </div>
 <p><em>#include &lt;mp++/concepts.hpp&gt;</em></p>
-<dl class="concept">
+<dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp12cpp_integralE">
 <span id="_CPPv3I0EN4mppp12cpp_integralE"></span><span id="_CPPv2I0EN4mppp12cpp_integralE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_integral</code><a class="headerlink" href="#_CPPv4I0EN4mppp12cpp_integralE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a C++ integral type.</p>
@@ -135,32 +135,32 @@ and refers to concepts in their native C++ form.</p>
 on the current platform/compiler combination (see also the <a class="reference internal" href="definitions.html#c.MPPP_HAVE_GCC_INT128" title="MPPP_HAVE_GCC_INT128"><code class="xref c c-macro docutils literal notranslate"><span class="pre">MPPP_HAVE_GCC_INT128</span></code></a> definition).</p>
 </dd></dl>
 
-<dl class="concept">
+<dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp21cpp_unsigned_integralE">
 <span id="_CPPv3I0EN4mppp21cpp_unsigned_integralE"></span><span id="_CPPv2I0EN4mppp21cpp_unsigned_integralE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_unsigned_integral</code><a class="headerlink" href="#_CPPv4I0EN4mppp21cpp_unsigned_integralE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is an unsigned <a class="reference internal" href="#_CPPv4I0EN4mppp12cpp_integralE" title="mppp::cpp_integral"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">cpp_integral</span></code></a>.</p>
 </dd></dl>
 
-<dl class="concept">
+<dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp19cpp_signed_integralE">
 <span id="_CPPv3I0EN4mppp19cpp_signed_integralE"></span><span id="_CPPv2I0EN4mppp19cpp_signed_integralE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_signed_integral</code><a class="headerlink" href="#_CPPv4I0EN4mppp19cpp_signed_integralE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a signed <a class="reference internal" href="#_CPPv4I0EN4mppp12cpp_integralE" title="mppp::cpp_integral"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">cpp_integral</span></code></a>.</p>
 </dd></dl>
 
-<dl class="concept">
+<dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp18cpp_floating_pointE">
 <span id="_CPPv3I0EN4mppp18cpp_floating_pointE"></span><span id="_CPPv2I0EN4mppp18cpp_floating_pointE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_floating_point</code><a class="headerlink" href="#_CPPv4I0EN4mppp18cpp_floating_pointE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a C++ floating-point type.</p>
 </dd></dl>
 
-<dl class="concept">
+<dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp14cpp_arithmeticE">
 <span id="_CPPv3I0EN4mppp14cpp_arithmeticE"></span><span id="_CPPv2I0EN4mppp14cpp_arithmeticE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_arithmetic</code><a class="headerlink" href="#_CPPv4I0EN4mppp14cpp_arithmeticE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is either a <a class="reference internal" href="#_CPPv4I0EN4mppp12cpp_integralE" title="mppp::cpp_integral"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">cpp_integral</span></code></a> or
 a <a class="reference internal" href="#_CPPv4I0EN4mppp18cpp_floating_pointE" title="mppp::cpp_floating_point"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">cpp_floating_point</span></code></a> type.</p>
 </dd></dl>
 
-<dl class="concept">
+<dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp11cpp_complexE">
 <span id="_CPPv3I0EN4mppp11cpp_complexE"></span><span id="_CPPv2I0EN4mppp11cpp_complexE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cpp_complex</code><a class="headerlink" href="#_CPPv4I0EN4mppp11cpp_complexE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is one of the C++ complex types:</p>
@@ -171,7 +171,7 @@ a <a class="reference internal" href="#_CPPv4I0EN4mppp18cpp_floating_pointE" tit
 </ul>
 </dd></dl>
 
-<dl class="concept">
+<dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp11string_typeE">
 <span id="_CPPv3I0EN4mppp11string_typeE"></span><span id="_CPPv2I0EN4mppp11string_typeE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">string_type</code><a class="headerlink" href="#_CPPv4I0EN4mppp11string_typeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied by C++ string-like types. Specifically, the concept will be true if <code class="docutils literal notranslate"><span class="pre">T</span></code>,
