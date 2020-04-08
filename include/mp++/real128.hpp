@@ -648,6 +648,22 @@ public:
         return dispatch_get(rop, detail::is_real128_cpp_interoperable<T>{});
     }
 
+    // Conversion member function to C++ complex types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_20 bool get(T &rop) const
+    {
+        using value_type = typename T::value_type;
+
+        rop.real(static_cast<value_type>(m_value));
+        rop.imag(static_cast<value_type>(0));
+
+        return true;
+    }
+
     // Convert to string.
     std::string to_string() const;
 

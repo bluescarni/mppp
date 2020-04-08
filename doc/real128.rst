@@ -283,19 +283,25 @@ The real128 class
       :return: ``this`` converted to the type ``T``.
 
    .. cpp:function:: template <real128_interoperable T> constexpr bool get(T &rop) const
+   .. cpp:function:: template <real128_cpp_complex T> constexpr bool get(T &rop) const
 
       .. note::
 
-        This member function is ``constexpr`` only if at least C++14 is being used.
+        The first overload is ``constexpr`` only if at least C++14 is being used.
+        The second overload is ``constexpr`` only if at least C++20 is being used.
 
-      Conversion member function to interoperable types.
+      Conversion member functions to interoperable and complex C++ types.
 
-      This member function, similarly to the conversion operator, will convert ``this`` to a
-      :cpp:concept:`~mppp::real128_interoperable` type, storing the result of the conversion into *rop*.
-      Differently from the conversion operator, this function does not raise any exception: if the conversion is
-      successful, the function will return ``true``, otherwise the function will return ``false``. If the
+      These member functions, similarly to the conversion operator, will convert ``this`` to
+      ``T``, storing the result of the conversion into *rop*.
+      Differently from the conversion operator, these functions do not raise any exception: if the conversion is
+      successful, the functions will return ``true``, otherwise the functions will return ``false``. If the
       conversion fails, *rop* will not be altered. The conversion can fail only if ``T`` is either
       :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and ``this`` represents a non-finite value.
+
+      .. versionadded:: 0.20
+
+         The conversion function to complex C++ types.
 
       :param rop: the variable which will store the result of the conversion.
 
