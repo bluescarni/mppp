@@ -440,7 +440,13 @@ public:
 #endif
     MPPP_CONSTEXPR_14 real128 &operator=(const T &c)
     {
+        // NOTE: icpc does not like __builtin_expect()
+        // in constexpr contexts.
+#if defined(__INTEL_COMPILER)
+        if (c.imag() != 0) {
+#else
         if (mppp_unlikely(c.imag()) != 0) {
+#endif
             throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part of "
                                     + detail::to_string(c.imag()) + " to a real128");
         }
