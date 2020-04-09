@@ -31,8 +31,8 @@ The complex128 class
    * a generic C++ API.
 
    Most of the functionality is exposed via plain :ref:`functions <complex128_functions>`, with the
-   general convention that the functions are named after the corresponding quadmath functions minus the trailing ``q``
-   suffix. For instance, the quadmath code
+   general convention that the functions are named after the corresponding quadmath functions minus the
+   leading ``c`` prefix and the trailing ``q`` suffix. For instance, the quadmath code
 
    .. code-block:: c++
 
@@ -49,8 +49,7 @@ The complex128 class
    where the ``sin()`` function is resolved via argument-dependent lookup.
 
    Various :ref:`overloaded operators <complex128_operators>` are provided. Alternative comparison functions
-   treating NaNs specially are also provided for use in the C++ standard library (and wherever strict weak ordering relations
-   are needed).
+   treating NaNs specially are also provided.
 
    The :cpp:class:`~mppp::complex128` class is a `literal type
    <https://en.cppreference.com/w/cpp/named_req/LiteralType>`__, and, whenever possible, operations involving
@@ -267,6 +266,23 @@ The complex128 class
       Conversion to complex C++ types.
 
       :return: ``this`` converted to the type ``T``.
+
+   .. cpp:function:: std::string to_string() const
+
+      Convert to string.
+
+      This member function will convert ``this`` to a decimal string representation in scientific format.
+      The number of significant digits in the output (36) guarantees that a :cpp:class:`~mppp::complex128`
+      constructed from the returned string will have a value identical to the value of ``this``.
+
+      The string format consists of the real and imaginary parts of ``this`` (as returned
+      by :cpp:func:`mppp::real128::to_string()`), separated by a comma
+      and enclosed by round brackets.
+
+      :return: a decimal string representation of ``this``.
+
+      :exception unspecified: any exception thrown by :cpp:func:`mppp::real128::to_string()`
+        or by the public interface of output streams.
 
 Types
 -----

@@ -67,6 +67,10 @@ using is_complex128_mppp_interoperable = disjunction<is_real128_mppp_interoperab
 #endif
                                                      >;
 
+// libquadmath wrappers.
+MPPP_DLL_PUBLIC cplex128 cabsq(const cplex128 &);
+MPPP_DLL_PUBLIC cplex128 cargq(const cplex128 &);
+
 } // namespace detail
 
 // Detect real-valued interoperable types.
@@ -296,6 +300,12 @@ public:
 
     // Conversion to string.
     std::string to_string() const;
+
+    // Complex absolute value.
+    complex128 &abs();
+
+    // Complex argument.
+    complex128 &arg();
 };
 
 // Getters for real/imaginary parts.

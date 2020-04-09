@@ -32,21 +32,35 @@ namespace mppp
 
 static_assert(std::is_same<cplex128, __complex128>::value, "Mismatched __complex128 types.");
 
-std::ostream &operator<<(std::ostream &os, const complex128 &c)
+namespace detail
 {
-    // NOTE: use the same printing format as std::complex.
-    os << '(' << c.real() << ',' << c.imag() << ')';
 
-    return os;
+// libquadmath wrappers.
+cplex128 cabsq(const cplex128 &c)
+{
+    return ::cabsq(c);
 }
+
+cplex128 cargq(const cplex128 &c)
+{
+    return ::cargq(c);
+}
+
+} // namespace detail
 
 std::string complex128::to_string() const
 {
     std::ostringstream oss;
 
-    oss << *this;
+    // NOTE: use the same printing format as std::complex.
+    oss << '(' << real().to_string() << ',' << imag().to_string() << ')';
 
     return oss.str();
+}
+
+std::ostream &operator<<(std::ostream &os, const complex128 &c)
+{
+    return os << c.to_string();
 }
 
 // Helper to construct the internal m_value
@@ -162,5 +176,19 @@ complex128::complex128(const char *begin, const char *end)
 complex128::complex128(const ptag &, const std::string_view &s) : complex128(s.data(), s.data() + s.size()) {}
 
 #endif
+
+complex128 &complex128::abs()
+{
+    m_value = detail::cabsq(m_value);
+
+    return *this;
+}
+
+complex128 &complex128::arg()
+{
+    m_value = detail::cargq(m_value);
+
+    return *this;
+}
 
 } // namespace mppp

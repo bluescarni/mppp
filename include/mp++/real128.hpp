@@ -658,6 +658,10 @@ public:
     {
         using value_type = typename T::value_type;
 
+        // NOTE: constexpr mutation of a std::complex
+        // seems to be available only since C++20:
+        // https://en.cppreference.com/w/cpp/numeric/complex/real
+        // https://en.cppreference.com/w/cpp/numeric/complex/operator%3D
         rop.real(static_cast<value_type>(m_value));
         rop.imag(static_cast<value_type>(0));
 
