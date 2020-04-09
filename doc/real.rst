@@ -1067,7 +1067,7 @@ Conversion
    will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
    not be altered.
 
-   :param rop:the variable which will store the result of the conversion.
+   :param rop: the variable which will store the result of the conversion.
    :param x: the input argument.
 
    :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
