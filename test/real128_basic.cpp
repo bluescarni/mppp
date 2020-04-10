@@ -81,10 +81,18 @@ constexpr auto test_cexpr_complex_ass(std::complex<double> c)
 #if MPPP_CPLUSPLUS >= 202002L
 
 template <typename T>
-constexpr auto test_cexpr_complex_get(real128 r)
+constexpr auto test_cexpr_complex_get1(real128 r)
 {
     std::complex<T> out{1, 2};
     r.get(out);
+    return out;
+}
+
+template <typename T>
+constexpr auto test_cexpr_complex_get2(real128 r)
+{
+    std::complex<T> out{1, 2};
+    get(out, r);
     return out;
 }
 
@@ -585,10 +593,14 @@ TEST_CASE("real128 conversions")
         std::complex<float> cf2{1, 2};
         REQUIRE(real128{4}.get(cf2));
         REQUIRE(cf2 == std::complex<float>{4, 0});
+        REQUIRE(get(cf2, real128{1}));
+        REQUIRE(cf2 == std::complex<float>{1, 0});
 
 #if MPPP_CPLUSPLUS >= 202002L
-        constexpr auto cf3 = test_cexpr_complex_get<float>(real128{7});
+        constexpr auto cf3 = test_cexpr_complex_get1<float>(real128{7});
         REQUIRE(cf3 == std::complex<float>{7, 0});
+        constexpr auto cf4 = test_cexpr_complex_get2<float>(real128{7});
+        REQUIRE(cf4 == std::complex<float>{7, 0});
 #endif
 
         MPPP_CONSTEXPR_14 auto cd = static_cast<std::complex<double>>(real128{-12});
@@ -598,10 +610,14 @@ TEST_CASE("real128 conversions")
         std::complex<double> cd2{1, 2};
         REQUIRE(real128{4}.get(cd2));
         REQUIRE(cd2 == std::complex<double>{4, 0});
+        REQUIRE(get(cd2, real128{1}));
+        REQUIRE(cd2 == std::complex<double>{1, 0});
 
 #if MPPP_CPLUSPLUS >= 202002L
-        constexpr auto cd3 = test_cexpr_complex_get<double>(real128{7});
+        constexpr auto cd3 = test_cexpr_complex_get1<double>(real128{7});
         REQUIRE(cd3 == std::complex<double>{7, 0});
+        constexpr auto cd4 = test_cexpr_complex_get2<double>(real128{7});
+        REQUIRE(cd4 == std::complex<double>{7, 0});
 #endif
 
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
@@ -612,10 +628,14 @@ TEST_CASE("real128 conversions")
         std::complex<long double> cld2{1, 2};
         REQUIRE(real128{4}.get(cld2));
         REQUIRE(cld2 == std::complex<long double>{4, 0});
+        REQUIRE(get(cld2, real128{1}));
+        REQUIRE(cld2 == std::complex<long double>{1, 0});
 
 #if MPPP_CPLUSPLUS >= 202002L
-        constexpr auto cld3 = test_cexpr_complex_get<long double>(real128{7});
+        constexpr auto cld3 = test_cexpr_complex_get1<long double>(real128{7});
         REQUIRE(cld3 == std::complex<long double>{7, 0});
+        constexpr auto cld4 = test_cexpr_complex_get2<long double>(real128{7});
+        REQUIRE(cld4 == std::complex<long double>{7, 0});
 #endif
 #else
         REQUIRE(!std::is_convertible<real128, std::complex<long double>>::value);

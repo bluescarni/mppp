@@ -580,17 +580,19 @@ Conversion
 ~~~~~~~~~~
 
 .. cpp:function:: template <mppp::real128_interoperable T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
+.. cpp:function:: template <mppp::real128_cpp_complex T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
 
    .. note::
 
-     This function is ``constexpr`` only if at least C++14 is being used.
+      The first overload is ``constexpr`` only if at least C++14 is being used.
+      The second overload is ``constexpr`` only if at least C++20 is being used.
 
-   Conversion function.
+   Conversion functions.
 
-   This function will convert the input :cpp:class:`~mppp::real128` *x* to a
-   :cpp:concept:`~mppp::real128_interoperable` type, storing the result of the conversion into *rop*.
-   If the conversion is successful, the function
-   will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
+   These functions will convert the input :cpp:class:`~mppp::real128` *x* to
+   ``T``, storing the result of the conversion into *rop*.
+   If the conversion is successful, the functions
+   will return ``true``, otherwise the functions will return ``false``. If the conversion fails, *rop* will
    not be altered. The conversion can fail only if ``T``
    is either :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and *x*
    represents a non-finite value.
