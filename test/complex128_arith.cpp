@@ -76,7 +76,7 @@ TEST_CASE("conj")
     REQUIRE(c == complex128{3, 3});
     REQUIRE(std::is_same<complex128 &, decltype(c.conj())>::value);
 
-#if MPPP_CPLUSPLUS >= 201402L
+#if MPPP_CPLUSPLUS >= 201402L && !defined(__INTEL_COMPILER)
     constexpr auto cnj2 = test_constexpr_conj(complex128{0, 3});
     REQUIRE(cnj2 == complex128{0, -3});
 #endif
