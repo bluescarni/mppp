@@ -241,7 +241,7 @@ public:
     real128(real128 &&) = default;
 
     // Constructor from a quadruple-precision floating-point value.
-    constexpr explicit real128(__float128 x) : m_value(x) {}
+    constexpr explicit real128(const __float128 &x) : m_value(x) {}
 
 private:
     // Cast an integer to a __float128.

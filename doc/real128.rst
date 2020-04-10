@@ -84,7 +84,7 @@ The real128 class
       :cpp:class:`~mppp::real128` is trivially copy and
       move constructible.
 
-   .. cpp:function:: constexpr explicit real128(__float128 x)
+   .. cpp:function:: constexpr explicit real128(const __float128 &x)
 
       Constructor from a :cpp:type:`__float128`.
 
