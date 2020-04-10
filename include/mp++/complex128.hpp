@@ -26,6 +26,7 @@
 #endif
 
 #include <mp++/concepts.hpp>
+#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/visibility.hpp>
 #include <mp++/integer.hpp>
@@ -67,10 +68,6 @@ using is_complex128_mppp_interoperable = disjunction<is_real128_mppp_interoperab
 #endif
                                                      >;
 
-// libquadmath wrappers.
-MPPP_DLL_PUBLIC cplex128 cabsq(const cplex128 &);
-MPPP_DLL_PUBLIC cplex128 cargq(const cplex128 &);
-
 } // namespace detail
 
 // Detect real-valued interoperable types.
@@ -88,6 +85,8 @@ template <typename T>
 MPPP_CONCEPT_DECL complex128_interoperable = is_complex128_interoperable<T>::value;
 
 #endif
+
+constexpr complex128 conj(const complex128 &);
 
 class MPPP_DLL_PUBLIC complex128
 {
@@ -306,6 +305,12 @@ public:
 
     // Complex argument.
     complex128 &arg();
+
+    // Complex conjugate.
+    MPPP_CONSTEXPR_14 complex128 &conj()
+    {
+        return *this = mppp::conj(*this);
+    }
 };
 
 // Getters for real/imaginary parts.
@@ -328,6 +333,18 @@ inline MPPP_CONSTEXPR_14 void set_real(complex128 &c, const real128 &re)
 inline MPPP_CONSTEXPR_14 void set_imag(complex128 &c, const real128 &im)
 {
     c.set_imag(im);
+}
+
+// Absolute value.
+MPPP_DLL_PUBLIC complex128 abs(const complex128 &);
+
+// Complex argument.
+MPPP_DLL_PUBLIC complex128 arg(const complex128 &);
+
+// Complex conjugate.
+constexpr complex128 conj(const complex128 &c)
+{
+    return complex128{c.real(), -c.imag()};
 }
 
 // Streaming operator.

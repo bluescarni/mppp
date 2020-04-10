@@ -31,6 +31,7 @@ class real;
 #if defined(MPPP_WITH_QUADMATH)
 
 class real128;
+class complex128;
 
 #endif
 

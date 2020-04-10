@@ -284,6 +284,26 @@ The complex128 class
       :exception unspecified: any exception thrown by :cpp:func:`mppp::real128::to_string()`
         or by the public interface of output streams.
 
+   .. cpp:function:: complex128 &abs()
+   .. cpp:function:: complex128 &arg()
+   .. cpp:function:: constexpr complex128 &conj()
+
+      .. note::
+
+        :cpp:func:`~mppp::complex128::conj()` is ``constexpr`` only if at least C++14 is being used.
+
+      In-place absolute value, argument and complex conjugate.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\left| z \right|`,
+      * :math:`\arg z`,
+      * :math:`\overline{z}`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 

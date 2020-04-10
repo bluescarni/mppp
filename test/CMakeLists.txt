@@ -175,6 +175,7 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_literal)
 
   ADD_MPPP_TESTCASE(complex128_basic)
+  ADD_MPPP_TESTCASE(complex128_arith)
 endif()
 
 if(MPPP_WITH_MPFR)

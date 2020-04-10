@@ -32,22 +32,6 @@ namespace mppp
 
 static_assert(std::is_same<cplex128, __complex128>::value, "Mismatched __complex128 types.");
 
-namespace detail
-{
-
-// libquadmath wrappers.
-cplex128 cabsq(const cplex128 &c)
-{
-    return ::cabsq(c);
-}
-
-cplex128 cargq(const cplex128 &c)
-{
-    return ::cargq(c);
-}
-
-} // namespace detail
-
 std::string complex128::to_string() const
 {
     std::ostringstream oss;
@@ -177,18 +161,24 @@ complex128::complex128(const ptag &, const std::string_view &s) : complex128(s.d
 
 #endif
 
+complex128 abs(const complex128 &c)
+{
+    return complex128{::cabsq(c.m_value)};
+}
+
 complex128 &complex128::abs()
 {
-    m_value = detail::cabsq(m_value);
+    return *this = mppp::abs(*this);
+}
 
-    return *this;
+complex128 arg(const complex128 &c)
+{
+    return complex128{::cargq(c.m_value)};
 }
 
 complex128 &complex128::arg()
 {
-    m_value = detail::cargq(m_value);
-
-    return *this;
+    return *this = mppp::arg(*this);
 }
 
 } // namespace mppp
