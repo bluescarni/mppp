@@ -498,3 +498,9 @@ TEST_CASE("conversions")
 #endif
     }
 }
+
+TEST_CASE("to_string")
+{
+    complex128 c{1, 2};
+    REQUIRE(c.to_string() == "(" + c.real().to_string() + "," + c.imag().to_string() + ")");
+}
