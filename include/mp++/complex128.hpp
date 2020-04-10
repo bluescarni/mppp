@@ -101,7 +101,7 @@ public:
     constexpr complex128(complex128 &&) = default;
 
     // Constructor from __complex128.
-    constexpr explicit complex128(cplex128 x) : m_value{x} {}
+    constexpr explicit complex128(const cplex128 &c) : m_value{c} {}
 
 private:
     // Helpers to cast to __float128.
@@ -231,19 +231,19 @@ public:
         return real128{__imag__ m_value};
     }
 
-    // Setters for real/imaginary parts.
-    MPPP_CONSTEXPR_14 void set_real(const real128 &re)
+    // Setters for the real/imaginary parts.
+    MPPP_CONSTEXPR_14 complex128 &set_real(const real128 &re)
     {
-        set_real(re.m_value);
+        return set_real(re.m_value);
     }
-    MPPP_CONSTEXPR_14 void set_imag(const real128 &im)
+    MPPP_CONSTEXPR_14 complex128 &set_imag(const real128 &im)
     {
-        set_imag(im.m_value);
+        return set_imag(im.m_value);
     }
 
 private:
     // Private setters in terms of __float128.
-    MPPP_CONSTEXPR_14 void set_real(const __float128 &re)
+    MPPP_CONSTEXPR_14 complex128 &set_real(const __float128 &re)
     {
         // NOTE: use this idiom, instead of setting
         // directly __real__ m_value, because
@@ -257,10 +257,14 @@ private:
         // uninitialised complex128 objects! (e.g., during
         // construction).
         m_value = cplex128{re, __imag__ m_value};
+
+        return *this;
     }
-    MPPP_CONSTEXPR_14 void set_imag(const __float128 &im)
+    MPPP_CONSTEXPR_14 complex128 &set_imag(const __float128 &im)
     {
         m_value = cplex128{__real__ m_value, im};
+
+        return *this;
     }
 
 public:
@@ -325,14 +329,14 @@ constexpr real128 cimag(const complex128 &c)
 }
 
 // Setters for real/imaginary parts.
-inline MPPP_CONSTEXPR_14 void set_real(complex128 &c, const real128 &re)
+inline MPPP_CONSTEXPR_14 complex128 &set_real(complex128 &c, const real128 &re)
 {
-    c.set_real(re);
+    return c.set_real(re);
 }
 
-inline MPPP_CONSTEXPR_14 void set_imag(complex128 &c, const real128 &im)
+inline MPPP_CONSTEXPR_14 complex128 &set_imag(complex128 &c, const real128 &im)
 {
-    c.set_imag(im);
+    return c.set_imag(im);
 }
 
 // Absolute value.

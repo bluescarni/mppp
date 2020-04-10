@@ -10,6 +10,7 @@
 
 #include <complex>
 #include <initializer_list>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -69,11 +70,19 @@ constexpr auto test_constexpr_cpp_complex_assignment(const std::complex<double> 
     return c2;
 }
 
-constexpr auto test_constexpr_setters(double re, double im)
+constexpr auto test_constexpr_setters1(double re, double im)
 {
     complex128 c2{};
     c2.set_real(real128{re});
     c2.set_imag(real128{im});
+    return c2;
+}
+
+constexpr auto test_constexpr_setters2(double re, double im)
+{
+    complex128 c2{};
+    set_real(c2, real128{re});
+    set_imag(c2, real128{im});
     return c2;
 }
 
@@ -409,18 +418,35 @@ TEST_CASE("setters getters")
     REQUIRE(b1);
     constexpr bool b2 = c1.imag() == 2;
     REQUIRE(b2);
+    constexpr bool b3 = creal(c1) == 1;
+    REQUIRE(b3);
+    constexpr bool b4 = cimag(c1) == 2;
+    REQUIRE(b4);
 
     auto c2 = complex128{4, 5};
-    c2.set_real(real128{-4});
-    c2.set_imag(real128{-5});
+    REQUIRE(&c2.set_real(real128{-4}) == &c2);
+    REQUIRE(&c2.set_imag(real128{-5}) == &c2);
     REQUIRE(c2.real() == -4);
     REQUIRE(c2.imag() == -5);
+    REQUIRE(std::is_same<complex128 &, decltype(c2.set_real(real128{-4}))>::value);
+    REQUIRE(std::is_same<complex128 &, decltype(c2.set_imag(real128{-4}))>::value);
+
+    REQUIRE(&set_real(c2, real128{14}) == &c2);
+    REQUIRE(&set_imag(c2, real128{15}) == &c2);
+    REQUIRE(c2.real() == 14);
+    REQUIRE(c2.imag() == 15);
+    REQUIRE(std::is_same<complex128 &, decltype(set_real(c2, real128{-4}))>::value);
+    REQUIRE(std::is_same<complex128 &, decltype(set_imag(c2, real128{-4}))>::value);
 
 #if MPPP_CPLUSPLUS >= 201402L
     {
-        constexpr auto tca = test_constexpr_setters(6., 7.);
-        REQUIRE(tca.real() == 6);
-        REQUIRE(tca.imag() == 7);
+        constexpr auto tca1 = test_constexpr_setters1(6., 7.);
+        REQUIRE(tca1.real() == 6);
+        REQUIRE(tca1.imag() == 7);
+
+        constexpr auto tca2 = test_constexpr_setters2(6., 7.);
+        REQUIRE(tca2.real() == 6);
+        REQUIRE(tca2.imag() == 7);
     }
 #endif
 }
@@ -503,4 +529,12 @@ TEST_CASE("to_string")
 {
     complex128 c{1, 2};
     REQUIRE(c.to_string() == "(" + c.real().to_string() + "," + c.imag().to_string() + ")");
+}
+
+TEST_CASE("stream operator")
+{
+    std::ostringstream oss;
+    oss << complex128{1, 2};
+
+    REQUIRE(oss.str() == complex128{1, 2}.to_string());
 }

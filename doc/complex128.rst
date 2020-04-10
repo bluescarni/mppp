@@ -80,14 +80,14 @@ The complex128 class
       :cpp:class:`~mppp::complex128` is trivially copy and
       move constructible.
 
-   .. cpp:function:: constexpr explicit complex128(__complex128 x)
+   .. cpp:function:: constexpr explicit complex128(const __complex128 &c)
 
       Constructor from a :cpp:type:`__complex128`.
 
       This constructor will initialise the internal :cpp:type:`__complex128`
-      value to *x*.
+      value to *c*.
 
-      :param x: the :cpp:type:`__complex128` that will be assigned to the internal value.
+      :param c: the :cpp:type:`__complex128` that will be assigned to the internal value.
 
    .. cpp:function:: template <complex128_interoperable T> constexpr explicit complex128(const T &x)
 
@@ -230,8 +230,8 @@ The complex128 class
 
       :return: a copy of the real or imaginary part of ``this``.
 
-   .. cpp:function:: constexpr void set_real(const real128 &x)
-   .. cpp:function:: constexpr void set_imag(const real128 &x)
+   .. cpp:function:: constexpr complex128 &set_real(const real128 &x)
+   .. cpp:function:: constexpr complex128 &set_imag(const real128 &x)
 
       .. note::
 
@@ -240,6 +240,8 @@ The complex128 class
       Setters for the real and imaginary parts.
 
       :param x: the desired value for the real or imaginary part of ``this``.
+
+      :return: a reference to ``this``.
 
    .. cpp:function:: constexpr explicit operator __complex128() const
 
@@ -328,3 +330,71 @@ Concepts
    * ``T`` satisfies :cpp:concept:`~mppp::real128_interoperable`, or
    * ``T`` is :cpp:class:`~mppp::real128`, or
    * ``T`` is :cpp:class:`~mppp::real`.
+
+.. _complex128_functions:
+
+Functions
+---------
+
+Real/imaginary parts
+~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: constexpr mppp::real128 mppp::creal(const mppp::complex128 &c)
+.. cpp:function:: constexpr mppp::real128 mppp::cimag(const mppp::complex128 &c)
+
+   Getters for the real/imaginary part.
+
+   :param c: the input argument.
+
+   :return: the real/imaginary part of *c*.
+
+.. cpp:function:: constexpr mppp::complex128 &mppp::set_real(mppp::complex128 &c, const mppp::real128 &x)
+.. cpp:function:: constexpr mppp::complex128 &mppp::set_imag(mppp::complex128 &c, const mppp::real128 &x)
+
+   .. note::
+
+      These functions are ``constexpr`` only if at least C++14 is being used.
+
+   Setters for the real/imaginary part.
+
+   :param c: the :cpp:class:`~mppp::complex128` whose real/imaginary part will be set.
+   :param x: the desired value for the real/imaginary part of *c*.
+
+   :return: a reference to *c*.
+
+Input/output
+~~~~~~~~~~~~
+
+.. cpp:function:: std::ostream &mppp::operator<<(std::ostream &os, const mppp::complex128 &c)
+
+   Output stream operator.
+
+   This operator will print to the stream *os* the :cpp:class:`~mppp::complex128` *c*. The current implementation
+   ignores any formatting flag specified in *os*, and the print format will be the one
+   described in :cpp:func:`mppp::complex128::to_string()`.
+
+   .. warning::
+      In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+      flags. For the time being, users are encouraged to use the ``quadmath_snprintf()`` function from the quadmath
+      library if precise and forward-compatible control on the printing format is needed.
+
+   :param os: the target stream.
+   :param c: the input :cpp:class:`~mppp::complex128`.
+
+   :return: a reference to *os*.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::complex128::to_string()`.
+
+.. _complex128_operators:
+
+Mathematical operators
+----------------------
+
+.. cpp:function:: constexpr mppp::complex128 mppp::operator+(const mppp::complex128 &c)
+.. cpp:function:: constexpr mppp::complex128 mppp::operator-(const mppp::complex128 &c)
+
+   Identity and negation.
+
+   :param x: the argument.
+
+   :return: :math:`c` and :math:`-c` respectively.
