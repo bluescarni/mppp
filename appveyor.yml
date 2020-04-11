@@ -24,19 +24,22 @@ environment:
 
 install:
 - if [%BUILD_TYPE%]==[MSVC15_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
-- if [%BUILD_TYPE%]==[MSVC15_64] conda config --add channels conda-forge --force
+- if [%BUILD_TYPE%]==[MSVC15_64] conda config --add channels conda-forge
+- if [%BUILD_TYPE%]==[MSVC15_64] conda config --set channel_priority strict
 - if [%BUILD_TYPE%]==[MSVC15_64] conda update -n base conda -y
 - if [%BUILD_TYPE%]==[MSVC15_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
 - if [%BUILD_TYPE%]==[MSVC15_64] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
-- if [%BUILD_TYPE%]==[MSVC17_64] conda config --add channels conda-forge --force
+- if [%BUILD_TYPE%]==[MSVC17_64] conda config --add channels conda-forge
+- if [%BUILD_TYPE%]==[MSVC17_64] conda config --set channel_priority strict
 - if [%BUILD_TYPE%]==[MSVC17_64] conda update -n base conda -y
 - if [%BUILD_TYPE%]==[MSVC17_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
 - if [%BUILD_TYPE%]==[MSVC17_64] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --add channels conda-forge --force
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --add channels conda-forge
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --set channel_priority strict
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] conda update -n base conda -y
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create -y --name mppp cmake ninja mpir mpfr
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call activate mppp

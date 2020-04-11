@@ -22,7 +22,8 @@ if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
     export PATH="$HOME/miniconda/bin:$PATH"
     bash miniconda.sh -b -p $HOME/miniconda
     if [[ "${TRAVIS_CPU_ARCH}" == "amd64" ]]; then
-        conda config --add channels conda-forge --force
+        conda config --add channels conda-forge
+        conda config --set channel_priority strict
     fi
 
     conda_pkgs="cmake<3.16 gmp mpfr arb libflint"
