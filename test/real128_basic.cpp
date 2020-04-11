@@ -13,10 +13,6 @@
 #endif
 
 #include <mp++/config.hpp>
-#include <mp++/detail/type_traits.hpp>
-#include <mp++/integer.hpp>
-#include <mp++/rational.hpp>
-#include <mp++/real128.hpp>
 
 #include <ciso646>
 #include <cstdint>
@@ -35,6 +31,17 @@
 #include <gmp.h>
 
 #include <quadmath.h>
+
+#include <mp++/detail/type_traits.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
+#include <mp++/real128.hpp>
+
+#if defined(MPPP_WITH_MPFR)
+
+#include <mp++/real.hpp>
+
+#endif
 
 #include "test_utils.hpp"
 
@@ -260,6 +267,21 @@ TEST_CASE("real128 constructors")
 #if defined(MPPP_HAVE_STRING_VIEW)
     ra = std::string_view{tmp_char + 6, 5};
     REQUIRE((ra.m_value == -1234));
+#endif
+
+#if defined(MPPP_WITH_MPFR)
+    ra = real{123};
+    REQUIRE(ra == 123);
+    ra = real{-42};
+    REQUIRE(ra == -42);
+    ra = real{"inf", 100};
+    REQUIRE(isinf(ra));
+    ra = real{"-inf", 100};
+    REQUIRE(isinf(ra));
+    REQUIRE(ra < 0);
+    ra = real{"nan", 100};
+    REQUIRE(isnan(ra));
+    REQUIRE(std::is_same<decltype(ra = real{"nan", 100}), real128 &>::value);
 #endif
 }
 

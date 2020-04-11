@@ -35,6 +35,18 @@
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
+#if defined(MPPP_WITH_QUADMATH)
+
+#include <mp++/real128.hpp>
+
+#endif
+
+#if defined(MPPP_WITH_MPFR)
+
+#include <mp++/real.hpp>
+
+#endif
+
 #include "catch.hpp"
 #include "test_utils.hpp"
 
@@ -1082,6 +1094,22 @@ struct gen_ass_tester {
         REQUIRE(q == -42);
         q = __uint128_t{84};
         REQUIRE(q == 84);
+#endif
+
+#if defined(MPPP_WITH_QUADMATH)
+        q = real128{123};
+        REQUIRE(q == 123);
+        q = real128{"-1.5"};
+        REQUIRE(q == rational{3, -2});
+        REQUIRE(std::is_same<decltype(q = real128{"-1.5"}), rational &>::value);
+#endif
+
+#if defined(MPPP_WITH_MPFR)
+        q = real{42};
+        REQUIRE(q == 42);
+        q = real{"-457.5", 100};
+        REQUIRE(q == rational{-915, 2});
+        REQUIRE(std::is_same<decltype(q = real{"-457.5", 100}), rational &>::value);
 #endif
     }
 };

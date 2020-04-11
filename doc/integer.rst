@@ -330,6 +330,31 @@ The integer class
       :exception std\:\:domain_error: if the imaginary part of *c* is not zero or if
         the real part of *c* is not finite.
 
+   .. cpp:function:: integer &operator=(const rational<SSize> &x)
+   .. cpp:function:: integer &operator=(const real128 &x)
+   .. cpp:function:: integer &operator=(const real &x)
+
+      .. note::
+
+         The :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real` overloads
+         are available only if mp++ was configured with, respectively, the ``MPPP_WITH_QUADMATH``
+         and ``MPPP_WITH_MPFR`` options enabled.
+
+      .. versionadded:: 0.20
+
+      Assignment operators from other mp++ classes.
+
+      These operators are formally equivalent to converting *x* to
+      :cpp:class:`~mppp::integer` and then move-assigning the result
+      to ``this``.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception raised by the conversion of *x*
+        to :cpp:class:`~mppp::integer`.
+
    .. cpp:function:: template <string_type T> integer &operator=(const T &s)
 
       Assignment from string.

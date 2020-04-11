@@ -685,6 +685,17 @@ void real::string_assignment_impl(const char *s, int base)
     }
 }
 
+#if defined(MPPP_WITH_QUADMATH)
+
+// Implementation of real128's assignment
+// from real.
+real128 &real128::operator=(const real &x)
+{
+    return *this = static_cast<real128>(x);
+}
+
+#endif
+
 // Copy assignment from mpfr_t.
 real &real::operator=(const ::mpfr_t x)
 {
