@@ -241,7 +241,18 @@ public:
     real128(real128 &&) = default;
 
     // Constructor from a quadruple-precision floating-point value.
-    constexpr explicit real128(__float128 x) : m_value(x) {}
+    // NOTE: early GCC versions seem to exhibit constexpr
+    // failures if x is passed by const reference.
+    constexpr explicit real128(
+#if defined(__GNUC__) && __GNUC__ < 5
+        __float128 x
+#else
+        const __float128 &x
+#endif
+        )
+        : m_value(x)
+    {
+    }
 
 private:
     // Cast an integer to a __float128.

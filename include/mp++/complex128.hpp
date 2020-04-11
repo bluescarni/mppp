@@ -101,7 +101,18 @@ public:
     constexpr complex128(complex128 &&) = default;
 
     // Constructor from __complex128.
-    constexpr explicit complex128(cplex128 c) : m_value{c} {}
+    // NOTE: early GCC versions seem to exhibit constexpr
+    // failures if c is passed by const reference.
+    constexpr explicit complex128(
+#if defined(__GNUC__) && __GNUC__ < 5
+        cplex128 c
+#else
+        const cplex128 &c
+#endif
+        )
+        : m_value{c}
+    {
+    }
 
 private:
     // Helpers to cast to __float128.
