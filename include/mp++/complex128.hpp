@@ -101,7 +101,7 @@ public:
     constexpr complex128(complex128 &&) = default;
 
     // Constructor from __complex128.
-    constexpr explicit complex128(const cplex128 &c) : m_value{c} {}
+    constexpr explicit complex128(cplex128 c) : m_value{c} {}
 
 private:
     // Helpers to cast to __float128.
