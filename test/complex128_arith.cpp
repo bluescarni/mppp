@@ -6,32 +6,10 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// #include <complex>
-// #include <initializer_list>
-// #include <stdexcept>
-// #include <string>
 #include <type_traits>
-// #include <utility>
-// #include <vector>
-
-// #if defined(MPPP_HAVE_STRING_VIEW)
-
-// #include <string_view>
-
-// #endif
 
 #include <mp++/complex128.hpp>
 #include <mp++/config.hpp>
-// #include <mp++/integer.hpp>
-// #include <mp++/rational.hpp>
-// #include <mp++/real128.hpp>
-// #include <mp++/type_name.hpp>
-
-// #if defined(MPPP_WITH_MPFR)
-
-// #include <mp++/real.hpp>
-
-// #endif
 
 #include "catch.hpp"
 
@@ -75,6 +53,10 @@ TEST_CASE("conj")
     c.conj();
     REQUIRE(c == complex128{3, 3});
     REQUIRE(std::is_same<complex128 &, decltype(c.conj())>::value);
+    c = complex128{1, 0};
+    REQUIRE(!c.imag().signbit());
+    c.conj();
+    REQUIRE(c.imag().signbit());
 
 #if MPPP_CPLUSPLUS >= 201402L && !defined(__INTEL_COMPILER)
     constexpr auto cnj2 = test_constexpr_conj(complex128{0, 3});
