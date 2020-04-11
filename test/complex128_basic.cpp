@@ -418,6 +418,7 @@ TEST_CASE("setters getters")
     REQUIRE(b1);
     constexpr bool b2 = c1.imag() == 2;
     REQUIRE(b2);
+#if 0
     constexpr bool b3 = creal(c1) == 1;
     REQUIRE(b3);
     constexpr bool b4 = cimag(c1) == 2;
@@ -448,6 +449,7 @@ TEST_CASE("setters getters")
         REQUIRE(tca2.real() == 6);
         REQUIRE(tca2.imag() == 7);
     }
+#endif
 #endif
 }
 
