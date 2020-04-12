@@ -418,6 +418,74 @@ MPPP_DLL_PUBLIC complex128 exp(const complex128 &);
 MPPP_DLL_PUBLIC complex128 log(const complex128 &);
 MPPP_DLL_PUBLIC complex128 log10(const complex128 &);
 
+namespace detail
+{
+
+template <typename T>
+using is_complex128_op_other_type
+    = disjunction<is_real128_interoperable<T>, std::is_same<T, real128>, is_real128_cpp_complex<T>>;
+
+}
+
+// Detect types for use in mathematical operators
+// involving complex128.
+template <typename T, typename U>
+using are_complex128_op_types
+    = detail::disjunction<detail::conjunction<std::is_same<T, complex128>, std::is_same<U, complex128>>,
+                          detail::conjunction<std::is_same<T, complex128>, detail::is_complex128_op_other_type<U>>,
+                          detail::conjunction<std::is_same<U, complex128>, detail::is_complex128_op_other_type<T>>,
+                          detail::conjunction<std::is_same<real128, T>, is_real128_cpp_complex<U>>,
+                          detail::conjunction<std::is_same<real128, U>, is_real128_cpp_complex<T>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL complex128_op_types = are_complex128_op_types<T, U>::value;
+
+#endif
+
+namespace detail
+{
+
+MPPP_DLL_PUBLIC complex128 pow_impl(const complex128 &, const complex128 &);
+
+template <typename T>
+inline complex128 pow_impl(const complex128 &x, const T &y)
+{
+    return pow_impl(x, static_cast<complex128>(y));
+}
+
+template <typename T>
+inline complex128 pow_impl(const T &x, const complex128 &y)
+{
+    return pow_impl(static_cast<complex128>(x), y);
+}
+
+template <typename T>
+inline complex128 pow_impl(const real128 &x, const std::complex<T> &y)
+{
+    return pow_impl(static_cast<complex128>(x), static_cast<complex128>(y));
+}
+
+template <typename T>
+inline complex128 pow_impl(const std::complex<T> &x, const real128 &y)
+{
+    return pow_impl(static_cast<complex128>(x), static_cast<complex128>(y));
+}
+
+} // namespace detail
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex128_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
+#endif
+    inline complex128 pow(const T &x, const U &y)
+{
+    return detail::pow_impl(x, y);
+}
+
 // Streaming operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex128 &);
 

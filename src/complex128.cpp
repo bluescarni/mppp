@@ -200,4 +200,14 @@ MPPP_COMPLEX128_IMPLEMENT_UNARY(log10)
 
 #undef MPPP_COMPLEX128_IMPLEMENT_UNARY
 
+namespace detail
+{
+
+complex128 pow_impl(const complex128 &x, const complex128 &y)
+{
+    return complex128{::cpowq(x.m_value, y.m_value)};
+}
+
+} // namespace detail
+
 } // namespace mppp
