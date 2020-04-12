@@ -317,18 +317,20 @@ public:
 
     // Complex absolute value.
     complex128 &abs();
-
     // Complex argument.
     complex128 &arg();
-
     // Complex conjugate.
     MPPP_CONSTEXPR_14 complex128 &conj()
     {
         return *this = mppp::conj(*this);
     }
-
     // Project into Riemann sphere.
     complex128 &proj();
+
+    // Trigonometric functions.
+    complex128 &sin();
+    complex128 &cos();
+    complex128 &tan();
 };
 
 // Getters for real/imaginary parts.
@@ -355,18 +357,20 @@ inline MPPP_CONSTEXPR_14 complex128 &set_imag(complex128 &c, const real128 &im)
 
 // Absolute value.
 MPPP_DLL_PUBLIC complex128 abs(const complex128 &);
-
 // Complex argument.
 MPPP_DLL_PUBLIC complex128 arg(const complex128 &);
-
 // Project into Riemann sphere.
 MPPP_DLL_PUBLIC complex128 proj(const complex128 &);
-
 // Complex conjugate.
 constexpr complex128 conj(const complex128 &c)
 {
     return complex128{c.real(), -c.imag()};
 }
+
+// Trigonometric functions
+MPPP_DLL_PUBLIC complex128 sin(const complex128 &);
+MPPP_DLL_PUBLIC complex128 cos(const complex128 &);
+MPPP_DLL_PUBLIC complex128 tan(const complex128 &);
 
 // Streaming operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex128 &);

@@ -308,6 +308,22 @@ The complex128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex128 &sin()
+   .. cpp:function:: complex128 &cos()
+   .. cpp:function:: complex128 &tan()
+
+      In-place trigonometric functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sin z`,
+      * :math:`\cos z`,
+      * :math:`\tan z`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -384,6 +400,25 @@ Basic complex functions
    :param z: the input value.
 
    :return: the result of the operation.
+
+Trigonometry
+~~~~~~~~~~~~
+
+.. cpp:function:: mppp::complex128 mppp::sin(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::cos(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::tan(const mppp::complex128 &z)
+
+   Trigonometric functions.
+
+   These functions will return, respectively:
+
+   * :math:`\sin z`,
+   * :math:`\cos z`,
+   * :math:`\tan z`.
+
+   :param z: the input value.
+
+   :return: the value of the trigonometric function.
 
 Input/output
 ~~~~~~~~~~~~
