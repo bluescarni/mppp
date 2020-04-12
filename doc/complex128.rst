@@ -308,6 +308,15 @@ The complex128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex128 &sqrt()
+
+      Square root.
+
+      This member function will set ``this`` to :math:`\sqrt{z}`,
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
    .. cpp:function:: complex128 &sin()
    .. cpp:function:: complex128 &cos()
    .. cpp:function:: complex128 &tan()
@@ -464,6 +473,17 @@ Basic complex functions
    :param z: the input value.
 
    :return: the result of the operation.
+
+Roots
+~~~~~
+
+.. cpp:function:: mppp::complex128 mppp::sqrt(const mppp::complex128 &z)
+
+   Square root.
+
+   :param z: the input value.
+
+   :return: :math:`\sqrt{z}`.
 
 Trigonometry
 ~~~~~~~~~~~~

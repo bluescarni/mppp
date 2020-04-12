@@ -176,6 +176,7 @@ if(MPPP_WITH_QUADMATH)
 
   ADD_MPPP_TESTCASE(complex128_basic)
   ADD_MPPP_TESTCASE(complex128_arith)
+  ADD_MPPP_TESTCASE(complex128_roots)
   ADD_MPPP_TESTCASE(complex128_trig)
   ADD_MPPP_TESTCASE(complex128_hyper)
   ADD_MPPP_TESTCASE(complex128_logexp)
