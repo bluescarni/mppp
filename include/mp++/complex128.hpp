@@ -336,6 +336,16 @@ public:
     complex128 &asin();
     complex128 &acos();
     complex128 &atan();
+
+    // Hyperbolic functions.
+    complex128 &sinh();
+    complex128 &cosh();
+    complex128 &tanh();
+
+    // Inverse hyperbolic functions.
+    complex128 &asinh();
+    complex128 &acosh();
+    complex128 &atanh();
 };
 
 // Getters for real/imaginary parts.
@@ -381,6 +391,16 @@ MPPP_DLL_PUBLIC complex128 tan(const complex128 &);
 MPPP_DLL_PUBLIC complex128 asin(const complex128 &);
 MPPP_DLL_PUBLIC complex128 acos(const complex128 &);
 MPPP_DLL_PUBLIC complex128 atan(const complex128 &);
+
+// Hyperbolic functions
+MPPP_DLL_PUBLIC complex128 sinh(const complex128 &);
+MPPP_DLL_PUBLIC complex128 cosh(const complex128 &);
+MPPP_DLL_PUBLIC complex128 tanh(const complex128 &);
+
+// Inverse hyperbolic functions
+MPPP_DLL_PUBLIC complex128 asinh(const complex128 &);
+MPPP_DLL_PUBLIC complex128 acosh(const complex128 &);
+MPPP_DLL_PUBLIC complex128 atanh(const complex128 &);
 
 // Streaming operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex128 &);

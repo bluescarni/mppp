@@ -340,6 +340,38 @@ The complex128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex128 &sinh()
+   .. cpp:function:: complex128 &cosh()
+   .. cpp:function:: complex128 &tanh()
+
+      In-place hyperbolic functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sinh z`,
+      * :math:`\cosh z`,
+      * :math:`\tanh z`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: complex128 &asinh()
+   .. cpp:function:: complex128 &acosh()
+   .. cpp:function:: complex128 &atanh()
+
+      In-place inverse hyperbolic functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\operatorname{arcsinh} z`,
+      * :math:`\operatorname{arccosh} z`,
+      * :math:`\operatorname{arctanh} z`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -451,6 +483,41 @@ Trigonometry
    :param z: the input value.
 
    :return: the value of the inverse trigonometric function.
+
+Hyperbolic functions
+~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mppp::complex128 mppp::sinh(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::cosh(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::tanh(const mppp::complex128 &z)
+
+   Hyperbolic functions.
+
+   These functions will return, respectively:
+
+   * :math:`\sinh z`,
+   * :math:`\cosh z`,
+   * :math:`\tanh z`.
+
+   :param z: the input value.
+
+   :return: the value of the hyperbolic function.
+
+.. cpp:function:: mppp::complex128 mppp::asinh(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::acosh(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::atanh(const mppp::complex128 &z)
+
+   Inverse hyperbolic functions.
+
+   These functions will return, respectively:
+
+   * :math:`\operatorname{arcsinh} z`,
+   * :math:`\operatorname{arccosh} z`,
+   * :math:`\operatorname{arctanh} z`.
+
+   :param z: the input value.
+
+   :return: the value of the inverse hyperbolic function.
 
 Input/output
 ~~~~~~~~~~~~
