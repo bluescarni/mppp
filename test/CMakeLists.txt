@@ -178,6 +178,7 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(complex128_arith)
   ADD_MPPP_TESTCASE(complex128_trig)
   ADD_MPPP_TESTCASE(complex128_hyper)
+  ADD_MPPP_TESTCASE(complex128_logexp)
   ADD_MPPP_TESTCASE(complex128_operators)
 endif()
 

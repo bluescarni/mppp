@@ -346,6 +346,11 @@ public:
     complex128 &asinh();
     complex128 &acosh();
     complex128 &atanh();
+
+    // Exponentials and logarithms.
+    complex128 &exp();
+    complex128 &log();
+    complex128 &log10();
 };
 
 // Getters for real/imaginary parts.
@@ -382,25 +387,30 @@ constexpr complex128 conj(const complex128 &c)
     return complex128{c.real(), -c.imag()};
 }
 
-// Trigonometric functions
+// Trigonometric functions.
 MPPP_DLL_PUBLIC complex128 sin(const complex128 &);
 MPPP_DLL_PUBLIC complex128 cos(const complex128 &);
 MPPP_DLL_PUBLIC complex128 tan(const complex128 &);
 
-// Inverse trigonometric functions
+// Inverse trigonometric functions.
 MPPP_DLL_PUBLIC complex128 asin(const complex128 &);
 MPPP_DLL_PUBLIC complex128 acos(const complex128 &);
 MPPP_DLL_PUBLIC complex128 atan(const complex128 &);
 
-// Hyperbolic functions
+// Hyperbolic functions.
 MPPP_DLL_PUBLIC complex128 sinh(const complex128 &);
 MPPP_DLL_PUBLIC complex128 cosh(const complex128 &);
 MPPP_DLL_PUBLIC complex128 tanh(const complex128 &);
 
-// Inverse hyperbolic functions
+// Inverse hyperbolic functions.
 MPPP_DLL_PUBLIC complex128 asinh(const complex128 &);
 MPPP_DLL_PUBLIC complex128 acosh(const complex128 &);
 MPPP_DLL_PUBLIC complex128 atanh(const complex128 &);
+
+// Exponentials and logarithms.
+MPPP_DLL_PUBLIC complex128 exp(const complex128 &);
+MPPP_DLL_PUBLIC complex128 log(const complex128 &);
+MPPP_DLL_PUBLIC complex128 log10(const complex128 &);
 
 // Streaming operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex128 &);

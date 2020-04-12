@@ -372,6 +372,22 @@ The complex128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex128 &exp()
+   .. cpp:function:: complex128 &log()
+   .. cpp:function:: complex128 &log10()
+
+      Exponentials and logarithms.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`e^z`,
+      * :math:`\log z`,
+      * :math:`\log_{10} z`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -518,6 +534,25 @@ Hyperbolic functions
    :param z: the input value.
 
    :return: the value of the inverse hyperbolic function.
+
+Exponentials and logarithms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mppp::complex128 mppp::exp(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::log(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::log10(const mppp::complex128 &z)
+
+   Exponentials and logarithms.
+
+   These functions will return, respectively:
+
+   * :math:`e^z`,
+   * :math:`\log z`,
+   * :math:`\log_{10} z`.
+
+   :param z: the input value.
+
+   :return: the value of the exponential or logarithm function.
 
 Input/output
 ~~~~~~~~~~~~
