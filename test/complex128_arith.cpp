@@ -54,10 +54,16 @@ TEST_CASE("conj")
     c.conj();
     REQUIRE(c == complex128{3, 3});
     REQUIRE(std::is_same<complex128 &, decltype(c.conj())>::value);
+
+    // NOTE: it looks like on ICC there might
+    // be a codegen issue that discards the sign
+    // of a negative zero in certain circumstances.
+#if !defined(__INTEL_COMPILER)
     c = complex128{1, 0};
     REQUIRE(!c.imag().signbit());
     c.conj();
     REQUIRE(c.imag().signbit());
+#endif
 
 #if MPPP_CPLUSPLUS >= 201402L && !defined(__INTEL_COMPILER)
     constexpr auto cnj2 = test_constexpr_conj(complex128{0, 3});
