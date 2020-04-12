@@ -289,18 +289,20 @@ The complex128 class
    .. cpp:function:: complex128 &abs()
    .. cpp:function:: complex128 &arg()
    .. cpp:function:: constexpr complex128 &conj()
+   .. cpp:function:: complex128 &proj()
 
       .. note::
 
         :cpp:func:`~mppp::complex128::conj()` is ``constexpr`` only if at least C++14 is being used.
 
-      In-place absolute value, argument and complex conjugate.
+      In-place absolute value, argument, complex conjugate and projection into Riemann sphere.
 
       These member functions will set ``this`` to, respectively:
 
       * :math:`\left| z \right|`,
       * :math:`\arg z`,
       * :math:`\overline{z}`,
+      * the projection of :math:`z` into Riemann sphere,
 
       where :math:`z` is the current value of ``this``.
 
@@ -361,6 +363,27 @@ Real/imaginary parts
    :param x: the desired value for the real/imaginary part of *c*.
 
    :return: a reference to *c*.
+
+Basic complex functions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mppp::complex128 mppp::abs(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::arg(const mppp::complex128 &z)
+.. cpp:function:: constexpr mppp::complex128 mppp::conj(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::proj(const mppp::complex128 &z)
+
+   Absolute value, argument, complex conjugate and projection into Riemann sphere.
+
+   These functions will return, respectively:
+
+   * :math:`\left| z \right|`,
+   * :math:`\arg z`,
+   * :math:`\overline{z}`,
+   * the projection of :math:`z` into Riemann sphere.
+
+   :param z: the input value.
+
+   :return: the result of the operation.
 
 Input/output
 ~~~~~~~~~~~~

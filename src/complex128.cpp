@@ -174,5 +174,6 @@ complex128::complex128(const ptag &, const std::string_view &s) : complex128(s.d
 
 MPPP_COMPLEX128_IMPLEMENT_UNARY(abs)
 MPPP_COMPLEX128_IMPLEMENT_UNARY(arg)
+MPPP_COMPLEX128_IMPLEMENT_UNARY(proj)
 
 } // namespace mppp

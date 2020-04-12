@@ -10,6 +10,7 @@
 
 #include <mp++/complex128.hpp>
 #include <mp++/config.hpp>
+#include <mp++/real128.hpp>
 
 #include "catch.hpp"
 
@@ -62,4 +63,18 @@ TEST_CASE("conj")
     constexpr auto cnj2 = test_constexpr_conj(complex128{0, 3});
     REQUIRE(cnj2 == complex128{0, -3});
 #endif
+}
+
+TEST_CASE("proj")
+{
+    complex128 c{42, -43};
+    REQUIRE(std::is_same<complex128 &, decltype(c.proj())>::value);
+    REQUIRE(c.proj().m_value == cplex128{42, -43});
+    REQUIRE(std::is_same<complex128, decltype(proj(complex128{1, 2}))>::value);
+    REQUIRE(proj(complex128{1, 2}).m_value == cplex128{1, 2});
+
+    REQUIRE(proj(complex128{real128_inf(), 123}).m_value == cplex128{real128_inf().m_value, 0});
+    REQUIRE(!proj(complex128{real128_inf(), 123}).imag().signbit());
+    REQUIRE(proj(complex128{real128_inf(), -123}).m_value == cplex128{real128_inf().m_value, 0});
+    REQUIRE(proj(complex128{real128_inf(), -123}).imag().signbit());
 }
