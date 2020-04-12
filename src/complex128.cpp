@@ -161,24 +161,18 @@ complex128::complex128(const ptag &, const std::string_view &s) : complex128(s.d
 
 #endif
 
-complex128 abs(const complex128 &c)
-{
-    return complex128{::cabsq(c.m_value)};
-}
+#define MPPP_COMPLEX128_IMPLEMENT_UNARY(func)                                                                          \
+    complex128 func(const complex128 &c)                                                                               \
+    {                                                                                                                  \
+        return complex128{::c##func##q(c.m_value)};                                                                    \
+    }                                                                                                                  \
+                                                                                                                       \
+    complex128 &complex128::func()                                                                                     \
+    {                                                                                                                  \
+        return *this = mppp::func(*this);                                                                              \
+    }
 
-complex128 &complex128::abs()
-{
-    return *this = mppp::abs(*this);
-}
-
-complex128 arg(const complex128 &c)
-{
-    return complex128{::cargq(c.m_value)};
-}
-
-complex128 &complex128::arg()
-{
-    return *this = mppp::arg(*this);
-}
+MPPP_COMPLEX128_IMPLEMENT_UNARY(abs)
+MPPP_COMPLEX128_IMPLEMENT_UNARY(arg)
 
 } // namespace mppp
