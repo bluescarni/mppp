@@ -864,3 +864,13 @@ TEST_CASE("integer nts")
 }
 
 #endif
+
+TEST_CASE("integer constexpr")
+{
+    constexpr detail::static_int<1> si1;
+    constexpr auto si2(si1);
+    // TODO test move ctor.
+
+    constexpr detail::integer_union<1> iu1;
+    constexpr auto iu2(iu1);
+}

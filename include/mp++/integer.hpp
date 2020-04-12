@@ -187,7 +187,7 @@ inline std::string mpz_to_str(const mpz_struct_t *mpz, int base = 10)
 }
 
 // Small wrapper to copy limbs.
-inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *out)
+MPPP_CONSTEXPR_20 inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *out)
 {
     for (; begin != end; ++begin, ++out) {
         *out = *begin;
@@ -195,7 +195,8 @@ inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_li
 }
 
 // The version with non-overlapping ranges.
-inline void copy_limbs_no(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *MPPP_RESTRICT out)
+MPPP_CONSTEXPR_20 inline void copy_limbs_no(const ::mp_limb_t *begin, const ::mp_limb_t *end,
+                                            ::mp_limb_t *MPPP_RESTRICT out)
 {
     assert(begin != out);
     for (; begin != end; ++begin, ++out) {
@@ -422,14 +423,20 @@ struct static_int {
         zero_upper_limbs(static_cast<std::size_t>(abs_size()));
     }
     // Default constructor, inits to zero.
-    static_int() : _mp_size(0)
+    MPPP_CONSTEXPR_20 static_int() : _mp_size(0)
     {
-        // Zero the limbs, if needed.
-        zero_upper_limbs(0);
+        if (is_constant_evaluated()) {
+            for (auto &l : m_limbs) {
+                l = 0;
+            }
+        } else {
+            // Zero the limbs, if needed.
+            zero_upper_limbs(0);
+        }
     }
     // Let's avoid copying the _mp_alloc member, as it is never written to and it must always
     // have the same value.
-    static_int(const static_int &other) : _mp_size(other._mp_size)
+    MPPP_CONSTEXPR_20 static_int(const static_int &other) : _mp_size(other._mp_size)
     {
         if (SSize <= opt_size) {
             // In this case, we know that other's upper limbs are already
@@ -444,7 +451,7 @@ struct static_int {
         }
     }
     // Same as copy constructor.
-    static_int(static_int &&other) noexcept : static_int(other) {}
+    MPPP_CONSTEXPR_20 static_int(static_int &&other) noexcept : static_int(other) {}
     // These 2 constructors are used in the generic constructor of integer_union.
     //
     // Constructor from a size and a single limb (will be the least significant limb).
@@ -532,7 +539,7 @@ struct static_int {
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
 
 #endif
-    bool dtor_checks() const
+    MPPP_CONSTEXPR_20 bool dtor_checks() const
     {
         // LCOV_EXCL_START
         const auto asize = abs_size();
@@ -565,14 +572,18 @@ struct static_int {
 #pragma GCC diagnostic pop
 
 #endif
-    ~static_int()
+    MPPP_CONSTEXPR_20 ~static_int()
     {
         assert(dtor_checks());
     }
     // Size in limbs (absolute value of the _mp_size member).
-    mpz_size_t abs_size() const
+    MPPP_CONSTEXPR_20 mpz_size_t abs_size() const
     {
-        return std::abs(_mp_size);
+        if (is_constant_evaluated()) {
+            return _mp_size >= 0 ? _mp_size : -_mp_size;
+        } else {
+            return std::abs(_mp_size);
+        }
     }
     // NOTE: the retval here can be used only in read-only mode, otherwise
     // we will have UB due to the const_cast use.
@@ -591,11 +602,12 @@ union integer_union {
     using s_storage = static_int<SSize>;
     using d_storage = mpz_struct_t;
     // Def ctor, will init to static.
-    integer_union() : m_st() {}
+    MPPP_CONSTEXPR_20 integer_union() : m_st() {}
     // Copy constructor, does a deep copy maintaining the storage class of other.
-    integer_union(const integer_union &other)
+    MPPP_CONSTEXPR_20 integer_union(const integer_union &other)
     {
         if (other.is_static()) {
+            m_st = other.g_st();
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
             ::new (static_cast<void *>(&m_dy)) d_storage;
@@ -879,7 +891,7 @@ union integer_union {
         }
         return *this;
     }
-    ~integer_union()
+    MPPP_CONSTEXPR_20 ~integer_union()
     {
         if (is_static()) {
             g_st().~s_storage();
@@ -896,7 +908,7 @@ union integer_union {
         g_dy().~d_storage();
     }
     // Check storage type.
-    bool is_static() const
+    MPPP_CONSTEXPR_20 bool is_static() const
     {
         return m_st._mp_alloc == s_storage::s_alloc;
     }
@@ -905,12 +917,12 @@ union integer_union {
         return m_st._mp_alloc != s_storage::s_alloc;
     }
     // Getters for st and dy.
-    const s_storage &g_st() const
+    MPPP_CONSTEXPR_20 const s_storage &g_st() const
     {
         assert(is_static());
         return m_st;
     }
-    s_storage &g_st()
+    MPPP_CONSTEXPR_20 s_storage &g_st()
     {
         assert(is_static());
         return m_st;
