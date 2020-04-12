@@ -268,6 +268,16 @@ template <typename T>
 struct nl_constants {
     static constexpr int digits = nl_digits<T>();
 };
+
+constexpr bool is_constant_evaluated() noexcept
+{
+#if MPPP_CPLUSPLUS >= 202002L
+    return std::is_constant_evaluated();
+#else
+    return false;
+#endif
+}
+
 } // namespace detail
 } // namespace mppp
 

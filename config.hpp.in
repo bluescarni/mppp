@@ -117,6 +117,16 @@
 
 #endif
 
+#if MPPP_CPLUSPLUS >= 202002L
+
+#define MPPP_CONSTEXPR_20 constexpr
+
+#else
+
+#define MPPP_CONSTEXPR_20
+
+#endif
+
 // Detect if the compiler supports GCC-style 128-bit integers.
 // NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
 // http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
@@ -164,7 +174,7 @@
 #endif
 
 // C++20 constinit.
-#if defined(__cpp_constinit)
+#if MPPP_CPLUSPLUS >= 202002L
 
 #define MPPP_CONSTINIT constinit
 
