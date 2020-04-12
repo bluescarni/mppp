@@ -331,6 +331,11 @@ public:
     complex128 &sin();
     complex128 &cos();
     complex128 &tan();
+
+    // Inverse trigonometric functions.
+    complex128 &asin();
+    complex128 &acos();
+    complex128 &atan();
 };
 
 // Getters for real/imaginary parts.
@@ -371,6 +376,11 @@ constexpr complex128 conj(const complex128 &c)
 MPPP_DLL_PUBLIC complex128 sin(const complex128 &);
 MPPP_DLL_PUBLIC complex128 cos(const complex128 &);
 MPPP_DLL_PUBLIC complex128 tan(const complex128 &);
+
+// Inverse trigonometric functions
+MPPP_DLL_PUBLIC complex128 asin(const complex128 &);
+MPPP_DLL_PUBLIC complex128 acos(const complex128 &);
+MPPP_DLL_PUBLIC complex128 atan(const complex128 &);
 
 // Streaming operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex128 &);

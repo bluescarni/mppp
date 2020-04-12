@@ -324,6 +324,22 @@ The complex128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex128 &asin()
+   .. cpp:function:: complex128 &acos()
+   .. cpp:function:: complex128 &atan()
+
+      In-place inverse trigonometric functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\arcsin z`,
+      * :math:`\arccos z`,
+      * :math:`\arctan z`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -419,6 +435,22 @@ Trigonometry
    :param z: the input value.
 
    :return: the value of the trigonometric function.
+
+.. cpp:function:: mppp::complex128 mppp::asin(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::acos(const mppp::complex128 &z)
+.. cpp:function:: mppp::complex128 mppp::atan(const mppp::complex128 &z)
+
+   Inverse trigonometric functions.
+
+   These functions will return, respectively:
+
+   * :math:`\arcsin z`,
+   * :math:`\arccos z`,
+   * :math:`\arctan z`.
+
+   :param z: the input value.
+
+   :return: the value of the inverse trigonometric function.
 
 Input/output
 ~~~~~~~~~~~~
