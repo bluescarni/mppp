@@ -422,6 +422,22 @@ Concepts
    * ``T`` is :cpp:class:`~mppp::real128`, or
    * ``T`` is :cpp:class:`~mppp::real`.
 
+.. cpp:concept:: template <typename T, typename U> mppp::complex128_op_types
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary :ref:`functions <complex128_functions>` and :ref:`operators <complex128_operators>`
+   involving :cpp:class:`~mppp::complex128` and other types. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` are both :cpp:class:`~mppp::complex128`, or
+   * one type is :cpp:class:`~mppp::complex128` and the other is either:
+
+     * a :cpp:concept:`~mppp::real128_interoperable` type, or
+     * :cpp:class:`~mppp::real128`, or
+     * a :cpp:concept:`~mppp::real128_cpp_complex` type, or
+
+   * one type is :cpp:class:`~mppp::real128` and the other type is
+     a :cpp:concept:`~mppp::real128_cpp_complex` type.
+
 .. _complex128_functions:
 
 Functions
@@ -484,6 +500,23 @@ Roots
    :param z: the input value.
 
    :return: :math:`\sqrt{z}`.
+
+Exponentiation
+~~~~~~~~~~~~~~
+
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> mppp::complex128 mppp::pow(const T &x, const T &y)
+
+   Exponentiation.
+
+   This function will return :math:`x^y`. The input arguments are converted to :cpp:class:`~mppp::complex128`
+   (if necessary) and the result is computed via the exponentiation function from the quadmath library.
+
+   :param x: the base.
+   :param y: the exponent.
+
+   :return: :math:`x^y`.
+
+   :exception unspecified: any exception raised by the conversion of *x* and/or *y* to :cpp:class:`~mppp::complex128`.
 
 Trigonometry
 ~~~~~~~~~~~~

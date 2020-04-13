@@ -421,11 +421,13 @@ MPPP_DLL_PUBLIC complex128 log10(const complex128 &);
 namespace detail
 {
 
+// The other type in binary operations when one
+// argument is complex128 and the other isn't.
 template <typename T>
 using is_complex128_op_other_type
     = disjunction<is_real128_interoperable<T>, std::is_same<T, real128>, is_real128_cpp_complex<T>>;
 
-}
+} // namespace detail
 
 // Detect types for use in mathematical operators
 // involving complex128.
