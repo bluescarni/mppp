@@ -269,6 +269,34 @@ The complex128 class
 
       :return: ``this`` converted to the type ``T``.
 
+   .. cpp:function:: template <complex128_interoperable T> constexpr bool get(T &rop) const
+   .. cpp:function:: template <real128_cpp_complex T> constexpr bool get(T &rop) const
+
+      .. note::
+
+        The first overload is ``constexpr`` only if at least C++14 is being used.
+        The second overload is ``constexpr`` only if at least C++20 is being used.
+
+      Conversion member functions to interoperable and complex C++ types.
+
+      These member functions, similarly to the conversion operator, will convert ``this`` to
+      ``T``, storing the result of the conversion into *rop*.
+      Differently from the conversion operator, these functions do not raise any exception: if the conversion is
+      successful, the functions will return ``true``, otherwise the functions will return ``false``. If the
+      conversion fails, *rop* will not be altered.
+
+      The conversion can fail only in the first overload,
+      if either:
+
+      * the imaginary part of ``this`` is not zero, or
+      * the conversion of the real part of ``this`` to ``T`` (where ``T`` is neither
+        :cpp:class:`~mppp::real128` nor :cpp:class:`~mppp::real`) via
+        :cpp:func:`mppp::real128::get()` returns ``false``.
+
+      :param rop: the variable which will store the result of the conversion.
+
+      :return: ``true`` if the conversion succeeds, ``false`` otherwise.
+
    .. cpp:function:: std::string to_string() const
 
       Convert to string.
@@ -468,6 +496,38 @@ Real/imaginary parts
    :param x: the desired value for the real/imaginary part of *c*.
 
    :return: a reference to *c*.
+
+Conversion
+~~~~~~~~~~
+
+.. cpp:function:: template <mppp::complex128_interoperable T> constexpr bool mppp::get(T &rop, const mppp::complex128 &c)
+.. cpp:function:: template <mppp::real128_cpp_complex T> constexpr bool mppp::get(T &rop, const mppp::complex128 &c)
+
+   .. note::
+
+      The first overload is ``constexpr`` only if at least C++14 is being used.
+      The second overload is ``constexpr`` only if at least C++20 is being used.
+
+   Conversion functions to interoperable and complex C++ types.
+
+   These functions, similarly to the conversion operator of :cpp:class:`~mppp::complex128`, will convert *c* to
+   ``T``, storing the result of the conversion into *rop*.
+   Differently from the conversion operator, these functions do not raise any exception: if the conversion is
+   successful, the functions will return ``true``, otherwise the functions will return ``false``. If the
+   conversion fails, *rop* will not be altered.
+
+   The conversion can fail only in the first overload,
+   if either:
+
+   * the imaginary part of *c* is not zero, or
+   * the conversion of the real part of *c* to ``T`` (where ``T`` is neither
+     :cpp:class:`~mppp::real128` nor :cpp:class:`~mppp::real`) via
+     :cpp:func:`mppp::real128::get()` returns ``false``.
+
+   :param rop: the variable which will store the result of the conversion.
+   :param c: the value that will be converted to ``T``.
+
+   :return: ``true`` if the conversion succeeds, ``false`` otherwise.
 
 Basic complex functions
 ~~~~~~~~~~~~~~~~~~~~~~~

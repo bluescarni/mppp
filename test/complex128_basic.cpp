@@ -538,3 +538,251 @@ TEST_CASE("stream operator")
 
     REQUIRE(oss.str() == complex128{1, 2}.to_string());
 }
+
+#if MPPP_CPLUSPLUS >= 201402L
+
+constexpr auto test_constexpr_get1(const complex128 &c)
+{
+    int n1 = -1;
+    c.get(n1);
+    get(n1, c);
+    return n1;
+}
+
+constexpr auto test_constexpr_get2(const complex128 &c)
+{
+    real128 n1{-1};
+    c.get(n1);
+    get(n1, c);
+    return n1;
+}
+
+#endif
+
+#if MPPP_CPLUSPLUS >= 202002L
+
+constexpr auto test_constexpr_get3(const complex128 &c)
+{
+    std::complex<double> ret{1, 5};
+    c.get(ret);
+    get(ret, c);
+    return ret;
+}
+
+#endif
+
+TEST_CASE("get")
+{
+    {
+        // To C++ arithmetic types.
+        int n;
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(n));
+        REQUIRE(n == 42);
+
+        REQUIRE(get(n, complex128{43}));
+        REQUIRE(n == 43);
+
+        REQUIRE(!complex128{42, -1}.get(n));
+        REQUIRE(n == 43);
+
+        REQUIRE(!get(n, complex128{43, 1}));
+        REQUIRE(n == 43);
+
+#if MPPP_CPLUSPLUS >= 201402L
+        constexpr auto tmp = test_constexpr_get1(complex128{44});
+        REQUIRE(tmp == 44);
+#endif
+    }
+
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        __int128_t n;
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(n));
+        REQUIRE(n == 42);
+
+        REQUIRE(get(n, complex128{43}));
+        REQUIRE(n == 43);
+
+        REQUIRE(!complex128{42, -1}.get(n));
+        REQUIRE(n == 43);
+
+        REQUIRE(!get(n, complex128{43, 1}));
+        REQUIRE(n == 43);
+    }
+#endif
+
+    {
+        double n;
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(n));
+        REQUIRE(n == 42);
+
+        REQUIRE(get(n, complex128{43}));
+        REQUIRE(n == 43);
+
+        REQUIRE(!complex128{42, -1}.get(n));
+        REQUIRE(n == 43);
+
+        REQUIRE(!get(n, complex128{43, 1}));
+        REQUIRE(n == 43);
+    }
+
+    {
+        // To integer.
+        auto n = 0_z1;
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(n));
+        REQUIRE(n == 42);
+
+        REQUIRE(get(n, complex128{43}));
+        REQUIRE(n == 43);
+
+        REQUIRE(!get(n, complex128{1, 2}));
+        REQUIRE(!complex128{3, -4}.get(n));
+        REQUIRE(n == 43);
+
+        REQUIRE(!get(n, complex128{"inf"}));
+        REQUIRE(!complex128{"inf"}.get(n));
+        REQUIRE(n == 43);
+    }
+
+    {
+        // To rational.
+        auto n = 0_q1;
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(n));
+        REQUIRE(n == 42);
+
+        REQUIRE(get(n, complex128{43}));
+        REQUIRE(n == 43);
+
+        REQUIRE(!get(n, complex128{4, 5}));
+        REQUIRE(!complex128{-7, -8}.get(n));
+        REQUIRE(n == 43);
+
+        REQUIRE(!get(n, complex128{"inf"}));
+        REQUIRE(!complex128{"inf"}.get(n));
+        REQUIRE(n == 43);
+    }
+
+    {
+        // To real128.
+        real128 n;
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(n));
+        REQUIRE(n == 42);
+
+        REQUIRE(get(n, complex128{43}));
+        REQUIRE(n == 43);
+
+        REQUIRE(!complex128{42, -1}.get(n));
+        REQUIRE(!get(n, complex128{43, 44}));
+        REQUIRE(n == 43);
+
+#if MPPP_CPLUSPLUS >= 201402L
+        constexpr auto tmp = test_constexpr_get2(complex128{44});
+        REQUIRE(tmp == 44);
+#endif
+    }
+
+#if defined(MPPP_WITH_MPFR)
+    {
+        // To real.
+        real r;
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(r))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(r, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(r));
+        REQUIRE(r == 42);
+        REQUIRE(r.get_prec() == 113);
+        r.set_prec(190);
+
+        REQUIRE(get(r, complex128{43}));
+        REQUIRE(r == 43);
+        REQUIRE(r.get_prec() == 113);
+        r.set_prec(190);
+
+        REQUIRE(get(r, complex128{"inf"}));
+        REQUIRE(inf_p(r));
+        REQUIRE(r.get_prec() == 113);
+        r.set_prec(190);
+
+        REQUIRE(get(r, complex128{"nan"}));
+        REQUIRE(nan_p(r));
+        REQUIRE(r.get_prec() == 113);
+        r.set_prec(190);
+
+        REQUIRE(!complex128{43, -5}.get(r));
+        REQUIRE(!get(r, complex128{43, -5}));
+        REQUIRE(r.get_prec() == 190);
+    }
+#endif
+
+    {
+        // To std::complex.
+        std::complex<float> c{1, 2};
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(c))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(c, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(c));
+        REQUIRE(c == 42.f);
+
+        REQUIRE(get(c, complex128{41, -1}));
+        REQUIRE(c == std::complex<float>{41, -1});
+
+#if MPPP_CPLUSPLUS >= 202002L
+        constexpr auto tmp = test_constexpr_get3(complex128{44, -89});
+        REQUIRE(tmp == std::complex<double>{44, -89});
+#endif
+    }
+
+    {
+        std::complex<double> c{1, 2};
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(c))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(c, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(c));
+        REQUIRE(c == 42.);
+
+        REQUIRE(get(c, complex128{41, -1}));
+        REQUIRE(c == std::complex<double>{41, -1});
+    }
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    {
+        std::complex<long double> c{1, 2};
+
+        REQUIRE(std::is_same<bool, decltype(complex128{42}.get(c))>::value);
+        REQUIRE(std::is_same<bool, decltype(get(c, complex128{43}))>::value);
+
+        REQUIRE(complex128{42}.get(c));
+        REQUIRE(c == 42.l);
+
+        REQUIRE(get(c, complex128{41, -1}));
+        REQUIRE(c == std::complex<long double>{41, -1});
+    }
+#endif
+}

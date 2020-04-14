@@ -27,6 +27,12 @@
 #include <mp++/complex128.hpp>
 #include <mp++/real128.hpp>
 
+#if defined(MPPP_WITH_MPFR)
+
+#include <mp++/real.hpp>
+
+#endif
+
 namespace mppp
 {
 
@@ -158,6 +164,16 @@ complex128::complex128(const char *begin, const char *end)
 #if defined(MPPP_HAVE_STRING_VIEW)
 
 complex128::complex128(const ptag &, const std::string_view &s) : complex128(s.data(), s.data() + s.size()) {}
+
+#endif
+
+#if defined(MPPP_WITH_MPFR)
+
+bool complex128::get_impl(mppp::real &rop, const real128 &r)
+{
+    rop = r;
+    return true;
+}
 
 #endif
 

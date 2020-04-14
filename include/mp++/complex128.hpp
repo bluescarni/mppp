@@ -312,6 +312,60 @@ public:
         return T{static_cast<value_t>(real()), static_cast<value_t>(imag())};
     }
 
+private:
+    // get() implementation for real128.
+    static MPPP_CONSTEXPR_14 bool get_impl(real128 &rop, const real128 &r)
+    {
+        rop = r;
+        return true;
+    }
+#if defined(MPPP_WITH_MPFR)
+    // get() implementation for real.
+    static bool get_impl(mppp::real &, const real128 &);
+#endif
+    // get() implementation for fundamental C++ types, integer
+    // and rational.
+    template <typename T>
+    static MPPP_CONSTEXPR_14 bool get_impl(T &rop, const real128 &r)
+    {
+        return r.get(rop);
+    }
+
+public:
+    // Conversion member function to real-valued interoperable types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex128_interoperable T>
+#else
+    template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 bool get(T &rop) const
+    {
+        if (imag() == 0) {
+            return get_impl(rop, real());
+        } else {
+            return false;
+        }
+    }
+    // Conversion member function to complex C++ types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_20 bool get(T &rop) const
+    {
+        using value_type = typename T::value_type;
+
+        // NOTE: constexpr mutation of a std::complex
+        // seems to be available only since C++20:
+        // https://en.cppreference.com/w/cpp/numeric/complex/real
+        // https://en.cppreference.com/w/cpp/numeric/complex/operator%3D
+        rop.real(static_cast<value_type>(real()));
+        rop.imag(static_cast<value_type>(imag()));
+
+        return true;
+    }
+
     // Conversion to string.
     std::string to_string() const;
 
@@ -376,6 +430,13 @@ inline MPPP_CONSTEXPR_14 complex128 &set_real(complex128 &c, const real128 &re)
 inline MPPP_CONSTEXPR_14 complex128 &set_imag(complex128 &c, const real128 &im)
 {
     return c.set_imag(im);
+}
+
+// Conversion function.
+template <typename T>
+inline MPPP_CONSTEXPR_14 auto get(T &rop, const complex128 &c) -> decltype(c.get(rop))
+{
+    return c.get(rop);
 }
 
 // Absolute value.
