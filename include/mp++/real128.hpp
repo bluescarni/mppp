@@ -1535,6 +1535,19 @@ template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>
     return x;
 }
 
+template <typename T, typename U>
+using are_real128_eq_op_types
+    = detail::disjunction<are_real128_op_types<T, U>,
+                          detail::conjunction<std::is_same<T, real128>, is_real128_cpp_complex<U>>,
+                          detail::conjunction<std::is_same<U, real128>, is_real128_cpp_complex<T>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL real128_eq_op_types = are_real128_eq_op_types<T, U>::value;
+
+#endif
+
 namespace detail
 {
 
@@ -1555,6 +1568,21 @@ constexpr bool dispatch_eq(const T &x, const real128 &y)
     return x == y.m_value;
 }
 
+template <typename T, enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+constexpr bool dispatch_eq(const real128 &x, const T &y)
+{
+    // NOTE: follow what std::complex does here, that is, real arguments are treated as
+    // complex numbers with the real part equal to the argument and the imaginary part set to zero.
+    // https://en.cppreference.com/w/cpp/numeric/complex/operator_cmp
+    return y.imag() == 0 && y.real() == x.m_value;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+constexpr bool dispatch_eq(const T &x, const real128 &y)
+{
+    return dispatch_eq(y, x);
+}
+
 template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 bool dispatch_eq(const real128 &, const T &);
 
@@ -1566,9 +1594,9 @@ bool dispatch_eq(const T &, const real128 &);
 // Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+requires real128_eq_op_types<T, U>
 #else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
 #endif
     constexpr bool operator==(const T &x, const U &y)
 {
@@ -1595,9 +1623,9 @@ inline bool dispatch_eq(const T &x, const real128 &y)
 // Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+requires real128_eq_op_types<T, U>
 #else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
 #endif
     constexpr bool operator!=(const T &x, const U &y)
 {

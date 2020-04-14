@@ -569,6 +569,17 @@ Concepts
    * ``T`` and ``U`` are both :cpp:class:`~mppp::real128`, or
    * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::real128_interoperable` type.
 
+.. cpp:concept:: template <typename T, typename U> mppp::real128_eq_op_types
+
+   .. versionadded:: 0.20
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary equality and inequality operators
+   involving :cpp:class:`~mppp::real128` and other types. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::real128_op_types`, or
+   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::real128_cpp_complex` type.
+
 .. _real128_functions:
 
 Functions
@@ -1081,12 +1092,12 @@ Mathematical operators
    :exception unspecified: any exception thrown by the corresponding binary operator, or by the conversion
      of :cpp:class:`~mppp::real128` to mp++ types.
 
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator==(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator!=(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator<(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator>(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator<=(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator>=(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_eq_op_types<T> U> constexpr bool mppp::operator==(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_eq_op_types<T> U> constexpr bool mppp::operator!=(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr bool mppp::operator<(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr bool mppp::operator>(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr bool mppp::operator<=(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr bool mppp::operator>=(const T &x, const U &y)
 
    Comparison operators.
 
@@ -1106,6 +1117,10 @@ Mathematical operators
      These operators will handle NaN in the same way as the builtin floating-point types.
      For alternative comparison functions that treat NaN specially, please see the
      :ref:`comparison functions section <real128_comparison>`.
+
+   .. versionadded:: 0.20
+
+      Equality and inequality comparison with :cpp:concept:`~mppp::real128_cpp_complex` types.
 
    :param x: the first operand.
    :param y: the second operand.
