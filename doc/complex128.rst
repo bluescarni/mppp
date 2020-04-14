@@ -429,9 +429,16 @@ Types
 -----
 
 .. cpp:type:: __complex128
+.. cpp:type:: mppp::cplex128 = __complex128
 
-   A quadruple-precision complex floating-point type available in recent versions of the GCC and Clang compilers.
+   :cpp:type:`__complex128` is a quadruple-precision complex floating-point type available in
+   recent versions of the GCC and Clang compilers.
    This is the type wrapped by the :cpp:class:`~mppp::complex128` class.
+
+   Because :cpp:type:`__complex128` is defined in the ``<quadmath.h>`` header, mp++ also provides
+   an alias for :cpp:type:`__complex128` called :cpp:type:`mppp::cplex128`, so that users
+   of the library need not to include ``<quadmath.h>`` (which can be problematic on non-GCC
+   compilers).
 
    .. seealso::
 
