@@ -558,10 +558,40 @@ constexpr complex128 operator+(const complex128 &c)
     return c;
 }
 
+// Prefix increment.
+inline MPPP_CONSTEXPR_14 complex128 &operator++(complex128 &x)
+{
+    x.m_value += 1;
+    return x;
+}
+
+// Suffix increment.
+inline MPPP_CONSTEXPR_14 complex128 operator++(complex128 &x, int)
+{
+    auto retval(x);
+    ++x;
+    return retval;
+}
+
 // Negation operator.
 constexpr complex128 operator-(const complex128 &c)
 {
     return complex128{-c.m_value};
+}
+
+// Prefix decrement.
+inline MPPP_CONSTEXPR_14 complex128 &operator--(complex128 &x)
+{
+    x.m_value -= 1;
+    return x;
+}
+
+// Suffix decrement.
+inline MPPP_CONSTEXPR_14 complex128 operator--(complex128 &x, int)
+{
+    auto retval(x);
+    --x;
+    return retval;
 }
 
 // Detect types for use in the comparison operators

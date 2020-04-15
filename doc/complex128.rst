@@ -710,3 +710,29 @@ Mathematical operators
    :param x: the argument.
 
    :return: :math:`c` and :math:`-c` respectively.
+
+.. cpp:function:: constexpr mppp::complex128 &mppp::operator++(mppp::complex128 &c)
+.. cpp:function:: constexpr mppp::complex128 &mppp::operator--(mppp::complex128 &c)
+
+   .. note::
+
+      These operators are ``constexpr`` only if at least C++14 is being used.
+
+   Prefix increment and decrement.
+
+   :param c: the argument.
+
+   :return: a reference to *c* after it has been incremented/decremented by one.
+
+.. cpp:function:: constexpr mppp::complex128 mppp::operator++(mppp::complex128 &c, int)
+.. cpp:function:: constexpr mppp::complex128 mppp::operator--(mppp::complex128 &c, int)
+
+   .. note::
+
+      These operators are ``constexpr`` only if at least C++14 is being used.
+
+   Suffix increment and decrement.
+
+   :param c: the argument.
+
+   :return: a copy of *c* before the increment/decrement.
