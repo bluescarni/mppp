@@ -13,7 +13,8 @@ New
 - mp++ now works with the Intel compiler
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__,
   tested with ``icpc (ICC) 19.1.0.166``). This includes
-  also support for :cpp:class:`~mppp::real128` (with
+  also support for :cpp:class:`~mppp::real128` and
+  :cpp:class:`~mppp::complex128` (with
   a couple of minor limitations).
 - The interoperability of :cpp:class:`~mppp::real128` with
   ``long double`` has been improved: it is now supported
@@ -55,6 +56,8 @@ Fix
 
 - Fix a bug in the :cpp:class:`~mppp::real128` test suite
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__).
+- Various doc fixes
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 - Fix a bug in the test suite in
   release mode
   (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
