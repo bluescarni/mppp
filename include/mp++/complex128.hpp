@@ -573,6 +573,75 @@ inline MPPP_CONSTEXPR_14 complex128 operator++(complex128 &x, int)
     return retval;
 }
 
+namespace detail
+{
+
+constexpr complex128 binary_add_impl(const complex128 &c1, const complex128 &c2)
+{
+    return complex128{c1.m_value + c2.m_value};
+}
+
+constexpr complex128 binary_add_impl(const complex128 &c, const real128 &x)
+{
+    return complex128{c.m_value + x.m_value};
+}
+
+constexpr complex128 binary_add_impl(const real128 &x, const complex128 &c)
+{
+    return complex128{x.m_value + c.m_value};
+}
+
+// NOTE: this covers all real128_interoperable types.
+template <typename T>
+constexpr complex128 binary_add_impl(const complex128 &c, const T &x)
+{
+    return binary_add_impl(c, static_cast<real128>(x));
+}
+
+template <typename T>
+constexpr complex128 binary_add_impl(const T &x, const complex128 &c)
+{
+    return binary_add_impl(static_cast<real128>(x), c);
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 complex128 binary_add_impl(const complex128 &c1, const std::complex<T> &c2)
+{
+    return binary_add_impl(c1, static_cast<complex128>(c2));
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 complex128 binary_add_impl(const std::complex<T> &c1, const complex128 &c2)
+{
+    return binary_add_impl(static_cast<complex128>(c1), c2);
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 complex128 binary_add_impl(const real128 &x, const std::complex<T> &c)
+{
+    return binary_add_impl(x, static_cast<complex128>(c));
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 complex128 binary_add_impl(const std::complex<T> &c, const real128 &x)
+{
+    return binary_add_impl(static_cast<complex128>(c), x);
+}
+
+} // namespace detail
+
+// Binary plus.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex128_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
+#endif
+    constexpr complex128 operator+(const T &x, const U &y)
+{
+    return detail::binary_add_impl(x, y);
+}
+
 // Negation operator.
 constexpr complex128 operator-(const complex128 &c)
 {

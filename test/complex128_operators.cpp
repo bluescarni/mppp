@@ -8,6 +8,7 @@
 
 #include <mp++/complex128.hpp>
 #include <mp++/config.hpp>
+#include <mp++/real128.hpp>
 
 #include "catch.hpp"
 
@@ -125,4 +126,25 @@ TEST_CASE("incdec")
     constexpr auto z6 = test_constexpr_decr();
     REQUIRE((z6.m_value == -2));
 #endif
+}
+
+TEST_CASE("binary_add")
+{
+    // complex128-complex128.
+    constexpr auto res0 = complex128{1, 2} + complex128{3, 4};
+    REQUIRE(res0 == complex128{4, 6});
+
+    // complex128-real128.
+    constexpr auto res1 = complex128{1, 2} + real128{3};
+    REQUIRE(res1 == complex128{4, 2});
+
+    constexpr auto res2 = real128{3} + complex128{1, 2};
+    REQUIRE(res2 == complex128{4, 2});
+
+    // complex128-C++ arithmetic.
+    constexpr auto res3 = 3 + complex128{1, 2};
+    REQUIRE(res3 == complex128{4, 2});
+
+    constexpr auto res4 = complex128{1, 2} + 3.f;
+    REQUIRE(res4 == complex128{4, 2});
 }
