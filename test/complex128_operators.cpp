@@ -6,8 +6,15 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <complex>
+#include <type_traits>
+#include <utility>
+
 #include <mp++/complex128.hpp>
 #include <mp++/config.hpp>
+#include <mp++/detail/type_traits.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"
@@ -87,6 +94,9 @@ static constexpr real128 test_constexpr_ipd()
 
 #endif
 
+template <typename T, typename U>
+using add_t = decltype(std::declval<const T &>(), std::declval<const U &>());
+
 TEST_CASE("identity")
 {
     REQUIRE(+complex128{3, 4}.m_value == cplex128{3, 4});
@@ -132,19 +142,78 @@ TEST_CASE("binary_add")
 {
     // complex128-complex128.
     constexpr auto res0 = complex128{1, 2} + complex128{3, 4};
+    REQUIRE(std::is_same<decltype(res0), const complex128>::value);
     REQUIRE(res0 == complex128{4, 6});
 
     // complex128-real128.
     constexpr auto res1 = complex128{1, 2} + real128{3};
+    REQUIRE(std::is_same<decltype(res1), const complex128>::value);
     REQUIRE(res1 == complex128{4, 2});
 
     constexpr auto res2 = real128{3} + complex128{1, 2};
+    REQUIRE(std::is_same<decltype(res2), const complex128>::value);
     REQUIRE(res2 == complex128{4, 2});
 
     // complex128-C++ arithmetic.
     constexpr auto res3 = 3 + complex128{1, 2};
+    REQUIRE(std::is_same<decltype(res3), const complex128>::value);
     REQUIRE(res3 == complex128{4, 2});
 
     constexpr auto res4 = complex128{1, 2} + 3.f;
+    REQUIRE(std::is_same<decltype(res4), const complex128>::value);
     REQUIRE(res4 == complex128{4, 2});
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    constexpr auto res4a = complex128{1, 2} + 3.l;
+    REQUIRE(std::is_same<decltype(res4a), const complex128>::value);
+    REQUIRE(res4a == complex128{4, 2});
+#else
+    REQUIRE(!detail::is_detected<add_t, complex128, long double>::value);
+    REQUIRE(!detail::is_detected<add_t, long double, complex128>::value);
+#endif
+
+    // complex128-mp++ types.
+    const auto res5 = complex128{1, 2} + 3_z1;
+    REQUIRE(std::is_same<decltype(res5), const complex128>::value);
+    REQUIRE(res5 == complex128{4, 2});
+
+    const auto res6 = 3_q1 + complex128{1, 2};
+    REQUIRE(std::is_same<decltype(res6), const complex128>::value);
+    REQUIRE(res6 == complex128{4, 2});
+
+    // complex128-c++ complex.
+    const MPPP_CONSTEXPR_14 auto res7 = complex128{1, 2} + std::complex<float>{3, 4};
+    REQUIRE(std::is_same<decltype(res7), const complex128>::value);
+    REQUIRE(res7 == complex128{4, 6});
+
+    const MPPP_CONSTEXPR_14 auto res8 = std::complex<double>{3, 4} + complex128{1, 2};
+    REQUIRE(std::is_same<decltype(res8), const complex128>::value);
+    REQUIRE(res8 == complex128{4, 6});
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    const MPPP_CONSTEXPR_14 auto res8a = std::complex<long double>{3, 4} + complex128{1, 2};
+    REQUIRE(std::is_same<decltype(res8a), const complex128>::value);
+    REQUIRE(res8a == complex128{4, 6});
+#else
+    REQUIRE(!detail::is_detected<add_t, complex128, std::complex<long double>>::value);
+    REQUIRE(!detail::is_detected<add_t, std::complex<long double>, complex128>::value);
+#endif
+
+    // real128-c++ complex.
+    const MPPP_CONSTEXPR_14 auto res9 = std::complex<float>{1, 2} + real128{3};
+    REQUIRE(std::is_same<decltype(res9), const complex128>::value);
+    REQUIRE(res9 == complex128{4, 2});
+
+    const MPPP_CONSTEXPR_14 auto res10 = real128{3} + std::complex<double>{1, 2};
+    REQUIRE(std::is_same<decltype(res10), const complex128>::value);
+    REQUIRE(res10 == complex128{4, 2});
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    const MPPP_CONSTEXPR_14 auto res10a = real128{3} + std::complex<long double>{1, 2};
+    REQUIRE(std::is_same<decltype(res10a), const complex128>::value);
+    REQUIRE(res10a == complex128{4, 2});
+#else
+    REQUIRE(!detail::is_detected<add_t, real128, std::complex<long double>>::value);
+    REQUIRE(!detail::is_detected<add_t, std::complex<long double>, real128>::value);
+#endif
 }
