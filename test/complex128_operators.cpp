@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <complex>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -96,6 +97,9 @@ static constexpr real128 test_constexpr_ipd()
 
 template <typename T, typename U>
 using add_t = decltype(std::declval<const T &>() + std::declval<const U &>());
+
+template <typename T, typename U>
+using ip_add_t = decltype(std::declval<T &>() += std::declval<const U &>());
 
 TEST_CASE("identity")
 {
@@ -235,4 +239,78 @@ TEST_CASE("in_place_add")
     complex128 c0{1, 2};
     c0 += complex128{-3, 4};
     REQUIRE(c0 == complex128{-2, 6});
+
+    // With real128.
+    c0 += real128{4};
+    REQUIRE(c0 == complex128{2, 6});
+
+    real128 r0{12};
+    r0 += complex128{4};
+    REQUIRE(r0 == 16);
+    REQUIRE_THROWS_AS((r0 += complex128{4, 5}), std::domain_error);
+
+    // With C++ arithmetic types.
+    c0 += 4;
+    REQUIRE(c0 == complex128{6, 6});
+    c0 += -7.f;
+    REQUIRE(c0 == complex128{-1, 6});
+
+    auto n0 = 7ll;
+    n0 += complex128{-2};
+    REQUIRE(n0 == 5);
+    REQUIRE_THROWS_AS((n0 += complex128{4, 5}), std::domain_error);
+    auto x0 = 6.;
+    x0 += complex128{1};
+    REQUIRE(x0 == 7);
+    REQUIRE_THROWS_AS((x0 += complex128{4, 5}), std::domain_error);
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    c0 += 6.l;
+    REQUIRE(c0 == complex128{5, 6});
+    // Reset c0.
+    c0 = complex128{-1, 6};
+
+    auto xl0 = 7.l;
+    xl0 += complex128{3};
+    REQUIRE(xl0 == 10);
+    REQUIRE_THROWS_AS((xl0 += complex128{4, 5}), std::domain_error);
+#else
+    REQUIRE(!detail::is_detected<ip_add_t, complex128, long double>::value);
+    REQUIRE(!detail::is_detected<ip_add_t, long double, complex128>::value);
+#endif
+
+    // With integer and rational.
+    c0 += 6_z1;
+    REQUIRE(c0 == complex128{5, 6});
+    auto z0 = 123_z1;
+    z0 += complex128{10};
+    REQUIRE(z0 == 133);
+    REQUIRE_THROWS_AS((z0 += complex128{4, 5}), std::domain_error);
+
+    c0 += 4_q1;
+    REQUIRE(c0 == complex128{9, 6});
+    auto q0 = 10_q1;
+    q0 += complex128{1};
+    REQUIRE(q0 == 11);
+    REQUIRE_THROWS_AS((q0 += complex128{4, 5}), std::domain_error);
+
+    // C++ complex.
+    c0 += std::complex<float>{1, 2};
+    REQUIRE(c0 == complex128{10, 8});
+    auto c1 = std::complex<double>{3, 4};
+    c1 += complex128{-5, -7};
+    REQUIRE(c1 == std::complex<double>{-2, -3});
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    c0 += std::complex<long double>{1, 2};
+    REQUIRE(c0 == complex128{11, 10});
+    // Reset c0.
+    c0 = complex128{10, 8};
+    auto c2 = std::complex<long double>{3, 4};
+    c2 += complex128{3, 6};
+    REQUIRE(c2 == std::complex<long double>{6, 10});
+#else
+    REQUIRE(!detail::is_detected<ip_add_t, complex128, std::complex<long double>>::value);
+    REQUIRE(!detail::is_detected<ip_add_t, std::complex<long double>, complex128>::value);
+#endif
 }
