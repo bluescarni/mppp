@@ -219,7 +219,7 @@ MPPP_COMPLEX128_IMPLEMENT_UNARY(log10)
 namespace detail
 {
 
-complex128 pow_impl(const complex128 &x, const complex128 &y)
+complex128 complex128_pow_impl(const complex128 &x, const complex128 &y)
 {
     return complex128{::cpowq(x.m_value, y.m_value)};
 }

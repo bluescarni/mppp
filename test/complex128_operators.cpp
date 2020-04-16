@@ -229,3 +229,10 @@ TEST_CASE("binary_add")
     REQUIRE(!detail::is_detected<add_t, std::complex<long double>, real128>::value);
 #endif
 }
+
+TEST_CASE("in_place_add")
+{
+    complex128 c0{1, 2};
+    c0 += complex128{-3, 4};
+    REQUIRE(c0 == complex128{-2, 6});
+}
