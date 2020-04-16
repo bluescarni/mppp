@@ -138,33 +138,45 @@ TEST_CASE("incdec")
 #endif
 }
 
+#if defined(__INTEL_COMPILER)
+
+#define MPPP_LOCAL_CONSTEXPR
+#define MPPP_LOCAL_CONSTEXPR_14
+
+#else
+
+#define MPPP_LOCAL_CONSTEXPR constexpr
+#define MPPP_LOCAL_CONSTEXPR_14 MPPP_CONSTEXPR_14
+
+#endif
+
 TEST_CASE("binary_add")
 {
     // complex128-complex128.
-    constexpr auto res0 = complex128{1, 2} + complex128{3, 4};
+    const MPPP_LOCAL_CONSTEXPR auto res0 = complex128{1, 2} + complex128{3, 4};
     REQUIRE(std::is_same<decltype(res0), const complex128>::value);
     REQUIRE(res0 == complex128{4, 6});
 
     // complex128-real128.
-    constexpr auto res1 = complex128{1, 2} + real128{3};
+    const MPPP_LOCAL_CONSTEXPR auto res1 = complex128{1, 2} + real128{3};
     REQUIRE(std::is_same<decltype(res1), const complex128>::value);
     REQUIRE(res1 == complex128{4, 2});
 
-    constexpr auto res2 = real128{3} + complex128{1, 2};
+    const MPPP_LOCAL_CONSTEXPR auto res2 = real128{3} + complex128{1, 2};
     REQUIRE(std::is_same<decltype(res2), const complex128>::value);
     REQUIRE(res2 == complex128{4, 2});
 
     // complex128-C++ arithmetic.
-    constexpr auto res3 = 3 + complex128{1, 2};
+    const MPPP_LOCAL_CONSTEXPR auto res3 = 3 + complex128{1, 2};
     REQUIRE(std::is_same<decltype(res3), const complex128>::value);
     REQUIRE(res3 == complex128{4, 2});
 
-    constexpr auto res4 = complex128{1, 2} + 3.f;
+    const MPPP_LOCAL_CONSTEXPR auto res4 = complex128{1, 2} + 3.f;
     REQUIRE(std::is_same<decltype(res4), const complex128>::value);
     REQUIRE(res4 == complex128{4, 2});
 
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    constexpr auto res4a = complex128{1, 2} + 3.l;
+    const MPPP_LOCAL_CONSTEXPR auto res4a = complex128{1, 2} + 3.l;
     REQUIRE(std::is_same<decltype(res4a), const complex128>::value);
     REQUIRE(res4a == complex128{4, 2});
 #else
@@ -182,16 +194,16 @@ TEST_CASE("binary_add")
     REQUIRE(res6 == complex128{4, 2});
 
     // complex128-c++ complex.
-    const MPPP_CONSTEXPR_14 auto res7 = complex128{1, 2} + std::complex<float>{3, 4};
+    const MPPP_LOCAL_CONSTEXPR_14 auto res7 = complex128{1, 2} + std::complex<float>{3, 4};
     REQUIRE(std::is_same<decltype(res7), const complex128>::value);
     REQUIRE(res7 == complex128{4, 6});
 
-    const MPPP_CONSTEXPR_14 auto res8 = std::complex<double>{3, 4} + complex128{1, 2};
+    const MPPP_LOCAL_CONSTEXPR_14 auto res8 = std::complex<double>{3, 4} + complex128{1, 2};
     REQUIRE(std::is_same<decltype(res8), const complex128>::value);
     REQUIRE(res8 == complex128{4, 6});
 
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    const MPPP_CONSTEXPR_14 auto res8a = std::complex<long double>{3, 4} + complex128{1, 2};
+    const MPPP_LOCAL_CONSTEXPR_14 auto res8a = std::complex<long double>{3, 4} + complex128{1, 2};
     REQUIRE(std::is_same<decltype(res8a), const complex128>::value);
     REQUIRE(res8a == complex128{4, 6});
 #else
@@ -200,16 +212,16 @@ TEST_CASE("binary_add")
 #endif
 
     // real128-c++ complex.
-    const MPPP_CONSTEXPR_14 auto res9 = std::complex<float>{1, 2} + real128{3};
+    const MPPP_LOCAL_CONSTEXPR_14 auto res9 = std::complex<float>{1, 2} + real128{3};
     REQUIRE(std::is_same<decltype(res9), const complex128>::value);
     REQUIRE(res9 == complex128{4, 2});
 
-    const MPPP_CONSTEXPR_14 auto res10 = real128{3} + std::complex<double>{1, 2};
+    const MPPP_LOCAL_CONSTEXPR_14 auto res10 = real128{3} + std::complex<double>{1, 2};
     REQUIRE(std::is_same<decltype(res10), const complex128>::value);
     REQUIRE(res10 == complex128{4, 2});
 
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    const MPPP_CONSTEXPR_14 auto res10a = real128{3} + std::complex<long double>{1, 2};
+    const MPPP_LOCAL_CONSTEXPR_14 auto res10a = real128{3} + std::complex<long double>{1, 2};
     REQUIRE(std::is_same<decltype(res10a), const complex128>::value);
     REQUIRE(res10a == complex128{4, 2});
 #else
