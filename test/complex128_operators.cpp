@@ -95,7 +95,7 @@ static constexpr real128 test_constexpr_ipd()
 #endif
 
 template <typename T, typename U>
-using add_t = decltype(std::declval<const T &>(), std::declval<const U &>());
+using add_t = decltype(std::declval<const T &>() + std::declval<const U &>());
 
 TEST_CASE("identity")
 {
