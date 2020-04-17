@@ -313,4 +313,25 @@ TEST_CASE("in_place_add")
     REQUIRE(!detail::is_detected<ip_add_t, complex128, std::complex<long double>>::value);
     REQUIRE(!detail::is_detected<ip_add_t, std::complex<long double>, complex128>::value);
 #endif
+
+    // real128-C++ complex.
+    r0 = 10;
+    r0 += std::complex<float>{6, 0};
+    REQUIRE(r0 == 16);
+    REQUIRE_THROWS_AS((r0 += complex128{4, 5}), std::domain_error);
+    c1 = std::complex<double>{4, 5};
+    c1 += real128{-9};
+    REQUIRE(c1 == std::complex<double>{-5, 5});
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    r0 += std::complex<long double>{-3, 0};
+    REQUIRE(r0 == 13);
+    r0 = 16;
+    c2 = std::complex<long double>{4, 1};
+    c2 += real128{6};
+    REQUIRE(c2 == std::complex<long double>{10, 1});
+#else
+    REQUIRE(!detail::is_detected<ip_add_t, real128, std::complex<long double>>::value);
+    REQUIRE(!detail::is_detected<ip_add_t, std::complex<long double>, real128>::value);
+#endif
 }
