@@ -1438,6 +1438,7 @@ public:
     integer &operator=(const rational<SSize> &);
 #if defined(MPPP_WITH_QUADMATH)
     integer &operator=(const real128 &);
+    integer &operator=(const complex128 &);
 #endif
 #if defined(MPPP_WITH_MPFR)
     integer &operator=(const real &);

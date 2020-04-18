@@ -786,3 +786,44 @@ TEST_CASE("get")
     }
 #endif
 }
+
+#if MPPP_CPLUSPLUS >= 201402L
+
+constexpr real128 test_rc128_cexpr_ass()
+{
+    real128 ret;
+    ret = complex128{42};
+    return ret;
+}
+
+#endif
+
+TEST_CASE("down_assignment")
+{
+    auto n = 123_z1;
+    n = complex128{4};
+    REQUIRE(n == 4);
+    REQUIRE_THROWS_AS((n = complex128{4, 5}), std::domain_error);
+
+    auto q = 123_q1;
+    q = complex128{4};
+    REQUIRE(q == 4);
+    REQUIRE_THROWS_AS((q = complex128{4, 5}), std::domain_error);
+
+    auto r = 123_rq;
+    r = complex128{4};
+    REQUIRE(r == 4);
+    REQUIRE_THROWS_AS((r = complex128{4, 5}), std::domain_error);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    constexpr auto tca = test_rc128_cexpr_ass();
+    REQUIRE(tca == 42);
+#endif
+
+#if defined(MPPP_WITH_MPFR)
+    auto rr = 123_r256;
+    rr = complex128{4};
+    REQUIRE(rr == 4);
+    REQUIRE_THROWS_AS((rr = complex128{4, 5}), std::domain_error);
+#endif
+}

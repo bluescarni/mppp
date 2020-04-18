@@ -276,6 +276,28 @@ The real class
       :exception std\:\:overflow_error: if an overflow occurs in the computation of
         the automatically-deduced precision.
 
+   .. cpp:function:: real &operator=(const complex128 &x)
+
+      .. note::
+
+         This operator is available only if mp++ was configured with the
+         ``MPPP_WITH_QUADMATH`` option enabled.
+
+      .. versionadded:: 0.20
+
+      Assignment operator from :cpp:class:`~mppp::complex128`.
+
+      This operator is formally equivalent to converting *x* to
+      :cpp:class:`~mppp::real` and then move-assigning the result
+      to ``this``.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception raised by the conversion of *x*
+        to :cpp:class:`~mppp::real`.
+
    .. cpp:function:: real &operator=(const mpfr_t x)
 
       Copy assignment from :cpp:type:`mpfr_t`.

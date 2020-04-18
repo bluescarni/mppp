@@ -206,17 +206,22 @@ The real128 class
       :exception std\:\:domain_error: if the imaginary part of *c* is not zero.
 
    .. cpp:function:: real128 &operator=(const real &x)
+   .. cpp:function:: constexpr real128 &operator=(const complex128 &x)
 
       .. note::
 
-         This operator is available only if mp++ was configured with the
+         The :cpp:class:`~mppp::real` overload is available only if mp++ was configured with the
          ``MPPP_WITH_MPFR`` option enabled.
+
+      .. note::
+
+        The :cpp:class:`~mppp::complex128` overload is ``constexpr`` only if at least C++14 is being used.
 
       .. versionadded:: 0.20
 
-      Assignment operator from :cpp:class:`~mppp::real`.
+      Assignment operators from other mp++ classes.
 
-      This operator is formally equivalent to converting *x* to
+      These operators are formally equivalent to converting *x* to
       :cpp:class:`~mppp::real128` and then move-assigning the result
       to ``this``.
 

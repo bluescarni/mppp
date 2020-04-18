@@ -1177,6 +1177,29 @@ inline complex128 operator"" _icq()
 
 } // namespace literals
 
+// Implementation of integer's assignment
+// from complex128.
+template <std::size_t SSize>
+inline integer<SSize> &integer<SSize>::operator=(const complex128 &x)
+{
+    return *this = static_cast<integer<SSize>>(x);
+}
+
+// Implementation of rational's assignment
+// from complex128.
+template <std::size_t SSize>
+inline rational<SSize> &rational<SSize>::operator=(const complex128 &x)
+{
+    return *this = static_cast<rational<SSize>>(x);
+}
+
+// Implementation of real128's assignment
+// from complex128.
+inline MPPP_CONSTEXPR_14 real128 &real128::operator=(const complex128 &x)
+{
+    return *this = static_cast<real128>(x);
+}
+
 } // namespace mppp
 
 // Support for pretty printing in xeus-cling.

@@ -333,12 +333,14 @@ The integer class
    .. cpp:function:: integer &operator=(const rational<SSize> &x)
    .. cpp:function:: integer &operator=(const real128 &x)
    .. cpp:function:: integer &operator=(const real &x)
+   .. cpp:function:: integer &operator=(const complex128 &x)
 
       .. note::
 
-         The :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real` overloads
-         are available only if mp++ was configured with, respectively, the ``MPPP_WITH_QUADMATH``
-         and ``MPPP_WITH_MPFR`` options enabled.
+         The :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`
+         overloads are available only if mp++ was configured with the ``MPPP_WITH_QUADMATH``
+         option enabled. The :cpp:class:`~mppp::real` overload
+         is available only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled.
 
       .. versionadded:: 0.20
 

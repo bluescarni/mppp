@@ -363,6 +363,7 @@ public:
     // other mp++ classes.
 #if defined(MPPP_WITH_QUADMATH)
     rational &operator=(const real128 &);
+    rational &operator=(const complex128 &);
 #endif
 #if defined(MPPP_WITH_MPFR)
     rational &operator=(const real &);

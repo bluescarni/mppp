@@ -235,4 +235,15 @@ complex128 complex128_pow_impl(const complex128 &x, const complex128 &y)
 
 } // namespace detail
 
+#if defined(MPPP_WITH_MPFR)
+
+// Implementation of real's assignment
+// from complex128.
+real &real::operator=(const complex128 &x)
+{
+    return *this = static_cast<real>(x);
+}
+
+#endif
+
 } // namespace mppp
