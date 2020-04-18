@@ -48,8 +48,7 @@ The complex128 class
 
    where the ``sin()`` function is resolved via argument-dependent lookup.
 
-   Various :ref:`overloaded operators <complex128_operators>` are provided. Alternative comparison functions
-   treating NaNs specially are also provided.
+   Various :ref:`overloaded operators <complex128_operators>` are provided.
 
    The :cpp:class:`~mppp::complex128` class is a `literal type
    <https://en.cppreference.com/w/cpp/named_req/LiteralType>`__, and, whenever possible, operations involving
