@@ -472,6 +472,18 @@ Concepts
    * one type is :cpp:class:`~mppp::real128` and the other type is
      a :cpp:concept:`~mppp::real128_cpp_complex` type.
 
+.. cpp:concept:: template <typename T, typename U> mppp::complex128_cmp_op_types
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic comparison :ref:`operators <complex128_operators>`
+   involving :cpp:class:`~mppp::complex128` and other types. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` are both :cpp:class:`~mppp::complex128`, or
+   * one type is :cpp:class:`~mppp::complex128` and the other is either:
+
+     * a :cpp:concept:`~mppp::complex128_interoperable` type, or
+     * a :cpp:concept:`~mppp::real128_cpp_complex` type.
+
 .. _complex128_functions:
 
 Functions
@@ -783,3 +795,22 @@ Mathematical operators
 
    :exception unspecified: any exception thrown by the corresponding binary operator, or by the conversion
      of the result of the binary operation to ``T``.
+
+.. cpp:function:: template <typename T, mppp::complex128_cmp_op_types<T> U> constexpr bool mppp::operator==(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::complex128_cmp_op_types<T> U> constexpr bool mppp::operator!=(const T &x, const U &y)
+
+   Comparison operators.
+
+   These operators will return ``true`` if, respectively:
+
+   * :math:`x = y`,
+   * :math:`x \neq y`,
+
+   ``false`` otherwise.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the result of the comparison.
+
+   :exception unspecified: any exception thrown by the comparison operators of :cpp:class:`~mppp::real128`.

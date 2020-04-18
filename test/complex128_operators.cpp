@@ -18,6 +18,12 @@
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
+#if defined(MPPP_WITH_MPFR)
+
+#include <mp++/real.hpp>
+
+#endif
+
 #include "catch.hpp"
 
 using namespace mppp;
@@ -208,6 +214,12 @@ using div_t_ = decltype(std::declval<const T &>() / std::declval<const U &>());
 
 template <typename T, typename U>
 using ip_div_t = decltype(std::declval<T &>() /= std::declval<const U &>());
+
+template <typename T, typename U>
+using eq_t = decltype(std::declval<const T &>() == std::declval<const U &>());
+
+template <typename T, typename U>
+using ineq_t = decltype(std::declval<const T &>() != std::declval<const U &>());
 
 TEST_CASE("identity")
 {
@@ -443,7 +455,7 @@ TEST_CASE("in_place_add")
     REQUIRE(!detail::is_detected<ip_add_t, std::complex<long double>, real128>::value);
 #endif
 
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS) && !defined(__INTEL_COMPILER)
     // Test constexprness.
     constexpr auto tc = test_constexpr_ipa();
     REQUIRE(tc == complex128{1, 2});
@@ -631,7 +643,7 @@ TEST_CASE("in_place_sub")
     REQUIRE(!detail::is_detected<ip_sub_t, std::complex<long double>, real128>::value);
 #endif
 
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS) && !defined(__INTEL_COMPILER)
     // Test constexprness.
     constexpr auto tc = test_constexpr_ips();
     REQUIRE(tc == complex128{1, 2});
@@ -819,7 +831,7 @@ TEST_CASE("in_place_mul")
     REQUIRE(!detail::is_detected<ip_mul_t, std::complex<long double>, real128>::value);
 #endif
 
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS) && !defined(__INTEL_COMPILER)
     // Test constexprness.
     constexpr auto tc = test_constexpr_ipm();
     REQUIRE(tc == complex128{1, 2});
@@ -1011,9 +1023,203 @@ TEST_CASE("in_place_div")
     REQUIRE(!detail::is_detected<ip_div_t, std::complex<long double>, real128>::value);
 #endif
 
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS) && !defined(__INTEL_COMPILER)
     // Test constexprness.
     constexpr auto tc = test_constexpr_ipd();
     REQUIRE(tc == complex128{1, 2});
 #endif
 }
+
+#if !defined(__INTEL_COMPILER)
+
+TEST_CASE("cmp")
+{
+    // complex128.
+    {
+        constexpr bool b0 = complex128{1, 2} == complex128{1, 2};
+        constexpr bool b1 = complex128{1, 2} != complex128{1, 2};
+        REQUIRE(b0);
+        REQUIRE(!b1);
+    }
+
+    {
+        constexpr bool b0 = complex128{1, 2} == complex128{3, 2};
+        constexpr bool b1 = complex128{1, 2} != complex128{3, 2};
+        REQUIRE(!b0);
+        REQUIRE(b1);
+    }
+
+    // real128.
+    {
+        constexpr bool b0 = complex128{45, 0} == real128{45};
+        constexpr bool b1 = complex128{45, 0} != real128{45};
+        constexpr bool b0a = real128{45} == complex128{45, 0};
+        constexpr bool b1a = real128{45} != complex128{45, 0};
+        REQUIRE(b0);
+        REQUIRE(!b1);
+        REQUIRE(b0a);
+        REQUIRE(!b1a);
+
+        constexpr bool b2 = complex128{45, 0} == real128{46};
+        constexpr bool b3 = complex128{45, 0} != real128{46};
+        constexpr bool b2a = real128{46} == complex128{45, 0};
+        constexpr bool b3a = real128{46} != complex128{45, 0};
+        REQUIRE(!b2);
+        REQUIRE(b3);
+        REQUIRE(!b2a);
+        REQUIRE(b3a);
+
+        constexpr bool b4 = complex128{45, 1} == real128{45};
+        constexpr bool b5 = complex128{45, 1} != real128{45};
+        constexpr bool b4a = real128{45} == complex128{45, 1};
+        constexpr bool b5a = real128{45} != complex128{45, 1};
+        REQUIRE(!b4);
+        REQUIRE(b5);
+        REQUIRE(!b4a);
+        REQUIRE(b5a);
+    }
+
+    // c++ arithmetic types.
+    {
+        constexpr bool b0 = complex128{45, 0} == 45;
+        constexpr bool b1 = complex128{45, 0} != 45ull;
+        constexpr bool b0a = 45l == complex128{45, 0};
+        constexpr bool b1a = short(45) != complex128{45, 0};
+        REQUIRE(b0);
+        REQUIRE(!b1);
+        REQUIRE(b0a);
+        REQUIRE(!b1a);
+
+        constexpr bool b2 = complex128{45, 0} == 46.;
+        constexpr bool b3 = complex128{45, 0} != 46.f;
+        constexpr bool b2a = 46. == complex128{45, 0};
+        constexpr bool b3a = 46.f != complex128{45, 0};
+        REQUIRE(!b2);
+        REQUIRE(b3);
+        REQUIRE(!b2a);
+        REQUIRE(b3a);
+
+        constexpr bool b4 = complex128{45, 1} == char(45);
+        constexpr bool b5 = complex128{45, 1} != 45u;
+        constexpr bool b4a = char(45) == complex128{45, 1};
+        constexpr bool b5a = 45u != complex128{45, 1};
+        REQUIRE(!b4);
+        REQUIRE(b5);
+        REQUIRE(!b4a);
+        REQUIRE(b5a);
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+        constexpr bool b6 = complex128{45, 1} == 45.l;
+        constexpr bool b7 = complex128{45, 1} != 45.l;
+        constexpr bool b6a = 45.l == complex128{45, 1};
+        constexpr bool b7a = 45.l != complex128{45, 1};
+        REQUIRE(!b6);
+        REQUIRE(b7);
+        REQUIRE(!b6a);
+        REQUIRE(b7a);
+#else
+        REQUIRE(!detail::is_detected<eq_t, complex128, long double>::value);
+        REQUIRE(!detail::is_detected<eq_t, long double, complex128, >::value);
+        REQUIRE(!detail::is_detected<ineq_t, complex128, long double>::value);
+        REQUIRE(!detail::is_detected<ineq_t, long double, complex128, >::value);
+#endif
+    }
+
+    // mp++ types.
+    {
+        REQUIRE(complex128{45, 0} == 45_z1);
+        REQUIRE(45_z1 == complex128{45, 0});
+        REQUIRE(!(complex128{45, 0} != 45_z1));
+        REQUIRE(!(45_z1 != complex128{45, 0}));
+        REQUIRE(complex128{46, 0} != 45_z1);
+        REQUIRE(45_z1 != complex128{46, 0});
+        REQUIRE(!(complex128{46, 0} == 45_z1));
+        REQUIRE(!(45_z1 == complex128{46, 0}));
+        REQUIRE(complex128{45, 1} != 45_z1);
+        REQUIRE(45_z1 != complex128{45, 1});
+        REQUIRE(!(complex128{45, 1} == 45_z1));
+        REQUIRE(!(45_z1 == complex128{45, 1}));
+
+        REQUIRE(complex128{45, 0} == 45_q1);
+        REQUIRE(45_q1 == complex128{45, 0});
+        REQUIRE(!(complex128{45, 0} != 45_q1));
+        REQUIRE(!(45_q1 != complex128{45, 0}));
+        REQUIRE(complex128{46, 0} != 45_q1);
+        REQUIRE(45_q1 != complex128{46, 0});
+        REQUIRE(!(complex128{46, 0} == 45_q1));
+        REQUIRE(!(45_q1 == complex128{46, 0}));
+        REQUIRE(complex128{45, 1} != 45_q1);
+        REQUIRE(45_q1 != complex128{45, 1});
+        REQUIRE(!(complex128{45, 1} == 45_q1));
+        REQUIRE(!(45_q1 == complex128{45, 1}));
+
+#if defined(MPPP_WITH_MPFR)
+        REQUIRE(complex128{45, 0} == 45_r256);
+        REQUIRE(45_r256 == complex128{45, 0});
+        REQUIRE(!(complex128{45, 0} != 45_r256));
+        REQUIRE(!(45_r256 != complex128{45, 0}));
+        REQUIRE(complex128{46, 0} != 45_r256);
+        REQUIRE(45_r256 != complex128{46, 0});
+        REQUIRE(!(complex128{46, 0} == 45_r256));
+        REQUIRE(!(45_r256 == complex128{46, 0}));
+        REQUIRE(complex128{45, 1} != 45_r256);
+        REQUIRE(45_r256 != complex128{45, 1});
+        REQUIRE(!(complex128{45, 1} == 45_r256));
+        REQUIRE(!(45_r256 == complex128{45, 1}));
+#endif
+    }
+
+    // C++ complex.
+    {
+        MPPP_CONSTEXPR_14 bool b0 = complex128{1, 2} == std::complex<float>{1, 2};
+        MPPP_CONSTEXPR_14 bool b1 = complex128{1, 2} != std::complex<float>{1, 2};
+        MPPP_CONSTEXPR_14 bool b0a = std::complex<float>{1, 2} == complex128{1, 2};
+        MPPP_CONSTEXPR_14 bool b1a = std::complex<float>{1, 2} != complex128{1, 2};
+
+        REQUIRE(b0);
+        REQUIRE(!b1);
+        REQUIRE(b0a);
+        REQUIRE(!b1a);
+
+        REQUIRE(complex128{3, 4} == std::complex<float>{3, 4});
+        REQUIRE(std::complex<float>{3, 4} == complex128{3, 4});
+        REQUIRE(complex128{3, 4} == std::complex<double>{3, 4});
+        REQUIRE(std::complex<double>{3, 4} == complex128{3, 4});
+        REQUIRE(!(complex128{3, 4} != std::complex<float>{3, 4}));
+        REQUIRE(!(std::complex<float>{3, 4} != complex128{3, 4}));
+        REQUIRE(!(complex128{3, 4} != std::complex<double>{3, 4}));
+        REQUIRE(!(std::complex<double>{3, 4} != complex128{3, 4}));
+
+        REQUIRE(complex128{2, 4} != std::complex<float>{3, 4});
+        REQUIRE(std::complex<float>{3, 4} != complex128{2, 4});
+        REQUIRE(complex128{2, 4} != std::complex<double>{3, 4});
+        REQUIRE(std::complex<double>{3, 4} != complex128{2, 4});
+        REQUIRE(!(complex128{2, 4} == std::complex<float>{3, 4}));
+        REQUIRE(!(std::complex<float>{3, 4} == complex128{2, 4}));
+        REQUIRE(!(complex128{2, 4} == std::complex<double>{3, 4}));
+        REQUIRE(!(std::complex<double>{3, 4} == complex128{2, 4}));
+
+        REQUIRE(complex128{3, 5} != std::complex<float>{3, 4});
+        REQUIRE(std::complex<float>{3, 4} != complex128{3, 5});
+        REQUIRE(complex128{3, 5} != std::complex<double>{3, 4});
+        REQUIRE(std::complex<double>{3, 4} != complex128{3, 5});
+        REQUIRE(!(complex128{3, 5} == std::complex<float>{3, 4}));
+        REQUIRE(!(std::complex<float>{3, 4} == complex128{3, 5}));
+        REQUIRE(!(complex128{3, 5} == std::complex<double>{3, 4}));
+        REQUIRE(!(std::complex<double>{3, 4} == complex128{3, 5}));
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+        REQUIRE(complex128{3, 4} == std::complex<long double>{3, 4});
+        REQUIRE(std::complex<long double>{3, 4} == complex128{3, 4});
+        REQUIRE(complex128{4, 4} != std::complex<long double>{3, 4});
+        REQUIRE(std::complex<long double>{3, 4} != complex128{4, 4});
+#else
+        REQUIRE(!detail::is_detected<eq_t, complex128, std::complex<long double>>::value);
+        REQUIRE(!detail::is_detected<eq_t, std::complex<long double>, complex128, >::value);
+        REQUIRE(!detail::is_detected<ineq_t, complex128, std::complex<long double>>::value);
+        REQUIRE(!detail::is_detected<ineq_t, std::complex<long double>, complex128, >::value);
+#endif
+    }
+}
+
+#endif

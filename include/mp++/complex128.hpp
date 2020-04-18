@@ -1089,59 +1089,57 @@ namespace detail
 {
 
 // complex128-complex128.
-constexpr bool dispatch_eq(const complex128 &c1, const complex128 &c2)
+constexpr bool complex128_eq_impl(const complex128 &c1, const complex128 &c2)
 {
     return c1.m_value == c2.m_value;
 }
 
 // complex128-real128.
-constexpr bool dispatch_eq(const complex128 &c, const real128 &x)
+constexpr bool complex128_eq_impl(const complex128 &c, const real128 &x)
 {
     return c.m_value == x.m_value;
 }
 
-constexpr bool dispatch_eq(const real128 &x, const complex128 &c)
+constexpr bool complex128_eq_impl(const real128 &x, const complex128 &c)
 {
-    return dispatch_eq(c, x);
+    return complex128_eq_impl(c, x);
 }
 
-// complex128-mppp.
-template <typename T, enable_if_t<is_complex128_mppp_interoperable<T>::value, int> = 0>
-inline bool dispatch_eq(const complex128 &x, const T &y)
+// NOTE: this will cover:
+// - integer, rational, real,
+// - arithmetic C++ types.
+template <typename T>
+constexpr bool complex128_eq_impl(const complex128 &x, const T &y)
 {
+    // NOTE: follow what std::complex does here, that is, real arguments are treated as
+    // complex numbers with the real part equal to the argument and the imaginary part set to zero.
+    // https://en.cppreference.com/w/cpp/numeric/complex/operator_cmp
+    // NOTE: using the bitwise AND operator here instead of && is equivalent,
+    // but it seems in practice to produce different binary code:
+    // https://godbolt.org/z/URq2tX
+    // (i.e., branchy vs branchless?)
+    // Keep this in mind for potential future performance optimisations
+    // (in real128 as well, where an identical pattern is used).
     return x.imag() == 0 && x.real() == y;
 }
 
-template <typename T, enable_if_t<is_complex128_mppp_interoperable<T>::value, int> = 0>
-inline bool dispatch_eq(const T &y, const complex128 &x)
+template <typename T>
+constexpr bool complex128_eq_impl(const T &y, const complex128 &x)
 {
-    return dispatch_eq(x, y);
-}
-
-// complex128-C++.
-template <typename T, enable_if_t<is_cpp_arithmetic<T>::value, int> = 0>
-constexpr bool dispatch_eq(const complex128 &c, const T &x)
-{
-    return c.m_value == x;
-}
-
-template <typename T, enable_if_t<is_cpp_arithmetic<T>::value, int> = 0>
-constexpr bool dispatch_eq(const T &x, const complex128 &c)
-{
-    return dispatch_eq(c, x);
+    return complex128_eq_impl(x, y);
 }
 
 // complex128-C++ complex.
 template <typename T>
-inline MPPP_CONSTEXPR_14 bool dispatch_eq(const complex128 &c1, const std::complex<T> &c2)
+inline MPPP_CONSTEXPR_14 bool complex128_eq_impl(const complex128 &c1, const std::complex<T> &c2)
 {
     return c1.real() == c2.real() && c1.imag() == c2.imag();
 }
 
 template <typename T>
-inline MPPP_CONSTEXPR_14 bool dispatch_eq(const std::complex<T> &c2, const complex128 &c1)
+inline MPPP_CONSTEXPR_14 bool complex128_eq_impl(const std::complex<T> &c2, const complex128 &c1)
 {
-    return dispatch_eq(c1, c2);
+    return complex128_eq_impl(c1, c2);
 }
 
 } // namespace detail
@@ -1154,7 +1152,7 @@ template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_type
 #endif
     constexpr bool operator==(const T &x, const U &y)
 {
-    return detail::dispatch_eq(x, y);
+    return detail::complex128_eq_impl(x, y);
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
