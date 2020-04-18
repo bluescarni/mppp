@@ -227,6 +227,7 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/rational.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/real.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/real128.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/complex128.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/type_name.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/fwd_decl.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/gmp.hpp"
