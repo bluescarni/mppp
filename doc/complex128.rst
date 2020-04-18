@@ -818,21 +818,15 @@ Mathematical operators
 User-defined literals
 ---------------------
 
-.. cpp:function:: template <char... Chars> mppp::complex128 mppp::literals::operator"" _cq()
 .. cpp:function:: template <char... Chars> mppp::complex128 mppp::literals::operator"" _icq()
 
-   User-defined quadruple-precision complex literals.
+   User-defined quadruple-precision imaginary literal.
 
-   These operators will return a :cpp:class:`~mppp::complex128` constructed
-   from a floating-point literal in decimal or hexadecimal format.
+   This operator will return a :cpp:class:`~mppp::complex128` with zero real part
+   and imaginary part constructed from the input floating-point literal in decimal
+   or hexadecimal format.
 
-   The first operator returns a value whose real part
-   is constructed from the input literal and whose imaginary part is zero.
-
-   The second operator returns a value whose real part
-   is zero and whose imaginary part is constructed from the input literal.
-
-   Both operators are implemented on top of :cpp:func:`~mppp::literals::operator"" _rq()`.
+   The operator is implemented on top of :cpp:func:`~mppp::literals::operator"" _rq()`.
 
    .. seealso::
 

@@ -1265,10 +1265,10 @@ Standard library specialisations
 
      :return: the output of :cpp:func:`mppp::real128_denorm_min()`.
 
-.. _real128_literal:
+.. _real128_literals:
 
-User-defined literal
---------------------
+User-defined literals
+---------------------
 
 .. versionadded:: 0.19
 

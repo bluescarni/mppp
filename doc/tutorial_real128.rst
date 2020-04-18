@@ -116,7 +116,7 @@ User-defined literal
 
 A user-defined literal is available to construct
 :cpp:class:`mppp::real128` instances.
-The :ref:`literal <real128_literal>`
+The :ref:`literal <real128_literals>`
 is defined within
 the inline namespace ``mppp::literals``, and it supports
 decimal and hexadecimal representations:

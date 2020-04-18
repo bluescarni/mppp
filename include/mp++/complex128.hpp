@@ -1170,12 +1170,6 @@ inline namespace literals
 {
 
 template <char... Chars>
-inline complex128 operator"" _cq()
-{
-    return complex128{operator"" _rq<Chars...>()};
-}
-
-template <char... Chars>
 inline complex128 operator"" _icq()
 {
     return complex128{0, operator"" _rq<Chars...>()};
