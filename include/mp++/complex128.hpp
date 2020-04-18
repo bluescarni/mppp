@@ -723,6 +723,121 @@ inline MPPP_CONSTEXPR_14 complex128 operator--(complex128 &x, int)
     return retval;
 }
 
+namespace detail
+{
+
+constexpr complex128 complex128_binary_sub_impl(const complex128 &c1, const complex128 &c2)
+{
+    return complex128{c1.m_value - c2.m_value};
+}
+
+constexpr complex128 complex128_binary_sub_impl(const complex128 &c, const real128 &x)
+{
+    return complex128{c.m_value - x.m_value};
+}
+
+constexpr complex128 complex128_binary_sub_impl(const real128 &x, const complex128 &c)
+{
+    return complex128{x.m_value - c.m_value};
+}
+
+template <typename T>
+constexpr complex128 complex128_binary_sub_impl(const complex128 &c, const T &x)
+{
+    return complex128_binary_sub_impl(c, static_cast<real128>(x));
+}
+
+template <typename T>
+constexpr complex128 complex128_binary_sub_impl(const T &x, const complex128 &c)
+{
+    return complex128_binary_sub_impl(static_cast<real128>(x), c);
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 complex128 complex128_binary_sub_impl(const complex128 &c1, const std::complex<T> &c2)
+{
+    return complex128_binary_sub_impl(c1, static_cast<complex128>(c2));
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 complex128 complex128_binary_sub_impl(const std::complex<T> &c1, const complex128 &c2)
+{
+    return complex128_binary_sub_impl(static_cast<complex128>(c1), c2);
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 complex128 complex128_binary_sub_impl(const real128 &x, const std::complex<T> &c)
+{
+    return complex128_binary_sub_impl(x, static_cast<complex128>(c));
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 complex128 complex128_binary_sub_impl(const std::complex<T> &c, const real128 &x)
+{
+    return complex128_binary_sub_impl(static_cast<complex128>(c), x);
+}
+
+} // namespace detail
+
+// Binary minus.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex128_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
+#endif
+    constexpr complex128 operator-(const T &x, const U &y)
+{
+    return detail::complex128_binary_sub_impl(x, y);
+}
+
+namespace detail
+{
+
+inline MPPP_CONSTEXPR_14 void complex128_in_place_sub_impl(complex128 &c1, const complex128 &c2)
+{
+    c1.m_value -= c2.m_value;
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 void complex128_in_place_sub_impl(complex128 &c, const T &x)
+{
+    c = c - x;
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 void complex128_in_place_sub_impl(T &x, const complex128 &c)
+{
+    x = static_cast<T>(x - c);
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 void complex128_in_place_sub_impl(real128 &x, const std::complex<T> &c)
+{
+    x = static_cast<real128>(x - c);
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_20 void complex128_in_place_sub_impl(std::complex<T> &c, const real128 &x)
+{
+    c = static_cast<std::complex<T>>(c - x);
+}
+
+} // namespace detail
+
+// In-place minus.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex128_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
+#endif
+    inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
+{
+    detail::complex128_in_place_sub_impl(x, y);
+    return x;
+}
+
 // Detect types for use in the comparison operators
 // involving complex128.
 template <typename T, typename U>
