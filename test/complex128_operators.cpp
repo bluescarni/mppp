@@ -47,18 +47,41 @@ static constexpr complex128 test_constexpr_decr()
     return retval;
 }
 
-#if 0
 static constexpr complex128 test_constexpr_ipa()
 {
-    complex128 retval{1};
-    retval += real128{-2};
-    retval += 1.;
-    retval += -1;
-    int n = 3;
-    n += real128{-2};
-    return retval + n;
+    // complex128.
+    complex128 c{1, 2};
+    c += complex128{3, 4};
+
+    // complex128 on the left.
+    c += 1;
+    c += real128{4};
+#if MPPP_CPLUSPLUS >= 202002L
+    c += std::complex<float>{1, 2};
+#endif
+
+    // complex128 on the right.
+    int n = 4;
+    n += complex128{4};
+    real128 r{4};
+    r += complex128{4};
+#if MPPP_CPLUSPLUS >= 202002L
+    std::complex<double> cd{1, 2};
+    cd += complex128{4, 5};
+#endif
+
+#if MPPP_CPLUSPLUS >= 202002L
+    // real128 on the left.
+    r += std::complex<double>{1};
+    // c++ complex on the left.
+    std::complex<double> cd2{4, 5};
+    cd2 += real128{3};
+#endif
+
+    return complex128{1, 2};
 }
 
+#if 0
 static constexpr real128 test_constexpr_ips()
 {
     real128 retval{1};
@@ -334,4 +357,8 @@ TEST_CASE("in_place_add")
     REQUIRE(!detail::is_detected<ip_add_t, real128, std::complex<long double>>::value);
     REQUIRE(!detail::is_detected<ip_add_t, std::complex<long double>, real128>::value);
 #endif
+
+    // Test constexprness.
+    constexpr auto tc = test_constexpr_ipa();
+    REQUIRE(tc == complex128{1, 2});
 }
