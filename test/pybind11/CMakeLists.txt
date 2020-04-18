@@ -4,7 +4,7 @@ set(PYBIND11_CPP_STANDARD "")
 # Find pybind11.
 find_package(pybind11 REQUIRED)
 
-# NOTE: this is very similar to function for creating C++ tests.
+# NOTE: this is very similar to the function for creating C++ tests.
 function(ADD_MPPP_PYBIND11_TESTCASE arg1)
     if(MPPP_TEST_NSPLIT)
         math(EXPR __MPPP_TEST_NUM "(${_MPPP_TEST_NUM} + 1) % ${MPPP_TEST_NSPLIT}")

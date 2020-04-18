@@ -61,6 +61,7 @@ struct globals_ {
     static std::unique_ptr<py::module> mpmath;
     static std::unique_ptr<py::object> mpmath_mp;
     static std::unique_ptr<py::object> mpf_class;
+    static std::unique_ptr<py::object> mpc_class;
     static std::unique_ptr<py::object> mpf_isinf;
     static std::unique_ptr<py::object> mpf_isnan;
     static std::unique_ptr<py::object> fraction_class;
@@ -78,6 +79,9 @@ std::unique_ptr<py::object> globals_<T>::mpmath_mp;
 
 template <typename T>
 std::unique_ptr<py::object> globals_<T>::mpf_class;
+
+template <typename T>
+std::unique_ptr<py::object> globals_<T>::mpc_class;
 
 template <typename T>
 std::unique_ptr<py::object> globals_<T>::mpf_isinf;
@@ -102,6 +106,7 @@ inline void cleanup()
     globals::mpmath.reset();
     globals::mpmath_mp.reset();
     globals::mpf_class.reset();
+    globals::mpc_class.reset();
     globals::mpf_isinf.reset();
     globals::mpf_isnan.reset();
     globals::fraction_class.reset();
@@ -164,6 +169,8 @@ inline void init()
         detail::globals::mpmath_mp.reset(new py::object(std::move(mpmath_mp)));
         auto mpf_class = mpmath_mod.attr("mpf");
         detail::globals::mpf_class.reset(new py::object(std::move(mpf_class)));
+        auto mpc_class = mpmath_mod.attr("mpc");
+        detail::globals::mpc_class.reset(new py::object(std::move(mpc_class)));
         auto mpf_isinf = mpmath_mod.attr("isinf");
         detail::globals::mpf_isinf.reset(new py::object(std::move(mpf_isinf)));
         auto mpf_isnan = mpmath_mod.attr("isnan");
@@ -295,7 +302,57 @@ inline py::int_ mppp_int_to_py(const mppp::integer<SSize> &src)
     }
     return retval;
 }
+
+#if defined(MPPP_WITH_QUADMATH)
+
+inline bool py_object_to_real128(real128 &value, handle src)
+{
+    if (!globals::mpmath || !::PyObject_IsInstance(src.ptr(), globals::mpf_class->ptr())) {
+        return false;
+    }
+    const auto prec = src.attr("context").attr("prec").cast<decltype(mppp::real128_sig_digits())>();
+    if (prec != mppp::real128_sig_digits()) {
+        return false;
+    }
+    const auto mpf_tuple = src.attr("_mpf_").cast<tuple>();
+    auto neg_if_needed = [&value, &mpf_tuple]() {
+        if (mpf_tuple[0].cast<int>()) {
+            value = -value;
+        }
+    };
+    if ((*globals::mpf_isinf)(src).cast<bool>()) {
+        value = mppp::real128_inf();
+        neg_if_needed();
+    } else if ((*globals::mpf_isnan)(src).cast<bool>()) {
+        value = mppp::real128_nan();
+    } else {
+        mppp::integer<1> sig;
+        if (!py_integer_to_mppp_int(sig, pybind11::int_(mpf_tuple[1]).ptr())) {
+            throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
+        }
+        // NOTE: we have to be careful here. We might have a very large significand
+        // coming in from the _mpf_ tuple (i.e., very high precision), even if the final value
+        // is small. If the significand is larger than 113 bits, then we will scale it down
+        // and adjust the exponent accordingly.
+        auto exp = mppp::integer<1>{mpf_tuple[2].cast<long>()};
+        const auto sig_nbits = sig.nbits();
+        if (sig_nbits > mppp::real128_sig_digits()) {
+            sig >>= (sig_nbits - mppp::real128_sig_digits());
+            exp += (sig_nbits - mppp::real128_sig_digits());
+        }
+        // Now we can set safely the real128 to the significand.
+        value = sig;
+        // Offset by the (possibly adjusted) exponent.
+        value = scalbln(value, static_cast<long>(exp));
+        neg_if_needed();
+    }
+    return true;
+}
+
+#endif
+
 } // namespace detail
+
 } // namespace mppp_pybind11
 
 namespace pybind11
@@ -438,48 +495,7 @@ struct type_caster<mppp::real128> {
     PYBIND11_TYPE_CASTER(mppp::real128, _("mppp::real128"));
     bool load(handle src, bool)
     {
-        if (!mppp_pybind11::detail::globals::mpmath
-            || !::PyObject_IsInstance(src.ptr(), mppp_pybind11::detail::globals::mpf_class->ptr())) {
-            return false;
-        }
-        const auto prec = src.attr("context").attr("prec").cast<decltype(mppp::real128_sig_digits())>();
-        if (prec != mppp::real128_sig_digits()) {
-            return false;
-        }
-        const auto mpf_tuple = src.attr("_mpf_").cast<tuple>();
-        auto neg_if_needed = [this, &mpf_tuple]() {
-            if (mpf_tuple[0].cast<int>()) {
-                this->value = -(this->value);
-            }
-        };
-        if ((*mppp_pybind11::detail::globals::mpf_isinf)(src).cast<bool>()) {
-            value = mppp::real128_inf();
-            neg_if_needed();
-        } else if ((*mppp_pybind11::detail::globals::mpf_isnan)(src).cast<bool>()) {
-            value = mppp::real128_nan();
-        } else {
-            mppp::integer<1> sig;
-            // NOTE: same as above, regarding the use of the full pybind11::int_ name.
-            if (!mppp_pybind11::detail::py_integer_to_mppp_int(sig, pybind11::int_(mpf_tuple[1]).ptr())) {
-                throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
-            }
-            // NOTE: we have to be careful here. We might have a very large significand
-            // coming in from the _mpf_ tuple (i.e., very high precision), even if the final value
-            // is small. If the significand is larger than 113 bits, then we will scale it down
-            // and adjust the exponent accordingly.
-            auto exp = mppp::integer<1>{mpf_tuple[2].cast<long>()};
-            const auto sig_nbits = sig.nbits();
-            if (sig_nbits > mppp::real128_sig_digits()) {
-                sig >>= (sig_nbits - mppp::real128_sig_digits());
-                exp += (sig_nbits - mppp::real128_sig_digits());
-            }
-            // Now we can set safely the real128 to the significand.
-            value = sig;
-            // Offset by the (possibly adjusted) exponent.
-            value = scalbln(value, static_cast<long>(exp));
-            neg_if_needed();
-        }
-        return true;
+        return py_object_to_real128(value, src, b);
     }
     static handle cast(const mppp::real128 &src, return_value_policy, handle)
     {
