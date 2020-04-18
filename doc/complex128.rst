@@ -538,7 +538,7 @@ Conversion
 Basic complex functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::complex128 mppp::abs(const mppp::complex128 &z)
+.. cpp:function:: mppp::real128 mppp::abs(const mppp::complex128 &z)
 .. cpp:function:: mppp::complex128 mppp::arg(const mppp::complex128 &z)
 .. cpp:function:: constexpr mppp::complex128 mppp::conj(const mppp::complex128 &z)
 .. cpp:function:: mppp::complex128 mppp::proj(const mppp::complex128 &z)

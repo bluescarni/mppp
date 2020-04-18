@@ -21,9 +21,9 @@ TEST_CASE("sinh")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.sinh())>::value);
     c.sinh();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(sinh(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{sinh(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{sinh(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("cosh")
@@ -33,9 +33,9 @@ TEST_CASE("cosh")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.cosh())>::value);
     c.cosh();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(cosh(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{cosh(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{cosh(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("tanh")
@@ -45,9 +45,9 @@ TEST_CASE("tanh")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.tanh())>::value);
     c.tanh();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(tanh(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{tanh(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{tanh(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("asinh")
@@ -57,9 +57,9 @@ TEST_CASE("asinh")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.asinh())>::value);
     c.asinh();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(asinh(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{asinh(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{asinh(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("acosh")
@@ -69,9 +69,9 @@ TEST_CASE("acosh")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.acosh())>::value);
     c.acosh();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(acosh(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{acosh(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{acosh(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("atanh")
@@ -81,7 +81,7 @@ TEST_CASE("atanh")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.atanh())>::value);
     c.atanh();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(atanh(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{atanh(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{atanh(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }

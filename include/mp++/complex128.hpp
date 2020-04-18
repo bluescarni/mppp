@@ -440,7 +440,7 @@ inline MPPP_CONSTEXPR_14 auto get(T &rop, const complex128 &c) -> decltype(c.get
 }
 
 // Absolute value.
-MPPP_DLL_PUBLIC complex128 abs(const complex128 &);
+MPPP_DLL_PUBLIC real128 abs(const complex128 &);
 // Complex argument.
 MPPP_DLL_PUBLIC complex128 arg(const complex128 &);
 // Project into Riemann sphere.

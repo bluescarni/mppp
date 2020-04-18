@@ -32,64 +32,51 @@ TEST_CASE("pow")
 
     // Complex-complex.
     REQUIRE(std::is_same<complex128, decltype(mppp::pow(complex128{3, 4}, complex128{5, 6}))>::value);
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, complex128{5, 6}).m_value - cmp1.m_value}).real().m_value
-            < 1E-32);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, complex128{5, 6}).m_value - cmp1.m_value}) < 1E-32);
 
     // Complex-interoperable.
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5).m_value - cmp2.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5).m_value - cmp2.m_value}) < 1E-29);
 #if defined(MPPP_HAVE_GCC_INT128)
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, __int128_t(5)).m_value - cmp2.m_value}).real().m_value < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, __uint128_t(5)).m_value - cmp2.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, __int128_t(5)).m_value - cmp2.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, __uint128_t(5)).m_value - cmp2.m_value}) < 1E-29);
 #endif
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5.).m_value - cmp2.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5.).m_value - cmp2.m_value}) < 1E-29);
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5.l).m_value - cmp2.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5.l).m_value - cmp2.m_value}) < 1E-29);
 #else
     REQUIRE(!detail::is_detected<pow_t, complex128, long double>::value);
 #endif
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5_z1).m_value - cmp2.m_value}).real().m_value < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5_q1).m_value - cmp2.m_value}).real().m_value < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5_rq).m_value - cmp2.m_value}).real().m_value < 1E-29);
-    REQUIRE(
-        abs(complex128{mppp::pow(complex128{3, 4}, std::complex<float>{5, 6}).m_value - cmp1.m_value}).real().m_value
-        < 1E-29);
-    REQUIRE(
-        abs(complex128{mppp::pow(complex128{3, 4}, std::complex<double>{5, 6}).m_value - cmp1.m_value}).real().m_value
-        < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5_z1).m_value - cmp2.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5_q1).m_value - cmp2.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, 5_rq).m_value - cmp2.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, std::complex<float>{5, 6}).m_value - cmp1.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, std::complex<double>{5, 6}).m_value - cmp1.m_value}) < 1E-29);
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
     REQUIRE(abs(complex128{mppp::pow(complex128{3, 4}, std::complex<long double>{5, 6}).m_value - cmp1.m_value})
-                .real()
-                .m_value
             < 1E-29);
 #else
     REQUIRE(!detail::is_detected<pow_t, complex128, std::complex<long double>>::value);
 #endif
 
     // Interoperable-complex.
-    REQUIRE(abs(complex128{mppp::pow(5, complex128{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5, complex128{3, 4}).m_value - cmp3.m_value}) < 1E-29);
 #if defined(MPPP_HAVE_GCC_INT128)
-    REQUIRE(abs(complex128{mppp::pow(__int128_t(5), complex128{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(__uint128_t(5), complex128{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(__int128_t(5), complex128{3, 4}).m_value - cmp3.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(__uint128_t(5), complex128{3, 4}).m_value - cmp3.m_value}) < 1E-29);
 #endif
-    REQUIRE(abs(complex128{mppp::pow(5., complex128{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5., complex128{3, 4}).m_value - cmp3.m_value}) < 1E-29);
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    REQUIRE(abs(complex128{mppp::pow(5.l, complex128{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5.l, complex128{3, 4}).m_value - cmp3.m_value}) < 1E-29);
 #else
     REQUIRE(!detail::is_detected<pow_t, long double, complex128>::value);
 #endif
-    REQUIRE(abs(complex128{mppp::pow(5_z1, complex128{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(5_q1, complex128{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(5_rq, complex128{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
-    REQUIRE(
-        abs(complex128{mppp::pow(std::complex<float>{3, 4}, complex128{5, 6}).m_value - cmp1.m_value}).real().m_value
-        < 1E-29);
-    REQUIRE(
-        abs(complex128{mppp::pow(std::complex<double>{3, 4}, complex128{5, 6}).m_value - cmp1.m_value}).real().m_value
-        < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5_z1, complex128{3, 4}).m_value - cmp3.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5_q1, complex128{3, 4}).m_value - cmp3.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5_rq, complex128{3, 4}).m_value - cmp3.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(std::complex<float>{3, 4}, complex128{5, 6}).m_value - cmp1.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(std::complex<double>{3, 4}, complex128{5, 6}).m_value - cmp1.m_value}) < 1E-29);
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
     REQUIRE(abs(complex128{mppp::pow(std::complex<long double>{3, 4}, complex128{5, 6}).m_value - cmp1.m_value})
-                .real()
-                .m_value
             < 1E-29);
 #else
     REQUIRE(!detail::is_detected<pow_t, std::complex<long double>, complex128>::value);
@@ -98,21 +85,19 @@ TEST_CASE("pow")
     // real128-cppcomplex and vice-versa.
     REQUIRE(std::is_same<complex128, decltype(mppp::pow(5_rq, std::complex<float>{3, 4}))>::value);
     REQUIRE(std::is_same<complex128, decltype(mppp::pow(std::complex<float>{3, 4}, 5_rq))>::value);
-    REQUIRE(abs(complex128{mppp::pow(5_rq, std::complex<float>{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(std::complex<float>{3, 4}, 5_rq).m_value - cmp2.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5_rq, std::complex<float>{3, 4}).m_value - cmp3.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(std::complex<float>{3, 4}, 5_rq).m_value - cmp2.m_value}) < 1E-29);
 
     REQUIRE(std::is_same<complex128, decltype(mppp::pow(5_rq, std::complex<double>{3, 4}))>::value);
     REQUIRE(std::is_same<complex128, decltype(mppp::pow(std::complex<double>{3, 4}, 5_rq))>::value);
-    REQUIRE(abs(complex128{mppp::pow(5_rq, std::complex<double>{3, 4}).m_value - cmp3.m_value}).real().m_value < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(std::complex<double>{3, 4}, 5_rq).m_value - cmp2.m_value}).real().m_value < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5_rq, std::complex<double>{3, 4}).m_value - cmp3.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(std::complex<double>{3, 4}, 5_rq).m_value - cmp2.m_value}) < 1E-29);
 
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
     REQUIRE(std::is_same<complex128, decltype(mppp::pow(5_rq, std::complex<long double>{3, 4}))>::value);
     REQUIRE(std::is_same<complex128, decltype(mppp::pow(std::complex<long double>{3, 4}, 5_rq))>::value);
-    REQUIRE(abs(complex128{mppp::pow(5_rq, std::complex<long double>{3, 4}).m_value - cmp3.m_value}).real().m_value
-            < 1E-29);
-    REQUIRE(abs(complex128{mppp::pow(std::complex<long double>{3, 4}, 5_rq).m_value - cmp2.m_value}).real().m_value
-            < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(5_rq, std::complex<long double>{3, 4}).m_value - cmp3.m_value}) < 1E-29);
+    REQUIRE(abs(complex128{mppp::pow(std::complex<long double>{3, 4}, 5_rq).m_value - cmp2.m_value}) < 1E-29);
 #else
     REQUIRE(!detail::is_detected<pow_t, std::complex<long double>, real128>::value);
     REQUIRE(!detail::is_detected<pow_t, real128, std::complex<long double>>::value);

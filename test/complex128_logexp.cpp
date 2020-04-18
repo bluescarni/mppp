@@ -21,9 +21,9 @@ TEST_CASE("exp")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.exp())>::value);
     c.exp();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(exp(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{exp(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{exp(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("log")
@@ -33,9 +33,9 @@ TEST_CASE("log")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.log())>::value);
     c.log();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(log(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{log(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{log(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("log10")
@@ -45,7 +45,7 @@ TEST_CASE("log10")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.log10())>::value);
     c.log10();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(log10(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{log10(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{log10(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }

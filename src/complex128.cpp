@@ -188,7 +188,16 @@ bool complex128::get_impl(mppp::real &rop, const real128 &r)
         return *this = mppp::func(*this);                                                                              \
     }
 
-MPPP_COMPLEX128_IMPLEMENT_UNARY(abs)
+real128 abs(const complex128 &c)
+{
+    return real128{::cabsq(c.m_value)};
+}
+
+complex128 &complex128::abs()
+{
+    return *this = mppp::abs(*this);
+}
+
 MPPP_COMPLEX128_IMPLEMENT_UNARY(arg)
 MPPP_COMPLEX128_IMPLEMENT_UNARY(proj)
 

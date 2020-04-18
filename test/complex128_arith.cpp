@@ -30,8 +30,8 @@ TEST_CASE("abs")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.abs())>::value);
     REQUIRE(c.abs().m_value == 5);
-    REQUIRE(std::is_same<complex128, decltype(abs(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{3, 4}).m_value == 5);
+    REQUIRE(std::is_same<real128, decltype(abs(complex128{3, 4}))>::value);
+    REQUIRE(abs(complex128{3, 4}) == 5);
 }
 
 TEST_CASE("arg")

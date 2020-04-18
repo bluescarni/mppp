@@ -21,9 +21,9 @@ TEST_CASE("sin")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.sin())>::value);
     c.sin();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(sin(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{sin(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{sin(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("cos")
@@ -33,9 +33,9 @@ TEST_CASE("cos")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.cos())>::value);
     c.cos();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(cos(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{cos(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{cos(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("tan")
@@ -45,9 +45,9 @@ TEST_CASE("tan")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.tan())>::value);
     c.tan();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(tan(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{tan(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{tan(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("asin")
@@ -57,9 +57,9 @@ TEST_CASE("asin")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.asin())>::value);
     c.asin();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(asin(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{asin(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{asin(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("acos")
@@ -69,9 +69,9 @@ TEST_CASE("acos")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.acos())>::value);
     c.acos();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(acos(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{acos(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{acos(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
 TEST_CASE("atan")
@@ -81,7 +81,7 @@ TEST_CASE("atan")
     complex128 c{3, 4};
     REQUIRE(std::is_same<complex128 &, decltype(c.atan())>::value);
     c.atan();
-    REQUIRE(abs(complex128{c.m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{c.m_value - cmp.m_value}) < 1E-32);
     REQUIRE(std::is_same<complex128, decltype(atan(complex128{3, 4}))>::value);
-    REQUIRE(abs(complex128{atan(complex128{3, 4}).m_value - cmp.m_value}).real().m_value < 1E-32);
+    REQUIRE(abs(complex128{atan(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
