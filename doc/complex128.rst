@@ -814,3 +814,28 @@ Mathematical operators
    :return: the result of the comparison.
 
    :exception unspecified: any exception thrown by the comparison operators of :cpp:class:`~mppp::real128`.
+
+User-defined literals
+---------------------
+
+.. cpp:function:: template <char... Chars> mppp::complex128 mppp::literals::operator"" _cq()
+.. cpp:function:: template <char... Chars> mppp::complex128 mppp::literals::operator"" _icq()
+
+   User-defined quadruple-precision complex literals.
+
+   These operators will return a :cpp:class:`~mppp::complex128` constructed
+   from a floating-point literal in decimal or hexadecimal format.
+
+   The first operator returns a value whose real part
+   is constructed from the input literal and whose imaginary part is zero.
+
+   The second operator returns a value whose real part
+   is zero and whose imaginary part is constructed from the input literal.
+
+   Both operators are implemented on top of :cpp:func:`~mppp::literals::operator"" _rq()`.
+
+   .. seealso::
+
+      https://en.cppreference.com/w/cpp/language/floating_literal
+
+   :exception unspecified: any exception thrown by :cpp:func:`~mppp::literals::operator"" _rq()`.

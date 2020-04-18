@@ -1176,15 +1176,9 @@ inline complex128 operator"" _cq()
 }
 
 template <char... Chars>
-constexpr complex128 operator"" _irq()
+inline complex128 operator"" _icq()
 {
     return complex128{0, operator"" _rq<Chars...>()};
-}
-
-template <>
-constexpr complex128 operator"" _irq<'1'>()
-{
-    return complex128{0, 1};
 }
 
 } // namespace literals

@@ -1119,9 +1119,9 @@ TEST_CASE("cmp")
         REQUIRE(b7a);
 #else
         REQUIRE(!detail::is_detected<eq_t, complex128, long double>::value);
-        REQUIRE(!detail::is_detected<eq_t, long double, complex128, >::value);
+        REQUIRE(!detail::is_detected<eq_t, long double, complex128>::value);
         REQUIRE(!detail::is_detected<ineq_t, complex128, long double>::value);
-        REQUIRE(!detail::is_detected<ineq_t, long double, complex128, >::value);
+        REQUIRE(!detail::is_detected<ineq_t, long double, complex128>::value);
 #endif
     }
 
@@ -1215,9 +1215,9 @@ TEST_CASE("cmp")
         REQUIRE(std::complex<long double>{3, 4} != complex128{4, 4});
 #else
         REQUIRE(!detail::is_detected<eq_t, complex128, std::complex<long double>>::value);
-        REQUIRE(!detail::is_detected<eq_t, std::complex<long double>, complex128, >::value);
+        REQUIRE(!detail::is_detected<eq_t, std::complex<long double>, complex128>::value);
         REQUIRE(!detail::is_detected<ineq_t, complex128, std::complex<long double>>::value);
-        REQUIRE(!detail::is_detected<ineq_t, std::complex<long double>, complex128, >::value);
+        REQUIRE(!detail::is_detected<ineq_t, std::complex<long double>, complex128>::value);
 #endif
     }
 }
