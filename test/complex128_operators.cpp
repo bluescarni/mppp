@@ -358,7 +358,9 @@ TEST_CASE("in_place_add")
     REQUIRE(!detail::is_detected<ip_add_t, std::complex<long double>, real128>::value);
 #endif
 
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     // Test constexprness.
     constexpr auto tc = test_constexpr_ipa();
     REQUIRE(tc == complex128{1, 2});
+#endif
 }
