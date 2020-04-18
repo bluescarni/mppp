@@ -1179,6 +1179,31 @@ inline complex128 operator"" _icq()
 
 } // namespace mppp
 
+// Support for pretty printing in xeus-cling.
+#if defined(__CLING__)
+
+#if __has_include(<nlohmann/json.hpp>)
+
+#include <nlohmann/json.hpp>
+
+namespace mppp
+{
+
+inline nlohmann::json mime_bundle_repr(const complex128 &c)
+{
+    auto bundle = nlohmann::json::object();
+
+    bundle["text/plain"] = c.to_string();
+
+    return bundle;
+}
+
+} // namespace mppp
+
+#endif
+
+#endif
+
 #else
 
 #error The complex128.hpp header was included but mp++ was not configured with the MPPP_WITH_QUADMATH option.
