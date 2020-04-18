@@ -735,3 +735,51 @@ Mathematical operators
    :param c: the argument.
 
    :return: a copy of *c* before the increment/decrement.
+
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr mppp::complex128 mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr mppp::complex128 mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr mppp::complex128 mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr mppp::complex128 mppp::operator/(const T &x, const U &y)
+
+   Binary arithmetic operators.
+
+   These operators will return, respectively:
+
+   * :math:`x+y`,
+   * :math:`x-y`,
+   * :math:`x\times y`,
+   * :math:`x / y`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the result of the binary operation.
+
+   :exception unspecified: any exception thrown by the conversion of *x* or *y* to
+     :cpp:class:`~mppp::real128` or :cpp:class:`~mppp::complex128`.
+
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr T &mppp::operator+=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr T &mppp::operator-=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr T &mppp::operator*=(T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr T &mppp::operator/=(T &x, const U &y)
+
+   .. note::
+
+      These operators are ``constexpr`` only if at least C++14 is being used.
+
+   In-place arithmetic operators.
+
+   These operators will set *x* to, respectively:
+
+   * :math:`x+y`,
+   * :math:`x-y`,
+   * :math:`x \times y`,
+   * :math:`x / y`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *x*.
+
+   :exception unspecified: any exception thrown by the corresponding binary operator, or by the conversion
+     of the result of the binary operation to ``T``.
