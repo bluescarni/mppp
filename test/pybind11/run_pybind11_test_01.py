@@ -41,59 +41,98 @@ class Test01(unittest.TestCase):
             return
 
         try:
-            from mpmath import mpf, mp, workprec, isnan, isinf
+            from mpmath import mpf, mpc, mp, workprec, isnan, isinf
         except ImportError:
             return
 
         # Default precision is 53, so the conversion will fail.
         self.assertRaises(TypeError, lambda: p.test_real128_conversion(mpf()))
         self.assertRaises(
+            TypeError, lambda: p.test_complex128_conversion(mpc()))
+        self.assertRaises(
             TypeError, lambda: p.test_real128_conversion(mpf("inf")))
         self.assertRaises(
+            TypeError, lambda: p.test_complex128_conversion(mpc("inf")))
+        self.assertRaises(
             TypeError, lambda: p.test_real128_conversion(mpf("nan")))
+        self.assertRaises(
+            TypeError, lambda: p.test_complex128_conversion(mpc("nan")))
 
         # Set precision to quadruple.
         mp.prec = 113
         self.assertTrue(p.test_real128_conversion(mpf()) == 0)
+        self.assertTrue(p.test_complex128_conversion(mpc()) == 0)
         self.assertTrue(p.test_real128_conversion(mpf(1)) == 1)
+        self.assertTrue(p.test_complex128_conversion(mpc(1)) == 1)
         self.assertTrue(p.test_real128_conversion(mpf(-1)) == -1)
+        self.assertTrue(p.test_complex128_conversion(mpc(-1)) == -1)
         self.assertTrue(p.test_real128_conversion(mpf("inf")) == mpf("inf"))
+        self.assertTrue(p.test_complex128_conversion(mpc("inf")) == mpc("inf"))
+        self.assertTrue(p.test_complex128_conversion(
+            mpc("inf", "inf")) == mpc("inf", "inf"))
         self.assertTrue(p.test_real128_conversion(-mpf("inf")) == -mpf("inf"))
+        self.assertTrue(
+            p.test_complex128_conversion(-mpc("inf")) == -mpc("inf"))
         self.assertTrue(isnan(p.test_real128_conversion(mpf("nan"))))
         self.assertTrue(p.test_real128_conversion(mpf(
             "1.32321321001020301293838201938121203")) == mpf("1.32321321001020301293838201938121203"))
+        self.assertTrue(p.test_complex128_conversion(mpc(
+            "1.32321321001020301293838201938121203")) == mpc("1.32321321001020301293838201938121203"))
+        self.assertTrue(p.test_complex128_conversion(mpc(
+            "1.32321321001020301293838201938121203", "4.48482020209340933923902320203402020")) == mpc("1.32321321001020301293838201938121203", "4.48482020209340933923902320203402020"))
         self.assertTrue(p.test_real128_conversion(-mpf(
             "1.32321321001020301293838201938121203")) == -mpf("1.32321321001020301293838201938121203"))
+        self.assertTrue(p.test_complex128_conversion(-mpc(
+            "1.32321321001020301293838201938121203")) == -mpc("1.32321321001020301293838201938121203"))
+        self.assertTrue(p.test_complex128_conversion(-mpc(
+            "1.32321321001020301293838201938121203", "4.48482020209340933923902320203402020")) == -mpc("1.32321321001020301293838201938121203", "4.48482020209340933923902320203402020"))
         self.assertTrue(p.test_real128_conversion(
             mpf(2)**-16382) == mpf(2)**-16382)
+        self.assertTrue(p.test_complex128_conversion(
+            mpc(2)**-16382) == mpc(2)**-16382)
         self.assertTrue(p.test_real128_conversion(
             -(mpf(2)**-16382)) == -(mpf(2)**-16382))
+        self.assertTrue(p.test_complex128_conversion(
+            -(mpc(2)**-16382)) == -(mpc(2)**-16382))
         # Try subnormal numbers behaviour.
         self.assertTrue(mpf(2)**-16495 != 0)
         self.assertTrue(p.test_real128_conversion(
             mpf(2)**-16495) == mpf(0))
+        self.assertTrue(p.test_complex128_conversion(
+            mpc(2)**-16495) == mpc(0))
 
         # Try the workprec construct.
         with workprec(2000):
             self.assertRaises(
                 TypeError, lambda: p.test_real128_conversion(mpf()))
             self.assertRaises(
+                TypeError, lambda: p.test_complex128_conversion(mpc()))
+            self.assertRaises(
                 TypeError, lambda: p.test_real128_conversion(mpf("inf")))
             self.assertRaises(
+                TypeError, lambda: p.test_complex128_conversion(mpc("inf")))
+            self.assertRaises(
                 TypeError, lambda: p.test_real128_conversion(mpf("nan")))
+            self.assertRaises(
+                TypeError, lambda: p.test_complex128_conversion(mpc("nan")))
 
-        # Test that the real128 overload is picked before the real one,
+        # Test that the real128/complex128 overloads are picked before the real one,
         # if instantiated before.
         self.assertTrue(p.test_overload(mpf(2)**-16495) == 0)
         if not p.has_mpfr():
             with workprec(2000):
                 self.assertTrue(p.test_overload(mpf(2)**-16495) != 0)
+            with workprec(2000):
+                self.assertTrue(p.test_overload(mpc(2)**-16495) != 0)
 
         # Test we don't end up to inf if the significand has more than 113 bits.
         mp.prec = 40000
         foo = mpf("1.1")
         with workprec(113):
             self.assertFalse(isinf(p.test_real128_conversion(foo)))
+        foo = mpc("1.1", "1.2")
+        with workprec(113):
+            self.assertFalse(isinf(p.test_complex128_conversion(foo)))
 
         # Restore prec on exit.
         mp.prec = 53
@@ -172,7 +211,7 @@ class Test01(unittest.TestCase):
             return
 
         try:
-            from mpmath import mpf, mp, workprec, isnan
+            from mpmath import mpf, mpc, mp, workprec, isnan
         except ImportError:
             return
 
@@ -186,16 +225,28 @@ class Test01(unittest.TestCase):
         self.assertTrue(p.test_vector_conversion(
             [mpf(1), mpf(-2), mpf("1.1")]) == [mpf(1), mpf(-2), mpf("1.1")])
         self.assertTrue(p.test_vector_conversion(
+            [mpc(1, 2), mpc(-2, -3), mpc("1.1")]) == [mpc(1, 2), mpc(-2, -3), mpc("1.1")])
+        self.assertTrue(p.test_vector_conversion(
             [mpf(1), mpf(2)**-16495, mpf(3)]) == [mpf(1), mpf(0), mpf(3)])
+        self.assertTrue(p.test_vector_conversion(
+            [mpc(1), mpc(2)**-16495, mpc(3)]) == [mpc(1), mpc(0), mpc(3)])
         self.assertRaises(TypeError, lambda: p.test_vector_conversion(
             [mpf(1), 2, mpf(3)]))
+        self.assertRaises(TypeError, lambda: p.test_vector_conversion(
+            [mpc(1), 2, mpc(3)]))
 
         self.assertTrue(p.test_unordered_map_conversion(
             {'a': mpf("1.1"), 'b': mpf(2)}) == {'a': mpf("1.1"), 'b': mpf(2)})
         self.assertTrue(p.test_unordered_map_conversion(
+            {'a': mpc("1.1", 2), 'b': mpc(2)}) == {'a': mpc("1.1", 2), 'b': mpc(2)})
+        self.assertTrue(p.test_unordered_map_conversion(
             {'a': mpf(1), 'b': mpf(2)**-16495}) == {'a': mpf(1), 'b': mpf(0)})
+        self.assertTrue(p.test_unordered_map_conversion(
+            {'a': mpc(1), 'b': mpc(2)**-16495}) == {'a': mpc(1), 'b': mpc(0)})
         self.assertRaises(TypeError, lambda: p.test_unordered_map_conversion(
             {'a': mpf(1), 'b': 2}))
+        self.assertRaises(TypeError, lambda: p.test_unordered_map_conversion(
+            {'a': mpc(1), 'b': 2}))
 
         mp.prec = 53
 
