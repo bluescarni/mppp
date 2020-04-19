@@ -218,7 +218,7 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 // - see if it's needed to provide alternate interoperable function/operators that do *not* promote
 //   the non-real to real (there's a bunch of functions for direct interface with GMP and cpp types
 //   in the MPFR API: arithmetic, comparison, etc.).
-// - it seems like we might be do multiple roundings when cting from real128.
+// - it seems like we might be doing multiple roundings when cting from real128.
 //   See if we can implement with only a single rounding, perhaps via an integer
 //   and mpfr_set_z_2exp()?
 // - Do we need real_equal_to() to work also on invalid reals, the way
@@ -1140,7 +1140,7 @@ inline real &set(real &r, const Args &... args)
     return r.set(args...);
 }
 
-// Set n*2**e.
+// Set to n*2**e.
 template <std::size_t SSize>
 inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
 {
