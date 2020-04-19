@@ -4,7 +4,7 @@ set(PYBIND11_CPP_STANDARD "")
 # Find pybind11.
 find_package(pybind11 REQUIRED)
 
-# NOTE: this is very similar to function for creating C++ tests.
+# NOTE: this is very similar to the function for creating C++ tests.
 function(ADD_MPPP_PYBIND11_TESTCASE arg1)
     if(MPPP_TEST_NSPLIT)
         math(EXPR __MPPP_TEST_NUM "(${_MPPP_TEST_NUM} + 1) % ${MPPP_TEST_NSPLIT}")
@@ -13,8 +13,10 @@ function(ADD_MPPP_PYBIND11_TESTCASE arg1)
     if(MPPP_TEST_NSPLIT AND "${MPPP_TEST_SPLIT_NUM}" STREQUAL "${_MPPP_TEST_NUM}")
         return()
     endif()
-    pybind11_add_module(${arg1} ${arg1}.cpp)
-    target_link_libraries(${arg1} PRIVATE mp++)
+    add_library(${arg1} MODULE ${arg1}.cpp)
+    target_link_libraries(${arg1} PRIVATE mp++ pybind11::module)
+    set_target_properties(${arg1} PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
+        SUFFIX "${PYTHON_MODULE_EXTENSION}")
     target_compile_options(${arg1} PRIVATE
         "$<$<CONFIG:Debug>:${MPPP_CXX_FLAGS_DEBUG}>"
         "$<$<CONFIG:Release>:${MPPP_CXX_FLAGS_RELEASE}>"

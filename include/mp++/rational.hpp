@@ -169,7 +169,7 @@ public:
     }
 
 private:
-    // A tag for private constrcutors.
+    // A tag for private constructors.
     struct ptag {
     };
     template <typename T,
@@ -363,6 +363,7 @@ public:
     // other mp++ classes.
 #if defined(MPPP_WITH_QUADMATH)
     rational &operator=(const real128 &);
+    rational &operator=(const complex128 &);
 #endif
 #if defined(MPPP_WITH_MPFR)
     rational &operator=(const real &);
@@ -1147,14 +1148,14 @@ inline rational<SSize> dispatch_binary_add(T n, const rational<SSize> &op2)
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_add(const rational<SSize> &op1, T x)
+inline T dispatch_binary_add(const rational<SSize> &op1, const T &x)
 {
     return static_cast<T>(op1) + x;
 }
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_add(T x, const rational<SSize> &op2)
+inline T dispatch_binary_add(const T &x, const rational<SSize> &op2)
 {
     return dispatch_binary_add(op2, x);
 }
@@ -1301,14 +1302,14 @@ inline rational<SSize> dispatch_binary_sub(T n, const rational<SSize> &op2)
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_sub(const rational<SSize> &op1, T x)
+inline T dispatch_binary_sub(const rational<SSize> &op1, const T &x)
 {
     return static_cast<T>(op1) - x;
 }
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
+inline T dispatch_binary_sub(const T &x, const rational<SSize> &op2)
 {
     return -dispatch_binary_sub(op2, x);
 }
@@ -1453,14 +1454,14 @@ inline rational<SSize> dispatch_binary_mul(T n, const rational<SSize> &op2)
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_mul(const rational<SSize> &op1, T x)
+inline T dispatch_binary_mul(const rational<SSize> &op1, const T &x)
 {
     return static_cast<T>(op1) * x;
 }
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
+inline T dispatch_binary_mul(const T &x, const rational<SSize> &op2)
 {
     return dispatch_binary_mul(op2, x);
 }
@@ -1636,14 +1637,14 @@ inline rational<SSize> dispatch_binary_div(T n, const rational<SSize> &op2)
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_div(const rational<SSize> &op1, T x)
+inline T dispatch_binary_div(const rational<SSize> &op1, const T &x)
 {
     return static_cast<T>(op1) / x;
 }
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_div(T x, const rational<SSize> &op2)
+inline T dispatch_binary_div(const T &x, const rational<SSize> &op2)
 {
     return x / static_cast<T>(op2);
 }

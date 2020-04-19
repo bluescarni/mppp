@@ -15,6 +15,7 @@
 #include <mp++/config.hpp>
 
 #include <ciso646>
+#include <complex>
 #include <cstdint>
 #include <limits>
 #include <random>
@@ -33,6 +34,7 @@
 #include <quadmath.h>
 
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
@@ -59,8 +61,47 @@ static std::mt19937 rng;
 static constexpr auto delta64 = detail::nl_digits<std::uint_least64_t>() - 64;
 static constexpr auto delta49 = detail::nl_digits<std::uint_least64_t>() - 49;
 
+#if MPPP_CPLUSPLUS >= 201402L
+
+constexpr auto test_cexpr_complex(std::complex<double> c)
+{
+    real128 out{c};
+    return out;
+}
+
+constexpr auto test_cexpr_complex_ass(std::complex<double> c)
+{
+    real128 out{};
+    out = c;
+    return out;
+}
+
+#endif
+
+#if MPPP_CPLUSPLUS >= 202002L
+
+template <typename T>
+constexpr auto test_cexpr_complex_get1(real128 r)
+{
+    std::complex<T> out{1, 2};
+    r.get(out);
+    return out;
+}
+
+template <typename T>
+constexpr auto test_cexpr_complex_get2(real128 r)
+{
+    std::complex<T> out{1, 2};
+    get(out, r);
+    return out;
+}
+
+#endif
+
 TEST_CASE("real128 constructors")
 {
+    using Catch::Matchers::Message;
+
     REQUIRE(std::is_nothrow_destructible<real128>::value);
     REQUIRE(std::is_nothrow_move_constructible<real128>::value);
     REQUIRE(std::is_nothrow_move_assignable<real128>::value);
@@ -195,6 +236,30 @@ TEST_CASE("real128 constructors")
              == real128{"1.295035023887605022184887791645529310e-4965"}.m_value));
     REQUIRE((real128{rat_t{-1, int_t{1} << 16494}}.m_value
              == real128{"-6.47517511943802511092443895822764655e-4966"}.m_value));
+    // Ctor from complex.
+    REQUIRE(real128{std::complex<float>{-42, 0}} == -42);
+    REQUIRE(real128{std::complex<double>{42, 0}} == 42);
+    REQUIRE_THROWS_MATCHES(
+        (real128{std::complex<double>{42, 5}}), std::domain_error,
+        Message("Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                + detail::to_string(5.)));
+    REQUIRE_THROWS_MATCHES(
+        (real128{std::complex<double>{0, -5}}), std::domain_error,
+        Message("Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                + detail::to_string(-5.)));
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(real128{std::complex<long double>{-42, 0}} == -42);
+    REQUIRE_THROWS_MATCHES(
+        (real128{std::complex<long double>{42, 5}}), std::domain_error,
+        Message("Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                + detail::to_string(5.l)));
+#endif
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_cexpr_complex(std::complex<double>{4, 0});
+        REQUIRE(tca == 4);
+    }
+#endif
     // String ctors.
     REQUIRE((real128{"0"}.m_value == 0));
     REQUIRE((real128{"-0"}.m_value == 0));
@@ -264,6 +329,27 @@ TEST_CASE("real128 constructors")
     REQUIRE((ra.m_value == -123000));
     ra = std::string("1234");
     REQUIRE((ra.m_value == 1234));
+    ra = std::complex<float>{-5, 0};
+    REQUIRE(ra == -5);
+    ra = std::complex<double>{-6, 0};
+    REQUIRE(ra == -6);
+    REQUIRE_THROWS_PREDICATE((ra = std::complex<double>{-6, 1}), std::domain_error, [](const std::domain_error &ex) {
+        return std::string(ex.what())
+               == "Cannot assign a complex C++ value with a non-zero imaginary part of " + detail::to_string(1.)
+                      + " to a real128";
+    });
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    ra = std::complex<long double>{-7, 0};
+    REQUIRE(ra == -7);
+#else
+    REQUIRE(!std::is_assignable<real128 &, std::complex<long double>>::value);
+#endif
+#if MPPP_CPLUSPLUS >= 201402L
+    {
+        constexpr auto tca = test_cexpr_complex_ass(std::complex<double>{4, 0});
+        REQUIRE(tca == 4);
+    }
+#endif
 #if defined(MPPP_HAVE_STRING_VIEW)
     ra = std::string_view{tmp_char + 6, 5};
     REQUIRE((ra.m_value == -1234));
@@ -303,6 +389,8 @@ TEST_CASE("real128 conversions")
     REQUIRE(xld == .1l);
     get(xld, real128{.3l});
     REQUIRE(xld == .3l);
+#else
+    REQUIRE(!std::is_convertible<real128, long double>::value);
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     constexpr __int128_t n128 = static_cast<__int128_t>(real128{4});
@@ -495,6 +583,64 @@ TEST_CASE("real128 conversions")
     REQUIRE(real128{123.456}.get(un128_rop));
     REQUIRE(un128_rop == 123);
 #endif
+
+    // Conversion to C++ complex types.
+    {
+        MPPP_CONSTEXPR_14 auto cf = static_cast<std::complex<float>>(real128{12});
+        REQUIRE(cf.real() == 12);
+        REQUIRE(cf.imag() == 0);
+
+        std::complex<float> cf2{1, 2};
+        REQUIRE(real128{4}.get(cf2));
+        REQUIRE(cf2 == std::complex<float>{4, 0});
+        REQUIRE(get(cf2, real128{1}));
+        REQUIRE(cf2 == std::complex<float>{1, 0});
+
+#if MPPP_CPLUSPLUS >= 202002L
+        constexpr auto cf3 = test_cexpr_complex_get1<float>(real128{7});
+        REQUIRE(cf3 == std::complex<float>{7, 0});
+        constexpr auto cf4 = test_cexpr_complex_get2<float>(real128{7});
+        REQUIRE(cf4 == std::complex<float>{7, 0});
+#endif
+
+        MPPP_CONSTEXPR_14 auto cd = static_cast<std::complex<double>>(real128{-12});
+        REQUIRE(cd.real() == -12);
+        REQUIRE(cd.imag() == 0);
+
+        std::complex<double> cd2{1, 2};
+        REQUIRE(real128{4}.get(cd2));
+        REQUIRE(cd2 == std::complex<double>{4, 0});
+        REQUIRE(get(cd2, real128{1}));
+        REQUIRE(cd2 == std::complex<double>{1, 0});
+
+#if MPPP_CPLUSPLUS >= 202002L
+        constexpr auto cd3 = test_cexpr_complex_get1<double>(real128{7});
+        REQUIRE(cd3 == std::complex<double>{7, 0});
+        constexpr auto cd4 = test_cexpr_complex_get2<double>(real128{7});
+        REQUIRE(cd4 == std::complex<double>{7, 0});
+#endif
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+        MPPP_CONSTEXPR_14 auto cld = static_cast<std::complex<long double>>(real128{-15});
+        REQUIRE(cld.real() == -15);
+        REQUIRE(cld.imag() == 0);
+
+        std::complex<long double> cld2{1, 2};
+        REQUIRE(real128{4}.get(cld2));
+        REQUIRE(cld2 == std::complex<long double>{4, 0});
+        REQUIRE(get(cld2, real128{1}));
+        REQUIRE(cld2 == std::complex<long double>{1, 0});
+
+#if MPPP_CPLUSPLUS >= 202002L
+        constexpr auto cld3 = test_cexpr_complex_get1<long double>(real128{7});
+        REQUIRE(cld3 == std::complex<long double>{7, 0});
+        constexpr auto cld4 = test_cexpr_complex_get2<long double>(real128{7});
+        REQUIRE(cld4 == std::complex<long double>{7, 0});
+#endif
+#else
+        REQUIRE(!std::is_convertible<real128, std::complex<long double>>::value);
+#endif
+    }
 }
 
 TEST_CASE("real128 frexp")

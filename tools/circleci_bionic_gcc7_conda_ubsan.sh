@@ -14,7 +14,8 @@ wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O mi
 export deps_dir=$HOME/local
 export PATH="$HOME/miniconda/bin:$PATH"
 bash miniconda.sh -b -p $HOME/miniconda
-conda config --add channels conda-forge --force
+conda config --add channels conda-forge
+conda config --set channel_priority strict
 conda_pkgs="cmake gmp mpfr libflint arb"
 conda create -q -p $deps_dir -y
 source activate $deps_dir

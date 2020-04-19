@@ -1438,6 +1438,7 @@ public:
     integer &operator=(const rational<SSize> &);
 #if defined(MPPP_WITH_QUADMATH)
     integer &operator=(const real128 &);
+    integer &operator=(const complex128 &);
 #endif
 #if defined(MPPP_WITH_MPFR)
     integer &operator=(const real &);
@@ -2761,7 +2762,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         //
         // NOTE: this is the implementation for 2 limbs, even if potentially the operands have 1 limb.
         // The idea here is that it's better to do a few computations more rather than paying the branching
-        // cost. 1-limb operands will have the upper limb set to zero from the zero-initialization of
+        // cost. 1-limb operands will have the upper limb set to zero from the zero-initialisation of
         // the limbs of static ints.
         //
         // NOTE: the rop hi limb might spill over either from the addition of the hi limbs
@@ -6769,14 +6770,14 @@ inline integer<SSize> dispatch_binary_add(T n, const integer<SSize> &op2)
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_add(const integer<SSize> &op1, T x)
+inline T dispatch_binary_add(const integer<SSize> &op1, const T &x)
 {
     return static_cast<T>(op1) + x;
 }
 
 template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_add(T x, const integer<SSize> &op2)
+inline T dispatch_binary_add(const T &x, const integer<SSize> &op2)
 {
     return dispatch_binary_add(op2, x);
 }
@@ -6907,14 +6908,14 @@ inline integer<SSize> dispatch_binary_sub(T n, const integer<SSize> &op2)
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_sub(const integer<SSize> &op1, T x)
+inline T dispatch_binary_sub(const integer<SSize> &op1, const T &x)
 {
     return static_cast<T>(op1) - x;
 }
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_sub(T x, const integer<SSize> &op2)
+inline T dispatch_binary_sub(const T &x, const integer<SSize> &op2)
 {
     return -dispatch_binary_sub(op2, x);
 }
@@ -7036,14 +7037,14 @@ inline integer<SSize> dispatch_binary_mul(T n, const integer<SSize> &op2)
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_mul(const integer<SSize> &op1, T x)
+inline T dispatch_binary_mul(const integer<SSize> &op1, const T &x)
 {
     return static_cast<T>(op1) * x;
 }
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_mul(T x, const integer<SSize> &op2)
+inline T dispatch_binary_mul(const T &x, const integer<SSize> &op2)
 {
     return dispatch_binary_mul(op2, x);
 }
@@ -7132,14 +7133,14 @@ inline integer<SSize> dispatch_binary_div(T n, const integer<SSize> &op2)
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_div(const integer<SSize> &op1, T x)
+inline T dispatch_binary_div(const integer<SSize> &op1, const T &x)
 {
     return static_cast<T>(op1) / x;
 }
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline T dispatch_binary_div(T x, const integer<SSize> &op2)
+inline T dispatch_binary_div(const T &x, const integer<SSize> &op2)
 {
     return x / static_cast<T>(op2);
 }
@@ -7356,14 +7357,14 @@ inline bool dispatch_equality(T n, const integer<SSize> &a)
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline bool dispatch_equality(const integer<SSize> &a, T x)
+inline bool dispatch_equality(const integer<SSize> &a, const T &x)
 {
     return static_cast<T>(a) == x;
 }
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
-inline bool dispatch_equality(T x, const integer<SSize> &a)
+inline bool dispatch_equality(const T &x, const integer<SSize> &a)
 {
     return dispatch_equality(a, x);
 }

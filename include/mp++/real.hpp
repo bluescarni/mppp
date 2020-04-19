@@ -527,6 +527,9 @@ public:
         dispatch_assignment<true>(x);
         return *this;
     }
+#if defined(MPPP_WITH_QUADMATH)
+    real &operator=(const complex128 &);
+#endif
 
     // Copy assignment from mpfr_t.
     real &operator=(const ::mpfr_t);
