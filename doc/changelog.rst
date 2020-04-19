@@ -22,6 +22,12 @@ New
   mp++ to be configured with the ``MPPP_WITH_MPFR``
   option any more
   (`#222 <https://github.com/bluescarni/mppp/pull/222>`__).
+- :cpp:class:`~mppp::real128` can now interact with
+  ``std::complex``
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
+- Add :cpp:class:`~mppp::complex128`, a quadruple-precision
+  complex number class
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 - mp++ now officially supports the ARM (``aarch64``)
   and PowerPC (``ppc64le``) architectures, which have
   been added to the continuous integration setup

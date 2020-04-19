@@ -6,7 +6,7 @@
 Welcome to mp++'s documentation!
 ================================
 
-mp++ is a C++11/14/17 library for multiprecision arithmetic, currently
+mp++ is a C++11/14/17/20 library for multiprecision arithmetic, currently
 featuring:
 
 * arbitrary-precision integers,

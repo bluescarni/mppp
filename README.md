@@ -8,7 +8,7 @@
 [![Anaconda-Server Badge](https://img.shields.io/conda/vn/conda-forge/mppp.svg?style=for-the-badge)](https://anaconda.org/conda-forge/mppp)
 [![DOI](https://zenodo.org/badge/66504757.svg)](https://doi.org/10.5281/zenodo.1043579)
 
-mp++ is a C++11/14/17 library for multiprecision arithmetic, currently
+mp++ is a C++11/14/17/20 library for multiprecision arithmetic, currently
 featuring:
 
 * arbitrary-precision integers,

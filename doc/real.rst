@@ -42,8 +42,8 @@ The real class
    The precision of a :cpp:class:`~mppp::real` can be set at construction, or it can be changed later via functions
    such as :cpp:func:`mppp::real::set_prec()`, :cpp:func:`mppp::real::prec_round()`, etc. By default,
    the precision of a :cpp:class:`~mppp::real` is automatically deduced upon construction following a set of heuristics
-   aimed at ensuring that the constructed :cpp:class:`~mppp::real` preserves the value used for initialisation
-   as accurately as possible.
+   aimed at ensuring that the constructed :cpp:class:`~mppp::real` preserves the value used for initialisation,
+   if possible.
    For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
    :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered by specifying explicitly
    the desired precision value.
