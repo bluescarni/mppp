@@ -349,6 +349,42 @@ inline bool py_object_to_real128(mppp::real128 &value, py::handle src)
     return true;
 }
 
+inline py::handle real128_to_py_object(const mppp::real128 &src)
+{
+    if (!globals::mpmath) {
+        throw std::runtime_error("Cannot convert a real128 to an mpf if mpmath is not available");
+    }
+    const auto prec = globals::mpmath_mp->attr("prec").cast<decltype(mppp::real128_sig_digits())>();
+    if (prec != mppp::real128_sig_digits()) {
+        throw std::invalid_argument(
+            "Cannot convert the real128 " + src.to_string() + " to an mpf: the precision of real128 ("
+            + std::to_string(mppp::real128_sig_digits()) + ") is different from the current mpf precision ("
+            + std::to_string(prec) + "). Please change the current mpf precision to "
+            + std::to_string(mppp::real128_sig_digits()) + " in order to avoid this error");
+    }
+    if (isinf(src)) {
+        if (std::numeric_limits<double>::has_infinity) {
+            return (*globals::mpf_class)(src > 0 ? std::numeric_limits<double>::infinity()
+                                                 : -std::numeric_limits<double>::infinity())
+                .release();
+        } else {
+            return (*globals::mpf_class)(src > 0 ? "inf" : "-inf").release();
+        }
+    }
+    if (isnan(src)) {
+        if (std::numeric_limits<double>::has_quiet_NaN) {
+            return (*globals::mpf_class)(std::numeric_limits<double>::quiet_NaN()).release();
+        } else {
+            return (*globals::mpf_class)("nan").release();
+        }
+    }
+    int exp;
+    const auto fr = scalbln(frexp(src, &exp), mppp::detail::safe_cast<long>(mppp::real128_sig_digits()));
+    return (*globals::mpf_class)(py::make_tuple(mppp_int_to_py(mppp::integer<1>(fr)),
+                                                static_cast<long>(mppp::integer<1>{exp} - mppp::real128_sig_digits())))
+        .release();
+}
+
 #endif
 
 } // namespace detail
@@ -499,40 +535,7 @@ struct type_caster<mppp::real128> {
     }
     static handle cast(const mppp::real128 &src, return_value_policy, handle)
     {
-        if (!mppp_pybind11::detail::globals::mpmath) {
-            throw std::runtime_error("Cannot convert a real128 to an mpf if mpmath is not available");
-        }
-        const auto prec
-            = mppp_pybind11::detail::globals::mpmath_mp->attr("prec").cast<decltype(mppp::real128_sig_digits())>();
-        if (prec != mppp::real128_sig_digits()) {
-            throw std::invalid_argument(
-                "Cannot convert the real128 " + src.to_string() + " to an mpf: the precision of real128 ("
-                + std::to_string(mppp::real128_sig_digits()) + ") is different from the current mpf precision ("
-                + std::to_string(prec) + "). Please change the current mpf precision to "
-                + std::to_string(mppp::real128_sig_digits()) + " in order to avoid this error");
-        }
-        if (isinf(src)) {
-            if (std::numeric_limits<double>::has_infinity) {
-                return (*mppp_pybind11::detail::globals::mpf_class)(src > 0 ? std::numeric_limits<double>::infinity()
-                                                                            : -std::numeric_limits<double>::infinity())
-                    .release();
-            } else {
-                return (*mppp_pybind11::detail::globals::mpf_class)(src > 0 ? "inf" : "-inf").release();
-            }
-        }
-        if (isnan(src)) {
-            if (std::numeric_limits<double>::has_quiet_NaN) {
-                return (*mppp_pybind11::detail::globals::mpf_class)(std::numeric_limits<double>::quiet_NaN()).release();
-            } else {
-                return (*mppp_pybind11::detail::globals::mpf_class)("nan").release();
-            }
-        }
-        int exp;
-        const auto fr = scalbln(frexp(src, &exp), mppp::detail::safe_cast<long>(mppp::real128_sig_digits()));
-        return (*mppp_pybind11::detail::globals::mpf_class)(
-                   make_tuple(mppp_pybind11::detail::mppp_int_to_py(mppp::integer<1>(fr)),
-                              static_cast<long>(mppp::integer<1>{exp} - mppp::real128_sig_digits())))
-            .release();
+        return mppp_pybind11::detail::real128_to_py_object(src);
     }
 };
 
