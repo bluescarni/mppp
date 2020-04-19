@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
   
@@ -91,6 +91,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex128.html">Quadruple-precision complex numbers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
@@ -393,11 +394,17 @@ will take care of releasing them when the destructor is called.</p>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp8rationalaSERK4real">
 <span id="_CPPv3N4mppp8rationalaSERK4real"></span><span id="_CPPv2N4mppp8rationalaSERK4real"></span><span id="mppp::rational::assign-operator__realCR"></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rationalaSERK4real" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp8rationalaSERK10complex128">
+<span id="_CPPv3N4mppp8rationalaSERK10complex128"></span><span id="_CPPv2N4mppp8rationalaSERK10complex128"></span><span id="mppp::rational::assign-operator__complex128CR"></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128">complex128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rationalaSERK10complex128" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">These operators
-are available only if mp++ was configured with, respectively, the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code>
-and <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> options enabled.</p>
+<p class="last">The <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a>
+overloads are available only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code>
+option enabled. The <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> overload
+is available only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled.</p>
 </div>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.20.</span></p>
@@ -540,7 +547,7 @@ fails, <em>rop</em> will not be altered.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>rop</strong> – the variable which will store the result of the conversion.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code> is
-a C++ integral type which cannot represent the truncated value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+an integral C++ type which cannot represent the truncated value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
 </dl>
 </dd></dl>
 
@@ -783,7 +790,7 @@ not be altered.</p>
 </ul>
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code> is
-a C++ integral type which cannot represent the truncated value of <em>q</em>.</p>
+an integral C++ type which cannot represent the truncated value of <em>q</em>.</p>
 </dd>
 </dl>
 </dd></dl>

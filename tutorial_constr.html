@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
   
@@ -173,7 +173,7 @@ in case of overflow, and it will produce the truncated value when constructing f
 <span class="n">assert</span><span class="p">((</span><span class="kt">int</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">}}</span> <span class="o">==</span> <span class="mi">1</span><span class="p">));</span> <span class="c1">// int construction from rational truncates.</span>
 </pre></div>
 </div>
-<p>On the other hand, conversion of <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects to C++ floating-point types does not raise any error
+<p>On the other hand, conversion of <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects to floating-point C++ types does not raise any error
 even if it does not preserve the exact value:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="n">f</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;32327737199221993919239912&quot;</span><span class="p">}};</span> <span class="c1">// Constructs a single-precision approximation</span>
                                               <span class="c1">// of the original integer.</span>

@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
   
@@ -220,7 +220,8 @@ via additional assignment operators
 <li>mp++ now works with the Intel compiler
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/224">#224</a>,
 tested with <code class="docutils literal notranslate"><span class="pre">icpc</span> <span class="pre">(ICC)</span> <span class="pre">19.1.0.166</span></code>). This includes
-also support for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (with
+also support for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and
+<a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> (with
 a couple of minor limitations).</li>
 <li>The interoperability of <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> with
 <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> has been improved: it is now supported
@@ -228,6 +229,12 @@ also on Clang (since version 7) and it does not require
 mp++ to be configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code>
 option any more
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/222">#222</a>).</li>
+<li><a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> can now interact with
+<code class="docutils literal notranslate"><span class="pre">std::complex</span></code>
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/220">#220</a>).</li>
+<li>Add <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a>, a quadruple-precision
+complex number class
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/220">#220</a>).</li>
 <li>mp++ now officially supports the ARM (<code class="docutils literal notranslate"><span class="pre">aarch64</span></code>)
 and PowerPC (<code class="docutils literal notranslate"><span class="pre">ppc64le</span></code>) architectures, which have
 been added to the continuous integration setup
@@ -255,6 +262,8 @@ doxygen is not involved any more
 <li>Various internal simplifications and improvements
 to <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/221">#221</a>).</li>
+<li>Update Catch to the latest version, 2.11.3
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/220">#220</a>).</li>
 </ul>
 </div>
 <div class="section" id="fix">
@@ -262,6 +271,8 @@ to <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title
 <ul class="simple">
 <li>Fix a bug in the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> test suite
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/224">#224</a>).</li>
+<li>Various doc fixes
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/220">#220</a>).</li>
 <li>Fix a bug in the test suite in
 release mode
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/219">#219</a>).</li>

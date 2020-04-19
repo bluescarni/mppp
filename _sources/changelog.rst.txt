@@ -13,7 +13,8 @@ New
 - mp++ now works with the Intel compiler
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__,
   tested with ``icpc (ICC) 19.1.0.166``). This includes
-  also support for :cpp:class:`~mppp::real128` (with
+  also support for :cpp:class:`~mppp::real128` and
+  :cpp:class:`~mppp::complex128` (with
   a couple of minor limitations).
 - The interoperability of :cpp:class:`~mppp::real128` with
   ``long double`` has been improved: it is now supported
@@ -21,6 +22,12 @@ New
   mp++ to be configured with the ``MPPP_WITH_MPFR``
   option any more
   (`#222 <https://github.com/bluescarni/mppp/pull/222>`__).
+- :cpp:class:`~mppp::real128` can now interact with
+  ``std::complex``
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
+- Add :cpp:class:`~mppp::complex128`, a quadruple-precision
+  complex number class
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 - mp++ now officially supports the ARM (``aarch64``)
   and PowerPC (``ppc64le``) architectures, which have
   been added to the continuous integration setup
@@ -47,12 +54,16 @@ Changes
 - Various internal simplifications and improvements
   to :cpp:class:`~mppp::real128`
   (`#221 <https://github.com/bluescarni/mppp/pull/221>`__).
+- Update Catch to the latest version, 2.11.3
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 
 Fix
 ~~~
 
 - Fix a bug in the :cpp:class:`~mppp::real128` test suite
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__).
+- Various doc fixes
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 - Fix a bug in the test suite in
   release mode
   (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).

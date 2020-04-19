@@ -16,5 +16,6 @@ Before perusing the C++ reference, users are encouraged to first go through the 
    integer.rst
    rational.rst
    real128.rst
+   complex128.rst
    real.rst
    utilities.rst

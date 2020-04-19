@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
   
@@ -25,7 +25,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Utility functions" href="utilities.html" />
-    <link rel="prev" title="Quadruple-precision floats" href="real128.html" />
+    <link rel="prev" title="Quadruple-precision complex numbers" href="complex128.html" />
   
    
 
@@ -40,7 +40,7 @@
           <a href="utilities.html" title="Utility functions"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="real128.html" title="Quadruple-precision floats"
+          <a href="complex128.html" title="Quadruple-precision complex numbers"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Reference</a> &#187;</li> 
@@ -72,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex128.html">Quadruple-precision complex numbers</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Multiprecision floats</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#the-real-class">The real class</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#types">Types</a></li>
@@ -163,7 +164,7 @@ It acts as a wrapper around the MPFR <a class="reference internal" href="#_CPPv4
 (whose size can be set at runtime) to a fixed-size exponent. In other words, <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 values can have an arbitrary number of binary digits of precision (limited only by the available memory),
 but the exponent range is limited.</p>
-<p><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> aims to behave like a C++ floating-point type whose precision is a runtime property
+<p><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> aims to behave like a floating-point C++ type whose precision is a runtime property
 of the class instances rather than a compile-time property of the type. Because of this, the way precision
 is handled in <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> differs from the way it is managed in MPFR. The most important difference
 is that in operations involving <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> the precision of the result is usually determined
@@ -179,7 +180,8 @@ the maximum precision among the two operands, that is, 200 bits.</p>
 <p>The precision of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> can be set at construction, or it can be changed later via functions
 such as <a class="reference internal" href="#_CPPv4N4mppp4real8set_precE11mpfr_prec_t" title="mppp::real::set_prec"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::set_prec()</span></code></a>, <a class="reference internal" href="#_CPPv4N4mppp4real10prec_roundE11mpfr_prec_t" title="mppp::real::prec_round"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::prec_round()</span></code></a>, etc. By default,
 the precision of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is automatically deduced upon construction following a set of heuristics
-aimed at ensuring that the constructed <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> represents exactly the value used for initialisation.
+aimed at ensuring that the constructed <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> preserves the value used for initialisation,
+if possible.
 For instance, by default, the construction of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> from a 32 bit integer will yield a
 <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> with a precision of 32 bits. This behaviour can be altered by specifying explicitly
 the desired precision value.</p>
@@ -292,8 +294,8 @@ exactly to <em>p</em>.</p>
 precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> according to the following
 heuristics:</p>
 <ul class="simple">
-<li>if <em>x</em> is a C++ integral type <code class="docutils literal notranslate"><span class="pre">I</span></code>, then the precision is set to the bit width of <code class="docutils literal notranslate"><span class="pre">I</span></code>;</li>
-<li>if <em>x</em> is a C++ floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the precision is set to the number of binary digits
+<li>if <em>x</em> is an integral C++ type <code class="docutils literal notranslate"><span class="pre">I</span></code>, then the precision is set to the bit width of <code class="docutils literal notranslate"><span class="pre">I</span></code>;</li>
+<li>if <em>x</em> is a floating-point C++ type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the precision is set to the number of binary digits
 in the significand of <code class="docutils literal notranslate"><span class="pre">F</span></code>;</li>
 <li>if <em>x</em> is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, then the precision is set to the number of bits in use by
 <em>x</em> (rounded up to the next multiple of the limb type’s bit width);</li>
@@ -455,6 +457,29 @@ heuristics described in the generic constructor.</p>
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
 <dt class="field-name">Throws</dt><dd class="field-body"><strong>std::overflow_error</strong> – if an overflow occurs in the computation of
 the automatically-deduced precision.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4realaSERK10complex128">
+<span id="_CPPv3N4mppp4realaSERK10complex128"></span><span id="_CPPv2N4mppp4realaSERK10complex128"></span><span id="mppp::real::assign-operator__complex128CR"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128">complex128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4realaSERK10complex128" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This operator is available only if mp++ was configured with the
+<code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option enabled.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>Assignment operator from <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a>.</p>
+<p>This operator is formally equivalent to converting <em>x</em> to
+<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and then move-assigning the result
+to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the assignment argument.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><strong>unspecified</strong> – any exception raised by the conversion of <em>x</em>
+to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</dd>
 </dl>
 </dd></dl>
 
@@ -799,10 +824,10 @@ proceeds as follows:</p>
 <ul class="simple">
 <li>if <code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="docutils literal notranslate"><span class="pre">bool</span></code>, then the conversion returns <code class="docutils literal notranslate"><span class="pre">false</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero, <code class="docutils literal notranslate"><span class="pre">true</span></code> otherwise
 (including if <code class="docutils literal notranslate"><span class="pre">this</span></code> is NaN);</li>
-<li>if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a C++ integral type other than <code class="docutils literal notranslate"><span class="pre">bool</span></code>, the conversion will yield the truncated counterpart
+<li>if <code class="docutils literal notranslate"><span class="pre">T</span></code> is an integral C++ type other than <code class="docutils literal notranslate"><span class="pre">bool</span></code>, the conversion will yield the truncated counterpart
 of <code class="docutils literal notranslate"><span class="pre">this</span></code> (i.e., the conversion rounds to zero). The conversion may fail due to overflow or domain errors
 (i.e., when trying to convert non-finite values);</li>
-<li>if <code class="docutils literal notranslate"><span class="pre">T</span></code> if a C++ floating-point type, the conversion calls directly the low-level MPFR functions (e.g.,
+<li>if <code class="docutils literal notranslate"><span class="pre">T</span></code> if a floating-point C++ type, the conversion calls directly the low-level MPFR functions (e.g.,
 <code class="docutils literal notranslate"><span class="pre">mpfr_get_d()</span></code>), and might yield infinities for finite input values;</li>
 <li>if <code class="docutils literal notranslate"><span class="pre">T</span></code> is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, the conversion rounds to zero and might fail due to domain errors,
 but it will never overflow;</li>
@@ -1576,11 +1601,15 @@ bit is unspecified.</p>
 If the conversion is successful, the function
 will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <em>rop</em> will
 not be altered.</p>
-<p>:param rop :the variable which will store the result of the conversion.
-:param x: the input argument.</p>
 <dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Returns</dt><dd class="field-body"><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail in the ways
-specified in the documentation of the conversion operator for <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</dd>
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the variable which will store the result of the conversion.</li>
+<li><strong>x</strong> – the input argument.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail in the ways
+specified in the documentation of the conversion operator for <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -3815,7 +3844,7 @@ a valid floating-point literal (as defined by the C++ standard).</dd>
   <div class="footer-relations">
     
       <div class="pull-left">
-        <a class="btn btn-default" href="real128.html" title="previous chapter (use the left arrow)">Quadruple-precision floats</a>
+        <a class="btn btn-default" href="complex128.html" title="previous chapter (use the left arrow)">Quadruple-precision complex numbers</a>
       </div>
     
       <div class="pull-right">
@@ -3837,7 +3866,7 @@ a valid floating-point literal (as defined by the C++ standard).</dd>
           <a href="utilities.html" title="Utility functions"
              >next</a> |</li>
         <li class="right" >
-          <a href="real128.html" title="Quadruple-precision floats"
+          <a href="complex128.html" title="Quadruple-precision complex numbers"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" >Reference</a> &#187;</li> 

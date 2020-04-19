@@ -168,10 +168,10 @@ The integer class
 
    .. cpp:function:: template <integer_cpp_arithmetic T> explicit integer(const T &x)
 
-      Generic constructor from C++ arithmetic types.
+      Generic constructor from arithmetic C++ types.
 
       This constructor will initialize an integer with the value of *x*.
-      The initialization is always successful if *x* is an integral value
+      The initialisation is always successful if *x* is an integral value
       (construction from ``bool`` yields 1 for ``true``, 0 for ``false``).
       If *x* is a floating-point value, the construction will fail if *x*
       is not finite. Construction from a floating-point type yields the
@@ -185,9 +185,9 @@ The integer class
 
       .. versionadded:: 0.19
 
-      Generic constructor from C++ complex types.
+      Generic constructor from complex C++ types.
 
-      This constructor will initialize an integer with the value of *c*. The initialization is
+      This constructor will initialize an integer with the value of *c*. The initialisation is
       successful only if the imaginary part of *c* is zero and the real part of *c* is finite.
 
       :param c: value that will be used to initialize ``this``.
@@ -299,7 +299,7 @@ The integer class
 
    .. cpp:function:: template <integer_cpp_arithmetic T> integer &operator=(const T &x)
 
-      Generic assignment operator from C++ arithmetic types.
+      Generic assignment operator from arithmetic C++ types.
 
       This operator will assign *x* to ``this``. The storage type of ``this`` after the assignment
       will depend only on the value of *x* (that is, the storage type will be static if the value of *x*
@@ -316,7 +316,7 @@ The integer class
 
       .. versionadded:: 0.19
 
-      Generic assignment operator from C++ complex types.
+      Generic assignment operator from complex C++ types.
 
       This operator will assign *c* to ``this``. The storage type of ``this`` after the assignment
       will depend only on the value of *c* (that is, the storage type will be static if the value of *c*
@@ -333,12 +333,14 @@ The integer class
    .. cpp:function:: integer &operator=(const rational<SSize> &x)
    .. cpp:function:: integer &operator=(const real128 &x)
    .. cpp:function:: integer &operator=(const real &x)
+   .. cpp:function:: integer &operator=(const complex128 &x)
 
       .. note::
 
-         The :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real` overloads
-         are available only if mp++ was configured with, respectively, the ``MPPP_WITH_QUADMATH``
-         and ``MPPP_WITH_MPFR`` options enabled.
+         The :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`
+         overloads are available only if mp++ was configured with the ``MPPP_WITH_QUADMATH``
+         option enabled. The :cpp:class:`~mppp::real` overload
+         is available only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled.
 
       .. versionadded:: 0.20
 
@@ -460,7 +462,7 @@ The integer class
 
    .. cpp:function:: template <integer_cpp_arithmetic T> explicit operator T() const
 
-      Generic conversion operator to C++ arithmetic types.
+      Generic conversion operator to arithmetic C++ types.
 
       This operator will convert ``this`` to ``T``.
       Conversion to ``bool`` yields ``false`` if ``this`` is zero,
@@ -477,7 +479,7 @@ The integer class
 
       .. versionadded:: 0.19
 
-      Generic conversion operator to C++ complex types.
+      Generic conversion operator to complex C++ types.
 
       This operator will convert ``this`` to ``T``.
       The conversion might yield inexact values and infinities.
@@ -486,7 +488,7 @@ The integer class
 
    .. cpp:function:: template <integer_cpp_arithmetic T> bool get(T &rop) const
 
-      Generic conversion member function to C++ arithmetic types.
+      Generic conversion member function to arithmetic C++ types.
 
       This member function, similarly to the conversion operator, will convert ``this``
       to ``T``, storing the result of the conversion into *rop*. Differently
@@ -497,13 +499,13 @@ The integer class
       :param rop: the variable which will store the result of the conversion.
 
       :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
-        a C++ integral type which cannot represent the value of ``this``.
+        an integral C++ type which cannot represent the value of ``this``.
 
    .. cpp:function:: template <integer_cpp_complex T> bool get(T &rop) const
 
       .. versionadded:: 0.19
 
-      Generic conversion member function to C++ complex types.
+      Generic conversion member function to complex C++ types.
 
       This member function, similarly to the conversion operator, will convert ``this``
       to ``T``, storing the result of the conversion into *rop*.
@@ -827,7 +829,7 @@ Concepts
 
 .. cpp:concept:: template <typename T> mppp::integer_cpp_arithmetic
 
-   This concept is satisfied if ``T`` is a C++ arithmetic type compatible with :cpp:class:`~mppp::integer`.
+   This concept is satisfied if ``T`` is an arithmetic C++ type compatible with :cpp:class:`~mppp::integer`.
 
    Specifically, this concept is equivalent to :cpp:concept:`~mppp::cpp_arithmetic` if mp++
    was built with the ``MPPP_WITH_MPFR`` option enabled (see the :ref:`installation instructions <installation>`).
@@ -835,7 +837,7 @@ Concepts
 
 .. cpp:concept:: template <typename T> mppp::integer_cpp_complex
 
-   This concept is satisfied if ``T`` is a C++ complex type compatible with :cpp:class:`~mppp::integer`.
+   This concept is satisfied if ``T`` is a complex C++ type compatible with :cpp:class:`~mppp::integer`.
 
    Specifically, this concept is equivalent to :cpp:concept:`~mppp::cpp_complex` if mp++
    was built with the ``MPPP_WITH_MPFR`` option enabled (see the :ref:`installation instructions <installation>`).
@@ -865,7 +867,7 @@ Concepts
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic binary :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
-   involving :cpp:class:`~mppp::integer` and C++ integral types. Specifically, the concept will be ``true``
+   involving :cpp:class:`~mppp::integer` and integral C++ types. Specifically, the concept will be ``true``
    if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size, or
@@ -933,7 +935,7 @@ Conversion
 
 .. cpp:function:: template <mppp::integer_cpp_arithmetic T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
 
-   Generic conversion function from :cpp:class:`~mppp::integer` to C++ arithmetic types.
+   Generic conversion function from :cpp:class:`~mppp::integer` to arithmetic C++ types.
 
    This function will convert the input :cpp:class:`~mppp::integer` *n* to ``T``,
    storing the result of the conversion into *rop*.
@@ -945,13 +947,13 @@ Conversion
    :param n: the input :cpp:class:`~mppp::integer`.
 
    :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
-     a C++ integral type which cannot represent the value of *n*.
+     an integral C++ type which cannot represent the value of *n*.
 
 .. cpp:function:: template <mppp::integer_cpp_complex T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
 
    .. versionadded:: 0.19
 
-   Generic conversion function from :cpp:class:`~mppp::integer` to C++ complex types.
+   Generic conversion function from :cpp:class:`~mppp::integer` to complex C++ types.
 
    This function will convert the input :cpp:class:`~mppp::integer` *n* to ``T``,
    storing the result of the conversion into *rop*.
@@ -990,7 +992,7 @@ Arithmetic
 .. cpp:function:: template <std::size_t SSize, mppp::cpp_unsigned_integral T> mppp::integer<SSize> &mppp::sub_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
 .. cpp:function:: template <std::size_t SSize, mppp::cpp_signed_integral T> mppp::integer<SSize> &mppp::sub_si(mppp::integer<SSize> &rop, const mppp::integer<SSize> &x, const T &y)
 
-   Ternary addition/subtraction primitives with C++ integral types.
+   Ternary addition/subtraction primitives with integral C++ types.
 
    These functions, which will set *rop* to :math:`x \pm y`, can be faster
    alternatives to the :cpp:class:`~mppp::integer` addition function

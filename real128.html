@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
   
@@ -24,7 +24,7 @@
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Multiprecision floats" href="real.html" />
+    <link rel="next" title="Quadruple-precision complex numbers" href="complex128.html" />
     <link rel="prev" title="Multiprecision rationals" href="rational.html" />
   
    
@@ -37,7 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="real.html" title="Multiprecision floats"
+          <a href="complex128.html" title="Quadruple-precision complex numbers"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="rational.html" title="Multiprecision rationals"
@@ -94,9 +94,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#mathematical-operators">Mathematical operators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#constants">Constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#user-defined-literal">User-defined literal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-defined-literals">User-defined literals</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="complex128.html">Quadruple-precision complex numbers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
@@ -179,12 +180,8 @@ suffix. For instance, the quadmath code</p>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">sin()</span></code> function is resolved via argument-dependent lookup.</p>
-<p>Various <a class="reference internal" href="#real128-operators"><span class="std std-ref">overloaded operators</span></a> are provided.
-The common arithmetic operators (<code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code> and <code class="docutils literal notranslate"><span class="pre">/</span></code>) always return <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
-as a result, promoting at most one operand to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> before actually performing
-the computation. Similarly, the relational operators, <code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code> will promote at
-most one argument to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> before performing the comparison. Alternative comparison functions
-treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
+<p>Various <a class="reference internal" href="#real128-operators"><span class="std std-ref">overloaded operators</span></a> are provided. Alternative comparison functions
+treating NaNs specially are also provided for use in the C++ standard library (and wherever strict weak ordering relations
 are needed).</p>
 <p>The <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class is a <a class="reference external" href="https://en.cppreference.com/w/cpp/named_req/LiteralType">literal type</a>, and, whenever possible, operations involving
 <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> are marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code>. Some functions which are not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> in the quadmath
@@ -224,8 +221,8 @@ move constructible.</p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp7real1287real128E10__float128">
-<span id="_CPPv3N4mppp7real1287real128E10__float128"></span><span id="_CPPv2N4mppp7real1287real128E10__float128"></span><span id="mppp::real128::real128____float128CE"></span><em class="property">explicit</em> <em class="property">constexpr</em> <code class="descname">real128</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410__float128" title="__float128">__float128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1287real128E10__float128" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp7real1287real128ERK10__float128">
+<span id="_CPPv3N4mppp7real1287real128ERK10__float128"></span><span id="_CPPv2N4mppp7real1287real128ERK10__float128"></span><span id="mppp::real128::real128____float128CRCE"></span><em class="property">explicit</em> <em class="property">constexpr</em> <code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv410__float128" title="__float128">__float128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1287real128ERK10__float128" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from a <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>.</p>
 <p>This constructor will initialise the internal <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>
 value to <em>x</em>.</p>
@@ -245,6 +242,24 @@ to <em>x</em> after initialisation (e.g., if <em>x</em> is a very large
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the value that will be used for the initialisation.</dd>
 <dt class="field-name">Throws</dt><dd class="field-body"><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors during initialisation.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_19real128_cpp_complexEN4mppp7real1287real128ERK1T">
+<span id="_CPPv3I_19real128_cpp_complexEN4mppp7real1287real128ERK1T"></span><span id="_CPPv2I_19real128_cpp_complexEN4mppp7real1287real128ERK1T"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="mppp::real128_cpp_complex">real128_cpp_complex</a> <code class="descname">T</code>&gt;<br /><em class="property">explicit</em> <em class="property">constexpr</em> <code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I_19real128_cpp_complexEN4mppp7real1287real128ERK1T" title="mppp::real128::real128::T">T</a> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_19real128_cpp_complexEN4mppp7real1287real128ERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This constructor is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>Constructor from complex C++ types.</p>
+<p>The initialisation is is successful only if the imaginary part of <em>c</em> is zero.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><strong>c</strong> – the input complex value.</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><strong>std::domain_error</strong> – if the imaginary part of <em>c</em> is not zero.</dd>
 </dl>
 </dd></dl>
 
@@ -335,18 +350,45 @@ move assignable.</p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp7real128aSERK4real">
-<span id="_CPPv3N4mppp7real128aSERK4real"></span><span id="_CPPv2N4mppp7real128aSERK4real"></span><span id="mppp::real128::assign-operator__realCR"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real128aSERK4real" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I_19real128_cpp_complexEN4mppp7real128aSER7real128RK1T">
+<span id="_CPPv3I_19real128_cpp_complexEN4mppp7real128aSERK1T"></span><span id="_CPPv2I_19real128_cpp_complexEN4mppp7real128aSERK1T"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="mppp::real128_cpp_complex">real128_cpp_complex</a> <code class="descname">T</code>&gt;<br /><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I_19real128_cpp_complexEN4mppp7real128aSER7real128RK1T" title="mppp::real128::operator=::T">T</a> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_19real128_cpp_complexEN4mppp7real128aSER7real128RK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This operator is available only if mp++ was configured with the
-<code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled.</p>
+<p class="last">This operator is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.20.</span></p>
 </div>
-<p>Assignment operator from <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
-<p>This operator is formally equivalent to converting <em>x</em> to
+<p>Assignment from complex C++ types.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><strong>c</strong> – the assignment argument.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><strong>std::domain_error</strong> – if the imaginary part of <em>c</em> is not zero.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real128aSERK4real">
+<span id="_CPPv3N4mppp7real128aSERK4real"></span><span id="_CPPv2N4mppp7real128aSERK4real"></span><span id="mppp::real128::assign-operator__realCR"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real128aSERK4real" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real128aSERK10complex128">
+<span id="_CPPv3N4mppp7real128aSERK10complex128"></span><span id="_CPPv2N4mppp7real128aSERK10complex128"></span><span id="mppp::real128::assign-operator__complex128CRCE"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128">complex128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real128aSERK10complex128" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> overload is available only if mp++ was configured with the
+<code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> overload is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>Assignment operators from other mp++ classes.</p>
+<p>These operators are formally equivalent to converting <em>x</em> to
 <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and then move-assigning the result
 to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
@@ -400,19 +442,44 @@ is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7i
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I_21real128_interoperableENK4mppp7real1283getEbR1T">
-<span id="_CPPv3I_21real128_interoperableENK4mppp7real1283getER1T"></span><span id="_CPPv2I_21real128_interoperableENK4mppp7real1283getER1T"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp21real128_interoperableE" title="mppp::real128_interoperable">real128_interoperable</a> <code class="descname">T</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_21real128_interoperableENK4mppp7real1283getEbR1T" title="mppp::real128::get::T">T</a> &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_21real128_interoperableENK4mppp7real1283getEbR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I_19real128_cpp_complexENK4mppp7real128cv1TEv">
+<span id="_CPPv3I_19real128_cpp_complexENK4mppp7real128cv1TEv"></span><span id="_CPPv2I_19real128_cpp_complexENK4mppp7real128cv1TEv"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="mppp::real128_cpp_complex">real128_cpp_complex</a> <code class="descname">T</code>&gt;<br /><em class="property">explicit</em> <em class="property">constexpr</em> <code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_19real128_cpp_complexENK4mppp7real128cv1TEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This member function is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p class="last">This operator is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
-<p>Conversion member function to interoperable types.</p>
-<p>This member function, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
-<a class="reference internal" href="#_CPPv4I0EN4mppp21real128_interoperableE" title="mppp::real128_interoperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">real128_interoperable</span></code></a> type, storing the result of the conversion into <em>rop</em>.
-Differently from the conversion operator, this function does not raise any exception: if the conversion is
-successful, the function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>Conversion to complex C++ types.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body"><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to the type <code class="docutils literal notranslate"><span class="pre">T</span></code>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_21real128_interoperableENK4mppp7real1283getEbR1T">
+<span id="_CPPv3I_21real128_interoperableENK4mppp7real1283getER1T"></span><span id="_CPPv2I_21real128_interoperableENK4mppp7real1283getER1T"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp21real128_interoperableE" title="mppp::real128_interoperable">real128_interoperable</a> <code class="descname">T</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_21real128_interoperableENK4mppp7real1283getEbR1T" title="mppp::real128::get::T">T</a> &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_21real128_interoperableENK4mppp7real1283getEbR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_19real128_cpp_complexENK4mppp7real1283getEbR1T">
+<span id="_CPPv3I_19real128_cpp_complexENK4mppp7real1283getER1T"></span><span id="_CPPv2I_19real128_cpp_complexENK4mppp7real1283getER1T"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="mppp::real128_cpp_complex">real128_cpp_complex</a> <code class="descname">T</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_19real128_cpp_complexENK4mppp7real1283getEbR1T" title="mppp::real128::get::T">T</a> &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_19real128_cpp_complexENK4mppp7real1283getEbR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The first overload is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.
+The second overload is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++20 is being used.</p>
+</div>
+<p>Conversion member functions to interoperable and complex C++ types.</p>
+<p>These member functions, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to
+<code class="docutils literal notranslate"><span class="pre">T</span></code>, storing the result of the conversion into <em>rop</em>.
+Differently from the conversion operator, these functions do not raise any exception: if the conversion is
+successful, the functions will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the functions will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the
 conversion fails, <em>rop</em> will not be altered. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code> is either
 <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, and <code class="docutils literal notranslate"><span class="pre">this</span></code> represents a non-finite value.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20: </span>The conversion function to complex C++ types.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>rop</strong> – the variable which will store the result of the conversion.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeds, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</dd>
@@ -740,7 +807,8 @@ This is the type wrapped by the <a class="reference internal" href="#_CPPv4N4mpp
 <dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp21real128_interoperableE">
 <span id="_CPPv3I0EN4mppp21real128_interoperableE"></span><span id="_CPPv2I0EN4mppp21real128_interoperableE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real128_interoperable</code><a class="headerlink" href="#_CPPv4I0EN4mppp21real128_interoperableE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied by types that can interoperate with <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.
+<dd><p>This concept is satisfied by real-valued types that can
+interoperate with <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.
 Specifically, this concept is satisfied if either:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">T</span></code> is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, or</li>
@@ -749,6 +817,23 @@ Specifically, this concept is satisfied if either:</p>
 <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp14cpp_arithmeticE" title="mppp::cpp_arithmetic"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::cpp_arithmetic</span></code></a>, or</li>
 <li>on Clang&lt;7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp14cpp_arithmeticE" title="mppp::cpp_arithmetic"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::cpp_arithmetic</span></code></a>, except if
 <code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>.</li>
+</ul>
+</dd></dl>
+
+<dl class="cpp concept">
+<dt id="_CPPv4I0EN4mppp19real128_cpp_complexE">
+<span id="_CPPv3I0EN4mppp19real128_cpp_complexE"></span><span id="_CPPv2I0EN4mppp19real128_cpp_complexE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real128_cpp_complex</code><a class="headerlink" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>This concept is satisfied by complex C++ types that can
+interoperate with <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.
+Specifically, this concept is satisfied if either:</p>
+<ul class="simple">
+<li>on GCC, the Intel compiler and Clang&gt;=7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11cpp_complexE" title="mppp::cpp_complex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::cpp_complex</span></code></a>, or</li>
+<li>on Clang&lt;7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11cpp_complexE" title="mppp::cpp_complex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::cpp_complex</span></code></a>, except if
+<code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="docutils literal notranslate"><span class="pre">std::complex&lt;long</span> <span class="pre">double&gt;</span></code>.</li>
 </ul>
 </dd></dl>
 
@@ -764,6 +849,21 @@ involving <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mpp
 </ul>
 </dd></dl>
 
+<dl class="cpp concept">
+<dt id="_CPPv4I00EN4mppp19real128_eq_op_typesE">
+<span id="_CPPv3I00EN4mppp19real128_eq_op_typesE"></span><span id="_CPPv2I00EN4mppp19real128_eq_op_typesE"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">U</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real128_eq_op_types</code><a class="headerlink" href="#_CPPv4I00EN4mppp19real128_eq_op_typesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>This concept is satisfied if the types <code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> are suitable for use in the
+generic binary equality and inequality operators
+involving <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and other types. Specifically, the concept will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if either:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">real128_op_types</span></code></a>, or</li>
+<li>one type is <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and the other is a <a class="reference internal" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="mppp::real128_cpp_complex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">real128_cpp_complex</span></code></a> type.</li>
+</ul>
+</dd></dl>
+
 </div>
 <div class="section" id="functions">
 <span id="real128-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
@@ -772,15 +872,21 @@ involving <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mpp
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp21real128_interoperableEEN4mppp3getEbR1TRKN4mppp7real128E">
 <span id="_CPPv3I_N4mppp21real128_interoperableEEN4mppp3getER1TRKN4mppp7real128E"></span><span id="_CPPv2I_N4mppp21real128_interoperableEEN4mppp3getER1TRKN4mppp7real128E"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp21real128_interoperableE" title="mppp::real128_interoperable">real128_interoperable</a> <code class="descname">T</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp21real128_interoperableEEN4mppp3getEbR1TRKN4mppp7real128E" title="mppp::get::T">T</a> &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp21real128_interoperableEEN4mppp3getEbR1TRKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp19real128_cpp_complexEEN4mppp3getEbR1TRKN4mppp7real128E">
+<span id="_CPPv3I_N4mppp19real128_cpp_complexEEN4mppp3getER1TRKN4mppp7real128E"></span><span id="_CPPv2I_N4mppp19real128_cpp_complexEEN4mppp3getER1TRKN4mppp7real128E"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="mppp::real128_cpp_complex">real128_cpp_complex</a> <code class="descname">T</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp19real128_cpp_complexEEN4mppp3getEbR1TRKN4mppp7real128E" title="mppp::get::T">T</a> &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp19real128_cpp_complexEEN4mppp3getEbR1TRKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This function is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+<p class="last">The first overload is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.
+The second overload is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++20 is being used.</p>
 </div>
-<p>Conversion function.</p>
-<p>This function will convert the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> <em>x</em> to a
-<a class="reference internal" href="#_CPPv4I0EN4mppp21real128_interoperableE" title="mppp::real128_interoperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">real128_interoperable</span></code></a> type, storing the result of the conversion into <em>rop</em>.
-If the conversion is successful, the function
-will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <em>rop</em> will
+<p>Conversion functions.</p>
+<p>These functions will convert the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> <em>x</em> to
+<code class="docutils literal notranslate"><span class="pre">T</span></code>, storing the result of the conversion into <em>rop</em>.
+If the conversion is successful, the functions
+will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the functions will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <em>rop</em> will
 not be altered. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code>
 is either <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, and <em>x</em>
 represents a non-finite value.</p>
@@ -1443,33 +1549,33 @@ of <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I00EN4mpppeqEbRK1TRK1U">
-<span id="_CPPv3I00EN4mpppeqERK1TRK1U"></span><span id="_CPPv2I00EN4mpppeqERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppeqEbRK1TRK1U" title="mppp::operator==::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppeqEbRK1TRK1U" title="mppp::operator==::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN4mpppeqEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppeqEbRK1TRK1U">
+<span id="_CPPv3I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppeqERK1TRK1U"></span><span id="_CPPv2I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppeqERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp19real128_eq_op_typesE" title="mppp::real128_eq_op_types">real128_eq_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppeqEbRK1TRK1U" title="mppp::operator==::T">T</a>&gt; <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppeqEbRK1TRK1U" title="mppp::operator==::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppeqEbRK1TRK1U" title="mppp::operator==::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppeqEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I00EN4mpppneEbRK1TRK1U">
-<span id="_CPPv3I00EN4mpppneERK1TRK1U"></span><span id="_CPPv2I00EN4mpppneERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppneEbRK1TRK1U" title="mppp::operator!=::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppneEbRK1TRK1U" title="mppp::operator!=::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN4mpppneEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppneEbRK1TRK1U">
+<span id="_CPPv3I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppneERK1TRK1U"></span><span id="_CPPv2I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppneERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp19real128_eq_op_typesE" title="mppp::real128_eq_op_types">real128_eq_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppneEbRK1TRK1U" title="mppp::operator!=::T">T</a>&gt; <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppneEbRK1TRK1U" title="mppp::operator!=::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppneEbRK1TRK1U" title="mppp::operator!=::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp19real128_eq_op_typesI1TEEEN4mpppneEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I00EN4mpppltEbRK1TRK1U">
-<span id="_CPPv3I00EN4mpppltERK1TRK1U"></span><span id="_CPPv2I00EN4mpppltERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppltEbRK1TRK1U" title="mppp::operator&lt;::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppltEbRK1TRK1U" title="mppp::operator&lt;::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN4mpppltEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppltEbRK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mpppltERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mpppltERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppltEbRK1TRK1U" title="mppp::operator&lt;::T">T</a>&gt; <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppltEbRK1TRK1U" title="mppp::operator&lt;::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppltEbRK1TRK1U" title="mppp::operator&lt;::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppltEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I00EN4mpppgtEbRK1TRK1U">
-<span id="_CPPv3I00EN4mpppgtERK1TRK1U"></span><span id="_CPPv2I00EN4mpppgtERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppgtEbRK1TRK1U" title="mppp::operator&gt;::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppgtEbRK1TRK1U" title="mppp::operator&gt;::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN4mpppgtEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgtEbRK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mpppgtERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mpppgtERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgtEbRK1TRK1U" title="mppp::operator&gt;::T">T</a>&gt; <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgtEbRK1TRK1U" title="mppp::operator&gt;::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgtEbRK1TRK1U" title="mppp::operator&gt;::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgtEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I00EN4mpppleEbRK1TRK1U">
-<span id="_CPPv3I00EN4mpppleERK1TRK1U"></span><span id="_CPPv2I00EN4mpppleERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppleEbRK1TRK1U" title="mppp::operator&lt;=::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppleEbRK1TRK1U" title="mppp::operator&lt;=::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN4mpppleEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppleEbRK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mpppleERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mpppleERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppleEbRK1TRK1U" title="mppp::operator&lt;=::T">T</a>&gt; <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppleEbRK1TRK1U" title="mppp::operator&lt;=::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppleEbRK1TRK1U" title="mppp::operator&lt;=::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppleEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I00EN4mpppgeEbRK1TRK1U">
-<span id="_CPPv3I00EN4mpppgeERK1TRK1U"></span><span id="_CPPv2I00EN4mpppgeERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, typename <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppgeEbRK1TRK1U" title="mppp::operator&gt;=::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mpppgeEbRK1TRK1U" title="mppp::operator&gt;=::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN4mpppgeEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgeEbRK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mpppgeERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mpppgeERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgeEbRK1TRK1U" title="mppp::operator&gt;=::T">T</a>&gt; <code class="descname">U</code>&gt;<br /><em class="property">constexpr</em> bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgeEbRK1TRK1U" title="mppp::operator&gt;=::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgeEbRK1TRK1U" title="mppp::operator&gt;=::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mpppgeEbRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Comparison operators.</p>
 <p>These operators will return <code class="docutils literal notranslate"><span class="pre">true</span></code> if, respectively:</p>
 <ul class="simple">
@@ -1486,6 +1592,9 @@ of <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <p class="last">These operators will handle NaN in the same way as the builtin floating-point types.
 For alternative comparison functions that treat NaN specially, please see the
 <a class="reference internal" href="#real128-comparison"><span class="std std-ref">comparison functions section</span></a>.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20: </span>Equality and inequality comparison with <a class="reference internal" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="mppp::real128_cpp_complex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">real128_cpp_complex</span></code></a> types.</p>
 </div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
@@ -1824,8 +1933,8 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 </dd></dl>
 
 </div>
-<div class="section" id="user-defined-literal">
-<span id="real128-literal"></span><h2>User-defined literal<a class="headerlink" href="#user-defined-literal" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="user-defined-literals">
+<span id="real128-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
 </div>
@@ -1859,7 +1968,7 @@ a valid floating-point literal (as defined by the C++ standard).</dd>
       </div>
     
       <div class="pull-right">
-        <a class="btn btn-default" href="real.html" title="next chapter (use the right arrow)">Multiprecision floats</a>
+        <a class="btn btn-default" href="complex128.html" title="next chapter (use the right arrow)">Quadruple-precision complex numbers</a>
       </div>
     </div>
     <div class="clearer"></div>
@@ -1874,7 +1983,7 @@ a valid floating-point literal (as defined by the C++ standard).</dd>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="real.html" title="Multiprecision floats"
+          <a href="complex128.html" title="Quadruple-precision complex numbers"
              >next</a> |</li>
         <li class="right" >
           <a href="rational.html" title="Multiprecision rationals"

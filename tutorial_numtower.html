@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
   
@@ -140,27 +140,27 @@ types, a higher range or bit width translates to a higher rank. The underlying
 idea is that automatic type coercion should not change the value of an operand <a class="footnote-reference" href="#f1" id="id1">[1]</a>.</p>
 <p>mp++ extends C++’s type hierarchy in a (hopefully) natural way:</p>
 <ul class="simple">
-<li><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> has a rank higher than any C++ integral type, but lower
-than any C++ floating-point type;</li>
+<li><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> has a rank higher than any integral C++ type, but lower
+than any floating-point C++ type;</li>
 <li><a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> has a rank higher than <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, but lower
-than any C++ floating-point type;</li>
-<li><a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> has a rank higher than any C++ floating-point type;</li>
+than any floating-point C++ type;</li>
+<li><a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> has a rank higher than any floating-point C++ type;</li>
 <li><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> has a rank higher than <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</li>
 </ul>
 <p>In other words, mp++’s type hierarchy (or <em>numerical tower</em>) from the lowest rank to the highest is the following:</p>
 <ul class="simple">
-<li>C++ integral types,</li>
+<li>integral C++ types,</li>
 <li><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>,</li>
 <li><a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>,</li>
-<li>C++ floating-point types,</li>
+<li>floating-point C++ types,</li>
 <li><a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>,</li>
 <li><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</li>
 </ul>
 <p>Note that up to and including <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, types with higher rank can represent exactly all values
 of any type with a lower rank. The floating-point types, however, cannot represent exactly all values representable
-by <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or even the C++ integral types. It should also be noted
+by <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or even the integral C++ types. It should also be noted
 that <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>’s precision is set at runtime, and it is thus possible to create <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-objects with a precision lower than <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> or any of the C++ floating-point types. Regardless,
+objects with a precision lower than <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> or any of the floating-point C++ types. Regardless,
 when it comes to type coercion, <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is always assigned a rank higher than any other type.</p>
 <p>mp++’s type coercion rules extend beyond arithmetic operators. The exponentiation functions <code class="docutils literal notranslate"><span class="pre">pow()</span></code>, for instance,
 also use the type hierarchy to determine the type of the result. Type coercion is also applied in the comparison operators,

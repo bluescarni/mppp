@@ -7,7 +7,7 @@ Introduction
 ------------
 
 mp++ is written in modern C++, and it requires a compiler able to understand
-at least C++11 (mp++ will also use features from C++14 and C++17,
+at least C++11 (mp++ will also use features from C++14, C++17 and C++20,
 if supported by the compiler). The library is regularly tested on
 a comprehensive continuous integration pipeline, which includes:
 
