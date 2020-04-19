@@ -305,7 +305,7 @@ inline py::int_ mppp_int_to_py(const mppp::integer<SSize> &src)
 
 #if defined(MPPP_WITH_QUADMATH)
 
-inline bool py_object_to_real128(real128 &value, handle src)
+inline bool py_object_to_real128(mppp::real128 &value, py::handle src)
 {
     if (!globals::mpmath || !::PyObject_IsInstance(src.ptr(), globals::mpf_class->ptr())) {
         return false;
@@ -314,7 +314,7 @@ inline bool py_object_to_real128(real128 &value, handle src)
     if (prec != mppp::real128_sig_digits()) {
         return false;
     }
-    const auto mpf_tuple = src.attr("_mpf_").cast<tuple>();
+    const auto mpf_tuple = src.attr("_mpf_").cast<py::tuple>();
     auto neg_if_needed = [&value, &mpf_tuple]() {
         if (mpf_tuple[0].cast<int>()) {
             value = -value;
@@ -327,7 +327,7 @@ inline bool py_object_to_real128(real128 &value, handle src)
         value = mppp::real128_nan();
     } else {
         mppp::integer<1> sig;
-        if (!py_integer_to_mppp_int(sig, pybind11::int_(mpf_tuple[1]).ptr())) {
+        if (!py_integer_to_mppp_int(sig, py::int_(mpf_tuple[1]).ptr())) {
             throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
         }
         // NOTE: we have to be careful here. We might have a very large significand
@@ -495,7 +495,7 @@ struct type_caster<mppp::real128> {
     PYBIND11_TYPE_CASTER(mppp::real128, _("mppp::real128"));
     bool load(handle src, bool)
     {
-        return py_object_to_real128(value, src, b);
+        return mppp_pybind11::detail::py_object_to_real128(value, src);
     }
     static handle cast(const mppp::real128 &src, return_value_policy, handle)
     {
