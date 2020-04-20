@@ -1275,59 +1275,79 @@ inline void mpfr_nary_func_wrapper(const std::false_type &, const F &f, Args &&.
     f(std::forward<Args>(args)...);
 }
 
-// Apply the MPFR n-ary function F with return value rop and real arguments (arg0, args...).
-// The precision of rop will be set to the maximum of the precision among the arguments,
-// but not less than min_prec.
-// Resources may be stolen from one of the arguments, if possible.
+// The goal of this helper is to invoke the MPFR-like function object f with signature
+//
+// void f(mpfr_t out, const mpfr_t x0, const mpfr_t x1, ...)
+//
+// on the mpfr_t instances contained in the input real objects,
+//
+// f(rop._get_mpfr_t(), arg0.get_mpfr_t(), arg1.get_mpfr_t(), ...)
+//
+// The helper will ensure that, before the invocation, the precision
+// of rop is set to max(min_prec, arg0.get_prec(), arg1.get_prec(), ...).
+//
+// One of the input arguments may be used as return value in the invocation
+// instead of rop if it provides enough precision and it is passed as a non-const
+// rvalue reference. In such a case, the selected input argument will be swapped
+// into rop after the invocation and before the function returns.
+//
 // The Rnd flag controls whether to add the rounding mode (MPFR_RNDN) at the end
-// of the function arguments list or not.
-// NOTE: this function assumes that all arguments are reals. When we want to invoke MPFR
-// functions that have argument types other than mpfr_t, then we will have to wrap them
-// into a lambda (or similar) that has only mpfr_t arguments.
+// of the MPFR-like function object arguments list or not.
+//
+// This function requires that the MPFR-like function object being called supports
+// overlapping arguments (both input and output).
 template <bool Rnd, typename F, typename Arg0, typename... Args>
 inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&... args)
 {
-    // This pair contains:
-    // - a pointer to the largest-precision real from which we can steal resources (may be nullptr),
-    // - the largest precision among all arguments.
-    // It's inited with arg0's precision (but no less than min_prec), and a pointer to arg0, if arg0 is a nonconst
+    // This pair will contain:
+    //
+    // - a pointer to the largest-precision arg from which we can steal resources (may be nullptr),
+    // - the largest precision among all args and min_prec (i.e., the target precision
+    //   for rop).
+    //
+    // It is inited with arg0's precision (but no less than min_prec), and a pointer to arg0, if arg0 is a nonconst
     // rvalue ref (a nullptr otherwise).
     auto p = mpfr_nary_op_init_pair(min_prec, std::forward<Arg0>(arg0));
-    // Examine the remaining arguments.
+    // Finish setting up p by examining the remaining arguments.
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
-    // Cache this for convenience.
+
+    // Cache for convenience.
     const auto r_prec = rop.get_prec();
+
     if (p.second == r_prec) {
-        // The largest precision among the operands and the precision of the return value
+        // The target precision and the precision of the return value
         // match. No need to steal, just execute the function.
         mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
                                args.get_mpfr_t()...);
     } else {
         if (r_prec > p.second) {
-            // The precision of the return value is larger than the largest precision
-            // among the operands. We can reset its precision destructively
+            // The precision of the return value is larger than the target precision.
+            // We can reset its precision destructively
             // because we know it does not overlap with any operand.
             rop.set_prec_impl<false>(p.second);
             mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
                                    args.get_mpfr_t()...);
         } else if (!p.first || p.first->get_prec() != p.second) {
-            // This covers 2 cases:
-            // - the precision of the return value is smaller than the largest precision
-            //   among the operands and we cannot steal from any argument,
-            // - the precision of the return value is smaller than the largest precision
-            //   among the operands, we can steal from an argument but the target argument
+            // The precision of the return value is smaller than the target precision,
+            // and either:
+            //
+            // - we cannot steal from any argument, or
+            // - we can steal from an argument but the selected argument
             //   does not have enough precision.
+            //
             // In these cases, we will just set the precision of rop and call the function.
-            // NOTE: we need to set the precision without destroying the rop, as it might
+            //
+            // NOTE: we need to set the precision without destroying the rop, as rop might
             // overlap with one of the arguments. Since this will be an increase in precision,
             // it should not entail a rounding operation.
-            // NOTE: we assume all the precs in the operands are valid, so we will not need
-            // to check them.
+            //
+            // NOTE: we assume all the precs in the operands and min_prec are valid, so
+            // we will not need to check them.
             rop.prec_round_impl<false>(p.second);
             mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
                                    args.get_mpfr_t()...);
         } else {
-            // The precision of the return value is smaller than the largest precision among the operands,
+            // The precision of the return value is smaller than the target precision,
             // and we have a candidate for stealing with enough precision: we will use it as return
             // value and then swap out the result to rop.
             mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(),
@@ -1335,35 +1355,60 @@ inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Ar
             swap(*p.first, rop);
         }
     }
+
     return rop;
 }
 
-// Invoke an MPFR function with arguments (arg0, args...), and store the result
-// in a value to be created by this function. If possible, this function will try
-// to re-use the storage provided by the input arguments, if one or more of these
-// arguments are rvalue references and their precision is large enough. As usual,
-// the precision of the return value will be the max precision among the operands,
-// but not less than min_prec.
+// The goal of this helper is to invoke the MPFR-like function object f with signature
+//
+// void f(mpfr_t out, const mpfr_t x0, const mpfr_t x1, ...)
+//
+// on the mpfr_t instances contained in the input real objects,
+//
+// f(rop._get_mpfr_t(), arg0.get_mpfr_t(), arg1.get_mpfr_t(), ...)
+//
+// and then return rop.
+//
+// The rop object will either be created within the helper with a precision
+// set to max(min_prec, arg0.get_prec(), arg1.get_prec(), ...),
+// or it will be one of the input arguments if it provides enough precision and
+// it is passed as a non-const rvalue reference.
+//
 // The Rnd flag controls whether to add the rounding mode (MPFR_RNDN) at the end
-// of the function arguments list or not.
+// of the MPFR-like function object arguments list or not.
+//
+// This function requires that the MPFR-like function object being called supports
+// overlapping arguments (both input and output).
 template <bool Rnd, typename F, typename Arg0, typename... Args>
 inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
 {
+    // This pair will contain:
+    //
+    // - a pointer to the largest-precision arg from which we can steal resources (may be nullptr),
+    // - the largest precision among all args and min_prec (i.e., the target precision
+    //   for the return value).
+    //
+    // It is inited with arg0's precision (but no less than min_prec), and a pointer to arg0, if arg0 is a nonconst
+    // rvalue ref (a nullptr otherwise).
     auto p = mpfr_nary_op_init_pair(min_prec, std::forward<Arg0>(arg0));
+    // Finish setting up p by examining the remaining arguments.
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
+
     if (p.first && p.first->get_prec() == p.second) {
-        // There's at least one arg we can steal from, and its precision is large enough
-        // to contain the result. Use it.
+        // We can steal from one or more args, and the precision of
+        // the largest-precision arg we can steal from matches
+        // the target precision. Use it.
         mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(),
                                args.get_mpfr_t()...);
         return std::move(*p.first);
+    } else {
+        // Either we cannot steal from any arg, or the candidate does not have
+        // enough precision. Init a new value and use it instead.
+        real retval{real::ptag{}, p.second, true};
+        mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, retval._get_mpfr_t(), arg0.get_mpfr_t(),
+                               args.get_mpfr_t()...);
+        return retval;
     }
-    // Either we cannot steal from any arg, or the candidate(s) do not have enough precision.
-    // Init a new value and use it instead.
-    real retval{real::ptag{}, p.second, true};
-    mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, retval._get_mpfr_t(), arg0.get_mpfr_t(),
-                           args.get_mpfr_t()...);
-    return retval;
 }
 
 } // namespace detail
@@ -1551,8 +1596,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real mul_2ui(T &&x, unsigned long n)
 {
-    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2ui(r, o, n, rnd); };
-    return detail::mpfr_nary_op_return_impl<true>(0, mul_2ui_wrapper, std::forward<T>(x));
+    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, mul_2ui_wrapper, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1562,8 +1607,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &mul_2ui(real &rop, T &&x, unsigned long n)
 {
-    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2ui(r, o, n, rnd); };
-    return detail::mpfr_nary_op_impl<true>(0, mul_2ui_wrapper, rop, std::forward<T>(x));
+    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, mul_2ui_wrapper, rop, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1573,8 +1618,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real mul_2si(T &&x, long n)
 {
-    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2si(r, o, n, rnd); };
-    return detail::mpfr_nary_op_return_impl<true>(0, mul_2si_wrapper, std::forward<T>(x));
+    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, mul_2si_wrapper, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1584,8 +1629,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &mul_2si(real &rop, T &&x, long n)
 {
-    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2si(r, o, n, rnd); };
-    return detail::mpfr_nary_op_impl<true>(0, mul_2si_wrapper, rop, std::forward<T>(x));
+    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, mul_2si_wrapper, rop, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1595,8 +1640,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real div_2ui(T &&x, unsigned long n)
 {
-    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2ui(r, o, n, rnd); };
-    return detail::mpfr_nary_op_return_impl<true>(0, div_2ui_wrapper, std::forward<T>(x));
+    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, div_2ui_wrapper, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1606,8 +1651,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &div_2ui(real &rop, T &&x, unsigned long n)
 {
-    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2ui(r, o, n, rnd); };
-    return detail::mpfr_nary_op_impl<true>(0, div_2ui_wrapper, rop, std::forward<T>(x));
+    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, div_2ui_wrapper, rop, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1617,8 +1662,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real div_2si(T &&x, long n)
 {
-    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2si(r, o, n, rnd); };
-    return detail::mpfr_nary_op_return_impl<true>(0, div_2si_wrapper, std::forward<T>(x));
+    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, div_2si_wrapper, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1628,8 +1673,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &div_2si(real &rop, T &&x, long n)
 {
-    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2si(r, o, n, rnd); };
-    return detail::mpfr_nary_op_impl<true>(0, div_2si_wrapper, rop, std::forward<T>(x));
+    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, div_2si_wrapper, rop, std::forward<T>(x));
 }
 
 // Detect NaN.
