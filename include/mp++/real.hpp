@@ -1327,7 +1327,14 @@ inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Ar
             rop.set_prec_impl<false>(p.second);
             mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
                                    args.get_mpfr_t()...);
-        } else if (!p.first || p.first->get_prec() != p.second) {
+        } else if (p.first && p.first->get_prec() == p.second) {
+            // The precision of the return value is smaller than the target precision,
+            // and we have a candidate for stealing with enough precision: we will use it as return
+            // value and then swap out the result to rop.
+            mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(),
+                                   args.get_mpfr_t()...);
+            swap(*p.first, rop);
+        } else {
             // The precision of the return value is smaller than the target precision,
             // and either:
             //
@@ -1346,13 +1353,6 @@ inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Ar
             rop.prec_round_impl<false>(p.second);
             mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
                                    args.get_mpfr_t()...);
-        } else {
-            // The precision of the return value is smaller than the target precision,
-            // and we have a candidate for stealing with enough precision: we will use it as return
-            // value and then swap out the result to rop.
-            mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(),
-                                   args.get_mpfr_t()...);
-            swap(*p.first, rop);
         }
     }
 
