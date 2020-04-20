@@ -146,9 +146,11 @@ TEST_CASE("real pow")
     REQUIRE(pow(r0, __uint128_t{2}) == real{9});
     REQUIRE(pow(__int128_t{3}, r1) == real{9});
     REQUIRE(pow(__uint128_t{3}, r1) == real{9});
-    REQUIRE(pow(real{3}, __int128_t{2}).get_prec() == 128);
-    REQUIRE(pow(__uint128_t{3}, real{2}).get_prec() == 128);
+    REQUIRE(pow(real{3}, __int128_t{2}).get_prec() == std::max(128, detail::nl_digits<int>() + 1));
+    REQUIRE(pow(__uint128_t{3}, real{2}).get_prec() == std::max(128, detail::nl_digits<int>() + 1));
 #endif
+
+    REQUIRE(abs(pow(1.1_r512, 1_q1 / 3) - cbrt(1.1_r512)) <= pow(2_r512, -500));
 }
 
 TEST_CASE("real sqr")

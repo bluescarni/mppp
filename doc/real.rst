@@ -33,10 +33,10 @@ The real class
 
    .. code-block:: c++
 
-      auto x = real{5,200} + real{6,150};
+      auto x = real{5, 200} + real{6, 150};
 
    the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
-   150 bits. The precision of the result ``x`` (and the precision at which the addition is computed) will be
+   150 bits. The precision of the result ``x`` will be
    the maximum precision among the two operands, that is, 200 bits.
 
    The precision of a :cpp:class:`~mppp::real` can be set at construction, or it can be changed later via functions
@@ -54,13 +54,13 @@ The real class
 
    .. code-block:: c++
 
-      mpfr_add(rop,a,b,MPFR_RNDN);
+      mpfr_add(rop, a, b, MPFR_RNDN);
 
    that writes the result of ``a + b``, rounded to nearest, into ``rop``, becomes simply
 
    .. code-block:: c++
 
-      add(rop,a,b);
+      add(rop, a, b);
 
    where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
    are allowed, unless noted otherwise. Unless otherwise specified, the :cpp:class:`~mppp::real` API always

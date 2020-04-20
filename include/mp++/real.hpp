@@ -1728,8 +1728,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &rootn_ui(real &rop, T &&op, unsigned long k)
 {
-    auto rootn_ui_wrapper = [k](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_rootn_ui(r, o, k, rnd); };
-    return detail::mpfr_nary_op_impl<true>(0, rootn_ui_wrapper, rop, std::forward<T>(op));
+    auto rootn_ui_wrapper = [k](::mpfr_t r, const ::mpfr_t o) { ::mpfr_rootn_ui(r, o, k, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, rootn_ui_wrapper, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1739,9 +1739,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real rootn_ui(T &&r, unsigned long k)
 {
-    auto rootn_ui_wrapper
-        = [k](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_rootn_ui(rop, op, k, rnd); };
-    return detail::mpfr_nary_op_return_impl<true>(0, rootn_ui_wrapper, std::forward<T>(r));
+    auto rootn_ui_wrapper = [k](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_rootn_ui(rop, op, k, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, rootn_ui_wrapper, std::forward<T>(r));
 }
 
 #endif
@@ -1760,29 +1759,97 @@ inline real &pow(real &rop, T &&op1, U &&op2)
 namespace detail
 {
 
+// real-real.
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
-inline real dispatch_pow(T &&op1, U &&op2)
+inline real dispatch_real_pow(T &&op1, U &&op2)
 {
-    return detail::mpfr_nary_op_return_impl<true>(0, ::mpfr_pow, std::forward<T>(op1), std::forward<U>(op2));
+    return mpfr_nary_op_return_impl<true>(0, ::mpfr_pow, std::forward<T>(op1), std::forward<U>(op2));
 }
 
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
-inline real dispatch_pow(T &&a, const U &x)
+// real-integer.
+template <typename T, std::size_t SSize, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_real_pow(T &&a, const integer<SSize> &n)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp = x;
-    return dispatch_pow(std::forward<T>(a), tmp);
+    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
+// real-unsigned integral.
 template <typename T, typename U,
-          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
-inline real dispatch_pow(const T &x, U &&a)
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+inline real dispatch_real_pow(T &&a, const U &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+        return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return dispatch_real_pow(std::forward<T>(a), integer<2>{n});
+    }
+}
+
+// real-signed integral.
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+inline real dispatch_real_pow(T &&a, const U &n)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+
+        return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return dispatch_real_pow(std::forward<T>(a), integer<2>{n});
+    }
+}
+
+// real-(floating point, rational, real128).
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<is_cpp_floating_point<U>, is_rational<U>
+#if defined(MPPP_WITH_QUADMATH)
+                                                                                ,
+                                                                                std::is_same<U, real128>
+#endif
+                                                                                >>::value,
+                      int> = 0>
+inline real dispatch_real_pow(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
-    return dispatch_pow(tmp, std::forward<U>(a));
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    return dispatch_real_pow(std::forward<T>(a), tmp);
+}
+
+// (everything but unsigned integral)-real.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, negation<is_cpp_unsigned_integral<T>>,
+                                  std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
+inline real dispatch_real_pow(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    return dispatch_real_pow(tmp, std::forward<U>(a));
+}
+
+// unsigned integral-real.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, is_cpp_unsigned_integral<T>,
+                                  std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
+inline real dispatch_real_pow(const T &n, U &&a)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+
+        return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<U>(a));
+    } else {
+        return dispatch_real_pow(integer<2>{n}, std::forward<U>(a));
+    }
 }
 
 } // namespace detail
@@ -1796,7 +1863,7 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 #endif
     inline real pow(T &&op1, U &&op2)
 {
-    return detail::dispatch_pow(std::forward<T>(op1), std::forward<U>(op2));
+    return detail::dispatch_real_pow(std::forward<T>(op1), std::forward<U>(op2));
 }
 
 // Squaring.
