@@ -2016,7 +2016,8 @@ template <typename T, typename U,
 inline real dispatch_atan2(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_atan2(std::forward<T>(a), tmp);
 }
 
@@ -2025,7 +2026,8 @@ template <typename T, typename U,
 inline real dispatch_atan2(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_atan2(tmp, std::forward<U>(a));
 }
 
@@ -2172,7 +2174,8 @@ template <typename T, typename U,
 inline real dispatch_gamma_inc(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_gamma_inc(std::forward<T>(a), tmp);
 }
 
@@ -2181,7 +2184,8 @@ template <typename T, typename U,
 inline real dispatch_gamma_inc(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_gamma_inc(tmp, std::forward<U>(a));
 }
 
@@ -2220,8 +2224,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &jn(real &rop, long n, T &&op)
 {
-    auto jn_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_jn(r, n, o, rnd); };
-    return detail::mpfr_nary_op_impl<true>(0, jn_wrapper, rop, std::forward<T>(op));
+    auto jn_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_jn(r, n, o, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, jn_wrapper, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2231,8 +2235,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real jn(long n, T &&r)
 {
-    auto jn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_jn(rop, n, op, rnd); };
-    return detail::mpfr_nary_op_return_impl<true>(0, jn_wrapper, std::forward<T>(r));
+    auto jn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_jn(rop, n, op, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, jn_wrapper, std::forward<T>(r));
 }
 
 MPPP_REAL_MPFR_UNARY_RETVAL(y0, ::mpfr_y0)
@@ -2249,8 +2253,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &yn(real &rop, long n, T &&op)
 {
-    auto yn_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_yn(r, n, o, rnd); };
-    return detail::mpfr_nary_op_impl<true>(0, yn_wrapper, rop, std::forward<T>(op));
+    auto yn_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_yn(r, n, o, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, yn_wrapper, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2260,8 +2264,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real yn(long n, T &&r)
 {
-    auto yn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_yn(rop, n, op, rnd); };
-    return detail::mpfr_nary_op_return_impl<true>(0, yn_wrapper, std::forward<T>(r));
+    auto yn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_yn(rop, n, op, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, yn_wrapper, std::forward<T>(r));
 }
 
 // Polylogarithms.
@@ -2313,7 +2317,8 @@ template <typename T, typename U,
 inline real dispatch_beta(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_beta(std::forward<T>(a), tmp);
 }
 
@@ -2322,7 +2327,8 @@ template <typename T, typename U,
 inline real dispatch_beta(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_beta(tmp, std::forward<U>(a));
 }
 
@@ -2371,7 +2377,8 @@ template <typename T, typename U,
 inline real dispatch_hypot(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_hypot(std::forward<T>(a), tmp);
 }
 
@@ -2380,7 +2387,8 @@ template <typename T, typename U,
 inline real dispatch_hypot(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_hypot(tmp, std::forward<U>(a));
 }
 
@@ -2429,7 +2437,8 @@ template <typename T, typename U,
 inline real dispatch_log_hypot(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_log_hypot(std::forward<T>(a), tmp);
 }
 
@@ -2438,7 +2447,8 @@ template <typename T, typename U,
 inline real dispatch_log_hypot(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_log_hypot(tmp, std::forward<U>(a));
 }
 
@@ -2484,7 +2494,8 @@ template <typename T, typename U,
 inline real dispatch_agm(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_agm(std::forward<T>(a), tmp);
 }
 
@@ -2493,7 +2504,8 @@ template <typename T, typename U,
 inline real dispatch_agm(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     return dispatch_agm(tmp, std::forward<U>(a));
 }
 

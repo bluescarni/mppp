@@ -150,6 +150,7 @@ TEST_CASE("real pow")
     REQUIRE(pow(__uint128_t{3}, real{2}).get_prec() == std::max(128, detail::nl_digits<int>() + 1));
 #endif
 
+    // Ensure that x**(1/3) is almost identical to cbrt(1.1).
     REQUIRE(abs(pow(1.1_r512, 1_q1 / 3) - cbrt(1.1_r512)) <= pow(2_r512, -500));
 }
 
