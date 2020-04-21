@@ -184,6 +184,13 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 200} + __uint128_t{10}).get_prec() == 200);
     REQUIRE((__uint128_t{10} + real{1, 200} == real{11}));
     REQUIRE((__uint128_t{10} + real{1, 200}).get_prec() == 200);
+
+    // Try also large values.
+    REQUIRE(1.23_r512 + (__int128_t{1} << 65) == 1.23_r512 + pow(2_r128, 65));
+    REQUIRE((__int128_t{1} << 65) + 1.23_r512 == 1.23_r512 + pow(2_r128, 65));
+
+    REQUIRE(1.23_r512 + (__uint128_t{1} << 65) == 1.23_r512 + pow(2_r128, 65));
+    REQUIRE((__uint128_t{1} << 65) + 1.23_r512 == 1.23_r512 + pow(2_r128, 65));
 #endif
 
     // Ensure correct precision handling if one operand (i.e., rational)

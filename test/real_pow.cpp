@@ -148,6 +148,13 @@ TEST_CASE("real pow")
     REQUIRE(pow(__uint128_t{3}, r1) == real{9});
     REQUIRE(pow(real{3}, __int128_t{2}).get_prec() == std::max(128, detail::nl_digits<int>() + 1));
     REQUIRE(pow(__uint128_t{3}, real{2}).get_prec() == std::max(128, detail::nl_digits<int>() + 1));
+
+    // Try also with large values.
+    REQUIRE(pow(1._r512, __int128_t{1} << 65) - pow(1._r512, pow(2_r128, 65)) == 0);
+    REQUIRE(pow(__int128_t{1} << 65, 1._r512) - pow(pow(2_r128, 65), 1._r512) == 0);
+
+    REQUIRE(pow(1._r512, __uint128_t{1} << 65) - pow(1._r512, pow(2_r128, 65)) == 0);
+    REQUIRE(pow(__uint128_t{1} << 65, 1._r512) - pow(pow(2_r128, 65), 1._r512) == 0);
 #endif
 
     // Ensure that x**(1/3) is almost identical to cbrt(1.1).
