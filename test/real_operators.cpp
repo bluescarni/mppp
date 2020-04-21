@@ -185,6 +185,11 @@ TEST_CASE("real binary add")
     REQUIRE((__uint128_t{10} + real{1, 200} == real{11}));
     REQUIRE((__uint128_t{10} + real{1, 200}).get_prec() == 200);
 #endif
+
+    // Ensure correct precision handling if one operand (i.e., rational)
+    // cannot be converted exactly to real.
+    REQUIRE(abs((1_r512 + 1 / 10_q1) - 1.1_r512) < pow(2_r512, -510));
+    REQUIRE(abs((1 / 10_q1 + 1_r512) - 1.1_r512) < pow(2_r512, -510));
 }
 
 TEST_CASE("real left in-place add")
