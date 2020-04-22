@@ -44,7 +44,7 @@ The real class
    the precision of a :cpp:class:`~mppp::real` is automatically deduced upon construction following a set of heuristics
    aimed at ensuring that the constructed :cpp:class:`~mppp::real` preserves the value used for initialisation,
    if possible.
-   For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
+   For instance, by default the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
    :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered by specifying explicitly
    the desired precision value.
 
@@ -1230,7 +1230,7 @@ Arithmetic
 
    .. versionadded:: 0.19
 
-   Ternary :cpp:class:`~mppp::real` primitives for exact
+   Ternary :cpp:class:`~mppp::real` primitives for
    multiplication/division by powers of 2.
 
    These functions will set *rop* to, respectively:
@@ -1239,7 +1239,6 @@ Arithmetic
    * :math:`\frac{x}{2^n}` (``div_2`` variants).
 
    The precision of the result will be equal to the precision of *x*.
-   The computation will be exact (that is, no rounding takes place).
 
    :param rop: the return value.
    :param x: the operand.
@@ -1254,7 +1253,7 @@ Arithmetic
 
    .. versionadded:: 0.19
 
-   Binary :cpp:class:`~mppp::real` primitives for exact
+   Binary :cpp:class:`~mppp::real` primitives for
    multiplication/division by powers of 2.
 
    These functions will return, respectively:
@@ -1263,7 +1262,6 @@ Arithmetic
    * :math:`\frac{x}{2^n}` (``div_2`` variants).
 
    The precision of the result will be equal to the precision of *x*.
-   The computation will be exact (that is, no rounding takes place).
 
    :param x: the operand.
    :param n: the power of 2.
@@ -1585,17 +1583,10 @@ Exponentiation
    This function will compute and return *op1* raised to the power of *op2*.
    The precision of the result will be set to the largest precision among the operands.
 
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
-   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
-   :cpp:class:`~mppp::real`.
-
    :param op1: the base.
    :param op2: the exponent.
 
    :return: *op1* raised to the power of *op2*.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
 
@@ -2459,17 +2450,10 @@ Mathematical operators
 
    The precision of the result will be set to the largest precision among the operands.
 
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
-   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
-   :cpp:class:`~mppp::real`.
-
    :param a: the first operand.
    :param b: the second operand.
 
    :return: the result of the binary operation.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. cpp:function:: template <typename U, mppp::real_in_place_op_types<U> T> T &mppp::operator+=(T &a, U &&b)
 .. cpp:function:: template <typename U, mppp::real_in_place_op_types<U> T> T &mppp::operator-=(T &a, U &&b)
