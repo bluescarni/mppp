@@ -2850,8 +2850,9 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_add(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_add(real &, const real128 &);
 #endif
 
-// NOTE: split this in two parts: for C++ types and real128, we use directly the cast
-// operator, for integer and rational we use the get() function.
+// NOTE: split this in two parts: for C++ types and real128, we use directly static_cast,
+// for integer and rational we use the get() function. The goal
+// is to produce more meaningful error messages.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
 #if defined(MPPP_WITH_QUADMATH)
@@ -2864,7 +2865,8 @@ template <typename T, typename U,
 inline void dispatch_real_in_place_add(T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     dispatch_real_in_place_add(tmp, std::forward<U>(a));
     x = static_cast<T>(tmp);
 }
@@ -2879,19 +2881,21 @@ inline void real_in_place_convert(T &x, const real &tmp, const real &a, const ch
             throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real " + a.to_string()
                                     + " with the integer " + x.to_string() + " is the non-finite value "
                                     + tmp.to_string());
+        } else {
+            // Conversion to rational can fail if the source value is not finite, or if the conversion
+            // results in overflow in the manipulation of the real exponent.
+            if (!tmp.number_p()) {
+                throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real "
+                                        + a.to_string() + " with the rational " + x.to_string()
+                                        + " is the non-finite value " + tmp.to_string());
+            }
+            // LCOV_EXCL_START
+            throw std::overflow_error("The conversion of the real " + tmp.to_string()
+                                      + " to rational during the in-place " + op + " of the real " + a.to_string()
+                                      + " with the rational " + x.to_string()
+                                      + " triggers an internal overflow condition");
+            // LCOV_EXCL_STOP
         }
-        // Conversion to rational can fail if the source value is not finite, or if the conversion
-        // results in overflow in the manipulation of the real exponent.
-        if (!tmp.number_p()) {
-            throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real " + a.to_string()
-                                    + " with the rational " + x.to_string() + " is the non-finite value "
-                                    + tmp.to_string());
-        }
-        // LCOV_EXCL_START
-        throw std::overflow_error("The conversion of the real " + tmp.to_string() + " to rational during the in-place "
-                                  + op + " of the real " + a.to_string() + " with the rational " + x.to_string()
-                                  + " triggers an internal overflow condition");
-        // LCOV_EXCL_STOP
     }
 }
 
@@ -2901,7 +2905,8 @@ template <typename T, typename U,
 inline void dispatch_real_in_place_add(T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
     dispatch_real_in_place_add(tmp, std::forward<U>(a));
     real_in_place_convert(x, tmp, a, "addition");
 }
