@@ -2959,30 +2959,201 @@ inline real operator-(T &&r)
 namespace detail
 {
 
+// real-real.
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
-inline real dispatch_binary_sub(T &&a, U &&b)
+inline real dispatch_real_binary_sub(T &&a, U &&b)
 {
     return mpfr_nary_op_return_impl<true>(0, ::mpfr_sub, std::forward<T>(a), std::forward<U>(b));
 }
 
+// real-integer.
+template <typename T, std::size_t SSize>
+inline real dispatch_real_binary_sub(T &&a, const integer<SSize> &n)
+{
+    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+
+    // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
+    // which is by definition valid because it is produced by an invocation of
+    // real_deduce_precision() (which does clamping).
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// integer-real.
+template <typename T, std::size_t SSize>
+inline real dispatch_real_binary_sub(const integer<SSize> &n, T &&a)
+{
+    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_z_sub(r, n.get_mpz_view(), o, MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// real-unsigned integral.
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
-inline real dispatch_binary_sub(T &&a, const U &x)
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+inline real dispatch_real_binary_sub(T &&a, const U &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+        return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return dispatch_real_binary_sub(std::forward<T>(a), integer<2>{n});
+    }
+}
+
+// unsigned integral-real.
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+inline real dispatch_real_binary_sub(const U &n, T &&a)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+
+        return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return dispatch_real_binary_sub(integer<2>{n}, std::forward<T>(a));
+    }
+}
+
+// real-bool.
+// NOTE: make this explicit (rather than letting bool fold into
+// the unsigned integrals overload) in order to avoid MSVC warnings.
+template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_real_binary_sub(T &&a, const bool &n)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// bool-real.
+template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_real_binary_sub(const bool &n, T &&a)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// real-signed integral.
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+inline real dispatch_real_binary_sub(T &&a, const U &n)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+
+        return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return dispatch_real_binary_sub(std::forward<T>(a), integer<2>{n});
+    }
+}
+
+// signed integral-real.
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+inline real dispatch_real_binary_sub(const U &n, T &&a)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_sub(r, static_cast<long>(n), o, MPFR_RNDN); };
+
+        return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return dispatch_real_binary_sub(integer<2>{n}, std::forward<T>(a));
+    }
+}
+
+// real-rational.
+template <typename T, std::size_t SSize>
+inline real dispatch_real_binary_sub(T &&a, const rational<SSize> &q)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_q(r, o, &qv, MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
+}
+
+// rational-real.
+template <typename T, std::size_t SSize>
+inline real dispatch_real_binary_sub(const rational<SSize> &q, T &&a)
+{
+    // NOTE: apparently there's no mpfr_q_sub() primitive.
+    return -dispatch_real_binary_sub(std::forward<T>(a), q);
+}
+
+// real-(float, double).
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
+                                  disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+                      int> = 0>
+inline real dispatch_real_binary_sub(T &&a, const U &x)
+{
+    // NOTE: the MPFR docs state that mpfr_sub_d() assumes that
+    // the radix of double is a power of 2. If we ever run into platforms
+    // for which this is not true, we can add a compile-time dispatch
+    // that uses the long double implementation instead.
+    constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
+    static_assert(!(dradix & (dradix - 1)), "mpfr_sub_d() requires the radix of the 'double' type to be a power of 2.");
+
+    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
+}
+
+// (float, double)-real.
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
+                                  disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+                      int> = 0>
+inline real dispatch_real_binary_sub(const U &x, T &&a)
+{
+    // NOTE: the MPFR docs state that mpfr_d_sub() assumes that
+    // the radix of double is a power of 2. If we ever run into platforms
+    // for which this is not true, we can add a compile-time dispatch
+    // that uses the long double implementation instead.
+    constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
+    static_assert(!(dradix & (dradix - 1)), "mpfr_d_sub() requires the radix of the 'double' type to be a power of 2.");
+
+    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_sub(r, static_cast<double>(x), o, MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
+}
+
+// real-(long double, real128)
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
+#if defined(MPPP_WITH_QUADMATH)
+                                                                                ,
+                                                                                std::is_same<U, real128>
+#endif
+                                                                                >>::value,
+                      int> = 0>
+inline real dispatch_real_binary_sub(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
-    return dispatch_binary_sub(std::forward<T>(a), tmp);
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    return dispatch_real_binary_sub(std::forward<T>(a), tmp);
 }
 
 template <typename T, typename U,
-          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
-inline real dispatch_binary_sub(const T &x, U &&a)
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
+#if defined(MPPP_WITH_QUADMATH)
+                                                                                ,
+                                                                                std::is_same<U, real128>
+#endif
+                                                                                >>::value,
+                      int> = 0>
+inline real dispatch_real_binary_sub(const U &x, T &&a)
 {
     MPPP_MAYBE_TLS real tmp;
-    tmp = x;
-    return dispatch_binary_sub(tmp, std::forward<U>(a));
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    return dispatch_real_binary_sub(tmp, std::forward<T>(a));
 }
+
 } // namespace detail
 
 // Binary subtraction.
@@ -2994,7 +3165,7 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 #endif
     inline real operator-(T &&a, U &&b)
 {
-    return detail::dispatch_binary_sub(std::forward<T>(a), std::forward<U>(b));
+    return detail::dispatch_real_binary_sub(std::forward<T>(a), std::forward<U>(b));
 }
 
 namespace detail
