@@ -3918,28 +3918,81 @@ template <typename T, typename U,
 namespace detail
 {
 
-// Common dispatch functions for comparison operators involving real.
-template <typename F, typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
-inline bool dispatch_real_comparison(const F &f, const real &a, const T &x)
+// real-real.
+MPPP_DLL_PUBLIC bool dispatch_real_equality(const real &, const real &);
+
+MPPP_DLL_PUBLIC bool dispatch_real_equality_integer_impl(const real &, const ::mpz_t);
+
+// real-integer.
+template <std::size_t SSize>
+inline bool dispatch_real_equality(const real &r, const integer<SSize> &n)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp = x;
-    return f(a.get_mpfr_t(), tmp.get_mpfr_t()) != 0;
+    return dispatch_real_equality_integer_impl(r, n.get_mpz_view());
 }
 
-template <typename F, typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
-inline bool dispatch_real_comparison(const F &f, const T &x, const real &a)
+// real-unsigned c++ integral.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_equality(const real &r, const T &n)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp = x;
-    return f(tmp.get_mpfr_t(), a.get_mpfr_t()) != 0;
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) == 0;
+        }
+    } else {
+        return dispatch_real_equality(r, integer<2>{n});
+    }
 }
 
-template <typename F>
-inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
+// NOTE: treat bool explicitly in order to avoid MSVC warnings.
+MPPP_DLL_PUBLIC bool dispatch_real_equality(const real &, bool);
+
+// real-signed c++ integral.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_equality(const real &r, const T &n)
 {
-    return f(a.get_mpfr_t(), b.get_mpfr_t()) != 0;
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) == 0;
+        }
+    } else {
+        return dispatch_real_equality(r, integer<2>{n});
+    }
 }
+
+MPPP_DLL_PUBLIC bool dispatch_real_equality_rational_impl(const real &, const ::mpq_t);
+
+// real-rational.
+template <std::size_t SSize>
+inline bool dispatch_real_equality(const real &r, const rational<SSize> &q)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_equality_rational_impl(r, &qv);
+}
+
+// real-C++ floating point.
+MPPP_DLL_PUBLIC bool dispatch_real_equality(const real &, const float &);
+MPPP_DLL_PUBLIC bool dispatch_real_equality(const real &, const double &);
+MPPP_DLL_PUBLIC bool dispatch_real_equality(const real &, const long double &);
+
+#if defined(MPPP_WITH_QUADMATH)
+
+// real-real128.
+MPPP_DLL_PUBLIC bool dispatch_real_equality(const real &, const real128 &);
+
+#endif
+
+// (anything)-real.
+template <typename T>
+inline bool dispatch_real_equality(const T &x, const real &r)
+{
+    return dispatch_real_equality(r, x);
+}
+
 } // namespace detail
 
 // Equality operator.
@@ -3951,7 +4004,7 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 #endif
     inline bool operator==(const T &a, const U &b)
 {
-    return detail::dispatch_real_comparison(::mpfr_equal_p, a, b);
+    return detail::dispatch_real_equality(a, b);
 }
 
 // Inequality operator.
@@ -3966,6 +4019,138 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
     return !(a == b);
 }
 
+namespace detail
+{
+
+// real-real.
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const real &, const real &);
+
+MPPP_DLL_PUBLIC bool dispatch_real_gt_integer_impl(const real &, const ::mpz_t);
+
+// real-integer.
+template <std::size_t SSize>
+inline bool dispatch_real_gt(const real &r, const integer<SSize> &n)
+{
+    return dispatch_real_gt_integer_impl(r, n.get_mpz_view());
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_gt_integer_impl(const ::mpz_t, const real &);
+
+// integer-real.
+template <std::size_t SSize>
+inline bool dispatch_real_gt(const integer<SSize> &n, const real &r)
+{
+    return dispatch_real_gt_integer_impl(n.get_mpz_view(), r);
+}
+
+// real-unsigned c++ integral.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_gt(const real &r, const T &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) > 0;
+        }
+    } else {
+        return dispatch_real_gt(r, integer<2>{n});
+    }
+}
+
+// unsigned c++ integral-real.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_gt(const T &n, const real &r)
+{
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) < 0;
+        }
+    } else {
+        return dispatch_real_gt(integer<2>{n}, r);
+    }
+}
+
+// NOTE: treat bool explicitly in order to avoid MSVC warnings.
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const real &, bool);
+MPPP_DLL_PUBLIC bool dispatch_real_gt(bool, const real &);
+
+// real-signed c++ integral.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_gt(const real &r, const T &n)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) > 0;
+        }
+    } else {
+        return dispatch_real_gt(r, integer<2>{n});
+    }
+}
+
+// signed c++ integral-real.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_gt(const T &n, const real &r)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) < 0;
+        }
+    } else {
+        return dispatch_real_gt(integer<2>{n}, r);
+    }
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_gt_rational_impl(const real &, const ::mpq_t);
+
+// real-rational.
+template <std::size_t SSize>
+inline bool dispatch_real_gt(const real &r, const rational<SSize> &q)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_gt_rational_impl(r, &qv);
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_gt_rational_impl(const ::mpq_t, const real &);
+
+// rational-real.
+template <std::size_t SSize>
+inline bool dispatch_real_gt(const rational<SSize> &q, const real &r)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_gt_rational_impl(&qv, r);
+}
+
+// real-C++ floating point.
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const real &, const float &);
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const real &, const double &);
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const real &, const long double &);
+
+// C++ floating point-real.
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const float &, const real &);
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const double &, const real &);
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const long double &, const real &);
+
+#if defined(MPPP_WITH_QUADMATH)
+
+// real-real128.
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const real &, const real128 &);
+
+// real128-real.
+MPPP_DLL_PUBLIC bool dispatch_real_gt(const real128 &, const real &);
+
+#endif
+
+} // namespace detail
+
 // Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
@@ -3975,8 +4160,140 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 #endif
     inline bool operator>(const T &a, const U &b)
 {
-    return detail::dispatch_real_comparison(::mpfr_greater_p, a, b);
+    return detail::dispatch_real_gt(a, b);
 }
+
+namespace detail
+{
+
+// real-real.
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const real &, const real &);
+
+MPPP_DLL_PUBLIC bool dispatch_real_gte_integer_impl(const real &, const ::mpz_t);
+
+// real-integer.
+template <std::size_t SSize>
+inline bool dispatch_real_gte(const real &r, const integer<SSize> &n)
+{
+    return dispatch_real_gte_integer_impl(r, n.get_mpz_view());
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_gte_integer_impl(const ::mpz_t, const real &);
+
+// integer-real.
+template <std::size_t SSize>
+inline bool dispatch_real_gte(const integer<SSize> &n, const real &r)
+{
+    return dispatch_real_gte_integer_impl(n.get_mpz_view(), r);
+}
+
+// real-unsigned c++ integral.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_gte(const real &r, const T &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) >= 0;
+        }
+    } else {
+        return dispatch_real_gte(r, integer<2>{n});
+    }
+}
+
+// unsigned c++ integral-real.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_gte(const T &n, const real &r)
+{
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) <= 0;
+        }
+    } else {
+        return dispatch_real_gte(integer<2>{n}, r);
+    }
+}
+
+// NOTE: treat bool explicitly in order to avoid MSVC warnings.
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const real &, bool);
+MPPP_DLL_PUBLIC bool dispatch_real_gte(bool, const real &);
+
+// real-signed c++ integral.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_gte(const real &r, const T &n)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) >= 0;
+        }
+    } else {
+        return dispatch_real_gte(r, integer<2>{n});
+    }
+}
+
+// signed c++ integral-real.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_gte(const T &n, const real &r)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) <= 0;
+        }
+    } else {
+        return dispatch_real_gte(integer<2>{n}, r);
+    }
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_gte_rational_impl(const real &, const ::mpq_t);
+
+// real-rational.
+template <std::size_t SSize>
+inline bool dispatch_real_gte(const real &r, const rational<SSize> &q)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_gte_rational_impl(r, &qv);
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_gte_rational_impl(const ::mpq_t, const real &);
+
+// rational-real.
+template <std::size_t SSize>
+inline bool dispatch_real_gte(const rational<SSize> &q, const real &r)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_gte_rational_impl(&qv, r);
+}
+
+// real-C++ floating point.
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const real &, const float &);
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const real &, const double &);
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const real &, const long double &);
+
+// C++ floating point-real.
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const float &, const real &);
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const double &, const real &);
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const long double &, const real &);
+
+#if defined(MPPP_WITH_QUADMATH)
+
+// real-real128.
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const real &, const real128 &);
+
+// real128-real.
+MPPP_DLL_PUBLIC bool dispatch_real_gte(const real128 &, const real &);
+
+#endif
+
+} // namespace detail
 
 // Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -3987,8 +4304,140 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 #endif
     inline bool operator>=(const T &a, const U &b)
 {
-    return detail::dispatch_real_comparison(::mpfr_greaterequal_p, a, b);
+    return detail::dispatch_real_gte(a, b);
 }
+
+namespace detail
+{
+
+// real-real.
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const real &, const real &);
+
+MPPP_DLL_PUBLIC bool dispatch_real_lt_integer_impl(const real &, const ::mpz_t);
+
+// real-integer.
+template <std::size_t SSize>
+inline bool dispatch_real_lt(const real &r, const integer<SSize> &n)
+{
+    return dispatch_real_lt_integer_impl(r, n.get_mpz_view());
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_lt_integer_impl(const ::mpz_t, const real &);
+
+// integer-real.
+template <std::size_t SSize>
+inline bool dispatch_real_lt(const integer<SSize> &n, const real &r)
+{
+    return dispatch_real_lt_integer_impl(n.get_mpz_view(), r);
+}
+
+// real-unsigned c++ integral.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_lt(const real &r, const T &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) < 0;
+        }
+    } else {
+        return dispatch_real_lt(r, integer<2>{n});
+    }
+}
+
+// unsigned c++ integral-real.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_lt(const T &n, const real &r)
+{
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) > 0;
+        }
+    } else {
+        return dispatch_real_lt(integer<2>{n}, r);
+    }
+}
+
+// NOTE: treat bool explicitly in order to avoid MSVC warnings.
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const real &, bool);
+MPPP_DLL_PUBLIC bool dispatch_real_lt(bool, const real &);
+
+// real-signed c++ integral.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_lt(const real &r, const T &n)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) < 0;
+        }
+    } else {
+        return dispatch_real_lt(r, integer<2>{n});
+    }
+}
+
+// signed c++ integral-real.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_lt(const T &n, const real &r)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) > 0;
+        }
+    } else {
+        return dispatch_real_lt(integer<2>{n}, r);
+    }
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_lt_rational_impl(const real &, const ::mpq_t);
+
+// real-rational.
+template <std::size_t SSize>
+inline bool dispatch_real_lt(const real &r, const rational<SSize> &q)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_lt_rational_impl(r, &qv);
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_lt_rational_impl(const ::mpq_t, const real &);
+
+// rational-real.
+template <std::size_t SSize>
+inline bool dispatch_real_lt(const rational<SSize> &q, const real &r)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_lt_rational_impl(&qv, r);
+}
+
+// real-C++ floating point.
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const real &, const float &);
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const real &, const double &);
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const real &, const long double &);
+
+// C++ floating point-real.
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const float &, const real &);
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const double &, const real &);
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const long double &, const real &);
+
+#if defined(MPPP_WITH_QUADMATH)
+
+// real-real128.
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const real &, const real128 &);
+
+// real128-real.
+MPPP_DLL_PUBLIC bool dispatch_real_lt(const real128 &, const real &);
+
+#endif
+
+} // namespace detail
 
 // Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -3999,8 +4448,140 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 #endif
     inline bool operator<(const T &a, const U &b)
 {
-    return detail::dispatch_real_comparison(::mpfr_less_p, a, b);
+    return detail::dispatch_real_lt(a, b);
 }
+
+namespace detail
+{
+
+// real-real.
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const real &, const real &);
+
+MPPP_DLL_PUBLIC bool dispatch_real_lte_integer_impl(const real &, const ::mpz_t);
+
+// real-integer.
+template <std::size_t SSize>
+inline bool dispatch_real_lte(const real &r, const integer<SSize> &n)
+{
+    return dispatch_real_lte_integer_impl(r, n.get_mpz_view());
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_lte_integer_impl(const ::mpz_t, const real &);
+
+// integer-real.
+template <std::size_t SSize>
+inline bool dispatch_real_lte(const integer<SSize> &n, const real &r)
+{
+    return dispatch_real_lte_integer_impl(n.get_mpz_view(), r);
+}
+
+// real-unsigned c++ integral.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_lte(const real &r, const T &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) <= 0;
+        }
+    } else {
+        return dispatch_real_lte(r, integer<2>{n});
+    }
+}
+
+// unsigned c++ integral-real.
+template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
+inline bool dispatch_real_lte(const T &n, const real &r)
+{
+    if (n <= nl_max<unsigned long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) >= 0;
+        }
+    } else {
+        return dispatch_real_lte(integer<2>{n}, r);
+    }
+}
+
+// NOTE: treat bool explicitly in order to avoid MSVC warnings.
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const real &, bool);
+MPPP_DLL_PUBLIC bool dispatch_real_lte(bool, const real &);
+
+// real-signed c++ integral.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_lte(const real &r, const T &n)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) <= 0;
+        }
+    } else {
+        return dispatch_real_lte(r, integer<2>{n});
+    }
+}
+
+// signed c++ integral-real.
+template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
+inline bool dispatch_real_lte(const T &n, const real &r)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (r.nan_p()) {
+            return false;
+        } else {
+            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) >= 0;
+        }
+    } else {
+        return dispatch_real_lte(integer<2>{n}, r);
+    }
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_lte_rational_impl(const real &, const ::mpq_t);
+
+// real-rational.
+template <std::size_t SSize>
+inline bool dispatch_real_lte(const real &r, const rational<SSize> &q)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_lte_rational_impl(r, &qv);
+}
+
+MPPP_DLL_PUBLIC bool dispatch_real_lte_rational_impl(const ::mpq_t, const real &);
+
+// rational-real.
+template <std::size_t SSize>
+inline bool dispatch_real_lte(const rational<SSize> &q, const real &r)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    return dispatch_real_lte_rational_impl(&qv, r);
+}
+
+// real-C++ floating point.
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const real &, const float &);
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const real &, const double &);
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const real &, const long double &);
+
+// C++ floating point-real.
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const float &, const real &);
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const double &, const real &);
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const long double &, const real &);
+
+#if defined(MPPP_WITH_QUADMATH)
+
+// real-real128.
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const real &, const real128 &);
+
+// real128-real.
+MPPP_DLL_PUBLIC bool dispatch_real_lte(const real128 &, const real &);
+
+#endif
+
+} // namespace detail
 
 // Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -4011,7 +4592,7 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 #endif
     inline bool operator<=(const T &a, const U &b)
 {
-    return detail::dispatch_real_comparison(::mpfr_lessequal_p, a, b);
+    return detail::dispatch_real_lte(a, b);
 }
 
 // Implementation of integer's assignment

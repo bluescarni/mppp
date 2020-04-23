@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <limits>
@@ -1812,6 +1813,649 @@ void dispatch_real_in_place_div(real &a, const long double &x)
 void dispatch_real_in_place_div(real &a, const real128 &x)
 {
     dispatch_real_in_place_div_generic_impl(a, x);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for equality.
+namespace detail
+{
+
+bool dispatch_real_equality(const real &x, const real &y)
+{
+    return ::mpfr_equal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
+}
+
+bool dispatch_real_equality_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) == 0;
+    }
+}
+
+bool dispatch_real_equality(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) == 0;
+    }
+}
+
+bool dispatch_real_equality_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) == 0;
+    }
+}
+
+bool dispatch_real_equality(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) == 0;
+    }
+}
+
+bool dispatch_real_equality(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) == 0;
+    }
+}
+
+bool dispatch_real_equality(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) == 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_equality(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_equality(r1, tmp);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for gt.
+namespace detail
+{
+
+bool dispatch_real_gt(const real &x, const real &y)
+{
+    return ::mpfr_greater_p(x.get_mpfr_t(), y.get_mpfr_t());
+}
+
+bool dispatch_real_gt_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) > 0;
+    }
+}
+
+bool dispatch_real_gt_integer_impl(const ::mpz_t n, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) < 0;
+    }
+}
+
+bool dispatch_real_gt(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) > 0;
+    }
+}
+
+bool dispatch_real_gt(bool b, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) < 0;
+    }
+}
+
+bool dispatch_real_gt_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) > 0;
+    }
+}
+
+bool dispatch_real_gt_rational_impl(const ::mpq_t q, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) < 0;
+    }
+}
+
+bool dispatch_real_gt(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) > 0;
+    }
+}
+
+bool dispatch_real_gt(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) > 0;
+    }
+}
+
+bool dispatch_real_gt(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) > 0;
+    }
+}
+
+bool dispatch_real_gt(const float &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) < 0;
+    }
+}
+
+bool dispatch_real_gt(const double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) < 0;
+    }
+}
+
+bool dispatch_real_gt(const long double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) < 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_gt(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_gt(r1, tmp);
+}
+
+bool dispatch_real_gt(const real128 &r1, const real &r2)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r1;
+
+    return dispatch_real_gt(tmp, r2);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for gte.
+namespace detail
+{
+
+bool dispatch_real_gte(const real &x, const real &y)
+{
+    return ::mpfr_greaterequal_p(x.get_mpfr_t(), y.get_mpfr_t());
+}
+
+bool dispatch_real_gte_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) >= 0;
+    }
+}
+
+bool dispatch_real_gte_integer_impl(const ::mpz_t n, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) <= 0;
+    }
+}
+
+bool dispatch_real_gte(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) >= 0;
+    }
+}
+
+bool dispatch_real_gte(bool b, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) <= 0;
+    }
+}
+
+bool dispatch_real_gte_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) >= 0;
+    }
+}
+
+bool dispatch_real_gte_rational_impl(const ::mpq_t q, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) <= 0;
+    }
+}
+
+bool dispatch_real_gte(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) >= 0;
+    }
+}
+
+bool dispatch_real_gte(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) >= 0;
+    }
+}
+
+bool dispatch_real_gte(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) >= 0;
+    }
+}
+
+bool dispatch_real_gte(const float &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) <= 0;
+    }
+}
+
+bool dispatch_real_gte(const double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) <= 0;
+    }
+}
+
+bool dispatch_real_gte(const long double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) <= 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_gte(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_gte(r1, tmp);
+}
+
+bool dispatch_real_gte(const real128 &r1, const real &r2)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r1;
+
+    return dispatch_real_gte(tmp, r2);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for lt.
+namespace detail
+{
+
+bool dispatch_real_lt(const real &x, const real &y)
+{
+    return ::mpfr_less_p(x.get_mpfr_t(), y.get_mpfr_t());
+}
+
+bool dispatch_real_lt_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) < 0;
+    }
+}
+
+bool dispatch_real_lt_integer_impl(const ::mpz_t n, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) > 0;
+    }
+}
+
+bool dispatch_real_lt(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) < 0;
+    }
+}
+
+bool dispatch_real_lt(bool b, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) > 0;
+    }
+}
+
+bool dispatch_real_lt_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) < 0;
+    }
+}
+
+bool dispatch_real_lt_rational_impl(const ::mpq_t q, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) > 0;
+    }
+}
+
+bool dispatch_real_lt(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) < 0;
+    }
+}
+
+bool dispatch_real_lt(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) < 0;
+    }
+}
+
+bool dispatch_real_lt(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) < 0;
+    }
+}
+
+bool dispatch_real_lt(const float &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) > 0;
+    }
+}
+
+bool dispatch_real_lt(const double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) > 0;
+    }
+}
+
+bool dispatch_real_lt(const long double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) > 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_lt(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_lt(r1, tmp);
+}
+
+bool dispatch_real_lt(const real128 &r1, const real &r2)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r1;
+
+    return dispatch_real_lt(tmp, r2);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for lte.
+namespace detail
+{
+
+bool dispatch_real_lte(const real &x, const real &y)
+{
+    return ::mpfr_lessequal_p(x.get_mpfr_t(), y.get_mpfr_t());
+}
+
+bool dispatch_real_lte_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) <= 0;
+    }
+}
+
+bool dispatch_real_lte_integer_impl(const ::mpz_t n, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) >= 0;
+    }
+}
+
+bool dispatch_real_lte(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) <= 0;
+    }
+}
+
+bool dispatch_real_lte(bool b, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) >= 0;
+    }
+}
+
+bool dispatch_real_lte_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) <= 0;
+    }
+}
+
+bool dispatch_real_lte_rational_impl(const ::mpq_t q, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) >= 0;
+    }
+}
+
+bool dispatch_real_lte(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) <= 0;
+    }
+}
+
+bool dispatch_real_lte(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) <= 0;
+    }
+}
+
+bool dispatch_real_lte(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) <= 0;
+    }
+}
+
+bool dispatch_real_lte(const float &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) >= 0;
+    }
+}
+
+bool dispatch_real_lte(const double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) >= 0;
+    }
+}
+
+bool dispatch_real_lte(const long double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) >= 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_lte(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_lte(r1, tmp);
+}
+
+bool dispatch_real_lte(const real128 &r1, const real &r2)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r1;
+
+    return dispatch_real_lte(tmp, r2);
 }
 
 #endif

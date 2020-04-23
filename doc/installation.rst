@@ -272,7 +272,9 @@ Intel compiler:
   as constant expressions. As a result, a few :cpp:class:`~mppp::real128`
   functions which are ``constexpr`` on GCC and Clang are not ``constexpr``
   when using the Intel compiler. These occurrences are marked in the API
-  reference.
+  reference. Also, the Intel compiler seems to be prone to internal
+  errors when performing ``constexpr`` computations with
+  :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`.
 
 MinGW:
 
