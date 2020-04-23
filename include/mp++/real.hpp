@@ -3387,6 +3387,24 @@ inline real dispatch_real_binary_mul(const T &n, U &&a)
     return dispatch_real_binary_mul(std::forward<U>(a), n);
 }
 
+// real-rational.
+template <typename T, std::size_t SSize>
+inline real dispatch_real_binary_mul(T &&a, const rational<SSize> &q)
+{
+    const auto qv = detail::get_mpq_view(q);
+
+    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_q(r, o, &qv, MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
+}
+
+// rational-real.
+template <typename T, std::size_t SSize>
+inline real dispatch_real_binary_mul(const rational<SSize> &q, T &&a)
+{
+    return dispatch_real_binary_mul(std::forward<T>(a), q);
+}
+
 // real-(float, double).
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
@@ -3416,16 +3434,15 @@ inline real dispatch_real_binary_mul(const T &x, U &&a)
     return dispatch_real_binary_mul(std::forward<U>(a), x);
 }
 
-// real-(long double, rational, real128)
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>, is_rational<U>
+// real-(long double, real128)
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
-                                                                          ,
-                                                                          std::is_same<U, real128>
+                                                                                ,
+                                                                                std::is_same<U, real128>
 #endif
-                                                                          >>::value,
-                int> = 0>
+                                                                                >>::value,
+                      int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3435,7 +3452,7 @@ inline real dispatch_real_binary_mul(T &&a, const U &x)
 }
 
 template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<std::is_same<T, long double>, is_rational<T>
+          enable_if_t<conjunction<disjunction<std::is_same<T, long double>
 #if defined(MPPP_WITH_QUADMATH)
                                               ,
                                               std::is_same<T, real128>
