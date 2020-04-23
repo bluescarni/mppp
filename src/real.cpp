@@ -1704,6 +1704,94 @@ void dispatch_real_in_place_mul(real &a, const real128 &x)
 
 } // namespace detail
 
+// Implementation bits for in-place division.
+namespace detail
+{
+
+void dispatch_real_in_place_div_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_z(r, o, n, MPFR_RNDN); };
+
+    // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
+    // which is by definition valid because it is produced by an invocation of
+    // real_deduce_precision() (which does clamping).
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+void dispatch_real_in_place_div(real &a, bool n)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
+void dispatch_real_in_place_div_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_q(r, o, q, MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_div_fd_impl(real &a, const T &x)
+{
+    // NOTE: the MPFR docs state that mpfr_div_d() assumes that
+    // the radix of double is a power of 2. If we ever run into platforms
+    // for which this is not true, we can add a compile-time dispatch
+    // that uses the long double implementation instead.
+    constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
+    static_assert(!(dradix & (dradix - 1)), "mpfr_div_d() requires the radix of the 'double' type to be a power of 2.");
+
+    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
+}
+
+} // namespace
+
+void dispatch_real_in_place_div(real &a, const float &x)
+{
+    dispatch_real_in_place_div_fd_impl(a, x);
+}
+
+void dispatch_real_in_place_div(real &a, const double &x)
+{
+    dispatch_real_in_place_div_fd_impl(a, x);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_div_generic_impl(real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    dispatch_real_in_place_div(a, tmp);
+}
+
+} // namespace
+
+void dispatch_real_in_place_div(real &a, const long double &x)
+{
+    dispatch_real_in_place_div_generic_impl(a, x);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+void dispatch_real_in_place_div(real &a, const real128 &x)
+{
+    dispatch_real_in_place_div_generic_impl(a, x);
+}
+
+#endif
+
+} // namespace detail
+
 // Three-way comparison.
 int cmp(const real &a, const real &b)
 {

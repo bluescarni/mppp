@@ -1364,7 +1364,19 @@ TEST_CASE("real binary div")
     REQUIRE((real{1, 200} / __uint128_t{10}).get_prec() == 200);
     REQUIRE((__uint128_t{10} / real{2, 200} == real{5}));
     REQUIRE((__uint128_t{10} / real{1, 200}).get_prec() == 200);
+
+    // Try also large values.
+    REQUIRE(1.23_r512 / (__int128_t{1} << 65) == 1.23_r512 / pow(2_r128, 65));
+    REQUIRE((__int128_t{1} << 65) / 1.23_r512 == pow(2_r128, 65) / 1.23_r512);
+
+    REQUIRE(1.23_r512 / (__uint128_t{1} << 65) == 1.23_r512 / pow(2_r128, 65));
+    REQUIRE((__uint128_t{1} << 65) / 1.23_r512 == pow(2_r128, 65) / 1.23_r512);
 #endif
+
+    // Ensure correct precision handling if one operand (i.e., rational)
+    // cannot be converted exactly to real.
+    REQUIRE(abs((1_r512 / (1 / 10_q1)) - 10_r512) < pow(2_r512, -510));
+    REQUIRE(abs(((1 / 10_q1) / 1_r512) - .1_r512) < pow(2_r512, -510));
 }
 
 TEST_CASE("real left in-place div")
@@ -1439,6 +1451,10 @@ TEST_CASE("real left in-place div")
     r0 /= rat_t{123};
     REQUIRE(r0 == 1 / real{rat_t{123}});
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 2);
+
+    r0 = -1_r512;
+    r0 /= 1 / 10_q1;
+    REQUIRE(abs(r0 + 10_r512) <= pow(2_r512, -500));
 #if defined(MPPP_WITH_QUADMATH)
     r0 = real{1, real_prec_min()};
     r0 /= real128{123};
@@ -1451,6 +1467,15 @@ TEST_CASE("real left in-place div")
     REQUIRE(r0.get_prec() == 128);
     r0 = real{-1};
     REQUIRE((r0 /= __uint128_t{2}) == 1 / real{-2});
+    REQUIRE(r0.get_prec() == 128);
+
+    // Try also large values.
+    r0 = real{1};
+    REQUIRE((r0 /= (__int128_t{1}) << 65) == pow(2_r128, -65));
+    REQUIRE(r0.get_prec() == 128);
+
+    r0 = real{1};
+    REQUIRE((r0 /= (__uint128_t{1}) << 65) == pow(2_r128, -65));
     REQUIRE(r0.get_prec() == 128);
 #endif
 
@@ -1550,6 +1575,10 @@ TEST_CASE("real right in-place div")
         n = 1;
         REQUIRE_THROWS_AS((n /= real{0, 5}), std::domain_error);
         REQUIRE(n == 1);
+
+        n = -1 / 10_q1;
+        n /= 10_r512;
+        REQUIRE(abs(n + 0.01_r512) <= pow(2_r512, -500));
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
