@@ -1528,6 +1528,19 @@ void dispatch_real_in_place_add(real &a, const real128 &x)
 
 } // namespace detail
 
+real &operator++(real &x)
+{
+    ::mpfr_add_ui(x._get_mpfr_t(), x.get_mpfr_t(), 1ul, MPFR_RNDN);
+    return x;
+}
+
+real operator++(real &x, int)
+{
+    auto retval(x);
+    ++x;
+    return retval;
+}
+
 // Implementation bits for in-place subtraction.
 namespace detail
 {
@@ -1615,6 +1628,19 @@ void dispatch_real_in_place_sub(real &a, const real128 &x)
 #endif
 
 } // namespace detail
+
+real &operator--(real &x)
+{
+    ::mpfr_sub_ui(x._get_mpfr_t(), x.get_mpfr_t(), 1ul, MPFR_RNDN);
+    return x;
+}
+
+real operator--(real &x, int)
+{
+    auto retval(x);
+    --x;
+    return retval;
+}
 
 // Implementation bits for in-place multiplication.
 namespace detail

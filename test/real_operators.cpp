@@ -1880,4 +1880,15 @@ TEST_CASE("real incdec")
     REQUIRE(--r0 == 1);
     REQUIRE(r0-- == 1);
     REQUIRE(r0.zero_p());
+
+    // Check precision handling.
+    r0 = real{0, 12};
+    ++r0;
+    REQUIRE(r0.get_prec() == 12);
+    r0++;
+    REQUIRE(r0.get_prec() == 12);
+    --r0;
+    REQUIRE(r0.get_prec() == 12);
+    r0--;
+    REQUIRE(r0.get_prec() == 12);
 }

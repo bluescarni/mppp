@@ -2481,21 +2481,19 @@ Mathematical operators
       a = static_cast<T>(a * b);
       a = static_cast<T>(a / b);
 
-   That is, the operation is performed via the corresponding binary operator
-   and the result is assigned back to *a*, after a conversion if necessary.
-
    :param a: the first operand.
    :param b: the second operand.
 
    :return: a reference to *a*.
 
-   :exception unspecified: any exception thrown by the corresponding binary operator,
-     or by the generic conversion operator of :cpp:class:`~mppp::real`.
+   :exception unspecified: any exception thrown by the generic conversion operator of :cpp:class:`~mppp::real`.
 
 .. cpp:function:: mppp::real &mppp::operator++(mppp::real &x)
 .. cpp:function:: mppp::real &mppp::operator--(mppp::real &x)
 
    Prefix increment/decrement.
+
+   The precision of *x* will not be altered by the increment/decrement.
 
    :param x: the input argument.
 
@@ -2505,6 +2503,8 @@ Mathematical operators
 .. cpp:function:: mppp::real mppp::operator--(mppp::real &x, int)
 
    Suffix increment/decrement.
+
+   The precision of *x* will not be altered by the increment/decrement.
 
    :param x: the input argument.
 

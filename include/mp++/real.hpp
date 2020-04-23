@@ -2733,7 +2733,7 @@ inline real dispatch_real_binary_add(const T &x, U &&a)
     return dispatch_real_binary_add(std::forward<U>(a), x);
 }
 
-// real-(long double, real128)
+// real-(long double, real128).
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
@@ -2750,6 +2750,7 @@ inline real dispatch_real_binary_add(T &&a, const U &x)
     return dispatch_real_binary_add(std::forward<T>(a), tmp);
 }
 
+// (long double, real128)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<std::is_same<T, long double>
 #if defined(MPPP_WITH_QUADMATH)
@@ -2850,6 +2851,7 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_add(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_add(real &, const real128 &);
 #endif
 
+// (c++ arithmetic, real128)-real.
 // NOTE: split this in two parts: for C++ types and real128, we use directly static_cast,
 // for integer and rational we use the get() function. The goal
 // is to produce more meaningful error messages.
@@ -2899,6 +2901,7 @@ inline void real_in_place_convert(T &x, const real &tmp, const real &a, const ch
     }
 }
 
+// (integer, rational)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
                       int> = 0>
@@ -2930,18 +2933,10 @@ template <typename T, typename U,
 }
 
 // Prefix increment.
-inline real &operator++(real &x)
-{
-    return x += 1;
-}
+MPPP_DLL_PUBLIC real &operator++(real &);
 
 // Suffix increment.
-inline real operator++(real &x, int)
-{
-    auto retval(x);
-    ++x;
-    return retval;
-}
+MPPP_DLL_PUBLIC real operator++(real &, int);
 
 // Negated copy.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -3121,7 +3116,7 @@ inline real dispatch_real_binary_sub(const U &x, T &&a)
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
 
-// real-(long double, real128)
+// real-(long double, real128).
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
@@ -3138,6 +3133,7 @@ inline real dispatch_real_binary_sub(T &&a, const U &x)
     return dispatch_real_binary_sub(std::forward<T>(a), tmp);
 }
 
+// (long double, real128)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
@@ -3240,6 +3236,7 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_sub(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_sub(real &, const real128 &);
 #endif
 
+// (c++ arithmetic, real128)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
 #if defined(MPPP_WITH_QUADMATH)
@@ -3258,6 +3255,7 @@ inline void dispatch_real_in_place_sub(T &x, U &&a)
     x = static_cast<T>(tmp);
 }
 
+// (integer, rational)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
                       int> = 0>
@@ -3289,18 +3287,10 @@ template <typename T, typename U,
 }
 
 // Prefix decrement.
-inline real &operator--(real &x)
-{
-    return x -= 1;
-}
+MPPP_DLL_PUBLIC real &operator--(real &);
 
 // Suffix decrement.
-inline real operator--(real &x, int)
-{
-    auto retval(x);
-    --x;
-    return retval;
-}
+MPPP_DLL_PUBLIC real operator--(real &, int);
 
 namespace detail
 {
@@ -3434,7 +3424,7 @@ inline real dispatch_real_binary_mul(const T &x, U &&a)
     return dispatch_real_binary_mul(std::forward<U>(a), x);
 }
 
-// real-(long double, real128)
+// real-(long double, real128).
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
@@ -3451,6 +3441,7 @@ inline real dispatch_real_binary_mul(T &&a, const U &x)
     return dispatch_real_binary_mul(std::forward<T>(a), tmp);
 }
 
+// (long double, real128)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<std::is_same<T, long double>
 #if defined(MPPP_WITH_QUADMATH)
@@ -3551,6 +3542,7 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_mul(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_mul(real &, const real128 &);
 #endif
 
+// (c++ arithmetic, real128)-real.
 // NOTE: split this in two parts: for C++ types and real128, we use directly static_cast,
 // for integer and rational we use the get() function. The goal
 // is to produce more meaningful error messages.
@@ -3572,6 +3564,7 @@ inline void dispatch_real_in_place_mul(T &x, U &&a)
     x = static_cast<T>(tmp);
 }
 
+// (integer, rational)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
                       int> = 0>
@@ -3770,7 +3763,7 @@ inline real dispatch_real_binary_div(const U &x, T &&a)
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
 
-// real-(long double, real128)
+// real-(long double, real128).
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
@@ -3872,6 +3865,7 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_div(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_div(real &, const real128 &);
 #endif
 
+// (c++ arithmetic, real128)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
 #if defined(MPPP_WITH_QUADMATH)
@@ -3890,6 +3884,7 @@ inline void dispatch_real_in_place_div(T &x, U &&a)
     x = static_cast<T>(tmp);
 }
 
+// (integer, rational)-real.
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
                       int> = 0>
