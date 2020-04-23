@@ -1650,6 +1650,12 @@ TEST_CASE("real eqineq")
     REQUIRE(!(1.l == real{"nan", 5}));
     REQUIRE((real{"nan", 5} != 1.));
     REQUIRE((1.f != real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(std::numeric_limits<double>::quiet_NaN() != real{"nan", 5});
+        REQUIRE(real{"nan", 5} != std::numeric_limits<double>::quiet_NaN());
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() == real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} == std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE(!(real{} != int_t{0}));
     REQUIRE(rat_t{1u} == real{1});
@@ -1674,6 +1680,10 @@ TEST_CASE("real eqineq")
     REQUIRE(!(real128{1} == real{"nan", 5}));
     REQUIRE((real{"nan", 5} != real128{1ul}));
     REQUIRE((real128{1l} != real{"nan", 5}));
+    REQUIRE(real{"nan", 5} != real128{"nan"});
+    REQUIRE(real128{"nan"} != real{"nan", 5});
+    REQUIRE(!(real{"nan", 5} == real128{"nan"}));
+    REQUIRE(!(real128{"nan"} == real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{-1} == __int128_t{-1});
@@ -1684,6 +1694,14 @@ TEST_CASE("real eqineq")
     REQUIRE(__int128_t{-1} != real{-2});
     REQUIRE(real{2} != __uint128_t{3});
     REQUIRE(__uint128_t{2} != real{3});
+    REQUIRE(pow(2_r128, 65) == (__uint128_t{1} << 65));
+    REQUIRE((__uint128_t{1} << 65) == pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) == (__int128_t{1} << 65));
+    REQUIRE((__int128_t{1} << 65) == pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) != (__uint128_t{1} << 65) + 1u);
+    REQUIRE((__uint128_t{1} << 65) + 1u != pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) != (__int128_t{1} << 65) + 1);
+    REQUIRE((__int128_t{1} << 65) + 1 != pow(2_r128, 65));
 #endif
 }
 
@@ -1712,6 +1730,10 @@ TEST_CASE("real lt")
     REQUIRE(!(real{"inf", 64} < 45.));
     REQUIRE(!(real{"nan", 5} < 1.));
     REQUIRE(!(1.l < real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() < real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} < std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE((rat_t{0u} < real{1}));
     REQUIRE(!(real{2} < rat_t{1ull}));
@@ -1724,12 +1746,18 @@ TEST_CASE("real lt")
     REQUIRE(!(real{"inf", 64} < real128{45}));
     REQUIRE(!(real{"nan", 5} < real128{1}));
     REQUIRE(!(real128{1} < real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} < real128{"nan"}));
+    REQUIRE(!(real128{"nan"} < real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{-2} < __int128_t{-1});
     REQUIRE(__int128_t{-2} < real{-1});
     REQUIRE(real{2} < __uint128_t{3});
     REQUIRE(__uint128_t{2} < real{3});
+    REQUIRE(pow(2_r128, 65) < (__uint128_t{1} << 65) + 1u);
+    REQUIRE((__uint128_t{1} << 65) < pow(2_r128, 65) + 1);
+    REQUIRE(pow(2_r128, 65) < (__int128_t{1} << 65) + 1);
+    REQUIRE((__int128_t{1} << 65) < pow(2_r128, 65) + 1);
 #endif
 }
 
@@ -1758,6 +1786,10 @@ TEST_CASE("real lte")
     REQUIRE(!(real{"inf", 64} <= 45.));
     REQUIRE(!(real{"nan", 5} <= 1.));
     REQUIRE(!(1.l <= real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() <= real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} <= std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE((rat_t{0u} <= real{1}));
     REQUIRE(!(real{2} <= rat_t{1ull}));
@@ -1770,12 +1802,18 @@ TEST_CASE("real lte")
     REQUIRE(!(real{"inf", 64} <= real128{45}));
     REQUIRE(!(real{"nan", 5} <= real128{1}));
     REQUIRE(!(real128{1} <= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} <= real128{"nan"}));
+    REQUIRE(!(real128{"nan"} <= real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{-2} <= __int128_t{-1});
     REQUIRE(__int128_t{-2} <= real{-2});
     REQUIRE(real{2} <= __uint128_t{3});
     REQUIRE(__uint128_t{3} <= real{3});
+    REQUIRE(pow(2_r128, 65) <= (__uint128_t{1} << 65) + 1u);
+    REQUIRE((__uint128_t{1} << 65) <= pow(2_r128, 65) + 1);
+    REQUIRE(pow(2_r128, 65) <= (__int128_t{1} << 65) + 1);
+    REQUIRE((__int128_t{1} << 65) <= pow(2_r128, 65) + 1);
 #endif
 }
 
@@ -1804,6 +1842,10 @@ TEST_CASE("real gt")
     REQUIRE((real{"inf", 64} > 45.));
     REQUIRE(!(real{"nan", 5} > 1.));
     REQUIRE(!(1.l > real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() > real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} > std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE(!(rat_t{0u} > real{1}));
     REQUIRE((real{2} > rat_t{1ull}));
@@ -1816,12 +1858,18 @@ TEST_CASE("real gt")
     REQUIRE((real{"inf", 64} > real128{45}));
     REQUIRE(!(real{"nan", 5} > real128{1}));
     REQUIRE(!(real128{1} > real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} > real128{"nan"}));
+    REQUIRE(!(real128{"nan"} > real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{2} > __int128_t{-1});
     REQUIRE(__int128_t{2} > real{-1});
     REQUIRE(real{5} > __uint128_t{3});
     REQUIRE(__uint128_t{5} > real{2});
+    REQUIRE(pow(2_r128, 65) + 1 > (__uint128_t{1} << 65));
+    REQUIRE((__uint128_t{1} << 65) + 1 > pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) + 1 > (__int128_t{1} << 65));
+    REQUIRE((__int128_t{1} << 65) + 1 > pow(2_r128, 65));
 #endif
 }
 
@@ -1850,6 +1898,10 @@ TEST_CASE("real gte")
     REQUIRE((real{"inf", 64} >= 45.));
     REQUIRE(!(real{"nan", 5} >= 1.));
     REQUIRE(!(1.l >= real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() >= real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} >= std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE(!(rat_t{0u} >= real{1}));
     REQUIRE((real{2} >= rat_t{1ull}));
@@ -1862,12 +1914,18 @@ TEST_CASE("real gte")
     REQUIRE((real{"inf", 64} >= real128{45}));
     REQUIRE(!(real{"nan", 5} >= real128{1}));
     REQUIRE(!(real128{1} >= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} >= real128{"nan"}));
+    REQUIRE(!(real128{"nan"} >= real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{2} >= __int128_t{-1});
     REQUIRE(__int128_t{2} >= real{2});
     REQUIRE(real{5} >= __uint128_t{3});
     REQUIRE(__uint128_t{5} >= real{5});
+    REQUIRE(pow(2_r128, 65) + 1 >= (__uint128_t{1} << 65));
+    REQUIRE((__uint128_t{1} << 65) + 1 >= pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) + 1 >= (__int128_t{1} << 65));
+    REQUIRE((__int128_t{1} << 65) + 1 >= pow(2_r128, 65));
 #endif
 }
 
