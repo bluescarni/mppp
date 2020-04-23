@@ -1904,7 +1904,7 @@ namespace detail
 
 bool dispatch_real_gt(const real &x, const real &y)
 {
-    return ::mpfr_greater_p(x.get_mpfr_t(), y.get_mpfr_t());
+    return ::mpfr_greater_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
 }
 
 bool dispatch_real_gt_integer_impl(const real &r, const ::mpz_t n)
@@ -2045,7 +2045,7 @@ namespace detail
 
 bool dispatch_real_gte(const real &x, const real &y)
 {
-    return ::mpfr_greaterequal_p(x.get_mpfr_t(), y.get_mpfr_t());
+    return ::mpfr_greaterequal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
 }
 
 bool dispatch_real_gte_integer_impl(const real &r, const ::mpz_t n)
@@ -2186,7 +2186,7 @@ namespace detail
 
 bool dispatch_real_lt(const real &x, const real &y)
 {
-    return ::mpfr_less_p(x.get_mpfr_t(), y.get_mpfr_t());
+    return ::mpfr_less_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
 }
 
 bool dispatch_real_lt_integer_impl(const real &r, const ::mpz_t n)
@@ -2327,7 +2327,7 @@ namespace detail
 
 bool dispatch_real_lte(const real &x, const real &y)
 {
-    return ::mpfr_lessequal_p(x.get_mpfr_t(), y.get_mpfr_t());
+    return ::mpfr_lessequal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
 }
 
 bool dispatch_real_lte_integer_impl(const real &r, const ::mpz_t n)
