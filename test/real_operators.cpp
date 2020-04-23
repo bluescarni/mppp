@@ -1065,6 +1065,10 @@ TEST_CASE("real left in-place mul")
     r0 *= rat_t{123};
     REQUIRE(r0 == real{rat_t{123}});
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 2);
+
+    r0 = 1_r512;
+    r0 *= 1 / 10_q1;
+    REQUIRE(abs(r0 - .1_r512) <= pow(2_r512, -500));
 #if defined(MPPP_WITH_QUADMATH)
     r0 = real{1, real_prec_min()};
     r0 *= real128{123};
@@ -1077,6 +1081,15 @@ TEST_CASE("real left in-place mul")
     REQUIRE(r0.get_prec() == 128);
     r0 = real{-1};
     REQUIRE((r0 *= __uint128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 128);
+
+    // Try also large values.
+    r0 = real{1, 32};
+    REQUIRE((r0 *= (__int128_t{1}) << 65) == pow(2_r128, 65));
+    REQUIRE(r0.get_prec() == 128);
+
+    r0 = real{1, 32};
+    REQUIRE((r0 *= (__uint128_t{1}) << 65) == pow(2_r128, 65));
     REQUIRE(r0.get_prec() == 128);
 #endif
 
@@ -1187,6 +1200,10 @@ TEST_CASE("real right in-place mul")
         n = 1;
         REQUIRE_THROWS_AS((n *= real{"inf", 5}), std::domain_error);
         REQUIRE(n == 1);
+
+        n = 1 / 10_q1;
+        n *= 1_r512;
+        REQUIRE(abs(n - .1_r512) <= pow(2_r512, -500));
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
