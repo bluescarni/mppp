@@ -976,7 +976,19 @@ TEST_CASE("real binary mul")
     REQUIRE((real{1, 200} * __uint128_t{10}).get_prec() == 200);
     REQUIRE((__uint128_t{10} * real{1, 200} == real{10}));
     REQUIRE((__uint128_t{10} * real{1, 200}).get_prec() == 200);
+
+    // Try also large values.
+    REQUIRE(1.23_r512 * (__int128_t{1} << 65) == 1.23_r512 * pow(2_r128, 65));
+    REQUIRE((__int128_t{1} << 65) * 1.23_r512 == 1.23_r512 * pow(2_r128, 65));
+
+    REQUIRE(1.23_r512 * (__uint128_t{1} << 65) == 1.23_r512 * pow(2_r128, 65));
+    REQUIRE((__uint128_t{1} << 65) * 1.23_r512 == 1.23_r512 * pow(2_r128, 65));
 #endif
+
+    // Ensure correct precision handling if one operand (i.e., rational)
+    // cannot be converted exactly to real.
+    REQUIRE(abs((1_r512 * (1 / 10_q1)) - 0.1_r512) < pow(2_r512, -510));
+    REQUIRE(abs(((1 / 10_q1) * 1_r512) - 0.1_r512) < pow(2_r512, -510));
 }
 
 TEST_CASE("real left in-place mul")
