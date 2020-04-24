@@ -28,24 +28,23 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ------------------------------------------------------------------------------------------
 
-if(FLINT_INCLUDE_DIR AND FLINT_LIBRARY)
+if(MPPP_ARB_INCLUDE_DIR AND MPPP_ARB_LIBRARY)
     # Already in cache, be silent
-    set(FLINT_FIND_QUIETLY TRUE)
+    set(mp++_Arb_FIND_QUIETLY TRUE)
 endif()
 
-find_path(FLINT_INCLUDE_DIR NAMES flint/flint.h)
-find_library(FLINT_LIBRARY NAMES flint)
+find_path(MPPP_ARB_INCLUDE_DIR NAMES arb.h)
+find_library(MPPP_ARB_LIBRARY NAMES arb)
 
 include(FindPackageHandleStandardArgs)
 
-find_package_handle_standard_args(FLINT DEFAULT_MSG FLINT_INCLUDE_DIR FLINT_LIBRARY)
+find_package_handle_standard_args(mp++_Arb DEFAULT_MSG MPPP_ARB_INCLUDE_DIR MPPP_ARB_LIBRARY)
 
-mark_as_advanced(FLINT_INCLUDE_DIR FLINT_LIBRARY)
+mark_as_advanced(MPPP_ARB_INCLUDE_DIR MPPP_ARB_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(FLINT_FOUND AND NOT TARGET FLINT::FLINT)
-    add_library(FLINT::FLINT UNKNOWN IMPORTED)
-    set_target_properties(FLINT::FLINT PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${FLINT_INCLUDE_DIR}"
-        IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-        IMPORTED_LOCATION "${FLINT_LIBRARY}")
+if(mp++_Arb_FOUND AND NOT TARGET mp++::Arb)
+    add_library(mp++::Arb UNKNOWN IMPORTED)
+    set_target_properties(mp++::Arb PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPPP_ARB_INCLUDE_DIR}"
+        IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "${MPPP_ARB_LIBRARY}")
 endif()

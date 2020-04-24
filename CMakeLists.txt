@@ -287,20 +287,20 @@ target_include_directories(mp++ PUBLIC
 # Find GMP first of all. We will make mp++ link to the imported
 # target later, because of linker sensitivity to the linking order
 # on some platforms (see the comment below).
-find_package(GMP REQUIRED)
+find_package(mp++_GMP REQUIRED)
 
 # Optional dependency on MPFR.
 if(MPPP_WITH_MPFR)
-    find_package(MPFR REQUIRED)
-    target_link_libraries(mp++ PUBLIC MPFR::MPFR)
+    find_package(mp++_MPFR REQUIRED)
+    target_link_libraries(mp++ PUBLIC mp++::MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
 
 # Optional dependency on Arb.
 if(MPPP_WITH_ARB)
-    find_package(FLINT REQUIRED)
-    find_package(Arb REQUIRED)
-    target_link_libraries(mp++ PRIVATE Arb::Arb FLINT::FLINT)
+    find_package(mp++_FLINT REQUIRED)
+    find_package(mp++_Arb REQUIRED)
+    target_link_libraries(mp++ PRIVATE mp++::Arb mp++::FLINT)
     set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
 endif()
 
@@ -312,19 +312,15 @@ if(MPPP_WITH_QUADMATH)
         message(FATAL_ERROR "The 'MPPP_WITH_QUADMATH' option was enabled but the '__float128' type does not exist.")
     endif()
     unset(_MPPP_FLOAT128_EXISTS)
-    find_package(Quadmath REQUIRED COMPONENTS libquadmath header)
-    # NOTE: both the header and the library functions are used
-    # only within libmp++. Thus, consumers of mp++ won't
-    # need to link to them.
-    target_link_libraries(mp++ PRIVATE Quadmath::libquadmath)
-    target_link_libraries(mp++ PRIVATE Quadmath::header)
+    find_package(mp++_quadmath REQUIRED)
+    target_link_libraries(mp++ PRIVATE mp++::quadmath)
     set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
 endif()
 
 # Mandatory dependency on GMP.
 # NOTE: depend on GMP *after* optionally depending on MPFR, as the order
 # of the libraries matters on some platforms.
-target_link_libraries(mp++ PUBLIC GMP::GMP)
+target_link_libraries(mp++ PUBLIC mp++::GMP)
 
 # Configure config.hpp.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" @ONLY)
@@ -347,13 +343,13 @@ install(TARGETS mp++
 # Setup of the optional deps.
 set(_MPPP_CONFIG_OPTIONAL_DEPS)
 if(MPPP_WITH_MPFR)
-    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(MPFR REQUIRED)\n")
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(mp++_MPFR REQUIRED)\n")
 endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findmp++_GMP.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findmp++_MPFR.cmake"
     DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 # Take care of versioning.
