@@ -1785,11 +1785,7 @@ Trigonometry
    Binary arctangent-2.
 
    This function will compute and return the arctangent-2 of *y* and *x*.
-
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
-   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`.
+   The precision of the result will be set to the largest precision among the operands.
 
    :param y: the sine argument.
    :param x: the cosine argument.
@@ -2003,11 +1999,7 @@ Logarithms and exponentials
    Binary log hypot function.
 
    This function will compute and return :math:`\log\left(\sqrt{x^2+y^2}\right)`.
-
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
-   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`.
+   The precision of the result will be set to the largest precision among the operands.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2122,11 +2114,7 @@ Gamma functions
    Binary incomplete Gamma function.
 
    This function will compute and return the upper incomplete Gamma function of *x* and *y*.
-
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
-   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`.
+   The precision of the result will be set to the largest precision among the operands.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2293,11 +2281,7 @@ Other special functions
    Binary beta function.
 
    This function will compute and return the beta function of *x* and *y*.
-
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
-   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`.
+   The precision of the result will be set to the largest precision among the operands.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2324,11 +2308,7 @@ Other special functions
    Binary hypot function.
 
    This function will compute and return :math:`\sqrt{x^2+y^2}`.
-
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
-   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`.
+   The precision of the result will be set to the largest precision among the operands.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2355,11 +2335,7 @@ Other special functions
    Binary AGM.
 
    This function will compute and return the arithmetic-geometric mean of *x* and *y*.
-
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
-   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
-   operator of :cpp:class:`~mppp::real`.
+   The precision of the result will be set to the largest precision among the operands.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -2530,24 +2506,16 @@ Mathematical operators
 
    and ``false`` otherwise.
 
-   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
-   The conversion of non-:cpp:class:`~mppp::real` operands
-   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
-   :cpp:class:`~mppp::real`.
+   The comparisons are always exact (i.e., no rounding is involved).
 
-   .. note::
-
-      These operators handle NaN in the same way specified by the IEEE floating-point
-      standard. :ref:`Alternative comparison functions <real_comparison>` treating NaN
-      specially are available.
+   These operators handle NaN in the same way specified by the IEEE floating-point
+   standard. :ref:`Alternative comparison functions <real_comparison>` treating NaN
+   specially are available.
 
    :param a: the first operand.
    :param b: the second operand.
 
    :return: the result of the comparison.
-
-   :exception unspecified: any exception thrown by the generic assignment operator
-     of :cpp:class:`~mppp::real`.
 
 .. _real_constants:
 

@@ -36,6 +36,9 @@ New
 Changes
 ~~~~~~~
 
+- Improve the interoperability between mp++ classes
+  via additional assignment operators
+  (`#229 <https://github.com/bluescarni/mppp/pull/229>`__).
 - For consistency with C++20, mp++'s concepts now
   use snake case notation. The concept hierarchy has also been
   simplified and streamlined
