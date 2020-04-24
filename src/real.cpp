@@ -11,8 +11,10 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -1438,6 +1440,1027 @@ real &real::trunc()
     detail::real_check_trunc_arg(*this);
     return self_mpfr_unary_nornd(::mpfr_trunc);
 }
+
+// Implementation bits for in-place addition.
+namespace detail
+{
+
+void dispatch_real_in_place_add_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_z(r, o, n, MPFR_RNDN); };
+
+    // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
+    // which is by definition valid because it is produced by an invocation of
+    // real_deduce_precision() (which does clamping).
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+void dispatch_real_in_place_add(real &a, bool n)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
+void dispatch_real_in_place_add_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_q(r, o, q, MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_add_fd_impl(real &a, const T &x)
+{
+    // NOTE: the MPFR docs state that mpfr_add_d() assumes that
+    // the radix of double is a power of 2. If we ever run into platforms
+    // for which this is not true, we can add a compile-time dispatch
+    // that uses the long double implementation instead.
+    constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
+    static_assert(!(dradix & (dradix - 1)), "mpfr_add_d() requires the radix of the 'double' type to be a power of 2.");
+
+    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
+}
+
+} // namespace
+
+void dispatch_real_in_place_add(real &a, const float &x)
+{
+    dispatch_real_in_place_add_fd_impl(a, x);
+}
+
+void dispatch_real_in_place_add(real &a, const double &x)
+{
+    dispatch_real_in_place_add_fd_impl(a, x);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_add_generic_impl(real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    dispatch_real_in_place_add(a, tmp);
+}
+
+} // namespace
+
+void dispatch_real_in_place_add(real &a, const long double &x)
+{
+    dispatch_real_in_place_add_generic_impl(a, x);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+void dispatch_real_in_place_add(real &a, const real128 &x)
+{
+    dispatch_real_in_place_add_generic_impl(a, x);
+}
+
+#endif
+
+} // namespace detail
+
+real &operator++(real &x)
+{
+    ::mpfr_add_ui(x._get_mpfr_t(), x.get_mpfr_t(), 1ul, MPFR_RNDN);
+    return x;
+}
+
+real operator++(real &x, int)
+{
+    auto retval(x);
+    ++x;
+    return retval;
+}
+
+// Implementation bits for in-place subtraction.
+namespace detail
+{
+
+void dispatch_real_in_place_sub_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_z(r, o, n, MPFR_RNDN); };
+
+    // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
+    // which is by definition valid because it is produced by an invocation of
+    // real_deduce_precision() (which does clamping).
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+void dispatch_real_in_place_sub(real &a, bool n)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
+void dispatch_real_in_place_sub_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_q(r, o, q, MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_sub_fd_impl(real &a, const T &x)
+{
+    // NOTE: the MPFR docs state that mpfr_sub_d() assumes that
+    // the radix of double is a power of 2. If we ever run into platforms
+    // for which this is not true, we can add a compile-time dispatch
+    // that uses the long double implementation instead.
+    constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
+    static_assert(!(dradix & (dradix - 1)), "mpfr_sub_d() requires the radix of the 'double' type to be a power of 2.");
+
+    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
+}
+
+} // namespace
+
+void dispatch_real_in_place_sub(real &a, const float &x)
+{
+    dispatch_real_in_place_sub_fd_impl(a, x);
+}
+
+void dispatch_real_in_place_sub(real &a, const double &x)
+{
+    dispatch_real_in_place_sub_fd_impl(a, x);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_sub_generic_impl(real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    dispatch_real_in_place_sub(a, tmp);
+}
+
+} // namespace
+
+void dispatch_real_in_place_sub(real &a, const long double &x)
+{
+    dispatch_real_in_place_sub_generic_impl(a, x);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+void dispatch_real_in_place_sub(real &a, const real128 &x)
+{
+    dispatch_real_in_place_sub_generic_impl(a, x);
+}
+
+#endif
+
+} // namespace detail
+
+real &operator--(real &x)
+{
+    ::mpfr_sub_ui(x._get_mpfr_t(), x.get_mpfr_t(), 1ul, MPFR_RNDN);
+    return x;
+}
+
+real operator--(real &x, int)
+{
+    auto retval(x);
+    --x;
+    return retval;
+}
+
+// Implementation bits for in-place multiplication.
+namespace detail
+{
+
+void dispatch_real_in_place_mul_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_z(r, o, n, MPFR_RNDN); };
+
+    // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
+    // which is by definition valid because it is produced by an invocation of
+    // real_deduce_precision() (which does clamping).
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+void dispatch_real_in_place_mul(real &a, bool n)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
+void dispatch_real_in_place_mul_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_q(r, o, q, MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_mul_fd_impl(real &a, const T &x)
+{
+    // NOTE: the MPFR docs state that mpfr_mul_d() assumes that
+    // the radix of double is a power of 2. If we ever run into platforms
+    // for which this is not true, we can add a compile-time dispatch
+    // that uses the long double implementation instead.
+    constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
+    static_assert(!(dradix & (dradix - 1)), "mpfr_mul_d() requires the radix of the 'double' type to be a power of 2.");
+
+    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
+}
+
+} // namespace
+
+void dispatch_real_in_place_mul(real &a, const float &x)
+{
+    dispatch_real_in_place_mul_fd_impl(a, x);
+}
+
+void dispatch_real_in_place_mul(real &a, const double &x)
+{
+    dispatch_real_in_place_mul_fd_impl(a, x);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_mul_generic_impl(real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    dispatch_real_in_place_mul(a, tmp);
+}
+
+} // namespace
+
+void dispatch_real_in_place_mul(real &a, const long double &x)
+{
+    dispatch_real_in_place_mul_generic_impl(a, x);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+void dispatch_real_in_place_mul(real &a, const real128 &x)
+{
+    dispatch_real_in_place_mul_generic_impl(a, x);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation bits for in-place division.
+namespace detail
+{
+
+void dispatch_real_in_place_div_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_z(r, o, n, MPFR_RNDN); };
+
+    // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
+    // which is by definition valid because it is produced by an invocation of
+    // real_deduce_precision() (which does clamping).
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+void dispatch_real_in_place_div(real &a, bool n)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
+void dispatch_real_in_place_div_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
+{
+    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_q(r, o, q, MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_div_fd_impl(real &a, const T &x)
+{
+    // NOTE: the MPFR docs state that mpfr_div_d() assumes that
+    // the radix of double is a power of 2. If we ever run into platforms
+    // for which this is not true, we can add a compile-time dispatch
+    // that uses the long double implementation instead.
+    constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
+    static_assert(!(dradix & (dradix - 1)), "mpfr_div_d() requires the radix of the 'double' type to be a power of 2.");
+
+    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+
+    mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
+}
+
+} // namespace
+
+void dispatch_real_in_place_div(real &a, const float &x)
+{
+    dispatch_real_in_place_div_fd_impl(a, x);
+}
+
+void dispatch_real_in_place_div(real &a, const double &x)
+{
+    dispatch_real_in_place_div_fd_impl(a, x);
+}
+
+namespace
+{
+
+template <typename T>
+inline void dispatch_real_in_place_div_generic_impl(real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    dispatch_real_in_place_div(a, tmp);
+}
+
+} // namespace
+
+void dispatch_real_in_place_div(real &a, const long double &x)
+{
+    dispatch_real_in_place_div_generic_impl(a, x);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+void dispatch_real_in_place_div(real &a, const real128 &x)
+{
+    dispatch_real_in_place_div_generic_impl(a, x);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for equality.
+namespace detail
+{
+
+bool dispatch_real_equality(const real &x, const real &y)
+{
+    return ::mpfr_equal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
+}
+
+bool dispatch_real_equality_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) == 0;
+    }
+}
+
+bool dispatch_real_equality(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) == 0;
+    }
+}
+
+bool dispatch_real_equality_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) == 0;
+    }
+}
+
+bool dispatch_real_equality(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) == 0;
+    }
+}
+
+bool dispatch_real_equality(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) == 0;
+    }
+}
+
+bool dispatch_real_equality(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) == 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_equality(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_equality(r1, tmp);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for gt.
+namespace detail
+{
+
+bool dispatch_real_gt(const real &x, const real &y)
+{
+    return ::mpfr_greater_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
+}
+
+bool dispatch_real_gt_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) > 0;
+    }
+}
+
+bool dispatch_real_gt_integer_impl(const ::mpz_t n, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) < 0;
+    }
+}
+
+bool dispatch_real_gt(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) > 0;
+    }
+}
+
+bool dispatch_real_gt(bool b, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) < 0;
+    }
+}
+
+bool dispatch_real_gt_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) > 0;
+    }
+}
+
+bool dispatch_real_gt_rational_impl(const ::mpq_t q, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) < 0;
+    }
+}
+
+bool dispatch_real_gt(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) > 0;
+    }
+}
+
+bool dispatch_real_gt(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) > 0;
+    }
+}
+
+bool dispatch_real_gt(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) > 0;
+    }
+}
+
+bool dispatch_real_gt(const float &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) < 0;
+    }
+}
+
+bool dispatch_real_gt(const double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) < 0;
+    }
+}
+
+bool dispatch_real_gt(const long double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) < 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_gt(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_gt(r1, tmp);
+}
+
+bool dispatch_real_gt(const real128 &r1, const real &r2)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r1;
+
+    return dispatch_real_gt(tmp, r2);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for gte.
+namespace detail
+{
+
+bool dispatch_real_gte(const real &x, const real &y)
+{
+    return ::mpfr_greaterequal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
+}
+
+bool dispatch_real_gte_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) >= 0;
+    }
+}
+
+bool dispatch_real_gte_integer_impl(const ::mpz_t n, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) <= 0;
+    }
+}
+
+bool dispatch_real_gte(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) >= 0;
+    }
+}
+
+bool dispatch_real_gte(bool b, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) <= 0;
+    }
+}
+
+bool dispatch_real_gte_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) >= 0;
+    }
+}
+
+bool dispatch_real_gte_rational_impl(const ::mpq_t q, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) <= 0;
+    }
+}
+
+bool dispatch_real_gte(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) >= 0;
+    }
+}
+
+bool dispatch_real_gte(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) >= 0;
+    }
+}
+
+bool dispatch_real_gte(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) >= 0;
+    }
+}
+
+bool dispatch_real_gte(const float &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) <= 0;
+    }
+}
+
+bool dispatch_real_gte(const double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) <= 0;
+    }
+}
+
+bool dispatch_real_gte(const long double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) <= 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_gte(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_gte(r1, tmp);
+}
+
+bool dispatch_real_gte(const real128 &r1, const real &r2)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r1;
+
+    return dispatch_real_gte(tmp, r2);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for lt.
+namespace detail
+{
+
+bool dispatch_real_lt(const real &x, const real &y)
+{
+    return ::mpfr_less_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
+}
+
+bool dispatch_real_lt_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) < 0;
+    }
+}
+
+bool dispatch_real_lt_integer_impl(const ::mpz_t n, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) > 0;
+    }
+}
+
+bool dispatch_real_lt(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) < 0;
+    }
+}
+
+bool dispatch_real_lt(bool b, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) > 0;
+    }
+}
+
+bool dispatch_real_lt_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) < 0;
+    }
+}
+
+bool dispatch_real_lt_rational_impl(const ::mpq_t q, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) > 0;
+    }
+}
+
+bool dispatch_real_lt(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) < 0;
+    }
+}
+
+bool dispatch_real_lt(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) < 0;
+    }
+}
+
+bool dispatch_real_lt(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) < 0;
+    }
+}
+
+bool dispatch_real_lt(const float &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) > 0;
+    }
+}
+
+bool dispatch_real_lt(const double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) > 0;
+    }
+}
+
+bool dispatch_real_lt(const long double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) > 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_lt(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_lt(r1, tmp);
+}
+
+bool dispatch_real_lt(const real128 &r1, const real &r2)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r1;
+
+    return dispatch_real_lt(tmp, r2);
+}
+
+#endif
+
+} // namespace detail
+
+// Implementation details for lte.
+namespace detail
+{
+
+bool dispatch_real_lte(const real &x, const real &y)
+{
+    return ::mpfr_lessequal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
+}
+
+bool dispatch_real_lte_integer_impl(const real &r, const ::mpz_t n)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) <= 0;
+    }
+}
+
+bool dispatch_real_lte_integer_impl(const ::mpz_t n, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_z(r.get_mpfr_t(), n) >= 0;
+    }
+}
+
+bool dispatch_real_lte(const real &r, bool b)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) <= 0;
+    }
+}
+
+bool dispatch_real_lte(bool b, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) >= 0;
+    }
+}
+
+bool dispatch_real_lte_rational_impl(const real &r, const ::mpq_t q)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) <= 0;
+    }
+}
+
+bool dispatch_real_lte_rational_impl(const ::mpq_t q, const real &r)
+{
+    if (r.nan_p()) {
+        return false;
+    } else {
+        return ::mpfr_cmp_q(r.get_mpfr_t(), q) >= 0;
+    }
+}
+
+bool dispatch_real_lte(const real &r, const float &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) <= 0;
+    }
+}
+
+bool dispatch_real_lte(const real &r, const double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) <= 0;
+    }
+}
+
+bool dispatch_real_lte(const real &r, const long double &x)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) <= 0;
+    }
+}
+
+bool dispatch_real_lte(const float &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x)) >= 0;
+    }
+}
+
+bool dispatch_real_lte(const double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_d(r.get_mpfr_t(), x) >= 0;
+    }
+}
+
+bool dispatch_real_lte(const long double &x, const real &r)
+{
+    if (r.nan_p() || std::isnan(x)) {
+        return false;
+    } else {
+        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) >= 0;
+    }
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+bool dispatch_real_lte(const real &r1, const real128 &r2)
+{
+    // NOTE: straight assignment here is fine: tmp
+    // will represent r2 exactly.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r2;
+
+    return dispatch_real_lte(r1, tmp);
+}
+
+bool dispatch_real_lte(const real128 &r1, const real &r2)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = r1;
+
+    return dispatch_real_lte(tmp, r2);
+}
+
+#endif
+
+} // namespace detail
 
 // Three-way comparison.
 int cmp(const real &a, const real &b)

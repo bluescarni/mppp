@@ -139,7 +139,7 @@ public:
     constexpr explicit complex128(const T &x) : m_value{cast_to_f128(x, detail::is_complex128_mppp_interoperable<T>{})}
     {
     }
-    // Binary generic ctor.
+    // Binary generic ctors.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <complex128_interoperable T, complex128_interoperable U>
 #else
@@ -150,6 +150,37 @@ public:
     constexpr explicit complex128(const T &re, const U &im)
         : m_value{cast_to_f128(re, detail::is_complex128_mppp_interoperable<T>{}),
                   cast_to_f128(im, detail::is_complex128_mppp_interoperable<U>{})}
+    {
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <string_type T, complex128_interoperable U>
+#else
+    template <
+        typename T, typename U,
+        detail::enable_if_t<detail::conjunction<is_string_type<T>, is_complex128_interoperable<U>>::value, int> = 0>
+#endif
+    explicit complex128(const T &re, const U &im)
+        : m_value{real128{re}.m_value, cast_to_f128(im, detail::is_complex128_mppp_interoperable<U>{})}
+    {
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex128_interoperable T, string_type U>
+#else
+    template <
+        typename T, typename U,
+        detail::enable_if_t<detail::conjunction<is_complex128_interoperable<T>, is_string_type<U>>::value, int> = 0>
+#endif
+    explicit complex128(const T &re, const U &im)
+        : m_value{cast_to_f128(re, detail::is_complex128_mppp_interoperable<T>{}), real128{im}.m_value}
+    {
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <string_type T, string_type U>
+#else
+    template <typename T, typename U,
+              detail::enable_if_t<detail::conjunction<is_string_type<T>, is_string_type<U>>::value, int> = 0>
+#endif
+    explicit complex128(const T &re, const U &im) : m_value{real128{re}.m_value, real128{im}.m_value}
     {
     }
     // Constructor from std::complex.
@@ -184,8 +215,10 @@ public:
     explicit complex128(const T &s) : complex128(ptag{}, s)
     {
     }
+    struct char_range_t {
+    };
     // Constructor from range of characters.
-    explicit complex128(const char *, const char *);
+    explicit complex128(const char *, const char *, char_range_t);
 
     // Trivial copy assignment operator.
     complex128 &operator=(const complex128 &) = default;

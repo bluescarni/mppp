@@ -90,6 +90,11 @@ constexpr auto test_constexpr_setters2(double re, double im)
 
 TEST_CASE("basic constructors")
 {
+    using Catch::Matchers::Message;
+#if defined(MPPP_HAVE_STRING_VIEW)
+    using namespace std::literals;
+#endif
+
     // Default ctor.
     complex128 c0;
     REQUIRE(c0.m_value == 0);
@@ -153,6 +158,33 @@ TEST_CASE("basic constructors")
     REQUIRE(complex128{123.f, -real{124}}.m_value == cplex128{123, -124});
 #endif
 
+    // Binary ctors with string args.
+    REQUIRE(complex128{"1.23", 4} == complex128{"(1.23,4)"});
+    REQUIRE(complex128{4., "1.23"} == complex128{"(4,1.23)"});
+    REQUIRE(complex128{"1.23", "4.56"} == complex128{"(1.23,4.56)"});
+
+    REQUIRE_THROWS_MATCHES(
+        (complex128{"bab", 4}), std::invalid_argument,
+        Message("The string 'bab' does not represent a valid quadruple-precision floating-point value"));
+    REQUIRE_THROWS_MATCHES(
+        (complex128{4, "baba"}), std::invalid_argument,
+        Message("The string 'baba' does not represent a valid quadruple-precision floating-point value"));
+
+#if defined(MPPP_WITH_MPFR)
+    REQUIRE(complex128{"1.23", real{4}} == complex128{"(1.23,4)"});
+    REQUIRE(complex128{real{4}, "1.23"} == complex128{"(4,1.23)"});
+#endif
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+    REQUIRE(complex128{"1.23"s, 4u} == complex128{"(1.23,4)"});
+    REQUIRE(complex128{4.f, "1.23"s} == complex128{"(4,1.23)"});
+    REQUIRE(complex128{"1.23"s, "4.56"s} == complex128{"(1.23,4.56)"});
+
+    REQUIRE(complex128{"1.23"sv, 4ll} == complex128{"(1.23,4)"});
+    REQUIRE(complex128{char(4), "1.23"sv} == complex128{"(4,1.23)"});
+    REQUIRE(complex128{"1.23"sv, "4.56"sv} == complex128{"(1.23,4.56)"});
+#endif
+
     // Ctor from std::complex.
     MPPP_CONSTEXPR_14 complex128 c10{std::complex<double>{1, 2}};
     REQUIRE(c10.m_value == cplex128{1, 2});
@@ -182,15 +214,23 @@ TEST_CASE("string constructors")
                            Message("The string ' ' is not a valid representation of a complex128"));
     REQUIRE_THROWS_MATCHES(complex128{"  "}, std::invalid_argument,
                            Message("The string '  ' is not a valid representation of a complex128"));
-    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data()}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data(), complex128::char_range_t{}}),
+                           std::invalid_argument,
                            Message("The string '' is not a valid representation of a complex128"));
+
+    {
+        // Example from the docs.
+        const char str[] = "1.23";
+        complex128 c{str, str + 4, complex128::char_range_t{}};
+        REQUIRE(c == complex128{"1.23"});
+    }
 
     // Only the real value, no brackets.
     REQUIRE(complex128{"123"}.m_value == 123);
     REQUIRE(complex128{std::string("123")}.m_value == 123);
     constexpr char str1[] = "123456";
-    REQUIRE(complex128{str1, str1 + 3}.m_value == 123);
-    REQUIRE(complex128{str1 + 3, str1 + 6}.m_value == 456);
+    REQUIRE(complex128{str1, str1 + 3, complex128::char_range_t{}}.m_value == 123);
+    REQUIRE(complex128{str1 + 3, str1 + 6, complex128::char_range_t{}}.m_value == 456);
 #if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE(complex128{"123"sv}.m_value == 123);
 #endif
@@ -207,20 +247,20 @@ TEST_CASE("string constructors")
         complex128{"  hello world "}, std::invalid_argument,
         Message("The string 'hello world ' does not represent a valid quadruple-precision floating-point value"));
     buffer = {'1', '2', '3'};
-    REQUIRE(complex128{buffer.data(), buffer.data() + 3}.m_value == 123);
+    REQUIRE(complex128{buffer.data(), buffer.data() + 3, complex128::char_range_t{}}.m_value == 123);
     buffer = {'1', '2', '3', '4', '5', '6'};
-    REQUIRE(complex128{buffer.data() + 3, buffer.data() + 6}.m_value == 456);
+    REQUIRE(complex128{buffer.data() + 3, buffer.data() + 6, complex128::char_range_t{}}.m_value == 456);
     buffer = {'1', '2', '3', ' '};
     REQUIRE_THROWS_MATCHES(
-        (complex128{buffer.data(), buffer.data() + 4}), std::invalid_argument,
+        (complex128{buffer.data(), buffer.data() + 4, complex128::char_range_t{}}), std::invalid_argument,
         Message("The string '123 ' does not represent a valid quadruple-precision floating-point value"));
 
     // Strings with brackets and only the real component.
     REQUIRE(complex128{"(123)"}.m_value == 123);
     REQUIRE(complex128{std::string("(123)")}.m_value == 123);
     constexpr char str2[] = "(123)(456)";
-    REQUIRE(complex128{str2, str2 + 5}.m_value == 123);
-    REQUIRE(complex128{str2 + 5, str2 + 10}.m_value == 456);
+    REQUIRE(complex128{str2, str2 + 5, complex128::char_range_t{}}.m_value == 123);
+    REQUIRE(complex128{str2 + 5, str2 + 10, complex128::char_range_t{}}.m_value == 456);
 #if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE(complex128{"(123)"sv}.m_value == 123);
 #endif
@@ -238,19 +278,20 @@ TEST_CASE("string constructors")
         complex128{" (123as)"}, std::invalid_argument,
         Message("The string '123as' does not represent a valid quadruple-precision floating-point value"));
     buffer = {'(', '1', '2', '3', ')'};
-    REQUIRE(complex128{buffer.data(), buffer.data() + 5}.m_value == 123);
+    REQUIRE(complex128{buffer.data(), buffer.data() + 5, complex128::char_range_t{}}.m_value == 123);
     buffer = {'(', '1', '2', '3', ')', '5', '6'};
-    REQUIRE(complex128{buffer.data(), buffer.data() + 5}.m_value == 123);
+    REQUIRE(complex128{buffer.data(), buffer.data() + 5, complex128::char_range_t{}}.m_value == 123);
     buffer = {'(', '2', '3', '4'};
-    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data() + 4}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data() + 4, complex128::char_range_t{}}),
+                           std::invalid_argument,
                            Message("The string '(234' is not a valid representation of a complex128"));
 
     // Real and imaginary components.
     REQUIRE(complex128{"(123,12)"}.m_value == cplex128{123, 12});
     REQUIRE(complex128{std::string("(123,12)")}.m_value == cplex128{123, 12});
     constexpr char str3[] = "(123,456)(-123,-456)";
-    REQUIRE(complex128{str3, str3 + 9}.m_value == cplex128{123, 456});
-    REQUIRE(complex128{str3 + 9, str3 + 20}.m_value == -cplex128{123, 456});
+    REQUIRE(complex128{str3, str3 + 9, complex128::char_range_t{}}.m_value == cplex128{123, 456});
+    REQUIRE(complex128{str3 + 9, str3 + 20, complex128::char_range_t{}}.m_value == -cplex128{123, 456});
 #if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE(complex128{"(123,12)"sv}.m_value == cplex128{123, 12});
 #endif
@@ -294,11 +335,12 @@ TEST_CASE("string constructors")
         complex128{"(,)"}, std::invalid_argument,
         Message("The string '' does not represent a valid quadruple-precision floating-point value"));
     buffer = {'(', '1', '2', '3', ',', '1', '2', ')'};
-    REQUIRE(complex128{buffer.data(), buffer.data() + 8}.m_value == cplex128{123, 12});
+    REQUIRE(complex128{buffer.data(), buffer.data() + 8, complex128::char_range_t{}}.m_value == cplex128{123, 12});
     buffer = {'(', '1', '2', '3', ',', '1', '2', ')', '4', '5'};
-    REQUIRE(complex128{buffer.data(), buffer.data() + 8}.m_value == cplex128{123, 12});
+    REQUIRE(complex128{buffer.data(), buffer.data() + 8, complex128::char_range_t{}}.m_value == cplex128{123, 12});
     buffer = {'(', '1', '2', '3', ',', '1'};
-    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data() + 6}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data() + 6, complex128::char_range_t{}}),
+                           std::invalid_argument,
                            Message("The string '(123,1' is not a valid representation of a complex128"));
 }
 

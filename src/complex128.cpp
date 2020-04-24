@@ -153,7 +153,7 @@ complex128::complex128(const ptag &, const char *str)
 
 complex128::complex128(const ptag &, const std::string &s) : complex128(s.c_str()) {}
 
-complex128::complex128(const char *begin, const char *end)
+complex128::complex128(const char *begin, const char *end, char_range_t)
 {
     MPPP_MAYBE_TLS std::vector<char> buffer;
     buffer.assign(begin, end);
@@ -163,7 +163,10 @@ complex128::complex128(const char *begin, const char *end)
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 
-complex128::complex128(const ptag &, const std::string_view &s) : complex128(s.data(), s.data() + s.size()) {}
+complex128::complex128(const ptag &, const std::string_view &s)
+    : complex128(s.data(), s.data() + s.size(), char_range_t{})
+{
+}
 
 #endif
 
