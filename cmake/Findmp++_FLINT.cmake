@@ -28,24 +28,24 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ------------------------------------------------------------------------------------------
 
-if(FLINT_INCLUDE_DIR AND FLINT_LIBRARY)
+if(MPPP_FLINT_INCLUDE_DIR AND MPPP_FLINT_LIBRARY)
     # Already in cache, be silent
-    set(FLINT_FIND_QUIETLY TRUE)
+    set(mp++_FLINT_FIND_QUIETLY TRUE)
 endif()
 
-find_path(FLINT_INCLUDE_DIR NAMES flint/flint.h)
-find_library(FLINT_LIBRARY NAMES flint)
+find_path(MPPP_FLINT_INCLUDE_DIR NAMES flint/flint.h)
+find_library(MPPP_FLINT_LIBRARY NAMES flint)
 
 include(FindPackageHandleStandardArgs)
 
-find_package_handle_standard_args(FLINT DEFAULT_MSG FLINT_INCLUDE_DIR FLINT_LIBRARY)
+find_package_handle_standard_args(mp++_FLINT DEFAULT_MSG MPPP_FLINT_INCLUDE_DIR MPPP_FLINT_LIBRARY)
 
-mark_as_advanced(FLINT_INCLUDE_DIR FLINT_LIBRARY)
+mark_as_advanced(MPPP_FLINT_INCLUDE_DIR MPPP_FLINT_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(FLINT_FOUND AND NOT TARGET FLINT::FLINT)
-    add_library(FLINT::FLINT UNKNOWN IMPORTED)
-    set_target_properties(FLINT::FLINT PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${FLINT_INCLUDE_DIR}"
+if(mp++_FLINT_FOUND AND NOT TARGET mp++::FLINT)
+    add_library(mp++::FLINT UNKNOWN IMPORTED)
+    set_target_properties(mp++::FLINT PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPPP_FLINT_INCLUDE_DIR}"
         IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-        IMPORTED_LOCATION "${FLINT_LIBRARY}")
+        IMPORTED_LOCATION "${MPPP_FLINT_LIBRARY}")
 endif()

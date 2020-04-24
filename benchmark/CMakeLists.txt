@@ -8,7 +8,7 @@ if(NOT TARGET Boost::boost)
 endif()
 
 if(MPPP_BENCHMARK_FLINT)
-  find_package(FLINT REQUIRED)
+  find_package(mp++_FLINT REQUIRED)
 endif()
 
 # Custom target to run all benchmarks.
@@ -24,7 +24,7 @@ function(ADD_MPPP_BENCHMARK arg1)
     target_compile_options(${arg1} PRIVATE "-DMPPP_BENCHMARK_BOOST")
   endif()
   if(MPPP_BENCHMARK_FLINT)
-    target_link_libraries(${arg1} PRIVATE FLINT::FLINT)
+    target_link_libraries(${arg1} PRIVATE mp++::FLINT)
     target_compile_options(${arg1} PRIVATE "-DMPPP_BENCHMARK_FLINT")
   endif()
   target_include_directories(${arg1} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
