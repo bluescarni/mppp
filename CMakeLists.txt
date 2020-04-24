@@ -312,12 +312,8 @@ if(MPPP_WITH_QUADMATH)
         message(FATAL_ERROR "The 'MPPP_WITH_QUADMATH' option was enabled but the '__float128' type does not exist.")
     endif()
     unset(_MPPP_FLOAT128_EXISTS)
-    find_package(Quadmath REQUIRED COMPONENTS libquadmath header)
-    # NOTE: both the header and the library functions are used
-    # only within libmp++. Thus, consumers of mp++ won't
-    # need to link to them.
-    target_link_libraries(mp++ PRIVATE Quadmath::libquadmath)
-    target_link_libraries(mp++ PRIVATE Quadmath::header)
+    find_package(mp++_quadmath REQUIRED)
+    target_link_libraries(mp++ PRIVATE mp++::quadmath)
     set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
 endif()
 
