@@ -80,7 +80,7 @@ Interacting with the GMP API
 
 Like :cpp:class:`~mppp::integer`, :cpp:class:`~mppp::rational` provides facilities for interfacing
 with the `GMP <https://gmplib.org/>`__ library. Currently, the interoperability is limited to
-:cpp:class:`~mppp::rational` objects being able to be constructed and assigned from both ``mpz_t``
+:cpp:class:`~mppp::rational` objects being able to be constructed and assigned from both :cpp:type:`mpz_t`
 and ``mpq_t`` objects:
 
 .. code-block:: c++

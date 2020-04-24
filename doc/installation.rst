@@ -7,7 +7,7 @@ Introduction
 ------------
 
 mp++ is written in modern C++, and it requires a compiler able to understand
-at least C++11 (mp++ will also use features from C++14 and C++17,
+at least C++11 (mp++ will also use features from C++14, C++17 and C++20,
 if supported by the compiler). The library is regularly tested on
 a comprehensive continuous integration pipeline, which includes:
 
@@ -22,12 +22,13 @@ mp++ has the following dependencies:
   the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
 * the `GNU MPFR <https://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support
-  for the ``long double`` type (MPFR 3 or a later version is required);
+  for the ``long double`` type in :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
+  (MPFR 3 or a later version is required);
 * the `Arb <http://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
   used in the implementation of additional special functions for the
   :cpp:class:`~mppp::real` class;
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
-  in the implementation of the :cpp:class:`~mppp::real128` class
+  in the implementation of the :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128` classes
   (typically, the quadmath library is part of GCC and it does not need to
   be installed separately);
 * the `Boost <https://www.boost.org/>`__ libraries, *optional*, currently used
@@ -131,6 +132,7 @@ to add ``conda-forge`` to the channels:
 .. code-block:: console
 
    $ conda config --add channels conda-forge
+   $ conda config --set channel_priority strict
    $ conda install mppp
 
 (note that the `conda package <https://anaconda.org/conda-forge/mppp>`__ for mp++ is named ``mppp`` rather than ``mp++``)
@@ -183,9 +185,8 @@ system you can compile this example with the following command:
 Because parts of mp++ are implemented using templates,
 users of the library will have to explicitly link to GMP
 and (if enabled) MPFR. Explicit linking to the other optional
-dependencies (quadmath, Arb, etc.) is not necessary, as they are
-used only within the compiled component
-of the mp++ library.
+dependencies is not necessary, as they will
+be automatically brought into the link chain by the mp++ library.
 
 If you are using CMake, it is highly recommended to make use of the config-file
 package provided with mp++ rather
@@ -270,7 +271,9 @@ Intel compiler:
   as constant expressions. As a result, a few :cpp:class:`~mppp::real128`
   functions which are ``constexpr`` on GCC and Clang are not ``constexpr``
   when using the Intel compiler. These occurrences are marked in the API
-  reference.
+  reference. Also, the Intel compiler seems to be prone to internal
+  errors when performing ``constexpr`` computations with
+  :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`.
 
 MinGW:
 

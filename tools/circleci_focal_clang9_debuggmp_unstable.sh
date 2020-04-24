@@ -23,7 +23,7 @@ make install
 
 # Compile mppp and run the tests.
 cd ..
-CC=clang CXX=clang++ cmake ../ -DCMAKE_BUILD_TYPE=Debug -DMPPP_WITH_QUADMATH=yes -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DCMAKE_PREFIX_PATH=/home/circleci/.local -DQuadmath_INCLUDE_DIR=/usr/lib/gcc/x86_64-linux-gnu/8/include/ -DQuadmath_LIBRARY=/usr/lib/gcc/x86_64-linux-gnu/8/libquadmath.so
+CC=clang CXX=clang++ cmake ../ -DCMAKE_BUILD_TYPE=Debug -DMPPP_WITH_QUADMATH=yes -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DCMAKE_PREFIX_PATH=/home/circleci/.local -DQuadmath_INCLUDE_DIR=/usr/lib/gcc/x86_64-linux-gnu/9/include/ -DQuadmath_LIBRARY=/usr/lib/gcc/x86_64-linux-gnu/9/libquadmath.so
 make -j2 VERBOSE=1
 ctest -V
 

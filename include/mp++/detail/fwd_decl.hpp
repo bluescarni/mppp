@@ -11,6 +11,8 @@
 
 #include <cstddef>
 
+#include <mp++/config.hpp>
+
 namespace mppp
 {
 
@@ -20,7 +22,19 @@ class integer;
 template <std::size_t>
 class rational;
 
+#if defined(MPPP_WITH_MPFR)
+
 class real;
+
+#endif
+
+#if defined(MPPP_WITH_QUADMATH)
+
+class real128;
+class complex128;
+
+#endif
+
 } // namespace mppp
 
 #endif

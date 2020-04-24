@@ -30,27 +30,27 @@ idea is that automatic type coercion should not change the value of an operand [
 
 mp++ extends C++'s type hierarchy in a (hopefully) natural way:
 
-* :cpp:class:`~mppp::integer` has a rank higher than any C++ integral type, but lower
-  than any C++ floating-point type;
+* :cpp:class:`~mppp::integer` has a rank higher than any integral C++ type, but lower
+  than any floating-point C++ type;
 * :cpp:class:`~mppp::rational` has a rank higher than :cpp:class:`~mppp::integer`, but lower
-  than any C++ floating-point type;
-* :cpp:class:`~mppp::real128` has a rank higher than any C++ floating-point type;
+  than any floating-point C++ type;
+* :cpp:class:`~mppp::real128` has a rank higher than any floating-point C++ type;
 * :cpp:class:`~mppp::real` has a rank higher than :cpp:class:`~mppp::real128`.
 
 In other words, mp++'s type hierarchy (or *numerical tower*) from the lowest rank to the highest is the following:
 
-* C++ integral types,
+* integral C++ types,
 * :cpp:class:`~mppp::integer`,
 * :cpp:class:`~mppp::rational`,
-* C++ floating-point types,
+* floating-point C++ types,
 * :cpp:class:`~mppp::real128`,
 * :cpp:class:`~mppp::real`.
 
 Note that up to and including :cpp:class:`~mppp::rational`, types with higher rank can represent exactly all values
 of any type with a lower rank. The floating-point types, however, cannot represent exactly all values representable
-by :cpp:class:`~mppp::rational`, :cpp:class:`~mppp::integer` or even the C++ integral types. It should also be noted
+by :cpp:class:`~mppp::rational`, :cpp:class:`~mppp::integer` or even the integral C++ types. It should also be noted
 that :cpp:class:`~mppp::real`'s precision is set at runtime, and it is thus possible to create :cpp:class:`~mppp::real`
-objects with a precision lower than :cpp:class:`~mppp::real128` or any of the C++ floating-point types. Regardless,
+objects with a precision lower than :cpp:class:`~mppp::real128` or any of the floating-point C++ types. Regardless,
 when it comes to type coercion, :cpp:class:`~mppp::real` is always assigned a rank higher than any other type.
 
 mp++'s type coercion rules extend beyond arithmetic operators. The exponentiation functions ``pow()``, for instance,

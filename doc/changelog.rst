@@ -7,15 +7,27 @@ Changelog
 New
 ~~~
 
+- Improve the interoperability between mp++ classes
+  via additional assignment operators
+  (`#229 <https://github.com/bluescarni/mppp/pull/229>`__).
 - mp++ now works with the Intel compiler
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__,
-  tested with ``icpc (ICC) 19.1.0.166``).
+  tested with ``icpc (ICC) 19.1.0.166``). This includes
+  also support for :cpp:class:`~mppp::real128` and
+  :cpp:class:`~mppp::complex128` (with
+  a couple of minor limitations).
 - The interoperability of :cpp:class:`~mppp::real128` with
   ``long double`` has been improved: it is now supported
   also on Clang (since version 7) and it does not require
   mp++ to be configured with the ``MPPP_WITH_MPFR``
   option any more
   (`#222 <https://github.com/bluescarni/mppp/pull/222>`__).
+- :cpp:class:`~mppp::real128` can now interact with
+  ``std::complex``
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
+- Add :cpp:class:`~mppp::complex128`, a quadruple-precision
+  complex number class
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 - mp++ now officially supports the ARM (``aarch64``)
   and PowerPC (``ppc64le``) architectures, which have
   been added to the continuous integration setup
@@ -24,15 +36,40 @@ New
 Changes
 ~~~~~~~
 
+- Improve the implementation of :cpp:class:`~mppp::real`
+  binary operators/functions by using the MPFR primitives
+  more extensively and by handling mixed-precision computations
+  more rigorously when one of the operands in not
+  a :cpp:class:`~mppp::real`
+  (`#230 <https://github.com/bluescarni/mppp/pull/230>`__).
+- For consistency with C++20, mp++'s concepts now
+  use snake case notation. The concept hierarchy has also been
+  simplified and streamlined
+  (`#228 <https://github.com/bluescarni/mppp/pull/228>`__).
+- **BREAKING**: the global precision setting mechanism has been
+  removed from :cpp:class:`~mppp::real`. As a result,
+  the API and behaviour of the :cpp:class:`~mppp::real`
+  class have undergone a few backwards-incompatible changes
+  (`#227 <https://github.com/bluescarni/mppp/pull/227>`__).
+- The documentation is now using sphinx exclusively,
+  doxygen is not involved any more
+  (`#227 <https://github.com/bluescarni/mppp/pull/227>`__,
+  `#225 <https://github.com/bluescarni/mppp/pull/225>`__,
+  `#223 <https://github.com/bluescarni/mppp/pull/223>`__,
+  `#221 <https://github.com/bluescarni/mppp/pull/221>`__).
 - Various internal simplifications and improvements
   to :cpp:class:`~mppp::real128`
   (`#221 <https://github.com/bluescarni/mppp/pull/221>`__).
+- Update Catch to the latest version, 2.11.3
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 
 Fix
 ~~~
 
 - Fix a bug in the :cpp:class:`~mppp::real128` test suite
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__).
+- Various doc fixes
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 - Fix a bug in the test suite in
   release mode
   (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
@@ -380,7 +417,7 @@ New
 Changes
 ~~~~~~~
 
-- The :cpp:concept:`mppp::StringType` concept is now satisfied by cv qualified types as well
+- The :cpp:concept:`mppp::string_type` concept is now satisfied by cv qualified types as well
   (`#127 <https://github.com/bluescarni/mppp/pull/127>`__).
 
 - Add a leading ``mppp::`` to the names of mp++'s classes in the pybind11 custom type casters
@@ -446,7 +483,7 @@ New
 
 - Add builds based on MSVC 2017 in Appveyor (`#110 <https://github.com/bluescarni/mppp/pull/110>`__).
 
-- Extend the :cpp:concept:`~mppp::CppInteroperable` concept to include all C++ integral types
+- Extend the ``mppp::CppInteroperable`` concept to include all C++ integral types
   (`#104 <https://github.com/bluescarni/mppp/pull/104>`__).
 
 - Add left bit shift benchmarks for :cpp:class:`~mppp::integer` (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
@@ -576,7 +613,7 @@ Changes
 
 - Various simplifications in the :cpp:class:`~mppp::rational` API (`#66 <https://github.com/bluescarni/mppp/pull/66>`__).
 
-- Introduce a :cpp:concept:`~mppp::StringType` concept and use it to reduce the number of overloads in the
+- Introduce a :cpp:concept:`~mppp::string_type` concept and use it to reduce the number of overloads in the
   constructors/assignment operators from string (`#63 <https://github.com/bluescarni/mppp/pull/63>`__,
   `#64 <https://github.com/bluescarni/mppp/pull/64>`__).
 

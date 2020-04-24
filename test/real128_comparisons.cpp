@@ -13,6 +13,7 @@
 #endif
 
 #include <algorithm>
+#include <complex>
 #include <initializer_list>
 #include <random>
 #include <set>
@@ -149,6 +150,42 @@ TEST_CASE("real128 equality")
     REQUIRE(!is_ineq_comparable<real128, long double>::value);
     REQUIRE(!is_ineq_comparable<long double, real128>::value);
 #endif
+
+    // Comparisons with std::complex.
+    REQUIRE(real128{42} == std::complex<float>{42, 0});
+    REQUIRE(std::complex<float>{42, 0} == real128{42});
+    REQUIRE(real128{43} != std::complex<float>{42, 0});
+    REQUIRE(std::complex<float>{43, 0} != real128{42});
+    REQUIRE(real128{43} != std::complex<float>{42, 1});
+    REQUIRE(std::complex<float>{43, 1} != real128{42});
+
+    REQUIRE(real128{42} == std::complex<double>{42, 0});
+    REQUIRE(std::complex<double>{42, 0} == real128{42});
+    REQUIRE(real128{43} != std::complex<double>{42, 0});
+    REQUIRE(std::complex<double>{43, 0} != real128{42});
+    REQUIRE(real128{43} != std::complex<double>{42, 1});
+    REQUIRE(std::complex<double>{43, 1} != real128{42});
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(real128{42} == std::complex<long double>{42, 0});
+    REQUIRE(std::complex<long double>{42, 0} == real128{42});
+    REQUIRE(real128{43} != std::complex<long double>{42, 0});
+    REQUIRE(std::complex<long double>{42, 0} != real128{43});
+    REQUIRE(real128{43} != std::complex<long double>{42, 1});
+    REQUIRE(std::complex<long double>{42, 1} != real128{43});
+#else
+    REQUIRE(!is_eq_comparable<real128, std::complex<long double>>::value);
+    REQUIRE(!is_eq_comparable<std::complex<long double>, real128>::value);
+
+    REQUIRE(!is_ineq_comparable<real128, std::complex<long double>>::value);
+    REQUIRE(!is_ineq_comparable<std::complex<long double>, real128>::value);
+#endif
+
+    // Test constexpr-ness.
+    constexpr auto cc1 = real128{42} == std::complex<float>{42, 0};
+    REQUIRE(cc1);
+    constexpr auto cc2 = real128{42} != std::complex<float>{42, 1};
+    REQUIRE(cc2);
 }
 
 template <typename T, typename U>
