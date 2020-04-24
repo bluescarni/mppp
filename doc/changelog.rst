@@ -36,9 +36,12 @@ New
 Changes
 ~~~~~~~
 
-- Improve the interoperability between mp++ classes
-  via additional assignment operators
-  (`#229 <https://github.com/bluescarni/mppp/pull/229>`__).
+- Improve the implementation of :cpp:class:`~mppp::real`
+  binary operators/functions by using the MPFR primitives
+  more extensively and by handling mixed-precision computations
+  more rigorously when one of the operands in not
+  a :cpp:class:`~mppp::real`
+  (`#230 <https://github.com/bluescarni/mppp/pull/230>`__).
 - For consistency with C++20, mp++'s concepts now
   use snake case notation. The concept hierarchy has also been
   simplified and streamlined
