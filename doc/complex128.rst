@@ -106,9 +106,9 @@ The complex128 class
    .. cpp:function:: template <complex128_interoperable T, string_type U> explicit complex128(const T &x, const U &y)
    .. cpp:function:: template <string_type T, string_type U> explicit complex128(const T &x, const U &y)
 
-      Constructor from real and imaginary parts, in numerical and/or string forms.
+      Constructors from real and imaginary parts, in numerical and/or string forms.
 
-      This constructor will initialise the internal value to :math:`x+\imath y`.
+      These constructors will initialise the internal value to :math:`x+\imath y`.
       Depending on the value and type of *x* and *y*, ``this`` may not be exactly equal
       to :math:`x+\imath y` after initialisation (e.g., if *x* and *y* are very large
       :cpp:class:`~mppp::integer` values).
