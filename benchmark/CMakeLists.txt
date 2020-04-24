@@ -79,3 +79,7 @@ ADD_MPPP_BENCHMARK(integer1_int_conversion)
 ADD_MPPP_BENCHMARK(integer2_int_conversion)
 ADD_MPPP_BENCHMARK(integer1_uint_conversion)
 ADD_MPPP_BENCHMARK(integer2_uint_conversion)
+
+if(MPPP_WITH_MPFR)
+  ADD_MPPP_BENCHMARK(real_alloc)
+endif()
