@@ -299,8 +299,8 @@ endif()
 # Optional dependency on Arb.
 if(MPPP_WITH_ARB)
     find_package(mp++_FLINT REQUIRED)
-    find_package(Arb REQUIRED)
-    target_link_libraries(mp++ PRIVATE Arb::Arb mp++::FLINT)
+    find_package(mp++_Arb REQUIRED)
+    target_link_libraries(mp++ PRIVATE mp++::Arb mp++::FLINT)
     set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
 endif()
 
