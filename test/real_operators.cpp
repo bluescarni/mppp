@@ -1638,6 +1638,19 @@ TEST_CASE("real eqineq")
     REQUIRE(!(1 == real{"nan", 5}));
     REQUIRE((real{"nan", 5} != 1ul));
     REQUIRE((1l != real{"nan", 5}));
+    // The bool specialisation.
+    REQUIRE(real{1} == true);
+    REQUIRE(real{0} == false);
+    REQUIRE(true == real{1});
+    REQUIRE(false == real{0});
+    REQUIRE(real{1} != false);
+    REQUIRE(real{0} != true);
+    REQUIRE(false != real{1});
+    REQUIRE(true != real{0});
+    REQUIRE(!(real{"nan", 45} == true));
+    REQUIRE(!(false == real{"nan", 45}));
+    REQUIRE(real{"nan", 45} != true);
+    REQUIRE(false != real{"nan", 45});
     // FP.
     REQUIRE(!(real{} != 0.f));
     REQUIRE(1. == real{1});
@@ -1724,11 +1737,30 @@ TEST_CASE("real lt")
     REQUIRE(!(real{"inf", 64} < 45));
     REQUIRE(!(real{"nan", 5} < 1));
     REQUIRE(!(1 < real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} < 1u));
+    REQUIRE(!(1u < real{"nan", 5}));
+    // The bool specialisations.
+    REQUIRE(real{0} < true);
+    REQUIRE(!(real{1} < true));
+    REQUIRE(real{-1} < false);
+    REQUIRE(!(real{"nan", 5} < false));
+    REQUIRE(!(true < real{1}));
+    REQUIRE(true < real{2});
+    REQUIRE(!(false < real{-1}));
+    REQUIRE(!(false < real{"nan", 5}));
     // FP.
     REQUIRE(!(1. < real{1}));
+    REQUIRE(!(1.f < real{1}));
+    REQUIRE(!(1.l < real{1}));
     REQUIRE((real{0.1} < 1.));
+    REQUIRE((real{0.1} < 1.f));
+    REQUIRE((real{0.1} < 1.l));
     REQUIRE(!(real{"inf", 64} < 45.));
     REQUIRE(!(real{"nan", 5} < 1.));
+    REQUIRE(!(real{"nan", 5} < 1.f));
+    REQUIRE(!(real{"nan", 5} < 1.l));
+    REQUIRE(!(1. < real{"nan", 5}));
+    REQUIRE(!(1.f < real{"nan", 5}));
     REQUIRE(!(1.l < real{"nan", 5}));
     if (std::numeric_limits<double>::has_quiet_NaN) {
         REQUIRE(!(std::numeric_limits<double>::quiet_NaN() < real{"nan", 5}));
@@ -1739,7 +1771,9 @@ TEST_CASE("real lt")
     REQUIRE(!(real{2} < rat_t{1ull}));
     REQUIRE(!(real{"inf", 64} < int_t{45}));
     REQUIRE(!(real{"nan", 5} < int_t{1}));
+    REQUIRE(!(int_t{1} < real{"nan", 5}));
     REQUIRE(!(rat_t{1} < real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} < rat_t{1}));
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE((real128{} < real{1}));
     REQUIRE(!(real{2} < real128{1ull}));
@@ -1780,11 +1814,30 @@ TEST_CASE("real lte")
     REQUIRE(!(real{"inf", 64} <= 45));
     REQUIRE(!(real{"nan", 5} <= 1));
     REQUIRE(!(1 <= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} <= 1u));
+    REQUIRE(!(1u <= real{"nan", 5}));
+    // The bool specialisations.
+    REQUIRE(real{0} <= true);
+    REQUIRE(real{1} <= true);
+    REQUIRE(real{-1} <= false);
+    REQUIRE(!(real{"nan", 5} <= false));
+    REQUIRE(true <= real{1});
+    REQUIRE(true <= real{2});
+    REQUIRE(!(false <= real{-1}));
+    REQUIRE(!(false <= real{"nan", 5}));
     // FP.
     REQUIRE((1. <= real{1}));
+    REQUIRE((1.f <= real{1}));
+    REQUIRE((1.l <= real{1}));
     REQUIRE((real{0.1} <= 1.));
+    REQUIRE((real{0.1} <= 1.f));
+    REQUIRE((real{0.1} <= 1.l));
     REQUIRE(!(real{"inf", 64} <= 45.));
     REQUIRE(!(real{"nan", 5} <= 1.));
+    REQUIRE(!(real{"nan", 5} <= 1.f));
+    REQUIRE(!(real{"nan", 5} <= 1.l));
+    REQUIRE(!(1. <= real{"nan", 5}));
+    REQUIRE(!(1.f <= real{"nan", 5}));
     REQUIRE(!(1.l <= real{"nan", 5}));
     if (std::numeric_limits<double>::has_quiet_NaN) {
         REQUIRE(!(std::numeric_limits<double>::quiet_NaN() <= real{"nan", 5}));
@@ -1795,7 +1848,9 @@ TEST_CASE("real lte")
     REQUIRE(!(real{2} <= rat_t{1ull}));
     REQUIRE(!(real{"inf", 64} <= int_t{45}));
     REQUIRE(!(real{"nan", 5} <= int_t{1}));
+    REQUIRE(!(int_t{1} <= real{"nan", 5}));
     REQUIRE(!(rat_t{1} <= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} <= rat_t{1}));
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE((real128{} <= real{1}));
     REQUIRE(!(real{2} <= real128{1ull}));
@@ -1836,11 +1891,30 @@ TEST_CASE("real gt")
     REQUIRE((real{"inf", 64} > 45));
     REQUIRE(!(real{"nan", 5} > 1));
     REQUIRE(!(1 > real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} > 1u));
+    REQUIRE(!(1u > real{"nan", 5}));
+    // The bool specialisations.
+    REQUIRE(real{2} > true);
+    REQUIRE(!(real{1} > true));
+    REQUIRE(!(real{-1} > false));
+    REQUIRE(!(real{"nan", 5} > false));
+    REQUIRE(true > real{0});
+    REQUIRE(!(true > real{1}));
+    REQUIRE(false > real{-1});
+    REQUIRE(!(false > real{"nan", 5}));
     // FP.
     REQUIRE(!(1. > real{1}));
     REQUIRE(!(real{0.1} > 1.));
+    REQUIRE(!(1.f > real{1}));
+    REQUIRE(!(real{0.1} > 1.f));
+    REQUIRE(!(1.l > real{1}));
+    REQUIRE(!(real{0.1} > 1.l));
     REQUIRE((real{"inf", 64} > 45.));
     REQUIRE(!(real{"nan", 5} > 1.));
+    REQUIRE(!(real{"nan", 5} > 1.f));
+    REQUIRE(!(real{"nan", 5} > 1.l));
+    REQUIRE(!(1. > real{"nan", 10}));
+    REQUIRE(!(1.f > real{"nan", 10}));
     REQUIRE(!(1.l > real{"nan", 5}));
     if (std::numeric_limits<double>::has_quiet_NaN) {
         REQUIRE(!(std::numeric_limits<double>::quiet_NaN() > real{"nan", 5}));
@@ -1851,7 +1925,9 @@ TEST_CASE("real gt")
     REQUIRE((real{2} > rat_t{1ull}));
     REQUIRE((real{"inf", 64} > int_t{45}));
     REQUIRE(!(real{"nan", 5} > int_t{1}));
+    REQUIRE(!(int_t{1} > real{"nan", 5}));
     REQUIRE(!(rat_t{1} > real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} > rat_t{1}));
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE(!(real128{} > real{1}));
     REQUIRE((real{2} > real128{1ull}));
@@ -1892,11 +1968,30 @@ TEST_CASE("real gte")
     REQUIRE((real{"inf", 64} >= 45));
     REQUIRE(!(real{"nan", 5} >= 1));
     REQUIRE(!(1 >= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} >= 1u));
+    REQUIRE(!(1u >= real{"nan", 5}));
+    // The bool specialisations.
+    REQUIRE(real{2} >= true);
+    REQUIRE(real{1} >= true);
+    REQUIRE(!(real{-1} >= false));
+    REQUIRE(!(real{"nan", 5} >= false));
+    REQUIRE(true >= real{0});
+    REQUIRE(true >= real{1});
+    REQUIRE(false >= real{-1});
+    REQUIRE(!(false >= real{"nan", 5}));
     // FP.
     REQUIRE((1. >= real{1}));
+    REQUIRE((1.f >= real{1}));
+    REQUIRE((1.l >= real{1}));
     REQUIRE(!(real{0.1} >= 1.));
+    REQUIRE(!(real{0.1} >= 1.f));
+    REQUIRE(!(real{0.1} >= 1.l));
     REQUIRE((real{"inf", 64} >= 45.));
     REQUIRE(!(real{"nan", 5} >= 1.));
+    REQUIRE(!(real{"nan", 5} >= 1.f));
+    REQUIRE(!(real{"nan", 5} >= 1.l));
+    REQUIRE(!(1. >= real{"nan", 5}));
+    REQUIRE(!(1.f >= real{"nan", 5}));
     REQUIRE(!(1.l >= real{"nan", 5}));
     if (std::numeric_limits<double>::has_quiet_NaN) {
         REQUIRE(!(std::numeric_limits<double>::quiet_NaN() >= real{"nan", 5}));
@@ -1907,7 +2002,9 @@ TEST_CASE("real gte")
     REQUIRE((real{2} >= rat_t{1ull}));
     REQUIRE((real{"inf", 64} >= int_t{45}));
     REQUIRE(!(real{"nan", 5} >= int_t{1}));
+    REQUIRE(!(int_t{1} >= real{"nan", 5}));
     REQUIRE(!(rat_t{1} >= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} >= rat_t{1}));
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE(!(real128{} >= real{1}));
     REQUIRE((real{2} >= real128{1ull}));
