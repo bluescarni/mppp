@@ -171,28 +171,28 @@ is that in operations involving <a class="reference internal" href="#_CPPv4N4mpp
 by the precision of the operands, whereas in MPFR the precision of the operation is determined by the precision
 of the return value (which is always passed as the first function parameter in the MPFR API). For instance,
 in the following code,</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">real</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="mi">200</span><span class="p">}</span> <span class="o">+</span> <span class="n">real</span><span class="p">{</span><span class="mi">6</span><span class="p">,</span><span class="mi">150</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">real</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="mi">200</span><span class="p">}</span> <span class="o">+</span> <span class="n">real</span><span class="p">{</span><span class="mi">6</span><span class="p">,</span> <span class="mi">150</span><span class="p">};</span>
 </pre></div>
 </div>
 <p>the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
-150 bits. The precision of the result <code class="docutils literal notranslate"><span class="pre">x</span></code> (and the precision at which the addition is computed) will be
+150 bits. The precision of the result <code class="docutils literal notranslate"><span class="pre">x</span></code> will be
 the maximum precision among the two operands, that is, 200 bits.</p>
 <p>The precision of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> can be set at construction, or it can be changed later via functions
 such as <a class="reference internal" href="#_CPPv4N4mppp4real8set_precE11mpfr_prec_t" title="mppp::real::set_prec"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::set_prec()</span></code></a>, <a class="reference internal" href="#_CPPv4N4mppp4real10prec_roundE11mpfr_prec_t" title="mppp::real::prec_round"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::prec_round()</span></code></a>, etc. By default,
 the precision of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is automatically deduced upon construction following a set of heuristics
 aimed at ensuring that the constructed <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> preserves the value used for initialisation,
 if possible.
-For instance, by default, the construction of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> from a 32 bit integer will yield a
+For instance, by default the construction of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> from a 32 bit integer will yield a
 <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> with a precision of 32 bits. This behaviour can be altered by specifying explicitly
 the desired precision value.</p>
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#real-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding MPFR functions minus the leading <code class="docutils literal notranslate"><span class="pre">mpfr_</span></code>
 prefix. For instance, the MPFR call</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpfr_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">MPFR_RNDN</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpfr_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">MPFR_RNDN</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>that writes the result of <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code>, rounded to nearest, into <code class="docutils literal notranslate"><span class="pre">rop</span></code>, becomes simply</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function is resolved via argument-dependent lookup. Function calls with overlapping arguments
@@ -1813,15 +1813,14 @@ equal to the precision of <em>x</em>.</p>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
 </div>
-<p>Ternary <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> primitives for exact
+<p>Ternary <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> primitives for
 multiplication/division by powers of 2.</p>
 <p>These functions will set <em>rop</em> to, respectively:</p>
 <ul class="simple">
 <li><span class="math notranslate nohighlight">\(x \times 2^n\)</span> (<code class="docutils literal notranslate"><span class="pre">mul_2</span></code> variants),</li>
 <li><span class="math notranslate nohighlight">\(\frac{x}{2^n}\)</span> (<code class="docutils literal notranslate"><span class="pre">div_2</span></code> variants).</li>
 </ul>
-<p>The precision of the result will be equal to the precision of <em>x</em>.
-The computation will be exact (that is, no rounding takes place).</p>
+<p>The precision of the result will be equal to the precision of <em>x</em>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>rop</strong> – the return value.</li>
@@ -1855,15 +1854,14 @@ The computation will be exact (that is, no rounding takes place).</p>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
 </div>
-<p>Binary <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> primitives for exact
+<p>Binary <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> primitives for
 multiplication/division by powers of 2.</p>
 <p>These functions will return, respectively:</p>
 <ul class="simple">
 <li><span class="math notranslate nohighlight">\(x \times 2^n\)</span> (<code class="docutils literal notranslate"><span class="pre">mul_2</span></code> variants),</li>
 <li><span class="math notranslate nohighlight">\(\frac{x}{2^n}\)</span> (<code class="docutils literal notranslate"><span class="pre">div_2</span></code> variants).</li>
 </ul>
-<p>The precision of the result will be equal to the precision of <em>x</em>.
-The computation will be exact (that is, no rounding takes place).</p>
+<p>The precision of the result will be equal to the precision of <em>x</em>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>x</strong> – the operand.</li>
@@ -2272,19 +2270,13 @@ The precision of <em>rop</em> will be set to the largest precision among the ope
 <dd><p>Binary exponentiation.</p>
 <p>This function will compute and return <em>op1</em> raised to the power of <em>op2</em>.
 The precision of the result will be set to the largest precision among the operands.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-before performing the operation. The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment operator of
-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>op1</strong> – the base.</li>
 <li><strong>op2</strong> – the exponent.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first"><em>op1</em> raised to the power of <em>op2</em>.</p>
-</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last"><em>op1</em> raised to the power of <em>op2</em>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2616,11 +2608,8 @@ The precision of <em>rop</em> will be set to the largest precision among the ope
 <dt id="_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5atan2EN4mppp4realERR1TRR1U">
 <span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mppp5atan2ERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mppp5atan2ERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types">real_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5atan2EN4mppp4realERR1TRR1U" title="mppp::atan2::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">atan2</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5atan2EN4mppp4realERR1TRR1U" title="mppp::atan2::T">T</a> &amp;&amp;<em>y</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5atan2EN4mppp4realERR1TRR1U" title="mppp::atan2::U">U</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5atan2EN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary arctangent-2.</p>
-<p>This function will compute and return the arctangent-2 of <em>y</em> and <em>x</em>.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-before performing the operation. The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment
-operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<p>This function will compute and return the arctangent-2 of <em>y</em> and <em>x</em>.
+The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>y</strong> – the sine argument.</li>
@@ -2976,11 +2965,8 @@ configured with the <code class="docutils literal notranslate"><span class="pre"
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 </div>
 <p>Binary log hypot function.</p>
-<p>This function will compute and return <span class="math notranslate nohighlight">\(\log\left(\sqrt{x^2+y^2}\right)\)</span>.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-before performing the operation. The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment
-operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<p>This function will compute and return <span class="math notranslate nohighlight">\(\log\left(\sqrt{x^2+y^2}\right)\)</span>.
+The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>x</strong> – the first argument.</li>
@@ -3144,11 +3130,8 @@ The precision of <em>rop</em> will be set to the largest precision among the ope
 <p class="last">This function is available from MPFR 4 onwards.</p>
 </div>
 <p>Binary incomplete Gamma function.</p>
-<p>This function will compute and return the upper incomplete Gamma function of <em>x</em> and <em>y</em>.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-before performing the operation. The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment
-operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<p>This function will compute and return the upper incomplete Gamma function of <em>x</em> and <em>y</em>.
+The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>x</strong> – the first argument.</li>
@@ -3405,11 +3388,8 @@ The precision of <em>rop</em> will be set to the largest precision among the ope
 <p class="last">This function is available from MPFR 4 onwards.</p>
 </div>
 <p>Binary beta function.</p>
-<p>This function will compute and return the beta function of <em>x</em> and <em>y</em>.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-before performing the operation. The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment
-operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<p>This function will compute and return the beta function of <em>x</em> and <em>y</em>.
+The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>x</strong> – the first argument.</li>
@@ -3445,11 +3425,8 @@ The precision of <em>rop</em> will be set to the largest precision among the ope
 <dt id="_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5hypotEN4mppp4realERR1TRR1U">
 <span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mppp5hypotERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mppp5hypotERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types">real_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5hypotEN4mppp4realERR1TRR1U" title="mppp::hypot::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">hypot</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5hypotEN4mppp4realERR1TRR1U" title="mppp::hypot::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5hypotEN4mppp4realERR1TRR1U" title="mppp::hypot::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp5hypotEN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary hypot function.</p>
-<p>This function will compute and return <span class="math notranslate nohighlight">\(\sqrt{x^2+y^2}\)</span>.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-before performing the operation. The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment
-operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<p>This function will compute and return <span class="math notranslate nohighlight">\(\sqrt{x^2+y^2}\)</span>.
+The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>x</strong> – the first argument.</li>
@@ -3485,11 +3462,8 @@ The precision of <em>rop</em> will be set to the largest precision among the ope
 <dt id="_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3agmEN4mppp4realERR1TRR1U">
 <span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mppp3agmERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mppp3agmERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types">real_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3agmEN4mppp4realERR1TRR1U" title="mppp::agm::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">agm</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3agmEN4mppp4realERR1TRR1U" title="mppp::agm::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3agmEN4mppp4realERR1TRR1U" title="mppp::agm::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3agmEN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary AGM.</p>
-<p>This function will compute and return the arithmetic-geometric mean of <em>x</em> and <em>y</em>.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-before performing the operation. The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment
-operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<p>This function will compute and return the arithmetic-geometric mean of <em>x</em> and <em>y</em>.
+The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>x</strong> – the first argument.</li>
@@ -3607,19 +3581,13 @@ library if precise and forward-compatible control on the printing format is need
 <span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mpppdvERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mpppdvERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types">real_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mpppdvEN4mppp4realERR1TRR1U" title="mppp::operator/::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator/</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mpppdvEN4mppp4realERR1TRR1U" title="mppp::operator/::T">T</a> &amp;&amp;<em>a</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mpppdvEN4mppp4realERR1TRR1U" title="mppp::operator/::U">U</a> &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mpppdvEN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary arithmetic operators.</p>
 <p>The precision of the result will be set to the largest precision among the operands.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
-before performing the operation. The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment operator of
-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>a</strong> – the first operand.</li>
 <li><strong>b</strong> – the second operand.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the result of the binary operation.</p>
-</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the result of the binary operation.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3658,8 +3626,6 @@ to the expressions:</p>
 <span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>That is, the operation is performed via the corresponding binary operator
-and the result is assigned back to <em>a</em>, after a conversion if necessary.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>a</strong> – the first operand.</li>
@@ -3668,8 +3634,7 @@ and the result is assigned back to <em>a</em>, after a conversion if necessary.<
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first">a reference to <em>a</em>.</p>
 </dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the corresponding binary operator,
-or by the generic conversion operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic conversion operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3683,6 +3648,7 @@ or by the generic conversion operator of <a class="reference internal" href="#_C
 <dt id="_CPPv4N4mpppmmERN4mppp4realE">
 <span id="_CPPv3N4mpppmmERN4mppp4realE"></span><span id="_CPPv2N4mpppmmERN4mppp4realE"></span><span id="mppp::dec-operator__mppp::realR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator--</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmmERN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Prefix increment/decrement.</p>
+<p>The precision of <em>x</em> will not be altered by the increment/decrement.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input argument.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <em>x</em> after the increment/decrement.</dd>
@@ -3698,6 +3664,7 @@ or by the generic conversion operator of <a class="reference internal" href="#_C
 <dt id="_CPPv4N4mpppmmERN4mppp4realEi">
 <span id="_CPPv3N4mpppmmERN4mppp4realEi"></span><span id="_CPPv2N4mpppmmERN4mppp4realEi"></span><span id="mppp::dec-operator__mppp::realR.i"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator--</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em>, int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmmERN4mppp4realEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Suffix increment/decrement.</p>
+<p>The precision of <em>x</em> will not be altered by the increment/decrement.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input argument.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">a copy of <em>x</em> before the increment/decrement.</dd>
@@ -3743,26 +3710,17 @@ or by the generic conversion operator of <a class="reference internal" href="#_C
 <li><span class="math notranslate nohighlight">\(a \geq b\)</span>,</li>
 </ul>
 <p>and <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
-<p>Non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> before performing the operation.
-The conversion of non-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> operands
-to <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> follows the same heuristics described in the generic assignment operator of
-<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">These operators handle NaN in the same way specified by the IEEE floating-point
+<p>The comparisons are always exact (i.e., no rounding is involved).</p>
+<p>These operators handle NaN in the same way specified by the IEEE floating-point
 standard. <a class="reference internal" href="#real-comparison"><span class="std std-ref">Alternative comparison functions</span></a> treating NaN
 specially are available.</p>
-</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>a</strong> – the first operand.</li>
 <li><strong>b</strong> – the second operand.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the result of the comparison.</p>
-</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator
-of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the result of the comparison.</p>
 </dd>
 </dl>
 </dd></dl>

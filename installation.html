@@ -137,7 +137,7 @@ for the <code class="docutils literal notranslate"><span class="pre">long</span>
 used in the implementation of additional special functions for the
 <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class;</li>
 <li>the <a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/">quadmath library</a> from GCC, <em>optional</em>, used
-in the implementation of the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class
+in the implementation of the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> classes
 (typically, the quadmath library is part of GCC and it does not need to
 be installed separately);</li>
 <li>the <a class="reference external" href="https://www.boost.org/">Boost</a> libraries, <em>optional</em>, currently used
@@ -273,9 +273,8 @@ system you can compile this example with the following command:</p>
 <p>Because parts of mp++ are implemented using templates,
 users of the library will have to explicitly link to GMP
 and (if enabled) MPFR. Explicit linking to the other optional
-dependencies (quadmath, Arb, etc.) is not necessary, as they are
-used only within the compiled component
-of the mp++ library.</p>
+dependencies is not necessary, as they will
+be automatically brought into the link chain by the mp++ library.</p>
 <p>If you are using CMake, it is highly recommended to make use of the config-file
 package provided with mp++ rather
 than locating and linking manually the required dependencies
@@ -356,7 +355,9 @@ floating-point primitives
 as constant expressions. As a result, a few <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 functions which are <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> on GCC and Clang are not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code>
 when using the Intel compiler. These occurrences are marked in the API
-reference.</li>
+reference. Also, the Intel compiler seems to be prone to internal
+errors when performing <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> computations with
+<a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a>.</li>
 </ul>
 <p>MinGW:</p>
 <ul class="simple">
