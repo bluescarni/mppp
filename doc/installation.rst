@@ -28,7 +28,7 @@ mp++ has the following dependencies:
   used in the implementation of additional special functions for the
   :cpp:class:`~mppp::real` class;
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
-  in the implementation of the :cpp:class:`~mppp::real128` class
+  in the implementation of the :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128` classes
   (typically, the quadmath library is part of GCC and it does not need to
   be installed separately);
 * the `Boost <https://www.boost.org/>`__ libraries, *optional*, currently used
@@ -185,9 +185,8 @@ system you can compile this example with the following command:
 Because parts of mp++ are implemented using templates,
 users of the library will have to explicitly link to GMP
 and (if enabled) MPFR. Explicit linking to the other optional
-dependencies (quadmath, Arb, etc.) is not necessary, as they are
-used only within the compiled component
-of the mp++ library.
+dependencies is not necessary, as they will
+be automatically brought into the link chain by the mp++ library.
 
 If you are using CMake, it is highly recommended to make use of the config-file
 package provided with mp++ rather
