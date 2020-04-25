@@ -28,6 +28,12 @@ class real;
 
 #endif
 
+#if defined(MPPP_WITH_MPC)
+
+class complex;
+
+#endif
+
 #if defined(MPPP_WITH_QUADMATH)
 
 class real128;

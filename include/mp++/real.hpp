@@ -248,6 +248,15 @@ class MPPP_DLL_PUBLIC real
         return p;
     }
 
+#if defined(MPPP_WITH_MPC)
+    friend class complex;
+
+    struct shallow_copy_t {
+    };
+
+    explicit real(shallow_copy_t, const ::mpfr_t r) : m_mpfr(r[0]) {}
+#endif
+
 public:
     // Default constructor.
     real();

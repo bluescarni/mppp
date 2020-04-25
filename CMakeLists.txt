@@ -26,8 +26,9 @@ option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effe
 mark_as_advanced(MPPP_BENCHMARK_BOOST)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_FLINT)
-option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
+option(MPPP_WITH_MPFR "Enable features relying on MPFR." OFF)
 option(MPPP_WITH_ARB "Enable features relying on Arb." OFF)
+option(MPPP_WITH_MPC "Enable features relying on MPC." OFF)
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
@@ -38,6 +39,10 @@ endif()
 
 if(MPPP_WITH_ARB AND NOT MPPP_WITH_MPFR)
     message(FATAL_ERROR "Arb support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
+endif()
+
+if(MPPP_WITH_MPC AND NOT MPPP_WITH_MPFR)
+    message(FATAL_ERROR "MPC support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
 endif()
 
 if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY)
@@ -217,6 +222,12 @@ if(MPPP_WITH_MPFR)
         "${MPPP_SRC_FILES}")
 endif()
 
+if(MPPP_WITH_MPC)
+    set(MPPP_SRC_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/complex.cpp"
+        "${MPPP_SRC_FILES}")
+endif()
+
 # Make mp++ header files accessible in Visual Studio IDE.
 if(YACMA_COMPILER_IS_MSVC)
   set(MPPP_HEADER_FILES
@@ -288,6 +299,13 @@ target_include_directories(mp++ PUBLIC
 # target later, because of linker sensitivity to the linking order
 # on some platforms (see the comment below).
 find_package(mp++_GMP REQUIRED)
+
+# Optional dependency on MPC.
+if(MPPP_WITH_MPC)
+    find_package(mp++_MPC REQUIRED)
+    target_link_libraries(mp++ PUBLIC mp++::MPC)
+    set(MPPP_ENABLE_MPC "#define MPPP_WITH_MPC")
+endif()
 
 # Optional dependency on MPFR.
 if(MPPP_WITH_MPFR)
