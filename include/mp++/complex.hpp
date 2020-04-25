@@ -13,6 +13,8 @@
 
 #if defined(MPPP_WITH_MPC)
 
+#include <cassert>
+#include <ostream>
 #include <utility>
 
 #include <mp++/detail/fwd_decl.hpp>
@@ -26,8 +28,18 @@ namespace mppp
 class MPPP_DLL_PUBLIC complex
 {
 public:
+    // Default ctor.
     complex();
+    // Copy ctor.
     complex(const complex &);
+    // Move constructor.
+    complex(complex &&other) noexcept
+    {
+        // Shallow copy other.
+        m_mpc = other.m_mpc;
+        // Mark the other as moved-from.
+        other.m_mpc.re->_mpfr_d = nullptr;
+    }
 
     explicit complex(const ::mpc_t);
 
@@ -141,12 +153,16 @@ public:
 
     ::mpfr_prec_t get_prec() const
     {
+        assert(mpfr_get_prec(mpc_realref(&m_mpc)) == mpfr_get_prec(mpc_imagref(&m_mpc)));
+
         return mpfr_get_prec(mpc_realref(&m_mpc));
     }
 
 private:
     mpc_struct_t m_mpc;
 };
+
+MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
 
 } // namespace mppp
 

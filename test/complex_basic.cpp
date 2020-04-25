@@ -22,9 +22,6 @@ TEST_CASE("complex constructors")
         rex.get() += 45;
         iex.get() += 42;
     }
-    {
-        complex::const_re_extractor ex{c};
 
-        std::cout << ex.get() << '\n';
-    }
+    std::cout << c << '\n';
 }

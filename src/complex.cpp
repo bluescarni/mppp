@@ -7,13 +7,58 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cassert>
+#include <cstddef>
+#include <ostream>
+#include <type_traits>
 
 #include <mp++/complex.hpp>
+#include <mp++/config.hpp>
 #include <mp++/detail/mpc.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/utils.hpp>
 
 namespace mppp
 {
+
+namespace detail
+{
+
+namespace
+{
+
+// Some misc tests to check that the mpc struct conforms to our expectations.
+struct expected_mpc_struct_t {
+    ::mpfr_t re;
+    ::mpfr_t im;
+};
+
+static_assert(sizeof(expected_mpc_struct_t) == sizeof(mpc_struct_t) && offsetof(mpc_struct_t, re) == 0u
+                  && offsetof(mpc_struct_t, im) == offsetof(expected_mpc_struct_t, im),
+              "Invalid mpc_t struct layout and/or MPC types.");
+
+#if MPPP_CPLUSPLUS >= 201703L
+
+// If we have C++17, we can use structured bindings to test the layout of mpc_struct_t
+// and its members' types.
+constexpr bool test_mpc_struct_t()
+{
+    auto [re, im] = mpc_struct_t{};
+
+    static_assert(std::is_same<decltype(re), ::mpfr_t>::value);
+    static_assert(std::is_same<decltype(im), ::mpfr_t>::value);
+
+    ignore(re, im);
+
+    return true;
+}
+
+static_assert(test_mpc_struct_t());
+
+#endif
+
+} // namespace
+
+} // namespace detail
 
 complex::complex()
 {
@@ -48,6 +93,17 @@ complex::complex(const ::mpc_t c)
     // Init with the same precision as other, and then set.
     ::mpc_init2(&m_mpc, mpfr_get_prec(mpc_realref(c)));
     ::mpc_set(&m_mpc, c, MPC_RNDNN);
+}
+
+// TODO implement on top of to_string().
+std::ostream &operator<<(std::ostream &os, const complex &c)
+{
+    complex::const_re_extractor rex{c};
+    complex::const_im_extractor iex{c};
+
+    os << '(' << rex.get().to_string() << ',' << iex.get().to_string() << ')';
+
+    return os;
 }
 
 } // namespace mppp
