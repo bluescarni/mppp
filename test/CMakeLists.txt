@@ -194,6 +194,10 @@ if(MPPP_WITH_MPFR)
   ADD_MPPP_TESTCASE(real_polylogs)
 endif()
 
+if(MPPP_WITH_MPC)
+  ADD_MPPP_TESTCASE(complex_basic)
+endif()
+
 if(MPPP_TEST_PYBIND11)
   add_subdirectory(pybind11)
 endif()

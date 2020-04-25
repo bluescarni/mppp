@@ -33,50 +33,110 @@ public:
 
     ~complex();
 
-    class real_extractor
+    class re_extractor
     {
     public:
-        explicit real_extractor(complex &c) : m_c(c), value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc)) {}
+        explicit re_extractor(complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc)) {}
 
-        real_extractor(const real_extractor &) = delete;
-        real_extractor(real_extractor &&) = delete;
-        real_extractor &operator=(const real_extractor &) = delete;
-        real_extractor &operator=(real_extractor &&) = delete;
+        re_extractor(const re_extractor &) = delete;
+        re_extractor(re_extractor &&) = delete;
+        re_extractor &operator=(const re_extractor &) = delete;
+        re_extractor &operator=(re_extractor &&) = delete;
 
-        ~real_extractor()
+        ~re_extractor()
         {
-            mpc_realref(&m_c.m_mpc)[0] = *value.get_mpfr_t();
-            value._get_mpfr_t()->_mpfr_d = nullptr;
+            mpc_realref(&m_c.m_mpc)[0] = *m_value.get_mpfr_t();
+            m_value._get_mpfr_t()->_mpfr_d = nullptr;
+        }
+
+        real &get()
+        {
+            return m_value;
         }
 
     private:
         complex &m_c;
-
-    public:
-        real value;
+        real m_value;
     };
 
-    class imag_extractor
+    class const_re_extractor
     {
     public:
-        explicit imag_extractor(complex &c) : m_c(c), value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc)) {}
-
-        imag_extractor(const imag_extractor &) = delete;
-        imag_extractor(imag_extractor &&) = delete;
-        imag_extractor &operator=(const imag_extractor &) = delete;
-        imag_extractor &operator=(imag_extractor &&) = delete;
-
-        ~imag_extractor()
+        explicit const_re_extractor(const complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc))
         {
-            mpc_imagref(&m_c.m_mpc)[0] = *value.get_mpfr_t();
-            value._get_mpfr_t()->_mpfr_d = nullptr;
+        }
+
+        const_re_extractor(const const_re_extractor &) = delete;
+        const_re_extractor(const_re_extractor &&) = delete;
+        const_re_extractor &operator=(const const_re_extractor &) = delete;
+        const_re_extractor &operator=(const_re_extractor &&) = delete;
+
+        ~const_re_extractor()
+        {
+            m_value._get_mpfr_t()->_mpfr_d = nullptr;
+        }
+
+        const real &get() const
+        {
+            return m_value;
+        }
+
+    private:
+        const complex &m_c;
+        real m_value;
+    };
+
+    class im_extractor
+    {
+    public:
+        explicit im_extractor(complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc)) {}
+
+        im_extractor(const im_extractor &) = delete;
+        im_extractor(im_extractor &&) = delete;
+        im_extractor &operator=(const im_extractor &) = delete;
+        im_extractor &operator=(im_extractor &&) = delete;
+
+        ~im_extractor()
+        {
+            mpc_imagref(&m_c.m_mpc)[0] = *m_value.get_mpfr_t();
+            m_value._get_mpfr_t()->_mpfr_d = nullptr;
+        }
+
+        real &get()
+        {
+            return m_value;
         }
 
     private:
         complex &m_c;
+        real m_value;
+    };
 
+    class const_im_extractor
+    {
     public:
-        real value;
+        explicit const_im_extractor(const complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc))
+        {
+        }
+
+        const_im_extractor(const const_im_extractor &) = delete;
+        const_im_extractor(const_im_extractor &&) = delete;
+        const_im_extractor &operator=(const const_im_extractor &) = delete;
+        const_im_extractor &operator=(const_im_extractor &&) = delete;
+
+        ~const_im_extractor()
+        {
+            m_value._get_mpfr_t()->_mpfr_d = nullptr;
+        }
+
+        const real &get() const
+        {
+            return m_value;
+        }
+
+    private:
+        const complex &m_c;
+        real m_value;
     };
 
     ::mpfr_prec_t get_prec() const
