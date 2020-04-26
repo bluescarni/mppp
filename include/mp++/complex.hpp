@@ -15,10 +15,13 @@
 
 #include <cassert>
 #include <ostream>
+#include <stdexcept>
 #include <utility>
 
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/mpc.hpp>
+#include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/detail/visibility.hpp>
 #include <mp++/real.hpp>
 
@@ -27,6 +30,17 @@ namespace mppp
 
 class MPPP_DLL_PUBLIC complex
 {
+    // Utility function to check the precision upon init.
+    static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
+    {
+        if (mppp_unlikely(!detail::real_prec_check(p))) {
+            throw std::invalid_argument("Cannot init a complex with a precision of " + detail::to_string(p)
+                                        + ": the maximum allowed precision is " + detail::to_string(real_prec_max())
+                                        + ", the minimum allowed precision is " + detail::to_string(real_prec_min()));
+        }
+        return p;
+    }
+
 public:
     // Default ctor.
     complex();
@@ -40,6 +54,9 @@ public:
         // Mark the other as moved-from.
         other.m_mpc.re->_mpfr_d = nullptr;
     }
+
+    // Copy constructor with custom precision.
+    explicit complex(const complex &, ::mpfr_prec_t);
 
     explicit complex(const ::mpc_t);
 

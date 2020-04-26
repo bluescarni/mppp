@@ -88,6 +88,13 @@ complex::~complex()
     }
 }
 
+complex::complex(const complex &other, ::mpfr_prec_t p)
+{
+    // Init with custom precision, and then set.
+    ::mpc_init2(&m_mpc, check_init_prec(p));
+    ::mpc_set(&m_mpc, &other.m_mpc, MPC_RNDNN);
+}
+
 complex::complex(const ::mpc_t c)
 {
     // Init with the same precision as other, and then set.
