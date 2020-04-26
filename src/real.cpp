@@ -74,6 +74,9 @@ static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offseto
                   && std::is_same<::mp_limb_t *, decltype(std::declval<mpfr_struct_t>()._mpfr_d)>::value,
               "Invalid mpfr_t struct layout and/or MPFR types.");
 
+// Double check that real is a standard layout class.
+static_assert(std::is_standard_layout<real>::value, "real is not a standard layout class.");
+
 #if MPPP_CPLUSPLUS >= 201703L
 
 // If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
