@@ -1086,14 +1086,15 @@ private:
     mpfr_struct_t m_mpfr;
 };
 
-// Double check that real is a standard layout class.
-static_assert(std::is_standard_layout<real>::value, "real is not a standard layout class.");
-
 template <typename T, typename U>
 using are_real_op_types = detail::disjunction<
     detail::conjunction<std::is_same<real, detail::uncvref_t<T>>, std::is_same<real, detail::uncvref_t<U>>>,
     detail::conjunction<std::is_same<real, detail::uncvref_t<T>>, is_real_interoperable<detail::uncvref_t<U>>>,
     detail::conjunction<std::is_same<real, detail::uncvref_t<U>>, is_real_interoperable<detail::uncvref_t<T>>>>;
+
+template <typename T, typename U>
+using are_real_in_place_op_types
+    = detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 
@@ -1101,7 +1102,7 @@ template <typename T, typename U>
 MPPP_CONCEPT_DECL real_op_types = are_real_op_types<T, U>::value;
 
 template <typename T, typename U>
-MPPP_CONCEPT_DECL real_in_place_op_types = real_op_types<T, U> && !std::is_const<detail::unref_t<T>>::value;
+MPPP_CONCEPT_DECL real_in_place_op_types = are_real_in_place_op_types<T, U>::value;
 
 #endif
 
@@ -2926,10 +2927,7 @@ inline void dispatch_real_in_place_add(T &x, U &&a)
 template <typename T, typename U>
 requires real_in_place_op_types<T, U>
 #else
-template <typename T, typename U,
-          detail::enable_if_t<
-              detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value,
-              int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
     inline T &operator+=(T &a, U &&b)
 {
@@ -3280,10 +3278,7 @@ inline void dispatch_real_in_place_sub(T &x, U &&a)
 template <typename T, typename U>
 requires real_in_place_op_types<T, U>
 #else
-template <typename T, typename U,
-          detail::enable_if_t<
-              detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value,
-              int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
     inline T &operator-=(T &a, U &&b)
 {
@@ -3589,10 +3584,7 @@ inline void dispatch_real_in_place_mul(T &x, U &&a)
 template <typename T, typename U>
 requires real_in_place_op_types<T, U>
 #else
-template <typename T, typename U,
-          detail::enable_if_t<
-              detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value,
-              int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
     inline T &operator*=(T &a, U &&b)
 {
@@ -3909,10 +3901,7 @@ inline void dispatch_real_in_place_div(T &x, U &&a)
 template <typename T, typename U>
 requires real_in_place_op_types<T, U>
 #else
-template <typename T, typename U,
-          detail::enable_if_t<
-              detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value,
-              int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
     inline T &operator/=(T &a, U &&b)
 {
