@@ -36,6 +36,9 @@ static_assert(sizeof(expected_mpc_struct_t) == sizeof(mpc_struct_t) && offsetof(
                   && offsetof(mpc_struct_t, im) == offsetof(expected_mpc_struct_t, im),
               "Invalid mpc_t struct layout and/or MPC types.");
 
+// Double check that complex is a standard layout class.
+static_assert(std::is_standard_layout<complex>::value, "complex is not a standard layout class.");
+
 #if MPPP_CPLUSPLUS >= 201703L
 
 // If we have C++17, we can use structured bindings to test the layout of mpc_struct_t
@@ -131,5 +134,20 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
 
     return os;
 }
+
+namespace detail
+{
+
+bool dispatch_complex_equality(const complex &c1, const complex &c2)
+{
+    const auto ret = ::mpc_cmp(c1.get_mpc_t(), c2.get_mpc_t());
+
+    const auto re_ret = MPC_INEX_RE(ret);
+    const auto im_ret = MPC_INEX_IM(ret);
+
+    return re_ret == 0 && im_ret == 0;
+}
+
+} // namespace detail
 
 } // namespace mppp

@@ -40,12 +40,27 @@
 namespace mppp
 {
 
+namespace detail
+{
+
+// Detect real-valued interoperable types
+// for complex. For internal use only.
 template <typename T>
-using is_complex_interoperable = detail::disjunction<is_cpp_arithmetic<T>, detail::is_integer<T>,
-                                                     detail::is_rational<T>, std::is_same<T, real>, is_cpp_complex<T>
+using is_rv_complex_interoperable
+    = disjunction<is_cpp_arithmetic<T>, is_integer<T>, is_rational<T>, std::is_same<T, real>
+#if defined(MPPP_WITH_QUADMATH)
+                  ,
+                  std::is_same<T, real128>
+#endif
+                  >;
+
+} // namespace detail
+
+template <typename T>
+using is_complex_interoperable = detail::disjunction<detail::is_rv_complex_interoperable<T>, is_cpp_complex<T>
 #if defined(MPPP_WITH_QUADMATH)
                                                      ,
-                                                     std::is_same<T, real128>, std::is_same<T, complex128>
+                                                     std::is_same<T, complex128>
 #endif
                                                      >;
 
@@ -94,14 +109,8 @@ private:
     struct gtag {
     };
     // From real-valued interoperable types.
-    template <typename T, detail::enable_if_t<!detail::disjunction<is_cpp_complex<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                                                   ,
-                                                                   std::is_same<T, complex128>
-#endif
-                                                                   >::value,
-                                              int> = 0>
-    explicit complex(gtag, const T &x)
+    template <typename T>
+    explicit complex(gtag, const T &x, std::true_type)
     {
         real re{x}, im{0, re.get_prec()};
 
@@ -114,14 +123,8 @@ private:
         im._get_mpfr_t()->_mpfr_d = nullptr;
     }
     // From complex-valued interoperable types.
-    template <typename T, detail::enable_if_t<detail::disjunction<is_cpp_complex<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                                                  ,
-                                                                  std::is_same<T, complex128>
-#endif
-                                                                  >::value,
-                                              int> = 0>
-    explicit complex(gtag, const T &c)
+    template <typename T>
+    explicit complex(gtag, const T &c, std::false_type)
     {
         real re{c.real()}, im{c.imag()};
 
@@ -137,7 +140,7 @@ private:
 public:
     // Ctor from interoperable types.
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
-    explicit complex(const T &x) : complex(gtag{}, x)
+    explicit complex(const T &x) : complex(gtag{}, x, detail::is_rv_complex_interoperable<T>{})
     {
     }
 
@@ -308,6 +311,26 @@ private:
     mpc_struct_t m_mpc;
 };
 
+template <typename T, typename U>
+using are_complex_op_types = detail::disjunction<
+    detail::conjunction<std::is_same<complex, detail::uncvref_t<T>>, std::is_same<complex, detail::uncvref_t<U>>>,
+    detail::conjunction<std::is_same<complex, detail::uncvref_t<T>>, is_complex_interoperable<detail::uncvref_t<U>>>,
+    detail::conjunction<std::is_same<complex, detail::uncvref_t<U>>, is_complex_interoperable<detail::uncvref_t<T>>>>;
+
+template <typename T, typename U>
+using are_complex_in_place_op_types
+    = detail::conjunction<are_complex_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL complex_op_types = are_complex_op_types<T, U>::value;
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL complex_in_place_op_types = are_complex_in_place_op_types<T, U>::value;
+
+#endif
+
 // Swap.
 inline void swap(complex &a, complex &b) noexcept
 {
@@ -315,6 +338,61 @@ inline void swap(complex &a, complex &b) noexcept
 }
 
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
+
+namespace detail
+{
+
+MPPP_DLL_PUBLIC bool dispatch_complex_equality(const complex &, const complex &);
+
+template <typename T, enable_if_t<is_rv_complex_interoperable<T>::value, int> = 0>
+inline bool dispatch_complex_equality(const complex &c, const T &x)
+{
+    complex::const_re_extractor rex{c};
+    complex::const_im_extractor iex{c};
+
+    return iex.get().zero_p() && rex.get() == x;
+}
+
+template <typename T, enable_if_t<!is_rv_complex_interoperable<T>::value, int> = 0>
+inline bool dispatch_complex_equality(const complex &c1, const T &c2)
+{
+    complex::const_re_extractor rex{c1};
+    complex::const_im_extractor iex{c1};
+
+    return rex.get() == c2.real() && iex.get() == c2.imag();
+}
+
+template <typename T>
+inline bool dispatch_complex_equality(const T &x, const complex &c)
+{
+    return dispatch_complex_equality(c, x);
+}
+
+} // namespace detail
+
+// Equality.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
+#endif
+    inline bool operator==(const T &x, const U &y)
+{
+    return detail::dispatch_complex_equality(x, y);
+}
+
+// Inequality.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
+#endif
+    inline bool operator!=(const T &x, const U &y)
+{
+    return !(x == y);
+}
 
 } // namespace mppp
 
