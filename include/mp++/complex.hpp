@@ -192,9 +192,7 @@ public:
     class const_re_extractor
     {
     public:
-        explicit const_re_extractor(const complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc))
-        {
-        }
+        explicit const_re_extractor(const complex &c) : m_value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc)) {}
 
         const_re_extractor(const const_re_extractor &) = delete;
         const_re_extractor(const_re_extractor &&) = delete;
@@ -212,7 +210,6 @@ public:
         }
 
     private:
-        const complex &m_c;
         real m_value;
     };
 
@@ -245,9 +242,7 @@ public:
     class const_im_extractor
     {
     public:
-        explicit const_im_extractor(const complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc))
-        {
-        }
+        explicit const_im_extractor(const complex &c) : m_value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc)) {}
 
         const_im_extractor(const const_im_extractor &) = delete;
         const_im_extractor(const_im_extractor &&) = delete;
@@ -265,7 +260,6 @@ public:
         }
 
     private:
-        const complex &m_c;
         real m_value;
     };
 
