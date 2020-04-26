@@ -16,17 +16,45 @@
 #include <cassert>
 #include <ostream>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
+#include <mp++/concepts.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/mpc.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/detail/visibility.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 #include <mp++/real.hpp>
+
+#if defined(MPPP_WITH_QUADMATH)
+
+#include <mp++/complex128.hpp>
+#include <mp++/real128.hpp>
+
+#endif
 
 namespace mppp
 {
+
+template <typename T>
+using is_complex_interoperable = detail::disjunction<is_cpp_arithmetic<T>, detail::is_integer<T>,
+                                                     detail::is_rational<T>, std::is_same<T, real>, is_cpp_complex<T>
+#if defined(MPPP_WITH_QUADMATH)
+                                                     ,
+                                                     std::is_same<T, real128>, std::is_same<T, complex128>
+#endif
+                                                     >;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL complex_interoperable = is_complex_interoperable<T>::value;
+
+#endif
 
 class MPPP_DLL_PUBLIC complex
 {
@@ -57,6 +85,58 @@ public:
 
     // Copy constructor with custom precision.
     explicit complex(const complex &, ::mpfr_prec_t);
+
+private:
+    // A tag for private generic ctors.
+    struct gtag {
+    };
+    // From real-valued interoperable types.
+    template <typename T, detail::enable_if_t<!detail::disjunction<is_cpp_complex<T>
+#if defined(MPPP_WITH_QUADMATH)
+                                                                   ,
+                                                                   std::is_same<T, complex128>
+#endif
+                                                                   >::value,
+                                              int> = 0>
+    explicit complex(gtag, const T &x)
+    {
+        real re{x}, im{0, re.get_prec()};
+
+        // Shallow-copy into this.
+        m_mpc.re[0] = *re.get_mpfr_t();
+        m_mpc.im[0] = *im.get_mpfr_t();
+
+        // Deactivate the temporaries.
+        re._get_mpfr_t()->_mpfr_d = nullptr;
+        im._get_mpfr_t()->_mpfr_d = nullptr;
+    }
+    // From complex-valued interoperable types.
+    template <typename T, detail::enable_if_t<detail::disjunction<is_cpp_complex<T>
+#if defined(MPPP_WITH_QUADMATH)
+                                                                  ,
+                                                                  std::is_same<T, complex128>
+#endif
+                                                                  >::value,
+                                              int> = 0>
+    explicit complex(gtag, const T &c)
+    {
+        real re{c.real()}, im{c.imag()};
+
+        // Shallow-copy into this.
+        m_mpc.re[0] = *re.get_mpfr_t();
+        m_mpc.im[0] = *im.get_mpfr_t();
+
+        // Deactivate the temporaries.
+        re._get_mpfr_t()->_mpfr_d = nullptr;
+        im._get_mpfr_t()->_mpfr_d = nullptr;
+    }
+
+public:
+    // Ctor from interoperable types.
+    template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
+    explicit complex(const T &x) : complex(gtag{}, x)
+    {
+    }
 
     explicit complex(const ::mpc_t);
 
