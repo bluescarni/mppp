@@ -26,7 +26,7 @@ if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
         conda config --set channel_priority strict
     fi
 
-    conda_pkgs="cmake<3.16 gmp mpfr arb libflint"
+    conda_pkgs="cmake<3.16 gmp mpfr arb libflint mpc"
 
     if [[ "${MPPP_BUILD}" == Documentation ]]; then
         conda_pkgs="$conda_pkgs pip"
