@@ -102,6 +102,25 @@ complex::complex(const ::mpc_t c)
     ::mpc_set(&m_mpc, c, MPC_RNDNN);
 }
 
+// Copy assignment operator.
+complex &complex::operator=(const complex &other)
+{
+    if (mppp_likely(this != &other)) {
+        if (is_valid()) {
+            // this has not been moved-from.
+            // Copy the precision. This will also reset the internal value.
+            // No need for prec checking as we assume other has a valid prec.
+            set_prec_impl<false>(other.get_prec());
+        } else {
+            // this has been moved-from: init before setting.
+            ::mpc_init2(&m_mpc, other.get_prec());
+        }
+        // Perform the actual copy from other.
+        ::mpc_set(&m_mpc, &other.m_mpc, MPC_RNDNN);
+    }
+    return *this;
+}
+
 // TODO implement on top of to_string().
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {

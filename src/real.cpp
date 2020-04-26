@@ -656,7 +656,7 @@ real::real(const ::mpfr_t x)
 real &real::operator=(const real &other)
 {
     if (mppp_likely(this != &other)) {
-        if (m_mpfr._mpfr_d) {
+        if (is_valid()) {
             // this has not been moved-from.
             // Copy the precision. This will also reset the internal value.
             // No need for prec checking as we assume other has a valid prec.

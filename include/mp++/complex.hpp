@@ -56,6 +56,9 @@ MPPP_CONCEPT_DECL complex_interoperable = is_complex_interoperable<T>::value;
 
 #endif
 
+// Fwd declare swap.
+void swap(complex &, complex &) noexcept;
+
 class MPPP_DLL_PUBLIC complex
 {
     // Utility function to check the precision upon init.
@@ -141,6 +144,24 @@ public:
     explicit complex(const ::mpc_t);
 
     ~complex();
+
+    // Copy assignment operator.
+    complex &operator=(const complex &);
+    // Move assignment operator.
+    complex &operator=(complex &&other) noexcept
+    {
+        // NOTE: for generic code, std::swap() is not a particularly good way of implementing
+        // the move assignment:
+        //
+        // https://stackoverflow.com/questions/6687388/why-do-some-people-use-swap-for-move-assignments
+        //
+        // Here however it is fine, as we know there are no side effects we need to maintain.
+        //
+        // NOTE: we use a raw std::swap() here (instead of mpc_swap()) because we don't know in principle
+        // if mpc_swap() relies on the operands not to be in a moved-from state (although it's unlikely).
+        std::swap(m_mpc, other.m_mpc);
+        return *this;
+    }
 
     class re_extractor
     {
@@ -256,8 +277,48 @@ public:
     }
 
 private:
+    // Utility function to check precision in set_prec().
+    static ::mpfr_prec_t check_set_prec(::mpfr_prec_t p)
+    {
+        if (mppp_unlikely(!detail::real_prec_check(p))) {
+            throw std::invalid_argument("Cannot set the precision of a complex to the value " + detail::to_string(p)
+                                        + ": the maximum allowed precision is " + detail::to_string(real_prec_max())
+                                        + ", the minimum allowed precision is " + detail::to_string(real_prec_min()));
+        }
+        return p;
+    }
+    // mpfr_set_prec() wrapper, with or without prec checking.
+    template <bool Check>
+    void set_prec_impl(::mpfr_prec_t p)
+    {
+        ::mpc_set_prec(&m_mpc, Check ? check_set_prec(p) : p);
+    }
+
+public:
+    const mpc_struct_t *get_mpc_t() const
+    {
+        return &m_mpc;
+    }
+    mpc_struct_t *_get_mpc_t()
+    {
+        return &m_mpc;
+    }
+
+    // Check validity.
+    bool is_valid() const noexcept
+    {
+        return mpc_realref(&m_mpc)->_mpfr_d != nullptr;
+    }
+
+private:
     mpc_struct_t m_mpc;
 };
+
+// Swap.
+inline void swap(complex &a, complex &b) noexcept
+{
+    ::mpc_swap(a._get_mpc_t(), b._get_mpc_t());
+}
 
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
 
