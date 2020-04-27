@@ -237,6 +237,7 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/mp++.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/rational.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/real.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/complex.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/real128.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/complex128.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/type_name.hpp"
@@ -247,6 +248,7 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/real_literals.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/real128_literal.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpfr.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpc.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/type_traits.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/visibility.hpp"
@@ -363,11 +365,15 @@ set(_MPPP_CONFIG_OPTIONAL_DEPS)
 if(MPPP_WITH_MPFR)
     set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(mp++_MPFR REQUIRED)\n")
 endif()
+if(MPPP_WITH_MPC)
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(mp++_MPC REQUIRED)\n")
+endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findmp++_GMP.cmake"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findmp++_MPFR.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findmp++_MPC.cmake"
     DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 # Take care of versioning.

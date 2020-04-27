@@ -348,9 +348,8 @@ template <typename T, enable_if_t<is_rv_complex_interoperable<T>::value, int> = 
 inline bool dispatch_complex_equality(const complex &c, const T &x)
 {
     complex::const_re_extractor rex{c};
-    complex::const_im_extractor iex{c};
 
-    return iex.get().zero_p() && rex.get() == x;
+    return mpfr_zero_p(mpc_imagref(&c.m_mpc)) != 0 && rex.get() == x;
 }
 
 template <typename T, enable_if_t<!is_rv_complex_interoperable<T>::value, int> = 0>

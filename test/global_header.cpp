@@ -32,4 +32,9 @@ TEST_CASE("global_test")
     auto r = 123_r256;
     REQUIRE(r == 123);
 #endif
+
+#if defined(MPPP_WITH_MPC)
+    auto c = complex{123};
+    REQUIRE(c == 123);
+#endif
 }

@@ -19,6 +19,10 @@
 #include <mp++/real.hpp>
 #endif
 
+#if defined(MPPP_WITH_MPC)
+#include <mp++/complex.hpp>
+#endif
+
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/complex128.hpp>
 #include <mp++/real128.hpp>
