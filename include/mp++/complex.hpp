@@ -74,6 +74,8 @@ MPPP_CONCEPT_DECL complex_interoperable = is_complex_interoperable<T>::value;
 // Fwd declare swap.
 void swap(complex &, complex &) noexcept;
 
+enum class complex_prec_t : ::mpfr_prec_t {};
+
 class MPPP_DLL_PUBLIC complex
 {
     // Utility function to check the precision upon init.
@@ -136,11 +138,44 @@ private:
         re._get_mpfr_t()->_mpfr_d = nullptr;
         im._get_mpfr_t()->_mpfr_d = nullptr;
     }
+    // From real-valued interoperable types + prec.
+    template <typename T>
+    explicit complex(gtag, const T &x, complex_prec_t p, std::true_type)
+    {
+        real re{x, static_cast<::mpfr_prec_t>(p)}, im{0, static_cast<::mpfr_prec_t>(p)};
+
+        // Shallow-copy into this.
+        m_mpc.re[0] = *re.get_mpfr_t();
+        m_mpc.im[0] = *im.get_mpfr_t();
+
+        // Deactivate the temporaries.
+        re._get_mpfr_t()->_mpfr_d = nullptr;
+        im._get_mpfr_t()->_mpfr_d = nullptr;
+    }
+    // From complex-valued interoperable types + prec.
+    template <typename T>
+    explicit complex(gtag, const T &c, complex_prec_t p, std::false_type)
+    {
+        real re{c.real(), static_cast<::mpfr_prec_t>(p)}, im{c.imag(), static_cast<::mpfr_prec_t>(p)};
+
+        // Shallow-copy into this.
+        m_mpc.re[0] = *re.get_mpfr_t();
+        m_mpc.im[0] = *im.get_mpfr_t();
+
+        // Deactivate the temporaries.
+        re._get_mpfr_t()->_mpfr_d = nullptr;
+        im._get_mpfr_t()->_mpfr_d = nullptr;
+    }
 
 public:
     // Ctor from interoperable types.
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
     explicit complex(const T &x) : complex(gtag{}, x, detail::is_rv_complex_interoperable<T>{})
+    {
+    }
+    // Ctor from interoperable types + precision.
+    template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
+    explicit complex(const T &x, complex_prec_t p) : complex(gtag{}, x, p, detail::is_rv_complex_interoperable<T>{})
     {
     }
 

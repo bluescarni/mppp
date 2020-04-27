@@ -35,4 +35,7 @@ TEST_CASE("complex constructors")
     std::cout << (complex{std::complex<double>{1.1}} == 1.1) << '\n';
     std::cout << (std::complex<double>{1.1, 2.1} == complex{std::complex<double>{1.1, 2.1}}) << '\n';
     std::cout << (1.1 == complex{std::complex<double>{1.1}}) << '\n';
+
+    std::cout << complex{123, complex_prec_t(512)} << '\n';
+    std::cout << complex{std::complex<double>{123, 456}, complex_prec_t(512)} << '\n';
 }
