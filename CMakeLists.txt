@@ -219,6 +219,7 @@ endif()
 if(MPPP_WITH_MPFR)
     set(MPPP_SRC_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/real.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/mpfr_arb_cleanup.cpp"
         "${MPPP_SRC_FILES}")
 endif()
 
