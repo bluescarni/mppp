@@ -74,7 +74,7 @@ complex::complex(const complex &other) : complex(&other.m_mpc) {}
 
 complex::~complex()
 {
-    if (mpc_realref(&m_mpc)->_mpfr_d) {
+    if (is_valid()) {
         // The object is not moved-from, destroy it.
 
         // Check that the imaginary part is also

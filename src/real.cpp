@@ -1057,7 +1057,7 @@ real::~real()
     detail::ignore(&detail::flint_cleanup_inst);
 #endif
 #endif
-    if (m_mpfr._mpfr_d) {
+    if (is_valid()) {
         // The object is not moved-from, destroy it.
         assert(detail::real_prec_check(get_prec()));
         ::mpfr_clear(&m_mpfr);
