@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add support for C++20's ``constinit``
+  (`#233 <https://github.com/bluescarni/mppp/pull/233>`__).
 - Improve the interoperability between mp++ classes
   via additional assignment operators
   (`#229 <https://github.com/bluescarni/mppp/pull/229>`__).
