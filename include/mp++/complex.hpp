@@ -133,31 +133,71 @@ private:
     }
     // From complex-valued interoperable types + optional precision.
     template <typename T, typename... Args>
-    explicit complex(gtag, std::false_type, const T &c, const Args &... args)
+    explicit complex(gtag, std::false_type, const T &c, const Args &... args) : complex(c.real(), c.imag(), args...)
     {
-        // Init real and imaginary parts, passing in the
-        // precision explicitly if provided.
-        real re{c.real(), static_cast<::mpfr_prec_t>(args)...}, im{c.imag(), static_cast<::mpfr_prec_t>(args)...};
-
-        // Shallow-copy into this.
-        m_mpc.re[0] = *re.get_mpfr_t();
-        m_mpc.im[0] = *im.get_mpfr_t();
-
-        // Deactivate the temporaries.
-        re._get_mpfr_t()->_mpfr_d = nullptr;
-        im._get_mpfr_t()->_mpfr_d = nullptr;
     }
 
 public:
     // Ctor from interoperable types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex_interoperable T>
+#else
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
+#endif
     explicit complex(const T &x) : complex(gtag{}, is_rv_complex_interoperable<T>{}, x)
     {
     }
     // Ctor from interoperable types + precision.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex_interoperable T>
+#else
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
+#endif
     explicit complex(const T &x, complex_prec_t p) : complex(gtag{}, is_rv_complex_interoperable<T>{}, x, p)
     {
+    }
+
+private:
+    template <typename T, typename U>
+    void real_imag_ctor_impl(const T &re, const U &im, ::mpfr_prec_t p)
+    {
+        // Init real-imaginary parts with the input prec.
+        real rp{re, p}, ip{im, p};
+
+        // Shallow-copy into this.
+        m_mpc.re[0] = *rp.get_mpfr_t();
+        m_mpc.im[0] = *ip.get_mpfr_t();
+
+        // Deactivate the temporaries.
+        rp._get_mpfr_t()->_mpfr_d = nullptr;
+        ip._get_mpfr_t()->_mpfr_d = nullptr;
+    }
+
+public:
+    // Binary ctor from interoperable types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <rv_complex_interoperable T, rv_complex_interoperable U>
+#else
+    template <typename T, typename U,
+              detail::enable_if_t<
+                  detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
+#endif
+    explicit complex(const T &re, const U &im)
+    {
+        real_imag_ctor_impl(re, im,
+                            detail::c_max(detail::real_deduce_precision(re), detail::real_deduce_precision(im)));
+    }
+    // Binary ctor from interoperable types + prec.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <rv_complex_interoperable T, rv_complex_interoperable U>
+#else
+    template <typename T, typename U,
+              detail::enable_if_t<
+                  detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
+#endif
+    explicit complex(const T &re, const U &im, ::mpfr_prec_t p)
+    {
+        real_imag_ctor_impl(re, im, p);
     }
 
     explicit complex(const ::mpc_t);

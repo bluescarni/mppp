@@ -9,6 +9,8 @@
 #include <complex>
 
 #include <mp++/complex.hpp>
+#include <mp++/detail/mpfr.hpp>
+#include <mp++/real.hpp>
 
 #include "catch.hpp"
 
@@ -16,26 +18,53 @@ using namespace mppp;
 
 TEST_CASE("complex constructors")
 {
-    complex c;
+    // Def ctor.
     {
-        complex::re_extractor rex{c};
-        complex::im_extractor iex{c};
+        complex c;
 
-        rex.get() += 45;
-        iex.get() += 42;
+        complex::const_re_extractor re{c};
+        complex::const_im_extractor im{c};
+
+        REQUIRE(re.get().zero_p());
+        REQUIRE(im.get().zero_p());
+        REQUIRE(re.get().get_prec() == real_prec_min());
+        REQUIRE(im.get().get_prec() == real_prec_min());
+        REQUIRE(!re.get().signbit());
+        REQUIRE(!im.get().signbit());
     }
 
-    std::cout << c << '\n';
+    // Generic ctor
+    {
+        complex c1{42};
 
-    std::cout << complex{123} << '\n';
-    std::cout << complex{std::complex<double>{1.1, 2.1}} << '\n';
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
 
-    std::cout << (complex{std::complex<double>{1.1, 2.1}} == complex{std::complex<double>{1.1, 2.1}}) << '\n';
-    std::cout << (complex{std::complex<double>{1.1, 2.1}} == std::complex<double>{1.1, 2.1}) << '\n';
-    std::cout << (complex{std::complex<double>{1.1}} == 1.1) << '\n';
-    std::cout << (std::complex<double>{1.1, 2.1} == complex{std::complex<double>{1.1, 2.1}}) << '\n';
-    std::cout << (1.1 == complex{std::complex<double>{1.1}}) << '\n';
+        REQUIRE(re.get() == 42);
+        REQUIRE(im.get().zero_p());
+        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(42));
+        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(42));
+    }
+    {
+        complex c1{42, complex_prec_t(123)};
 
-    std::cout << complex{123, complex_prec_t(512)} << '\n';
-    std::cout << complex{std::complex<double>{123, 456}, complex_prec_t(512)} << '\n';
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 42);
+        REQUIRE(im.get().zero_p());
+        REQUIRE(re.get().get_prec() == 123);
+        REQUIRE(im.get().get_prec() == 123);
+    }
+    {
+        complex c1{std::complex<double>{-4, 7}};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == -4);
+        REQUIRE(im.get() == 7);
+        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(-4.));
+        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(7.));
+    }
 }
