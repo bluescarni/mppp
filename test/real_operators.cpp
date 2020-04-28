@@ -184,7 +184,19 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 200} + __uint128_t{10}).get_prec() == 200);
     REQUIRE((__uint128_t{10} + real{1, 200} == real{11}));
     REQUIRE((__uint128_t{10} + real{1, 200}).get_prec() == 200);
+
+    // Try also large values.
+    REQUIRE(1.23_r512 + (__int128_t{1} << 65) == 1.23_r512 + pow(2_r128, 65));
+    REQUIRE((__int128_t{1} << 65) + 1.23_r512 == 1.23_r512 + pow(2_r128, 65));
+
+    REQUIRE(1.23_r512 + (__uint128_t{1} << 65) == 1.23_r512 + pow(2_r128, 65));
+    REQUIRE((__uint128_t{1} << 65) + 1.23_r512 == 1.23_r512 + pow(2_r128, 65));
 #endif
+
+    // Ensure correct precision handling if one operand (i.e., rational)
+    // cannot be converted exactly to real.
+    REQUIRE(abs((1_r512 + 1 / 10_q1) - 1.1_r512) < pow(2_r512, -510));
+    REQUIRE(abs((1 / 10_q1 + 1_r512) - 1.1_r512) < pow(2_r512, -510));
 }
 
 TEST_CASE("real left in-place add")
@@ -261,6 +273,10 @@ TEST_CASE("real left in-place add")
     r0 += rat_t{123};
     REQUIRE(r0 == real{rat_t{123}});
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 2);
+
+    r0 = 1_r512;
+    r0 += 1 / 10_q1;
+    REQUIRE(abs(r0 - 1.1_r512) <= pow(2_r512, -500));
 #if defined(MPPP_WITH_QUADMATH)
     r0 = real{};
     r0 += real128{123};
@@ -273,6 +289,15 @@ TEST_CASE("real left in-place add")
     REQUIRE(r0.get_prec() == 128);
     r0 = real{};
     REQUIRE((r0 += __uint128_t{10}) == real{10});
+    REQUIRE(r0.get_prec() == 128);
+
+    // Try also large values.
+    r0 = real{};
+    REQUIRE((r0 += (__int128_t{1}) << 65) == pow(2_r128, 65));
+    REQUIRE(r0.get_prec() == 128);
+
+    r0 = real{};
+    REQUIRE((r0 += (__uint128_t{1}) << 65) == pow(2_r128, 65));
     REQUIRE(r0.get_prec() == 128);
 #endif
 
@@ -383,6 +408,10 @@ TEST_CASE("real right in-place add")
         n = 1;
         REQUIRE_THROWS_AS((n += real{"inf", 5}), std::domain_error);
         REQUIRE(n == 1);
+
+        n = 1 / 10_q1;
+        n += 1_r512;
+        REQUIRE(abs(n - 1.1_r512) <= pow(2_r512, -500));
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -559,7 +588,19 @@ TEST_CASE("real binary sub")
     REQUIRE((real{1, 200} - __uint128_t{10}).get_prec() == 200);
     REQUIRE((__uint128_t{10} - real{1, 200} == real{9}));
     REQUIRE((__uint128_t{10} - real{1, 200}).get_prec() == 200);
+
+    // Try also large values.
+    REQUIRE(1.23_r512 - (__int128_t{1} << 65) == 1.23_r512 - pow(2_r128, 65));
+    REQUIRE((__int128_t{1} << 65) - 1.23_r512 == -1.23_r512 + pow(2_r128, 65));
+
+    REQUIRE(1.23_r512 - (__uint128_t{1} << 65) == 1.23_r512 - pow(2_r128, 65));
+    REQUIRE((__uint128_t{1} << 65) - 1.23_r512 == -1.23_r512 + pow(2_r128, 65));
 #endif
+
+    // Ensure correct precision handling if one operand (i.e., rational)
+    // cannot be converted exactly to real.
+    REQUIRE(abs((-1_r512 - 1 / 10_q1) + 1.1_r512) < pow(2_r512, -510));
+    REQUIRE(abs((-1 / 10_q1 - 1_r512) + 1.1_r512) < pow(2_r512, -510));
 }
 
 TEST_CASE("real left in-place sub")
@@ -636,6 +677,10 @@ TEST_CASE("real left in-place sub")
     r0 -= rat_t{123};
     REQUIRE(r0 == real{-rat_t{123}});
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 2);
+
+    r0 = -1_r512;
+    r0 -= 1 / 10_q1;
+    REQUIRE(abs(r0 + 1.1_r512) <= pow(2_r512, -500));
 #if defined(MPPP_WITH_QUADMATH)
     r0 = real{};
     r0 -= real128{123};
@@ -648,6 +693,15 @@ TEST_CASE("real left in-place sub")
     REQUIRE(r0.get_prec() == 128);
     r0 = real{};
     REQUIRE((r0 -= __uint128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 128);
+
+    // Try also large values.
+    r0 = real{};
+    REQUIRE((r0 -= (__int128_t{1}) << 65) == -pow(2_r128, 65));
+    REQUIRE(r0.get_prec() == 128);
+
+    r0 = real{};
+    REQUIRE((r0 -= (__uint128_t{1}) << 65) == -pow(2_r128, 65));
     REQUIRE(r0.get_prec() == 128);
 #endif
 
@@ -758,6 +812,10 @@ TEST_CASE("real right in-place sub")
         n = 1;
         REQUIRE_THROWS_AS((n -= real{"inf", 5}), std::domain_error);
         REQUIRE(n == 1);
+
+        n = -1 / 10_q1;
+        n -= 1_r512;
+        REQUIRE(abs(n + 1.1_r512) <= pow(2_r512, -500));
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -918,7 +976,19 @@ TEST_CASE("real binary mul")
     REQUIRE((real{1, 200} * __uint128_t{10}).get_prec() == 200);
     REQUIRE((__uint128_t{10} * real{1, 200} == real{10}));
     REQUIRE((__uint128_t{10} * real{1, 200}).get_prec() == 200);
+
+    // Try also large values.
+    REQUIRE(1.23_r512 * (__int128_t{1} << 65) == 1.23_r512 * pow(2_r128, 65));
+    REQUIRE((__int128_t{1} << 65) * 1.23_r512 == 1.23_r512 * pow(2_r128, 65));
+
+    REQUIRE(1.23_r512 * (__uint128_t{1} << 65) == 1.23_r512 * pow(2_r128, 65));
+    REQUIRE((__uint128_t{1} << 65) * 1.23_r512 == 1.23_r512 * pow(2_r128, 65));
 #endif
+
+    // Ensure correct precision handling if one operand (i.e., rational)
+    // cannot be converted exactly to real.
+    REQUIRE(abs((1_r512 * (1 / 10_q1)) - 0.1_r512) < pow(2_r512, -510));
+    REQUIRE(abs(((1 / 10_q1) * 1_r512) - 0.1_r512) < pow(2_r512, -510));
 }
 
 TEST_CASE("real left in-place mul")
@@ -995,6 +1065,10 @@ TEST_CASE("real left in-place mul")
     r0 *= rat_t{123};
     REQUIRE(r0 == real{rat_t{123}});
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 2);
+
+    r0 = 1_r512;
+    r0 *= 1 / 10_q1;
+    REQUIRE(abs(r0 - .1_r512) <= pow(2_r512, -500));
 #if defined(MPPP_WITH_QUADMATH)
     r0 = real{1, real_prec_min()};
     r0 *= real128{123};
@@ -1007,6 +1081,15 @@ TEST_CASE("real left in-place mul")
     REQUIRE(r0.get_prec() == 128);
     r0 = real{-1};
     REQUIRE((r0 *= __uint128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 128);
+
+    // Try also large values.
+    r0 = real{1, 32};
+    REQUIRE((r0 *= (__int128_t{1}) << 65) == pow(2_r128, 65));
+    REQUIRE(r0.get_prec() == 128);
+
+    r0 = real{1, 32};
+    REQUIRE((r0 *= (__uint128_t{1}) << 65) == pow(2_r128, 65));
     REQUIRE(r0.get_prec() == 128);
 #endif
 
@@ -1117,6 +1200,10 @@ TEST_CASE("real right in-place mul")
         n = 1;
         REQUIRE_THROWS_AS((n *= real{"inf", 5}), std::domain_error);
         REQUIRE(n == 1);
+
+        n = 1 / 10_q1;
+        n *= 1_r512;
+        REQUIRE(abs(n - .1_r512) <= pow(2_r512, -500));
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -1277,7 +1364,19 @@ TEST_CASE("real binary div")
     REQUIRE((real{1, 200} / __uint128_t{10}).get_prec() == 200);
     REQUIRE((__uint128_t{10} / real{2, 200} == real{5}));
     REQUIRE((__uint128_t{10} / real{1, 200}).get_prec() == 200);
+
+    // Try also large values.
+    REQUIRE(1.23_r512 / (__int128_t{1} << 65) == 1.23_r512 / pow(2_r128, 65));
+    REQUIRE((__int128_t{1} << 65) / 1.23_r512 == pow(2_r128, 65) / 1.23_r512);
+
+    REQUIRE(1.23_r512 / (__uint128_t{1} << 65) == 1.23_r512 / pow(2_r128, 65));
+    REQUIRE((__uint128_t{1} << 65) / 1.23_r512 == pow(2_r128, 65) / 1.23_r512);
 #endif
+
+    // Ensure correct precision handling if one operand (i.e., rational)
+    // cannot be converted exactly to real.
+    REQUIRE(abs((1_r512 / (1 / 10_q1)) - 10_r512) < pow(2_r512, -510));
+    REQUIRE(abs(((1 / 10_q1) / 1_r512) - .1_r512) < pow(2_r512, -510));
 }
 
 TEST_CASE("real left in-place div")
@@ -1352,6 +1451,10 @@ TEST_CASE("real left in-place div")
     r0 /= rat_t{123};
     REQUIRE(r0 == 1 / real{rat_t{123}});
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 2);
+
+    r0 = -1_r512;
+    r0 /= 1 / 10_q1;
+    REQUIRE(abs(r0 + 10_r512) <= pow(2_r512, -500));
 #if defined(MPPP_WITH_QUADMATH)
     r0 = real{1, real_prec_min()};
     r0 /= real128{123};
@@ -1364,6 +1467,15 @@ TEST_CASE("real left in-place div")
     REQUIRE(r0.get_prec() == 128);
     r0 = real{-1};
     REQUIRE((r0 /= __uint128_t{2}) == 1 / real{-2});
+    REQUIRE(r0.get_prec() == 128);
+
+    // Try also large values.
+    r0 = real{1};
+    REQUIRE((r0 /= (__int128_t{1}) << 65) == pow(2_r128, -65));
+    REQUIRE(r0.get_prec() == 128);
+
+    r0 = real{1};
+    REQUIRE((r0 /= (__uint128_t{1}) << 65) == pow(2_r128, -65));
     REQUIRE(r0.get_prec() == 128);
 #endif
 
@@ -1463,6 +1575,10 @@ TEST_CASE("real right in-place div")
         n = 1;
         REQUIRE_THROWS_AS((n /= real{0, 5}), std::domain_error);
         REQUIRE(n == 1);
+
+        n = -1 / 10_q1;
+        n /= 10_r512;
+        REQUIRE(abs(n + 0.01_r512) <= pow(2_r512, -500));
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -1522,6 +1638,19 @@ TEST_CASE("real eqineq")
     REQUIRE(!(1 == real{"nan", 5}));
     REQUIRE((real{"nan", 5} != 1ul));
     REQUIRE((1l != real{"nan", 5}));
+    // The bool specialisation.
+    REQUIRE(real{1} == true);
+    REQUIRE(real{0} == false);
+    REQUIRE(true == real{1});
+    REQUIRE(false == real{0});
+    REQUIRE(real{1} != false);
+    REQUIRE(real{0} != true);
+    REQUIRE(false != real{1});
+    REQUIRE(true != real{0});
+    REQUIRE(!(real{"nan", 45} == true));
+    REQUIRE(!(false == real{"nan", 45}));
+    REQUIRE(real{"nan", 45} != true);
+    REQUIRE(false != real{"nan", 45});
     // FP.
     REQUIRE(!(real{} != 0.f));
     REQUIRE(1. == real{1});
@@ -1534,6 +1663,12 @@ TEST_CASE("real eqineq")
     REQUIRE(!(1.l == real{"nan", 5}));
     REQUIRE((real{"nan", 5} != 1.));
     REQUIRE((1.f != real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(std::numeric_limits<double>::quiet_NaN() != real{"nan", 5});
+        REQUIRE(real{"nan", 5} != std::numeric_limits<double>::quiet_NaN());
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() == real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} == std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE(!(real{} != int_t{0}));
     REQUIRE(rat_t{1u} == real{1});
@@ -1558,6 +1693,10 @@ TEST_CASE("real eqineq")
     REQUIRE(!(real128{1} == real{"nan", 5}));
     REQUIRE((real{"nan", 5} != real128{1ul}));
     REQUIRE((real128{1l} != real{"nan", 5}));
+    REQUIRE(real{"nan", 5} != real128{"nan"});
+    REQUIRE(real128{"nan"} != real{"nan", 5});
+    REQUIRE(!(real{"nan", 5} == real128{"nan"}));
+    REQUIRE(!(real128{"nan"} == real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{-1} == __int128_t{-1});
@@ -1568,6 +1707,14 @@ TEST_CASE("real eqineq")
     REQUIRE(__int128_t{-1} != real{-2});
     REQUIRE(real{2} != __uint128_t{3});
     REQUIRE(__uint128_t{2} != real{3});
+    REQUIRE(pow(2_r128, 65) == (__uint128_t{1} << 65));
+    REQUIRE((__uint128_t{1} << 65) == pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) == (__int128_t{1} << 65));
+    REQUIRE((__int128_t{1} << 65) == pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) != (__uint128_t{1} << 65) + 1u);
+    REQUIRE((__uint128_t{1} << 65) + 1u != pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) != (__int128_t{1} << 65) + 1);
+    REQUIRE((__int128_t{1} << 65) + 1 != pow(2_r128, 65));
 #endif
 }
 
@@ -1590,30 +1737,61 @@ TEST_CASE("real lt")
     REQUIRE(!(real{"inf", 64} < 45));
     REQUIRE(!(real{"nan", 5} < 1));
     REQUIRE(!(1 < real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} < 1u));
+    REQUIRE(!(1u < real{"nan", 5}));
+    // The bool specialisations.
+    REQUIRE(real{0} < true);
+    REQUIRE(!(real{1} < true));
+    REQUIRE(real{-1} < false);
+    REQUIRE(!(real{"nan", 5} < false));
+    REQUIRE(!(true < real{1}));
+    REQUIRE(true < real{2});
+    REQUIRE(!(false < real{-1}));
+    REQUIRE(!(false < real{"nan", 5}));
     // FP.
     REQUIRE(!(1. < real{1}));
+    REQUIRE(!(1.f < real{1}));
+    REQUIRE(!(1.l < real{1}));
     REQUIRE((real{0.1} < 1.));
+    REQUIRE((real{0.1} < 1.f));
+    REQUIRE((real{0.1} < 1.l));
     REQUIRE(!(real{"inf", 64} < 45.));
     REQUIRE(!(real{"nan", 5} < 1.));
+    REQUIRE(!(real{"nan", 5} < 1.f));
+    REQUIRE(!(real{"nan", 5} < 1.l));
+    REQUIRE(!(1. < real{"nan", 5}));
+    REQUIRE(!(1.f < real{"nan", 5}));
     REQUIRE(!(1.l < real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() < real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} < std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE((rat_t{0u} < real{1}));
     REQUIRE(!(real{2} < rat_t{1ull}));
     REQUIRE(!(real{"inf", 64} < int_t{45}));
     REQUIRE(!(real{"nan", 5} < int_t{1}));
+    REQUIRE(!(int_t{1} < real{"nan", 5}));
     REQUIRE(!(rat_t{1} < real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} < rat_t{1}));
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE((real128{} < real{1}));
     REQUIRE(!(real{2} < real128{1ull}));
     REQUIRE(!(real{"inf", 64} < real128{45}));
     REQUIRE(!(real{"nan", 5} < real128{1}));
     REQUIRE(!(real128{1} < real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} < real128{"nan"}));
+    REQUIRE(!(real128{"nan"} < real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{-2} < __int128_t{-1});
     REQUIRE(__int128_t{-2} < real{-1});
     REQUIRE(real{2} < __uint128_t{3});
     REQUIRE(__uint128_t{2} < real{3});
+    REQUIRE(pow(2_r128, 65) < (__uint128_t{1} << 65) + 1u);
+    REQUIRE((__uint128_t{1} << 65) < pow(2_r128, 65) + 1);
+    REQUIRE(pow(2_r128, 65) < (__int128_t{1} << 65) + 1);
+    REQUIRE((__int128_t{1} << 65) < pow(2_r128, 65) + 1);
 #endif
 }
 
@@ -1636,30 +1814,61 @@ TEST_CASE("real lte")
     REQUIRE(!(real{"inf", 64} <= 45));
     REQUIRE(!(real{"nan", 5} <= 1));
     REQUIRE(!(1 <= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} <= 1u));
+    REQUIRE(!(1u <= real{"nan", 5}));
+    // The bool specialisations.
+    REQUIRE(real{0} <= true);
+    REQUIRE(real{1} <= true);
+    REQUIRE(real{-1} <= false);
+    REQUIRE(!(real{"nan", 5} <= false));
+    REQUIRE(true <= real{1});
+    REQUIRE(true <= real{2});
+    REQUIRE(!(false <= real{-1}));
+    REQUIRE(!(false <= real{"nan", 5}));
     // FP.
     REQUIRE((1. <= real{1}));
+    REQUIRE((1.f <= real{1}));
+    REQUIRE((1.l <= real{1}));
     REQUIRE((real{0.1} <= 1.));
+    REQUIRE((real{0.1} <= 1.f));
+    REQUIRE((real{0.1} <= 1.l));
     REQUIRE(!(real{"inf", 64} <= 45.));
     REQUIRE(!(real{"nan", 5} <= 1.));
+    REQUIRE(!(real{"nan", 5} <= 1.f));
+    REQUIRE(!(real{"nan", 5} <= 1.l));
+    REQUIRE(!(1. <= real{"nan", 5}));
+    REQUIRE(!(1.f <= real{"nan", 5}));
     REQUIRE(!(1.l <= real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() <= real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} <= std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE((rat_t{0u} <= real{1}));
     REQUIRE(!(real{2} <= rat_t{1ull}));
     REQUIRE(!(real{"inf", 64} <= int_t{45}));
     REQUIRE(!(real{"nan", 5} <= int_t{1}));
+    REQUIRE(!(int_t{1} <= real{"nan", 5}));
     REQUIRE(!(rat_t{1} <= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} <= rat_t{1}));
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE((real128{} <= real{1}));
     REQUIRE(!(real{2} <= real128{1ull}));
     REQUIRE(!(real{"inf", 64} <= real128{45}));
     REQUIRE(!(real{"nan", 5} <= real128{1}));
     REQUIRE(!(real128{1} <= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} <= real128{"nan"}));
+    REQUIRE(!(real128{"nan"} <= real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{-2} <= __int128_t{-1});
     REQUIRE(__int128_t{-2} <= real{-2});
     REQUIRE(real{2} <= __uint128_t{3});
     REQUIRE(__uint128_t{3} <= real{3});
+    REQUIRE(pow(2_r128, 65) <= (__uint128_t{1} << 65) + 1u);
+    REQUIRE((__uint128_t{1} << 65) <= pow(2_r128, 65) + 1);
+    REQUIRE(pow(2_r128, 65) <= (__int128_t{1} << 65) + 1);
+    REQUIRE((__int128_t{1} << 65) <= pow(2_r128, 65) + 1);
 #endif
 }
 
@@ -1682,30 +1891,61 @@ TEST_CASE("real gt")
     REQUIRE((real{"inf", 64} > 45));
     REQUIRE(!(real{"nan", 5} > 1));
     REQUIRE(!(1 > real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} > 1u));
+    REQUIRE(!(1u > real{"nan", 5}));
+    // The bool specialisations.
+    REQUIRE(real{2} > true);
+    REQUIRE(!(real{1} > true));
+    REQUIRE(!(real{-1} > false));
+    REQUIRE(!(real{"nan", 5} > false));
+    REQUIRE(true > real{0});
+    REQUIRE(!(true > real{1}));
+    REQUIRE(false > real{-1});
+    REQUIRE(!(false > real{"nan", 5}));
     // FP.
     REQUIRE(!(1. > real{1}));
     REQUIRE(!(real{0.1} > 1.));
+    REQUIRE(!(1.f > real{1}));
+    REQUIRE(!(real{0.1} > 1.f));
+    REQUIRE(!(1.l > real{1}));
+    REQUIRE(!(real{0.1} > 1.l));
     REQUIRE((real{"inf", 64} > 45.));
     REQUIRE(!(real{"nan", 5} > 1.));
+    REQUIRE(!(real{"nan", 5} > 1.f));
+    REQUIRE(!(real{"nan", 5} > 1.l));
+    REQUIRE(!(1. > real{"nan", 10}));
+    REQUIRE(!(1.f > real{"nan", 10}));
     REQUIRE(!(1.l > real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() > real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} > std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE(!(rat_t{0u} > real{1}));
     REQUIRE((real{2} > rat_t{1ull}));
     REQUIRE((real{"inf", 64} > int_t{45}));
     REQUIRE(!(real{"nan", 5} > int_t{1}));
+    REQUIRE(!(int_t{1} > real{"nan", 5}));
     REQUIRE(!(rat_t{1} > real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} > rat_t{1}));
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE(!(real128{} > real{1}));
     REQUIRE((real{2} > real128{1ull}));
     REQUIRE((real{"inf", 64} > real128{45}));
     REQUIRE(!(real{"nan", 5} > real128{1}));
     REQUIRE(!(real128{1} > real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} > real128{"nan"}));
+    REQUIRE(!(real128{"nan"} > real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{2} > __int128_t{-1});
     REQUIRE(__int128_t{2} > real{-1});
     REQUIRE(real{5} > __uint128_t{3});
     REQUIRE(__uint128_t{5} > real{2});
+    REQUIRE(pow(2_r128, 65) + 1 > (__uint128_t{1} << 65));
+    REQUIRE((__uint128_t{1} << 65) + 1 > pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) + 1 > (__int128_t{1} << 65));
+    REQUIRE((__int128_t{1} << 65) + 1 > pow(2_r128, 65));
 #endif
 }
 
@@ -1728,30 +1968,61 @@ TEST_CASE("real gte")
     REQUIRE((real{"inf", 64} >= 45));
     REQUIRE(!(real{"nan", 5} >= 1));
     REQUIRE(!(1 >= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} >= 1u));
+    REQUIRE(!(1u >= real{"nan", 5}));
+    // The bool specialisations.
+    REQUIRE(real{2} >= true);
+    REQUIRE(real{1} >= true);
+    REQUIRE(!(real{-1} >= false));
+    REQUIRE(!(real{"nan", 5} >= false));
+    REQUIRE(true >= real{0});
+    REQUIRE(true >= real{1});
+    REQUIRE(false >= real{-1});
+    REQUIRE(!(false >= real{"nan", 5}));
     // FP.
     REQUIRE((1. >= real{1}));
+    REQUIRE((1.f >= real{1}));
+    REQUIRE((1.l >= real{1}));
     REQUIRE(!(real{0.1} >= 1.));
+    REQUIRE(!(real{0.1} >= 1.f));
+    REQUIRE(!(real{0.1} >= 1.l));
     REQUIRE((real{"inf", 64} >= 45.));
     REQUIRE(!(real{"nan", 5} >= 1.));
+    REQUIRE(!(real{"nan", 5} >= 1.f));
+    REQUIRE(!(real{"nan", 5} >= 1.l));
+    REQUIRE(!(1. >= real{"nan", 5}));
+    REQUIRE(!(1.f >= real{"nan", 5}));
     REQUIRE(!(1.l >= real{"nan", 5}));
+    if (std::numeric_limits<double>::has_quiet_NaN) {
+        REQUIRE(!(std::numeric_limits<double>::quiet_NaN() >= real{"nan", 5}));
+        REQUIRE(!(real{"nan", 5} >= std::numeric_limits<double>::quiet_NaN()));
+    }
     // int/rat.
     REQUIRE(!(rat_t{0u} >= real{1}));
     REQUIRE((real{2} >= rat_t{1ull}));
     REQUIRE((real{"inf", 64} >= int_t{45}));
     REQUIRE(!(real{"nan", 5} >= int_t{1}));
+    REQUIRE(!(int_t{1} >= real{"nan", 5}));
     REQUIRE(!(rat_t{1} >= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} >= rat_t{1}));
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE(!(real128{} >= real{1}));
     REQUIRE((real{2} >= real128{1ull}));
     REQUIRE((real{"inf", 64} >= real128{45}));
     REQUIRE(!(real{"nan", 5} >= real128{1}));
     REQUIRE(!(real128{1} >= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 5} >= real128{"nan"}));
+    REQUIRE(!(real128{"nan"} >= real{"nan", 5}));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(real{2} >= __int128_t{-1});
     REQUIRE(__int128_t{2} >= real{2});
     REQUIRE(real{5} >= __uint128_t{3});
     REQUIRE(__uint128_t{5} >= real{5});
+    REQUIRE(pow(2_r128, 65) + 1 >= (__uint128_t{1} << 65));
+    REQUIRE((__uint128_t{1} << 65) + 1 >= pow(2_r128, 65));
+    REQUIRE(pow(2_r128, 65) + 1 >= (__int128_t{1} << 65));
+    REQUIRE((__int128_t{1} << 65) + 1 >= pow(2_r128, 65));
 #endif
 }
 
@@ -1764,4 +2035,15 @@ TEST_CASE("real incdec")
     REQUIRE(--r0 == 1);
     REQUIRE(r0-- == 1);
     REQUIRE(r0.zero_p());
+
+    // Check precision handling.
+    r0 = real{0, 12};
+    ++r0;
+    REQUIRE(r0.get_prec() == 12);
+    r0++;
+    REQUIRE(r0.get_prec() == 12);
+    --r0;
+    REQUIRE(r0.get_prec() == 12);
+    r0--;
+    REQUIRE(r0.get_prec() == 12);
 }

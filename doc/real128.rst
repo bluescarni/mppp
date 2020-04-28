@@ -48,12 +48,8 @@ The real128 class
 
    where the ``sin()`` function is resolved via argument-dependent lookup.
 
-   Various :ref:`overloaded operators <real128_operators>` are provided.
-   The common arithmetic operators (``+``, ``-``, ``*`` and ``/``) always return :cpp:class:`~mppp::real128`
-   as a result, promoting at most one operand to :cpp:class:`~mppp::real128` before actually performing
-   the computation. Similarly, the relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote at
-   most one argument to :cpp:class:`~mppp::real128` before performing the comparison. Alternative comparison functions
-   treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
+   Various :ref:`overloaded operators <real128_operators>` are provided. Alternative comparison functions
+   treating NaNs specially are also provided for use in the C++ standard library (and wherever strict weak ordering relations
    are needed).
 
    The :cpp:class:`~mppp::real128` class is a `literal type
@@ -88,7 +84,7 @@ The real128 class
       :cpp:class:`~mppp::real128` is trivially copy and
       move constructible.
 
-   .. cpp:function:: constexpr explicit real128(__float128 x)
+   .. cpp:function:: constexpr explicit real128(const __float128 &x)
 
       Constructor from a :cpp:type:`__float128`.
 
@@ -109,6 +105,22 @@ The real128 class
       :param x: the value that will be used for the initialisation.
 
       :exception std\:\:overflow_error: in case of (unlikely) overflow errors during initialisation.
+
+   .. cpp:function:: template <real128_cpp_complex T> constexpr explicit real128(const T &c)
+
+      .. note::
+
+        This constructor is ``constexpr`` only if at least C++14 is being used.
+
+      .. versionadded:: 0.20
+
+      Constructor from complex C++ types.
+
+      The initialisation is is successful only if the imaginary part of *c* is zero.
+
+      :param c: the input complex value.
+
+      :exception std\:\:domain_error: if the imaginary part of *c* is not zero.
 
    .. cpp:function:: template <string_type T> explicit real128(const T &s)
 
@@ -177,18 +189,39 @@ The real128 class
       :exception unspecified: any exception thrown by the construction of a
         :cpp:class:`~mppp::real128` from *x*.
 
-   .. cpp:function:: real128 &operator=(const real &x)
+   .. cpp:function:: template <real128_cpp_complex T> constexpr real128 &operator=(const T &c)
 
       .. note::
 
-         This operator is available only if mp++ was configured with the
-         ``MPPP_WITH_MPFR`` option enabled.
+        This operator is ``constexpr`` only if at least C++14 is being used.
 
       .. versionadded:: 0.20
 
-      Assignment operator from :cpp:class:`~mppp::real`.
+      Assignment from complex C++ types.
 
-      This operator is formally equivalent to converting *x* to
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:domain_error: if the imaginary part of *c* is not zero.
+
+   .. cpp:function:: real128 &operator=(const real &x)
+   .. cpp:function:: constexpr real128 &operator=(const complex128 &x)
+
+      .. note::
+
+         The :cpp:class:`~mppp::real` overload is available only if mp++ was configured with the
+         ``MPPP_WITH_MPFR`` option enabled.
+
+      .. note::
+
+        The :cpp:class:`~mppp::complex128` overload is ``constexpr`` only if at least C++14 is being used.
+
+      .. versionadded:: 0.20
+
+      Assignment operators from other mp++ classes.
+
+      These operators are formally equivalent to converting *x* to
       :cpp:class:`~mppp::real128` and then move-assigning the result
       to ``this``.
 
@@ -242,20 +275,38 @@ The real128 class
       :exception std\:\:domain_error: if ``this`` represents a non-finite value and ``T``
         is :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`.
 
-   .. cpp:function:: template <real128_interoperable T> constexpr bool get(T &rop) const
+   .. cpp:function:: template <real128_cpp_complex T> constexpr explicit operator T() const
 
       .. note::
 
-        This member function is ``constexpr`` only if at least C++14 is being used.
+        This operator is ``constexpr`` only if at least C++14 is being used.
 
-      Conversion member function to interoperable types.
+      .. versionadded:: 0.20
 
-      This member function, similarly to the conversion operator, will convert ``this`` to a
-      :cpp:concept:`~mppp::real128_interoperable` type, storing the result of the conversion into *rop*.
-      Differently from the conversion operator, this function does not raise any exception: if the conversion is
-      successful, the function will return ``true``, otherwise the function will return ``false``. If the
+      Conversion to complex C++ types.
+
+      :return: ``this`` converted to the type ``T``.
+
+   .. cpp:function:: template <real128_interoperable T> constexpr bool get(T &rop) const
+   .. cpp:function:: template <real128_cpp_complex T> constexpr bool get(T &rop) const
+
+      .. note::
+
+        The first overload is ``constexpr`` only if at least C++14 is being used.
+        The second overload is ``constexpr`` only if at least C++20 is being used.
+
+      Conversion member functions to interoperable and complex C++ types.
+
+      These member functions, similarly to the conversion operator, will convert ``this`` to
+      ``T``, storing the result of the conversion into *rop*.
+      Differently from the conversion operator, these functions do not raise any exception: if the conversion is
+      successful, the functions will return ``true``, otherwise the functions will return ``false``. If the
       conversion fails, *rop* will not be altered. The conversion can fail only if ``T`` is either
       :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and ``this`` represents a non-finite value.
+
+      .. versionadded:: 0.20
+
+         The conversion function to complex C++ types.
 
       :param rop: the variable which will store the result of the conversion.
 
@@ -490,7 +541,8 @@ Concepts
 
 .. cpp:concept:: template <typename T> mppp::real128_interoperable
 
-   This concept is satisfied by types that can interoperate with :cpp:class:`~mppp::real128`.
+   This concept is satisfied by real-valued types that can
+   interoperate with :cpp:class:`~mppp::real128`.
    Specifically, this concept is satisfied if either:
 
    * ``T`` is :cpp:class:`~mppp::integer`, or
@@ -500,6 +552,19 @@ Concepts
    * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::cpp_arithmetic`, except if
      ``T`` is ``long double``.
 
+.. cpp:concept:: template <typename T> mppp::real128_cpp_complex
+
+   .. versionadded:: 0.20
+
+   This concept is satisfied by complex C++ types that can
+   interoperate with :cpp:class:`~mppp::real128`.
+   Specifically, this concept is satisfied if either:
+
+   * on GCC, the Intel compiler and Clang>=7, ``T`` satisfies
+     :cpp:concept:`mppp::cpp_complex`, or
+   * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::cpp_complex`, except if
+     ``T`` is ``std::complex<long double>``.
+
 .. cpp:concept:: template <typename T, typename U> mppp::real128_op_types
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
@@ -508,6 +573,17 @@ Concepts
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::real128`, or
    * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::real128_interoperable` type.
+
+.. cpp:concept:: template <typename T, typename U> mppp::real128_eq_op_types
+
+   .. versionadded:: 0.20
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary equality and inequality operators
+   involving :cpp:class:`~mppp::real128` and other types. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::real128_op_types`, or
+   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::real128_cpp_complex` type.
 
 .. _real128_functions:
 
@@ -520,17 +596,19 @@ Conversion
 ~~~~~~~~~~
 
 .. cpp:function:: template <mppp::real128_interoperable T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
+.. cpp:function:: template <mppp::real128_cpp_complex T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
 
    .. note::
 
-     This function is ``constexpr`` only if at least C++14 is being used.
+      The first overload is ``constexpr`` only if at least C++14 is being used.
+      The second overload is ``constexpr`` only if at least C++20 is being used.
 
-   Conversion function.
+   Conversion functions.
 
-   This function will convert the input :cpp:class:`~mppp::real128` *x* to a
-   :cpp:concept:`~mppp::real128_interoperable` type, storing the result of the conversion into *rop*.
-   If the conversion is successful, the function
-   will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
+   These functions will convert the input :cpp:class:`~mppp::real128` *x* to
+   ``T``, storing the result of the conversion into *rop*.
+   If the conversion is successful, the functions
+   will return ``true``, otherwise the functions will return ``false``. If the conversion fails, *rop* will
    not be altered. The conversion can fail only if ``T``
    is either :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and *x*
    represents a non-finite value.
@@ -1019,12 +1097,12 @@ Mathematical operators
    :exception unspecified: any exception thrown by the corresponding binary operator, or by the conversion
      of :cpp:class:`~mppp::real128` to mp++ types.
 
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator==(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator!=(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator<(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator>(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator<=(const T &x, const U &y)
-.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator>=(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_eq_op_types<T> U> constexpr bool mppp::operator==(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_eq_op_types<T> U> constexpr bool mppp::operator!=(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr bool mppp::operator<(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr bool mppp::operator>(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr bool mppp::operator<=(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr bool mppp::operator>=(const T &x, const U &y)
 
    Comparison operators.
 
@@ -1044,6 +1122,10 @@ Mathematical operators
      These operators will handle NaN in the same way as the builtin floating-point types.
      For alternative comparison functions that treat NaN specially, please see the
      :ref:`comparison functions section <real128_comparison>`.
+
+   .. versionadded:: 0.20
+
+      Equality and inequality comparison with :cpp:concept:`~mppp::real128_cpp_complex` types.
 
    :param x: the first operand.
    :param y: the second operand.
@@ -1188,10 +1270,10 @@ Standard library specialisations
 
      :return: the output of :cpp:func:`mppp::real128_denorm_min()`.
 
-.. _real128_literal:
+.. _real128_literals:
 
-User-defined literal
---------------------
+User-defined literals
+---------------------
 
 .. versionadded:: 0.19
 

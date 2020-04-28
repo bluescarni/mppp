@@ -28,23 +28,23 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ------------------------------------------------------------------------------------------
 
-if(MPFR_INCLUDE_DIR AND MPFR_LIBRARY)
+if(MPPP_GMP_INCLUDE_DIR AND MPPP_GMP_LIBRARY)
     # Already in cache, be silent
-    set(MPFR_FIND_QUIETLY TRUE)
+    set(mp++_GMP_FIND_QUIETLY TRUE)
 endif()
 
-find_path(MPFR_INCLUDE_DIR NAMES mpfr.h)
-find_library(MPFR_LIBRARY NAMES mpfr)
+find_path(MPPP_GMP_INCLUDE_DIR NAMES gmp.h)
+find_library(MPPP_GMP_LIBRARY NAMES gmp mpir)
 
 include(FindPackageHandleStandardArgs)
 
-find_package_handle_standard_args(MPFR DEFAULT_MSG MPFR_INCLUDE_DIR MPFR_LIBRARY)
+find_package_handle_standard_args(mp++_GMP DEFAULT_MSG MPPP_GMP_INCLUDE_DIR MPPP_GMP_LIBRARY)
 
-mark_as_advanced(MPFR_INCLUDE_DIR MPFR_LIBRARY)
+mark_as_advanced(MPPP_GMP_INCLUDE_DIR MPPP_GMP_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(MPFR_FOUND AND NOT TARGET MPFR::MPFR)
-    add_library(MPFR::MPFR UNKNOWN IMPORTED)
-    set_target_properties(MPFR::MPFR PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPFR_INCLUDE_DIR}"
-        IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "${MPFR_LIBRARY}")
+if(mp++_GMP_FOUND AND NOT TARGET mp++::GMP)
+    add_library(mp++::GMP UNKNOWN IMPORTED)
+    set_target_properties(mp++::GMP PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPPP_GMP_INCLUDE_DIR}"
+        IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "${MPPP_GMP_LIBRARY}")
 endif()

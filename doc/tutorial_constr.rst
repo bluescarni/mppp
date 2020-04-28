@@ -69,7 +69,7 @@ in case of overflow, and it will produce the truncated value when constructing f
                                     // raises std::overflow_error.
    assert((int{rat_t{4, 3}} == 1)); // int construction from rational truncates.
 
-On the other hand, conversion of :cpp:class:`~mppp::integer` objects to C++ floating-point types does not raise any error
+On the other hand, conversion of :cpp:class:`~mppp::integer` objects to floating-point C++ types does not raise any error
 even if it does not preserve the exact value:
 
 .. code-block:: c++

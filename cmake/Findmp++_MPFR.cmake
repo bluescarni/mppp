@@ -28,23 +28,23 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ------------------------------------------------------------------------------------------
 
-if(Arb_INCLUDE_DIR AND Arb_LIBRARY)
+if(MPPP_MPFR_INCLUDE_DIR AND MPPP_MPFR_LIBRARY)
     # Already in cache, be silent
-    set(Arb_FIND_QUIETLY TRUE)
+    set(mp++_MPFR_FIND_QUIETLY TRUE)
 endif()
 
-find_path(Arb_INCLUDE_DIR NAMES arb.h)
-find_library(Arb_LIBRARY NAMES arb)
+find_path(MPPP_MPFR_INCLUDE_DIR NAMES mpfr.h)
+find_library(MPPP_MPFR_LIBRARY NAMES mpfr)
 
 include(FindPackageHandleStandardArgs)
 
-find_package_handle_standard_args(Arb DEFAULT_MSG Arb_INCLUDE_DIR Arb_LIBRARY)
+find_package_handle_standard_args(mp++_MPFR DEFAULT_MSG MPPP_MPFR_INCLUDE_DIR MPPP_MPFR_LIBRARY)
 
-mark_as_advanced(Arb_INCLUDE_DIR Arb_LIBRARY)
+mark_as_advanced(MPPP_MPFR_INCLUDE_DIR MPPP_MPFR_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(Arb_FOUND AND NOT TARGET Arb::Arb)
-    add_library(Arb::Arb UNKNOWN IMPORTED)
-    set_target_properties(Arb::Arb PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Arb_INCLUDE_DIR}"
-        IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "${Arb_LIBRARY}")
+if(mp++_MPFR_FOUND AND NOT TARGET mp++::MPFR)
+    add_library(mp++::MPFR UNKNOWN IMPORTED)
+    set_target_properties(mp++::MPFR PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPPP_MPFR_INCLUDE_DIR}"
+        IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "${MPPP_MPFR_LIBRARY}")
 endif()

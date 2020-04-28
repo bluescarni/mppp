@@ -23,22 +23,28 @@ environment:
       PLATFORM: x64
 
 install:
-- if [%BUILD_TYPE%]==[MSVC15_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
-- if [%BUILD_TYPE%]==[MSVC15_64] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC15_64] conda update -n base conda -y
-- if [%BUILD_TYPE%]==[MSVC15_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
+- if [%BUILD_TYPE%]==[MSVC15_64] call "C:\\Miniconda36-x64\\Scripts\\activate.bat"
+- if [%BUILD_TYPE%]==[MSVC15_64] conda config --set always_yes yes
+- if [%BUILD_TYPE%]==[MSVC15_64] conda update -n base conda
+- if [%BUILD_TYPE%]==[MSVC15_64] conda config --add channels conda-forge
+- if [%BUILD_TYPE%]==[MSVC15_64] conda config --set channel_priority strict
+- if [%BUILD_TYPE%]==[MSVC15_64] conda create --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
 - if [%BUILD_TYPE%]==[MSVC15_64] call activate mppp
 
-- if [%BUILD_TYPE%]==[MSVC17_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
-- if [%BUILD_TYPE%]==[MSVC17_64] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC17_64] conda update -n base conda -y
-- if [%BUILD_TYPE%]==[MSVC17_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
+- if [%BUILD_TYPE%]==[MSVC17_64] call "C:\\Miniconda36-x64\\Scripts\\activate.bat"
+- if [%BUILD_TYPE%]==[MSVC17_64] conda config --set always_yes yes
+- if [%BUILD_TYPE%]==[MSVC17_64] conda update -n base conda
+- if [%BUILD_TYPE%]==[MSVC17_64] conda config --add channels conda-forge
+- if [%BUILD_TYPE%]==[MSVC17_64] conda config --set channel_priority strict
+- if [%BUILD_TYPE%]==[MSVC17_64] conda create --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
 - if [%BUILD_TYPE%]==[MSVC17_64] call activate mppp
 
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda update -n base conda -y
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create -y --name mppp cmake ninja mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\\Miniconda36-x64\\Scripts\\activate.bat"
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --set always_yes yes
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda update -n base conda
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --add channels conda-forge
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --set channel_priority strict
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create --name mppp cmake ninja mpir mpfr
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call activate mppp
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] clang-cl -v
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
@@ -71,7 +77,7 @@ build_script:
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_BUILD_STATIC_LIBRARY=yes -DCMAKE_CXX_STANDARD=17
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . -- -v
 
-- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Os -fconcepts" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a -DMPPP_TEST_NSPLIT=%TEST_NSPLIT% -DMPPP_TEST_SPLIT_NUM=%SPLIT_TEST_NUM% ..
+- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Os -fconcepts" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DMPPP_GMP_INCLUDE_DIR=C:/local/include -DMPPP_GMP_LIBRARY=C:/local/lib/libgmp.a -DMPPP_MPFR_INCLUDE_DIR=C:/local/include -DMPPP_MPFR_LIBRARY=C:/local/lib/libmpfr.a -DMPPP_TEST_NSPLIT=%TEST_NSPLIT% -DMPPP_TEST_SPLIT_NUM=%SPLIT_TEST_NUM% ..
 #- if [%COMPILER%]==[MinGW] cmake --build . --config %BUILD_TYPE% --target all
 - if [%BUILD_TYPE%]==[MinGW] mingw32-make -j2 VERBOSE=1
 

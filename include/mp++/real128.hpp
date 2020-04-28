@@ -15,6 +15,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <complex>
 #include <cstdint>
 #include <limits>
 #include <ostream>
@@ -178,6 +179,21 @@ MPPP_CONCEPT_DECL real128_interoperable = is_real128_interoperable<T>::value;
 
 #endif
 
+template <typename T>
+using is_real128_cpp_complex = detail::conjunction<is_cpp_complex<T>
+#if !defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+                                                   ,
+                                                   detail::negation<std::is_same<T, std::complex<long double>>>
+#endif
+                                                   >;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL real128_cpp_complex = is_real128_cpp_complex<T>::value;
+
+#endif
+
 template <typename T, typename U>
 using are_real128_op_types
     = detail::disjunction<detail::conjunction<std::is_same<T, real128>, std::is_same<U, real128>>,
@@ -226,7 +242,18 @@ public:
     real128(real128 &&) = default;
 
     // Constructor from a quadruple-precision floating-point value.
-    constexpr explicit real128(__float128 x) : m_value(x) {}
+    // NOTE: early GCC versions seem to exhibit constexpr
+    // failures if x is passed by const reference.
+    constexpr explicit real128(
+#if defined(__GNUC__) && __GNUC__ < 5
+        __float128 x
+#else
+        const __float128 &x
+#endif
+        )
+        : m_value(x)
+    {
+    }
 
 private:
     // Cast an integer to a __float128.
@@ -356,6 +383,20 @@ public:
     constexpr explicit real128(const T &x) : m_value(cast_to_float128(x))
     {
     }
+    // Constructor from std::complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 explicit real128(const T &c)
+        : m_value(c.imag() == 0
+                      ? c.real()
+                      : throw std::domain_error(
+                          "Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                          + detail::to_string(c.imag())))
+    {
+    }
 
 private:
     // A tag to call private ctors.
@@ -403,11 +444,32 @@ public:
         return *this = real128{x};
     }
 
+    // Assignment from C++ complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 real128 &operator=(const T &c)
+    {
+        // NOTE: icpc does not like __builtin_expect()
+        // in constexpr contexts.
+#if defined(__INTEL_COMPILER)
+        if (c.imag() != 0) {
+#else
+        if (mppp_unlikely(c.imag()) != 0) {
+#endif
+            throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                    + detail::to_string(c.imag()) + " to a real128");
+        }
+        return *this = c.real();
+    }
     // Declaration of the assignments from
     // other mp++ classes.
 #if defined(MPPP_WITH_MPFR)
     real128 &operator=(const real &);
 #endif
+    MPPP_CONSTEXPR_14 real128 &operator=(const complex128 &);
 
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -566,6 +628,19 @@ public:
         return dispatch_conversion<T>(detail::is_real128_cpp_interoperable<T>{});
     }
 
+    // Conversion operator to C++ complex types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_14 explicit operator T() const
+    {
+        using value_t = typename T::value_type;
+
+        return T{static_cast<value_t>(*this), value_t(0)};
+    }
+
 private:
     // get() implementation for C++ types.
     template <typename T>
@@ -590,6 +665,26 @@ public:
     MPPP_CONSTEXPR_14 bool get(T &rop) const
     {
         return dispatch_get(rop, detail::is_real128_cpp_interoperable<T>{});
+    }
+
+    // Conversion member function to C++ complex types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <real128_cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+#endif
+    MPPP_CONSTEXPR_20 bool get(T &rop) const
+    {
+        using value_type = typename T::value_type;
+
+        // NOTE: constexpr mutation of a std::complex
+        // seems to be available only since C++20:
+        // https://en.cppreference.com/w/cpp/numeric/complex/real
+        // https://en.cppreference.com/w/cpp/numeric/complex/operator%3D
+        rop.real(static_cast<value_type>(m_value));
+        rop.imag(static_cast<value_type>(0));
+
+        return true;
     }
 
     // Convert to string.
@@ -1450,6 +1545,19 @@ template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>
     return x;
 }
 
+template <typename T, typename U>
+using are_real128_eq_op_types
+    = detail::disjunction<are_real128_op_types<T, U>,
+                          detail::conjunction<std::is_same<T, real128>, is_real128_cpp_complex<U>>,
+                          detail::conjunction<std::is_same<U, real128>, is_real128_cpp_complex<T>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL real128_eq_op_types = are_real128_eq_op_types<T, U>::value;
+
+#endif
+
 namespace detail
 {
 
@@ -1470,6 +1578,21 @@ constexpr bool dispatch_eq(const T &x, const real128 &y)
     return x == y.m_value;
 }
 
+template <typename T, enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+constexpr bool dispatch_eq(const real128 &x, const T &y)
+{
+    // NOTE: follow what std::complex does here, that is, real arguments are treated as
+    // complex numbers with the real part equal to the argument and the imaginary part set to zero.
+    // https://en.cppreference.com/w/cpp/numeric/complex/operator_cmp
+    return y.imag() == 0 && y.real() == x.m_value;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
+constexpr bool dispatch_eq(const T &x, const real128 &y)
+{
+    return dispatch_eq(y, x);
+}
+
 template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 bool dispatch_eq(const real128 &, const T &);
 
@@ -1481,9 +1604,9 @@ bool dispatch_eq(const T &, const real128 &);
 // Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+requires real128_eq_op_types<T, U>
 #else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
 #endif
     constexpr bool operator==(const T &x, const U &y)
 {
@@ -1510,9 +1633,9 @@ inline bool dispatch_eq(const T &x, const real128 &y)
 // Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+requires real128_eq_op_types<T, U>
 #else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
 #endif
     constexpr bool operator!=(const T &x, const U &y)
 {

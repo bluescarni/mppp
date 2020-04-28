@@ -228,12 +228,14 @@ The rational class
 
    .. cpp:function:: rational &operator=(const real128 &x)
    .. cpp:function:: rational &operator=(const real &x)
+   .. cpp:function:: rational &operator=(const complex128 &x)
 
       .. note::
 
-         These operators
-         are available only if mp++ was configured with, respectively, the ``MPPP_WITH_QUADMATH``
-         and ``MPPP_WITH_MPFR`` options enabled.
+         The :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`
+         overloads are available only if mp++ was configured with the ``MPPP_WITH_QUADMATH``
+         option enabled. The :cpp:class:`~mppp::real` overload
+         is available only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled.
 
       .. versionadded:: 0.20
 
@@ -381,7 +383,7 @@ The rational class
       :param rop: the variable which will store the result of the conversion.
 
       :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
-         a C++ integral type which cannot represent the truncated value of ``this``.
+         an integral C++ type which cannot represent the truncated value of ``this``.
 
    .. cpp:function:: const int_t &get_num() const
    .. cpp:function:: const int_t &get_den() const
@@ -564,7 +566,7 @@ Conversion
    :param q: the input argument.
 
    :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``T`` is
-     a C++ integral type which cannot represent the truncated value of *q*.
+     an integral C++ type which cannot represent the truncated value of *q*.
 
 .. _rational_arithmetic:
 

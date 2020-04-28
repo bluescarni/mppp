@@ -65,12 +65,14 @@ PYBIND11_MODULE(pybind11_test_01, m)
 
 #if defined(MPPP_WITH_QUADMATH)
     m.def("test_real128_conversion", [](const mppp::real128 &r) { return r; });
+    m.def("test_complex128_conversion", [](const mppp::complex128 &c) { return c; });
 #endif
 
     m.def("test_overload", [](const mppp::integer<1> &n) { return n; });
     m.def("test_overload", [](const mppp::rational<1> &q) { return q; });
 #if defined(MPPP_WITH_QUADMATH)
     m.def("test_overload", [](const mppp::real128 &r) { return r; });
+    m.def("test_overload", [](const mppp::complex128 &c) { return c; });
 #endif
 #if defined(MPPP_WITH_MPFR)
     m.def("test_overload", [](const mppp::real &r) { return r; });
@@ -82,6 +84,7 @@ PYBIND11_MODULE(pybind11_test_01, m)
     m.def("test_vector_conversion", test_vector<mppp::rational<2>>);
 #if defined(MPPP_WITH_QUADMATH)
     m.def("test_vector_conversion", test_vector<mppp::real128>);
+    m.def("test_vector_conversion", test_vector<mppp::complex128>);
 #endif
 #if defined(MPPP_WITH_MPFR)
     m.def("test_vector_conversion", test_vector<mppp::real>);
@@ -93,6 +96,7 @@ PYBIND11_MODULE(pybind11_test_01, m)
     m.def("test_unordered_map_conversion", test_unordered_map<mppp::rational<2>>);
 #if defined(MPPP_WITH_QUADMATH)
     m.def("test_unordered_map_conversion", test_unordered_map<mppp::real128>);
+    m.def("test_unordered_map_conversion", test_unordered_map<mppp::complex128>);
 #endif
 #if defined(MPPP_WITH_MPFR)
     m.def("test_unordered_map_conversion", test_unordered_map<mppp::real>);

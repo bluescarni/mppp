@@ -54,8 +54,8 @@ function(ADD_MPPP_TESTCASE arg1)
   target_link_libraries(${arg1} PRIVATE mp++ mp++_test Threads::Threads)
   if(MPPP_WITH_QUADMATH)
     # NOTE: in some real128 tests we access
-    # functions from the quadmath.h header.
-    target_link_libraries(${arg1} PRIVATE Quadmath::header)
+    # functions from the quadmath API.
+    target_link_libraries(${arg1} PRIVATE mp++::quadmath)
   endif()
   target_compile_options(${arg1} PRIVATE
     "$<$<CONFIG:Debug>:${MPPP_CXX_FLAGS_DEBUG}>"
@@ -79,6 +79,8 @@ function(ADD_MPPP_TESTCASE arg1)
 endfunction()
 
 ADD_MPPP_TESTCASE(concepts)
+ADD_MPPP_TESTCASE(global_header)
+
 ADD_MPPP_TESTCASE(integer_abs)
 ADD_MPPP_TESTCASE(integer_addsub_ui_si)
 ADD_MPPP_TESTCASE(integer_arith)
@@ -126,10 +128,8 @@ ADD_MPPP_TESTCASE(rational_arith)
 ADD_MPPP_TESTCASE(rational_arith_ops_01)
 ADD_MPPP_TESTCASE(rational_arith_ops_02)
 ADD_MPPP_TESTCASE(rational_arith_ops_03)
-if(NOT MINGW)
-    # NOTE: same as above.
-    ADD_MPPP_TESTCASE(rational_basic)
-endif()
+ADD_MPPP_TESTCASE(rational_basic_01)
+ADD_MPPP_TESTCASE(rational_basic_02)
 ADD_MPPP_TESTCASE(rational_binomial)
 ADD_MPPP_TESTCASE(rational_hash)
 ADD_MPPP_TESTCASE(rational_inv)
@@ -143,14 +143,6 @@ ADD_MPPP_TESTCASE(rational_literals)
 if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_arith)
   ADD_MPPP_TESTCASE(real128_basic)
-  # NOTE: some real128 tests use directly
-  # the quadmath.h API.
-  # NOTE: the real128_basic target may
-  # not be defined due to the MPPP_TEST_NSPLIT
-  # machinery.
-  if(TARGET real128_basic)
-    target_link_libraries(real128_basic PRIVATE Quadmath::libquadmath Quadmath::header)
-  endif()
   ADD_MPPP_TESTCASE(real128_comparisons)
   ADD_MPPP_TESTCASE(real128_constants)
   ADD_MPPP_TESTCASE(real128_fpmanip)
@@ -162,17 +154,21 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_operators)
   ADD_MPPP_TESTCASE(real128_pow)
   ADD_MPPP_TESTCASE(real128_roots)
-  if(TARGET real128_roots)
-    target_link_libraries(real128_roots PRIVATE Quadmath::libquadmath Quadmath::header)
-  endif()
   ADD_MPPP_TESTCASE(real128_signbit)
-  if(TARGET real128_signbit)
-    target_link_libraries(real128_signbit PRIVATE Quadmath::libquadmath Quadmath::header)
-  endif()
   ADD_MPPP_TESTCASE(real128_trig)
   ADD_MPPP_TESTCASE(real128_hyperbolic)
   ADD_MPPP_TESTCASE(real128_miscfunctions)
   ADD_MPPP_TESTCASE(real128_literal)
+
+  ADD_MPPP_TESTCASE(complex128_basic)
+  ADD_MPPP_TESTCASE(complex128_arith)
+  ADD_MPPP_TESTCASE(complex128_roots)
+  ADD_MPPP_TESTCASE(complex128_trig)
+  ADD_MPPP_TESTCASE(complex128_hyper)
+  ADD_MPPP_TESTCASE(complex128_logexp)
+  ADD_MPPP_TESTCASE(complex128_pow)
+  ADD_MPPP_TESTCASE(complex128_operators)
+  ADD_MPPP_TESTCASE(complex128_literal)
 endif()
 
 if(MPPP_WITH_MPFR)

@@ -13,7 +13,8 @@ New
 - mp++ now works with the Intel compiler
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__,
   tested with ``icpc (ICC) 19.1.0.166``). This includes
-  also support for :cpp:class:`~mppp::real128` (with
+  also support for :cpp:class:`~mppp::real128` and
+  :cpp:class:`~mppp::complex128` (with
   a couple of minor limitations).
 - The interoperability of :cpp:class:`~mppp::real128` with
   ``long double`` has been improved: it is now supported
@@ -21,6 +22,12 @@ New
   mp++ to be configured with the ``MPPP_WITH_MPFR``
   option any more
   (`#222 <https://github.com/bluescarni/mppp/pull/222>`__).
+- :cpp:class:`~mppp::real128` can now interact with
+  ``std::complex``
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
+- Add :cpp:class:`~mppp::complex128`, a quadruple-precision
+  complex number class
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 - mp++ now officially supports the ARM (``aarch64``)
   and PowerPC (``ppc64le``) architectures, which have
   been added to the continuous integration setup
@@ -29,6 +36,12 @@ New
 Changes
 ~~~~~~~
 
+- Improve the implementation of :cpp:class:`~mppp::real`
+  binary operators/functions by using the MPFR primitives
+  more extensively and by handling mixed-precision computations
+  more rigorously when one of the operands in not
+  a :cpp:class:`~mppp::real`
+  (`#230 <https://github.com/bluescarni/mppp/pull/230>`__).
 - For consistency with C++20, mp++'s concepts now
   use snake case notation. The concept hierarchy has also been
   simplified and streamlined
@@ -44,15 +57,23 @@ Changes
   `#225 <https://github.com/bluescarni/mppp/pull/225>`__,
   `#223 <https://github.com/bluescarni/mppp/pull/223>`__,
   `#221 <https://github.com/bluescarni/mppp/pull/221>`__).
+- Improve the build system's compatibility with other projects
+  by namespacing variables and imported targets related to
+  mp++'s dependencies
+  (`#226 <https://github.com/bluescarni/mppp/pull/226>`__).
 - Various internal simplifications and improvements
   to :cpp:class:`~mppp::real128`
   (`#221 <https://github.com/bluescarni/mppp/pull/221>`__).
+- Update Catch to the latest version, 2.11.3
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 
 Fix
 ~~~
 
 - Fix a bug in the :cpp:class:`~mppp::real128` test suite
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__).
+- Various doc fixes
+  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 - Fix a bug in the test suite in
   release mode
   (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
