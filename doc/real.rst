@@ -882,7 +882,8 @@ Types
 .. cpp:type:: mpfr_t
 
    This is the type used by the MPFR library to represent multiprecision floats.
-   It is defined as an array of size 1 of an unspecified structure.
+   It is defined as an array of size 1 of an unspecified structure
+   (see :cpp:type:`~mppp::mpfr_struct_t`).
 
    .. seealso::
 

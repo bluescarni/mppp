@@ -74,6 +74,9 @@ static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offseto
                   && std::is_same<::mp_limb_t *, decltype(std::declval<mpfr_struct_t>()._mpfr_d)>::value,
               "Invalid mpfr_t struct layout and/or MPFR types.");
 
+// Double check that real is a standard layout class.
+static_assert(std::is_standard_layout<real>::value, "real is not a standard layout class.");
+
 #if MPPP_CPLUSPLUS >= 201703L
 
 // If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
@@ -233,7 +236,7 @@ struct flint_cleanup {
 };
 
 // Instantiate a cleanup object for each thread.
-thread_local const flint_cleanup flint_cleanup_inst;
+MPPP_CONSTINIT thread_local const flint_cleanup flint_cleanup_inst;
 
 #endif
 
@@ -992,7 +995,7 @@ struct mpfr_cleanup {
 };
 
 // Instantiate a cleanup object for each thread.
-thread_local const mpfr_cleanup mpfr_cleanup_inst;
+MPPP_CONSTINIT thread_local const mpfr_cleanup mpfr_cleanup_inst;
 
 #else
 
@@ -1021,12 +1024,12 @@ struct mpfr_global_cleanup {
     }
 };
 
-thread_local const mpfr_tl_cleanup mpfr_tl_cleanup_inst;
+MPPP_CONSTINIT thread_local const mpfr_tl_cleanup mpfr_tl_cleanup_inst;
 // NOTE: because the destruction of thread-local objects
 // always happens before the destruction of objects with
 // static storage duration, the global cleanup will always
 // be performed after thread-local cleanup.
-const mpfr_global_cleanup mpfr_global_cleanup_inst;
+MPPP_CONSTINIT const mpfr_global_cleanup mpfr_global_cleanup_inst;
 
 #endif
 
