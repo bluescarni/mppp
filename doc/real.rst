@@ -98,9 +98,9 @@ The real class
    .. cpp:function:: explicit real(const real &other, mpfr_prec_t p)
    .. cpp:function:: explicit real(real &&other, mpfr_prec_t p)
 
-      Copy/move constructor with custom precision.
+      Copy/move constructors with custom precision.
 
-      This constructor will set *this* to the value of *other* with precision *p*. If *p*
+      These constructors will set *this* to the value of *other* with precision *p*. If *p*
       is smaller than the precision of *other*, a rounding operation will be performed,
       otherwise the value will be copied exactly.
 
