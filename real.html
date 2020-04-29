@@ -234,10 +234,21 @@ member function. After re-assignment, <em>other</em> can be used normally again.
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp4real4realERK4real11mpfr_prec_t">
 <span id="_CPPv3N4mppp4real4realERK4real11mpfr_prec_t"></span><span id="_CPPv2N4mppp4real4realERK4real11mpfr_prec_t"></span><span id="mppp::real::real__realCR.mpfr_prec_t"></span><em class="property">explicit</em> <code class="descname">real</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N4mppp4real4realERK4real11mpfr_prec_t" title="mppp::real::real">real</a> &amp;<em>other</em>, <a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4realERK4real11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Copy constructor with custom precision.</p>
-<p>This constructor will set <em>this</em> to a copy of <em>other</em> with precision <em>p</em>. If <em>p</em>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real4realERR4real11mpfr_prec_t">
+<span id="_CPPv3N4mppp4real4realERR4real11mpfr_prec_t"></span><span id="_CPPv2N4mppp4real4realERR4real11mpfr_prec_t"></span><span id="mppp::real::real__realRR.mpfr_prec_t"></span><em class="property">explicit</em> <code class="descname">real</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4mppp4real4realERR4real11mpfr_prec_t" title="mppp::real::real">real</a> &amp;&amp;<em>other</em>, <a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4realERR4real11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Copy/move constructors with custom precision.</p>
+<p>These constructors will set <em>this</em> to the value of <em>other</em> with precision <em>p</em>. If <em>p</em>
 is smaller than the precision of <em>other</em>, a rounding operation will be performed,
 otherwise the value will be copied exactly.</p>
+<p>After move construction, the only valid operations on <em>other</em> are
+destruction, copy/move assignment and the invocation of the <a class="reference internal" href="#_CPPv4NK4mppp4real8is_validEv" title="mppp::real::is_valid"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">is_valid()</span></code></a>
+member function. After re-assignment, <em>other</em> can be used normally again.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20: </span>The move overload.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>other</strong> – the construction argument.</li>
