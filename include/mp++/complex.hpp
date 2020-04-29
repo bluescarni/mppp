@@ -44,22 +44,24 @@ namespace mppp
 // for complex.
 template <typename T>
 using is_rv_complex_interoperable
-    = detail::disjunction<is_cpp_arithmetic<T>, detail::is_integer<T>, detail::is_rational<T>, std::is_same<T, real>
+    = detail::disjunction<is_cpp_arithmetic<detail::uncvref_t<T>>, detail::is_integer<detail::uncvref_t<T>>,
+                          detail::is_rational<detail::uncvref_t<T>>, std::is_same<detail::uncvref_t<T>, real>
 #if defined(MPPP_WITH_QUADMATH)
                           ,
-                          std::is_same<T, real128>
+                          std::is_same<detail::uncvref_t<T>, real128>
 #endif
                           >;
 
 // Detect interoperable types
 // for complex.
 template <typename T>
-using is_complex_interoperable = detail::disjunction<is_rv_complex_interoperable<T>, is_cpp_complex<T>
+using is_complex_interoperable
+    = detail::disjunction<is_rv_complex_interoperable<detail::uncvref_t<T>>, is_cpp_complex<detail::uncvref_t<T>>
 #if defined(MPPP_WITH_QUADMATH)
-                                                     ,
-                                                     std::is_same<T, complex128>
+                          ,
+                          std::is_same<detail::uncvref_t<T>, complex128>
 #endif
-                                                     >;
+                          >;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 
@@ -113,10 +115,10 @@ private:
     };
     // From real-valued interoperable types + optional precision.
     template <typename T, typename... Args>
-    explicit complex(gtag, std::true_type, const T &x, const Args &... args)
+    explicit complex(gtag, std::true_type, T &&x, const Args &... args)
     {
         // Init the real part from x + optional explicit precision.
-        real re{x, static_cast<::mpfr_prec_t>(args)...};
+        real re{std::forward<T>(x), static_cast<::mpfr_prec_t>(args)...};
         // The imaginary part is inited to +0, using either the explicit
         // precision (if provided) or the precision of the real part
         // otherwise.
@@ -132,6 +134,9 @@ private:
         im._get_mpfr_t()->_mpfr_d = nullptr;
     }
     // From complex-valued interoperable types + optional precision.
+    // NOTE: this will delegate to the ctors from real + imaginary parts.
+    // NOTE: no need for std::forward, as this constructor will involve
+    // only std::complex or complex128.
     template <typename T, typename... Args>
     explicit complex(gtag, std::false_type, const T &c, const Args &... args) : complex(c.real(), c.imag(), args...)
     {
@@ -144,7 +149,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
 #endif
-    explicit complex(const T &x) : complex(gtag{}, is_rv_complex_interoperable<T>{}, x)
+    explicit complex(T &&x) : complex(gtag{}, is_rv_complex_interoperable<T>{}, std::forward<T>(x))
     {
     }
     // Ctor from interoperable types + precision.
@@ -153,16 +158,18 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
 #endif
-    explicit complex(const T &x, complex_prec_t p) : complex(gtag{}, is_rv_complex_interoperable<T>{}, x, p)
+    explicit complex(T &&x, complex_prec_t p) : complex(gtag{}, is_rv_complex_interoperable<T>{}, std::forward<T>(x), p)
     {
     }
 
 private:
+    // Implementation of the ctor from real and imaginary
+    // parts + explicitly specified precision.
     template <typename T, typename U>
-    void real_imag_ctor_impl(const T &re, const U &im, ::mpfr_prec_t p)
+    void real_imag_ctor_impl(T &&re, U &&im, ::mpfr_prec_t p)
     {
         // Init real-imaginary parts with the input prec.
-        real rp{re, p}, ip{im, p};
+        real rp{std::forward<T>(re), p}, ip{std::forward<U>(im), p};
 
         // Shallow-copy into this.
         m_mpc.re[0] = *rp.get_mpfr_t();
@@ -182,9 +189,11 @@ public:
               detail::enable_if_t<
                   detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
 #endif
-    explicit complex(const T &re, const U &im)
+    explicit complex(T &&re, U &&im)
     {
-        real_imag_ctor_impl(re, im,
+        // NOTE: the precision will be the largest between the
+        // automatically-deduced ones for re and im.
+        real_imag_ctor_impl(std::forward<T>(re), std::forward<U>(im),
                             detail::c_max(detail::real_deduce_precision(re), detail::real_deduce_precision(im)));
     }
     // Binary ctor from interoperable types + prec.
@@ -195,9 +204,9 @@ public:
               detail::enable_if_t<
                   detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
 #endif
-    explicit complex(const T &re, const U &im, ::mpfr_prec_t p)
+    explicit complex(T &&re, U &&im, ::mpfr_prec_t p)
     {
-        real_imag_ctor_impl(re, im, p);
+        real_imag_ctor_impl(std::forward<T>(re), std::forward<U>(im), p);
     }
 
     explicit complex(const ::mpc_t);
@@ -370,8 +379,8 @@ private:
 template <typename T, typename U>
 using are_complex_op_types = detail::disjunction<
     detail::conjunction<std::is_same<complex, detail::uncvref_t<T>>, std::is_same<complex, detail::uncvref_t<U>>>,
-    detail::conjunction<std::is_same<complex, detail::uncvref_t<T>>, is_complex_interoperable<detail::uncvref_t<U>>>,
-    detail::conjunction<std::is_same<complex, detail::uncvref_t<U>>, is_complex_interoperable<detail::uncvref_t<T>>>>;
+    detail::conjunction<std::is_same<complex, detail::uncvref_t<T>>, is_complex_interoperable<U>>,
+    detail::conjunction<std::is_same<complex, detail::uncvref_t<U>>, is_complex_interoperable<T>>>;
 
 template <typename T, typename U>
 using are_complex_in_place_op_types
