@@ -138,7 +138,8 @@ private:
     // NOTE: no need for std::forward, as this constructor will involve
     // only std::complex or complex128.
     template <typename T, typename... Args>
-    explicit complex(gtag, std::false_type, const T &c, const Args &... args) : complex(c.real(), c.imag(), args...)
+    explicit complex(gtag, std::false_type, const T &c, const Args &... args)
+        : complex(c.real(), c.imag(), static_cast<::mpfr_prec_t>(args)...)
     {
     }
 
