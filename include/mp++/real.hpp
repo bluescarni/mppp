@@ -274,6 +274,8 @@ public:
 
     // Copy constructor with custom precision.
     explicit real(const real &, ::mpfr_prec_t);
+    // Move constructor with custom precision.
+    explicit real(real &&, ::mpfr_prec_t);
 
     // Constructor from a special value, sign and precision.
     explicit real(real_kind, int, ::mpfr_prec_t);
