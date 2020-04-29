@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Add a move constructor with custom precision
+  for :cpp:class:`~mppp::real`
+  (`#234 <https://github.com/bluescarni/mppp/pull/234>`__).
 - Add support for C++20's ``constinit``
   (`#233 <https://github.com/bluescarni/mppp/pull/233>`__).
 - Improve the interoperability between mp++ classes
