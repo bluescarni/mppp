@@ -485,6 +485,21 @@ real::real(const real &other, ::mpfr_prec_t p)
     ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
 }
 
+// Move constructor with custom precision.
+real::real(real &&other, ::mpfr_prec_t p)
+{
+    // Check the precision first of all.
+    check_init_prec(p);
+
+    // Shallow copy other.
+    m_mpfr = other.m_mpfr;
+    // Mark the other as moved-from.
+    other.m_mpfr._mpfr_d = nullptr;
+
+    // Apply the precision.
+    prec_round_impl<false>(p);
+}
+
 // Construction from FPs.
 template <typename Func, typename T>
 void real::dispatch_fp_construction(const Func &func, const T &x)

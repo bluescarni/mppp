@@ -96,12 +96,21 @@ The real class
       :param other: the construction argument.
 
    .. cpp:function:: explicit real(const real &other, mpfr_prec_t p)
+   .. cpp:function:: explicit real(real &&other, mpfr_prec_t p)
 
-      Copy constructor with custom precision.
+      Copy/move constructor with custom precision.
 
-      This constructor will set *this* to a copy of *other* with precision *p*. If *p*
+      This constructor will set *this* to the value of *other* with precision *p*. If *p*
       is smaller than the precision of *other*, a rounding operation will be performed,
       otherwise the value will be copied exactly.
+
+      After move construction, the only valid operations on *other* are
+      destruction, copy/move assignment and the invocation of the :cpp:func:`~mppp::real::is_valid()`
+      member function. After re-assignment, *other* can be used normally again.
+
+      .. versionadded:: 0.20
+
+         The move overload.
 
       :param other: the construction argument.
       :param p: the desired precision.
