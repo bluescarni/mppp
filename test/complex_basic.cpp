@@ -7,10 +7,12 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <complex>
+#include <stdexcept>
 #include <utility>
 
 #include <mp++/complex.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
@@ -27,6 +29,8 @@ using namespace mppp;
 
 TEST_CASE("complex constructors")
 {
+    using Catch::Matchers::Message;
+
     // Def ctor.
     {
         complex c;
@@ -287,4 +291,210 @@ TEST_CASE("complex constructors")
         REQUIRE(im.get().get_prec() == 512);
     }
 #endif
+    // Bad prec value.
+    {
+        REQUIRE_THROWS_MATCHES((complex{42.l, complex_prec_t(-1)}), std::invalid_argument,
+                               Message("Cannot init a real with a precision of -1: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+        REQUIRE_THROWS_MATCHES((complex{std::complex<float>{1, 2}, complex_prec_t(-2)}), std::invalid_argument,
+                               Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+    }
+
+    // Copy ctor with custom precision.
+    {
+        complex c{1.1_r512}, c1{c, 256};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 1.1_r256);
+        REQUIRE(re.get() != 1.1_r512);
+        REQUIRE(im.get() == 0);
+        REQUIRE(re.get().get_prec() == 256);
+        REQUIRE(im.get().get_prec() == 256);
+
+        // Error checking.
+        REQUIRE_THROWS_MATCHES((complex{c1, -1}), std::invalid_argument,
+                               Message("Cannot init a complex with a precision of -1: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+        REQUIRE_THROWS_MATCHES((complex{c1, 0}), std::invalid_argument,
+                               Message("Cannot init a complex with a precision of 0: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+    }
+
+    // Move ctor with custom precision.
+    {
+        complex c{1.1_r512}, c1{std::move(c), 256};
+        REQUIRE(!c.is_valid());
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 1.1_r256);
+        REQUIRE(re.get() != 1.1_r512);
+        REQUIRE(im.get() == 0);
+        REQUIRE(re.get().get_prec() == 256);
+        REQUIRE(im.get().get_prec() == 256);
+
+        REQUIRE_THROWS_MATCHES((complex{std::move(c1), -1}), std::invalid_argument,
+                               Message("Cannot init a complex with a precision of -1: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+        REQUIRE_THROWS_MATCHES((complex{std::move(c1), 0}), std::invalid_argument,
+                               Message("Cannot init a complex with a precision of 0: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+    }
+
+    // Binary ctors.
+    {
+        complex c1{45, -67.};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 45);
+        REQUIRE(re.get().get_prec()
+                == detail::c_max(detail::real_deduce_precision(45), detail::real_deduce_precision(-67.)));
+        REQUIRE(im.get() == -67);
+        REQUIRE(im.get().get_prec()
+                == detail::c_max(detail::real_deduce_precision(45), detail::real_deduce_precision(-67.)));
+    }
+    {
+        complex c1{45_z1, -67 / 123_q1};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 45);
+        REQUIRE(re.get().get_prec()
+                == detail::c_max(detail::real_deduce_precision(45_z1), detail::real_deduce_precision(-67 / 123_q1)));
+        REQUIRE(im.get() == real{-67 / 123_q1});
+        REQUIRE(im.get().get_prec()
+                == detail::c_max(detail::real_deduce_precision(45_z1), detail::real_deduce_precision(-67 / 123_q1)));
+    }
+    {
+        auto r = 1.23_r512;
+        auto i = 4.56_r256;
+        complex c1{r, i};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 1.23_r512);
+        REQUIRE(re.get().get_prec() == 512);
+        REQUIRE(im.get() == 4.56_r256);
+        REQUIRE(im.get().get_prec() == 512);
+    }
+    {
+        auto r = 1.23_r512;
+        auto i = 4.56_r256;
+        complex c1{std::move(r), std::move(i)};
+
+        REQUIRE(!r.is_valid());
+        REQUIRE(!i.is_valid());
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 1.23_r512);
+        REQUIRE(re.get().get_prec() == 512);
+        REQUIRE(im.get() == 4.56_r256);
+        REQUIRE(im.get().get_prec() == 512);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex c1{45_rq, 12_rq};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 45);
+        REQUIRE(re.get().get_prec() == 113);
+        REQUIRE(im.get() == 12);
+        REQUIRE(im.get().get_prec() == 113);
+    }
+#endif
+
+    // Binary ctors with custom precision.
+    {
+        complex c1{45, -67., 36};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 45);
+        REQUIRE(re.get().get_prec() == 36);
+        REQUIRE(im.get() == -67);
+        REQUIRE(im.get().get_prec() == 36);
+    }
+    {
+        complex c1{45_z1, -67 / 123_q1, 87};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 45);
+        REQUIRE(re.get().get_prec() == 87);
+        REQUIRE(im.get() == real{-67 / 123_q1, 87});
+        REQUIRE(im.get().get_prec() == 87);
+    }
+    {
+        auto r = 1.23_r512;
+        auto i = 4.56_r256;
+        complex c1{r, i, 128};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 1.23_r128);
+        REQUIRE(re.get().get_prec() == 128);
+        REQUIRE(im.get() == 4.56_r128);
+        REQUIRE(im.get().get_prec() == 128);
+    }
+    {
+        auto r = 1.23_r512;
+        auto i = 4.56_r256;
+        complex c1{std::move(r), std::move(i), 128};
+
+        REQUIRE(!r.is_valid());
+        REQUIRE(!i.is_valid());
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 1.23_r128);
+        REQUIRE(re.get().get_prec() == 128);
+        REQUIRE(im.get() == 4.56_r128);
+        REQUIRE(im.get().get_prec() == 128);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex c1{45_rq, 12_rq, 28};
+
+        complex::const_re_extractor re{c1};
+        complex::const_im_extractor im{c1};
+
+        REQUIRE(re.get() == 45);
+        REQUIRE(re.get().get_prec() == 28);
+        REQUIRE(im.get() == 12);
+        REQUIRE(im.get().get_prec() == 28);
+    }
+#endif
+    // Bad prec value.
+    {
+        REQUIRE_THROWS_MATCHES((complex{42, 43, -1}), std::invalid_argument,
+                               Message("Cannot init a real with a precision of -1: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+        REQUIRE_THROWS_MATCHES((complex{1_q1, 1.23_r512, -2}), std::invalid_argument,
+                               Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+    }
 }

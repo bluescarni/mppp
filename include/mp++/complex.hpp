@@ -108,6 +108,8 @@ public:
 
     // Copy constructor with custom precision.
     explicit complex(const complex &, ::mpfr_prec_t);
+    // Move constructor with custom precision.
+    explicit complex(complex &&, ::mpfr_prec_t);
 
 private:
     // A tag for private generic ctors.
@@ -182,7 +184,7 @@ private:
     }
 
 public:
-    // Binary ctor from interoperable types.
+    // Binary ctor from real-valued interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <rv_complex_interoperable T, rv_complex_interoperable U>
 #else
@@ -197,7 +199,7 @@ public:
         real_imag_ctor_impl(std::forward<T>(re), std::forward<U>(im),
                             detail::c_max(detail::real_deduce_precision(re), detail::real_deduce_precision(im)));
     }
-    // Binary ctor from interoperable types + prec.
+    // Binary ctor from real-valued interoperable types + prec.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <rv_complex_interoperable T, rv_complex_interoperable U>
 #else
@@ -350,11 +352,20 @@ private:
         }
         return p;
     }
-    // mpfr_set_prec() wrapper, with or without prec checking.
+    // mpc_set_prec() wrapper, with or without prec checking.
     template <bool Check>
     void set_prec_impl(::mpfr_prec_t p)
     {
         ::mpc_set_prec(&m_mpc, Check ? check_set_prec(p) : p);
+    }
+    // Wrapper for setting the precision while preserving
+    // the original value, with or without precision checking.
+    template <bool Check>
+    void prec_round_impl(::mpfr_prec_t p_)
+    {
+        const auto p = Check ? check_set_prec(p_) : p_;
+        ::mpfr_prec_round(mpc_realref(&m_mpc), p, MPFR_RNDN);
+        ::mpfr_prec_round(mpc_imagref(&m_mpc), p, MPFR_RNDN);
     }
 
 public:

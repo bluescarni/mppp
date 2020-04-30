@@ -78,6 +78,20 @@ complex::complex(const complex &other, ::mpfr_prec_t p)
     ::mpc_set(&m_mpc, &other.m_mpc, MPC_RNDNN);
 }
 
+complex::complex(complex &&other, ::mpfr_prec_t p)
+{
+    // Check the precision first of all.
+    check_init_prec(p);
+
+    // Shallow copy other.
+    m_mpc = other.m_mpc;
+    // Mark the other as moved-from.
+    other.m_mpc.re->_mpfr_d = nullptr;
+
+    // Apply the precision.
+    prec_round_impl<false>(p);
+}
+
 complex::complex(const ::mpc_t c)
 {
     // Init with the same precision as other, and then set.
