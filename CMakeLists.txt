@@ -200,6 +200,7 @@ set(MPPP_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/integer.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/rational.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/type_name.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/parse_complex.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/utils.cpp"
 )
 
@@ -239,6 +240,7 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/type_traits.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/visibility.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/parse_complex.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/extra/pybind11.hpp"
   )
   source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" PREFIX "Header Files" FILES ${MPPP_HEADER_FILES})
