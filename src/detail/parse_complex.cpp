@@ -12,8 +12,7 @@
 #include <string>
 
 #include <mp++/config.hpp>
-
-#include "parse_complex.hpp"
+#include <mp++/detail/parse_complex.hpp>
 
 namespace mppp
 {
