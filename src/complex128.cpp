@@ -25,6 +25,7 @@
 #include <quadmath.h>
 
 #include <mp++/complex128.hpp>
+#include <mp++/detail/parse_complex.hpp>
 #include <mp++/real128.hpp>
 
 #if defined(MPPP_WITH_MPFR)
@@ -32,8 +33,6 @@
 #include <mp++/real.hpp>
 
 #endif
-
-#include "parse_complex.hpp"
 
 namespace mppp
 {
