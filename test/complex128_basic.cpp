@@ -209,14 +209,14 @@ TEST_CASE("string constructors")
 
     // Empty strings.
     REQUIRE_THROWS_MATCHES(complex128{""}, std::invalid_argument,
-                           Message("The string '' is not a valid representation of a complex128"));
+                           Message("The string '' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(complex128{" "}, std::invalid_argument,
-                           Message("The string ' ' is not a valid representation of a complex128"));
+                           Message("The string ' ' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(complex128{"  "}, std::invalid_argument,
-                           Message("The string '  ' is not a valid representation of a complex128"));
+                           Message("The string '  ' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data(), complex128::char_range_t{}}),
                            std::invalid_argument,
-                           Message("The string '' is not a valid representation of a complex128"));
+                           Message("The string '' is not a valid representation of a complex value"));
 
     {
         // Example from the docs.
@@ -268,12 +268,12 @@ TEST_CASE("string constructors")
     REQUIRE(complex128{" ( 123)"}.m_value == 123);
     REQUIRE(complex128{"  ( -0x2f2)"}.m_value == -754);
     REQUIRE_THROWS_MATCHES(complex128{" (123) "}, std::invalid_argument,
-                           Message("The string ' (123) ' is not a valid representation of a complex128"));
+                           Message("The string ' (123) ' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(
         complex128{" (123 )"}, std::invalid_argument,
         Message("The string '123 ' does not represent a valid quadruple-precision floating-point value"));
     REQUIRE_THROWS_MATCHES(complex128{" (123"}, std::invalid_argument,
-                           Message("The string ' (123' is not a valid representation of a complex128"));
+                           Message("The string ' (123' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(
         complex128{" (123as)"}, std::invalid_argument,
         Message("The string '123as' does not represent a valid quadruple-precision floating-point value"));
@@ -284,7 +284,7 @@ TEST_CASE("string constructors")
     buffer = {'(', '2', '3', '4'};
     REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data() + 4, complex128::char_range_t{}}),
                            std::invalid_argument,
-                           Message("The string '(234' is not a valid representation of a complex128"));
+                           Message("The string '(234' is not a valid representation of a complex value"));
 
     // Real and imaginary components.
     REQUIRE(complex128{"(123,12)"}.m_value == cplex128{123, 12});
@@ -302,7 +302,7 @@ TEST_CASE("string constructors")
     REQUIRE(complex128{" ( 0x10.1p0, 0x10.1p0)"}.m_value == cplex128{(16.0625_rq).m_value, (16.0625_rq).m_value});
     REQUIRE(complex128{" ( 12, 0x10.1p0)"}.m_value == cplex128{12, (16.0625_rq).m_value});
     REQUIRE_THROWS_MATCHES(complex128{" (123,12) "}, std::invalid_argument,
-                           Message("The string ' (123,12) ' is not a valid representation of a complex128"));
+                           Message("The string ' (123,12) ' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(
         complex128{" (123 ,12)"}, std::invalid_argument,
         Message("The string '123 ' does not represent a valid quadruple-precision floating-point value"));
@@ -310,15 +310,15 @@ TEST_CASE("string constructors")
         complex128{" (123, 12 )"}, std::invalid_argument,
         Message("The string ' 12 ' does not represent a valid quadruple-precision floating-point value"));
     REQUIRE_THROWS_MATCHES(complex128{" (123,"}, std::invalid_argument,
-                           Message("The string ' (123,' is not a valid representation of a complex128"));
+                           Message("The string ' (123,' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(complex128{" (123, "}, std::invalid_argument,
-                           Message("The string ' (123, ' is not a valid representation of a complex128"));
+                           Message("The string ' (123, ' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(complex128{" (123,1"}, std::invalid_argument,
-                           Message("The string ' (123,1' is not a valid representation of a complex128"));
+                           Message("The string ' (123,1' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(complex128{" (123, 1"}, std::invalid_argument,
-                           Message("The string ' (123, 1' is not a valid representation of a complex128"));
+                           Message("The string ' (123, 1' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(complex128{" (123,1 "}, std::invalid_argument,
-                           Message("The string ' (123,1 ' is not a valid representation of a complex128"));
+                           Message("The string ' (123,1 ' is not a valid representation of a complex value"));
     REQUIRE_THROWS_MATCHES(
         complex128{" (hello,12)"}, std::invalid_argument,
         Message("The string 'hello' does not represent a valid quadruple-precision floating-point value"));
@@ -341,7 +341,7 @@ TEST_CASE("string constructors")
     buffer = {'(', '1', '2', '3', ',', '1'};
     REQUIRE_THROWS_MATCHES((complex128{buffer.data(), buffer.data() + 6, complex128::char_range_t{}}),
                            std::invalid_argument,
-                           Message("The string '(123,1' is not a valid representation of a complex128"));
+                           Message("The string '(123,1' is not a valid representation of a complex value"));
 }
 
 TEST_CASE("assignment operators")

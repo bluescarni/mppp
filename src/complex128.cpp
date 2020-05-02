@@ -8,9 +8,9 @@
 
 #include <mp++/config.hpp>
 
+#include <cassert>
 #include <ostream>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -32,6 +32,8 @@
 #include <mp++/real.hpp>
 
 #endif
+
+#include "parse_complex.hpp"
 
 namespace mppp
 {
@@ -62,87 +64,20 @@ void complex128::construct_from_nts(const char *str)
     // below operate on a well-defined internal value.
     m_value = 0;
 
-    // Small helper to raise an error in case
-    // of a malformed string.
-    auto raise_error = [str]() {
-        throw std::invalid_argument(std::string("The string '") + str
-                                    + "' is not a valid representation of a complex128");
-    };
+    const auto res = detail::parse_complex(str);
 
-    auto s = str;
+    // Set the real part.
+    set_real(real128{res[0], res[1]});
 
-    // Skip leading whitespaces.
-    for (; *s == ' '; ++s) {
-    }
+    // The imaginary part might not be present.
+    if (res[2] == nullptr) {
+        assert(res[3] == nullptr);
 
-    if (mppp_unlikely(*s == '\0')) {
-        // The string consists only of whitespaces.
-        raise_error();
-    }
-
-    if (*s == '(') {
-        // The string starts with a round bracket. Try to
-        // understand if we have only the real component, or
-        // the imaginary as well.
-
-        // Examine the string until we get either to a comma
-        // (the separator between real and imaginary parts)
-        // or the end of the string.
-        auto p = s + 1;
-        for (; *p != ',' && *p != '\0'; ++p) {
-        }
-
-        if (*p == '\0') {
-            // We reached the end of the string,
-            // the format must be (real).
-            if (mppp_unlikely(*(p - 1) != ')')) {
-                // Unbalanced bracket.
-                raise_error();
-            }
-
-            // NOTE: here we know that:
-            //
-            // - *s == '(',
-            // - p > s,
-            // - *(p-1) == ')'.
-            //
-            // Thus, p-1 > s >= s+1.
-            set_real(real128{s + 1, p - 1});
-            set_imag(0);
-        } else {
-            // We reached a comma, the format must
-            // be (real,imag).
-
-            // Set the real part first.
-            set_real(real128{s + 1, p});
-
-            // Move p past the comma, assign to s.
-            s = ++p;
-
-            if (mppp_unlikely(*p == '\0')) {
-                // There's nothing after the comma.
-                raise_error();
-            }
-
-            // Look for the end of the string.
-            for (++p; *p != '\0'; ++p) {
-            }
-
-            // NOTE: here we are sure that p > s.
-            if (mppp_unlikely(*(p - 1) != ')')) {
-                // Unbalanced bracket.
-                raise_error();
-            }
-
-            // Set the imaginary part.
-            set_imag(real128{s, p - 1});
-        }
-
-    } else {
-        // The string does not start with a round
-        // bracket, interpret as a real value.
-        set_real(real128{s});
         set_imag(0);
+    } else {
+        assert(res[3] != nullptr);
+
+        set_imag(real128{res[2], res[3]});
     }
 }
 
