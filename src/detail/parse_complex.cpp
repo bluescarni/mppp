@@ -84,7 +84,7 @@ std::array<const char *, 4> parse_complex(const char *str)
             // - *(p-1) == ')'.
             //
             // Thus, p-1 > s >= s+1.
-            return {s + 1, p - 1, nullptr, nullptr};
+            return {{s + 1, p - 1, nullptr, nullptr}};
         } else {
             // We reached a comma, the format must
             // be (real,imag).
@@ -110,12 +110,12 @@ std::array<const char *, 4> parse_complex(const char *str)
                 raise_error();
             }
 
-            return {re_start, re_end, s, p - 1};
+            return {{re_start, re_end, s, p - 1}};
         }
     } else {
         // The string does not start with a round
         // bracket, interpret as a real value.
-        return {s, s + std::strlen(s), nullptr, nullptr};
+        return {{s, s + std::strlen(s), nullptr, nullptr}};
     }
 }
 
