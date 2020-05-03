@@ -184,8 +184,8 @@ complex &complex::operator=(const complex &other)
 // TODO implement on top of to_string().
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {
-    complex::const_re_extractor rex{c};
-    complex::const_im_extractor iex{c};
+    complex::re_cref rex{c};
+    complex::im_cref iex{c};
 
     os << '(' << rex->to_string() << ',' << iex->to_string() << ')';
 

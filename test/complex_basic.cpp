@@ -44,8 +44,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c;
 
-        complex::const_re_extractor re{c};
-        complex::const_im_extractor im{c};
+        complex::re_cref re{c};
+        complex::im_cref im{c};
 
         REQUIRE(re->zero_p());
         REQUIRE(im->zero_p());
@@ -59,8 +59,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{42};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 42);
         REQUIRE(im->zero_p());
@@ -70,8 +70,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{123.};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 123);
         REQUIRE(im->zero_p());
@@ -81,8 +81,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{-42_z1};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == -42);
         REQUIRE(im->zero_p());
@@ -92,8 +92,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{73_q1 / 2};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 73_q1 / 2);
         REQUIRE(im->zero_p());
@@ -103,8 +103,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{1.1_r512};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.1_r512);
         REQUIRE(im->zero_p());
@@ -118,8 +118,8 @@ TEST_CASE("basic and generic constructors")
         complex c1{std::move(r)};
         REQUIRE(!r.is_valid());
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.1_r512);
         REQUIRE(im->zero_p());
@@ -130,8 +130,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{-3.1_rq};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == -3.1_rq);
         REQUIRE(im->zero_p());
@@ -142,8 +142,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{std::complex<double>{-4, 7}};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == -4);
         REQUIRE((*im) == 7);
@@ -154,8 +154,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{-3.1_rq + 2.1_icq};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == -3.1_rq);
         REQUIRE((*im) == 2.1_rq);
@@ -168,8 +168,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{std::complex<double>{-4, 7}}, c2 = c1;
 
-        complex::const_re_extractor re{c2};
-        complex::const_im_extractor im{c2};
+        complex::re_cref re{c2};
+        complex::im_cref im{c2};
 
         REQUIRE((*re) == -4);
         REQUIRE((*im) == 7);
@@ -183,8 +183,8 @@ TEST_CASE("basic and generic constructors")
 
         REQUIRE(!c1.is_valid());
 
-        complex::const_re_extractor re{c2};
-        complex::const_im_extractor im{c2};
+        complex::re_cref re{c2};
+        complex::im_cref im{c2};
 
         REQUIRE((*re) == -4);
         REQUIRE((*im) == 7);
@@ -196,8 +196,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{42, complex_prec_t(123)};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 42);
         REQUIRE(im->zero_p());
@@ -207,8 +207,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{42.l, complex_prec_t(10)};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 42);
         REQUIRE(im->zero_p());
@@ -218,8 +218,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{-42_z1, complex_prec_t(768)};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == -42);
         REQUIRE(im->zero_p());
@@ -229,8 +229,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{73_q1 / 2, complex_prec_t(1768)};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 73_q1 / 2);
         REQUIRE(im->zero_p());
@@ -240,8 +240,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{1.1_r512, complex_prec_t(128)};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.1_r128);
         REQUIRE(im->zero_p());
@@ -255,8 +255,8 @@ TEST_CASE("basic and generic constructors")
         complex c1{std::move(r), complex_prec_t(1024)};
         REQUIRE(!r.is_valid());
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.1_r512);
         REQUIRE(im->zero_p());
@@ -267,8 +267,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{-3.1_rq, complex_prec_t(1024)};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == -3.1_rq);
         REQUIRE(im->zero_p());
@@ -279,8 +279,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{std::complex<double>{-4, 7}, complex_prec_t(10)};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == -4);
         REQUIRE((*im) == 7);
@@ -291,8 +291,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{-3.1_rq + 2.1_icq, complex_prec_t(512)};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == -3.1_rq);
         REQUIRE((*im) == 2.1_rq);
@@ -316,8 +316,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c{1.1_r512}, c1{c, 256};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.1_r256);
         REQUIRE((*re) != 1.1_r512);
@@ -341,8 +341,8 @@ TEST_CASE("basic and generic constructors")
         complex c{1.1_r512}, c1{std::move(c), 256};
         REQUIRE(!c.is_valid());
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.1_r256);
         REQUIRE((*re) != 1.1_r512);
@@ -364,8 +364,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{45, -67.};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 45);
         REQUIRE(re->get_prec()
@@ -377,8 +377,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{45_z1, -67 / 123_q1};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 45);
         REQUIRE(re->get_prec()
@@ -392,8 +392,8 @@ TEST_CASE("basic and generic constructors")
         auto i = 4.56_r256;
         complex c1{r, i};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.23_r512);
         REQUIRE(re->get_prec() == 512);
@@ -408,8 +408,8 @@ TEST_CASE("basic and generic constructors")
         REQUIRE(!r.is_valid());
         REQUIRE(!i.is_valid());
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.23_r512);
         REQUIRE(re->get_prec() == 512);
@@ -420,8 +420,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{45_rq, 12_rq};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 45);
         REQUIRE(re->get_prec() == 113);
@@ -434,8 +434,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{45, -67., 36};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 45);
         REQUIRE(re->get_prec() == 36);
@@ -445,8 +445,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{45_z1, -67 / 123_q1, 87};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 45);
         REQUIRE(re->get_prec() == 87);
@@ -458,8 +458,8 @@ TEST_CASE("basic and generic constructors")
         auto i = 4.56_r256;
         complex c1{r, i, 128};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.23_r128);
         REQUIRE(re->get_prec() == 128);
@@ -474,8 +474,8 @@ TEST_CASE("basic and generic constructors")
         REQUIRE(!r.is_valid());
         REQUIRE(!i.is_valid());
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 1.23_r128);
         REQUIRE(re->get_prec() == 128);
@@ -486,8 +486,8 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{45_rq, 12_rq, 28};
 
-        complex::const_re_extractor re{c1};
-        complex::const_im_extractor im{c1};
+        complex::re_cref re{c1};
+        complex::im_cref im{c1};
 
         REQUIRE((*re) == 45);
         REQUIRE(re->get_prec() == 28);
@@ -520,8 +520,8 @@ TEST_CASE("string constructors")
         REQUIRE(c == 0);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_re_extractor re{c};
-        complex::const_im_extractor im{c};
+        complex::re_cref re{c};
+        complex::im_cref im{c};
 
         REQUIRE(!re->signbit());
         REQUIRE(!(*im).signbit());
@@ -531,8 +531,8 @@ TEST_CASE("string constructors")
         REQUIRE(c == 0);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_re_extractor re{c};
-        complex::const_im_extractor im{c};
+        complex::re_cref re{c};
+        complex::im_cref im{c};
 
         REQUIRE(re->signbit());
         REQUIRE(!(*im).signbit());
@@ -542,8 +542,8 @@ TEST_CASE("string constructors")
         REQUIRE(c == 0);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_re_extractor re{c};
-        complex::const_im_extractor im{c};
+        complex::re_cref re{c};
+        complex::im_cref im{c};
 
         REQUIRE(!re->signbit());
         REQUIRE(!(*im).signbit());
@@ -555,7 +555,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -564,7 +564,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -573,7 +573,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -585,7 +585,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -597,7 +597,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.3_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -606,7 +606,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -615,7 +615,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -633,7 +633,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -642,7 +642,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -651,7 +651,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -660,7 +660,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -669,7 +669,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -681,7 +681,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -693,7 +693,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == 1.3_r128);
         REQUIRE(c.get_prec() == 128);
 
-        complex::const_im_extractor im{c};
+        complex::im_cref im{c};
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
@@ -758,4 +758,43 @@ TEST_CASE("string constructors")
                            Message("The string 'hello' does not represent a valid real in base 10"));
     REQUIRE_THROWS_MATCHES((complex{"(2, world )", 12, 128}), std::invalid_argument,
                            Message("The string ' world ' does not represent a valid real in base 12"));
+}
+
+TEST_CASE("ref getters")
+{
+    complex c{1, -2};
+    {
+        complex::re_cref re{c};
+        complex::im_cref im{c};
+
+        REQUIRE((*re) == 1);
+        REQUIRE((*im) == -2);
+    }
+#if MPPP_CPLUSPLUS >= 201703L
+    {
+        REQUIRE(*c.real_cref() == 1);
+        REQUIRE(*c.imag_cref() == -2);
+    }
+#endif
+    {
+        complex::re_ref re{c};
+        complex::im_ref im{c};
+
+        *re = -1;
+        *im = 100;
+
+        REQUIRE((*re) == -1);
+        REQUIRE((*im) == 100);
+    }
+    REQUIRE(c == complex{-1, 100});
+#if MPPP_CPLUSPLUS >= 201703L
+    {
+        *c.real_ref() = 42;
+        *c.imag_ref() = -43;
+
+        REQUIRE(*c.real_ref() == 42);
+        REQUIRE(*c.imag_ref() == -43);
+    }
+    REQUIRE(c == complex{42, -43});
+#endif
 }

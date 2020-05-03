@@ -274,17 +274,17 @@ public:
         return *this;
     }
 
-    class re_extractor
+    class re_ref
     {
     public:
-        explicit re_extractor(complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc)) {}
+        explicit re_ref(complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc)) {}
 
-        re_extractor(const re_extractor &) = delete;
-        re_extractor(re_extractor &&) = delete;
-        re_extractor &operator=(const re_extractor &) = delete;
-        re_extractor &operator=(re_extractor &&) = delete;
+        re_ref(const re_ref &) = delete;
+        re_ref(re_ref &&) = delete;
+        re_ref &operator=(const re_ref &) = delete;
+        re_ref &operator=(re_ref &&) = delete;
 
-        ~re_extractor()
+        ~re_ref()
         {
             mpc_realref(&m_c.m_mpc)[0] = *m_value.get_mpfr_t();
             m_value._get_mpfr_t()->_mpfr_d = nullptr;
@@ -305,17 +305,17 @@ public:
         real m_value;
     };
 
-    class const_re_extractor
+    class re_cref
     {
     public:
-        explicit const_re_extractor(const complex &c) : m_value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc)) {}
+        explicit re_cref(const complex &c) : m_value(real::shallow_copy_t{}, mpc_realref(&c.m_mpc)) {}
 
-        const_re_extractor(const const_re_extractor &) = delete;
-        const_re_extractor(const_re_extractor &&) = delete;
-        const_re_extractor &operator=(const const_re_extractor &) = delete;
-        const_re_extractor &operator=(const_re_extractor &&) = delete;
+        re_cref(const re_cref &) = delete;
+        re_cref(re_cref &&) = delete;
+        re_cref &operator=(const re_cref &) = delete;
+        re_cref &operator=(re_cref &&) = delete;
 
-        ~const_re_extractor()
+        ~re_cref()
         {
             m_value._get_mpfr_t()->_mpfr_d = nullptr;
         }
@@ -334,17 +334,17 @@ public:
         real m_value;
     };
 
-    class im_extractor
+    class im_ref
     {
     public:
-        explicit im_extractor(complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc)) {}
+        explicit im_ref(complex &c) : m_c(c), m_value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc)) {}
 
-        im_extractor(const im_extractor &) = delete;
-        im_extractor(im_extractor &&) = delete;
-        im_extractor &operator=(const im_extractor &) = delete;
-        im_extractor &operator=(im_extractor &&) = delete;
+        im_ref(const im_ref &) = delete;
+        im_ref(im_ref &&) = delete;
+        im_ref &operator=(const im_ref &) = delete;
+        im_ref &operator=(im_ref &&) = delete;
 
-        ~im_extractor()
+        ~im_ref()
         {
             mpc_imagref(&m_c.m_mpc)[0] = *m_value.get_mpfr_t();
             m_value._get_mpfr_t()->_mpfr_d = nullptr;
@@ -365,17 +365,17 @@ public:
         real m_value;
     };
 
-    class const_im_extractor
+    class im_cref
     {
     public:
-        explicit const_im_extractor(const complex &c) : m_value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc)) {}
+        explicit im_cref(const complex &c) : m_value(real::shallow_copy_t{}, mpc_imagref(&c.m_mpc)) {}
 
-        const_im_extractor(const const_im_extractor &) = delete;
-        const_im_extractor(const_im_extractor &&) = delete;
-        const_im_extractor &operator=(const const_im_extractor &) = delete;
-        const_im_extractor &operator=(const_im_extractor &&) = delete;
+        im_cref(const im_cref &) = delete;
+        im_cref(im_cref &&) = delete;
+        im_cref &operator=(const im_cref &) = delete;
+        im_cref &operator=(im_cref &&) = delete;
 
-        ~const_im_extractor()
+        ~im_cref()
         {
             m_value._get_mpfr_t()->_mpfr_d = nullptr;
         }
@@ -397,19 +397,19 @@ public:
 #if MPPP_CPLUSPLUS >= 201703L
     auto real_cref() const
     {
-        return const_re_extractor{*this};
+        return re_cref{*this};
     }
     auto imag_cref() const
     {
-        return const_im_extractor{*this};
+        return im_cref{*this};
     }
     auto real_ref()
     {
-        return re_extractor{*this};
+        return re_ref{*this};
     }
     auto imag_ref()
     {
-        return im_extractor{*this};
+        return im_ref{*this};
     }
 #endif
 
@@ -503,7 +503,7 @@ MPPP_DLL_PUBLIC bool dispatch_complex_equality(const complex &, const complex &)
 template <typename T, enable_if_t<is_rv_complex_interoperable<T>::value, int> = 0>
 inline bool dispatch_complex_equality(const complex &c, const T &x)
 {
-    complex::const_re_extractor rex{c};
+    complex::re_cref rex{c};
 
     return mpfr_zero_p(mpc_imagref(c.get_mpc_t())) != 0 && *rex == x;
 }
@@ -511,8 +511,8 @@ inline bool dispatch_complex_equality(const complex &c, const T &x)
 template <typename T, enable_if_t<!is_rv_complex_interoperable<T>::value, int> = 0>
 inline bool dispatch_complex_equality(const complex &c1, const T &c2)
 {
-    complex::const_re_extractor rex{c1};
-    complex::const_im_extractor iex{c1};
+    complex::re_cref rex{c1};
+    complex::im_cref iex{c1};
 
     return *rex == c2.real() && *iex == c2.imag();
 }
