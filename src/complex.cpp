@@ -187,7 +187,7 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
     complex::const_re_extractor rex{c};
     complex::const_im_extractor iex{c};
 
-    os << '(' << rex.get().to_string() << ',' << iex.get().to_string() << ')';
+    os << '(' << rex->to_string() << ',' << iex->to_string() << ')';
 
     return os;
 }

@@ -47,12 +47,12 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c};
         complex::const_im_extractor im{c};
 
-        REQUIRE(re.get().zero_p());
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == real_prec_min());
-        REQUIRE(im.get().get_prec() == real_prec_min());
-        REQUIRE(!re.get().signbit());
-        REQUIRE(!im.get().signbit());
+        REQUIRE(re->zero_p());
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == real_prec_min());
+        REQUIRE(im->get_prec() == real_prec_min());
+        REQUIRE(!re->signbit());
+        REQUIRE(!im->signbit());
     }
 
     // Generic ctor
@@ -62,10 +62,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 42);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(42));
-        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(42));
+        REQUIRE((*re) == 42);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == detail::real_deduce_precision(42));
+        REQUIRE(im->get_prec() == detail::real_deduce_precision(42));
     }
     {
         complex c1{123.};
@@ -73,10 +73,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 123);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(123.));
-        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(123.));
+        REQUIRE((*re) == 123);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == detail::real_deduce_precision(123.));
+        REQUIRE(im->get_prec() == detail::real_deduce_precision(123.));
     }
     {
         complex c1{-42_z1};
@@ -84,10 +84,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == -42);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(-42_z1));
-        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(-42_z1));
+        REQUIRE((*re) == -42);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == detail::real_deduce_precision(-42_z1));
+        REQUIRE(im->get_prec() == detail::real_deduce_precision(-42_z1));
     }
     {
         complex c1{73_q1 / 2};
@@ -95,10 +95,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 73_q1 / 2);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(73_q1 / 2));
-        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(73_q1 / 2));
+        REQUIRE((*re) == 73_q1 / 2);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == detail::real_deduce_precision(73_q1 / 2));
+        REQUIRE(im->get_prec() == detail::real_deduce_precision(73_q1 / 2));
     }
     {
         complex c1{1.1_r512};
@@ -106,10 +106,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.1_r512);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 512);
-        REQUIRE(im.get().get_prec() == 512);
+        REQUIRE((*re) == 1.1_r512);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 512);
+        REQUIRE(im->get_prec() == 512);
     }
     {
         // Try moving in a real.
@@ -121,10 +121,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.1_r512);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 512);
-        REQUIRE(im.get().get_prec() == 512);
+        REQUIRE((*re) == 1.1_r512);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 512);
+        REQUIRE(im->get_prec() == 512);
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -133,10 +133,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == -3.1_rq);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 113);
-        REQUIRE(im.get().get_prec() == 113);
+        REQUIRE((*re) == -3.1_rq);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 113);
+        REQUIRE(im->get_prec() == 113);
     }
 #endif
     {
@@ -145,10 +145,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == -4);
-        REQUIRE(im.get() == 7);
-        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(-4.));
-        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(7.));
+        REQUIRE((*re) == -4);
+        REQUIRE((*im) == 7);
+        REQUIRE(re->get_prec() == detail::real_deduce_precision(-4.));
+        REQUIRE(im->get_prec() == detail::real_deduce_precision(7.));
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -157,10 +157,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == -3.1_rq);
-        REQUIRE(im.get() == 2.1_rq);
-        REQUIRE(re.get().get_prec() == 113);
-        REQUIRE(im.get().get_prec() == 113);
+        REQUIRE((*re) == -3.1_rq);
+        REQUIRE((*im) == 2.1_rq);
+        REQUIRE(re->get_prec() == 113);
+        REQUIRE(im->get_prec() == 113);
     }
 #endif
 
@@ -171,10 +171,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c2};
         complex::const_im_extractor im{c2};
 
-        REQUIRE(re.get() == -4);
-        REQUIRE(im.get() == 7);
-        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(-4.));
-        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(7.));
+        REQUIRE((*re) == -4);
+        REQUIRE((*im) == 7);
+        REQUIRE(re->get_prec() == detail::real_deduce_precision(-4.));
+        REQUIRE(im->get_prec() == detail::real_deduce_precision(7.));
     }
 
     // Move ctor.
@@ -186,10 +186,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c2};
         complex::const_im_extractor im{c2};
 
-        REQUIRE(re.get() == -4);
-        REQUIRE(im.get() == 7);
-        REQUIRE(re.get().get_prec() == detail::real_deduce_precision(-4.));
-        REQUIRE(im.get().get_prec() == detail::real_deduce_precision(7.));
+        REQUIRE((*re) == -4);
+        REQUIRE((*im) == 7);
+        REQUIRE(re->get_prec() == detail::real_deduce_precision(-4.));
+        REQUIRE(im->get_prec() == detail::real_deduce_precision(7.));
     }
 
     // Generic ctor with custom precision.
@@ -199,10 +199,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 42);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 123);
-        REQUIRE(im.get().get_prec() == 123);
+        REQUIRE((*re) == 42);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 123);
+        REQUIRE(im->get_prec() == 123);
     }
     {
         complex c1{42.l, complex_prec_t(10)};
@@ -210,10 +210,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 42);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 10);
-        REQUIRE(im.get().get_prec() == 10);
+        REQUIRE((*re) == 42);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 10);
+        REQUIRE(im->get_prec() == 10);
     }
     {
         complex c1{-42_z1, complex_prec_t(768)};
@@ -221,10 +221,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == -42);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 768);
-        REQUIRE(im.get().get_prec() == 768);
+        REQUIRE((*re) == -42);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 768);
+        REQUIRE(im->get_prec() == 768);
     }
     {
         complex c1{73_q1 / 2, complex_prec_t(1768)};
@@ -232,10 +232,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 73_q1 / 2);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 1768);
-        REQUIRE(im.get().get_prec() == 1768);
+        REQUIRE((*re) == 73_q1 / 2);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 1768);
+        REQUIRE(im->get_prec() == 1768);
     }
     {
         complex c1{1.1_r512, complex_prec_t(128)};
@@ -243,10 +243,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.1_r128);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 128);
-        REQUIRE(im.get().get_prec() == 128);
+        REQUIRE((*re) == 1.1_r128);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 128);
+        REQUIRE(im->get_prec() == 128);
     }
     {
         // Try moving in a real.
@@ -258,10 +258,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.1_r512);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 1024);
-        REQUIRE(im.get().get_prec() == 1024);
+        REQUIRE((*re) == 1.1_r512);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 1024);
+        REQUIRE(im->get_prec() == 1024);
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -270,10 +270,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == -3.1_rq);
-        REQUIRE(im.get().zero_p());
-        REQUIRE(re.get().get_prec() == 1024);
-        REQUIRE(im.get().get_prec() == 1024);
+        REQUIRE((*re) == -3.1_rq);
+        REQUIRE(im->zero_p());
+        REQUIRE(re->get_prec() == 1024);
+        REQUIRE(im->get_prec() == 1024);
     }
 #endif
     {
@@ -282,10 +282,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == -4);
-        REQUIRE(im.get() == 7);
-        REQUIRE(re.get().get_prec() == 10);
-        REQUIRE(im.get().get_prec() == 10);
+        REQUIRE((*re) == -4);
+        REQUIRE((*im) == 7);
+        REQUIRE(re->get_prec() == 10);
+        REQUIRE(im->get_prec() == 10);
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -294,10 +294,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == -3.1_rq);
-        REQUIRE(im.get() == 2.1_rq);
-        REQUIRE(re.get().get_prec() == 512);
-        REQUIRE(im.get().get_prec() == 512);
+        REQUIRE((*re) == -3.1_rq);
+        REQUIRE((*im) == 2.1_rq);
+        REQUIRE(re->get_prec() == 512);
+        REQUIRE(im->get_prec() == 512);
     }
 #endif
     // Bad prec value.
@@ -319,11 +319,11 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.1_r256);
-        REQUIRE(re.get() != 1.1_r512);
-        REQUIRE(im.get() == 0);
-        REQUIRE(re.get().get_prec() == 256);
-        REQUIRE(im.get().get_prec() == 256);
+        REQUIRE((*re) == 1.1_r256);
+        REQUIRE((*re) != 1.1_r512);
+        REQUIRE((*im) == 0);
+        REQUIRE(re->get_prec() == 256);
+        REQUIRE(im->get_prec() == 256);
 
         // Error checking.
         REQUIRE_THROWS_MATCHES((complex{c1, -1}), std::invalid_argument,
@@ -344,11 +344,11 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.1_r256);
-        REQUIRE(re.get() != 1.1_r512);
-        REQUIRE(im.get() == 0);
-        REQUIRE(re.get().get_prec() == 256);
-        REQUIRE(im.get().get_prec() == 256);
+        REQUIRE((*re) == 1.1_r256);
+        REQUIRE((*re) != 1.1_r512);
+        REQUIRE((*im) == 0);
+        REQUIRE(re->get_prec() == 256);
+        REQUIRE(im->get_prec() == 256);
 
         REQUIRE_THROWS_MATCHES((complex{std::move(c1), -1}), std::invalid_argument,
                                Message("Cannot init a complex with a precision of -1: the maximum allowed precision is "
@@ -367,11 +367,11 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 45);
-        REQUIRE(re.get().get_prec()
+        REQUIRE((*re) == 45);
+        REQUIRE(re->get_prec()
                 == detail::c_max(detail::real_deduce_precision(45), detail::real_deduce_precision(-67.)));
-        REQUIRE(im.get() == -67);
-        REQUIRE(im.get().get_prec()
+        REQUIRE((*im) == -67);
+        REQUIRE(im->get_prec()
                 == detail::c_max(detail::real_deduce_precision(45), detail::real_deduce_precision(-67.)));
     }
     {
@@ -380,11 +380,11 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 45);
-        REQUIRE(re.get().get_prec()
+        REQUIRE((*re) == 45);
+        REQUIRE(re->get_prec()
                 == detail::c_max(detail::real_deduce_precision(45_z1), detail::real_deduce_precision(-67 / 123_q1)));
-        REQUIRE(im.get() == real{-67 / 123_q1});
-        REQUIRE(im.get().get_prec()
+        REQUIRE((*im) == real{-67 / 123_q1});
+        REQUIRE(im->get_prec()
                 == detail::c_max(detail::real_deduce_precision(45_z1), detail::real_deduce_precision(-67 / 123_q1)));
     }
     {
@@ -395,10 +395,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.23_r512);
-        REQUIRE(re.get().get_prec() == 512);
-        REQUIRE(im.get() == 4.56_r256);
-        REQUIRE(im.get().get_prec() == 512);
+        REQUIRE((*re) == 1.23_r512);
+        REQUIRE(re->get_prec() == 512);
+        REQUIRE((*im) == 4.56_r256);
+        REQUIRE(im->get_prec() == 512);
     }
     {
         auto r = 1.23_r512;
@@ -411,10 +411,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.23_r512);
-        REQUIRE(re.get().get_prec() == 512);
-        REQUIRE(im.get() == 4.56_r256);
-        REQUIRE(im.get().get_prec() == 512);
+        REQUIRE((*re) == 1.23_r512);
+        REQUIRE(re->get_prec() == 512);
+        REQUIRE((*im) == 4.56_r256);
+        REQUIRE(im->get_prec() == 512);
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -423,10 +423,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 45);
-        REQUIRE(re.get().get_prec() == 113);
-        REQUIRE(im.get() == 12);
-        REQUIRE(im.get().get_prec() == 113);
+        REQUIRE((*re) == 45);
+        REQUIRE(re->get_prec() == 113);
+        REQUIRE((*im) == 12);
+        REQUIRE(im->get_prec() == 113);
     }
 #endif
 
@@ -437,10 +437,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 45);
-        REQUIRE(re.get().get_prec() == 36);
-        REQUIRE(im.get() == -67);
-        REQUIRE(im.get().get_prec() == 36);
+        REQUIRE((*re) == 45);
+        REQUIRE(re->get_prec() == 36);
+        REQUIRE((*im) == -67);
+        REQUIRE(im->get_prec() == 36);
     }
     {
         complex c1{45_z1, -67 / 123_q1, 87};
@@ -448,10 +448,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 45);
-        REQUIRE(re.get().get_prec() == 87);
-        REQUIRE(im.get() == real{-67 / 123_q1, 87});
-        REQUIRE(im.get().get_prec() == 87);
+        REQUIRE((*re) == 45);
+        REQUIRE(re->get_prec() == 87);
+        REQUIRE((*im) == real{-67 / 123_q1, 87});
+        REQUIRE(im->get_prec() == 87);
     }
     {
         auto r = 1.23_r512;
@@ -461,10 +461,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.23_r128);
-        REQUIRE(re.get().get_prec() == 128);
-        REQUIRE(im.get() == 4.56_r128);
-        REQUIRE(im.get().get_prec() == 128);
+        REQUIRE((*re) == 1.23_r128);
+        REQUIRE(re->get_prec() == 128);
+        REQUIRE((*im) == 4.56_r128);
+        REQUIRE(im->get_prec() == 128);
     }
     {
         auto r = 1.23_r512;
@@ -477,10 +477,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 1.23_r128);
-        REQUIRE(re.get().get_prec() == 128);
-        REQUIRE(im.get() == 4.56_r128);
-        REQUIRE(im.get().get_prec() == 128);
+        REQUIRE((*re) == 1.23_r128);
+        REQUIRE(re->get_prec() == 128);
+        REQUIRE((*im) == 4.56_r128);
+        REQUIRE(im->get_prec() == 128);
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
@@ -489,10 +489,10 @@ TEST_CASE("basic and generic constructors")
         complex::const_re_extractor re{c1};
         complex::const_im_extractor im{c1};
 
-        REQUIRE(re.get() == 45);
-        REQUIRE(re.get().get_prec() == 28);
-        REQUIRE(im.get() == 12);
-        REQUIRE(im.get().get_prec() == 28);
+        REQUIRE((*re) == 45);
+        REQUIRE(re->get_prec() == 28);
+        REQUIRE((*im) == 12);
+        REQUIRE(im->get_prec() == 28);
     }
 #endif
     // Bad prec value.

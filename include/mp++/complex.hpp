@@ -290,11 +290,6 @@ public:
             m_value._get_mpfr_t()->_mpfr_d = nullptr;
         }
 
-        real &get()
-        {
-            return m_value;
-        }
-
         real &operator*()
         {
             return m_value;
@@ -323,11 +318,6 @@ public:
         ~const_re_extractor()
         {
             m_value._get_mpfr_t()->_mpfr_d = nullptr;
-        }
-
-        const real &get() const
-        {
-            return m_value;
         }
 
         const real &operator*() const
@@ -360,11 +350,6 @@ public:
             m_value._get_mpfr_t()->_mpfr_d = nullptr;
         }
 
-        real &get()
-        {
-            return m_value;
-        }
-
         real &operator*()
         {
             return m_value;
@@ -393,11 +378,6 @@ public:
         ~const_im_extractor()
         {
             m_value._get_mpfr_t()->_mpfr_d = nullptr;
-        }
-
-        const real &get() const
-        {
-            return m_value;
         }
 
         const real &operator*() const
