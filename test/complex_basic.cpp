@@ -601,6 +601,7 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
+#if MPPP_CPLUSPLUS >= 201703L
     {
         complex c{std::string("  -0x2f2.1aa4p0"), 16, 128};
         REQUIRE(c == -0x2f2.1aa4p0_r128);
@@ -619,6 +620,7 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
+#endif
     REQUIRE_THROWS_MATCHES((complex{"1.1 ", 10, 128}), std::invalid_argument,
                            Message("The string '1.1 ' does not represent a valid real in base 10"));
     REQUIRE_THROWS_MATCHES((complex{"hello world", 12, 128}), std::invalid_argument,
@@ -646,6 +648,7 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
+#if MPPP_CPLUSPLUS >= 201703L
     {
         complex c{std::string(" ( -0x2f2.1aa4p0)"), 16, 128};
         REQUIRE(c == -0x2f2.1aa4p0_r128);
@@ -664,6 +667,7 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
+#endif
     {
         complex c{" ( 1.1)", 128};
         REQUIRE(c == 1.1_r128);
@@ -744,6 +748,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == complex{-1.3_r128, 0.7_r128});
         REQUIRE(c.get_prec() == 128);
     }
+#if MPPP_CPLUSPLUS >= 201703L
     {
         complex c{"(   -0x2f2.1aa4p0, 0x123.aaap4)", 16, 128};
         REQUIRE(c == complex{-0x2f2.1aa4p0_r128, 0x123.aaap4_r128});
@@ -754,6 +759,7 @@ TEST_CASE("string constructors")
         REQUIRE(c == complex{-0x2f2.1aa4p0_r128, 0x123.aaap4_r128});
         REQUIRE(c.get_prec() == 128);
     }
+#endif
     REQUIRE_THROWS_MATCHES((complex{" (hello, 2)", 10, 128}), std::invalid_argument,
                            Message("The string 'hello' does not represent a valid real in base 10"));
     REQUIRE_THROWS_MATCHES((complex{"(2, world )", 12, 128}), std::invalid_argument,
