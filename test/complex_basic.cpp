@@ -6,9 +6,18 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <complex>
+#include <initializer_list>
 #include <stdexcept>
+#include <string>
 #include <utility>
+#include <vector>
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+#include <string_view>
+#endif
 
 #include <mp++/complex.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -27,7 +36,7 @@
 
 using namespace mppp;
 
-TEST_CASE("complex constructors")
+TEST_CASE("basic and generic constructors")
 {
     using Catch::Matchers::Message;
 
@@ -497,4 +506,256 @@ TEST_CASE("complex constructors")
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
     }
+}
+
+TEST_CASE("string constructors")
+{
+    using Catch::Matchers::Message;
+
+    std::vector<char> buffer;
+
+    // Start with zeroes.
+    {
+        complex c{"0", 10, 128};
+        REQUIRE(c == 0);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_re_extractor re{c};
+        complex::const_im_extractor im{c};
+
+        REQUIRE(!re->signbit());
+        REQUIRE(!(*im).signbit());
+    }
+    {
+        complex c{std::string("(-0)"), 10, 128};
+        REQUIRE(c == 0);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_re_extractor re{c};
+        complex::const_im_extractor im{c};
+
+        REQUIRE(re->signbit());
+        REQUIRE(!(*im).signbit());
+    }
+    {
+        complex c{"(0,0)", 10, 128};
+        REQUIRE(c == 0);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_re_extractor re{c};
+        complex::const_im_extractor im{c};
+
+        REQUIRE(!re->signbit());
+        REQUIRE(!(*im).signbit());
+    }
+
+    // Single value, no brackets.
+    {
+        complex c{"1.1", 10, 128};
+        REQUIRE(c == 1.1_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{"  1.1", 10, 128};
+        REQUIRE(c == 1.1_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{"  +1.1", 128};
+        REQUIRE(c == 1.1_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        buffer = {' ', '+', '1', '.', '1'};
+
+        complex c{buffer.data(), buffer.data() + buffer.size(), 10, 128};
+
+        REQUIRE(c == 1.1_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        buffer = {' ', '+', '1', '.', '3'};
+
+        complex c{buffer.data(), buffer.data() + buffer.size(), 128};
+
+        REQUIRE(c == 1.3_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{std::string("  -0x2f2.1aa4p0"), 16, 128};
+        REQUIRE(c == -0x2f2.1aa4p0_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{std::string("  -0x2f2.1aa4p0"), 0, 128};
+        REQUIRE(c == -0x2f2.1aa4p0_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    REQUIRE_THROWS_MATCHES((complex{"1.1 ", 10, 128}), std::invalid_argument,
+                           Message("The string '1.1 ' does not represent a valid real in base 10"));
+    REQUIRE_THROWS_MATCHES((complex{"hello world", 12, 128}), std::invalid_argument,
+                           Message("The string 'hello world' does not represent a valid real in base 12"));
+    REQUIRE_THROWS_MATCHES((complex{"1.1 ", -2, 128}), std::invalid_argument,
+                           Message("Cannot construct a complex from a string in base -2: the base must either be zero "
+                                   "or in the [2,62] range"));
+
+    // Single value, brackets.
+    {
+        complex c{"(1.1)", 10, 128};
+        REQUIRE(c == 1.1_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{" (1.1)", 10, 128};
+        REQUIRE(c == 1.1_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{std::string(" ( -0x2f2.1aa4p0)"), 16, 128};
+        REQUIRE(c == -0x2f2.1aa4p0_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{std::string(" ( -0x2f2.1aa4p0)"), 0, 128};
+        REQUIRE(c == -0x2f2.1aa4p0_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{" ( 1.1)", 128};
+        REQUIRE(c == 1.1_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        buffer = {' ', '(', '+', '1', '.', '1', ')'};
+
+        complex c{buffer.data(), buffer.data() + buffer.size(), 10, 128};
+
+        REQUIRE(c == 1.1_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        buffer = {' ', '(', '+', '1', '.', '3', ')'};
+
+        complex c{buffer.data(), buffer.data() + buffer.size(), 128};
+
+        REQUIRE(c == 1.3_r128);
+        REQUIRE(c.get_prec() == 128);
+
+        complex::const_im_extractor im{c};
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    REQUIRE_THROWS_MATCHES((complex{" ( 1.1 )", 10, 128}), std::invalid_argument,
+                           Message("The string ' 1.1 ' does not represent a valid real in base 10"));
+    REQUIRE_THROWS_MATCHES((complex{"(hello world)", 12, 128}), std::invalid_argument,
+                           Message("The string 'hello world' does not represent a valid real in base 12"));
+    REQUIRE_THROWS_MATCHES((complex{"(1.1)", -20, 128}), std::invalid_argument,
+                           Message("Cannot construct a complex from a string in base -20: the base must either be zero "
+                                   "or in the [2,62] range"));
+
+    // Two values.
+    {
+        complex c{"(-1.1,-2.3)", 10, 256};
+        REQUIRE(c == complex{-1.1_r256, -2.3_r256});
+        REQUIRE(c.get_prec() == 256);
+    }
+#if defined(MPPP_HAVE_STRING_VIEW)
+    {
+        complex c{std::string_view("(-1.1,-2.3)"), 10, 256};
+        REQUIRE(c == complex{-1.1_r256, -2.3_r256});
+        REQUIRE(c.get_prec() == 256);
+    }
+#endif
+    {
+        complex c{" (-1.1,-2.3)", 0, 256};
+        REQUIRE(c == complex{-1.1_r256, -2.3_r256});
+        REQUIRE(c.get_prec() == 256);
+    }
+    {
+        complex c{std::string(" ( -1.1, -2.3)"), 0, 256};
+        REQUIRE(c == complex{-1.1_r256, -2.3_r256});
+        REQUIRE(c.get_prec() == 256);
+    }
+    {
+        buffer = {' ', '(', '-', '1', '.', '3', ',', '0', '.', '7', ')'};
+
+        complex c{buffer.data(), buffer.data() + buffer.size(), 128};
+
+        REQUIRE(c == complex{-1.3_r128, 0.7_r128});
+        REQUIRE(c.get_prec() == 128);
+    }
+    {
+        buffer = {' ', '(', '-', '1', '.', '3', ',', '0', '.', '7', ')'};
+
+        complex c{buffer.data(), buffer.data() + buffer.size(), 10, 128};
+
+        REQUIRE(c == complex{-1.3_r128, 0.7_r128});
+        REQUIRE(c.get_prec() == 128);
+    }
+    {
+        complex c{"(   -0x2f2.1aa4p0, 0x123.aaap4)", 16, 128};
+        REQUIRE(c == complex{-0x2f2.1aa4p0_r128, 0x123.aaap4_r128});
+        REQUIRE(c.get_prec() == 128);
+    }
+    {
+        complex c{"(   -0x2f2.1aa4p0, 0x123.aaap4)", 0, 128};
+        REQUIRE(c == complex{-0x2f2.1aa4p0_r128, 0x123.aaap4_r128});
+        REQUIRE(c.get_prec() == 128);
+    }
+    REQUIRE_THROWS_MATCHES((complex{" (hello, 2)", 10, 128}), std::invalid_argument,
+                           Message("The string 'hello' does not represent a valid real in base 10"));
+    REQUIRE_THROWS_MATCHES((complex{"(2, world )", 12, 128}), std::invalid_argument,
+                           Message("The string ' world ' does not represent a valid real in base 12"));
 }

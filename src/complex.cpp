@@ -6,15 +6,26 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
+#include <cassert>
 #include <cstddef>
 #include <ostream>
+#include <stdexcept>
+#include <string>
 #include <type_traits>
+#include <vector>
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+#include <string_view>
+#endif
 
 #include <mp++/complex.hpp>
-#include <mp++/config.hpp>
 #include <mp++/detail/mpc.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/parse_complex.hpp>
 #include <mp++/detail/utils.hpp>
+#include <mp++/real.hpp>
 
 namespace mppp
 {
@@ -91,6 +102,58 @@ complex::complex(complex &&other, ::mpfr_prec_t p)
     // Apply the precision.
     prec_round_impl<false>(p);
 }
+
+// Various helpers and constructors from string-like entities.
+void complex::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
+{
+    if (mppp_unlikely(base && (base < 2 || base > 62))) {
+        throw std::invalid_argument("Cannot construct a complex from a string in base " + detail::to_string(base)
+                                    + ": the base must either be zero or in the [2,62] range");
+    }
+
+    // Try parsing the real and imaginary parts.
+    const auto res = detail::parse_complex(s);
+
+    // Construct the real part.
+    real re{res[0], res[1], base, p};
+
+    // The imaginary part might not be present.
+    auto im = (res[2] == nullptr) ? real{real_kind::zero, 1, p} : real{res[2], res[3], base, p};
+
+    // Shallow-copy into this.
+    m_mpc.re[0] = *re.get_mpfr_t();
+    m_mpc.im[0] = *im.get_mpfr_t();
+
+    // Deactivate the temporaries.
+    re._get_mpfr_t()->_mpfr_d = nullptr;
+    im._get_mpfr_t()->_mpfr_d = nullptr;
+}
+
+complex::complex(const stag &, const char *s, int base, ::mpfr_prec_t p)
+{
+    construct_from_c_string(s, base, p);
+}
+
+complex::complex(const stag &, const std::string &s, int base, ::mpfr_prec_t p) : complex(s.c_str(), base, p) {}
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+complex::complex(const stag &, const std::string_view &s, int base, ::mpfr_prec_t p)
+    : complex(s.data(), s.data() + s.size(), base, p)
+{
+}
+#endif
+
+// Constructor from range of characters, base and precision.
+complex::complex(const char *begin, const char *end, int base, ::mpfr_prec_t p)
+{
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+    buffer.assign(begin, end);
+    buffer.emplace_back('\0');
+    construct_from_c_string(buffer.data(), base, p);
+}
+
+// Constructor from range of characters and precision.
+complex::complex(const char *begin, const char *end, ::mpfr_prec_t p) : complex(begin, end, 10, p) {}
 
 complex::complex(const ::mpc_t c)
 {

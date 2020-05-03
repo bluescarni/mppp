@@ -19,6 +19,10 @@
 #include <type_traits>
 #include <utility>
 
+#if defined(MPPP_HAVE_STRING_VIEW)
+#include <string_view>
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/mpc.hpp>
@@ -212,6 +216,42 @@ public:
         real_imag_ctor_impl(std::forward<T>(re), std::forward<U>(im), p);
     }
 
+private:
+    // A tag for private string ctors.
+    struct stag {
+    };
+    MPPP_DLL_LOCAL void construct_from_c_string(const char *, int, ::mpfr_prec_t);
+    explicit complex(const stag &, const char *, int, ::mpfr_prec_t);
+    explicit complex(const stag &, const std::string &, int, ::mpfr_prec_t);
+#if defined(MPPP_HAVE_STRING_VIEW)
+    explicit complex(const stag &, const std::string_view &, int, ::mpfr_prec_t);
+#endif
+
+public:
+    // Constructor from string, base and precision.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <string_type T>
+#else
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
+#endif
+    explicit complex(const T &s, int base, ::mpfr_prec_t p) : complex(stag{}, s, base, p)
+    {
+    }
+    // Constructor from string and precision.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <string_type T>
+#else
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
+#endif
+    explicit complex(const T &s, ::mpfr_prec_t p) : complex(s, 10, p)
+    {
+    }
+    // Constructor from range of characters, base and precision.
+    explicit complex(const char *, const char *, int, ::mpfr_prec_t);
+    // Constructor from range of characters and precision.
+    explicit complex(const char *, const char *, ::mpfr_prec_t);
+
+    // Constructor from mpc_t.
     explicit complex(const ::mpc_t);
 
     ~complex();
@@ -255,6 +295,16 @@ public:
             return m_value;
         }
 
+        real &operator*()
+        {
+            return m_value;
+        }
+
+        real *operator->()
+        {
+            return &m_value;
+        }
+
     private:
         complex &m_c;
         real m_value;
@@ -278,6 +328,16 @@ public:
         const real &get() const
         {
             return m_value;
+        }
+
+        const real &operator*() const
+        {
+            return m_value;
+        }
+
+        const real *operator->() const
+        {
+            return &m_value;
         }
 
     private:
@@ -305,6 +365,16 @@ public:
             return m_value;
         }
 
+        real &operator*()
+        {
+            return m_value;
+        }
+
+        real *operator->()
+        {
+            return &m_value;
+        }
+
     private:
         complex &m_c;
         real m_value;
@@ -330,9 +400,38 @@ public:
             return m_value;
         }
 
+        const real &operator*() const
+        {
+            return m_value;
+        }
+
+        const real *operator->() const
+        {
+            return &m_value;
+        }
+
     private:
         real m_value;
     };
+
+#if MPPP_CPLUSPLUS >= 201703L
+    auto real_cref() const
+    {
+        return const_re_extractor{*this};
+    }
+    auto imag_cref() const
+    {
+        return const_im_extractor{*this};
+    }
+    auto real_ref()
+    {
+        return re_extractor{*this};
+    }
+    auto imag_ref()
+    {
+        return im_extractor{*this};
+    }
+#endif
 
     ::mpfr_prec_t get_prec() const
     {
@@ -426,7 +525,7 @@ inline bool dispatch_complex_equality(const complex &c, const T &x)
 {
     complex::const_re_extractor rex{c};
 
-    return mpfr_zero_p(mpc_imagref(c.get_mpc_t())) != 0 && rex.get() == x;
+    return mpfr_zero_p(mpc_imagref(c.get_mpc_t())) != 0 && *rex == x;
 }
 
 template <typename T, enable_if_t<!is_rv_complex_interoperable<T>::value, int> = 0>
@@ -435,7 +534,7 @@ inline bool dispatch_complex_equality(const complex &c1, const T &c2)
     complex::const_re_extractor rex{c1};
     complex::const_im_extractor iex{c1};
 
-    return rex.get() == c2.real() && iex.get() == c2.imag();
+    return *rex == c2.real() && *iex == c2.imag();
 }
 
 template <typename T>
