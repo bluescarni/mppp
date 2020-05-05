@@ -144,8 +144,7 @@ private:
     // NOTE: no need for std::forward, as this constructor will involve
     // only std::complex or complex128.
     template <typename T, typename... Args>
-    explicit complex(gtag, std::false_type, const T &c, const Args &... args)
-        : complex(c.real(), c.imag(), static_cast<::mpfr_prec_t>(args)...)
+    explicit complex(gtag, std::false_type, const T &c, const Args &... args) : complex(c.real(), c.imag(), args...)
     {
     }
 
@@ -211,9 +210,41 @@ public:
               detail::enable_if_t<
                   detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
 #endif
-    explicit complex(T &&re, U &&im, ::mpfr_prec_t p)
+    explicit complex(T &&re, U &&im, complex_prec_t p)
     {
-        real_imag_ctor_impl(std::forward<T>(re), std::forward<U>(im), p);
+        real_imag_ctor_impl(std::forward<T>(re), std::forward<U>(im), static_cast<::mpfr_prec_t>(p));
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <string_type T, rv_complex_interoperable U>
+#else
+    template <
+        typename T, typename U,
+        detail::enable_if_t<detail::conjunction<is_string_type<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
+#endif
+    explicit complex(const T &re, U &&im, complex_prec_t p)
+    {
+        real_imag_ctor_impl(re, std::forward<U>(im), static_cast<::mpfr_prec_t>(p));
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <rv_complex_interoperable T, string_type U>
+#else
+    template <
+        typename T, typename U,
+        detail::enable_if_t<detail::conjunction<is_rv_complex_interoperable<T>, is_string_type<U>>::value, int> = 0>
+#endif
+    explicit complex(T &&re, const U &im, complex_prec_t p)
+    {
+        real_imag_ctor_impl(std::forward<T>(re), im, static_cast<::mpfr_prec_t>(p));
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <string_type T, string_type U>
+#else
+    template <typename T, typename U,
+              detail::enable_if_t<detail::conjunction<is_string_type<T>, is_string_type<U>>::value, int> = 0>
+#endif
+    explicit complex(const T &re, const U &im, complex_prec_t p)
+    {
+        real_imag_ctor_impl(re, im, static_cast<::mpfr_prec_t>(p));
     }
 
 private:

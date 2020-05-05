@@ -84,13 +84,97 @@ The complex class
 
       The variant without the *p* argument will set the
       precision of ``this`` according to the heuristics explained in the
-      generic constructors of :cpp:class:`~mppp::real`.
+      generic constructors of :cpp:class:`~mppp::real` (or exactly to
+      the output of :cpp:func:`mppp::real::get_prec()` if *x* is a
+      :cpp:class:`~mppp::real`).
 
       :param x: the construction argument.
       :param p: the desired precision.
 
       :exception unspecified: any exception raised by the invoked :cpp:class:`~mppp::real`
         constructor.
+
+   .. cpp:function:: template <rv_complex_interoperable T, rv_complex_interoperable U> explicit complex(T &&x, U &&y)
+   .. cpp:function:: template <rv_complex_interoperable T, rv_complex_interoperable U> explicit complex(T &&x, U &&y, complex_prec_t p)
+   .. cpp:function:: template <string_type T, rv_complex_interoperable U> explicit complex(const T &x, U &&y, complex_prec_t p)
+   .. cpp:function:: template <rv_complex_interoperable T, string_type U> explicit complex(T &&x, const U &y, complex_prec_t p)
+   .. cpp:function:: template <string_type T, string_type U> explicit complex(const T &x, const U &y, complex_prec_t p)
+
+      Generic constructors from real and imaginary parts, in numerical or string format.
+
+      These constructors will set ``this`` to :math:`x+\imath y`.
+
+      The variants with a precision argument
+      will set the precision of ``this`` exactly to *p*.
+
+      Otherwise, the precision of ``this`` will be the maximum among the deduced precisions
+      of *x* and *y*. The precision deduction rules are the same explained in the generic
+      constructors of :cpp:class:`~mppp::real`. If *x* and/or *y* are :cpp:class:`~mppp::real`,
+      the deduced precision is the output of :cpp:func:`mppp::real::get_prec()`.
+
+      The string variants expect a representation in base 10.
+
+      :param x: the real part of the value that will be used for the initialisation.
+      :param y: the imaginary part of the value that will be used for the initialisation.
+      :param p: the desired precision.
+
+      :exception unspecified: any exception raised by the invoked :cpp:class:`~mppp::real`
+        constructor.
+
+   .. cpp:function:: template <string_type T> explicit complex(const T &s, int base, mpfr_prec_t p)
+   .. cpp:function:: template <string_type T> explicit complex(const T &s, mpfr_prec_t p)
+
+      Constructors from string, base and precision.
+
+      These constructors will initialise ``this`` from the :cpp:concept:`~mppp::string_type` *s*,
+      which is interpreted as a complex number in base *base*. *base* must be either zero (in which case the base
+      will be automatically deduced) or a number in the :math:`\left[ 2,62 \right]` range.
+      The accepted string formats are:
+
+      * a single floating-point number (e.g., ``1.234``),
+      * a single floating-point number surrounded by round brackets
+        (e.g., ``(1.234)``),
+      * a pair of floating-point numbers, surrounded by round brackets and
+        separated by a comma (e.g., ``(1.234, 4.567)``).
+
+      The allowed floating-point representations (for both the real and imaginary part)
+      are described in the documentation of the constructor from string of
+      :cpp:class:`~mppp::real`.
+
+      The precision of ``this`` will be set to *p*.
+
+      The second constructor calls the first one with a *base* value of 10.
+
+      :param s: the input string.
+      :param base: the base used in the string representation.
+      :param p: the desired precision.
+
+      :exception std\:\:invalid_argument: if *base* is not zero and not in the
+        :math:`\left[ 2,62 \right]` range, or *s* cannot be interpreted as a complex number.
+
+      :exception unspecified: any exception thrown by the constructor of
+        :cpp:class:`~mppp::real` from string.
+
+   .. cpp:function:: explicit complex(const char *begin, const char *end, int base, mpfr_prec_t p)
+   .. cpp:function:: explicit complex(const char *begin, const char *end, mpfr_prec_t p)
+
+      Constructors from range of characters, base and precision.
+
+      The first constructor will initialise ``this`` from the content of the input half-open range,
+      which is interpreted as the string representation of a complex value in base ``base``.
+
+      Internally, the constructor will copy the content of the range to a local buffer, add a
+      string terminator, and invoke the constructor from string, base and precision.
+
+      The second constructor calls the first one with a *base* value of 10.
+
+      :param begin: the start of the input range.
+      :param end: the end of the input range.
+      :param base: the base used in the string representation.
+      :param p: the desired precision.
+
+      :exception unspecified: any exception thrown by the constructor from string, or by memory
+        allocation errors in standard containers.
 
 Types
 -----
@@ -109,8 +193,7 @@ Types
 .. cpp:enum-class:: mppp::complex_prec_t : mpfr_prec_t
 
    A strongly-typed counterpart to :cpp:type:`mpfr_prec_t`, used in certain constructors of
-   :cpp:class:`~mppp::complex` in order to avoid ambiguities when the input precision may
-   be interpreted as an imaginary part instead.
+   :cpp:class:`~mppp::complex` in order to avoid ambiguities during overload resolution.
 
 Concepts
 --------

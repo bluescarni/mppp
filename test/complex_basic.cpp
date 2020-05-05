@@ -432,7 +432,7 @@ TEST_CASE("basic and generic constructors")
 
     // Binary ctors with custom precision.
     {
-        complex c1{45, -67., 36};
+        complex c1{45, -67., complex_prec_t(36)};
 
         complex::re_cref re{c1};
         complex::im_cref im{c1};
@@ -443,7 +443,7 @@ TEST_CASE("basic and generic constructors")
         REQUIRE(im->get_prec() == 36);
     }
     {
-        complex c1{45_z1, -67 / 123_q1, 87};
+        complex c1{45_z1, -67 / 123_q1, complex_prec_t(87)};
 
         complex::re_cref re{c1};
         complex::im_cref im{c1};
@@ -456,7 +456,7 @@ TEST_CASE("basic and generic constructors")
     {
         auto r = 1.23_r512;
         auto i = 4.56_r256;
-        complex c1{r, i, 128};
+        complex c1{r, i, complex_prec_t(128)};
 
         complex::re_cref re{c1};
         complex::im_cref im{c1};
@@ -469,7 +469,7 @@ TEST_CASE("basic and generic constructors")
     {
         auto r = 1.23_r512;
         auto i = 4.56_r256;
-        complex c1{std::move(r), std::move(i), 128};
+        complex c1{std::move(r), std::move(i), complex_prec_t(128)};
 
         REQUIRE(!r.is_valid());
         REQUIRE(!i.is_valid());
@@ -484,7 +484,7 @@ TEST_CASE("basic and generic constructors")
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
-        complex c1{45_rq, 12_rq, 28};
+        complex c1{45_rq, 12_rq, complex_prec_t(28)};
 
         complex::re_cref re{c1};
         complex::im_cref im{c1};
@@ -495,13 +495,64 @@ TEST_CASE("basic and generic constructors")
         REQUIRE(im->get_prec() == 28);
     }
 #endif
+    // With arguments in string form.
+    {
+        complex c1{"1.1", 4, complex_prec_t(128)};
+
+        REQUIRE(c1.get_prec() == 128);
+        REQUIRE(c1 == complex{1.1_r128, 4_r128});
+    }
+    {
+        real r{4};
+
+        complex c1{std::string("1.1"), std::move(r), complex_prec_t(128)};
+        REQUIRE(!r.is_valid());
+
+        REQUIRE(c1.get_prec() == 128);
+        REQUIRE(c1 == complex{1.1_r128, 4_r128});
+    }
+    {
+        constexpr char str[] = "-1.1";
+
+        complex c1{4, str, complex_prec_t(128)};
+
+        REQUIRE(c1.get_prec() == 128);
+        REQUIRE(c1 == complex{4_r128, -1.1_r128});
+    }
+    {
+        real r{4};
+
+        complex c1{std::move(r), "-1.1", complex_prec_t(128)};
+        REQUIRE(!r.is_valid());
+
+        REQUIRE(c1.get_prec() == 128);
+        REQUIRE(c1 == complex{4_r128, -1.1_r128});
+    }
+    {
+        complex c1{"1.1", std::string("2.3"), complex_prec_t(128)};
+
+        REQUIRE(c1.get_prec() == 128);
+        REQUIRE(c1 == complex{1.1_r128, 2.3_r128});
+    }
     // Bad prec value.
     {
-        REQUIRE_THROWS_MATCHES((complex{42, 43, -1}), std::invalid_argument,
+        REQUIRE_THROWS_MATCHES((complex{42, 43, complex_prec_t(-1)}), std::invalid_argument,
                                Message("Cannot init a real with a precision of -1: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
-        REQUIRE_THROWS_MATCHES((complex{1_q1, 1.23_r512, -2}), std::invalid_argument,
+        REQUIRE_THROWS_MATCHES((complex{1_q1, 1.23_r512, complex_prec_t(-2)}), std::invalid_argument,
+                               Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+        REQUIRE_THROWS_MATCHES((complex{"1", 1.23_r512, complex_prec_t(-2)}), std::invalid_argument,
+                               Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+        REQUIRE_THROWS_MATCHES((complex{1.23_r512, "1", complex_prec_t(-2)}), std::invalid_argument,
+                               Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
+                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                       + detail::to_string(real_prec_min())));
+        REQUIRE_THROWS_MATCHES((complex{"4", "1", complex_prec_t(-2)}), std::invalid_argument,
                                Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
@@ -603,7 +654,9 @@ TEST_CASE("string constructors")
     }
 #if MPPP_CPLUSPLUS >= 201703L
     {
-        complex c{std::string("  -0x2f2.1aa4p0"), 16, 128};
+        constexpr char str[] = "  -0x2f2.1aa4p0";
+
+        complex c{str, 16, 128};
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
