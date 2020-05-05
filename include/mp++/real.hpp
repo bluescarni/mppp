@@ -407,8 +407,10 @@ public:
 
     // Copy constructor from mpfr_t.
     explicit real(const ::mpfr_t);
+#if !defined(_MSC_VER) || defined(__clang__)
     // Move constructor from mpfr_t.
     explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
+#endif
 
     // Destructor.
     ~real();
@@ -548,8 +550,10 @@ public:
     // Copy assignment from mpfr_t.
     real &operator=(const ::mpfr_t);
 
+#if !defined(_MSC_VER) || defined(__clang__)
     // Move assignment from mpfr_t.
     real &operator=(::mpfr_t &&);
+#endif
 
     // Check validity.
     bool is_valid() const noexcept

@@ -685,6 +685,8 @@ real &real::operator=(const ::mpfr_t x)
     return *this;
 }
 
+#if !defined(_MSC_VER) || defined(__clang__)
+
 // Move assignment from mpfr_t.
 real &real::operator=(::mpfr_t &&x)
 {
@@ -694,6 +696,8 @@ real &real::operator=(::mpfr_t &&x)
     m_mpfr = *x;
     return *this;
 }
+
+#endif
 
 // Set to another real.
 real &real::set(const real &other)
