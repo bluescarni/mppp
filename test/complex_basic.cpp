@@ -859,6 +859,8 @@ TEST_CASE("ref getters")
 #endif
 }
 
+#if !defined(_MSC_VER) || defined(__clang__)
+
 TEST_CASE("mpc move ctor")
 {
     ::mpc_t c;
@@ -871,6 +873,8 @@ TEST_CASE("mpc move ctor")
     REQUIRE(c2.get_prec() == 14);
     REQUIRE(c2 == complex{1.1, -2.3, complex_prec_t(14)});
 }
+
+#endif
 
 TEST_CASE("copy move ass")
 {

@@ -284,8 +284,10 @@ public:
 
     // Constructor from mpc_t.
     explicit complex(const ::mpc_t);
+#if !defined(_MSC_VER) || defined(__clang__)
     // Move constructor from mpc_t.
     explicit complex(::mpc_t &&c) : m_mpc(*c) {}
+#endif
 
     ~complex();
 

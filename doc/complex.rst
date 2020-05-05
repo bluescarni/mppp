@@ -212,6 +212,10 @@ The complex class
          called on *c*: the resources previously owned by *c* are now owned by ``this``, which
          will take care of releasing them when the destructor is called.
 
+      .. note::
+
+         Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
+
       :param c: the :cpp:type:`mpc_t` that will be moved.
 
    .. cpp:function:: ~complex()
