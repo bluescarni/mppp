@@ -20,6 +20,7 @@
 #endif
 
 #include <mp++/complex.hpp>
+#include <mp++/detail/mpc.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
@@ -856,4 +857,54 @@ TEST_CASE("ref getters")
     }
     REQUIRE(c == complex{42, -43});
 #endif
+}
+
+TEST_CASE("mpc move ctor")
+{
+    ::mpc_t c;
+    ::mpc_init2(c, 14);
+    ::mpfr_set_d(mpc_realref(c), 1.1, MPFR_RNDN);
+    ::mpfr_set_d(mpc_imagref(c), -2.3, MPFR_RNDN);
+
+    complex c2{std::move(c)};
+
+    REQUIRE(c2.get_prec() == 14);
+    REQUIRE(c2 == complex{1.1, -2.3, complex_prec_t(14)});
+}
+
+TEST_CASE("copy move ass")
+{
+    {
+        complex c1, c2{3, 4};
+        c1 = c2;
+        REQUIRE(c1 == complex{3, 4});
+
+        // Revive moved-from object via copy assignment.
+        complex c3{std::move(c1)};
+        REQUIRE(!c1.is_valid());
+        c1 = c2;
+        REQUIRE(c1 == complex{3, 4});
+
+        // Self copy assignment.
+        c1 = *&c1;
+        REQUIRE(c1 == complex{3, 4});
+    }
+
+    {
+        complex c1, c2{3, 4};
+        c1 = std::move(c2);
+        REQUIRE(c1 == complex{3, 4});
+        REQUIRE(c2.is_valid());
+        REQUIRE(c2 == complex{});
+
+        // Revive moved-from object via move assignment.
+        complex c3{std::move(c1)};
+        REQUIRE(!c1.is_valid());
+        c1 = complex{45, 46};
+        REQUIRE(c1 == complex{45, 46});
+
+        // Self move assignment.
+        c1 = std::move(*&c1);
+        REQUIRE(c1 == complex{45, 46});
+    }
 }

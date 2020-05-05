@@ -284,6 +284,8 @@ public:
 
     // Constructor from mpc_t.
     explicit complex(const ::mpc_t);
+    // Move constructor from mpc_t.
+    explicit complex(::mpc_t &&c) : m_mpc(*c) {}
 
     ~complex();
 

@@ -262,6 +262,8 @@ The real class
 
       Destructor.
 
+      The destructor will run sanity checks in debug mode.
+
    .. cpp:function:: real &operator=(const real &other)
    .. cpp:function:: real &operator=(real &&other) noexcept
 

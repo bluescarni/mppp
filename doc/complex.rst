@@ -176,6 +176,59 @@ The complex class
       :exception unspecified: any exception thrown by the constructor from string, or by memory
         allocation errors in standard containers.
 
+   .. cpp:function:: explicit complex(const mpc_t c)
+
+      Constructor from an :cpp:type:`mpc_t`.
+
+      This constructor will initialise ``this`` with an exact deep copy of *c*.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *c* has been correctly initialised
+         with a precision which is:
+
+         * the same for the real and imaginary parts,
+         * within the bounds established by :cpp:func:`mppp::real_prec_min()`
+           and :cpp:func:`mppp::real_prec_max()`.
+
+      :param c: the :cpp:type:`mpc_t` that will be deep-copied.
+
+   .. cpp:function:: explicit complex(mpc_t &&c)
+
+      Move constructor from an :cpp:type:`mpc_t`.
+
+      This constructor will initialise ``this`` with a shallow copy of *c*.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *c* has been correctly initialised
+         with a precision which is:
+
+         * the same for the real and imaginary parts,
+         * within the bounds established by :cpp:func:`mppp::real_prec_min()`
+           and :cpp:func:`mppp::real_prec_max()`.
+
+         Additionally, the user must ensure that, after construction, ``mpc_clear()`` is never
+         called on *c*: the resources previously owned by *c* are now owned by ``this``, which
+         will take care of releasing them when the destructor is called.
+
+      :param c: the :cpp:type:`mpc_t` that will be moved.
+
+   .. cpp:function:: ~complex()
+
+      Destructor.
+
+      The destructor will run sanity checks in debug mode.
+
+   .. cpp:function:: complex &operator=(const complex &other)
+   .. cpp:function:: complex &operator=(complex &&other) noexcept
+
+      Copy and move assignment operators.
+
+      :param other: the assignment argument.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
