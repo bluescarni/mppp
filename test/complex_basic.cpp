@@ -916,7 +916,7 @@ TEST_CASE("copy move ass")
 TEST_CASE("generic assignment")
 {
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         c = 45;
         REQUIRE(c.get_prec() == detail::real_deduce_precision(45));
 
@@ -928,7 +928,7 @@ TEST_CASE("generic assignment")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         c = 45.;
         REQUIRE(c.get_prec() == detail::real_deduce_precision(45.));
 
@@ -940,7 +940,7 @@ TEST_CASE("generic assignment")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         c = 45_z1;
         REQUIRE(c.get_prec() == detail::real_deduce_precision(45_z1));
 
@@ -952,7 +952,7 @@ TEST_CASE("generic assignment")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         c = 1 / 3_q1;
         REQUIRE(c.get_prec() == detail::real_deduce_precision(1 / 3_q1));
 
@@ -965,7 +965,7 @@ TEST_CASE("generic assignment")
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         c = 1.1_rq;
         REQUIRE(c.get_prec() == 113);
 
@@ -978,7 +978,7 @@ TEST_CASE("generic assignment")
     }
 #endif
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         c = 1.1_r256;
         REQUIRE(c.get_prec() == 256);
 
@@ -991,7 +991,7 @@ TEST_CASE("generic assignment")
     }
     // Test moving too.
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         auto r = 1.1_r256;
         c = std::move(r);
         REQUIRE(r.is_valid());
@@ -1007,7 +1007,7 @@ TEST_CASE("generic assignment")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         c = std::complex<double>{1.1, -2.3};
         REQUIRE(c.get_prec() == detail::real_deduce_precision(1.1));
 
@@ -1019,7 +1019,7 @@ TEST_CASE("generic assignment")
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
-        complex c{12, 13, complex_prec_t{12}};
+        complex c{12, 13, complex_prec_t(12)};
         c = complex128{1.1_rq, -2.3_rq};
         REQUIRE(c.get_prec() == 113);
 
