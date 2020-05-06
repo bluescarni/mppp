@@ -41,6 +41,10 @@ New
 Changes
 ~~~~~~~
 
+- :cpp:class:`~mppp::real` move operations from
+  :cpp:type:`mpfr_t` have been disabled on MSVC
+  due to compiler issues
+  (`#236 <https://github.com/bluescarni/mppp/pull/236>`__).
 - Improve the implementation of :cpp:class:`~mppp::real`
   binary operators/functions by using the MPFR primitives
   more extensively and by handling mixed-precision computations
