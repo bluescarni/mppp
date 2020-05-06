@@ -87,15 +87,9 @@ ADD_MPPP_TESTCASE(integer_arith)
 ADD_MPPP_TESTCASE(integer_arith_ops_01)
 ADD_MPPP_TESTCASE(integer_arith_ops_02)
 ADD_MPPP_TESTCASE(integer_arith_ops_03)
-if(NOT MINGW)
-  # At the moment this test results in a linking error in conjunction
-  # with catch. Needs to be investigated.
-  # NOTE: this might be related to the binary size and/or debug info, we can try splitting
-  # some tests up more or compile without debug info on the CI.
-  ADD_MPPP_TESTCASE(integer_basic_01)
-  ADD_MPPP_TESTCASE(integer_basic_02)
-  ADD_MPPP_TESTCASE(integer_basic_03)
-endif()
+ADD_MPPP_TESTCASE(integer_basic_01)
+ADD_MPPP_TESTCASE(integer_basic_02)
+ADD_MPPP_TESTCASE(integer_basic_03)
 ADD_MPPP_TESTCASE(integer_bin)
 ADD_MPPP_TESTCASE(integer_bitwise)
 ADD_MPPP_TESTCASE(integer_caches)
