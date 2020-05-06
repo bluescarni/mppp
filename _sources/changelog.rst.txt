@@ -41,6 +41,10 @@ New
 Changes
 ~~~~~~~
 
+- Enable all tests on MinGW
+  (`#237 <https://github.com/bluescarni/mppp/pull/237>`__).
+- Update Catch to the latest version, 2.12.1
+  (`#237 <https://github.com/bluescarni/mppp/pull/237>`__).
 - :cpp:class:`~mppp::real` move operations from
   :cpp:type:`mpfr_t` have been disabled on MSVC
   due to compiler issues
@@ -73,8 +77,6 @@ Changes
 - Various internal simplifications and improvements
   to :cpp:class:`~mppp::real128`
   (`#221 <https://github.com/bluescarni/mppp/pull/221>`__).
-- Update Catch to the latest version, 2.11.3
-  (`#220 <https://github.com/bluescarni/mppp/pull/220>`__).
 
 Fix
 ~~~
