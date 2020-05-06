@@ -309,6 +309,69 @@ public:
         return *this;
     }
 
+private:
+    // Assignment from real-valued interoperable types.
+    template <typename T>
+    void dispatch_generic_assignment(T &&x, std::true_type)
+    {
+        re_ref re{*this};
+        im_ref im{*this};
+
+        // Assign the real part.
+        *re = std::forward<T>(x);
+        // Set the imaginary part to zero with
+        // the same precision as re.
+        im->set_prec(re->get_prec());
+        im->set_zero();
+    }
+    // Assignment from complex-valued interoperable types.
+    template <typename T>
+    void dispatch_generic_assignment(const T &c, std::false_type)
+    {
+        // Determine the max prec between the real
+        // and imaginary parts.
+        // NOTE: this is not really necessary, as for std::complex
+        // and complex128 (the only two other complex types) the
+        // prec deduction does not depend on the value. However,
+        // this is what we *would* do if we had a complex type
+        // in which the two parts can have different precisions.
+        const auto p = detail::c_max(detail::real_deduce_precision(c.real()), detail::real_deduce_precision(c.imag()));
+
+        re_ref re{*this};
+        im_ref im{*this};
+
+        // Destructively set the precision to p
+        // for both re and im.
+        re->set_prec(p);
+        im->set_prec(p);
+
+        // Assign the values from c with the setter
+        // (and not with the assignment operator, which
+        // may alter the precision of re and im).
+        re->set(c.real());
+        im->set(c.imag());
+    }
+
+public:
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex_interoperable T>
+#else
+    template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
+#endif
+    complex &operator=(T &&x)
+    {
+        dispatch_generic_assignment(std::forward<T>(x), is_rv_complex_interoperable<T>{});
+        return *this;
+    }
+
+    // Copy assignment from mpc_t.
+    complex &operator=(const ::mpc_t);
+
+#if !defined(_MSC_VER) || defined(__clang__)
+    // Move assignment from mpc_t.
+    complex &operator=(::mpc_t &&);
+#endif
+
     class re_ref
     {
     public:

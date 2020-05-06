@@ -912,3 +912,142 @@ TEST_CASE("copy move ass")
         REQUIRE(c1 == complex{45, 46});
     }
 }
+
+TEST_CASE("generic assignment")
+{
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        c = 45;
+        REQUIRE(c.get_prec() == detail::real_deduce_precision(45));
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == 45);
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        c = 45.;
+        REQUIRE(c.get_prec() == detail::real_deduce_precision(45.));
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == 45.);
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        c = 45_z1;
+        REQUIRE(c.get_prec() == detail::real_deduce_precision(45_z1));
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == 45);
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        c = 1 / 3_q1;
+        REQUIRE(c.get_prec() == detail::real_deduce_precision(1 / 3_q1));
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == real{1 / 3_q1});
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        c = 1.1_rq;
+        REQUIRE(c.get_prec() == 113);
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == 1.1_rq);
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+#endif
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        c = 1.1_r256;
+        REQUIRE(c.get_prec() == 256);
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == 1.1_r256);
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    // Test moving too.
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        auto r = 1.1_r256;
+        c = std::move(r);
+        REQUIRE(r.is_valid());
+        REQUIRE(r == 12);
+        REQUIRE(r.get_prec() == 12);
+        REQUIRE(c.get_prec() == 256);
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == 1.1_r256);
+        REQUIRE(im->zero_p());
+        REQUIRE(!im->signbit());
+    }
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        c = std::complex<double>{1.1, -2.3};
+        REQUIRE(c.get_prec() == detail::real_deduce_precision(1.1));
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == 1.1);
+        REQUIRE(*im == -2.3);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex c{12, 13, complex_prec_t{12}};
+        c = complex128{1.1_rq, -2.3_rq};
+        REQUIRE(c.get_prec() == 113);
+
+        complex::re_cref re(c);
+        complex::im_cref im(c);
+
+        REQUIRE(*re == 1.1_rq);
+        REQUIRE(*im == -2.3_rq);
+    }
+#endif
+}
+
+TEST_CASE("mpc_t assignment")
+{
+    complex c1, c2{41, 42};
+    c1 = c2.get_mpc_t();
+
+    REQUIRE(c1 == complex{41, 42});
+#if !defined(_MSC_VER) || defined(__clang__)
+    complex c3;
+
+    mpc_t o;
+    ::mpc_init2(o, 150);
+    ::mpc_set_d_d(o, 1.1, 2.3, MPC_RNDNN);
+
+    c3 = std::move(o);
+
+    REQUIRE(c3 == complex{1.1, 2.3, complex_prec_t(150)});
+    REQUIRE(c3.get_prec() == 150);
+#endif
+}

@@ -181,6 +181,31 @@ complex &complex::operator=(const complex &other)
     return *this;
 }
 
+// Copy assignment from mpc_t.
+complex &complex::operator=(const ::mpc_t c)
+{
+    // Set the precision, assuming the prec of c is valid.
+    assert(mpfr_get_prec(mpc_realref(c)) == mpfr_get_prec(mpc_imagref(c)));
+    set_prec_impl<false>(mpfr_get_prec(mpc_realref(c)));
+    // Set the value.
+    ::mpc_set(&m_mpc, c, MPC_RNDNN);
+    return *this;
+}
+
+#if !defined(_MSC_VER) || defined(__clang__)
+
+// Move assignment from mpc_t.
+complex &complex::operator=(::mpc_t &&c)
+{
+    // Clear this.
+    ::mpc_clear(&m_mpc);
+    // Shallow copy c.
+    m_mpc = *c;
+    return *this;
+}
+
+#endif
+
 // TODO implement on top of to_string().
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {

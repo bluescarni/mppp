@@ -233,6 +233,66 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: template <complex_interoperable T> complex &operator=(T &&x)
+
+      The generic assignment operator will set ``this`` to the value of *x*.
+
+      The precision of ``this`` will be set according to the same
+      heuristics described in the generic constructor.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the generic assignment operator
+        of :cpp:class:`~mppp::real`.
+
+   .. cpp:function:: complex &operator=(const mpc_t c)
+
+      Copy assignment from :cpp:type:`mpc_t`.
+
+      This operator will set ``this`` to a deep copy of *c*.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *c* has been correctly initialised
+         with a precision which is:
+
+         * the same for the real and imaginary parts,
+         * within the bounds established by :cpp:func:`mppp::real_prec_min()`
+           and :cpp:func:`mppp::real_prec_max()`.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: complex &operator=(mpc_t &&c)
+
+      Move assignment from :cpp:type:`mpc_t`.
+
+      This operator will set ``this`` to a shallow copy of *c*.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *c* has been correctly initialised
+         with a precision which is:
+
+         * the same for the real and imaginary parts,
+         * within the bounds established by :cpp:func:`mppp::real_prec_min()`
+           and :cpp:func:`mppp::real_prec_max()`.
+
+         Additionally, the user must ensure that, after the assignment, ``mpc_clear()`` is never
+         called on *c*: the resources previously owned by *c* are now owned by ``this``, which
+         will take care of releasing them when the destructor is called.
+
+      .. note::
+
+         Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
