@@ -256,6 +256,10 @@ The real class
          called on *x*: the resources previously owned by *x* are now owned by ``this``, which
          will take care of releasing them when the destructor is called.
 
+      .. note::
+
+         Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
+
       :param x: the :cpp:type:`mpfr_t` that will be moved.
 
    .. cpp:function:: ~real()
@@ -338,6 +342,10 @@ The real class
          Additionally, the user must ensure that, after the assignment, ``mpfr_clear()`` is never
          called on *x*: the resources previously owned by *x* are now owned by ``this``, which
          will take care of releasing them when the destructor is called.
+
+      .. note::
+
+         Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
 
       :param x: the assignment argument.
 

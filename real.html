@@ -431,6 +431,10 @@ and <a class="reference internal" href="#_CPPv4N4mppp13real_prec_maxEv" title="m
 called on <em>x</em>: the resources previously owned by <em>x</em> are now owned by <code class="docutils literal notranslate"><span class="pre">this</span></code>, which
 will take care of releasing them when the destructor is called.</p>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the <a class="reference internal" href="#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a> that will be moved.</dd>
 </dl>
@@ -524,6 +528,10 @@ and <a class="reference internal" href="#_CPPv4N4mppp13real_prec_maxEv" title="m
 <p class="last">Additionally, the user must ensure that, after the assignment, <code class="docutils literal notranslate"><span class="pre">mpfr_clear()</span></code> is never
 called on <em>x</em>: the resources previously owned by <em>x</em> are now owned by <code class="docutils literal notranslate"><span class="pre">this</span></code>, which
 will take care of releasing them when the destructor is called.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Due to a compiler bug, this operator is not available on Microsoft Visual Studio.</p>
 </div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the assignment argument.</dd>

@@ -249,6 +249,10 @@ been added to the continuous integration setup
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> move operations from
+<a class="reference internal" href="real.html#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a> have been disabled on MSVC
+due to compiler issues
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/236">#236</a>).</li>
 <li>Improve the implementation of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 binary operators/functions by using the MPFR primitives
 more extensively and by handling mixed-precision computations
