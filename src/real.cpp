@@ -34,6 +34,7 @@
 #include <flint/fmpz.h>
 
 #include <arb.h>
+#include <arb_hypgeom.h>
 #include <arf.h>
 #include <mag.h>
 
@@ -373,6 +374,43 @@ void arb_sinc_pi(::mpfr_t rop, const ::mpfr_t op)
     }
 }
 
+// NOTE: arb_hypgeom_bessel_j/y need special casing to handle
+// positive infinity.
+void arb_hypgeom_bessel_j(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
+{
+    if (::mpfr_number_p(op1) && mpfr_inf_p(op2) && mpfr_sgn(op2) > 0) {
+        // jx(nu, +infty) is zero for every finite nu.
+        ::mpfr_set_zero(rop, 1);
+    } else {
+        MPPP_MAYBE_TLS arb_raii arb_rop, arb_op1, arb_op2;
+
+        mpfr_to_arb(arb_op1.m_arb, op1);
+        mpfr_to_arb(arb_op2.m_arb, op2);
+
+        ::arb_hypgeom_bessel_j(arb_rop.m_arb, arb_op1.m_arb, arb_op2.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+        arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+    }
+}
+
+void arb_hypgeom_bessel_y(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
+{
+    if (::mpfr_number_p(op1) && mpfr_inf_p(op2) && mpfr_sgn(op2) > 0) {
+        // yx(nu, +infty) is zero for every finite nu.
+        ::mpfr_set_zero(rop, 1);
+    } else {
+        MPPP_MAYBE_TLS arb_raii arb_rop, arb_op1, arb_op2;
+
+        mpfr_to_arb(arb_op1.m_arb, op1);
+        mpfr_to_arb(arb_op2.m_arb, op2);
+
+        ::arb_hypgeom_bessel_y(arb_rop.m_arb, arb_op1.m_arb, arb_op2.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+        arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+    }
+}
+
+#undef MPPP_BINARY_ARB_WRAPPER
 #undef MPPP_UNARY_ARB_WRAPPER
 
 #endif

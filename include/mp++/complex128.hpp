@@ -594,7 +594,11 @@ constexpr complex128 operator+(const complex128 &c)
 // Prefix increment.
 inline MPPP_CONSTEXPR_14 complex128 &operator++(complex128 &x)
 {
+#if defined(__clang__)
+    __real__ x.m_value += 1;
+#else
     x.m_value += 1;
+#endif
     return x;
 }
 
@@ -682,7 +686,11 @@ namespace detail
 
 inline MPPP_CONSTEXPR_14 void complex128_in_place_add_impl(complex128 &c1, const complex128 &c2)
 {
+#if defined(__clang__)
+    c1.m_value = c1.m_value + c2.m_value;
+#else
     c1.m_value += c2.m_value;
+#endif
 }
 
 // NOTE: this will cover the following types for T:
@@ -744,7 +752,11 @@ constexpr complex128 operator-(const complex128 &c)
 // Prefix decrement.
 inline MPPP_CONSTEXPR_14 complex128 &operator--(complex128 &x)
 {
+#if defined(__clang__)
+    __real__ x.m_value -= 1;
+#else
     x.m_value -= 1;
+#endif
     return x;
 }
 
@@ -829,7 +841,11 @@ namespace detail
 
 inline MPPP_CONSTEXPR_14 void complex128_in_place_sub_impl(complex128 &c1, const complex128 &c2)
 {
+#if defined(__clang__)
+    c1.m_value = c1.m_value - c2.m_value;
+#else
     c1.m_value -= c2.m_value;
+#endif
 }
 
 template <typename T>
@@ -944,7 +960,11 @@ namespace detail
 
 inline MPPP_CONSTEXPR_14 void complex128_in_place_mul_impl(complex128 &c1, const complex128 &c2)
 {
+#if defined(__clang__)
+    c1.m_value = c1.m_value * c2.m_value;
+#else
     c1.m_value *= c2.m_value;
+#endif
 }
 
 template <typename T>
@@ -1059,7 +1079,11 @@ namespace detail
 
 inline MPPP_CONSTEXPR_14 void complex128_in_place_div_impl(complex128 &c1, const complex128 &c2)
 {
+#if defined(__clang__)
+    c1.m_value = c1.m_value / c2.m_value;
+#else
     c1.m_value /= c2.m_value;
+#endif
 }
 
 template <typename T>
