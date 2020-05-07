@@ -374,6 +374,8 @@ void arb_sinc_pi(::mpfr_t rop, const ::mpfr_t op)
     }
 }
 
+// NOTE: arb_hypgeom_bessel_j/y need special casing to handle
+// positive infinity.
 void arb_hypgeom_bessel_j(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
 {
     if (::mpfr_number_p(op1) && mpfr_inf_p(op2) && mpfr_sgn(op2) > 0) {
