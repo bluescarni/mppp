@@ -220,10 +220,6 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 //   if we exploit the mpfr_t internals.
 // - probably we should have a build in the CI against the latest MPFR, built with sanitizers on.
 // - probably we should have MPFR as well in the 32bit coverage build.
-// - investigate the applicability of a cache.
-// - see if it's needed to provide alternate interoperable function/operators that do *not* promote
-//   the non-real to real (there's a bunch of functions for direct interface with GMP and cpp types
-//   in the MPFR API: arithmetic, comparison, etc.).
 // - it seems like we might be doing multiple roundings when cting from real128.
 //   See if we can implement with only a single rounding, perhaps via an integer
 //   and mpfr_set_z_2exp()?
