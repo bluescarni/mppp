@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Add Bessel functions of real order for
+  :cpp:class:`~mppp::real`
+  (`#238 <https://github.com/bluescarni/mppp/pull/238>`__).
 - Add a move constructor with custom precision
   for :cpp:class:`~mppp::real`
   (`#234 <https://github.com/bluescarni/mppp/pull/234>`__).
@@ -81,6 +84,9 @@ Changes
 Fix
 ~~~
 
+- Implement a workaround for Clang 10 not allowing ``constexpr``
+  in-place arithmetics for :cpp:type:`__complex128`
+  (`#238 <https://github.com/bluescarni/mppp/pull/238>`__).
 - Fix a bug in the :cpp:class:`~mppp::real128` test suite
   (`#224 <https://github.com/bluescarni/mppp/pull/224>`__).
 - Various doc fixes
