@@ -1730,43 +1730,30 @@ MPPP_DLL_PUBLIC bool real_lt(const real &, const real &);
 MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
 
 // These are helper macros to reduce typing when dealing with the common case
-// of exposing MPFR functions with a single argument (both variants with retval
+// of exposing MPFR-like functions with a single argument (both variants with retval
 // and with return). "name" will be the name of the mppp function, "fname" is
-// the name of the MPFR function and "rnd" is a boolean flag that signals whether
+// the name of the MPFR-like function and "rnd" is a boolean flag that signals whether
 // fname requires a rounding mode argument or not.
-#define MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(name, fname, rnd)                                                             \
-    inline real &name(real &rop, T &&op)                                                                               \
-    {                                                                                                                  \
-        return detail::mpfr_nary_op_impl<rnd>(0, fname, rop, std::forward<T>(op));                                     \
-    }
+// The fname function must accept only mpfr_t arguments in input (plus the rounding mode if
+// rnd is true).
 
-#define MPPP_REAL_MPFR_UNARY_RETURN_IMPL(name, fname, rnd)                                                             \
-    inline real name(T &&r)                                                                                            \
-    {                                                                                                                  \
-        return detail::mpfr_nary_op_return_impl<rnd>(0, fname, std::forward<T>(r));                                    \
-    }
-
+// These are the headers of the overloads that will be produced. They are different depending
+// on whether concepts are available or not.
 #if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_REAL_MPFR_UNARY_HEADER template <cvr_real T>
 #else
 #define MPPP_REAL_MPFR_UNARY_HEADER template <typename T, cvr_real_enabler<T> = 0>
 #endif
 
-#define MPPP_REAL_MPFR_UNARY_RETVAL(name, fname)                                                                       \
-    MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(name, fname, true)
-#define MPPP_REAL_MPFR_UNARY_RETURN(name, fname)                                                                       \
-    MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETURN_IMPL(name, fname, true)
-
-#if defined(MPPP_WITH_ARB)
-
-// The Arb-MPFR wrappers do not want a rounding argument at the end, so the
-// macros are slightly different.
-#define MPPP_REAL_ARB_UNARY_RETVAL(name, fname)                                                                        \
-    MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(name, fname, false)
-#define MPPP_REAL_ARB_UNARY_RETURN(name, fname)                                                                        \
-    MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETURN_IMPL(name, fname, false)
-
-#endif
+#define MPPP_REAL_MPFR_UNARY_IMPL(name, fname, rnd)                                                                    \
+    MPPP_REAL_MPFR_UNARY_HEADER inline real &name(real &rop, T &&op)                                                   \
+    {                                                                                                                  \
+        return detail::mpfr_nary_op_impl<rnd>(0, fname, rop, std::forward<T>(op));                                     \
+    }                                                                                                                  \
+    MPPP_REAL_MPFR_UNARY_HEADER inline real name(T &&r)                                                                \
+    {                                                                                                                  \
+        return detail::mpfr_nary_op_return_impl<rnd>(0, fname, std::forward<T>(r));                                    \
+    }
 
 // Machinery to expose the binary MPFR-like function fname as an mppp function called "name".
 //
@@ -1841,24 +1828,20 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
     }
 
 // Square root.
-MPPP_REAL_MPFR_UNARY_RETVAL(sqrt, ::mpfr_sqrt)
-MPPP_REAL_MPFR_UNARY_RETURN(sqrt, ::mpfr_sqrt)
+MPPP_REAL_MPFR_UNARY_IMPL(sqrt, ::mpfr_sqrt, true)
 
 #if defined(MPPP_WITH_ARB)
 
 // sqrt1pm1.
-MPPP_REAL_ARB_UNARY_RETVAL(sqrt1pm1, detail::arb_sqrt1pm1)
-MPPP_REAL_ARB_UNARY_RETURN(sqrt1pm1, detail::arb_sqrt1pm1)
+MPPP_REAL_MPFR_UNARY_IMPL(sqrt1pm1, detail::arb_sqrt1pm1, false)
 
 #endif
 
 // Reciprocal square root.
-MPPP_REAL_MPFR_UNARY_RETVAL(rec_sqrt, ::mpfr_rec_sqrt)
-MPPP_REAL_MPFR_UNARY_RETURN(rec_sqrt, ::mpfr_rec_sqrt)
+MPPP_REAL_MPFR_UNARY_IMPL(rec_sqrt, ::mpfr_rec_sqrt, true)
 
 // Cubic root.
-MPPP_REAL_MPFR_UNARY_RETVAL(cbrt, ::mpfr_cbrt)
-MPPP_REAL_MPFR_UNARY_RETURN(cbrt, ::mpfr_cbrt)
+MPPP_REAL_MPFR_UNARY_IMPL(cbrt, ::mpfr_cbrt, true)
 
 #if MPFR_VERSION_MAJOR >= 4
 
@@ -2012,54 +1995,31 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 }
 
 // Squaring.
-MPPP_REAL_MPFR_UNARY_RETVAL(sqr, ::mpfr_sqr)
-MPPP_REAL_MPFR_UNARY_RETURN(sqr, ::mpfr_sqr)
+MPPP_REAL_MPFR_UNARY_IMPL(sqr, ::mpfr_sqr, true)
 
 // Trigonometric functions.
 
-MPPP_REAL_MPFR_UNARY_RETVAL(sin, ::mpfr_sin)
-MPPP_REAL_MPFR_UNARY_RETURN(sin, ::mpfr_sin)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(cos, ::mpfr_cos)
-MPPP_REAL_MPFR_UNARY_RETURN(cos, ::mpfr_cos)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(tan, ::mpfr_tan)
-MPPP_REAL_MPFR_UNARY_RETURN(tan, ::mpfr_tan)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(sec, ::mpfr_sec)
-MPPP_REAL_MPFR_UNARY_RETURN(sec, ::mpfr_sec)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(csc, ::mpfr_csc)
-MPPP_REAL_MPFR_UNARY_RETURN(csc, ::mpfr_csc)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(cot, ::mpfr_cot)
-MPPP_REAL_MPFR_UNARY_RETURN(cot, ::mpfr_cot)
+MPPP_REAL_MPFR_UNARY_IMPL(sin, ::mpfr_sin, true)
+MPPP_REAL_MPFR_UNARY_IMPL(cos, ::mpfr_cos, true)
+MPPP_REAL_MPFR_UNARY_IMPL(tan, ::mpfr_tan, true)
+MPPP_REAL_MPFR_UNARY_IMPL(sec, ::mpfr_sec, true)
+MPPP_REAL_MPFR_UNARY_IMPL(csc, ::mpfr_csc, true)
+MPPP_REAL_MPFR_UNARY_IMPL(cot, ::mpfr_cot, true)
 
 #if defined(MPPP_WITH_ARB)
 
-MPPP_REAL_ARB_UNARY_RETVAL(sin_pi, detail::arb_sin_pi)
-MPPP_REAL_ARB_UNARY_RETURN(sin_pi, detail::arb_sin_pi)
-MPPP_REAL_ARB_UNARY_RETVAL(cos_pi, detail::arb_cos_pi)
-MPPP_REAL_ARB_UNARY_RETURN(cos_pi, detail::arb_cos_pi)
-MPPP_REAL_ARB_UNARY_RETVAL(tan_pi, detail::arb_tan_pi)
-MPPP_REAL_ARB_UNARY_RETURN(tan_pi, detail::arb_tan_pi)
-MPPP_REAL_ARB_UNARY_RETVAL(cot_pi, detail::arb_cot_pi)
-MPPP_REAL_ARB_UNARY_RETURN(cot_pi, detail::arb_cot_pi)
-MPPP_REAL_ARB_UNARY_RETVAL(sinc, detail::arb_sinc)
-MPPP_REAL_ARB_UNARY_RETURN(sinc, detail::arb_sinc)
-MPPP_REAL_ARB_UNARY_RETVAL(sinc_pi, detail::arb_sinc_pi)
-MPPP_REAL_ARB_UNARY_RETURN(sinc_pi, detail::arb_sinc_pi)
+MPPP_REAL_MPFR_UNARY_IMPL(sin_pi, detail::arb_sin_pi, false)
+MPPP_REAL_MPFR_UNARY_IMPL(cos_pi, detail::arb_cos_pi, false)
+MPPP_REAL_MPFR_UNARY_IMPL(tan_pi, detail::arb_tan_pi, false)
+MPPP_REAL_MPFR_UNARY_IMPL(cot_pi, detail::arb_cot_pi, false)
+MPPP_REAL_MPFR_UNARY_IMPL(sinc, detail::arb_sinc, false)
+MPPP_REAL_MPFR_UNARY_IMPL(sinc_pi, detail::arb_sinc_pi, false)
 
 #endif
 
-MPPP_REAL_MPFR_UNARY_RETVAL(asin, ::mpfr_asin)
-MPPP_REAL_MPFR_UNARY_RETURN(asin, ::mpfr_asin)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(acos, ::mpfr_acos)
-MPPP_REAL_MPFR_UNARY_RETURN(acos, ::mpfr_acos)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(atan, ::mpfr_atan)
-MPPP_REAL_MPFR_UNARY_RETURN(atan, ::mpfr_atan)
+MPPP_REAL_MPFR_UNARY_IMPL(asin, ::mpfr_asin, true)
+MPPP_REAL_MPFR_UNARY_IMPL(acos, ::mpfr_acos, true)
+MPPP_REAL_MPFR_UNARY_IMPL(atan, ::mpfr_atan, true)
 
 // sin and cos at the same time.
 // NOTE: we don't have the machinery to steal resources
@@ -2094,32 +2054,15 @@ MPPP_REAL_MPFR_BINARY_IMPL(atan2, ::mpfr_atan2, true)
 
 // Hyperbolic functions.
 
-MPPP_REAL_MPFR_UNARY_RETVAL(sinh, ::mpfr_sinh)
-MPPP_REAL_MPFR_UNARY_RETURN(sinh, ::mpfr_sinh)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(cosh, ::mpfr_cosh)
-MPPP_REAL_MPFR_UNARY_RETURN(cosh, ::mpfr_cosh)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(tanh, ::mpfr_tanh)
-MPPP_REAL_MPFR_UNARY_RETURN(tanh, ::mpfr_tanh)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(sech, ::mpfr_sech)
-MPPP_REAL_MPFR_UNARY_RETURN(sech, ::mpfr_sech)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(csch, ::mpfr_csch)
-MPPP_REAL_MPFR_UNARY_RETURN(csch, ::mpfr_csch)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(coth, ::mpfr_coth)
-MPPP_REAL_MPFR_UNARY_RETURN(coth, ::mpfr_coth)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(asinh, ::mpfr_asinh)
-MPPP_REAL_MPFR_UNARY_RETURN(asinh, ::mpfr_asinh)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(acosh, ::mpfr_acosh)
-MPPP_REAL_MPFR_UNARY_RETURN(acosh, ::mpfr_acosh)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(atanh, ::mpfr_atanh)
-MPPP_REAL_MPFR_UNARY_RETURN(atanh, ::mpfr_atanh)
+MPPP_REAL_MPFR_UNARY_IMPL(sinh, ::mpfr_sinh, true)
+MPPP_REAL_MPFR_UNARY_IMPL(cosh, ::mpfr_cosh, true)
+MPPP_REAL_MPFR_UNARY_IMPL(tanh, ::mpfr_tanh, true)
+MPPP_REAL_MPFR_UNARY_IMPL(sech, ::mpfr_sech, true)
+MPPP_REAL_MPFR_UNARY_IMPL(csch, ::mpfr_csch, true)
+MPPP_REAL_MPFR_UNARY_IMPL(coth, ::mpfr_coth, true)
+MPPP_REAL_MPFR_UNARY_IMPL(asinh, ::mpfr_asinh, true)
+MPPP_REAL_MPFR_UNARY_IMPL(acosh, ::mpfr_acosh, true)
+MPPP_REAL_MPFR_UNARY_IMPL(atanh, ::mpfr_atanh, true)
 
 // sinh and cosh at the same time.
 // NOTE: we don't have the machinery to steal resources
@@ -2152,43 +2095,21 @@ inline void sinh_cosh(real &sop, real &cop, T &&op)
 
 // Exponentials and logarithms.
 
-MPPP_REAL_MPFR_UNARY_RETVAL(exp, ::mpfr_exp)
-MPPP_REAL_MPFR_UNARY_RETURN(exp, ::mpfr_exp)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(exp2, ::mpfr_exp2)
-MPPP_REAL_MPFR_UNARY_RETURN(exp2, ::mpfr_exp2)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(exp10, ::mpfr_exp10)
-MPPP_REAL_MPFR_UNARY_RETURN(exp10, ::mpfr_exp10)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(expm1, ::mpfr_expm1)
-MPPP_REAL_MPFR_UNARY_RETURN(expm1, ::mpfr_expm1)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(log, ::mpfr_log)
-MPPP_REAL_MPFR_UNARY_RETURN(log, ::mpfr_log)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(log2, ::mpfr_log2)
-MPPP_REAL_MPFR_UNARY_RETURN(log2, ::mpfr_log2)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(log10, ::mpfr_log10)
-MPPP_REAL_MPFR_UNARY_RETURN(log10, ::mpfr_log10)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(log1p, ::mpfr_log1p)
-MPPP_REAL_MPFR_UNARY_RETURN(log1p, ::mpfr_log1p)
+MPPP_REAL_MPFR_UNARY_IMPL(exp, ::mpfr_exp, true)
+MPPP_REAL_MPFR_UNARY_IMPL(exp2, ::mpfr_exp2, true)
+MPPP_REAL_MPFR_UNARY_IMPL(exp10, ::mpfr_exp10, true)
+MPPP_REAL_MPFR_UNARY_IMPL(expm1, ::mpfr_expm1, true)
+MPPP_REAL_MPFR_UNARY_IMPL(log, ::mpfr_log, true)
+MPPP_REAL_MPFR_UNARY_IMPL(log2, ::mpfr_log2, true)
+MPPP_REAL_MPFR_UNARY_IMPL(log10, ::mpfr_log10, true)
+MPPP_REAL_MPFR_UNARY_IMPL(log1p, ::mpfr_log1p, true)
 
 // Gamma functions.
 
-MPPP_REAL_MPFR_UNARY_RETVAL(gamma, ::mpfr_gamma)
-MPPP_REAL_MPFR_UNARY_RETURN(gamma, ::mpfr_gamma)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(lngamma, ::mpfr_lngamma)
-MPPP_REAL_MPFR_UNARY_RETURN(lngamma, ::mpfr_lngamma)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(lgamma, detail::real_lgamma_wrapper)
-MPPP_REAL_MPFR_UNARY_RETURN(lgamma, detail::real_lgamma_wrapper)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(digamma, ::mpfr_digamma)
-MPPP_REAL_MPFR_UNARY_RETURN(digamma, ::mpfr_digamma)
+MPPP_REAL_MPFR_UNARY_IMPL(gamma, ::mpfr_gamma, true)
+MPPP_REAL_MPFR_UNARY_IMPL(lngamma, ::mpfr_lngamma, true)
+MPPP_REAL_MPFR_UNARY_IMPL(lgamma, detail::real_lgamma_wrapper, true)
+MPPP_REAL_MPFR_UNARY_IMPL(digamma, ::mpfr_digamma, true)
 
 #if MPFR_VERSION_MAJOR >= 4
 
@@ -2199,11 +2120,8 @@ MPPP_REAL_MPFR_BINARY_IMPL(gamma_inc, ::mpfr_gamma_inc, true)
 
 // Bessel functions.
 
-MPPP_REAL_MPFR_UNARY_RETVAL(j0, ::mpfr_j0)
-MPPP_REAL_MPFR_UNARY_RETURN(j0, ::mpfr_j0)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(j1, ::mpfr_j1)
-MPPP_REAL_MPFR_UNARY_RETURN(j1, ::mpfr_j1)
+MPPP_REAL_MPFR_UNARY_IMPL(j0, ::mpfr_j0, true)
+MPPP_REAL_MPFR_UNARY_IMPL(j1, ::mpfr_j1, true)
 
 // Bessel function of the first kind of order n.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2228,11 +2146,8 @@ inline real jn(long n, T &&r)
     return detail::mpfr_nary_op_return_impl<false>(0, jn_wrapper, std::forward<T>(r));
 }
 
-MPPP_REAL_MPFR_UNARY_RETVAL(y0, ::mpfr_y0)
-MPPP_REAL_MPFR_UNARY_RETURN(y0, ::mpfr_y0)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(y1, ::mpfr_y1)
-MPPP_REAL_MPFR_UNARY_RETURN(y1, ::mpfr_y1)
+MPPP_REAL_MPFR_UNARY_IMPL(y0, ::mpfr_y0, true)
+MPPP_REAL_MPFR_UNARY_IMPL(y1, ::mpfr_y1, true)
 
 // Bessel function of the second kind of order n.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2265,25 +2180,14 @@ MPPP_REAL_MPFR_BINARY_IMPL(yx, detail::arb_hypgeom_bessel_y, false)
 #endif
 
 // Polylogarithms.
-
-MPPP_REAL_MPFR_UNARY_RETVAL(li2, detail::real_li2_wrapper)
-MPPP_REAL_MPFR_UNARY_RETURN(li2, detail::real_li2_wrapper)
+MPPP_REAL_MPFR_UNARY_IMPL(li2, detail::real_li2_wrapper, true)
 
 // Other special functions.
-MPPP_REAL_MPFR_UNARY_RETVAL(eint, ::mpfr_eint)
-MPPP_REAL_MPFR_UNARY_RETURN(eint, ::mpfr_eint)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(zeta, ::mpfr_zeta)
-MPPP_REAL_MPFR_UNARY_RETURN(zeta, ::mpfr_zeta)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(erf, ::mpfr_erf)
-MPPP_REAL_MPFR_UNARY_RETURN(erf, ::mpfr_erf)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(erfc, ::mpfr_erfc)
-MPPP_REAL_MPFR_UNARY_RETURN(erfc, ::mpfr_erfc)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(ai, ::mpfr_ai)
-MPPP_REAL_MPFR_UNARY_RETURN(ai, ::mpfr_ai)
+MPPP_REAL_MPFR_UNARY_IMPL(eint, ::mpfr_eint, true)
+MPPP_REAL_MPFR_UNARY_IMPL(zeta, ::mpfr_zeta, true)
+MPPP_REAL_MPFR_UNARY_IMPL(erf, ::mpfr_erf, true)
+MPPP_REAL_MPFR_UNARY_IMPL(erfc, ::mpfr_erfc, true)
+MPPP_REAL_MPFR_UNARY_IMPL(ai, ::mpfr_ai, true)
 
 #if MPFR_VERSION_MAJOR >= 4
 
@@ -2305,23 +2209,11 @@ MPPP_REAL_MPFR_BINARY_IMPL(log_hypot, detail::arb_log_hypot, false)
 // agm.
 MPPP_REAL_MPFR_BINARY_IMPL(agm, ::mpfr_agm, true)
 
-#undef MPPP_REAL_MPFR_UNARY_RETURN
-#undef MPPP_REAL_MPFR_UNARY_RETVAL
 #undef MPPP_REAL_MPFR_UNARY_HEADER
-#undef MPPP_REAL_MPFR_UNARY_RETURN_IMPL
-#undef MPPP_REAL_MPFR_UNARY_RETVAL_IMPL
+#undef MPPP_REAL_MPFR_UNARY_IMPL
 #undef MPPP_REAL_MPFR_BINARY_HEADER1
 #undef MPPP_REAL_MPFR_BINARY_HEADER2
 #undef MPPP_REAL_MPFR_BINARY_IMPL
-
-#if defined(MPPP_WITH_ARB)
-
-#undef MPPP_REAL_ARB_UNARY_RETURN
-#undef MPPP_REAL_ARB_UNARY_RETVAL
-#undef MPPP_REAL_ARB_UNARY_RETURN_IMPL
-#undef MPPP_REAL_ARB_UNARY_RETVAL_IMPL
-
-#endif
 
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
