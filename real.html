@@ -2636,9 +2636,7 @@ The precision of the result will be set to the largest precision among the opera
 <li><strong>x</strong> – the cosine argument.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the arctangent-2 of <em>y</em> and <em>x</em>.</p>
-</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the arctangent-2 of <em>y</em> and <em>x</em>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2995,11 +2993,8 @@ The precision of the result will be set to the largest precision among the opera
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the log hypot function of <em>x</em> and <em>y</em>.</p>
 </dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
-<li><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</li>
-<li><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
-fails because of (unlikely) overflow conditions.</li>
-</ul>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3158,9 +3153,7 @@ The precision of the result will be set to the largest precision among the opera
 <li><strong>y</strong> – the second argument.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the upper incomplete Gamma function of <em>x</em> and <em>y</em></p>
-</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the upper incomplete Gamma function of <em>x</em> and <em>y</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -3303,7 +3296,10 @@ configured with the <code class="docutils literal notranslate"><span class="pre"
 <li><strong>x</strong> – the argument.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3340,7 +3336,8 @@ configured with the <code class="docutils literal notranslate"><span class="pre"
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the Bessel function of <em>x</em>.</p>
 </dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3495,9 +3492,7 @@ The precision of the result will be set to the largest precision among the opera
 <li><strong>y</strong> – the second argument.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the beta function of <em>x</em> and <em>y</em>.</p>
-</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the beta function of <em>x</em> and <em>y</em>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3532,9 +3527,7 @@ The precision of the result will be set to the largest precision among the opera
 <li><strong>y</strong> – the second argument.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the hypot function of <em>x</em> and <em>y</em>.</p>
-</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the hypot function of <em>x</em> and <em>y</em>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3569,9 +3562,7 @@ The precision of the result will be set to the largest precision among the opera
 <li><strong>y</strong> – the second argument.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the AGM of <em>x</em> and <em>y</em>.</p>
-</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by the generic assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the AGM of <em>x</em> and <em>y</em>.</p>
 </dd>
 </dl>
 </dd></dl>

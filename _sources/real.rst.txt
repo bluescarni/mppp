@@ -1427,6 +1427,7 @@ Roots
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -1450,6 +1451,7 @@ Roots
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -1534,6 +1536,7 @@ Roots
    .. versionadded:: 0.12
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary :cpp:class:`~mppp::real` k-th root.
@@ -1558,6 +1561,7 @@ Roots
    .. versionadded:: 0.12
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Unary :cpp:class:`~mppp::real` k-th root.
@@ -1653,6 +1657,7 @@ Trigonometry
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sinc_pi(mppp::real &rop, T &&x)
 
    .. note::
+
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
@@ -1705,6 +1710,7 @@ Trigonometry
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sinc_pi(T &&x)
 
    .. note::
+
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
@@ -1809,8 +1815,6 @@ Trigonometry
    :param x: the cosine argument.
 
    :return: the arctangent-2 of *y* and *x*.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_hyper:
 
@@ -1987,6 +1991,7 @@ Logarithms and exponentials
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2010,6 +2015,7 @@ Logarithms and exponentials
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2024,7 +2030,6 @@ Logarithms and exponentials
 
    :return: the log hypot function of *x* and *y*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
@@ -2109,6 +2114,7 @@ Gamma functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Ternary incomplete Gamma function.
@@ -2127,6 +2133,7 @@ Gamma functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary incomplete Gamma function.
@@ -2138,8 +2145,6 @@ Gamma functions
    :param y: the second argument.
 
    :return: the upper incomplete Gamma function of *x* and *y*
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_bessel:
 
@@ -2205,6 +2210,7 @@ Bessel functions
    .. versionadded:: 0.20
 
    .. note::
+
       These functions are available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2224,12 +2230,16 @@ Bessel functions
 
    :return: a reference to *rop*.
 
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::jx(T &&nu, U &&x)
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::yx(T &&nu, U &&x)
 
    .. versionadded:: 0.20
 
    .. note::
+
       These functions are available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2248,7 +2258,8 @@ Bessel functions
 
    :return: the Bessel function of *x*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. _real_err_func:
 
@@ -2329,6 +2340,7 @@ Other special functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Ternary beta function.
@@ -2347,6 +2359,7 @@ Other special functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary beta function.
@@ -2358,8 +2371,6 @@ Other special functions
    :param y: the second argument.
 
    :return: the beta function of *x* and *y*.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::hypot(mppp::real &rop, T &&x, U &&y)
 
@@ -2386,8 +2397,6 @@ Other special functions
 
    :return: the hypot function of *x* and *y*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
-
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::agm(mppp::real &rop, T &&x, U &&y)
 
    Ternary AGM.
@@ -2412,8 +2421,6 @@ Other special functions
    :param y: the second argument.
 
    :return: the AGM of *x* and *y*.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_intrem:
 
