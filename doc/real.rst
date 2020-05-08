@@ -1810,8 +1810,6 @@ Trigonometry
 
    :return: the arctangent-2 of *y* and *x*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
-
 .. _real_hyper:
 
 Hyperbolic functions
@@ -2024,7 +2022,6 @@ Logarithms and exponentials
 
    :return: the log hypot function of *x* and *y*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
@@ -2139,8 +2136,6 @@ Gamma functions
 
    :return: the upper incomplete Gamma function of *x* and *y*
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
-
 .. _real_bessel:
 
 Bessel functions
@@ -2224,6 +2219,9 @@ Bessel functions
 
    :return: a reference to *rop*.
 
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::jx(T &&nu, U &&x)
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::yx(T &&nu, U &&x)
 
@@ -2248,7 +2246,8 @@ Bessel functions
 
    :return: the Bessel function of *x*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. _real_err_func:
 
@@ -2359,8 +2358,6 @@ Other special functions
 
    :return: the beta function of *x* and *y*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
-
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::hypot(mppp::real &rop, T &&x, U &&y)
 
    Ternary hypot function.
@@ -2386,8 +2383,6 @@ Other special functions
 
    :return: the hypot function of *x* and *y*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
-
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::agm(mppp::real &rop, T &&x, U &&y)
 
    Ternary AGM.
@@ -2412,8 +2407,6 @@ Other special functions
    :param y: the second argument.
 
    :return: the AGM of *x* and *y*.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_intrem:
 
