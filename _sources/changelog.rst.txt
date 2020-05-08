@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- The mp++ library can now be built with link-time
+  optimisations enabled
+  (`#240 <https://github.com/bluescarni/mppp/pull/240>`__).
 - Add Bessel functions of real order for
   :cpp:class:`~mppp::real`
   (`#238 <https://github.com/bluescarni/mppp/pull/238>`__).

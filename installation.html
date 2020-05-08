@@ -174,8 +174,23 @@ quadmath library (off by default),</li>
 <li><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_STATIC_LIBRARY</span></code>: build mp++ as a static library, instead
 of a dynamic library (off by default),</li>
 <li><code class="docutils literal notranslate"><span class="pre">MPPP_MSVC_UNICODE</span></code>: enable Unicode solutions for MSVC (available only
-when using MSVC, off by default).</li>
+when using MSVC, off by default),</li>
+<li><code class="docutils literal notranslate"><span class="pre">MPPP_ENABLE_IPO</span></code>: enable link-time optimisations when building
+the mp++ library (requires CMake &gt;= 3.9 and compiler support,
+off by default).</li>
 </ul>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.5: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> and <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> build options.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.15: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_STATIC_LIBRARY</span></code> and <code class="docutils literal notranslate"><span class="pre">MPPP_MSVC_UNICODE</span></code> build options.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> build option.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_ENABLE_IPO</span></code> build option.</p>
+</div>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only
 using GCC (all the supported versions), Clang
 (since version 3.9) and the Intel compiler. When this option is active,
@@ -273,8 +288,8 @@ system you can compile this example with the following command:</p>
 <p>Because parts of mp++ are implemented using templates,
 users of the library will have to explicitly link to GMP
 and (if enabled) MPFR. Explicit linking to the other optional
-dependencies is not necessary, as they will
-be automatically brought into the link chain by the mp++ library.</p>
+dependencies is not necessary, as their use is confined within
+the mp++ compiled library.</p>
 <p>If you are using CMake, it is highly recommended to make use of the config-file
 package provided with mp++ rather
 than locating and linking manually the required dependencies
