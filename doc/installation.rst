@@ -63,7 +63,26 @@ path, etc.). The available configuration options are:
 * ``MPPP_BUILD_STATIC_LIBRARY``: build mp++ as a static library, instead
   of a dynamic library (off by default),
 * ``MPPP_MSVC_UNICODE``: enable Unicode solutions for MSVC (available only
-  when using MSVC, off by default).
+  when using MSVC, off by default),
+* ``MPPP_ENABLE_IPO``: enable link-time optimisations when building
+  the mp++ library (requires CMake >= 3.9 and compiler support,
+  off by default).
+
+.. versionadded:: 0.5
+
+   The ``MPPP_WITH_MPFR`` and ``MPPP_WITH_QUADMATH`` build options.
+
+.. versionadded:: 0.15
+
+   The ``MPPP_BUILD_STATIC_LIBRARY`` and ``MPPP_MSVC_UNICODE`` build options.
+
+.. versionadded:: 0.19
+
+   The ``MPPP_WITH_ARB`` build option.
+
+.. versionadded:: 0.20
+
+   The ``MPPP_ENABLE_IPO`` build option.
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions), Clang
