@@ -252,11 +252,14 @@ class MPPP_DLL_PUBLIC real
     }
 
 #if defined(MPPP_WITH_MPC)
+    // NOTE: the complex class needs access to some
+    // private bits of real.
     friend class complex;
 
+    // Shallow copy constructor from mpfr_t, used
+    // only by the complex class.
     struct shallow_copy_t {
     };
-
     explicit real(shallow_copy_t, const ::mpfr_t r) : m_mpfr(r[0]) {}
 #endif
 

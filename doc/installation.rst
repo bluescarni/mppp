@@ -87,7 +87,7 @@ path, etc.). The available configuration options are:
 
 .. versionadded:: 0.20
 
-   The ``MPPP_ENABLE_IPO`` build option.
+   The ``MPPP_WITH_MPC`` and ``MPPP_ENABLE_IPO`` build options.
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions), Clang
