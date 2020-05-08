@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.3.0)
+# NOTE: policy for using the CheckIPOSupported module:
+# https://cmake.org/cmake/help/latest/policy/CMP0069.html
+cmake_policy(SET CMP0069 NEW)
 
 # Set default build type to "Release".
 # NOTE: this should be done before the project command since the latter can set
@@ -36,6 +39,9 @@ option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dyn
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_UNICODE "Enable Unicode solutions for MSVC." OFF)
 endif()
+# Build option: enable IPO.
+option(MPPP_ENABLE_IPO "Enable IPO (requires CMake >= 3.9 and compiler support)." OFF)
+mark_as_advanced(MPPP_ENABLE_IPO)
 
 if(MPPP_WITH_ARB AND NOT MPPP_WITH_MPFR)
     message(FATAL_ERROR "Arb support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
@@ -299,6 +305,22 @@ target_include_directories(mp++ PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
+
+# IPO setup.
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0")
+    if(MPPP_ENABLE_IPO)
+        include(CheckIPOSupported)
+        check_ipo_supported(RESULT _MPPP_IPO_RESULT OUTPUT _MPPP_IPO_OUTPUT)
+        if (_MPPP_IPO_RESULT)
+            message(STATUS "IPO requested and supported, enabling.")
+            set_property(TARGET mp++ PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+        else()
+            message(STATUS "IPO requested, but it is not supported by the compiler:\n${_MPPP_IPO_OUTPUT}")
+        endif()
+        unset(_MPPP_IPO_RESULT)
+        unset(_MPPP_IPO_OUTPUT)
+    endif()
+endif()
 
 # Find GMP first of all. We will make mp++ link to the imported
 # target later, because of linker sensitivity to the linking order

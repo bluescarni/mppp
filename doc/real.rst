@@ -1429,6 +1429,7 @@ Roots
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -1452,6 +1453,7 @@ Roots
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -1536,6 +1538,7 @@ Roots
    .. versionadded:: 0.12
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary :cpp:class:`~mppp::real` k-th root.
@@ -1560,6 +1563,7 @@ Roots
    .. versionadded:: 0.12
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Unary :cpp:class:`~mppp::real` k-th root.
@@ -1655,6 +1659,7 @@ Trigonometry
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sinc_pi(mppp::real &rop, T &&x)
 
    .. note::
+
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
@@ -1707,6 +1712,7 @@ Trigonometry
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sinc_pi(T &&x)
 
    .. note::
+
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
@@ -1811,8 +1817,6 @@ Trigonometry
    :param x: the cosine argument.
 
    :return: the arctangent-2 of *y* and *x*.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_hyper:
 
@@ -1989,6 +1993,7 @@ Logarithms and exponentials
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2012,6 +2017,7 @@ Logarithms and exponentials
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2026,7 +2032,6 @@ Logarithms and exponentials
 
    :return: the log hypot function of *x* and *y*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
@@ -2111,6 +2116,7 @@ Gamma functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Ternary incomplete Gamma function.
@@ -2129,6 +2135,7 @@ Gamma functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary incomplete Gamma function.
@@ -2141,8 +2148,6 @@ Gamma functions
 
    :return: the upper incomplete Gamma function of *x* and *y*
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
-
 .. _real_bessel:
 
 Bessel functions
@@ -2150,54 +2155,113 @@ Bessel functions
 
 .. versionadded:: 0.17
 
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::j0(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::j1(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::jn(mppp::real &rop, long n, T &&op)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::y0(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::y1(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::yn(mppp::real &rop, long n, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::j0(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::j1(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::jn(mppp::real &rop, long n, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::y0(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::y1(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::yn(mppp::real &rop, long n, T &&x)
 
-   Bessel functions.
+   Bessel functions of the first and second kind of integral order.
 
    These functions will set *rop* to, respectively,
 
-   * the Bessel function of the first kind of order 0 :math:`\left(J_0\right)` of *op*,
-   * the Bessel function of the first kind of order 1 :math:`\left(J_1\right)` of *op*,
-   * the Bessel function of the first kind of order *n* :math:`\left(J_n\right)` of *op*,
-   * the Bessel function of the second kind of order 0 :math:`\left(Y_0\right)` of *op*,
-   * the Bessel function of the second kind of order 1 :math:`\left(Y_1\right)` of *op*,
-   * the Bessel function of the second kind of order *n* :math:`\left(Y_n\right)` of *op*.
+   * :math:`J_0\left( x \right)`,
+   * :math:`J_1\left( x \right)`,
+   * :math:`J_n\left( x \right)`,
+   * :math:`Y_0\left( x \right)`,
+   * :math:`Y_1\left( x \right)`,
+   * :math:`Y_n\left( x \right)`.
 
-   The precision of the result will be equal to the precision of *op*.
+   The precision of the result will be equal to the precision of *x*.
 
    :param rop: the return value.
-   :param op: the argument.
+   :param n: the order of the Bessel function.
+   :param x: the argument.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::j0(T &&r)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::j1(T &&r)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::jn(long n, T &&r)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::y0(T &&r)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::y1(T &&r)
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::yn(long n, T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::j0(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::j1(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::jn(long n, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::y0(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::y1(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::yn(long n, T &&x)
 
-   Bessel functions.
+   Bessel functions of the first and second kind of integral order.
 
    These functions will return, respectively,
 
-   * the Bessel function of the first kind of order 0 :math:`\left(J_0\right)` of *r*,
-   * the Bessel function of the first kind of order 1 :math:`\left(J_1\right)` of *r*,
-   * the Bessel function of the first kind of order *n* :math:`\left(J_n\right)` of *r*,
-   * the Bessel function of the second kind of order 0 :math:`\left(Y_0\right)` of *r*,
-   * the Bessel function of the second kind of order 1 :math:`\left(Y_1\right)` of *r*,
-   * the Bessel function of the second kind of order *n* :math:`\left(Y_n\right)` of *r*.
+   * :math:`J_0\left( x \right)`,
+   * :math:`J_1\left( x \right)`,
+   * :math:`J_n\left( x \right)`,
+   * :math:`Y_0\left( x \right)`,
+   * :math:`Y_1\left( x \right)`,
+   * :math:`Y_n\left( x \right)`.
 
-   The precision of the result will be equal to the precision of *r*.
+   The precision of the result will be equal to the precision of *x*.
 
+   :param n: the order of the Bessel function.
    :param r: the argument.
 
    :return: the Bessel function of *r*.
+
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::jx(mppp::real &rop, T &&nu, U &&x)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::yx(mppp::real &rop, T &&nu, U &&x)
+
+   .. versionadded:: 0.20
+
+   .. note::
+
+      These functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Bessel functions of the first and second kind of real order.
+
+   These functions will set *rop* to, respectively,
+
+   * :math:`J_\nu\left( x \right)`,
+   * :math:`Y_\nu\left( x \right)`,
+
+   where :math:`\nu \in \mathbb{R}`. The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param nu: the order of the Bessel function.
+   :param x: the argument.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::jx(T &&nu, U &&x)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::yx(T &&nu, U &&x)
+
+   .. versionadded:: 0.20
+
+   .. note::
+
+      These functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Bessel functions of the first and second kind of real order.
+
+   These functions will return, respectively,
+
+   * :math:`J_\nu\left( x \right)`,
+   * :math:`Y_\nu\left( x \right)`,
+
+   where :math:`\nu \in \mathbb{R}`. The precision of the result will be set to the largest precision among the operands.
+
+   :param nu: the order of the Bessel function.
+   :param x: the argument.
+
+   :return: the Bessel function of *x*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. _real_err_func:
 
@@ -2278,6 +2342,7 @@ Other special functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Ternary beta function.
@@ -2296,6 +2361,7 @@ Other special functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary beta function.
@@ -2307,8 +2373,6 @@ Other special functions
    :param y: the second argument.
 
    :return: the beta function of *x* and *y*.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::hypot(mppp::real &rop, T &&x, U &&y)
 
@@ -2335,8 +2399,6 @@ Other special functions
 
    :return: the hypot function of *x* and *y*.
 
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
-
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::agm(mppp::real &rop, T &&x, U &&y)
 
    Ternary AGM.
@@ -2361,8 +2423,6 @@ Other special functions
    :param y: the second argument.
 
    :return: the AGM of *x* and *y*.
-
-   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_intrem:
 
