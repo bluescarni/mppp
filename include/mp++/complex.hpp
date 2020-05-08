@@ -372,6 +372,51 @@ public:
     complex &operator=(::mpc_t &&);
 #endif
 
+    // Check validity.
+    bool is_valid() const noexcept
+    {
+        return mpc_realref(&m_mpc)->_mpfr_d != nullptr;
+    }
+
+    // Set to another complex.
+    complex &set(const complex &);
+
+private:
+    // Implementation of the generic setter.
+    template <typename T>
+    void set_impl(const T &x, std::true_type)
+    {
+        re_ref re{*this};
+
+        re->set(x);
+        ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
+    }
+    template <typename T>
+    void set_impl(const T &c, std::false_type)
+    {
+        re_ref re{*this};
+        im_ref im{*this};
+
+        re->set(c.real());
+        im->set(c.imag());
+    }
+
+public:
+    // Generic setter.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex_interoperable T>
+#else
+    template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
+#endif
+    complex &set(const T &other)
+    {
+        set_impl(other, is_rv_complex_interoperable<T>{});
+        return *this;
+    }
+
+    // Set to an mpc_t.
+    complex &set(const ::mpc_t);
+
     class re_ref
     {
     public:
@@ -553,12 +598,6 @@ public:
     mpc_struct_t *_get_mpc_t()
     {
         return &m_mpc;
-    }
-
-    // Check validity.
-    bool is_valid() const noexcept
-    {
-        return mpc_realref(&m_mpc)->_mpfr_d != nullptr;
     }
 
 private:

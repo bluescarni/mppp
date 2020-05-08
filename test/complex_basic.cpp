@@ -1051,3 +1051,74 @@ TEST_CASE("mpc_t assignment")
     REQUIRE(c3.get_prec() == 150);
 #endif
 }
+
+TEST_CASE("is_valid")
+{
+    complex c{1, 2};
+    REQUIRE(c.is_valid());
+    complex c2{std::move(c)};
+    REQUIRE(!c.is_valid());
+}
+
+TEST_CASE("set")
+{
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(complex{3, 4, complex_prec_t(42)});
+        REQUIRE(c == complex{3, 4, complex_prec_t(14)});
+        REQUIRE(c.get_prec() == 14);
+    }
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(42);
+        REQUIRE(c == 42);
+        REQUIRE(c.get_prec() == 14);
+    }
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(-1.3);
+        REQUIRE(c == complex{-1.3, complex_prec_t(14)});
+        REQUIRE(c.get_prec() == 14);
+    }
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(42_z1);
+        REQUIRE(c == 42);
+        REQUIRE(c.get_prec() == 14);
+    }
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(1 / 10_q1);
+        REQUIRE(c == complex{1 / 10_q1, complex_prec_t(14)});
+        REQUIRE(c.get_prec() == 14);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(1.1_rq);
+        REQUIRE(c == complex{1.1_rq, complex_prec_t(14)});
+        REQUIRE(c.get_prec() == 14);
+    }
+#endif
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(1.1_r256);
+        REQUIRE(c == complex{1.1_r256, complex_prec_t(14)});
+        REQUIRE(c.get_prec() == 14);
+    }
+
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(std::complex<double>(-1.3, 1.1));
+        REQUIRE(c == complex{std::complex<double>(-1.3, 1.1), complex_prec_t(14)});
+        REQUIRE(c.get_prec() == 14);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set(1.1_rq + 2.3_icq);
+        REQUIRE(c == complex{1.1_rq + 2.3_icq, complex_prec_t(14)});
+        REQUIRE(c.get_prec() == 14);
+    }
+#endif
+}

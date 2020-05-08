@@ -206,6 +206,17 @@ complex &complex::operator=(::mpc_t &&c)
 
 #endif
 
+complex &complex::set(const complex &c)
+{
+    return set(&c.m_mpc);
+}
+
+complex &complex::set(const ::mpc_t c)
+{
+    ::mpc_set(&m_mpc, c, MPC_RNDNN);
+    return *this;
+}
+
 // TODO implement on top of to_string().
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {

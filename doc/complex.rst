@@ -293,6 +293,44 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: bool is_valid() const noexcept
+
+      Check validity.
+
+      A :cpp:class:`~mppp::complex` becomes invalid after it is used
+      as an argument to the move constructor.
+
+      :return: ``true`` if ``this`` is valid, ``false`` otherwise.
+
+   .. cpp:function:: complex &set(const complex &other)
+
+      Set to another :cpp:class:`~mppp::complex`.
+
+      This member function will set ``this`` to the value of *other*. Contrary to the copy assignment operator,
+      the precision of the assignment is dictated by the precision of ``this``, rather than
+      the precision of *other*. Consequently, the precision of ``this`` will not be altered by the
+      assignment, and a rounding might occur, depending on the values
+      and the precisions of the operands.
+
+      This function is a thin wrapper around the ``mpc_set()`` assignment function from the MPC API.
+
+      :param other: the value to which ``this`` will be set.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: template <complex_interoperable T> complex &set(const T &x)
+
+      Generic setter.
+
+      This member function will set ``this`` to the value of *x*. Contrary to the generic assignment operator,
+      the precision of the assignment is dictated by the precision of ``this``, rather than
+      being deduced from the type and value of *x*. Consequently, the precision of ``this`` will not be altered
+      by the assignment, and a rounding might occur, depending on the operands.
+
+      :param x: the value to which ``this`` will be set.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
