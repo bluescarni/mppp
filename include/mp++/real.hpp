@@ -1994,7 +1994,6 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 MPPP_REAL_MPFR_UNARY_IMPL(sqr, ::mpfr_sqr, true)
 
 // Trigonometric functions.
-
 MPPP_REAL_MPFR_UNARY_IMPL(sin, ::mpfr_sin, true)
 MPPP_REAL_MPFR_UNARY_IMPL(cos, ::mpfr_cos, true)
 MPPP_REAL_MPFR_UNARY_IMPL(tan, ::mpfr_tan, true)
@@ -2049,7 +2048,6 @@ inline void sin_cos(real &sop, real &cop, T &&op)
 MPPP_REAL_MPFR_BINARY_IMPL(atan2, ::mpfr_atan2, true)
 
 // Hyperbolic functions.
-
 MPPP_REAL_MPFR_UNARY_IMPL(sinh, ::mpfr_sinh, true)
 MPPP_REAL_MPFR_UNARY_IMPL(cosh, ::mpfr_cosh, true)
 MPPP_REAL_MPFR_UNARY_IMPL(tanh, ::mpfr_tanh, true)
@@ -2090,7 +2088,6 @@ inline void sinh_cosh(real &sop, real &cop, T &&op)
 }
 
 // Exponentials and logarithms.
-
 MPPP_REAL_MPFR_UNARY_IMPL(exp, ::mpfr_exp, true)
 MPPP_REAL_MPFR_UNARY_IMPL(exp2, ::mpfr_exp2, true)
 MPPP_REAL_MPFR_UNARY_IMPL(exp10, ::mpfr_exp10, true)
@@ -2101,7 +2098,6 @@ MPPP_REAL_MPFR_UNARY_IMPL(log10, ::mpfr_log10, true)
 MPPP_REAL_MPFR_UNARY_IMPL(log1p, ::mpfr_log1p, true)
 
 // Gamma functions.
-
 MPPP_REAL_MPFR_UNARY_IMPL(gamma, ::mpfr_gamma, true)
 MPPP_REAL_MPFR_UNARY_IMPL(lngamma, ::mpfr_lngamma, true)
 MPPP_REAL_MPFR_UNARY_IMPL(lgamma, detail::real_lgamma_wrapper, true)
@@ -2115,7 +2111,6 @@ MPPP_REAL_MPFR_BINARY_IMPL(gamma_inc, ::mpfr_gamma_inc, true)
 #endif
 
 // Bessel functions.
-
 MPPP_REAL_MPFR_UNARY_IMPL(j0, ::mpfr_j0, true)
 MPPP_REAL_MPFR_UNARY_IMPL(j1, ::mpfr_j1, true)
 

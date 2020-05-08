@@ -1427,6 +1427,7 @@ Roots
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -1450,6 +1451,7 @@ Roots
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -1534,6 +1536,7 @@ Roots
    .. versionadded:: 0.12
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary :cpp:class:`~mppp::real` k-th root.
@@ -1558,6 +1561,7 @@ Roots
    .. versionadded:: 0.12
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Unary :cpp:class:`~mppp::real` k-th root.
@@ -1653,6 +1657,7 @@ Trigonometry
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sinc_pi(mppp::real &rop, T &&x)
 
    .. note::
+
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
@@ -1705,6 +1710,7 @@ Trigonometry
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sinc_pi(T &&x)
 
    .. note::
+
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
@@ -1985,6 +1991,7 @@ Logarithms and exponentials
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2008,6 +2015,7 @@ Logarithms and exponentials
    .. versionadded:: 0.19
 
    .. note::
+
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2106,6 +2114,7 @@ Gamma functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Ternary incomplete Gamma function.
@@ -2124,6 +2133,7 @@ Gamma functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary incomplete Gamma function.
@@ -2200,6 +2210,7 @@ Bessel functions
    .. versionadded:: 0.20
 
    .. note::
+
       These functions are available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2228,6 +2239,7 @@ Bessel functions
    .. versionadded:: 0.20
 
    .. note::
+
       These functions are available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
@@ -2328,6 +2340,7 @@ Other special functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Ternary beta function.
@@ -2346,6 +2359,7 @@ Other special functions
    .. versionadded:: 0.17
 
    .. note::
+
       This function is available from MPFR 4 onwards.
 
    Binary beta function.
