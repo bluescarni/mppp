@@ -102,13 +102,10 @@ The complex128 class
       :exception unspecified: any exception raised by casting ``T`` to :cpp:class:`~mppp::real128`.
 
    .. cpp:function:: template <complex128_interoperable T, complex128_interoperable U> constexpr explicit complex128(const T &x, const U &y)
-   .. cpp:function:: template <string_type T, complex128_interoperable U> explicit complex128(const T &x, const U &y)
-   .. cpp:function:: template <complex128_interoperable T, string_type U> explicit complex128(const T &x, const U &y)
-   .. cpp:function:: template <string_type T, string_type U> explicit complex128(const T &x, const U &y)
 
-      Constructors from real and imaginary parts, in numerical and/or string forms.
+      Constructor from real and imaginary parts.
 
-      These constructors will initialise the internal value to :math:`x+\imath y`.
+      This constructor will initialise the internal value to :math:`x+\imath y`.
       Depending on the value and type of *x* and *y*, ``this`` may not be exactly equal
       to :math:`x+\imath y` after initialisation (e.g., if *x* and *y* are very large
       :cpp:class:`~mppp::integer` values).
@@ -116,8 +113,7 @@ The complex128 class
       :param x: the real part of the value that will be used for the initialisation.
       :param y: the imaginary part of the value that will be used for the initialisation.
 
-      :exception unspecified: any exception raised by casting ``T`` to :cpp:class:`~mppp::real128`,
-        or by the constructor from string of :cpp:class:`~mppp::real128`.
+      :exception unspecified: any exception raised by casting ``T`` to :cpp:class:`~mppp::real128`.
 
    .. cpp:function:: template <real128_cpp_complex T> constexpr explicit complex128(const T &c)
 
@@ -152,8 +148,7 @@ The complex128 class
         complex floating-point value.
       :exception unspecified: any exception thrown by memory errors in standard containers.
 
-   .. cpp:class:: char_range_t
-   .. cpp:function:: explicit complex128(const char *begin, const char *end, char_range_t)
+   .. cpp:function:: explicit complex128(const char *begin, const char *end)
 
       Constructor from a range of characters.
 
@@ -162,17 +157,6 @@ The complex128 class
 
       Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and
       invoke the constructor from string.
-
-      The third argument of type :cpp:class:`~mppp::complex128::char_range_t` is used only to
-      prevent this constructor from competing with the binary constructors during overload resolution.
-
-      Example:
-
-      .. code-block:: c++
-
-         const char str[] = "1.23";
-         complex128 c{str, str + 4, complex128::char_range_t{}};
-         assert(c == complex128{"1.23"});
 
       :param begin: the begin of the input range.
       :param end: the end of the input range.
