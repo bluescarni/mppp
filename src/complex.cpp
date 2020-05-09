@@ -233,12 +233,10 @@ namespace detail
 
 bool dispatch_complex_equality(const complex &c1, const complex &c2)
 {
-    const auto ret = ::mpc_cmp(c1.get_mpc_t(), c2.get_mpc_t());
+    complex::re_cref re1{c1}, re2{c2};
+    complex::im_cref im1{c1}, im2{c2};
 
-    const auto re_ret = MPC_INEX_RE(ret);
-    const auto im_ret = MPC_INEX_IM(ret);
-
-    return re_ret == 0 && im_ret == 0;
+    return *re1 == *re2 && *im1 == *im2;
 }
 
 } // namespace detail
