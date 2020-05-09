@@ -1062,6 +1062,8 @@ TEST_CASE("is_valid")
 
 TEST_CASE("set")
 {
+    using Catch::Matchers::Message;
+
     {
         complex c{1, 2, complex_prec_t(14)};
         c.set(complex{3, 4, complex_prec_t(42)});
@@ -1121,4 +1123,112 @@ TEST_CASE("set")
         REQUIRE(c.get_prec() == 14);
     }
 #endif
+
+    // String setters.
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        c.set("123");
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{123, complex_prec_t(14)});
+
+        c.set(std::string("(456)"));
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{456, complex_prec_t(14)});
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+        c.set(std::string_view("(456)"));
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{456, complex_prec_t(14)});
+#endif
+
+        // Try different base as well.
+        c.set("(1111011,111001000)", 2);
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{"(123,456)", 14});
+
+        c.set("(1c8)", 16);
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{"(456)", 14});
+
+        // Detect base.
+        c.set("(0x1c8)", 0);
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{"(456)", 14});
+
+        c.set("(0b1111011,0x1c8)", 0);
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{"(123,456)", 14});
+
+        c.set("(1.1,2.3)");
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{"(1.1,2.3)", 14});
+
+        std::vector<char> buffer;
+        constexpr char s[] = "(1.1,2.3)";
+        buffer.assign(s, s + sizeof(s) - 1u);
+        buffer.emplace_back('a');
+        buffer.emplace_back('b');
+        buffer.emplace_back('c');
+
+        c.set(buffer.data(), buffer.data() + sizeof(s) - 1u);
+        REQUIRE(c == complex{"(1.1,2.3)", 14});
+
+        // Error handling.
+        REQUIRE_THROWS_MATCHES(c.set("456", -1), std::invalid_argument,
+                               Message("Cannot assign a complex from a string in base -1: the base must either be zero "
+                                       "or in the [2,62] range"));
+        REQUIRE_THROWS_MATCHES(
+            c.set("456", 128), std::invalid_argument,
+            Message("Cannot assign a complex from a string in base 128: the base must either be zero "
+                    "or in the [2,62] range"));
+
+        {
+            REQUIRE_THROWS_MATCHES(
+                c.set("hello"), std::invalid_argument,
+                Message("The string 'hello' cannot be interpreted as a floating-point value in base 10"));
+
+            complex::re_cref re{c};
+            complex::im_cref im{c};
+
+            REQUIRE(re->nan_p());
+            REQUIRE(im->nan_p());
+        }
+        REQUIRE(c.get_prec() == 14);
+        c.set("(1.1,2.3)");
+        {
+            REQUIRE_THROWS_MATCHES(
+                c.set("(123,hello)"), std::invalid_argument,
+                Message("The string 'hello' cannot be interpreted as a floating-point value in base 10"));
+
+            complex::re_cref re{c};
+            complex::im_cref im{c};
+
+            REQUIRE(re->nan_p());
+            REQUIRE(im->nan_p());
+        }
+        REQUIRE(c.get_prec() == 14);
+        c.set("(1.1,2.3)");
+        {
+            REQUIRE_THROWS_MATCHES(c.set("(123,"), std::invalid_argument,
+                                   Message("The string '(123,' is not a valid representation of a complex value"));
+
+            complex::re_cref re{c};
+            complex::im_cref im{c};
+
+            REQUIRE(re->nan_p());
+            REQUIRE(im->nan_p());
+        }
+        REQUIRE(c.get_prec() == 14);
+        c.set("(1.1,2.3)");
+        {
+            REQUIRE_THROWS_MATCHES(c.set(""), std::invalid_argument,
+                                   Message("The string '' is not a valid representation of a complex value"));
+
+            complex::re_cref re{c};
+            complex::im_cref im{c};
+
+            REQUIRE(re->nan_p());
+            REQUIRE(im->nan_p());
+        }
+    }
 }

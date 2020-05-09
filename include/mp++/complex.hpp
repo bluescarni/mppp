@@ -414,6 +414,29 @@ public:
         return *this;
     }
 
+private:
+    // Implementation of string setters.
+    MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
+    complex &set_impl(const char *, int);
+    complex &set_impl(const std::string &, int);
+#if defined(MPPP_HAVE_STRING_VIEW)
+    complex &set_impl(const std::string_view &, int);
+#endif
+
+public:
+    // Setter to string.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <string_type T>
+#else
+    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
+#endif
+    complex &set(const T &s, int base = 10)
+    {
+        return set_impl(s, base);
+    }
+    // Set to character range.
+    complex &set(const char *begin, const char *end, int base = 10);
+
     // Set to an mpc_t.
     complex &set(const ::mpc_t);
 

@@ -331,6 +331,49 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: template <string_type T> complex &set(const T &s, int base = 10)
+
+      Setter to string.
+
+      This member function will set ``this`` to the value represented by *s*, which will
+      be interpreted as a complex number in base *base* (the expected string representations
+      for a complex number are detailed in the documentation of the constructor from string).
+      *base* must be either 0 (in which case the base is
+      automatically deduced), or a value in the :math:`\left[ 2,62 \right]` range.
+      The precision of the assignment is dictated by the
+      precision of ``this``, and a rounding might thus occur.
+
+      If *s* is not a valid representation of a complex number in base *base*, the real and imaginary
+      parts of ``this`` will be set to NaN and an error will be raised.
+
+      :param s: the string to which ``this`` will be set.
+      :param base: the base used in the string representation.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if *s* cannot be parsed as a complex value, or if the value
+        of *base* is invalid.
+      :exception unspecified: any exception thrown by memory allocation errors in standard containers.
+
+   .. cpp:function:: complex &set(const char *begin, const char *end, int base = 10)
+
+      Set to character range.
+
+      This setter will set ``this`` to the content of the input half-open range,
+      which is interpreted as the string representation of a complex value in base *base*.
+
+      Internally, the setter will copy the content of the range to a local buffer, add a
+      string terminator, and invoke the setter to string.
+
+      :param begin: the start of the input range.
+      :param end: the end of the input range.
+      :param base: the base used in the string representation.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the setter to string, or by memory
+        allocation errors in standard containers.
+
 Types
 -----
 

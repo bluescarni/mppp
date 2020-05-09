@@ -217,6 +217,68 @@ complex &complex::set(const ::mpc_t c)
     return *this;
 }
 
+// Implementation of the assignment from string.
+void complex::string_assignment_impl(const char *s, int base)
+{
+    if (mppp_unlikely(base && (base < 2 || base > 62))) {
+        throw std::invalid_argument("Cannot assign a complex from a string in base " + detail::to_string(base)
+                                    + ": the base must either be zero or in the [2,62] range");
+    }
+
+    re_ref re{*this};
+    im_ref im{*this};
+
+    try {
+        // Try parsing the real and imaginary parts.
+        const auto res = detail::parse_complex(s);
+
+        // Set the real part.
+        re->set(res[0], res[1], base);
+
+        // Set the imaginary part, if present.
+        if (res[2] == nullptr) {
+            im->set_zero(1);
+        } else {
+            im->set(res[2], res[3], base);
+        }
+    } catch (...) {
+        // In case of errors, make sure we set this to (nan,nan)
+        // before re-throwing.
+        re->set_nan();
+        im->set_nan();
+
+        throw;
+    }
+}
+
+// Implementation of string setters.
+complex &complex::set_impl(const char *s, int base)
+{
+    string_assignment_impl(s, base);
+    return *this;
+}
+
+complex &complex::set_impl(const std::string &s, int base)
+{
+    return set(s.c_str(), base);
+}
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+complex &complex::set_impl(const std::string_view &s, int base)
+{
+    return set(s.data(), s.data() + s.size(), base);
+}
+#endif
+
+// Set to character range.
+complex &complex::set(const char *begin, const char *end, int base)
+{
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+    buffer.assign(begin, end);
+    buffer.emplace_back('\0');
+    return set(buffer.data(), base);
+}
+
 // TODO implement on top of to_string().
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {
