@@ -1232,3 +1232,92 @@ TEST_CASE("set")
         }
     }
 }
+
+TEST_CASE("mpc_t getters")
+{
+    complex c{1, 2};
+    REQUIRE(::mpfr_cmp_ui(mpc_realref(c.get_mpc_t()), 1u) == 0);
+    REQUIRE(::mpfr_cmp_ui(mpc_imagref(c.get_mpc_t()), 2u) == 0);
+    ::mpc_add_ui(c._get_mpc_t(), c.get_mpc_t(), 3u, MPC_RNDNN);
+    REQUIRE(::mpfr_cmp_ui(mpc_realref(c.get_mpc_t()), 4u) == 0);
+    REQUIRE(::mpfr_cmp_ui(mpc_imagref(c.get_mpc_t()), 2u) == 0);
+}
+
+TEST_CASE("special values")
+{
+    complex c;
+    REQUIRE(c.zero_p());
+
+    c = 1;
+    REQUIRE(!c.zero_p());
+
+    c = complex{0, 1};
+    REQUIRE(!c.zero_p());
+
+    c = complex{1, 1};
+    REQUIRE(!c.zero_p());
+
+    c = complex{0, 0};
+    REQUIRE(c.zero_p());
+
+    REQUIRE(!c.is_one());
+
+    c = complex{2, 0};
+    REQUIRE(!c.is_one());
+
+    c = complex{2, 1};
+    REQUIRE(!c.is_one());
+
+    c = complex{1, 1};
+    REQUIRE(!c.is_one());
+
+    c = complex{1, 0};
+    REQUIRE(c.is_one());
+
+    c = complex{-1, 0};
+    REQUIRE(!c.is_one());
+}
+
+TEST_CASE("precision handling")
+{
+    using Catch::Matchers::Message;
+
+    complex c;
+    REQUIRE(c.get_prec() == real_prec_min());
+
+    c = complex{1, 2, complex_prec_t(42)};
+    REQUIRE(c.get_prec() == 42);
+
+    c.set_prec(128);
+    REQUIRE(c.get_prec() == 128);
+    {
+        complex::re_cref re{c};
+        complex::im_cref im{c};
+
+        REQUIRE(re->nan_p());
+        REQUIRE(im->nan_p());
+    }
+
+    c = complex{"1.1", "2.3", complex_prec_t(128)};
+    c.prec_round(64);
+    REQUIRE(c.get_prec() == 64);
+    REQUIRE(c != complex{"1.1", "2.3", complex_prec_t(128)});
+    REQUIRE(c == complex{"1.1", "2.3", complex_prec_t(64)});
+
+    // Error handling.
+    REQUIRE_THROWS_MATCHES(
+        c.set_prec(-1), std::invalid_argument,
+        Message("Cannot set the precision of a complex to the value -1: the maximum allowed precision is "
+                + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                + detail::to_string(real_prec_min())));
+    REQUIRE_THROWS_MATCHES(
+        c.prec_round(0), std::invalid_argument,
+        Message("Cannot set the precision of a complex to the value 0: the maximum allowed precision is "
+                + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                + detail::to_string(real_prec_min())));
+    REQUIRE_THROWS_MATCHES(c.prec_round(real_prec_max() + 1), std::invalid_argument,
+                           Message("Cannot set the precision of a complex to the value "
+                                   + detail::to_string(real_prec_max() + 1) + ": the maximum allowed precision is "
+                                   + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                   + detail::to_string(real_prec_min())));
+}

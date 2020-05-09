@@ -561,6 +561,8 @@ public:
     };
 
 #if MPPP_CPLUSPLUS >= 201703L
+    // Helpers to construct re/im refs.
+    // They require C++17.
     auto real_cref() const
     {
         return re_cref{*this};
@@ -579,6 +581,7 @@ public:
     }
 #endif
 
+    // Precision getter.
     ::mpfr_prec_t get_prec() const
     {
         assert(mpfr_get_prec(mpc_realref(&m_mpc)) == mpfr_get_prec(mpc_imagref(&m_mpc)));
@@ -614,6 +617,11 @@ private:
     }
 
 public:
+    // Precision setters.
+    complex &set_prec(::mpfr_prec_t);
+    complex &prec_round(::mpfr_prec_t);
+
+    // mpc_t getters.
     const mpc_struct_t *get_mpc_t() const
     {
         return &m_mpc;
@@ -622,6 +630,13 @@ public:
     {
         return &m_mpc;
     }
+
+    // Detect special values.
+    bool zero_p() const
+    {
+        return mpfr_zero_p(mpc_realref(&m_mpc)) != 0 && mpfr_zero_p(mpc_imagref(&m_mpc)) != 0;
+    }
+    bool is_one() const;
 
 private:
     mpc_struct_t m_mpc;

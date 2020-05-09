@@ -374,6 +374,96 @@ The complex class
       :exception unspecified: any exception thrown by the setter to string, or by memory
         allocation errors in standard containers.
 
+   .. cpp:function:: complex &set(const mpc_t c)
+
+      Set to an :cpp:type:`mpc_t`.
+
+      This member function will set ``this`` to the value of *c*. Contrary to the corresponding assignment operator,
+      the precision of the assignment is dictated by the precision of ``this``, rather than
+      the precision of *c*. Consequently, the precision of ``this`` will not be altered by the
+      assignment, and a rounding might occur, depending on the values
+      and the precisions of the operands.
+
+      This function is a thin wrapper around the ``mpc_set()`` assignment function from the MPC API.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *c* has been correctly initialised
+         with a precision which is:
+
+         * the same for the real and imaginary parts,
+         * within the bounds established by :cpp:func:`mppp::real_prec_min()`
+           and :cpp:func:`mppp::real_prec_max()`.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: const mpc_struct_t *get_mpc_t() const
+   .. cpp:function:: mpc_struct_t *_get_mpc_t()
+
+      Getters for the internal :cpp:type:`mpc_t` instance.
+
+      These member functions will return a const or mutable pointer
+      to the internal :cpp:type:`mpc_t` instance.
+
+      .. warning::
+
+         When using the mutable getter, it is the user's responsibility to ensure
+         that the internal MPC structure is kept in a state which respects the invariants
+         of the :cpp:class:`~mppp::complex` class. Specifically, the precision value
+         must be the same for the real and imaginary parts and
+         within the bounds established by :cpp:func:`mppp::real_prec_min()` and
+         :cpp:func:`mppp::real_prec_max()`, and upon destruction a :cpp:class:`~mppp::complex`
+         object must contain a valid :cpp:type:`mpc_t` object.
+
+      :return: a const or mutable pointer to the internal MPC structure.
+
+   .. cpp:function:: bool zero_p() const
+   .. cpp:function:: bool is_one() const
+
+      Detect special values.
+
+      These member functions will return ``true`` if ``this`` is, respectively, zero or one,
+      ``false`` otherwise.
+
+      :return: the result of the detection.
+
+   .. cpp:function:: mpfr_prec_t get_prec() const
+
+      Precision getter.
+
+      :return: the precision of ``this``.
+
+   .. cpp:function:: complex &set_prec(mpfr_prec_t p)
+
+      Destructively set the precision
+
+      This member function will set the precision of ``this`` to exactly *p* bits. The value
+      of the real and imaginary parts of ``this`` will be set to NaN.
+
+      :param p: the desired precision.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
+   .. cpp:function:: complex &prec_round(mpfr_prec_t p)
+
+      Set the precision maintaining the current value.
+
+      This member function will set the precision of ``this`` to exactly *p* bits. If *p*
+      is smaller than the current precision of ``this``, a rounding operation will be performed,
+      otherwise the current value will be preserved exactly.
+
+      :param p: the desired precision.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
 Types
 -----
 

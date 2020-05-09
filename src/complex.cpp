@@ -279,6 +279,29 @@ complex &complex::set(const char *begin, const char *end, int base)
     return set(buffer.data(), base);
 }
 
+// Detect one.
+bool complex::is_one() const
+{
+    re_cref re{*this};
+    im_cref im{*this};
+
+    return im->zero_p() && re->is_one();
+}
+
+// Destructively set the precision.
+complex &complex::set_prec(::mpfr_prec_t p)
+{
+    set_prec_impl<true>(p);
+    return *this;
+}
+
+// Set the precision maintaining the current value.
+complex &complex::prec_round(::mpfr_prec_t p)
+{
+    prec_round_impl<true>(p);
+    return *this;
+}
+
 // TODO implement on top of to_string().
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {
