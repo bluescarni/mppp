@@ -53,8 +53,8 @@ The complex class
 
       :param other: the construction argument.
 
-   .. cpp:function:: explicit complex(const complex &other, mpfr_prec_t p)
-   .. cpp:function:: explicit complex(complex &&other, mpfr_prec_t p)
+   .. cpp:function:: explicit complex(const complex &other, complex_prec_t p)
+   .. cpp:function:: explicit complex(complex &&other, complex_prec_t p)
 
       Copy/move constructors with custom precision.
 
@@ -96,11 +96,8 @@ The complex class
 
    .. cpp:function:: template <rv_complex_interoperable T, rv_complex_interoperable U> explicit complex(T &&x, U &&y)
    .. cpp:function:: template <rv_complex_interoperable T, rv_complex_interoperable U> explicit complex(T &&x, U &&y, complex_prec_t p)
-   .. cpp:function:: template <string_type T, rv_complex_interoperable U> explicit complex(const T &x, U &&y, complex_prec_t p)
-   .. cpp:function:: template <rv_complex_interoperable T, string_type U> explicit complex(T &&x, const U &y, complex_prec_t p)
-   .. cpp:function:: template <string_type T, string_type U> explicit complex(const T &x, const U &y, complex_prec_t p)
 
-      Generic constructors from real and imaginary parts, in numerical or string format.
+      Generic constructors from real and imaginary parts.
 
       These constructors will set ``this`` to :math:`x+\imath y`.
 
@@ -112,8 +109,6 @@ The complex class
       constructors of :cpp:class:`~mppp::real`. If *x* and/or *y* are :cpp:class:`~mppp::real`,
       the deduced precision is the output of :cpp:func:`mppp::real::get_prec()`.
 
-      The string variants expect a representation in base 10.
-
       :param x: the real part of the value that will be used for the initialisation.
       :param y: the imaginary part of the value that will be used for the initialisation.
       :param p: the desired precision.
@@ -121,8 +116,8 @@ The complex class
       :exception unspecified: any exception raised by the invoked :cpp:class:`~mppp::real`
         constructor.
 
-   .. cpp:function:: template <string_type T> explicit complex(const T &s, int base, mpfr_prec_t p)
-   .. cpp:function:: template <string_type T> explicit complex(const T &s, mpfr_prec_t p)
+   .. cpp:function:: template <string_type T> explicit complex(const T &s, int base, complex_prec_t p)
+   .. cpp:function:: template <string_type T> explicit complex(const T &s, complex_prec_t p)
 
       Constructors from string, base and precision.
 
@@ -155,8 +150,8 @@ The complex class
       :exception unspecified: any exception thrown by the constructor of
         :cpp:class:`~mppp::real` from string.
 
-   .. cpp:function:: explicit complex(const char *begin, const char *end, int base, mpfr_prec_t p)
-   .. cpp:function:: explicit complex(const char *begin, const char *end, mpfr_prec_t p)
+   .. cpp:function:: explicit complex(const char *begin, const char *end, int base, complex_prec_t p)
+   .. cpp:function:: explicit complex(const char *begin, const char *end, complex_prec_t p)
 
       Constructors from range of characters, base and precision.
 
@@ -480,7 +475,7 @@ Types
 
 .. cpp:enum-class:: mppp::complex_prec_t : mpfr_prec_t
 
-   A strongly-typed counterpart to :cpp:type:`mpfr_prec_t`, used in certain constructors of
+   A strongly-typed counterpart to :cpp:type:`mpfr_prec_t`, used in the constructors of
    :cpp:class:`~mppp::complex` in order to avoid ambiguities during overload resolution.
 
 Concepts

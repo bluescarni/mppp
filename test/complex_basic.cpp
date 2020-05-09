@@ -315,7 +315,7 @@ TEST_CASE("basic and generic constructors")
 
     // Copy ctor with custom precision.
     {
-        complex c{1.1_r512}, c1{c, 256};
+        complex c{1.1_r512}, c1{c, complex_prec_t(256)};
 
         complex::re_cref re{c1};
         complex::im_cref im{c1};
@@ -327,11 +327,11 @@ TEST_CASE("basic and generic constructors")
         REQUIRE(im->get_prec() == 256);
 
         // Error checking.
-        REQUIRE_THROWS_MATCHES((complex{c1, -1}), std::invalid_argument,
+        REQUIRE_THROWS_MATCHES((complex{c1, complex_prec_t(-1)}), std::invalid_argument,
                                Message("Cannot init a complex with a precision of -1: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
-        REQUIRE_THROWS_MATCHES((complex{c1, 0}), std::invalid_argument,
+        REQUIRE_THROWS_MATCHES((complex{c1, complex_prec_t(0)}), std::invalid_argument,
                                Message("Cannot init a complex with a precision of 0: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
@@ -339,7 +339,7 @@ TEST_CASE("basic and generic constructors")
 
     // Move ctor with custom precision.
     {
-        complex c{1.1_r512}, c1{std::move(c), 256};
+        complex c{1.1_r512}, c1{std::move(c), complex_prec_t(256)};
         REQUIRE(!c.is_valid());
 
         complex::re_cref re{c1};
@@ -351,11 +351,11 @@ TEST_CASE("basic and generic constructors")
         REQUIRE(re->get_prec() == 256);
         REQUIRE(im->get_prec() == 256);
 
-        REQUIRE_THROWS_MATCHES((complex{std::move(c1), -1}), std::invalid_argument,
+        REQUIRE_THROWS_MATCHES((complex{std::move(c1), complex_prec_t(-1)}), std::invalid_argument,
                                Message("Cannot init a complex with a precision of -1: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
-        REQUIRE_THROWS_MATCHES((complex{std::move(c1), 0}), std::invalid_argument,
+        REQUIRE_THROWS_MATCHES((complex{std::move(c1), complex_prec_t(0)}), std::invalid_argument,
                                Message("Cannot init a complex with a precision of 0: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
@@ -496,45 +496,6 @@ TEST_CASE("basic and generic constructors")
         REQUIRE(im->get_prec() == 28);
     }
 #endif
-    // With arguments in string form.
-    {
-        complex c1{"1.1", 4, complex_prec_t(128)};
-
-        REQUIRE(c1.get_prec() == 128);
-        REQUIRE(c1 == complex{1.1_r128, 4_r128});
-    }
-    {
-        real r{4};
-
-        complex c1{std::string("1.1"), std::move(r), complex_prec_t(128)};
-        REQUIRE(!r.is_valid());
-
-        REQUIRE(c1.get_prec() == 128);
-        REQUIRE(c1 == complex{1.1_r128, 4_r128});
-    }
-    {
-        constexpr char str[] = "-1.1";
-
-        complex c1{4, str, complex_prec_t(128)};
-
-        REQUIRE(c1.get_prec() == 128);
-        REQUIRE(c1 == complex{4_r128, -1.1_r128});
-    }
-    {
-        real r{4};
-
-        complex c1{std::move(r), "-1.1", complex_prec_t(128)};
-        REQUIRE(!r.is_valid());
-
-        REQUIRE(c1.get_prec() == 128);
-        REQUIRE(c1 == complex{4_r128, -1.1_r128});
-    }
-    {
-        complex c1{"1.1", std::string("2.3"), complex_prec_t(128)};
-
-        REQUIRE(c1.get_prec() == 128);
-        REQUIRE(c1 == complex{1.1_r128, 2.3_r128});
-    }
     // Bad prec value.
     {
         REQUIRE_THROWS_MATCHES((complex{42, 43, complex_prec_t(-1)}), std::invalid_argument,
@@ -542,18 +503,6 @@ TEST_CASE("basic and generic constructors")
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
         REQUIRE_THROWS_MATCHES((complex{1_q1, 1.23_r512, complex_prec_t(-2)}), std::invalid_argument,
-                               Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
-                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                                       + detail::to_string(real_prec_min())));
-        REQUIRE_THROWS_MATCHES((complex{"1", 1.23_r512, complex_prec_t(-2)}), std::invalid_argument,
-                               Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
-                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                                       + detail::to_string(real_prec_min())));
-        REQUIRE_THROWS_MATCHES((complex{1.23_r512, "1", complex_prec_t(-2)}), std::invalid_argument,
-                               Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
-                                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                                       + detail::to_string(real_prec_min())));
-        REQUIRE_THROWS_MATCHES((complex{"4", "1", complex_prec_t(-2)}), std::invalid_argument,
                                Message("Cannot init a real with a precision of -2: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
@@ -568,7 +517,7 @@ TEST_CASE("string constructors")
 
     // Start with zeroes.
     {
-        complex c{"0", 10, 128};
+        complex c{"0", 10, complex_prec_t(128)};
         REQUIRE(c == 0);
         REQUIRE(c.get_prec() == 128);
 
@@ -579,7 +528,7 @@ TEST_CASE("string constructors")
         REQUIRE(!(*im).signbit());
     }
     {
-        complex c{std::string("(-0)"), 10, 128};
+        complex c{std::string("(-0)"), 10, complex_prec_t(128)};
         REQUIRE(c == 0);
         REQUIRE(c.get_prec() == 128);
 
@@ -590,7 +539,7 @@ TEST_CASE("string constructors")
         REQUIRE(!(*im).signbit());
     }
     {
-        complex c{"(0,0)", 10, 128};
+        complex c{"(0,0)", 10, complex_prec_t(128)};
         REQUIRE(c == 0);
         REQUIRE(c.get_prec() == 128);
 
@@ -603,7 +552,7 @@ TEST_CASE("string constructors")
 
     // Single value, no brackets.
     {
-        complex c{"1.1", 10, 128};
+        complex c{"1.1", 10, complex_prec_t(128)};
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -612,7 +561,7 @@ TEST_CASE("string constructors")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{"  1.1", 10, 128};
+        complex c{"  1.1", 10, complex_prec_t(128)};
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -621,7 +570,7 @@ TEST_CASE("string constructors")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{"  +1.1", 128};
+        complex c{"  +1.1", complex_prec_t(128)};
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -632,7 +581,7 @@ TEST_CASE("string constructors")
     {
         buffer = {' ', '+', '1', '.', '1'};
 
-        complex c{buffer.data(), buffer.data() + buffer.size(), 10, 128};
+        complex c{buffer.data(), buffer.data() + buffer.size(), 10, complex_prec_t(128)};
 
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
@@ -644,7 +593,7 @@ TEST_CASE("string constructors")
     {
         buffer = {' ', '+', '1', '.', '3'};
 
-        complex c{buffer.data(), buffer.data() + buffer.size(), 128};
+        complex c{buffer.data(), buffer.data() + buffer.size(), complex_prec_t(128)};
 
         REQUIRE(c == 1.3_r128);
         REQUIRE(c.get_prec() == 128);
@@ -657,7 +606,7 @@ TEST_CASE("string constructors")
     {
         constexpr char str[] = "  -0x2f2.1aa4p0";
 
-        complex c{str, 16, 128};
+        complex c{str, 16, complex_prec_t(128)};
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -666,7 +615,7 @@ TEST_CASE("string constructors")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{std::string("  -0x2f2.1aa4p0"), 0, 128};
+        complex c{std::string("  -0x2f2.1aa4p0"), 0, complex_prec_t(128)};
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -675,17 +624,17 @@ TEST_CASE("string constructors")
         REQUIRE(!im->signbit());
     }
 #endif
-    REQUIRE_THROWS_MATCHES((complex{"1.1 ", 10, 128}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex{"1.1 ", 10, complex_prec_t(128)}), std::invalid_argument,
                            Message("The string '1.1 ' does not represent a valid real in base 10"));
-    REQUIRE_THROWS_MATCHES((complex{"hello world", 12, 128}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex{"hello world", 12, complex_prec_t(128)}), std::invalid_argument,
                            Message("The string 'hello world' does not represent a valid real in base 12"));
-    REQUIRE_THROWS_MATCHES((complex{"1.1 ", -2, 128}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex{"1.1 ", -2, complex_prec_t(128)}), std::invalid_argument,
                            Message("Cannot construct a complex from a string in base -2: the base must either be zero "
                                    "or in the [2,62] range"));
 
     // Single value, brackets.
     {
-        complex c{"(1.1)", 10, 128};
+        complex c{"(1.1)", 10, complex_prec_t(128)};
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -694,7 +643,7 @@ TEST_CASE("string constructors")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{" (1.1)", 10, 128};
+        complex c{" (1.1)", 10, complex_prec_t(128)};
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -704,7 +653,7 @@ TEST_CASE("string constructors")
     }
 #if MPPP_CPLUSPLUS >= 201703L
     {
-        complex c{std::string(" ( -0x2f2.1aa4p0)"), 16, 128};
+        complex c{std::string(" ( -0x2f2.1aa4p0)"), 16, complex_prec_t(128)};
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -713,7 +662,7 @@ TEST_CASE("string constructors")
         REQUIRE(!im->signbit());
     }
     {
-        complex c{std::string(" ( -0x2f2.1aa4p0)"), 0, 128};
+        complex c{std::string(" ( -0x2f2.1aa4p0)"), 0, complex_prec_t(128)};
         REQUIRE(c == -0x2f2.1aa4p0_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -723,7 +672,7 @@ TEST_CASE("string constructors")
     }
 #endif
     {
-        complex c{" ( 1.1)", 128};
+        complex c{" ( 1.1)", complex_prec_t(128)};
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
 
@@ -734,7 +683,7 @@ TEST_CASE("string constructors")
     {
         buffer = {' ', '(', '+', '1', '.', '1', ')'};
 
-        complex c{buffer.data(), buffer.data() + buffer.size(), 10, 128};
+        complex c{buffer.data(), buffer.data() + buffer.size(), 10, complex_prec_t(128)};
 
         REQUIRE(c == 1.1_r128);
         REQUIRE(c.get_prec() == 128);
@@ -746,7 +695,7 @@ TEST_CASE("string constructors")
     {
         buffer = {' ', '(', '+', '1', '.', '3', ')'};
 
-        complex c{buffer.data(), buffer.data() + buffer.size(), 128};
+        complex c{buffer.data(), buffer.data() + buffer.size(), complex_prec_t(128)};
 
         REQUIRE(c == 1.3_r128);
         REQUIRE(c.get_prec() == 128);
@@ -755,41 +704,41 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
-    REQUIRE_THROWS_MATCHES((complex{" ( 1.1 )", 10, 128}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex{" ( 1.1 )", 10, complex_prec_t(128)}), std::invalid_argument,
                            Message("The string ' 1.1 ' does not represent a valid real in base 10"));
-    REQUIRE_THROWS_MATCHES((complex{"(hello world)", 12, 128}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex{"(hello world)", 12, complex_prec_t(128)}), std::invalid_argument,
                            Message("The string 'hello world' does not represent a valid real in base 12"));
-    REQUIRE_THROWS_MATCHES((complex{"(1.1)", -20, 128}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex{"(1.1)", -20, complex_prec_t(128)}), std::invalid_argument,
                            Message("Cannot construct a complex from a string in base -20: the base must either be zero "
                                    "or in the [2,62] range"));
 
     // Two values.
     {
-        complex c{"(-1.1,-2.3)", 10, 256};
+        complex c{"(-1.1,-2.3)", 10, complex_prec_t(256)};
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
         REQUIRE(c.get_prec() == 256);
     }
 #if defined(MPPP_HAVE_STRING_VIEW)
     {
-        complex c{std::string_view("(-1.1,-2.3)"), 10, 256};
+        complex c{std::string_view("(-1.1,-2.3)"), 10, complex_prec_t(256)};
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
         REQUIRE(c.get_prec() == 256);
     }
 #endif
     {
-        complex c{" (-1.1,-2.3)", 0, 256};
+        complex c{" (-1.1,-2.3)", 0, complex_prec_t(256)};
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
         REQUIRE(c.get_prec() == 256);
     }
     {
-        complex c{std::string(" ( -1.1, -2.3)"), 0, 256};
+        complex c{std::string(" ( -1.1, -2.3)"), 0, complex_prec_t(256)};
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
         REQUIRE(c.get_prec() == 256);
     }
     {
         buffer = {' ', '(', '-', '1', '.', '3', ',', '0', '.', '7', ')'};
 
-        complex c{buffer.data(), buffer.data() + buffer.size(), 128};
+        complex c{buffer.data(), buffer.data() + buffer.size(), complex_prec_t(128)};
 
         REQUIRE(c == complex{-1.3_r128, 0.7_r128});
         REQUIRE(c.get_prec() == 128);
@@ -797,26 +746,26 @@ TEST_CASE("string constructors")
     {
         buffer = {' ', '(', '-', '1', '.', '3', ',', '0', '.', '7', ')'};
 
-        complex c{buffer.data(), buffer.data() + buffer.size(), 10, 128};
+        complex c{buffer.data(), buffer.data() + buffer.size(), 10, complex_prec_t(128)};
 
         REQUIRE(c == complex{-1.3_r128, 0.7_r128});
         REQUIRE(c.get_prec() == 128);
     }
 #if MPPP_CPLUSPLUS >= 201703L
     {
-        complex c{"(   -0x2f2.1aa4p0, 0x123.aaap4)", 16, 128};
+        complex c{"(   -0x2f2.1aa4p0, 0x123.aaap4)", 16, complex_prec_t(128)};
         REQUIRE(c == complex{-0x2f2.1aa4p0_r128, 0x123.aaap4_r128});
         REQUIRE(c.get_prec() == 128);
     }
     {
-        complex c{"(   -0x2f2.1aa4p0, 0x123.aaap4)", 0, 128};
+        complex c{"(   -0x2f2.1aa4p0, 0x123.aaap4)", 0, complex_prec_t(128)};
         REQUIRE(c == complex{-0x2f2.1aa4p0_r128, 0x123.aaap4_r128});
         REQUIRE(c.get_prec() == 128);
     }
 #endif
-    REQUIRE_THROWS_MATCHES((complex{" (hello, 2)", 10, 128}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex{" (hello, 2)", 10, complex_prec_t(128)}), std::invalid_argument,
                            Message("The string 'hello' does not represent a valid real in base 10"));
-    REQUIRE_THROWS_MATCHES((complex{"(2, world )", 12, 128}), std::invalid_argument,
+    REQUIRE_THROWS_MATCHES((complex{"(2, world )", 12, complex_prec_t(128)}), std::invalid_argument,
                            Message("The string ' world ' does not represent a valid real in base 12"));
 }
 
@@ -1144,24 +1093,24 @@ TEST_CASE("set")
         // Try different base as well.
         c.set("(1111011,111001000)", 2);
         REQUIRE(c.get_prec() == 14);
-        REQUIRE(c == complex{"(123,456)", 14});
+        REQUIRE(c == complex{"(123,456)", complex_prec_t(14)});
 
         c.set("(1c8)", 16);
         REQUIRE(c.get_prec() == 14);
-        REQUIRE(c == complex{"(456)", 14});
+        REQUIRE(c == complex{"(456)", complex_prec_t(14)});
 
         // Detect base.
         c.set("(0x1c8)", 0);
         REQUIRE(c.get_prec() == 14);
-        REQUIRE(c == complex{"(456)", 14});
+        REQUIRE(c == complex{"(456)", complex_prec_t(14)});
 
         c.set("(0b1111011,0x1c8)", 0);
         REQUIRE(c.get_prec() == 14);
-        REQUIRE(c == complex{"(123,456)", 14});
+        REQUIRE(c == complex{"(123,456)", complex_prec_t(14)});
 
         c.set("(1.1,2.3)");
         REQUIRE(c.get_prec() == 14);
-        REQUIRE(c == complex{"(1.1,2.3)", 14});
+        REQUIRE(c == complex{"(1.1,2.3)", complex_prec_t(14)});
 
         std::vector<char> buffer;
         constexpr char s[] = "(1.1,2.3)";
@@ -1171,7 +1120,7 @@ TEST_CASE("set")
         buffer.emplace_back('c');
 
         c.set(buffer.data(), buffer.data() + sizeof(s) - 1u);
-        REQUIRE(c == complex{"(1.1,2.3)", 14});
+        REQUIRE(c == complex{"(1.1,2.3)", complex_prec_t(14)});
 
         // Error handling.
         REQUIRE_THROWS_MATCHES(c.set("456", -1), std::invalid_argument,
@@ -1298,11 +1247,11 @@ TEST_CASE("precision handling")
         REQUIRE(im->nan_p());
     }
 
-    c = complex{"1.1", "2.3", complex_prec_t(128)};
+    c = complex{"(1.1,2.3)", complex_prec_t(128)};
     c.prec_round(64);
     REQUIRE(c.get_prec() == 64);
-    REQUIRE(c != complex{"1.1", "2.3", complex_prec_t(128)});
-    REQUIRE(c == complex{"1.1", "2.3", complex_prec_t(64)});
+    REQUIRE(c != complex{"(1.1,2.3)", complex_prec_t(128)});
+    REQUIRE(c == complex{"(1.1,2.3)", complex_prec_t(64)});
 
     // Error handling.
     REQUIRE_THROWS_MATCHES(

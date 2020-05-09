@@ -111,9 +111,9 @@ public:
     }
 
     // Copy constructor with custom precision.
-    explicit complex(const complex &, ::mpfr_prec_t);
+    explicit complex(const complex &, complex_prec_t);
     // Move constructor with custom precision.
-    explicit complex(complex &&, ::mpfr_prec_t);
+    explicit complex(complex &&, complex_prec_t);
 
 private:
     // A tag for private generic ctors.
@@ -214,38 +214,6 @@ public:
     {
         real_imag_ctor_impl(std::forward<T>(re), std::forward<U>(im), static_cast<::mpfr_prec_t>(p));
     }
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <string_type T, rv_complex_interoperable U>
-#else
-    template <
-        typename T, typename U,
-        detail::enable_if_t<detail::conjunction<is_string_type<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
-#endif
-    explicit complex(const T &re, U &&im, complex_prec_t p)
-    {
-        real_imag_ctor_impl(re, std::forward<U>(im), static_cast<::mpfr_prec_t>(p));
-    }
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <rv_complex_interoperable T, string_type U>
-#else
-    template <
-        typename T, typename U,
-        detail::enable_if_t<detail::conjunction<is_rv_complex_interoperable<T>, is_string_type<U>>::value, int> = 0>
-#endif
-    explicit complex(T &&re, const U &im, complex_prec_t p)
-    {
-        real_imag_ctor_impl(std::forward<T>(re), im, static_cast<::mpfr_prec_t>(p));
-    }
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <string_type T, string_type U>
-#else
-    template <typename T, typename U,
-              detail::enable_if_t<detail::conjunction<is_string_type<T>, is_string_type<U>>::value, int> = 0>
-#endif
-    explicit complex(const T &re, const U &im, complex_prec_t p)
-    {
-        real_imag_ctor_impl(re, im, static_cast<::mpfr_prec_t>(p));
-    }
 
 private:
     // A tag for private string ctors.
@@ -265,7 +233,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
-    explicit complex(const T &s, int base, ::mpfr_prec_t p) : complex(stag{}, s, base, p)
+    explicit complex(const T &s, int base, complex_prec_t p) : complex(stag{}, s, base, static_cast<::mpfr_prec_t>(p))
     {
     }
     // Constructor from string and precision.
@@ -274,13 +242,13 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
-    explicit complex(const T &s, ::mpfr_prec_t p) : complex(s, 10, p)
+    explicit complex(const T &s, complex_prec_t p) : complex(s, 10, p)
     {
     }
     // Constructor from range of characters, base and precision.
-    explicit complex(const char *, const char *, int, ::mpfr_prec_t);
+    explicit complex(const char *, const char *, int, complex_prec_t);
     // Constructor from range of characters and precision.
-    explicit complex(const char *, const char *, ::mpfr_prec_t);
+    explicit complex(const char *, const char *, complex_prec_t);
 
     // Constructor from mpc_t.
     explicit complex(const ::mpc_t);

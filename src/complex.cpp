@@ -82,15 +82,17 @@ complex::complex()
 
 complex::complex(const complex &other) : complex(&other.m_mpc) {}
 
-complex::complex(const complex &other, ::mpfr_prec_t p)
+complex::complex(const complex &other, complex_prec_t p)
 {
     // Init with custom precision, and then set.
-    ::mpc_init2(&m_mpc, check_init_prec(p));
+    ::mpc_init2(&m_mpc, check_init_prec(static_cast<::mpfr_prec_t>(p)));
     ::mpc_set(&m_mpc, &other.m_mpc, MPC_RNDNN);
 }
 
-complex::complex(complex &&other, ::mpfr_prec_t p)
+complex::complex(complex &&other, complex_prec_t p_)
 {
+    const auto p = static_cast<::mpfr_prec_t>(p_);
+
     // Check the precision first of all.
     check_init_prec(p);
 
@@ -134,26 +136,29 @@ complex::complex(const stag &, const char *s, int base, ::mpfr_prec_t p)
     construct_from_c_string(s, base, p);
 }
 
-complex::complex(const stag &, const std::string &s, int base, ::mpfr_prec_t p) : complex(s.c_str(), base, p) {}
+complex::complex(const stag &, const std::string &s, int base, ::mpfr_prec_t p)
+    : complex(s.c_str(), base, complex_prec_t(p))
+{
+}
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 complex::complex(const stag &, const std::string_view &s, int base, ::mpfr_prec_t p)
-    : complex(s.data(), s.data() + s.size(), base, p)
+    : complex(s.data(), s.data() + s.size(), base, complex_prec_t(p))
 {
 }
 #endif
 
 // Constructor from range of characters, base and precision.
-complex::complex(const char *begin, const char *end, int base, ::mpfr_prec_t p)
+complex::complex(const char *begin, const char *end, int base, complex_prec_t p)
 {
     MPPP_MAYBE_TLS std::vector<char> buffer;
     buffer.assign(begin, end);
     buffer.emplace_back('\0');
-    construct_from_c_string(buffer.data(), base, p);
+    construct_from_c_string(buffer.data(), base, static_cast<::mpfr_prec_t>(p));
 }
 
 // Constructor from range of characters and precision.
-complex::complex(const char *begin, const char *end, ::mpfr_prec_t p) : complex(begin, end, 10, p) {}
+complex::complex(const char *begin, const char *end, complex_prec_t p) : complex(begin, end, 10, p) {}
 
 complex::complex(const ::mpc_t c)
 {
