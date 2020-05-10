@@ -356,14 +356,14 @@ public:
 #endif
     MPPP_CONSTEXPR_20 bool get(T &rop) const
     {
-        using value_type = typename T::value_type;
+        using value_t = typename T::value_type;
 
         // NOTE: constexpr mutation of a std::complex
         // seems to be available only since C++20:
         // https://en.cppreference.com/w/cpp/numeric/complex/real
         // https://en.cppreference.com/w/cpp/numeric/complex/operator%3D
-        rop.real(static_cast<value_type>(real()));
-        rop.imag(static_cast<value_type>(imag()));
+        rop.real(static_cast<value_t>(real()));
+        rop.imag(static_cast<value_t>(imag()));
 
         return true;
     }
