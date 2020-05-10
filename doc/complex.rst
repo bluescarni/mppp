@@ -94,15 +94,15 @@ The complex class
       :exception unspecified: any exception raised by the invoked :cpp:class:`~mppp::real`
         constructor.
 
-   .. cpp:function:: template <rv_complex_interoperable T, rv_complex_interoperable U> explicit complex(T &&x, U &&y)
    .. cpp:function:: template <rv_complex_interoperable T, rv_complex_interoperable U> explicit complex(T &&x, U &&y, complex_prec_t p)
+   .. cpp:function:: template <rv_complex_interoperable T, rv_complex_interoperable U> explicit complex(T &&x, U &&y)
 
       Generic constructors from real and imaginary parts.
 
       These constructors will set ``this`` to :math:`x+\imath y`.
 
-      The variants with a precision argument
-      will set the precision of ``this`` exactly to *p*.
+      The variant with the *p* argument will set the precision of ``this``
+      exactly to *p*.
 
       Otherwise, the precision of ``this`` will be the maximum among the deduced precisions
       of *x* and *y*. The precision deduction rules are the same explained in the generic
