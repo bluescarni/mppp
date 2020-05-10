@@ -16,6 +16,7 @@
 #include <cassert>
 #include <ostream>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -33,6 +34,7 @@
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
+#include <mp++/type_name.hpp>
 
 #if defined(MPPP_WITH_QUADMATH)
 
@@ -67,6 +69,9 @@ using is_complex_interoperable
 #endif
                           >;
 
+template <typename T>
+using is_complex_convertible = detail::conjunction<is_complex_interoperable<T>, std::is_same<T, detail::uncvref_t<T>>>;
+
 #if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T>
@@ -74,6 +79,9 @@ MPPP_CONCEPT_DECL rv_complex_interoperable = is_rv_complex_interoperable<T>::val
 
 template <typename T>
 MPPP_CONCEPT_DECL complex_interoperable = is_complex_interoperable<T>::value;
+
+template <typename T>
+MPPP_CONCEPT_DECL complex_convertible = is_complex_convertible<T>::value;
 
 #endif
 
@@ -605,6 +613,48 @@ public:
         return mpfr_zero_p(mpc_realref(&m_mpc)) != 0 && mpfr_zero_p(mpc_imagref(&m_mpc)) != 0;
     }
     bool is_one() const;
+
+private:
+    // Implementation of the conversion operator.
+    template <typename T>
+    T dispatch_conversion(std::true_type) const
+    {
+        if (std::is_same<T, bool>::value) {
+            return static_cast<T>(!zero_p());
+        } else {
+            if (mppp_unlikely(!mpfr_zero_p(mpc_imagref(&m_mpc)))) {
+                throw std::domain_error("Cannot convert the complex value " + to_string() + " to the real-valued type '"
+                                        + type_name<T>() + "': the imaginary part is not zero");
+            }
+
+            re_cref re{*this};
+
+            return static_cast<T>(*re);
+        }
+    }
+    template <typename T>
+    T dispatch_conversion(std::false_type) const
+    {
+        using value_type = typename T::value_type;
+
+        re_cref re{*this};
+        im_cref im{*this};
+
+        return T{static_cast<value_type>(*re), static_cast<value_type>(*im)};
+    }
+
+public:
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex_convertible T>
+#else
+    template <typename T, detail::enable_if_t<is_complex_convertible<T>::value, int> = 0>
+#endif
+    explicit operator T() const
+    {
+        return dispatch_conversion<T>(is_rv_complex_interoperable<T>{});
+    }
+
+    std::string to_string(int base = 10) const;
 
 private:
     mpc_struct_t m_mpc;

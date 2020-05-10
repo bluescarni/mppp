@@ -12,6 +12,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -26,6 +27,7 @@
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
+#include <mp++/type_name.hpp>
 
 #if defined(MPPP_WITH_QUADMATH)
 
@@ -1269,4 +1271,77 @@ TEST_CASE("precision handling")
                                    + detail::to_string(real_prec_max() + 1) + ": the maximum allowed precision is "
                                    + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                    + detail::to_string(real_prec_min())));
+}
+
+TEST_CASE("conversions")
+{
+    using Catch::Matchers::Message;
+
+    {
+        REQUIRE(static_cast<int>(complex{42, 0}) == 42);
+        REQUIRE_THROWS_MATCHES(static_cast<int>(complex{42, 1}), std::domain_error,
+                               Message("Cannot convert the complex value " + complex{42, 1}.to_string()
+                                       + " to the real-valued type '" + type_name<int>()
+                                       + "': the imaginary part is not zero"));
+    }
+    {
+        REQUIRE(static_cast<double>(complex{-63, 0}) == -63.);
+        REQUIRE_THROWS_MATCHES(static_cast<double>(complex{-63, 1}), std::domain_error,
+                               Message("Cannot convert the complex value " + complex{-63, 1}.to_string()
+                                       + " to the real-valued type '" + type_name<double>()
+                                       + "': the imaginary part is not zero"));
+    }
+    {
+        REQUIRE(static_cast<integer<1>>(complex{-63, 0}) == -63);
+        REQUIRE_THROWS_MATCHES(static_cast<integer<1>>(complex{-63, 1}), std::domain_error,
+                               Message("Cannot convert the complex value " + complex{-63, 1}.to_string()
+                                       + " to the real-valued type '" + type_name<integer<1>>()
+                                       + "': the imaginary part is not zero"));
+    }
+    {
+        REQUIRE(static_cast<rational<1>>(complex{-63, 0}) == -63);
+        REQUIRE_THROWS_MATCHES(static_cast<rational<1>>(complex{-63, 1}), std::domain_error,
+                               Message("Cannot convert the complex value " + complex{-63, 1}.to_string()
+                                       + " to the real-valued type '" + type_name<rational<1>>()
+                                       + "': the imaginary part is not zero"));
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        REQUIRE(static_cast<real128>(complex{-63, 0}) == -63);
+        REQUIRE_THROWS_MATCHES(static_cast<real128>(complex{-63, 1}), std::domain_error,
+                               Message("Cannot convert the complex value " + complex{-63, 1}.to_string()
+                                       + " to the real-valued type '" + type_name<real128>()
+                                       + "': the imaginary part is not zero"));
+    }
+#endif
+    {
+        REQUIRE(static_cast<real>(complex{-63, 0}) == -63);
+        REQUIRE(static_cast<real>(complex{-63, 0, complex_prec_t(78)}).get_prec() == 78);
+        REQUIRE_THROWS_MATCHES(static_cast<real>(complex{-63, 1}), std::domain_error,
+                               Message("Cannot convert the complex value " + complex{-63, 1}.to_string()
+                                       + " to the real-valued type '" + type_name<real>()
+                                       + "': the imaginary part is not zero"));
+    }
+    {
+        REQUIRE(static_cast<std::complex<double>>(complex{-63, 12}) == std::complex<double>{-63, 12});
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        REQUIRE(static_cast<complex128>(complex{-63, 12}) == complex128{-63, 12});
+    }
+#endif
+
+    // Make sure we prevent conversion to ref/cv qualified
+    // interoperable types.
+    REQUIRE(!std::is_convertible<complex, const int>::value);
+    REQUIRE(!std::is_convertible<complex, double &>::value);
+    REQUIRE(!std::is_convertible<const complex &, integer<1> &&>::value);
+
+    // Special casing for bool.
+    REQUIRE(complex{1, 0});
+    REQUIRE(complex{1, 1});
+    REQUIRE(complex{0, 1});
+    REQUIRE(complex{0, real{"nan", 42}});
+    REQUIRE(complex{real{"nan", 42}, 0});
+    REQUIRE(complex{real{"nan", 42}, real{"nan", 42}});
 }

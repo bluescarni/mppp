@@ -307,15 +307,17 @@ complex &complex::prec_round(::mpfr_prec_t p)
     return *this;
 }
 
-// TODO implement on top of to_string().
+std::string complex::to_string(int base) const
+{
+    re_cref re{*this};
+    im_cref im{*this};
+
+    return '(' + re->to_string(base) + ',' + im->to_string(base) + ')';
+}
+
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {
-    complex::re_cref rex{c};
-    complex::im_cref iex{c};
-
-    os << '(' << rex->to_string() << ',' << iex->to_string() << ')';
-
-    return os;
+    return os << c.to_string();
 }
 
 namespace detail

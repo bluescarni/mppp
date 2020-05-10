@@ -459,6 +459,28 @@ The complex class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
+   .. cpp:function:: template <complex_convertible T> explicit operator T() const
+
+      Generic conversion operator.
+
+      This operator will convert ``this`` to ``T``.
+
+      Conversion to ``bool`` returns ``false`` if ``this`` is zero, ``true`` otherwise.
+
+      Conversion to other real-valued :cpp:concept:`~mppp::complex_convertible` types
+      will attempt to convert the real part of ``this`` to ``T`` via the cast operator
+      of :cpp:class:`~mppp::real`. If the imaginary part of ``this`` is nonzero,
+      a domain error will be raised.
+
+      Conversion to complex-valued :cpp:concept:`~mppp::complex_convertible` types
+      will also employ the cast operator of :cpp:class:`~mppp::real`.
+
+      :return: ``this`` converted to ``T``.
+
+      :exception std\:\:domain_error: if ``T`` is a real-valued type other than ``bool`` and
+        the imaginary part of ``this`` is not zero.
+      :exception unspecified: any exception raised by the cast operator of :cpp:class:`~mppp::real`.
+
 Types
 -----
 
@@ -504,3 +526,10 @@ Concepts
    * an :cpp:concept:`~mppp::rv_complex_interoperable` type, or
    * a :cpp:concept:`~mppp::cpp_complex` type, or
    * :cpp:class:`~mppp::complex128`.
+
+.. cpp:concept:: template <typename T> mppp::complex_convertible
+
+   This concept is satisfied if ``T`` is a type which a :cpp:class:`~mppp::complex`
+   can be converted to. Specifically, this concept will be true if ``T``
+   is a :cpp:concept:`~mppp::complex_interoperable` type which is not a reference
+   or cv qualified.
