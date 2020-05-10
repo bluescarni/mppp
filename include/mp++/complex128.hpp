@@ -93,6 +93,8 @@ class MPPP_DLL_PUBLIC complex128
 public:
     cplex128 m_value;
 
+    using value_type = real128;
+
     // Default constructor.
     constexpr complex128() : m_value{0} {}
     // Trivial copy constructor.

@@ -67,6 +67,10 @@ The complex128 class
       This class member gives direct access to the :cpp:type:`__complex128` instance stored
       inside a :cpp:class:`~mppp::complex128`.
 
+   .. cpp:type:: value_type = real128
+
+      Alias to mimick the interface of ``std::complex``.
+
    .. cpp:function:: constexpr complex128()
 
       Default constructor.
