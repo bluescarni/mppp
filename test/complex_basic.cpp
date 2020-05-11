@@ -1338,10 +1338,11 @@ TEST_CASE("conversions")
     REQUIRE(!std::is_convertible<const complex &, integer<1> &&>::value);
 
     // Special casing for bool.
-    REQUIRE(complex{1, 0});
-    REQUIRE(complex{1, 1});
-    REQUIRE(complex{0, 1});
-    REQUIRE(complex{0, real{"nan", 42}});
-    REQUIRE(complex{real{"nan", 42}, 0});
-    REQUIRE(complex{real{"nan", 42}, real{"nan", 42}});
+    REQUIRE(static_cast<bool>(complex{0, 0}) == false);
+    REQUIRE(static_cast<bool>(complex{1, 0}));
+    REQUIRE(static_cast<bool>(complex{1, 1}));
+    REQUIRE(static_cast<bool>(complex{0, 1}));
+    REQUIRE(static_cast<bool>(complex{0, real{"nan", 42}}));
+    REQUIRE(static_cast<bool>(complex{real{"nan", 42}, 0}));
+    REQUIRE(static_cast<bool>(complex{real{"nan", 42}, real{"nan", 42}}));
 }
