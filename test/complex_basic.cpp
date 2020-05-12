@@ -8,8 +8,10 @@
 
 #include <mp++/config.hpp>
 
+#include <cmath>
 #include <complex>
 #include <initializer_list>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -1361,19 +1363,26 @@ TEST_CASE("get conversions")
         REQUIRE(n == -43);
         REQUIRE(!get(n, complex{42, 1}));
         REQUIRE(n == -43);
+        REQUIRE(!get(n, complex{"nan", complex_prec_t(12)}));
+        REQUIRE(n == -43);
     }
     {
         double x;
-        REQUIRE(complex{42.1, 0}.get(x));
-        REQUIRE(x == 42.1);
+        REQUIRE(complex{42, 0}.get(x));
+        REQUIRE(x == 42);
 
-        REQUIRE(get(x, complex{-43.3, 0}));
-        REQUIRE(x == -43.3);
+        REQUIRE(get(x, complex{-43, 0}));
+        REQUIRE(x == -43);
 
         REQUIRE(!complex{42, -1}.get(x));
-        REQUIRE(x == -43.3);
+        REQUIRE(x == -43);
         REQUIRE(!get(x, complex{42, 1}));
-        REQUIRE(x == -43.3);
+        REQUIRE(x == -43);
+
+        if (std::numeric_limits<double>::has_quiet_NaN) {
+            REQUIRE(get(x, complex{"nan", complex_prec_t(12)}));
+            REQUIRE(std::isnan(x));
+        }
     }
     {
         integer<1> x;
@@ -1387,6 +1396,8 @@ TEST_CASE("get conversions")
         REQUIRE(x == -43);
         REQUIRE(!get(x, complex{42, 1}));
         REQUIRE(x == -43);
+        REQUIRE(!get(x, complex{"nan", complex_prec_t(12)}));
+        REQUIRE(x == -43);
     }
     {
         rational<1> x;
@@ -1399,6 +1410,8 @@ TEST_CASE("get conversions")
         REQUIRE(!complex{42, -1}.get(x));
         REQUIRE(x == -43);
         REQUIRE(!get(x, complex{42, 1}));
+        REQUIRE(x == -43);
+        REQUIRE(!get(x, complex{"nan", complex_prec_t(12)}));
         REQUIRE(x == -43);
     }
 #if defined(MPPP_WITH_QUADMATH)
@@ -1414,6 +1427,8 @@ TEST_CASE("get conversions")
         REQUIRE(x == -43.3_rq);
         REQUIRE(!get(x, complex{42, 1}));
         REQUIRE(x == -43.3_rq);
+        REQUIRE(get(x, complex{"nan", complex_prec_t(12)}));
+        REQUIRE(isnan(x));
     }
 #endif
     {
@@ -1422,12 +1437,36 @@ TEST_CASE("get conversions")
         REQUIRE(x == 42);
         REQUIRE(x.get_prec() == 67);
 
-        REQUIRE(get(x, complex{-43.3_rq, 0}));
-        REQUIRE(x == -43.3_rq);
+        REQUIRE(get(x, complex{-43, 0, complex_prec_t(34)}));
+        REQUIRE(x == -43);
+        REQUIRE(x.get_prec() == 34);
 
         REQUIRE(!complex{42, -1}.get(x));
-        REQUIRE(x == -43.3_rq);
+        REQUIRE(x == -43);
+        REQUIRE(x.get_prec() == 34);
         REQUIRE(!get(x, complex{42, 1}));
-        REQUIRE(x == -43.3_rq);
+        REQUIRE(x == -43);
+        REQUIRE(x.get_prec() == 34);
+        REQUIRE(get(x, complex{"nan", complex_prec_t(12)}));
+        REQUIRE(x.nan_p());
+        REQUIRE(x.get_prec() == 12);
     }
+    {
+        std::complex<double> c;
+        REQUIRE(complex{42, -37}.get(c));
+        REQUIRE(c == std::complex<double>{42, -37});
+
+        REQUIRE(get(c, complex{-43, 35}));
+        REQUIRE(c == std::complex<double>{-43, 35});
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex128 c;
+        REQUIRE(complex{42, -37}.get(c));
+        REQUIRE(c == complex128{42, -37});
+
+        REQUIRE(get(c, complex{-43, 35}));
+        REQUIRE(c == complex128{-43, 35});
+    }
+#endif
 }
