@@ -1102,7 +1102,7 @@ Conversion
    Generic conversion function.
 
    This function will convert the input :cpp:class:`~mppp::real` *x* to
-   `T`, storing the result of the conversion into *rop*.
+   ``T``, storing the result of the conversion into *rop*.
    If the conversion is successful, the function
    will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
    not be altered.
