@@ -1129,6 +1129,7 @@ namespace detail
 
 template <typename... Args>
 using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &>()...));
+
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
