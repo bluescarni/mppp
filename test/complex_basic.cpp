@@ -1184,6 +1184,20 @@ TEST_CASE("set")
             REQUIRE(im->nan_p());
         }
     }
+
+    // Try also the free-function overload.
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        set(c, -1.3);
+        REQUIRE(c == complex{-1.3, complex_prec_t(14)});
+        REQUIRE(c.get_prec() == 14);
+    }
+    {
+        complex c{1, 2, complex_prec_t(14)};
+        set(c, "(1111011,111001000)", 2);
+        REQUIRE(c.get_prec() == 14);
+        REQUIRE(c == complex{"(123,456)", complex_prec_t(14)});
+    }
 }
 
 TEST_CASE("mpc_t getters")
@@ -1237,12 +1251,24 @@ TEST_CASE("precision handling")
 
     complex c;
     REQUIRE(c.get_prec() == real_prec_min());
+    REQUIRE(get_prec(c) == real_prec_min());
 
     c = complex{1, 2, complex_prec_t(42)};
     REQUIRE(c.get_prec() == 42);
+    REQUIRE(get_prec(c) == 42);
 
     c.set_prec(128);
     REQUIRE(c.get_prec() == 128);
+    {
+        complex::re_cref re{c};
+        complex::im_cref im{c};
+
+        REQUIRE(re->nan_p());
+        REQUIRE(im->nan_p());
+    }
+
+    set_prec(c, 129);
+    REQUIRE(c.get_prec() == 129);
     {
         complex::re_cref re{c};
         complex::im_cref im{c};
@@ -1256,6 +1282,10 @@ TEST_CASE("precision handling")
     REQUIRE(c.get_prec() == 64);
     REQUIRE(c != complex{"(1.1,2.3)", complex_prec_t(128)});
     REQUIRE(c == complex{"(1.1,2.3)", complex_prec_t(64)});
+    prec_round(c, 32);
+    REQUIRE(c.get_prec() == 32);
+    REQUIRE(c != complex{"(1.1,2.3)", complex_prec_t(64)});
+    REQUIRE(c == complex{"(1.1,2.3)", complex_prec_t(32)});
 
     // Error handling.
     REQUIRE_THROWS_MATCHES(
@@ -1468,5 +1498,19 @@ TEST_CASE("get conversions")
         REQUIRE(get(c, complex{-43, 35}));
         REQUIRE(c == complex128{-43, 35});
     }
+#endif
+}
+
+TEST_CASE("swap")
+{
+    complex c1{123, -45, complex_prec_t(45)}, c2{67, 89, complex_prec_t(23)};
+    swap(c1, c2);
+    REQUIRE(c1.get_prec() == 23);
+    REQUIRE(c2.get_prec() == 45);
+    REQUIRE(c1 == complex{67, 89, complex_prec_t(23)});
+    REQUIRE(c2 == complex{123, -45, complex_prec_t(45)});
+
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE(std::is_nothrow_swappable_v<complex>);
 #endif
 }

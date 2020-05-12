@@ -550,8 +550,80 @@ Concepts
    is a :cpp:concept:`~mppp::complex_interoperable` type which is not a reference
    or cv qualified.
 
+.. cpp:concept:: template <typename... Args> mppp::complex_set_args
+
+   This concept is satisfied if the types in the parameter pack ``Args``
+   can be used as argument types in one of the :cpp:func:`mppp::complex::set()` member function overloads.
+   In other words, this concept is satisfied if the expression
+
+   .. code-block:: c++
+
+      c.set(x, y, z, ...);
+
+   is valid (where ``c`` is a non-const :cpp:class:`~mppp::complex` and ``x``, ``y``, ``z``, etc. are const
+   references to the types in ``Args``).
+
 Functions
 ---------
+
+Precision handling
+~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mpfr_prec_t mppp::get_prec(const mppp::complex &c)
+
+   Get the precision of a :cpp:class:`~mppp::complex`.
+
+   :param c: the input argument.
+
+   :return: the precision of *c*.
+
+.. cpp:function:: void mppp::set_prec(mppp::complex &c, mpfr_prec_t p)
+.. cpp:function:: void mppp::prec_round(mppp::complex &c, mpfr_prec_t p)
+
+   Set the precision of a :cpp:class:`~mppp::complex`.
+
+   The first variant will set the precision of *c* to exactly *p* bits. The value
+   of *c* will be set to NaN.
+
+   The second variant will preserve the current value of *c*, performing
+   a rounding operation if *p* is less than the current precision of *c*.
+
+   :param c: the input argument.
+   :param p: the desired precision.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::complex::set_prec()`
+     or :cpp:func:`mppp::complex::prec_round()`.
+
+Assignment
+~~~~~~~~~~
+
+.. cpp:function:: template <mppp::complex_set_args... Args> mppp::complex &mppp::set(mppp::complex &c, const Args &... args)
+
+   Generic setter.
+
+   This function will use the arguments *args* to set the value of the :cpp:class:`~mppp::complex` *c*,
+   using one of the available :cpp:func:`mppp::complex::set()` overloads. That is,
+   the body of this function is equivalent to
+
+   .. code-block:: c++
+
+      return c.set(args...);
+
+   The input arguments must satisfy the :cpp:concept:`mppp::complex_set_args` concept.
+
+   :param c: the return value.
+   :param args: the arguments that will be passed to :cpp:func:`mppp::complex::set()`.
+
+   :return: a reference to *c*.
+
+   :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::complex::set()` overload.
+
+.. cpp:function:: void mppp::swap(mppp::complex &a, mppp::complex &b) noexcept
+
+   Swap efficiently *a* and *b*.
+
+   :param a: the first argument.
+   :param b: the second argument.
 
 Conversion
 ~~~~~~~~~~

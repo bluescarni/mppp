@@ -744,6 +744,48 @@ MPPP_CONCEPT_DECL complex_in_place_op_types = are_complex_in_place_op_types<T, U
 
 #endif
 
+// Precision handling.
+inline ::mpfr_prec_t get_prec(const complex &c)
+{
+    return c.get_prec();
+}
+
+inline void set_prec(complex &c, ::mpfr_prec_t p)
+{
+    c.set_prec(p);
+}
+
+inline void prec_round(complex &c, ::mpfr_prec_t p)
+{
+    c.prec_round(p);
+}
+
+namespace detail
+{
+
+template <typename... Args>
+using complex_set_t = decltype(std::declval<complex &>().set(std::declval<const Args &>()...));
+
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename... Args>
+MPPP_CONCEPT_DECL complex_set_args = detail::is_detected<detail::complex_set_t, Args...>::value;
+
+#endif
+
+// Generic setter.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <complex_set_args... Args>
+#else
+template <typename... Args, detail::enable_if_t<detail::is_detected<detail::complex_set_t, Args...>::value, int> = 0>
+#endif
+inline complex &set(complex &c, const Args &... args)
+{
+    return c.set(args...);
+}
+
 // Swap.
 inline void swap(complex &a, complex &b) noexcept
 {
