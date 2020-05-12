@@ -654,6 +654,70 @@ public:
         return dispatch_conversion<T>(is_rv_complex_interoperable<T>{});
     }
 
+private:
+    // Implementation of get().
+    template <typename T>
+    bool dispatch_get(T &rop, std::integral_constant<int, 1>) const
+    {
+        if (std::is_same<T, bool>::value) {
+            rop = static_cast<T>(!zero_p());
+            return true;
+        } else {
+            if (!mpfr_zero_p(mpc_imagref(&m_mpc))) {
+                return false;
+            }
+
+            re_cref re{*this};
+
+            return re->get(rop);
+        }
+    }
+    // Special case if T is mppp::real.
+    template <typename T>
+    bool dispatch_get(T &rop, std::integral_constant<int, 3>) const
+    {
+        if (!mpfr_zero_p(mpc_imagref(&m_mpc))) {
+            return false;
+        }
+
+        re_cref re{*this};
+
+        rop = *re;
+
+        return true;
+    }
+    template <typename T>
+    bool dispatch_get(T &rop, std::integral_constant<int, 0>) const
+    {
+        using value_type = typename T::value_type;
+
+        re_cref re{*this};
+        im_cref im{*this};
+
+        // NOTE: currently here T is always either
+        // std::complex or complex128, and thus the conversion
+        // of the real/imag parts of this to the value type
+        // of T can never fail. We will have to change this
+        // in the future if we introduce other complex types
+        // with different properties.
+        rop = T{static_cast<value_type>(*re), static_cast<value_type>(*im)};
+
+        return true;
+    }
+
+public:
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <complex_convertible T>
+#else
+    template <typename T, detail::enable_if_t<is_complex_convertible<T>::value, int> = 0>
+#endif
+    bool get(T &rop) const
+    {
+        return dispatch_get(
+            rop,
+            std::integral_constant<int, is_rv_complex_interoperable<T>::value + std::is_same<T, real>::value * 2>{});
+    }
+
     std::string to_string(int base = 10) const;
 
 private:
@@ -684,6 +748,17 @@ MPPP_CONCEPT_DECL complex_in_place_op_types = are_complex_in_place_op_types<T, U
 inline void swap(complex &a, complex &b) noexcept
 {
     ::mpc_swap(a._get_mpc_t(), b._get_mpc_t());
+}
+
+// Generic conversion function.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <complex_convertible T>
+#else
+template <typename T, detail::enable_if_t<is_complex_convertible<T>::value, int> = 0>
+#endif
+inline bool get(T &rop, const complex &c)
+{
+    return c.get(rop);
 }
 
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);

@@ -469,17 +469,33 @@ The complex class
 
       Conversion to other real-valued :cpp:concept:`~mppp::complex_convertible` types
       will attempt to convert the real part of ``this`` to ``T`` via the cast operator
-      of :cpp:class:`~mppp::real`. If the imaginary part of ``this`` is nonzero,
+      of :cpp:class:`~mppp::real` (unless ``T`` is :cpp:class:`~mppp::real`, in which case a copy
+      of the real part of ``this`` will be returned). If the imaginary part of ``this`` is nonzero,
       a domain error will be raised.
 
       Conversion to complex-valued :cpp:concept:`~mppp::complex_convertible` types
-      will also employ the cast operator of :cpp:class:`~mppp::real`.
+      is also implemented on top of the conversion operator of :cpp:class:`~mppp::real`.
 
       :return: ``this`` converted to ``T``.
 
       :exception std\:\:domain_error: if ``T`` is a real-valued type other than ``bool`` and
         the imaginary part of ``this`` is not zero.
       :exception unspecified: any exception raised by the cast operator of :cpp:class:`~mppp::real`.
+
+   .. cpp:function:: template <complex_convertible T> bool get(T &rop) const
+
+      Generic conversion function.
+
+      This member function, similarly to the conversion operator, will convert ``this`` to
+      ``T``, storing the result of the conversion into *rop*. Differently
+      from the conversion operator, this function does not raise any exception: if the conversion is successful, the
+      function will return ``true``, otherwise the function will return ``false``. If the conversion fails,
+      *rop* will not be altered.
+
+      :param rop: the variable which will store the result of the conversion.
+
+      :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
+        specified in the documentation of the conversion operator.
 
 Types
 -----
@@ -533,3 +549,25 @@ Concepts
    can be converted to. Specifically, this concept will be true if ``T``
    is a :cpp:concept:`~mppp::complex_interoperable` type which is not a reference
    or cv qualified.
+
+Functions
+---------
+
+Conversion
+~~~~~~~~~~
+
+.. cpp:function:: template <mppp::complex_convertible T> bool mppp::get(T &rop, const mppp::complex &c)
+
+   Generic conversion function.
+
+   This function will convert the input :cpp:class:`~mppp::complex` *c* to
+   ``T``, storing the result of the conversion into *rop*.
+   If the conversion is successful, the function
+   will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
+   not be altered.
+
+   :param rop: the variable which will store the result of the conversion.
+   :param c: the input argument.
+
+   :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
+      specified in the documentation of the conversion operator for :cpp:class:`~mppp::complex`.

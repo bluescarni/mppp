@@ -1346,3 +1346,88 @@ TEST_CASE("conversions")
     REQUIRE(static_cast<bool>(complex{real{"nan", 42}, 0}));
     REQUIRE(static_cast<bool>(complex{real{"nan", 42}, real{"nan", 42}}));
 }
+
+TEST_CASE("get conversions")
+{
+    {
+        int n;
+        REQUIRE(complex{42, 0}.get(n));
+        REQUIRE(n == 42);
+
+        REQUIRE(get(n, complex{-43, 0}));
+        REQUIRE(n == -43);
+
+        REQUIRE(!complex{42, -1}.get(n));
+        REQUIRE(n == -43);
+        REQUIRE(!get(n, complex{42, 1}));
+        REQUIRE(n == -43);
+    }
+    {
+        double x;
+        REQUIRE(complex{42.1, 0}.get(x));
+        REQUIRE(x == 42.1);
+
+        REQUIRE(get(x, complex{-43.3, 0}));
+        REQUIRE(x == -43.3);
+
+        REQUIRE(!complex{42, -1}.get(x));
+        REQUIRE(x == -43.3);
+        REQUIRE(!get(x, complex{42, 1}));
+        REQUIRE(x == -43.3);
+    }
+    {
+        integer<1> x;
+        REQUIRE(complex{42, 0}.get(x));
+        REQUIRE(x == 42);
+
+        REQUIRE(get(x, complex{-43, 0}));
+        REQUIRE(x == -43);
+
+        REQUIRE(!complex{42, -1}.get(x));
+        REQUIRE(x == -43);
+        REQUIRE(!get(x, complex{42, 1}));
+        REQUIRE(x == -43);
+    }
+    {
+        rational<1> x;
+        REQUIRE(complex{42, 0}.get(x));
+        REQUIRE(x == 42);
+
+        REQUIRE(get(x, complex{-43, 0}));
+        REQUIRE(x == -43);
+
+        REQUIRE(!complex{42, -1}.get(x));
+        REQUIRE(x == -43);
+        REQUIRE(!get(x, complex{42, 1}));
+        REQUIRE(x == -43);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        real128 x;
+        REQUIRE(complex{42.1_rq, 0}.get(x));
+        REQUIRE(x == 42.1_rq);
+
+        REQUIRE(get(x, complex{-43.3_rq, 0}));
+        REQUIRE(x == -43.3_rq);
+
+        REQUIRE(!complex{42, -1}.get(x));
+        REQUIRE(x == -43.3_rq);
+        REQUIRE(!get(x, complex{42, 1}));
+        REQUIRE(x == -43.3_rq);
+    }
+#endif
+    {
+        real x{1, 56};
+        REQUIRE(complex{42, 0, complex_prec_t(67)}.get(x));
+        REQUIRE(x == 42);
+        REQUIRE(x.get_prec() == 67);
+
+        REQUIRE(get(x, complex{-43.3_rq, 0}));
+        REQUIRE(x == -43.3_rq);
+
+        REQUIRE(!complex{42, -1}.get(x));
+        REQUIRE(x == -43.3_rq);
+        REQUIRE(!get(x, complex{42, 1}));
+        REQUIRE(x == -43.3_rq);
+    }
+}
