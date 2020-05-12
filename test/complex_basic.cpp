@@ -1514,3 +1514,11 @@ TEST_CASE("swap")
     REQUIRE(std::is_nothrow_swappable_v<complex>);
 #endif
 }
+
+TEST_CASE("to_string")
+{
+    complex c{45, 67, complex_prec_t(12)};
+    REQUIRE(c.to_string() == '(' + real{45, 12}.to_string() + ',' + real{67, 12}.to_string() + ')');
+    REQUIRE(c.to_string(16) == '(' + real{45, 12}.to_string(16) + ',' + real{67, 12}.to_string(16) + ')');
+    REQUIRE(c.to_string(11) == '(' + real{45, 12}.to_string(11) + ',' + real{67, 12}.to_string(11) + ')');
+}

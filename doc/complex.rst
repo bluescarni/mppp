@@ -497,6 +497,20 @@ The complex class
       :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
         specified in the documentation of the conversion operator.
 
+   .. cpp:function:: std::string to_string(int base = 10) const
+
+      Conversion to string.
+
+      This member function will convert ``this`` to a string representation in base *base*. The returned string is guaranteed
+      to produce exactly the original value when used in one of the constructors from string of
+      :cpp:class:`~mppp::complex` (provided that the original precision and base are used in the construction).
+
+      :param base: the base to be used for the string representation.
+
+      :return: ``this`` converted to a string.
+
+      :exception unspecified: any exception thrown by :cpp:func:`mppp::real::to_string()`.
+
 Types
 -----
 
