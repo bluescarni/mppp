@@ -721,6 +721,16 @@ public:
     std::string to_string(int base = 10) const;
 
 private:
+    template <typename T>
+    MPPP_DLL_LOCAL complex &self_mpc_unary(T &&);
+
+public:
+    complex &neg();
+    complex &conj();
+    complex &abs();
+    complex &norm();
+
+private:
     mpc_struct_t m_mpc;
 };
 

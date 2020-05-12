@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
@@ -332,5 +333,54 @@ bool dispatch_complex_equality(const complex &c1, const complex &c2)
 }
 
 } // namespace detail
+
+// Wrapper to apply the input unary MPC function to this with
+// MPC_RNDNN rounding mode. Returns a reference to this.
+template <typename T>
+complex &complex::self_mpc_unary(T &&f)
+{
+    std::forward<T>(f)(&m_mpc, &m_mpc, MPC_RNDNN);
+    return *this;
+}
+
+// In-place negation.
+complex &complex::neg()
+{
+    return self_mpc_unary(::mpc_neg);
+}
+
+// In-place conjugate.
+complex &complex::conj()
+{
+    return self_mpc_unary(::mpc_conj);
+}
+
+// In-place absolute value.
+complex &complex::abs()
+{
+    MPPP_MAYBE_TLS real tmp;
+
+    tmp.set_prec(get_prec());
+    ::mpc_abs(tmp._get_mpfr_t(), &m_mpc, MPFR_RNDN);
+
+    ::mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
+    ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
+
+    return *this;
+}
+
+// In-place norm.
+complex &complex::norm()
+{
+    MPPP_MAYBE_TLS real tmp;
+
+    tmp.set_prec(get_prec());
+    ::mpc_norm(tmp._get_mpfr_t(), &m_mpc, MPFR_RNDN);
+
+    ::mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
+    ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
+
+    return *this;
+}
 
 } // namespace mppp
