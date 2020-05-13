@@ -551,8 +551,8 @@ Conversion
 
    :return: ``true`` if the conversion succeeds, ``false`` otherwise.
 
-Basic complex functions
-~~~~~~~~~~~~~~~~~~~~~~~
+Arithmetic
+~~~~~~~~~~
 
 .. cpp:function:: mppp::real128 mppp::abs(const mppp::complex128 &z)
 .. cpp:function:: mppp::complex128 mppp::arg(const mppp::complex128 &z)
