@@ -729,6 +729,8 @@ public:
     complex &conj();
     complex &abs();
     complex &norm();
+    complex &arg();
+    complex &proj();
 
 private:
     mpc_struct_t m_mpc;

@@ -326,10 +326,7 @@ namespace detail
 
 bool dispatch_complex_equality(const complex &c1, const complex &c2)
 {
-    complex::re_cref re1{c1}, re2{c2};
-    complex::im_cref im1{c1}, im2{c2};
-
-    return *re1 == *re2 && *im1 == *im2;
+    return ::mpc_cmp(c1.get_mpc_t(), c2.get_mpc_t()) == 0;
 }
 
 } // namespace detail
@@ -381,6 +378,26 @@ complex &complex::norm()
     ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
 
     return *this;
+}
+
+// In-place arg.
+complex &complex::arg()
+{
+    MPPP_MAYBE_TLS real tmp;
+
+    tmp.set_prec(get_prec());
+    ::mpc_arg(tmp._get_mpfr_t(), &m_mpc, MPFR_RNDN);
+
+    ::mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
+    ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
+
+    return *this;
+}
+
+// In-place proj.
+complex &complex::proj()
+{
+    return self_mpc_unary(::mpc_proj);
 }
 
 } // namespace mppp
