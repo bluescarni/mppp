@@ -725,6 +725,7 @@ private:
     MPPP_DLL_LOCAL complex &self_mpc_unary(T &&);
 
 public:
+    // In-place arithmetic functions.
     complex &neg();
     complex &conj();
     complex &abs();

@@ -511,6 +511,28 @@ The complex class
 
       :exception unspecified: any exception thrown by :cpp:func:`mppp::real::to_string()`.
 
+   .. cpp:function:: complex &neg()
+   .. cpp:function:: complex &conj()
+   .. cpp:function:: complex &abs()
+   .. cpp:function:: complex &norm()
+   .. cpp:function:: complex &arg()
+   .. cpp:function:: complex &proj()
+
+      In-place basic aritmetic functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`-z`,
+      * :math:`\overline{z}`,
+      * :math:`\left| z \right|`,
+      * :math:`\left| z \right|^2`,
+      * :math:`\arg z`,
+      * the projection of :math:`z` into Riemann sphere,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
