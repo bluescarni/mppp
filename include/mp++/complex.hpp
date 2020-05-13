@@ -85,14 +85,42 @@ MPPP_CONCEPT_DECL complex_convertible = is_complex_convertible<T>::value;
 
 #endif
 
+template <typename T>
+using is_cvr_complex = std::is_same<detail::uncvref_t<T>, complex>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL cvr_complex = is_cvr_complex<T>::value;
+
+#endif
+
 // Fwd declare swap.
 void swap(complex &, complex &) noexcept;
+
+namespace detail
+{
+
+// Fwd declare for friendship.
+template <bool, typename F, typename Arg0, typename... Args>
+complex &mpc_nary_op_impl(::mpfr_prec_t, const F &, complex &, Arg0 &&, Args &&...);
+
+template <bool, typename F, typename Arg0, typename... Args>
+complex mpc_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
+
+} // namespace detail
 
 // Strongly typed enum alias for mpfr_prec_t.
 enum class complex_prec_t : ::mpfr_prec_t {};
 
 class MPPP_DLL_PUBLIC complex
 {
+    // Make friends, for accessing the non-checking prec setting funcs.
+    template <bool, typename F, typename Arg0, typename... Args>
+    friend complex &detail::mpc_nary_op_impl(::mpfr_prec_t, const F &, complex &, Arg0 &&, Args &&...);
+    template <bool, typename F, typename Arg0, typename... Args>
+    friend complex detail::mpc_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
+
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
@@ -107,6 +135,16 @@ class MPPP_DLL_PUBLIC complex
 public:
     // Default ctor.
     complex();
+
+private:
+    // A tag to call private ctors.
+    struct ptag {
+    };
+    // Private ctor that sets to NaN with a certain precision,
+    // without checking the input precision value.
+    explicit complex(const ptag &, ::mpfr_prec_t, bool);
+
+public:
     // Copy ctor.
     complex(const complex &);
     // Move constructor.
@@ -816,6 +854,275 @@ inline bool get(T &rop, const complex &c)
     return c.get(rop);
 }
 
+namespace detail
+{
+
+// NOTE: there's lots of similarity with the implementation
+// of the same functionality for real. Perhaps in the future
+// we can avoid the repetition.
+
+// A small helper to init the pairs in the functions below. We need this because
+// we cannot take the address of a const complex as a complex *.
+template <typename Arg, enable_if_t<!is_ncrvr<Arg &&>::value, int> = 0>
+inline std::pair<complex *, ::mpfr_prec_t> mpc_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
+{
+    // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
+    return std::make_pair(static_cast<complex *>(nullptr), c_max(arg.get_prec(), min_prec));
+}
+
+template <typename Arg, enable_if_t<is_ncrvr<Arg &&>::value, int> = 0>
+inline std::pair<complex *, ::mpfr_prec_t> mpc_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
+{
+    // arg is a non-const rvalue ref, and a candidate for stealing resources.
+    return std::make_pair(&arg, c_max(arg.get_prec(), min_prec));
+}
+
+// A recursive function to determine, in an MPC function call,
+// the largest argument we can steal resources from, and the max precision among
+// all the arguments.
+inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &) {}
+
+// NOTE: we need 2 overloads for this, as we cannot extract a non-const pointer from
+// arg0 if arg0 is a const ref.
+template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int> = 0>
+void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
+
+template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int> = 0>
+void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
+
+template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
+inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
+{
+    // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
+    // update the max prec.
+    p.second = c_max(arg0.get_prec(), p.second);
+    mpc_nary_op_check_steal(p, std::forward<Args>(args)...);
+}
+
+template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int>>
+inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
+{
+    const auto prec0 = arg0.get_prec();
+    if (!p.first || prec0 > p.first->get_prec()) {
+        // The current argument arg0 is a non-const rvalue reference, and either it's
+        // the first argument we encounter we can steal from, or it has a precision
+        // larger than the current candidate for stealing resources from. This means that
+        // arg0 is the new candidate.
+        p.first = &arg0;
+    }
+    // Update the max precision among the arguments, if necessary.
+    p.second = c_max(prec0, p.second);
+    mpc_nary_op_check_steal(p, std::forward<Args>(args)...);
+}
+
+// A small wrapper to call an MPC function f with arguments args. If the first param is true_type,
+// the rounding mode MPC_RNDNN will be appended at the end of the function arguments list.
+template <typename F, typename... Args>
+inline void mpc_nary_func_wrapper(const std::true_type &, const F &f, Args &&... args)
+{
+    f(std::forward<Args>(args)..., MPC_RNDNN);
+}
+
+template <typename F, typename... Args>
+inline void mpc_nary_func_wrapper(const std::false_type &, const F &f, Args &&... args)
+{
+    f(std::forward<Args>(args)...);
+}
+
+// The goal of this helper is to invoke the MPC-like function object f with signature
+//
+// void f(mpc_t out, const mpc_t x0, const mpc_t x1, ...)
+//
+// on the mpc_t instances contained in the input complex objects,
+//
+// f(rop._get_mpc_t(), arg0.get_mpc_t(), arg1.get_mpc_t(), ...)
+//
+// The helper will ensure that, before the invocation, the precision
+// of rop is set to max(min_prec, arg0.get_prec(), arg1.get_prec(), ...).
+//
+// One of the input arguments may be used as return value in the invocation
+// instead of rop if it provides enough precision and it is passed as a non-const
+// rvalue reference. In such a case, the selected input argument will be swapped
+// into rop after the invocation and before the function returns.
+//
+// The Rnd flag controls whether to add the rounding mode (MPC_RNDNN) at the end
+// of the MPC-like function object arguments list or not.
+//
+// This function requires that the MPC-like function object being called supports
+// overlapping arguments (both input and output).
+template <bool Rnd, typename F, typename Arg0, typename... Args>
+inline complex &mpc_nary_op_impl(::mpfr_prec_t min_prec, const F &f, complex &rop, Arg0 &&arg0, Args &&... args)
+{
+    // Make sure min_prec is valid.
+    // NOTE: min_prec == 0 is ok, it just means
+    // p below will be inited with arg0's precision
+    // rather than min_prec.
+    assert(min_prec == 0 || real_prec_check(min_prec));
+
+    // This pair will contain:
+    //
+    // - a pointer to the largest-precision arg from which we can steal resources (may be nullptr),
+    // - the largest precision among all args and min_prec (i.e., the target precision
+    //   for rop).
+    //
+    // It is inited with arg0's precision (but no less than min_prec), and a pointer to arg0, if arg0 is a nonconst
+    // rvalue ref (a nullptr otherwise).
+    auto p = mpc_nary_op_init_pair(min_prec, std::forward<Arg0>(arg0));
+    // Finish setting up p by examining the remaining arguments.
+    mpc_nary_op_check_steal(p, std::forward<Args>(args)...);
+
+    // Cache for convenience.
+    const auto r_prec = rop.get_prec();
+
+    if (p.second == r_prec) {
+        // The target precision and the precision of the return value
+        // match. No need to steal, just execute the function.
+        mpc_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpc_t(), arg0.get_mpc_t(),
+                              args.get_mpc_t()...);
+    } else {
+        if (r_prec > p.second) {
+            // The precision of the return value is larger than the target precision.
+            // We can reset its precision destructively
+            // because we know it does not overlap with any operand.
+            rop.set_prec_impl<false>(p.second);
+            mpc_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpc_t(), arg0.get_mpc_t(),
+                                  args.get_mpc_t()...);
+        } else if (p.first && p.first->get_prec() == p.second) {
+            // The precision of the return value is smaller than the target precision,
+            // and we have a candidate for stealing with enough precision: we will use it as return
+            // value and then swap out the result to rop.
+            mpc_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpc_t(), arg0.get_mpc_t(),
+                                  args.get_mpc_t()...);
+            swap(*p.first, rop);
+        } else {
+            // The precision of the return value is smaller than the target precision,
+            // and either:
+            //
+            // - we cannot steal from any argument, or
+            // - we can steal from an argument but the selected argument
+            //   does not have enough precision.
+            //
+            // In these cases, we will just set the precision of rop and call the function.
+            //
+            // NOTE: we need to set the precision without destroying the rop, as rop might
+            // overlap with one of the arguments. Since this will be an increase in precision,
+            // it should not entail a rounding operation.
+            //
+            // NOTE: we assume all the precs in the operands and min_prec are valid, so
+            // we will not need to check them.
+            rop.prec_round_impl<false>(p.second);
+            mpc_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpc_t(), arg0.get_mpc_t(),
+                                  args.get_mpc_t()...);
+        }
+    }
+
+    return rop;
+}
+
+// The goal of this helper is to invoke the MPC-like function object f with signature
+//
+// void f(mpc_t out, const mpc_t x0, const mpc_t x1, ...)
+//
+// on the mpc_t instances contained in the input complex objects,
+//
+// f(rop._get_mpc_t(), arg0.get_mpc_t(), arg1.get_mpc_t(), ...)
+//
+// and then return rop.
+//
+// The rop object will either be created within the helper with a precision
+// set to max(min_prec, arg0.get_prec(), arg1.get_prec(), ...),
+// or it will be one of the input arguments if it provides enough precision and
+// it is passed as a non-const rvalue reference.
+//
+// The Rnd flag controls whether to add the rounding mode (MPC_RNDNN) at the end
+// of the MPC-like function object arguments list or not.
+//
+// This function requires that the MPC-like function object being called supports
+// overlapping arguments (both input and output).
+template <bool Rnd, typename F, typename Arg0, typename... Args>
+inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
+{
+    // Make sure min_prec is valid.
+    // NOTE: min_prec == 0 is ok, it just means
+    // p below will be inited with arg0's precision
+    // rather than min_prec.
+    assert(min_prec == 0 || real_prec_check(min_prec));
+
+    // This pair will contain:
+    //
+    // - a pointer to the largest-precision arg from which we can steal resources (may be nullptr),
+    // - the largest precision among all args and min_prec (i.e., the target precision
+    //   for the return value).
+    //
+    // It is inited with arg0's precision (but no less than min_prec), and a pointer to arg0, if arg0 is a nonconst
+    // rvalue ref (a nullptr otherwise).
+    auto p = mpc_nary_op_init_pair(min_prec, std::forward<Arg0>(arg0));
+    // Finish setting up p by examining the remaining arguments.
+    mpc_nary_op_check_steal(p, std::forward<Args>(args)...);
+
+    if (p.first && p.first->get_prec() == p.second) {
+        // We can steal from one or more args, and the precision of
+        // the largest-precision arg we can steal from matches
+        // the target precision. Use it.
+        mpc_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpc_t(), arg0.get_mpc_t(),
+                              args.get_mpc_t()...);
+        return std::move(*p.first);
+    } else {
+        // Either we cannot steal from any arg, or the candidate does not have
+        // enough precision. Init a new value and use it instead.
+        complex retval{complex::ptag{}, p.second, true};
+        mpc_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, retval._get_mpc_t(), arg0.get_mpc_t(),
+                              args.get_mpc_t()...);
+        return retval;
+    }
+}
+
+} // namespace detail
+
+// These are helper macros to reduce typing when dealing with the common case
+// of exposing MPC-like functions with a single argument (both variants with retval
+// and with return). "name" will be the name of the mppp function, "fname" is
+// the name of the MPC-like function and "rnd" is a boolean flag that signals whether
+// fname requires a rounding mode argument or not.
+// The fname function must accept only mpc_t arguments in input (plus the rounding mode if
+// rnd is true).
+
+// These are the headers of the overloads that will be produced. They are different depending
+// on whether concepts are available or not.
+#if defined(MPPP_HAVE_CONCEPTS)
+#define MPPP_COMPLEX_MPC_UNARY_HEADER template <cvr_complex T>
+#else
+#define MPPP_COMPLEX_MPC_UNARY_HEADER template <typename T, detail::enable_if_t<is_cvr_complex<T>::value, int> = 0>
+#endif
+
+#define MPPP_COMPLEX_MPC_UNARY_IMPL(name, fname, rnd)                                                                  \
+    MPPP_COMPLEX_MPC_UNARY_HEADER inline complex &name(complex &rop, T &&op)                                           \
+    {                                                                                                                  \
+        return detail::mpc_nary_op_impl<rnd>(0, fname, rop, std::forward<T>(op));                                      \
+    }                                                                                                                  \
+    MPPP_COMPLEX_MPC_UNARY_HEADER inline complex name(T &&r)                                                           \
+    {                                                                                                                  \
+        return detail::mpc_nary_op_return_impl<rnd>(0, fname, std::forward<T>(r));                                     \
+    }
+
+// Basic arithmetics.
+MPPP_COMPLEX_MPC_UNARY_IMPL(neg, ::mpc_neg, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(conj, ::mpc_conj, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)
+
+MPPP_DLL_PUBLIC real &abs(real &, const complex &);
+MPPP_DLL_PUBLIC real abs(const complex &);
+
+MPPP_DLL_PUBLIC real &norm(real &, const complex &);
+MPPP_DLL_PUBLIC real norm(const complex &);
+
+MPPP_DLL_PUBLIC real &arg(real &, const complex &);
+MPPP_DLL_PUBLIC real arg(const complex &);
+
+#undef MPPP_COMPLEX_MPC_UNARY_HEADER
+#undef MPPP_COMPLEX_MPC_UNARY_IMPL
+
+// Stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
 
 namespace detail

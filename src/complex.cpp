@@ -81,6 +81,16 @@ complex::complex()
     ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
 }
 
+// Init a complex with precision p, setting its value to (nan,nan). No precision
+// checking is performed.
+complex::complex(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
+{
+    assert(ignore_prec);
+    assert(detail::real_prec_check(p));
+    detail::ignore(ignore_prec);
+    ::mpc_init2(&m_mpc, p);
+}
+
 complex::complex(const complex &other) : complex(&other.m_mpc) {}
 
 complex::complex(const complex &other, complex_prec_t p)
@@ -398,6 +408,51 @@ complex &complex::arg()
 complex &complex::proj()
 {
     return self_mpc_unary(::mpc_proj);
+}
+
+// Free-function abs.
+real &abs(real &rop, const complex &c)
+{
+    rop.set_prec(c.get_prec());
+    ::mpc_abs(rop._get_mpfr_t(), c.get_mpc_t(), MPFR_RNDN);
+    return rop;
+}
+
+real abs(const complex &c)
+{
+    real ret{real_kind::nan, c.get_prec()};
+    ::mpc_abs(ret._get_mpfr_t(), c.get_mpc_t(), MPFR_RNDN);
+    return ret;
+}
+
+// Free-function norm.
+real &norm(real &rop, const complex &c)
+{
+    rop.set_prec(c.get_prec());
+    ::mpc_norm(rop._get_mpfr_t(), c.get_mpc_t(), MPFR_RNDN);
+    return rop;
+}
+
+real norm(const complex &c)
+{
+    real ret{real_kind::nan, c.get_prec()};
+    ::mpc_norm(ret._get_mpfr_t(), c.get_mpc_t(), MPFR_RNDN);
+    return ret;
+}
+
+// Free-function arg.
+real &arg(real &rop, const complex &c)
+{
+    rop.set_prec(c.get_prec());
+    ::mpc_arg(rop._get_mpfr_t(), c.get_mpc_t(), MPFR_RNDN);
+    return rop;
+}
+
+real arg(const complex &c)
+{
+    real ret{real_kind::nan, c.get_prec()};
+    ::mpc_arg(ret._get_mpfr_t(), c.get_mpc_t(), MPFR_RNDN);
+    return ret;
 }
 
 } // namespace mppp

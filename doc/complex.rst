@@ -513,10 +513,10 @@ The complex class
 
    .. cpp:function:: complex &neg()
    .. cpp:function:: complex &conj()
+   .. cpp:function:: complex &proj()
    .. cpp:function:: complex &abs()
    .. cpp:function:: complex &norm()
    .. cpp:function:: complex &arg()
-   .. cpp:function:: complex &proj()
 
       In-place basic aritmetic functions.
 
@@ -524,10 +524,10 @@ The complex class
 
       * :math:`-z`,
       * :math:`\overline{z}`,
+      * the projection of :math:`z` into Riemann sphere,
       * :math:`\left| z \right|`,
       * :math:`\left| z \right|^2`,
       * :math:`\arg z`,
-      * the projection of :math:`z` into Riemann sphere,
 
       where :math:`z` is the current value of ``this``.
 
@@ -554,6 +554,11 @@ Types
 
 Concepts
 --------
+
+.. cpp:concept:: template <typename T> mppp::cvr_complex
+
+   This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
+   is the same as :cpp:class:`mppp::complex`.
 
 .. cpp:concept:: template <typename T> mppp::rv_complex_interoperable
 
@@ -679,3 +684,55 @@ Conversion
 
    :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
       specified in the documentation of the conversion operator for :cpp:class:`~mppp::complex`.
+
+Arithmetic
+~~~~~~~~~~
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::neg(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::conj(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::proj(mppp::complex &rop, T &&z)
+.. cpp:function:: mppp::real &mppp::abs(mppp::real &rop, const mppp::complex &z)
+.. cpp:function:: mppp::real &mppp::norm(mppp::real &rop, const mppp::complex &z)
+.. cpp:function:: mppp::real &mppp::arg(mppp::real &rop, const mppp::complex &z)
+
+   Basic arithmetic functions.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`-z`,
+   * :math:`\overline{z}`,
+   * the projection of :math:`z` into Riemann sphere,
+   * :math:`\left| z \right|`,
+   * :math:`\left| z \right|^2`,
+   * :math:`\arg z`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   :param rop: the return value.
+   :param z: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::neg(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::conj(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::proj(T &&z)
+.. cpp:function:: mppp::real mppp::abs(const mppp::complex &z)
+.. cpp:function:: mppp::real mppp::norm(const mppp::complex &z)
+.. cpp:function:: mppp::real mppp::arg(const mppp::complex &z)
+
+   Basic arithmetic functions.
+
+   These functions will return, respectively:
+
+   * :math:`-z`,
+   * :math:`\overline{z}`,
+   * the projection of :math:`z` into Riemann sphere,
+   * :math:`\left| z \right|`,
+   * :math:`\left| z \right|^2`,
+   * :math:`\arg z`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   :param z: the argument.
+
+   :return: the result of the operation.
