@@ -1527,50 +1527,6 @@ inline real fms(T &&a, U &&b, V &&c)
                                                   std::forward<V>(c));
 }
 
-// Binary negation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &neg(real &rop, T &&x)
-{
-    return detail::mpfr_nary_op_impl<true>(0, ::mpfr_neg, rop, std::forward<T>(x));
-}
-
-// Unary negation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real neg(T &&x)
-{
-    return detail::mpfr_nary_op_return_impl<true>(0, ::mpfr_neg, std::forward<T>(x));
-}
-
-// Binary absolute value.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &abs(real &rop, T &&x)
-{
-    return detail::mpfr_nary_op_impl<true>(0, ::mpfr_abs, rop, std::forward<T>(x));
-}
-
-// Unary absolute value.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real abs(T &&x)
-{
-    return detail::mpfr_nary_op_return_impl<true>(0, ::mpfr_abs, std::forward<T>(x));
-}
-
 // mul2/div2 primitives.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
@@ -1823,6 +1779,10 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
     {                                                                                                                  \
         return detail::dispatch_##name(std::forward<T>(y), std::forward<U>(x));                                        \
     }
+
+// Neg and abs.
+MPPP_REAL_MPFR_UNARY_IMPL(neg, ::mpfr_neg, true)
+MPPP_REAL_MPFR_UNARY_IMPL(abs, ::mpfr_abs, true)
 
 // Square root.
 MPPP_REAL_MPFR_UNARY_IMPL(sqrt, ::mpfr_sqrt, true)
