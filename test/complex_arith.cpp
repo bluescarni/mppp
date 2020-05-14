@@ -76,6 +76,126 @@ TEST_CASE("add")
     REQUIRE(r1 == 22);
 }
 
+TEST_CASE("sub")
+{
+    complex r1, r2, r3;
+    sub(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1 = 56;
+    sub(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r2 = complex{56, 3};
+    r3 = complex{-45, 4};
+    r1 = complex{-4, complex_prec_t(128)};
+    sub(r1, r2, r3);
+    REQUIRE(r1 == complex{101, -1});
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1.prec_round(real_prec_min());
+    sub(r1, r2, r3);
+    REQUIRE(r1 == complex{101, -1});
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    sub(r1, complex{12, complex_prec_t(123)}, complex{34, complex_prec_t(128)});
+    REQUIRE(r1 == -22);
+    REQUIRE(r1.get_prec() == 128);
+    // Some tests with rvalue refs/overlapping arguments.
+    sub(r1, std::move(r1), std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 0);
+    sub(r1, std::move(r1), complex{100, complex_prec_t(150)});
+    REQUIRE(r1.get_prec() == 150);
+    REQUIRE(r1 == -100);
+    sub(r1, std::move(r1), complex{100, complex_prec_t(50)});
+    REQUIRE(r1.get_prec() == 150);
+    REQUIRE(r1 == -200);
+    sub(r1, complex{100, complex_prec_t(160)}, std::move(r1));
+    REQUIRE(r1.get_prec() == 160);
+    REQUIRE(r1 == 300);
+    sub(r1, complex{100, complex_prec_t(50)}, std::move(r1));
+    REQUIRE(r1.get_prec() == 160);
+    REQUIRE(r1 == -200);
+    r1 = complex{92, complex_prec_t(128)};
+    sub(r1, r1, std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 0);
+    sub(r1, std::move(r1), r1);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 0);
+    r1 = complex{};
+    sub(r1, complex{10, complex_prec_t(50)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 51);
+    REQUIRE(r1 == -2);
+    r1 = complex{};
+    sub(r1, complex{10, complex_prec_t(52)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(r1 == -2);
+    r1 = complex{0, 123};
+    sub(r1, complex{10, complex_prec_t(52)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(r1 == -2);
+}
+
+TEST_CASE("mul")
+{
+    complex r1, r2, r3;
+    mul(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1 = 56;
+    mul(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r2 = complex{56, 3};
+    r3 = complex{-45, 4};
+    r1 = complex{-4, complex_prec_t(128)};
+    mul(r1, r2, r3);
+    REQUIRE(r1 == complex{-2532, 89});
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1.prec_round(real_prec_min());
+    mul(r1, r2, r3);
+    REQUIRE(r1 == complex{-2532, 89});
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    mul(r1, complex{12, complex_prec_t(123)}, complex{34, complex_prec_t(128)});
+    REQUIRE(r1 == 408);
+    REQUIRE(r1.get_prec() == 128);
+    // Some tests with rvalue refs/overlapping arguments.
+    mul(r1, std::move(r1), std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 166464l);
+    mul(r1, std::move(r1), complex{100, complex_prec_t(150)});
+    REQUIRE(r1.get_prec() == 150);
+    REQUIRE(r1 == 16646400ll);
+    mul(r1, std::move(r1), complex{100, complex_prec_t(50)});
+    REQUIRE(r1.get_prec() == 150);
+    REQUIRE(r1 == 1664640000ll);
+    mul(r1, complex{100, complex_prec_t(160)}, std::move(r1));
+    REQUIRE(r1.get_prec() == 160);
+    REQUIRE(r1 == 166464000000ll);
+    mul(r1, complex{100, complex_prec_t(50)}, std::move(r1));
+    REQUIRE(r1.get_prec() == 160);
+    REQUIRE(r1 == 16646400000000ll);
+    r1 = complex{92, complex_prec_t(128)};
+    mul(r1, r1, std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 8464);
+    mul(r1, std::move(r1), r1);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 71639296);
+    r1 = complex{};
+    mul(r1, complex{10, complex_prec_t(50)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 51);
+    REQUIRE(r1 == 120);
+    r1 = complex{};
+    mul(r1, complex{10, complex_prec_t(52)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(r1 == 120);
+    r1 = complex{0, 123};
+    mul(r1, complex{10, complex_prec_t(52)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(r1 == 120);
+}
+
 TEST_CASE("neg")
 {
     {
