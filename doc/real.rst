@@ -100,7 +100,7 @@ The real class
 
       Copy/move constructors with custom precision.
 
-      These constructors will set *this* to the value of *other* with precision *p*. If *p*
+      These constructors will set ``this`` to the value of *other* with precision *p*. If *p*
       is smaller than the precision of *other*, a rounding operation will be performed,
       otherwise the value will be copied exactly.
 
