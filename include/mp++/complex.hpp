@@ -1110,6 +1110,8 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(neg, ::mpc_neg, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(conj, ::mpc_conj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)
 
+// NOTE: these functions return a real, thus we need
+// custom implementations.
 MPPP_DLL_PUBLIC real &abs(real &, const complex &);
 MPPP_DLL_PUBLIC real abs(const complex &);
 
