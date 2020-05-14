@@ -8,7 +8,8 @@ New
 ~~~
 
 - Add the :cpp:func:`~mppp::set_ui_2exp()` and :cpp:func:`~mppp::set_si_2exp()`
-  functions for :cpp:class:`~mppp::real`
+  functions for :cpp:class:`~mppp::real`, and implement constructors
+  from an integral multiple of a power of 2
   (`#242 <https://github.com/bluescarni/mppp/pull/242>`__).
 - The mp++ library can now be built with link-time
   optimisations enabled

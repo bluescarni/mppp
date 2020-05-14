@@ -281,6 +281,12 @@ public:
     // Constructor from a special value and precision.
     explicit real(real_kind, ::mpfr_prec_t);
 
+    // Constructors from n*2**e.
+    template <std::size_t SSize>
+    explicit real(const integer<SSize> &, ::mpfr_exp_t, ::mpfr_prec_t);
+    explicit real(unsigned long, ::mpfr_exp_t, ::mpfr_prec_t);
+    explicit real(long, ::mpfr_exp_t, ::mpfr_prec_t);
+
 private:
     // Construction from FPs.
     template <typename Func, typename T>
@@ -1160,6 +1166,15 @@ inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
 
 MPPP_DLL_PUBLIC real &set_ui_2exp(real &, unsigned long, ::mpfr_exp_t);
 MPPP_DLL_PUBLIC real &set_si_2exp(real &, long, ::mpfr_exp_t);
+
+// Implementation of the constructor from n*2**e, integer overload.
+// Place it here so that set_z_2exp() is visible.
+template <std::size_t SSize>
+inline real::real(const integer<SSize> &n, ::mpfr_exp_t e, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
+    set_z_2exp(*this, n, e);
+}
 
 // Set to NaN.
 inline real &set_nan(real &r)

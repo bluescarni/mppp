@@ -700,6 +700,19 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
 // Constructor from a special value and precision.
 real::real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
 
+// Constructors from n*2**e.
+real::real(unsigned long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
+    set_ui_2exp(*this, n, e);
+}
+
+real::real(long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
+    set_si_2exp(*this, n, e);
+}
+
 // Copy constructor from mpfr_t.
 real::real(const ::mpfr_t x)
 {

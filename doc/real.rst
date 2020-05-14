@@ -139,6 +139,23 @@ The real class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
+   .. cpp:function:: template <std::size_t SSize> explicit real(const integer<SSize> &n, mpfr_exp_t e, mpfr_prec_t p)
+   .. cpp:function:: explicit real(unsigned long n, mpfr_exp_t e, mpfr_prec_t p)
+   .. cpp:function:: explicit real(long n, mpfr_exp_t e, mpfr_prec_t p)
+
+      .. versionadded:: 0.20
+
+      Constructors from an integral multiple of a power of two.
+
+      These constructors will set ``this`` to :math:`n\times 2^e` with a precision of *p*.
+
+      :param n: the integral multiple.
+      :param e: the power of 2.
+      :param p: the desired precision.
+
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
    .. cpp:function:: template <real_interoperable T> explicit real(const T &x, mpfr_prec_t p)
    .. cpp:function:: template <real_interoperable T> explicit real(const T &x)
 
