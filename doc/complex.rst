@@ -688,6 +688,28 @@ Conversion
 Arithmetic
 ~~~~~~~~~~
 
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U> mppp::complex &mppp::add(mppp::complex &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U> mppp::complex &mppp::sub(mppp::complex &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U> mppp::complex &mppp::mul(mppp::complex &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U> mppp::complex &mppp::div(mppp::complex &rop, T &&a, U &&b)
+
+   Basic :cpp:class:`~mppp::complex` binary arithmetic.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`a+b`,
+   * :math:`a-b`,
+   * :math:`a \times b`,
+   * :math:`\frac{a}{b}`.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: a reference to *rop*.
+
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::neg(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::conj(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::proj(mppp::complex &rop, T &&z)
@@ -695,7 +717,7 @@ Arithmetic
 .. cpp:function:: mppp::real &mppp::norm(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::arg(mppp::real &rop, const mppp::complex &z)
 
-   Basic arithmetic functions.
+   Basic unary arithmetic functions.
 
    These functions will set *rop* to, respectively:
 
@@ -720,7 +742,7 @@ Arithmetic
 .. cpp:function:: mppp::real mppp::norm(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::arg(const mppp::complex &z)
 
-   Basic arithmetic functions.
+   Basic unary arithmetic functions.
 
    These functions will return, respectively:
 

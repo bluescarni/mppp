@@ -21,6 +21,7 @@ TEST_CASE("add")
 {
     complex r1, r2, r3;
     add(r1, r2, r3);
+    REQUIRE(std::is_same<complex &, decltype(add(r1, r2, r3))>::value);
     REQUIRE(r1.zero_p());
     REQUIRE(r1.get_prec() == r3.get_prec());
     r1 = 56;
@@ -81,6 +82,7 @@ TEST_CASE("sub")
 {
     complex r1, r2, r3;
     sub(r1, r2, r3);
+    REQUIRE(std::is_same<complex &, decltype(sub(r1, r2, r3))>::value);
     REQUIRE(r1.zero_p());
     REQUIRE(r1.get_prec() == r3.get_prec());
     r1 = 56;
@@ -141,6 +143,7 @@ TEST_CASE("mul")
 {
     complex r1, r2, r3;
     mul(r1, r2, r3);
+    REQUIRE(std::is_same<complex &, decltype(mul(r1, r2, r3))>::value);
     REQUIRE(r1.zero_p());
     REQUIRE(r1.get_prec() == r3.get_prec());
     r1 = 56;
@@ -201,6 +204,7 @@ TEST_CASE("div")
 {
     complex r1, r2, r3{1};
     div(r1, r2, r3);
+    REQUIRE(std::is_same<complex &, decltype(div(r1, r2, r3))>::value);
     REQUIRE(r1.zero_p());
     REQUIRE(r1.get_prec() == r3.get_prec());
     r1 = 56;
