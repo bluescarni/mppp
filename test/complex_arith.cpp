@@ -10,6 +10,7 @@
 #include <utility>
 
 #include <mp++/complex.hpp>
+#include <mp++/rational.hpp>
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
@@ -194,6 +195,66 @@ TEST_CASE("mul")
     mul(r1, complex{10, complex_prec_t(52)}, complex{12, complex_prec_t(51)});
     REQUIRE(r1.get_prec() == 52);
     REQUIRE(r1 == 120);
+}
+
+TEST_CASE("div")
+{
+    complex r1, r2, r3{1};
+    div(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1 = 56;
+    div(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r2 = complex{2, -4};
+    r3 = complex{2, -4};
+    r1 = complex{-4, complex_prec_t(128)};
+    div(r1, r2, r3);
+    REQUIRE(r1 == 1);
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1.prec_round(real_prec_min());
+    div(r1, r2, r3);
+    REQUIRE(r1 == 1);
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    div(r1, complex{12, complex_prec_t(123)}, complex{6, complex_prec_t(128)});
+    REQUIRE(r1 == 2);
+    REQUIRE(r1.get_prec() == 128);
+    // Some tests with rvalue refs/overlapping arguments.
+    div(r1, std::move(r1), std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 1);
+    div(r1, std::move(r1), complex{16, complex_prec_t(150)});
+    REQUIRE(r1.get_prec() == 150);
+    REQUIRE(r1 == 1 / 16_q1);
+    div(r1, std::move(r1), complex{2, complex_prec_t(50)});
+    REQUIRE(r1.get_prec() == 150);
+    REQUIRE(r1 == 1 / 32_q1);
+    div(r1, complex{2, complex_prec_t(160)}, std::move(r1));
+    REQUIRE(r1.get_prec() == 160);
+    REQUIRE(r1 == 64);
+    div(r1, complex{2, complex_prec_t(50)}, std::move(r1));
+    REQUIRE(r1.get_prec() == 160);
+    REQUIRE(r1 == 1 / 32_q1);
+    r1 = complex{92, complex_prec_t(128)};
+    div(r1, r1, std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 1);
+    div(r1, std::move(r1), r1);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 1);
+    r1 = complex{};
+    div(r1, complex{10, complex_prec_t(50)}, complex{20, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 51);
+    REQUIRE(r1 == 1 / 2_q1);
+    r1 = complex{};
+    div(r1, complex{10, complex_prec_t(52)}, complex{5, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(r1 == 2);
+    r1 = complex{0, 123};
+    div(r1, complex{6, complex_prec_t(52)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(r1 == 1 / 2_q1);
 }
 
 TEST_CASE("neg")
