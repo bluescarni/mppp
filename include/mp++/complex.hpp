@@ -95,6 +95,9 @@ MPPP_CONCEPT_DECL cvr_complex = is_cvr_complex<T>::value;
 
 #endif
 
+template <typename... Args>
+using cvr_complex_enabler = detail::enable_if_t<detail::conjunction<is_cvr_complex<Args>...>::value, int>;
+
 // Fwd declare swap.
 void swap(complex &, complex &) noexcept;
 
@@ -1106,6 +1109,51 @@ inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 
     }
 
 // Basic arithmetics.
+
+// Ternary addition.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T, cvr_complex U>
+#else
+template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
+#endif
+inline complex &add(complex &rop, T &&a, U &&b)
+{
+    return detail::mpc_nary_op_impl<true>(0, ::mpc_add, rop, std::forward<T>(a), std::forward<U>(b));
+}
+
+// Ternary subtraction.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T, cvr_complex U>
+#else
+template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
+#endif
+inline complex &sub(complex &rop, T &&a, U &&b)
+{
+    return detail::mpc_nary_op_impl<true>(0, ::mpc_sub, rop, std::forward<T>(a), std::forward<U>(b));
+}
+
+// Ternary multiplication.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T, cvr_complex U>
+#else
+template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
+#endif
+inline complex &mul(complex &rop, T &&a, U &&b)
+{
+    return detail::mpc_nary_op_impl<true>(0, ::mpc_mul, rop, std::forward<T>(a), std::forward<U>(b));
+}
+
+// Ternary division.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T, cvr_complex U>
+#else
+template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
+#endif
+inline complex &div(complex &rop, T &&a, U &&b)
+{
+    return detail::mpc_nary_op_impl<true>(0, ::mpc_div, rop, std::forward<T>(a), std::forward<U>(b));
+}
+
 MPPP_COMPLEX_MPC_UNARY_IMPL(neg, ::mpc_neg, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(conj, ::mpc_conj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)

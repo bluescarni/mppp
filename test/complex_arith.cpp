@@ -16,6 +16,66 @@
 
 using namespace mppp;
 
+TEST_CASE("add")
+{
+    complex r1, r2, r3;
+    add(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1 = 56;
+    add(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r2 = complex{56, 3};
+    r3 = complex{-45, 4};
+    r1 = complex{-4, complex_prec_t(128)};
+    add(r1, r2, r3);
+    REQUIRE(r1 == complex{11, 7});
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1.prec_round(real_prec_min());
+    add(r1, r2, r3);
+    REQUIRE(r1 == complex{11, 7});
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    add(r1, complex{12, complex_prec_t(123)}, complex{34, complex_prec_t(128)});
+    REQUIRE(r1 == 46);
+    REQUIRE(r1.get_prec() == 128);
+    // Some tests with rvalue refs/overlapping arguments.
+    add(r1, std::move(r1), std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 92);
+    add(r1, std::move(r1), complex{100, complex_prec_t(150)});
+    REQUIRE(r1.get_prec() == 150);
+    REQUIRE(r1 == 192);
+    add(r1, std::move(r1), complex{100, complex_prec_t(50)});
+    REQUIRE(r1.get_prec() == 150);
+    REQUIRE(r1 == 292);
+    add(r1, complex{100, complex_prec_t(160)}, std::move(r1));
+    REQUIRE(r1.get_prec() == 160);
+    REQUIRE(r1 == 392);
+    add(r1, complex{100, complex_prec_t(50)}, std::move(r1));
+    REQUIRE(r1.get_prec() == 160);
+    REQUIRE(r1 == 492);
+    r1 = complex{92, complex_prec_t(128)};
+    add(r1, r1, std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 184);
+    add(r1, std::move(r1), r1);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(r1 == 368);
+    r1 = complex{};
+    add(r1, complex{10, complex_prec_t(50)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 51);
+    REQUIRE(r1 == 22);
+    r1 = complex{};
+    add(r1, complex{10, complex_prec_t(52)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(r1 == 22);
+    r1 = complex{0, 123};
+    add(r1, complex{10, complex_prec_t(52)}, complex{12, complex_prec_t(51)});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(r1 == 22);
+}
+
 TEST_CASE("neg")
 {
     {
