@@ -1158,6 +1158,9 @@ inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
     return r;
 }
 
+MPPP_DLL_PUBLIC real &set_ui_2exp(real &, unsigned long, ::mpfr_exp_t);
+MPPP_DLL_PUBLIC real &set_si_2exp(real &, long, ::mpfr_exp_t);
+
 // Set to NaN.
 inline real &set_nan(real &r)
 {

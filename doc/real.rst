@@ -1056,15 +1056,22 @@ Assignment
 
    :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::real::set()` overload.
 
+.. cpp:function:: mppp::real &mppp::set_ui_2exp(mppp::real &r, unsigned long n, mpfr_exp_t e)
+.. cpp:function:: mppp::real &mppp::set_si_2exp(mppp::real &r, long n, mpfr_exp_t e)
 .. cpp:function:: template <std::size_t SSize> mppp::real &mppp::set_z_2exp(mppp::real &r, const mppp::integer<SSize> &n, mpfr_exp_t e)
 
    Set to :math:`n\times 2^e`.
 
-   This function will set *r* to :math:`n\times 2^e`. The precision of *r*
+   These functions will set *r* to :math:`n\times 2^e`. The precision of *r*
    will not be altered. If *n* is zero, the result will be positive zero.
 
+   .. versionadded:: 0.20
+
+      The :cpp:func:`~mppp::set_ui_2exp()` and :cpp:func:`~mppp::set_si_2exp()`
+      functions.
+
    :param r: the return value.
-   :param n: input :cpp:class:`~mppp::integer`.
+   :param n: input integer.
    :param e: the exponent.
 
    :return: a reference to *r*.
