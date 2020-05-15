@@ -191,6 +191,7 @@ endif()
 if(MPPP_WITH_MPC)
   ADD_MPPP_TESTCASE(complex_basic)
   ADD_MPPP_TESTCASE(complex_arith)
+  ADD_MPPP_TESTCASE(complex_operators)
 endif()
 
 if(MPPP_TEST_PYBIND11)

@@ -58,16 +58,26 @@ using is_rv_complex_interoperable
 #endif
                           >;
 
+namespace detail
+{
+
+// Detect complex-valued interoperable types.
+// For internal use only.
+template <typename T>
+using is_cv_complex_interoperable = detail::disjunction<is_cpp_complex<detail::uncvref_t<T>>
+#if defined(MPPP_WITH_QUADMATH)
+                                                        ,
+                                                        std::is_same<detail::uncvref_t<T>, complex128>
+#endif
+                                                        >;
+
+} // namespace detail
+
 // Detect interoperable types
 // for complex.
 template <typename T>
 using is_complex_interoperable
-    = detail::disjunction<is_rv_complex_interoperable<detail::uncvref_t<T>>, is_cpp_complex<detail::uncvref_t<T>>
-#if defined(MPPP_WITH_QUADMATH)
-                          ,
-                          std::is_same<detail::uncvref_t<T>, complex128>
-#endif
-                          >;
+    = detail::disjunction<is_rv_complex_interoperable<T>, detail::is_cv_complex_interoperable<T>>;
 
 template <typename T>
 using is_complex_convertible = detail::conjunction<is_complex_interoperable<T>, std::is_same<T, detail::uncvref_t<T>>>;
@@ -1179,6 +1189,172 @@ template <typename T, cvr_complex_enabler<T> = 0>
 inline complex operator+(T &&c)
 {
     return std::forward<T>(c);
+}
+
+namespace detail
+{
+
+// complex-complex.
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_complex<T>, is_cvr_complex<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_add(T &&a, U &&b)
+{
+    return mpc_nary_op_return_impl<true>(0, ::mpc_add, std::forward<T>(a), std::forward<U>(b));
+}
+
+// complex-real.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex dispatch_complex_binary_add(T &&a, const real &x)
+{
+    // NOTE: this is the usual pattern in which we transform a non-MPC-like binary operation
+    // into an unary MPC-like operation and account for the non-mpc_t argument's precision
+    // via the min_prec parameter of mpc_nary_op_return_impl().
+    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
+}
+
+// real-complex.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex dispatch_complex_binary_add(const real &x, T &&a)
+{
+    return dispatch_complex_binary_add(std::forward<T>(a), x);
+}
+
+// complex-(anything real-valued other than unsigned integral or real).
+// NOTE: MPC has primitives only for ui and mpfr_t addition. Thus, for
+// other real-valued types, we implement on top of the real API.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
+                                  negation<is_cpp_unsigned_integral<U>>>::value,
+                      int> = 0>
+inline complex dispatch_complex_binary_add(T &&a, const U &x)
+{
+    // NOTE: another way of implementing this is via the conversion
+    // of x to a temporary real whose precision is max(a_prec, x_prec),
+    // and then delegating to mpc_add_fr(). The potential advantage of this
+    // implementation is that it re-uses the specialised adding primitives
+    // of real, which *may* be more efficient than doing real vs real
+    // operations (but I haven't measured that).
+    complex ret{std::forward<T>(a)};
+
+    {
+        // NOTE: scope the lifetime of re/im, so that
+        // we are sure that ret is updated before
+        // the return statement.
+        complex::re_ref re{ret};
+        complex::im_ref im{ret};
+
+        // Add x to the real part of ret.
+        *re += x;
+
+        // Depending on the value and type of x,
+        // the precision of re may have increased
+        // after the addition. In such case,
+        // increase the precision of the imaginary
+        // part as well.
+        if (re->get_prec() != im->get_prec()) {
+            assert(re->get_prec() > im->get_prec());
+            im->prec_round(re->get_prec());
+        }
+    }
+
+    return ret;
+}
+
+// complex-unsigned integral.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_add(T &&a, const U &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+        return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return dispatch_complex_binary_add(std::forward<T>(a), integer<2>{n});
+    }
+}
+
+// complex-bool.
+// NOTE: make this explicit (rather than letting bool fold into
+// the unsigned integrals overload) in order to avoid MSVC warnings.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex dispatch_complex_binary_add(T &&a, const bool &n)
+{
+    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// unsigned integral-complex.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cpp_unsigned_integral<T>, is_cvr_complex<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_add(const T &n, U &&a)
+{
+    return dispatch_complex_binary_add(std::forward<U>(a), n);
+}
+
+// complex-complex valued interoperable types.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_add(T &&a, const U &c)
+{
+    complex ret{std::forward<T>(a)};
+
+    {
+        complex::re_ref re{ret};
+        complex::im_ref im{ret};
+
+        // NOTE: currently the only complex interoperable
+        // types are std::complex and complex128, for which
+        // the precision deduction rules always return
+        // the same compile-time constant. Thus, since
+        // we know re and im have the same precision, after
+        // the additions either they both have the original
+        // precision, or they both have the same larger
+        // precision. If we ever allow for interoperable
+        // complex types with
+        // different behaviour, we will have to change
+        // this implementation.
+        *re += c.real();
+        *im += c.imag();
+    }
+
+    return ret;
+}
+
+// complex valued interoperable types-comple.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_add(const U &c, T &&a)
+{
+    return dispatch_complex_binary_add(std::forward<T>(a), c);
+}
+
+} // namespace detail
+
+// Binary addition.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
+#endif
+    inline complex operator+(T &&a, U &&b)
+{
+    return detail::dispatch_complex_binary_add(std::forward<T>(a), std::forward<U>(b));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex operator-(T &&c)
+{
+    complex ret{std::forward<T>(c)};
+    ret.neg();
+    return ret;
 }
 
 // Stream operator.
