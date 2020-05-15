@@ -779,10 +779,9 @@ private:
 };
 
 template <typename T, typename U>
-using are_complex_op_types = detail::disjunction<
-    detail::conjunction<std::is_same<complex, detail::uncvref_t<T>>, std::is_same<complex, detail::uncvref_t<U>>>,
-    detail::conjunction<std::is_same<complex, detail::uncvref_t<T>>, is_complex_interoperable<U>>,
-    detail::conjunction<std::is_same<complex, detail::uncvref_t<U>>, is_complex_interoperable<T>>>;
+using are_complex_op_types = detail::disjunction<detail::conjunction<is_cvr_complex<T>, is_cvr_complex<U>>,
+                                                 detail::conjunction<is_cvr_complex<T>, is_complex_interoperable<U>>,
+                                                 detail::conjunction<is_cvr_complex<U>, is_complex_interoperable<T>>>;
 
 template <typename T, typename U>
 using are_complex_in_place_op_types
@@ -1171,6 +1170,16 @@ MPPP_DLL_PUBLIC real arg(const complex &);
 
 #undef MPPP_COMPLEX_MPC_UNARY_HEADER
 #undef MPPP_COMPLEX_MPC_UNARY_IMPL
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex operator+(T &&c)
+{
+    return std::forward<T>(c);
+}
 
 // Stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
