@@ -795,7 +795,7 @@ using are_complex_op_types = detail::disjunction<detail::conjunction<is_cvr_comp
 
 template <typename T, typename U>
 using are_complex_in_place_op_types
-    = detail::conjunction<are_complex_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>;
+    = detail::conjunction<detail::negation<std::is_const<detail::unref_t<T>>>, are_complex_op_types<T, U>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 
