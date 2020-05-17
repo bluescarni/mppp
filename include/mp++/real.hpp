@@ -2398,11 +2398,10 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, is_cvr_real<U>>::value, int> = 0>
-inline void dispatch_real_in_place_add(T &a, U &&b)
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline void dispatch_real_in_place_add(real &a, T &&b)
 {
-    add(a, a, std::forward<U>(b));
+    add(a, a, std::forward<T>(b));
 }
 
 MPPP_DLL_PUBLIC void dispatch_real_in_place_add_integer_impl(real &, const ::mpz_t, ::mpfr_prec_t);
@@ -2772,11 +2771,10 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, is_cvr_real<U>>::value, int> = 0>
-inline void dispatch_real_in_place_sub(T &a, U &&b)
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline void dispatch_real_in_place_sub(real &a, T &&b)
 {
-    sub(a, a, std::forward<U>(b));
+    sub(a, a, std::forward<T>(b));
 }
 
 MPPP_DLL_PUBLIC void dispatch_real_in_place_sub_integer_impl(real &, const ::mpz_t, ::mpfr_prec_t);
@@ -3067,11 +3065,10 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, is_cvr_real<U>>::value, int> = 0>
-inline void dispatch_real_in_place_mul(T &a, U &&b)
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline void dispatch_real_in_place_mul(real &a, T &&b)
 {
-    mul(a, a, std::forward<U>(b));
+    mul(a, a, std::forward<T>(b));
 }
 
 MPPP_DLL_PUBLIC void dispatch_real_in_place_mul_integer_impl(real &, const ::mpz_t, ::mpfr_prec_t);
@@ -3379,11 +3376,10 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, is_cvr_real<U>>::value, int> = 0>
-inline void dispatch_real_in_place_div(T &a, U &&b)
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline void dispatch_real_in_place_div(real &a, T &&b)
 {
-    div(a, a, std::forward<U>(b));
+    div(a, a, std::forward<T>(b));
 }
 
 MPPP_DLL_PUBLIC void dispatch_real_in_place_div_integer_impl(real &, const ::mpz_t, ::mpfr_prec_t);
