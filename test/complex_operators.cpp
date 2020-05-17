@@ -208,6 +208,18 @@ TEST_CASE("binary plus")
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
         REQUIRE(!c1.is_valid());
 
+        // Bool special casing.
+        c1 = c2;
+        ret = true + c1;
+        REQUIRE(ret == complex{2, 1});
+        ret = c1 + false;
+        REQUIRE(ret == complex{1, 1});
+        ret = true + std::move(c1);
+        REQUIRE(ret == complex{2, 1});
+        c1 = c2;
+        ret = std::move(c1) + false;
+        REQUIRE(ret == complex{1, 1});
+
 #if defined(MPPP_HAVE_GCC_INT128)
         // Try with a large integral.
         c1 = c2;
@@ -325,6 +337,15 @@ TEST_CASE("binary plus")
         REQUIRE(!c1.is_valid());
     }
 #endif
+}
+
+TEST_CASE("in-place plus")
+{
+    // complex-complex.
+    {
+        complex c1{1, 2}, c2{3, 4};
+        c1 += c2;
+    }
 }
 
 TEST_CASE("negation")

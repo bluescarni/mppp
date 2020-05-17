@@ -1366,6 +1366,31 @@ inline complex operator-(T &&c)
     return ret;
 }
 
+namespace detail
+{
+
+// complex-complex.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline void dispatch_complex_in_place_add(complex &a, T &&b)
+{
+    add(a, a, std::forward<T>(b));
+}
+
+} // namespace detail
+
+// In-place addition.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex_in_place_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
+#endif
+    inline T &operator+=(T &a, U &&b)
+{
+    detail::dispatch_complex_in_place_add(a, std::forward<U>(b));
+    return a;
+}
+
 // Stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
 
