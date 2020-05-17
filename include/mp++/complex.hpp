@@ -1234,31 +1234,40 @@ inline complex dispatch_complex_binary_add(T &&a, const U &x)
     // and then delegating to mpc_add_fr(). The potential advantage of this
     // implementation is that it re-uses the specialised adding primitives
     // of real, which *may* be more efficient than doing real vs real
-    // operations (but I haven't measured that).
-    complex ret{std::forward<T>(a)};
+    // operations after a conversion (but I haven't measured that).
+
+    // Init the return value with the necessary precision.
+    // If a already has enough precision, forward it
+    // so that we may steal its resources. Otherwise,
+    // copy-construct with extended precision.
+    // NOTE: this also mirrors the usual semantics of
+    // mpc_nary_op_return_impl(): try stealing if a has
+    // enough precision, otherwise init new value.
+    const auto a_prec = a.get_prec();
+    const auto x_prec = real_deduce_precision(x);
+    auto ret = (a_prec >= x_prec) ? complex{std::forward<T>(a)} : complex{a, complex_prec_t(x_prec)};
 
     {
-        // NOTE: scope the lifetime of re/im, so that
+        // NOTE: scope the lifetime of re, so that
         // we are sure that ret is updated before
         // the return statement.
         complex::re_ref re{ret};
-        complex::im_ref im{ret};
 
         // Add x to the real part of ret.
         *re += x;
-
-        // Depending on the value and type of x,
-        // the precision of re may have increased
-        // after the addition. In such case,
-        // increase the precision of the imaginary
-        // part as well.
-        if (re->get_prec() != im->get_prec()) {
-            assert(re->get_prec() > im->get_prec());
-            im->prec_round(re->get_prec());
-        }
     }
 
     return ret;
+}
+
+// (anything real-valued other than unsigned integral or real)-complex.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
+                                  negation<is_cpp_unsigned_integral<U>>>::value,
+                      int> = 0>
+inline complex dispatch_complex_binary_add(const U &x, T &&a)
+{
+    return dispatch_complex_binary_add(std::forward<T>(a), x);
 }
 
 // complex-unsigned integral.
@@ -1299,23 +1308,23 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
 inline complex dispatch_complex_binary_add(T &&a, const U &c)
 {
-    complex ret{std::forward<T>(a)};
+    // NOTE: same precision-handling scheme as in the
+    // complex-real valued overload.
+    // NOTE: here we are taking advantage of the fact that
+    // U is either std::complex<T> or complex128, for which
+    // the precision deduction rules are the same as for T
+    // and real128 (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    const auto a_prec = a.get_prec();
+    const auto c_prec = real_deduce_precision(c.real());
+    auto ret = (a_prec >= c_prec) ? complex{std::forward<T>(a)} : complex{a, complex_prec_t(c_prec)};
 
     {
         complex::re_ref re{ret};
         complex::im_ref im{ret};
 
-        // NOTE: currently the only complex interoperable
-        // types are std::complex and complex128, for which
-        // the precision deduction rules always return
-        // the same compile-time constant. Thus, since
-        // we know re and im have the same precision, after
-        // the additions either they both have the original
-        // precision, or they both have the same larger
-        // precision. If we ever allow for interoperable
-        // complex types with
-        // different behaviour, we will have to change
-        // this implementation.
         *re += c.real();
         *im += c.imag();
     }
