@@ -83,10 +83,16 @@ The complex class
       exactly to *p*.
 
       The variant without the *p* argument will set the
-      precision of ``this`` according to the heuristics explained in the
-      generic constructors of :cpp:class:`~mppp::real` (or exactly to
-      the output of :cpp:func:`mppp::real::get_prec()` if *x* is a
-      :cpp:class:`~mppp::real`).
+      precision of ``this`` according to the following heuristics:
+
+      * if ``T`` is :cpp:class:`~mppp::real`, then the precision is set to
+        the precision of *x* (as returned by :cpp:func:`mppp::real::get_prec()`),
+      * if ``T`` is real-valued, then the precision is set following the same
+        heuristics described in the generic constructor of :cpp:class:`~mppp::real`,
+      * if ``T`` is complex-valued, then the precision is set to the maximum
+        between the precisions of the real and imaginary parts of *x* (which are deduced
+        following the same
+        heuristics described in the generic constructor of :cpp:class:`~mppp::real`).
 
       :param x: the construction argument.
       :param p: the desired precision.
