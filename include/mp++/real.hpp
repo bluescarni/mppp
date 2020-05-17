@@ -1100,7 +1100,7 @@ using are_real_op_types
 
 template <typename T, typename U>
 using are_real_in_place_op_types
-    = detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>;
+    = detail::conjunction<detail::negation<std::is_const<detail::unref_t<T>>>, are_real_op_types<T, U>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 
