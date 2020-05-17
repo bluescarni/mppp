@@ -256,6 +256,11 @@ The complex128 class
 
       Conversion to real-valued interoperable types.
 
+      Conversion to non-:cpp:class:`~mppp::real` types uses the cast operator
+      of :cpp:class:`~mppp::real128`. Conversion to :cpp:class:`~mppp::real`
+      invokes the :cpp:class:`~mppp::real` constructor from :cpp:class:`~mppp::real128`,
+      and thus produces a return value with a precision of 113 bits.
+
       :return: ``this`` converted to the type ``T``.
 
       :exception std\:\:domain_error: if the imaginary part of ``this`` is not zero.
