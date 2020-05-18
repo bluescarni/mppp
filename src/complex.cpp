@@ -334,11 +334,11 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
 namespace detail
 {
 
-void dispatch_complex_in_place_add(complex &c, const real &x)
+void dispatch_complex_in_place_add(complex &a, const real &x)
 {
     auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
-    mpc_nary_op_impl<false>(x.get_prec(), wrapper, c, c);
+    mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_add(complex &a, bool n)
