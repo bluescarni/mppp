@@ -1088,7 +1088,7 @@ Assignment
       functions.
 
    :param r: the return value.
-   :param n: input integer.
+   :param n: the input integer multiplier.
    :param e: the exponent.
 
    :return: a reference to *r*.
