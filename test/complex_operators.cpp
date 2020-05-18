@@ -345,6 +345,116 @@ TEST_CASE("in-place plus")
     {
         complex c1{1, 2}, c2{3, 4};
         c1 += c2;
+        REQUIRE(c1 == complex{4, 6});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+
+        // Move which does not steal.
+        c1 += std::move(c2);
+        REQUIRE(c1 == complex{7, 10});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+        REQUIRE(c2.is_valid());
+
+        // Move which steals.
+        complex c3{4, 5, complex_prec_t(detail::real_deduce_precision(1) + 1)};
+        c1 += std::move(c3);
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+        REQUIRE(c3.is_valid());
+        REQUIRE(c3 == complex{7, 10});
+        REQUIRE(c3.get_prec() == detail::real_deduce_precision(1));
+    }
+    // complex-real.
+    {
+        // Same precision.
+        complex c1{1, 2};
+        real r{4};
+        c1 += r;
+        REQUIRE(c1 == complex{5, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+
+        // r with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 += r;
+        REQUIRE(c1 == complex{5, 1});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+
+        // r with smaller precision.
+        c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(1) + 1)};
+        c1 += r;
+        REQUIRE(c1 == complex{5, 1});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+    }
+    // complex-real valued.
+    {
+        // Other op with same precision.
+        complex c1{1, 2};
+        c1 += 4;
+        REQUIRE(c1 == complex{5, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+
+        // Other op with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 += 4.;
+        REQUIRE(c1 == complex{5, 1});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(4.));
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(detail::real_deduce_precision(1) + 1)};
+        c1 += 4;
+        REQUIRE(c1 == complex{5, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+    }
+    // complex-unsigned integral.
+    {
+        // Other op with same precision.
+        complex c1{1u, 2u};
+        c1 += 4u;
+        REQUIRE(c1 == complex{5, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1u));
+
+        // Other op with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 += 4u;
+        REQUIRE(c1 == complex{5, 1});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(4u));
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(detail::real_deduce_precision(1u) + 1)};
+        c1 += 4u;
+        REQUIRE(c1 == complex{5, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1u) + 1);
+
+#if defined(MPPP_HAVE_GCC_INT128)
+        // Test with large unsigned integral type.
+        c1 = complex{1, 0, complex_prec_t(real_prec_min())};
+        c1 += __uint128_t(-1);
+        REQUIRE(c1 == 1_z1 + __uint128_t(-1));
+        REQUIRE(c1.get_prec() == 128);
+
+        c1 = complex{1, 0, complex_prec_t(256)};
+        c1 += __uint128_t(-1);
+        REQUIRE(c1 == 1_z1 + __uint128_t(-1));
+        REQUIRE(c1.get_prec() == 256);
+#endif
+    }
+    // Special casing for bool.
+    {
+        // Other op with same precision.
+        complex c1{true, false};
+        c1 += true;
+        REQUIRE(c1 == complex{2, 0});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(true));
+
+        // Other op with higher precision.
+        c1 = complex{true, false, complex_prec_t(real_prec_min())};
+        c1 += true;
+        REQUIRE(c1 == complex{2, 0});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(true));
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(detail::real_deduce_precision(true) + 1)};
+        c1 += false;
+        REQUIRE(c1 == complex{1, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(true) + 1);
     }
 }
 

@@ -1354,18 +1354,6 @@ template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>
     return detail::dispatch_complex_binary_add(std::forward<T>(a), std::forward<U>(b));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
-inline complex operator-(T &&c)
-{
-    complex ret{std::forward<T>(c)};
-    ret.neg();
-    return ret;
-}
-
 namespace detail
 {
 
@@ -1375,6 +1363,52 @@ inline void dispatch_complex_in_place_add(complex &a, T &&b)
 {
     add(a, a, std::forward<T>(b));
 }
+
+// complex-real.
+MPPP_DLL_PUBLIC void dispatch_complex_in_place_add(complex &, const real &);
+
+// complex-(anything real-valued other than unsigned integral or real).
+template <
+    typename T,
+    enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int> = 0>
+inline void dispatch_complex_in_place_add(complex &a, const T &x)
+{
+    const auto orig_p = a.get_prec();
+
+    complex::re_ref re{a};
+
+    *re += x;
+
+    const auto new_p = re->get_prec();
+
+    // NOTE: the addition of x might have increased
+    // the precision of re. If that's the case,
+    // increase the precision of the imaginary part as well.
+    if (new_p != orig_p) {
+        assert(new_p > orig_p);
+        complex::im_ref im{a};
+        im->prec_round(new_p);
+    }
+}
+
+// complex-unsigned integral.
+template <typename T, enable_if_t<conjunction<is_cpp_unsigned_integral<T>>::value, int> = 0>
+inline void dispatch_complex_in_place_add(complex &a, const T &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+        mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+    } else {
+        dispatch_complex_in_place_add(a, integer<2>{n});
+    }
+}
+
+// complex-bool.
+// NOTE: make this explicit (rather than letting bool fold into
+// the unsigned integrals overload) in order to avoid MSVC warnings.
+MPPP_DLL_PUBLIC void dispatch_complex_in_place_add(complex &, bool);
 
 } // namespace detail
 
@@ -1389,6 +1423,18 @@ template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_ty
 {
     detail::dispatch_complex_in_place_add(a, std::forward<U>(b));
     return a;
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex operator-(T &&c)
+{
+    complex ret{std::forward<T>(c)};
+    ret.neg();
+    return ret;
 }
 
 // Stream operator.

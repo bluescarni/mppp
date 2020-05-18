@@ -334,6 +334,19 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
 namespace detail
 {
 
+void dispatch_complex_in_place_add(complex &c, const real &x)
+{
+    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+
+    mpc_nary_op_impl<false>(x.get_prec(), wrapper, c, c);
+}
+
+void dispatch_complex_in_place_add(complex &a, bool n)
+{
+    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
 bool dispatch_complex_equality(const complex &c1, const complex &c2)
 {
     return ::mpc_cmp(c1.get_mpc_t(), c2.get_mpc_t()) == 0;
