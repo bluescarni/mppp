@@ -456,6 +456,59 @@ TEST_CASE("in-place plus")
         REQUIRE(c1 == complex{1, 2});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(true) + 1);
     }
+
+    // complex-std::complex.
+    {
+        // Other op with same precision.
+        complex c1{1., 2.};
+        c1 += std::complex<double>{3, 4};
+        REQUIRE(c1 == complex{4, 6});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1.));
+
+        // Other op with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 += std::complex<double>{3, 4};
+        REQUIRE(c1 == complex{4, 5});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(4.));
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(detail::real_deduce_precision(1.) + 1)};
+        c1 += std::complex<double>{3, 4};
+        REQUIRE(c1 == complex{4, 6});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1.) + 1);
+    }
+
+#if defined(MPPP_WITH_QUADMATH)
+    // complex-complex128.
+    {
+        // Other op with same precision.
+        complex c1{1., 2., complex_prec_t(113)};
+        c1 += complex128{3, 4};
+        REQUIRE(c1 == complex{4, 6});
+        REQUIRE(c1.get_prec() == 113);
+
+        // Other op with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 += complex128{3, 4};
+        REQUIRE(c1 == complex{4, 5});
+        REQUIRE(c1.get_prec() == 113);
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(114)};
+        c1 += std::complex<double>{3, 4};
+        REQUIRE(c1 == complex{4, 6});
+        REQUIRE(c1.get_prec() == 114);
+    }
+#endif
+
+    // real valued-complex.
+    {
+        int n = 5;
+        n += complex{4, 0};
+        REQUIRE(n == 9);
+
+        n += complex{4, 1};
+    }
 }
 
 TEST_CASE("negation")

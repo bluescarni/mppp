@@ -1410,6 +1410,46 @@ inline void dispatch_complex_in_place_add(complex &a, const T &n)
 // the unsigned integrals overload) in order to avoid MSVC warnings.
 MPPP_DLL_PUBLIC void dispatch_complex_in_place_add(complex &, bool);
 
+// complex-complex valued.
+template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
+inline void dispatch_complex_in_place_add(complex &a, const T &c)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // T is either std::complex<U> or complex128, for which
+    // the precision deduction rules are the same as for U
+    // and real128 (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    complex::re_ref re{a};
+    complex::im_ref im{a};
+
+    *re += c.real();
+    *im += c.imag();
+}
+
+// real valued-complex.
+template <typename T, enable_if_t<is_rv_complex_interoperable<T>::value, int> = 0>
+inline void dispatch_complex_in_place_add(T &x, const complex &c)
+{
+    MPPP_MAYBE_TLS complex tmp;
+    tmp.set_prec(c_max(c.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+    dispatch_complex_in_place_add(tmp, c);
+    x = static_cast<T>(tmp);
+}
+
+// complex valued-complex.
+template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
+inline void dispatch_complex_in_place_add(T &x, const complex &c)
+{
+    MPPP_MAYBE_TLS complex tmp;
+    tmp.set_prec(c_max(c.get_prec(), real_deduce_precision(x.real())));
+    tmp.set(x);
+    dispatch_complex_in_place_add(tmp, c);
+    x = static_cast<T>(tmp);
+}
+
 } // namespace detail
 
 // In-place addition.
