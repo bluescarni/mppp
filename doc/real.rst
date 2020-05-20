@@ -2571,8 +2571,6 @@ Mathematical operators
 
    Prefix increment/decrement.
 
-   The precision of *x* will not be altered by the increment/decrement.
-
    :param x: the input argument.
 
    :return: a reference to *x* after the increment/decrement.
@@ -2581,8 +2579,6 @@ Mathematical operators
 .. cpp:function:: mppp::real mppp::operator--(mppp::real &x, int)
 
    Suffix increment/decrement.
-
-   The precision of *x* will not be altered by the increment/decrement.
 
    :param x: the input argument.
 

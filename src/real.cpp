@@ -1617,6 +1617,9 @@ void dispatch_real_in_place_add(real &a, const real128 &x)
 
 real &operator++(real &x)
 {
+    if (mppp_unlikely(x.get_prec() < detail::real_deduce_precision(1))) {
+        x.prec_round(detail::real_deduce_precision(1));
+    }
     ::mpfr_add_ui(x._get_mpfr_t(), x.get_mpfr_t(), 1ul, MPFR_RNDN);
     return x;
 }
@@ -1718,6 +1721,9 @@ void dispatch_real_in_place_sub(real &a, const real128 &x)
 
 real &operator--(real &x)
 {
+    if (mppp_unlikely(x.get_prec() < detail::real_deduce_precision(1))) {
+        x.prec_round(detail::real_deduce_precision(1));
+    }
     ::mpfr_sub_ui(x._get_mpfr_t(), x.get_mpfr_t(), 1ul, MPFR_RNDN);
     return x;
 }
