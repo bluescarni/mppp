@@ -281,6 +281,12 @@ public:
     // Constructor from a special value and precision.
     explicit real(real_kind, ::mpfr_prec_t);
 
+    // Constructors from n*2**e.
+    template <std::size_t SSize>
+    explicit real(const integer<SSize> &, ::mpfr_exp_t, ::mpfr_prec_t);
+    explicit real(unsigned long, ::mpfr_exp_t, ::mpfr_prec_t);
+    explicit real(long, ::mpfr_exp_t, ::mpfr_prec_t);
+
 private:
     // Construction from FPs.
     template <typename Func, typename T>
@@ -1087,14 +1093,14 @@ private:
 };
 
 template <typename T, typename U>
-using are_real_op_types = detail::disjunction<
-    detail::conjunction<std::is_same<real, detail::uncvref_t<T>>, std::is_same<real, detail::uncvref_t<U>>>,
-    detail::conjunction<std::is_same<real, detail::uncvref_t<T>>, is_real_interoperable<detail::uncvref_t<U>>>,
-    detail::conjunction<std::is_same<real, detail::uncvref_t<U>>, is_real_interoperable<detail::uncvref_t<T>>>>;
+using are_real_op_types
+    = detail::disjunction<detail::conjunction<is_cvr_real<T>, is_cvr_real<U>>,
+                          detail::conjunction<is_cvr_real<T>, is_real_interoperable<detail::uncvref_t<U>>>,
+                          detail::conjunction<is_cvr_real<U>, is_real_interoperable<detail::uncvref_t<T>>>>;
 
 template <typename T, typename U>
 using are_real_in_place_op_types
-    = detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>;
+    = detail::conjunction<detail::negation<std::is_const<detail::unref_t<T>>>, are_real_op_types<T, U>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 
@@ -1129,6 +1135,7 @@ namespace detail
 
 template <typename... Args>
 using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &>()...));
+
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1155,6 +1162,18 @@ inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
 {
     ::mpfr_set_z_2exp(r._get_mpfr_t(), n.get_mpz_view(), e, MPFR_RNDN);
     return r;
+}
+
+MPPP_DLL_PUBLIC real &set_ui_2exp(real &, unsigned long, ::mpfr_exp_t);
+MPPP_DLL_PUBLIC real &set_si_2exp(real &, long, ::mpfr_exp_t);
+
+// Implementation of the constructor from n*2**e, integer overload.
+// Place it here so that set_z_2exp() is visible.
+template <std::size_t SSize>
+inline real::real(const integer<SSize> &n, ::mpfr_exp_t e, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
+    set_z_2exp(*this, n, e);
 }
 
 // Set to NaN.
@@ -1526,50 +1545,6 @@ inline real fms(T &&a, U &&b, V &&c)
                                                   std::forward<V>(c));
 }
 
-// Binary negation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &neg(real &rop, T &&x)
-{
-    return detail::mpfr_nary_op_impl<true>(0, ::mpfr_neg, rop, std::forward<T>(x));
-}
-
-// Unary negation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real neg(T &&x)
-{
-    return detail::mpfr_nary_op_return_impl<true>(0, ::mpfr_neg, std::forward<T>(x));
-}
-
-// Binary absolute value.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &abs(real &rop, T &&x)
-{
-    return detail::mpfr_nary_op_impl<true>(0, ::mpfr_abs, rop, std::forward<T>(x));
-}
-
-// Unary absolute value.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real abs(T &&x)
-{
-    return detail::mpfr_nary_op_return_impl<true>(0, ::mpfr_abs, std::forward<T>(x));
-}
-
 // mul2/div2 primitives.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
@@ -1823,6 +1798,10 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
         return detail::dispatch_##name(std::forward<T>(y), std::forward<U>(x));                                        \
     }
 
+// Neg and abs.
+MPPP_REAL_MPFR_UNARY_IMPL(neg, ::mpfr_neg, true)
+MPPP_REAL_MPFR_UNARY_IMPL(abs, ::mpfr_abs, true)
+
 // Square root.
 MPPP_REAL_MPFR_UNARY_IMPL(sqrt, ::mpfr_sqrt, true)
 
@@ -1881,15 +1860,14 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_pow(T &&op1, U &&op2)
 {
     return mpfr_nary_op_return_impl<true>(0, ::mpfr_pow, std::forward<T>(op1), std::forward<U>(op2));
 }
 
 // real-integer.
-template <typename T, std::size_t SSize, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const integer<SSize> &n)
 {
     auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
@@ -1901,8 +1879,7 @@ inline real dispatch_real_pow(T &&a, const integer<SSize> &n)
 }
 
 // real-unsigned integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -1916,8 +1893,7 @@ inline real dispatch_real_pow(T &&a, const U &n)
 }
 
 // real-signed integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
@@ -1931,12 +1907,12 @@ inline real dispatch_real_pow(T &&a, const U &n)
 
 // real-(floating point, rational, real128).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<is_cpp_floating_point<U>, is_rational<U>
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<is_cpp_floating_point<U>, is_rational<U>
 #if defined(MPPP_WITH_QUADMATH)
-                                                                                ,
-                                                                                std::is_same<U, real128>
+                                                              ,
+                                                              std::is_same<U, real128>
 #endif
-                                                                                >>::value,
+                                                              >>::value,
                       int> = 0>
 inline real dispatch_real_pow(T &&a, const U &x)
 {
@@ -1947,10 +1923,10 @@ inline real dispatch_real_pow(T &&a, const U &x)
 }
 
 // (everything but unsigned integral)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_real_interoperable<T>, negation<is_cpp_unsigned_integral<T>>,
-                                  std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_real_interoperable<T>, negation<is_cpp_unsigned_integral<T>>, is_cvr_real<U>>::value,
+                int> = 0>
 inline real dispatch_real_pow(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -1960,10 +1936,9 @@ inline real dispatch_real_pow(const T &x, U &&a)
 }
 
 // unsigned integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_real_interoperable<T>, is_cpp_unsigned_integral<T>,
-                                  std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_real_interoperable<T>, is_cpp_unsigned_integral<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_pow(const T &n, U &&a)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -2252,8 +2227,7 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_binary_add(T &&a, U &&b)
 {
     return mpfr_nary_op_return_impl<true>(0, ::mpfr_add, std::forward<T>(a), std::forward<U>(b));
@@ -2279,8 +2253,7 @@ inline real dispatch_real_binary_add(const integer<SSize> &n, T &&a)
 }
 
 // real-unsigned integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_add(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -2296,7 +2269,7 @@ inline real dispatch_real_binary_add(T &&a, const U &n)
 // real-bool.
 // NOTE: make this explicit (rather than letting bool fold into
 // the unsigned integrals overload) in order to avoid MSVC warnings.
-template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_add(T &&a, const bool &n)
 {
     auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
@@ -2304,16 +2277,14 @@ inline real dispatch_real_binary_add(T &&a, const bool &n)
 }
 
 // unsigned integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cpp_unsigned_integral<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cpp_unsigned_integral<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_binary_add(const T &n, U &&a)
 {
     return dispatch_real_binary_add(std::forward<U>(a), n);
 }
 
 // real-signed integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_add(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
@@ -2326,8 +2297,7 @@ inline real dispatch_real_binary_add(T &&a, const U &n)
 }
 
 // signed integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cpp_signed_integral<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cpp_signed_integral<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_binary_add(const T &n, U &&a)
 {
     return dispatch_real_binary_add(std::forward<U>(a), n);
@@ -2353,8 +2323,7 @@ inline real dispatch_real_binary_add(const rational<SSize> &q, T &&a)
 
 // real-(float, double).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
-                                  disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
                       int> = 0>
 inline real dispatch_real_binary_add(T &&a, const U &x)
 {
@@ -2372,8 +2341,7 @@ inline real dispatch_real_binary_add(T &&a, const U &x)
 
 // (float, double)-real.
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>,
-                                  disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value,
+          enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value,
                       int> = 0>
 inline real dispatch_real_binary_add(const T &x, U &&a)
 {
@@ -2382,12 +2350,12 @@ inline real dispatch_real_binary_add(const T &x, U &&a)
 
 // real-(long double, real128).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
-                                                                                ,
-                                                                                std::is_same<U, real128>
+                                                              ,
+                                                              std::is_same<U, real128>
 #endif
-                                                                                >>::value,
+                                                              >>::value,
                       int> = 0>
 inline real dispatch_real_binary_add(T &&a, const U &x)
 {
@@ -2405,7 +2373,7 @@ template <typename T, typename U,
                                               std::is_same<T, real128>
 #endif
                                               >,
-                                  std::is_same<real, uncvref_t<U>>>::value,
+                                  is_cvr_real<U>>::value,
                       int> = 0>
 inline real dispatch_real_binary_add(const T &x, U &&a)
 {
@@ -2430,11 +2398,10 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
-inline void dispatch_real_in_place_add(T &a, U &&b)
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline void dispatch_real_in_place_add(real &a, T &&b)
 {
-    add(a, a, std::forward<U>(b));
+    add(a, a, std::forward<T>(b));
 }
 
 MPPP_DLL_PUBLIC void dispatch_real_in_place_add_integer_impl(real &, const ::mpz_t, ::mpfr_prec_t);
@@ -2498,67 +2465,11 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_add(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_add(real &, const real128 &);
 #endif
 
-// (c++ arithmetic, real128)-real.
-// NOTE: split this in two parts: for C++ types and real128, we use directly static_cast,
-// for integer and rational we use the get() function. The goal
-// is to produce more meaningful error messages.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<T, real128>
-#endif
-                                              >,
-                                  std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
+// (real interoperable)-real.
+template <typename T, typename U, enable_if_t<is_real_interoperable<T>::value, int> = 0>
 inline void dispatch_real_in_place_add(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_add(tmp, std::forward<U>(a));
-    x = static_cast<T>(tmp);
-}
-
-template <typename T>
-inline void real_in_place_convert(T &x, const real &tmp, const real &a, const char *op)
-{
-    if (mppp_unlikely(!get(x, tmp))) {
-        if (is_integer<T>::value) {
-            // Conversion to integer can fail only if the source value is not finite.
-            assert(!tmp.number_p());
-            throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real " + a.to_string()
-                                    + " with the integer " + x.to_string() + " is the non-finite value "
-                                    + tmp.to_string());
-        } else {
-            // Conversion to rational can fail if the source value is not finite, or if the conversion
-            // results in overflow in the manipulation of the real exponent.
-            if (!tmp.number_p()) {
-                throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real "
-                                        + a.to_string() + " with the rational " + x.to_string()
-                                        + " is the non-finite value " + tmp.to_string());
-            }
-            // LCOV_EXCL_START
-            throw std::overflow_error("The conversion of the real " + tmp.to_string()
-                                      + " to rational during the in-place " + op + " of the real " + a.to_string()
-                                      + " with the rational " + x.to_string()
-                                      + " triggers an internal overflow condition");
-            // LCOV_EXCL_STOP
-        }
-    }
-}
-
-// (integer, rational)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
-inline void dispatch_real_in_place_add(T &x, U &&a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_add(tmp, std::forward<U>(a));
-    real_in_place_convert(x, tmp, a, "addition");
+    x = static_cast<T>(x + std::forward<U>(a));
 }
 
 } // namespace detail
@@ -2599,8 +2510,7 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_binary_sub(T &&a, U &&b)
 {
     return mpfr_nary_op_return_impl<true>(0, ::mpfr_sub, std::forward<T>(a), std::forward<U>(b));
@@ -2628,8 +2538,7 @@ inline real dispatch_real_binary_sub(const integer<SSize> &n, T &&a)
 }
 
 // real-unsigned integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -2643,8 +2552,7 @@ inline real dispatch_real_binary_sub(T &&a, const U &n)
 }
 
 // unsigned integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_sub(const U &n, T &&a)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -2660,7 +2568,7 @@ inline real dispatch_real_binary_sub(const U &n, T &&a)
 // real-bool.
 // NOTE: make this explicit (rather than letting bool fold into
 // the unsigned integrals overload) in order to avoid MSVC warnings.
-template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const bool &n)
 {
     auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
@@ -2668,7 +2576,7 @@ inline real dispatch_real_binary_sub(T &&a, const bool &n)
 }
 
 // bool-real.
-template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_sub(const bool &n, T &&a)
 {
     auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
@@ -2676,8 +2584,7 @@ inline real dispatch_real_binary_sub(const bool &n, T &&a)
 }
 
 // real-signed integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
@@ -2690,8 +2597,7 @@ inline real dispatch_real_binary_sub(T &&a, const U &n)
 }
 
 // signed integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_sub(const U &n, T &&a)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
@@ -2724,8 +2630,7 @@ inline real dispatch_real_binary_sub(const rational<SSize> &q, T &&a)
 
 // real-(float, double).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
-                                  disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
                       int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const U &x)
 {
@@ -2743,8 +2648,7 @@ inline real dispatch_real_binary_sub(T &&a, const U &x)
 
 // (float, double)-real.
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
-                                  disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
                       int> = 0>
 inline real dispatch_real_binary_sub(const U &x, T &&a)
 {
@@ -2762,12 +2666,12 @@ inline real dispatch_real_binary_sub(const U &x, T &&a)
 
 // real-(long double, real128).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
-                                                                                ,
-                                                                                std::is_same<U, real128>
+                                                              ,
+                                                              std::is_same<U, real128>
 #endif
-                                                                                >>::value,
+                                                              >>::value,
                       int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const U &x)
 {
@@ -2779,12 +2683,12 @@ inline real dispatch_real_binary_sub(T &&a, const U &x)
 
 // (long double, real128)-real.
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
-                                                                                ,
-                                                                                std::is_same<U, real128>
+                                                              ,
+                                                              std::is_same<U, real128>
 #endif
-                                                                                >>::value,
+                                                              >>::value,
                       int> = 0>
 inline real dispatch_real_binary_sub(const U &x, T &&a)
 {
@@ -2812,11 +2716,10 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
-inline void dispatch_real_in_place_sub(T &a, U &&b)
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline void dispatch_real_in_place_sub(real &a, T &&b)
 {
-    sub(a, a, std::forward<U>(b));
+    sub(a, a, std::forward<T>(b));
 }
 
 MPPP_DLL_PUBLIC void dispatch_real_in_place_sub_integer_impl(real &, const ::mpz_t, ::mpfr_prec_t);
@@ -2880,36 +2783,11 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_sub(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_sub(real &, const real128 &);
 #endif
 
-// (c++ arithmetic, real128)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<T, real128>
-#endif
-                                              >,
-                                  std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
+// (real interoperable)-real.
+template <typename T, typename U, enable_if_t<is_real_interoperable<T>::value, int> = 0>
 inline void dispatch_real_in_place_sub(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_sub(tmp, std::forward<U>(a));
-    x = static_cast<T>(tmp);
-}
-
-// (integer, rational)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
-inline void dispatch_real_in_place_sub(T &x, U &&a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_sub(tmp, std::forward<U>(a));
-    real_in_place_convert(x, tmp, a, "subtraction");
+    x = static_cast<T>(x - std::forward<U>(a));
 }
 
 } // namespace detail
@@ -2937,8 +2815,7 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_binary_mul(T &&a, U &&b)
 {
     return mpfr_nary_op_return_impl<true>(0, ::mpfr_mul, std::forward<T>(a), std::forward<U>(b));
@@ -2964,8 +2841,7 @@ inline real dispatch_real_binary_mul(const integer<SSize> &n, T &&a)
 }
 
 // real-unsigned integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -2981,7 +2857,7 @@ inline real dispatch_real_binary_mul(T &&a, const U &n)
 // real-bool.
 // NOTE: make this explicit (rather than letting bool fold into
 // the unsigned integrals overload) in order to avoid MSVC warnings.
-template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const bool &n)
 {
     auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
@@ -2989,16 +2865,14 @@ inline real dispatch_real_binary_mul(T &&a, const bool &n)
 }
 
 // unsigned integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cpp_unsigned_integral<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cpp_unsigned_integral<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_binary_mul(const T &n, U &&a)
 {
     return dispatch_real_binary_mul(std::forward<U>(a), n);
 }
 
 // real-signed integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
@@ -3011,8 +2885,7 @@ inline real dispatch_real_binary_mul(T &&a, const U &n)
 }
 
 // signed integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cpp_signed_integral<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cpp_signed_integral<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_binary_mul(const T &n, U &&a)
 {
     return dispatch_real_binary_mul(std::forward<U>(a), n);
@@ -3038,8 +2911,7 @@ inline real dispatch_real_binary_mul(const rational<SSize> &q, T &&a)
 
 // real-(float, double).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
-                                  disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
                       int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &x)
 {
@@ -3057,8 +2929,7 @@ inline real dispatch_real_binary_mul(T &&a, const U &x)
 
 // (float, double)-real.
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>,
-                                  disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value,
+          enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value,
                       int> = 0>
 inline real dispatch_real_binary_mul(const T &x, U &&a)
 {
@@ -3067,12 +2938,12 @@ inline real dispatch_real_binary_mul(const T &x, U &&a)
 
 // real-(long double, real128).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
-                                                                                ,
-                                                                                std::is_same<U, real128>
+                                                              ,
+                                                              std::is_same<U, real128>
 #endif
-                                                                                >>::value,
+                                                              >>::value,
                       int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &x)
 {
@@ -3090,7 +2961,7 @@ template <typename T, typename U,
                                               std::is_same<T, real128>
 #endif
                                               >,
-                                  std::is_same<real, uncvref_t<U>>>::value,
+                                  is_cvr_real<U>>::value,
                       int> = 0>
 inline real dispatch_real_binary_mul(const T &x, U &&a)
 {
@@ -3115,11 +2986,10 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
-inline void dispatch_real_in_place_mul(T &a, U &&b)
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline void dispatch_real_in_place_mul(real &a, T &&b)
 {
-    mul(a, a, std::forward<U>(b));
+    mul(a, a, std::forward<T>(b));
 }
 
 MPPP_DLL_PUBLIC void dispatch_real_in_place_mul_integer_impl(real &, const ::mpz_t, ::mpfr_prec_t);
@@ -3183,39 +3053,11 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_mul(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_mul(real &, const real128 &);
 #endif
 
-// (c++ arithmetic, real128)-real.
-// NOTE: split this in two parts: for C++ types and real128, we use directly static_cast,
-// for integer and rational we use the get() function. The goal
-// is to produce more meaningful error messages.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<T, real128>
-#endif
-                                              >,
-                                  std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
+// (real interoperable)-real.
+template <typename T, typename U, enable_if_t<is_real_interoperable<T>::value, int> = 0>
 inline void dispatch_real_in_place_mul(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_mul(tmp, std::forward<U>(a));
-    x = static_cast<T>(tmp);
-}
-
-// (integer, rational)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
-inline void dispatch_real_in_place_mul(T &x, U &&a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_mul(tmp, std::forward<U>(a));
-    real_in_place_convert(x, tmp, a, "multiplication");
+    x = static_cast<T>(x * std::forward<U>(a));
 }
 
 } // namespace detail
@@ -3237,8 +3079,7 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cvr_real<U>>::value, int> = 0>
 inline real dispatch_real_binary_div(T &&a, U &&b)
 {
     return mpfr_nary_op_return_impl<true>(0, ::mpfr_div, std::forward<T>(a), std::forward<U>(b));
@@ -3247,15 +3088,15 @@ inline real dispatch_real_binary_div(T &&a, U &&b)
 // (long double, real128, integer, rational)-real.
 // NOTE: place it here because it is used in the
 // implementations below.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
-                                  disjunction<std::is_same<U, long double>, is_integer<U>, is_rational<U>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, long double>, is_integer<U>, is_rational<U>
 #if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<U, real128>
+                                                        ,
+                                                        std::is_same<U, real128>
 #endif
-                                              >>::value,
-                      int> = 0>
+                                                        >>::value,
+                int> = 0>
 inline real dispatch_real_binary_div(const U &x, T &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3277,8 +3118,7 @@ inline real dispatch_real_binary_div(T &&a, const integer<SSize> &n)
 }
 
 // real-unsigned integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -3292,8 +3132,7 @@ inline real dispatch_real_binary_div(T &&a, const U &n)
 }
 
 // unsigned integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_div(const U &n, T &&a)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -3309,7 +3148,7 @@ inline real dispatch_real_binary_div(const U &n, T &&a)
 // real-bool.
 // NOTE: make this explicit (rather than letting bool fold into
 // the unsigned integrals overload) in order to avoid MSVC warnings.
-template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_div(T &&a, const bool &n)
 {
     auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
@@ -3317,7 +3156,7 @@ inline real dispatch_real_binary_div(T &&a, const bool &n)
 }
 
 // bool-real.
-template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_div(const bool &n, T &&a)
 {
     auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_div(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
@@ -3325,8 +3164,7 @@ inline real dispatch_real_binary_div(const bool &n, T &&a)
 }
 
 // real-signed integral.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
@@ -3339,8 +3177,7 @@ inline real dispatch_real_binary_div(T &&a, const U &n)
 }
 
 // signed integral-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_cpp_signed_integral<U>>::value, int> = 0>
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_binary_div(const U &n, T &&a)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
@@ -3365,8 +3202,7 @@ inline real dispatch_real_binary_div(T &&a, const rational<SSize> &q)
 
 // real-(float, double).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
-                                  disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
                       int> = 0>
 inline real dispatch_real_binary_div(T &&a, const U &x)
 {
@@ -3384,8 +3220,7 @@ inline real dispatch_real_binary_div(T &&a, const U &x)
 
 // (float, double)-real.
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>,
-                                  disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
                       int> = 0>
 inline real dispatch_real_binary_div(const U &x, T &&a)
 {
@@ -3403,12 +3238,12 @@ inline real dispatch_real_binary_div(const U &x, T &&a)
 
 // real-(long double, real128).
 template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, disjunction<std::is_same<U, long double>
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, long double>
 #if defined(MPPP_WITH_QUADMATH)
-                                                                                ,
-                                                                                std::is_same<U, real128>
+                                                              ,
+                                                              std::is_same<U, real128>
 #endif
-                                                                                >>::value,
+                                                              >>::value,
                       int> = 0>
 inline real dispatch_real_binary_div(T &&a, const U &x)
 {
@@ -3435,11 +3270,10 @@ namespace detail
 {
 
 // real-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
-inline void dispatch_real_in_place_div(T &a, U &&b)
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline void dispatch_real_in_place_div(real &a, T &&b)
 {
-    div(a, a, std::forward<U>(b));
+    div(a, a, std::forward<T>(b));
 }
 
 MPPP_DLL_PUBLIC void dispatch_real_in_place_div_integer_impl(real &, const ::mpz_t, ::mpfr_prec_t);
@@ -3503,36 +3337,11 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_div(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_div(real &, const real128 &);
 #endif
 
-// (c++ arithmetic, real128)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<T, real128>
-#endif
-                                              >,
-                                  std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
+// (real interoperable)-real.
+template <typename T, typename U, enable_if_t<is_real_interoperable<T>::value, int> = 0>
 inline void dispatch_real_in_place_div(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_div(tmp, std::forward<U>(a));
-    x = static_cast<T>(tmp);
-}
-
-// (integer, rational)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
-                      int> = 0>
-inline void dispatch_real_in_place_div(T &x, U &&a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_div(tmp, std::forward<U>(a));
-    real_in_place_convert(x, tmp, a, "division");
+    x = static_cast<T>(x / std::forward<U>(a));
 }
 
 } // namespace detail

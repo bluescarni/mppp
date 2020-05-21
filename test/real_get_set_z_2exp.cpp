@@ -23,10 +23,13 @@ TEST_CASE("real set_z_2exp")
     real r0{45};
     set_z_2exp(r0, int_t{2}, 4);
     REQUIRE(r0 == 32);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
     set_z_2exp(r0, int_t{-1}, -1);
     REQUIRE(r0 == real{"-.5", 7});
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
     set_z_2exp(r0, int_t{0}, -1);
     REQUIRE(r0 == real{});
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
     REQUIRE(!r0.signbit());
 }
 
@@ -53,4 +56,26 @@ TEST_CASE("real get_z_2exp")
     REQUIRE(n == old_n);
     exp = get_z_2exp(n, real{});
     REQUIRE(n.is_zero());
+}
+
+TEST_CASE("real set_ui_si_2exp")
+{
+    real r0{45};
+    set_ui_2exp(r0, 2, 4);
+    REQUIRE(r0 == 32);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
+    set_si_2exp(r0, 2, 5);
+    REQUIRE(r0 == 64);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
+    set_si_2exp(r0, -1, -1);
+    REQUIRE(r0 == real{"-.5", 7});
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
+    set_si_2exp(r0, 0, -1);
+    REQUIRE(r0 == real{});
+    REQUIRE(!r0.signbit());
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
+    set_ui_2exp(r0, 0, -1);
+    REQUIRE(r0 == real{});
+    REQUIRE(!r0.signbit());
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
 }

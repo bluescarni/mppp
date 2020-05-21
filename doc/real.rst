@@ -100,7 +100,7 @@ The real class
 
       Copy/move constructors with custom precision.
 
-      These constructors will set *this* to the value of *other* with precision *p*. If *p*
+      These constructors will set ``this`` to the value of *other* with precision *p*. If *p*
       is smaller than the precision of *other*, a rounding operation will be performed,
       otherwise the value will be copied exactly.
 
@@ -135,6 +135,23 @@ The real class
       :param k: the desired special value.
       :param sign: the desired sign for ``this``.
       :param p: the desired precision for ``this``.
+
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
+   .. cpp:function:: template <std::size_t SSize> explicit real(const integer<SSize> &n, mpfr_exp_t e, mpfr_prec_t p)
+   .. cpp:function:: explicit real(unsigned long n, mpfr_exp_t e, mpfr_prec_t p)
+   .. cpp:function:: explicit real(long n, mpfr_exp_t e, mpfr_prec_t p)
+
+      .. versionadded:: 0.20
+
+      Constructors from an integral multiple of a power of two.
+
+      These constructors will set ``this`` to :math:`n\times 2^e` with a precision of *p*.
+
+      :param n: the integral multiple.
+      :param e: the power of 2.
+      :param p: the desired precision.
 
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
@@ -1056,15 +1073,22 @@ Assignment
 
    :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::real::set()` overload.
 
+.. cpp:function:: mppp::real &mppp::set_ui_2exp(mppp::real &r, unsigned long n, mpfr_exp_t e)
+.. cpp:function:: mppp::real &mppp::set_si_2exp(mppp::real &r, long n, mpfr_exp_t e)
 .. cpp:function:: template <std::size_t SSize> mppp::real &mppp::set_z_2exp(mppp::real &r, const mppp::integer<SSize> &n, mpfr_exp_t e)
 
    Set to :math:`n\times 2^e`.
 
-   This function will set *r* to :math:`n\times 2^e`. The precision of *r*
+   These functions will set *r* to :math:`n\times 2^e`. The precision of *r*
    will not be altered. If *n* is zero, the result will be positive zero.
 
+   .. versionadded:: 0.20
+
+      The :cpp:func:`~mppp::set_ui_2exp()` and :cpp:func:`~mppp::set_si_2exp()`
+      functions.
+
    :param r: the return value.
-   :param n: input :cpp:class:`~mppp::integer`.
+   :param n: the input integer multiplier.
    :param e: the exponent.
 
    :return: a reference to *r*.
@@ -1102,7 +1126,7 @@ Conversion
    Generic conversion function.
 
    This function will convert the input :cpp:class:`~mppp::real` *x* to
-   `T`, storing the result of the conversion into *rop*.
+   ``T``, storing the result of the conversion into *rop*.
    If the conversion is successful, the function
    will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
    not be altered.
@@ -2547,8 +2571,6 @@ Mathematical operators
 
    Prefix increment/decrement.
 
-   The precision of *x* will not be altered by the increment/decrement.
-
    :param x: the input argument.
 
    :return: a reference to *x* after the increment/decrement.
@@ -2557,8 +2579,6 @@ Mathematical operators
 .. cpp:function:: mppp::real mppp::operator--(mppp::real &x, int)
 
    Suffix increment/decrement.
-
-   The precision of *x* will not be altered by the increment/decrement.
 
    :param x: the input argument.
 

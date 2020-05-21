@@ -324,6 +324,12 @@ TEST_CASE("real right in-place add")
         n = -1;
         REQUIRE_THROWS_AS(n += real{detail::nl_min<int>()}, std::overflow_error);
         REQUIRE(n == -1);
+
+        // Check stealing.
+        real r{123, detail::real_deduce_precision(5) + 1};
+        n += std::move(r);
+        REQUIRE(n == 122);
+        REQUIRE(!r.is_valid());
     }
     {
         unsigned n = 3;
@@ -728,6 +734,12 @@ TEST_CASE("real right in-place sub")
         n = -1;
         REQUIRE_THROWS_AS(n -= -real{detail::nl_min<int>()}, std::overflow_error);
         REQUIRE(n == -1);
+
+        // Check stealing.
+        real r{123, detail::real_deduce_precision(5) + 1};
+        n -= std::move(r);
+        REQUIRE(n == -124);
+        REQUIRE(!r.is_valid());
     }
     {
         unsigned n = 3;
@@ -1116,6 +1128,12 @@ TEST_CASE("real right in-place mul")
         n = -2;
         REQUIRE_THROWS_AS(n *= real{detail::nl_min<int>()}, std::overflow_error);
         REQUIRE(n == -2);
+
+        // Check stealing.
+        real r{2, detail::real_deduce_precision(5) + 1};
+        n *= std::move(r);
+        REQUIRE(n == -4);
+        REQUIRE(!r.is_valid());
     }
     {
         unsigned n = 3;
@@ -1498,6 +1516,12 @@ TEST_CASE("real right in-place div")
         n = 2;
         REQUIRE_THROWS_AS((n /= real{0, 5}), std::domain_error);
         REQUIRE(n == 2);
+
+        // Check stealing.
+        real r{2, detail::real_deduce_precision(5) + 1};
+        n /= std::move(r);
+        REQUIRE(n == 1);
+        REQUIRE(!r.is_valid());
     }
     {
         unsigned n = 3;
@@ -2037,13 +2061,16 @@ TEST_CASE("real incdec")
     REQUIRE(r0.zero_p());
 
     // Check precision handling.
-    r0 = real{0, 12};
+    r0 = real{0, 4};
     ++r0;
-    REQUIRE(r0.get_prec() == 12);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(1));
+    r0 = real{0, 4};
     r0++;
-    REQUIRE(r0.get_prec() == 12);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(1));
+    r0 = real{0, 4};
     --r0;
-    REQUIRE(r0.get_prec() == 12);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(1));
+    r0 = real{0, 4};
     r0--;
-    REQUIRE(r0.get_prec() == 12);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(1));
 }
