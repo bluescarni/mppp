@@ -656,6 +656,47 @@ TEST_CASE("real kind constructors")
         });
 }
 
+TEST_CASE("real 2exp ctors")
+{
+    using Catch::Matchers::Message;
+
+    auto r = real{0ul, 4, 56};
+    REQUIRE(r.zero_p());
+    REQUIRE(!r.signbit());
+    REQUIRE(r.get_prec() == 56);
+    REQUIRE_THROWS_MATCHES((r = real{0ul, 4, -1}), std::invalid_argument,
+                           Message("Cannot init a real with a precision of -1: the maximum allowed precision is "
+                                   + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                   + detail::to_string(real_prec_min())));
+    r = real{2ul, 4, 57};
+    REQUIRE(r == 32);
+    REQUIRE(r.get_prec() == 57);
+
+    r = real{0l, 4, 56};
+    REQUIRE(r.zero_p());
+    REQUIRE(!r.signbit());
+    REQUIRE(r.get_prec() == 56);
+    REQUIRE_THROWS_MATCHES((r = real{0l, 4, -1}), std::invalid_argument,
+                           Message("Cannot init a real with a precision of -1: the maximum allowed precision is "
+                                   + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                   + detail::to_string(real_prec_min())));
+    r = real{2l, 4, 57};
+    REQUIRE(r == 32);
+    REQUIRE(r.get_prec() == 57);
+
+    r = real{0_z1, 4, 56};
+    REQUIRE(r.zero_p());
+    REQUIRE(!r.signbit());
+    REQUIRE(r.get_prec() == 56);
+    REQUIRE_THROWS_MATCHES((r = real{0_z1, 4, -1}), std::invalid_argument,
+                           Message("Cannot init a real with a precision of -1: the maximum allowed precision is "
+                                   + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                   + detail::to_string(real_prec_min())));
+    r = real{2_z1, 4, 57};
+    REQUIRE(r == 32);
+    REQUIRE(r.get_prec() == 57);
+}
+
 struct int_ass_tester {
     template <typename T>
     void operator()(const T &) const

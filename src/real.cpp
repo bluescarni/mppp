@@ -659,6 +659,19 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
 // Constructor from a special value and precision.
 real::real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
 
+// Constructors from n*2**e.
+real::real(unsigned long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
+    set_ui_2exp(*this, n, e);
+}
+
+real::real(long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
+    set_si_2exp(*this, n, e);
+}
+
 // Copy constructor from mpfr_t.
 real::real(const ::mpfr_t x)
 {
@@ -1346,6 +1359,19 @@ real &real::trunc()
     return self_mpfr_unary_nornd(::mpfr_trunc);
 }
 
+// Set to n*2**e.
+real &set_ui_2exp(real &r, unsigned long n, ::mpfr_exp_t e)
+{
+    ::mpfr_set_ui_2exp(r._get_mpfr_t(), n, e, MPFR_RNDN);
+    return r;
+}
+
+real &set_si_2exp(real &r, long n, ::mpfr_exp_t e)
+{
+    ::mpfr_set_si_2exp(r._get_mpfr_t(), n, e, MPFR_RNDN);
+    return r;
+}
+
 // Implementation bits for in-place addition.
 namespace detail
 {
@@ -1436,6 +1462,9 @@ void dispatch_real_in_place_add(real &a, const real128 &x)
 
 real &operator++(real &x)
 {
+    if (mppp_unlikely(x.get_prec() < detail::real_deduce_precision(1))) {
+        x.prec_round(detail::real_deduce_precision(1));
+    }
     ::mpfr_add_ui(x._get_mpfr_t(), x.get_mpfr_t(), 1ul, MPFR_RNDN);
     return x;
 }
@@ -1537,6 +1566,9 @@ void dispatch_real_in_place_sub(real &a, const real128 &x)
 
 real &operator--(real &x)
 {
+    if (mppp_unlikely(x.get_prec() < detail::real_deduce_precision(1))) {
+        x.prec_round(detail::real_deduce_precision(1));
+    }
     ::mpfr_sub_ui(x._get_mpfr_t(), x.get_mpfr_t(), 1ul, MPFR_RNDN);
     return x;
 }

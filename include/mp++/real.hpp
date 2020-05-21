@@ -297,6 +297,12 @@ public:
     // Constructor from a special value and precision.
     explicit real(real_kind, ::mpfr_prec_t);
 
+    // Constructors from n*2**e.
+    template <std::size_t SSize>
+    explicit real(const integer<SSize> &, ::mpfr_exp_t, ::mpfr_prec_t);
+    explicit real(unsigned long, ::mpfr_exp_t, ::mpfr_prec_t);
+    explicit real(long, ::mpfr_exp_t, ::mpfr_prec_t);
+
 private:
     // Construction from FPs.
     template <typename Func, typename T>
@@ -1183,6 +1189,18 @@ inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
 {
     ::mpfr_set_z_2exp(r._get_mpfr_t(), n.get_mpz_view(), e, MPFR_RNDN);
     return r;
+}
+
+MPPP_DLL_PUBLIC real &set_ui_2exp(real &, unsigned long, ::mpfr_exp_t);
+MPPP_DLL_PUBLIC real &set_si_2exp(real &, long, ::mpfr_exp_t);
+
+// Implementation of the constructor from n*2**e, integer overload.
+// Place it here so that set_z_2exp() is visible.
+template <std::size_t SSize>
+inline real::real(const integer<SSize> &n, ::mpfr_exp_t e, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
+    set_z_2exp(*this, n, e);
 }
 
 // Set to NaN.
@@ -2474,66 +2492,11 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_add(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_add(real &, const real128 &);
 #endif
 
-// (c++ arithmetic, real128)-real.
-// NOTE: split this in two parts: for C++ types and real128, we use directly static_cast,
-// for integer and rational we use the get() function. The goal
-// is to produce more meaningful error messages.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<T, real128>
-#endif
-                                              >,
-                                  is_cvr_real<U>>::value,
-                      int> = 0>
+// (real interoperable)-real.
+template <typename T, typename U, enable_if_t<is_real_interoperable<T>::value, int> = 0>
 inline void dispatch_real_in_place_add(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_add(tmp, std::forward<U>(a));
-    x = static_cast<T>(tmp);
-}
-
-template <typename T>
-inline void real_in_place_convert(T &x, const real &tmp, const real &a, const char *op)
-{
-    if (mppp_unlikely(!get(x, tmp))) {
-        if (is_integer<T>::value) {
-            // Conversion to integer can fail only if the source value is not finite.
-            assert(!tmp.number_p());
-            throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real " + a.to_string()
-                                    + " with the integer " + x.to_string() + " is the non-finite value "
-                                    + tmp.to_string());
-        } else {
-            // Conversion to rational can fail if the source value is not finite, or if the conversion
-            // results in overflow in the manipulation of the real exponent.
-            if (!tmp.number_p()) {
-                throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real "
-                                        + a.to_string() + " with the rational " + x.to_string()
-                                        + " is the non-finite value " + tmp.to_string());
-            }
-            // LCOV_EXCL_START
-            throw std::overflow_error("The conversion of the real " + tmp.to_string()
-                                      + " to rational during the in-place " + op + " of the real " + a.to_string()
-                                      + " with the rational " + x.to_string()
-                                      + " triggers an internal overflow condition");
-            // LCOV_EXCL_STOP
-        }
-    }
-}
-
-// (integer, rational)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, is_cvr_real<U>>::value, int> = 0>
-inline void dispatch_real_in_place_add(T &x, U &&a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_add(tmp, std::forward<U>(a));
-    real_in_place_convert(x, tmp, a, "addition");
+    x = static_cast<T>(x + std::forward<U>(a));
 }
 
 } // namespace detail
@@ -2847,35 +2810,11 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_sub(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_sub(real &, const real128 &);
 #endif
 
-// (c++ arithmetic, real128)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<T, real128>
-#endif
-                                              >,
-                                  is_cvr_real<U>>::value,
-                      int> = 0>
+// (real interoperable)-real.
+template <typename T, typename U, enable_if_t<is_real_interoperable<T>::value, int> = 0>
 inline void dispatch_real_in_place_sub(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_sub(tmp, std::forward<U>(a));
-    x = static_cast<T>(tmp);
-}
-
-// (integer, rational)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, is_cvr_real<U>>::value, int> = 0>
-inline void dispatch_real_in_place_sub(T &x, U &&a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_sub(tmp, std::forward<U>(a));
-    real_in_place_convert(x, tmp, a, "subtraction");
+    x = static_cast<T>(x - std::forward<U>(a));
 }
 
 } // namespace detail
@@ -3141,38 +3080,11 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_mul(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_mul(real &, const real128 &);
 #endif
 
-// (c++ arithmetic, real128)-real.
-// NOTE: split this in two parts: for C++ types and real128, we use directly static_cast,
-// for integer and rational we use the get() function. The goal
-// is to produce more meaningful error messages.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<T, real128>
-#endif
-                                              >,
-                                  is_cvr_real<U>>::value,
-                      int> = 0>
+// (real interoperable)-real.
+template <typename T, typename U, enable_if_t<is_real_interoperable<T>::value, int> = 0>
 inline void dispatch_real_in_place_mul(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_mul(tmp, std::forward<U>(a));
-    x = static_cast<T>(tmp);
-}
-
-// (integer, rational)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, is_cvr_real<U>>::value, int> = 0>
-inline void dispatch_real_in_place_mul(T &x, U &&a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_mul(tmp, std::forward<U>(a));
-    real_in_place_convert(x, tmp, a, "multiplication");
+    x = static_cast<T>(x * std::forward<U>(a));
 }
 
 } // namespace detail
@@ -3452,35 +3364,11 @@ MPPP_DLL_PUBLIC void dispatch_real_in_place_div(real &, const long double &);
 MPPP_DLL_PUBLIC void dispatch_real_in_place_div(real &, const real128 &);
 #endif
 
-// (c++ arithmetic, real128)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_cpp_arithmetic<T>
-#if defined(MPPP_WITH_QUADMATH)
-                                              ,
-                                              std::is_same<T, real128>
-#endif
-                                              >,
-                                  is_cvr_real<U>>::value,
-                      int> = 0>
+// (real interoperable)-real.
+template <typename T, typename U, enable_if_t<is_real_interoperable<T>::value, int> = 0>
 inline void dispatch_real_in_place_div(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_div(tmp, std::forward<U>(a));
-    x = static_cast<T>(tmp);
-}
-
-// (integer, rational)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, is_cvr_real<U>>::value, int> = 0>
-inline void dispatch_real_in_place_div(T &x, U &&a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_real_in_place_div(tmp, std::forward<U>(a));
-    real_in_place_convert(x, tmp, a, "division");
+    x = static_cast<T>(x / std::forward<U>(a));
 }
 
 } // namespace detail
