@@ -79,7 +79,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#real-imaginary-parts">Real/imaginary parts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#conversion">Conversion</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#basic-complex-functions">Basic complex functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#arithmetic">Arithmetic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#roots">Roots</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#exponentiation">Exponentiation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#trigonometry">Trigonometry</a></li>
@@ -436,6 +436,10 @@ from string.</p>
 <dt id="_CPPv4I_24complex128_interoperableENK4mppp10complex128cv1TEv">
 <span id="_CPPv3I_24complex128_interoperableENK4mppp10complex128cv1TEv"></span><span id="_CPPv2I_24complex128_interoperableENK4mppp10complex128cv1TEv"></span>template&lt;<a class="reference internal" href="#_CPPv4I0EN4mppp24complex128_interoperableE" title="mppp::complex128_interoperable">complex128_interoperable</a> <code class="descname">T</code>&gt;<br /><em class="property">explicit</em> <em class="property">constexpr</em> <code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_24complex128_interoperableENK4mppp10complex128cv1TEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Conversion to real-valued interoperable types.</p>
+<p>Conversion to non-<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> types uses the cast operator
+of <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>. Conversion to <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+invokes the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> constructor from <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>,
+and thus produces a return value with a precision of 113 bits.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to the type <code class="docutils literal notranslate"><span class="pre">T</span></code>.</p>
 </dd>
@@ -851,8 +855,8 @@ if either:</p>
 </dd></dl>
 
 </div>
-<div class="section" id="basic-complex-functions">
-<h3>Basic complex functions<a class="headerlink" href="#basic-complex-functions" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="arithmetic">
+<h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp3absERKN4mppp10complex128E">
 <span id="_CPPv3N4mppp3absERKN4mppp10complex128E"></span><span id="_CPPv2N4mppp3absERKN4mppp10complex128E"></span><span id="mppp::abs__mppp::complex128CR"></span>mppp::<a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">abs</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128">complex128</a> &amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3absERKN4mppp10complex128E" title="Permalink to this definition">¶</a><br /></dt>

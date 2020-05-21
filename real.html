@@ -240,7 +240,7 @@ member function. After re-assignment, <em>other</em> can be used normally again.
 <dt id="_CPPv4N4mppp4real4realERR4real11mpfr_prec_t">
 <span id="_CPPv3N4mppp4real4realERR4real11mpfr_prec_t"></span><span id="_CPPv2N4mppp4real4realERR4real11mpfr_prec_t"></span><span id="mppp::real::real__realRR.mpfr_prec_t"></span><em class="property">explicit</em> <code class="descname">real</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4mppp4real4realERR4real11mpfr_prec_t" title="mppp::real::real">real</a> &amp;&amp;<em>other</em>, <a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4realERR4real11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Copy/move constructors with custom precision.</p>
-<p>These constructors will set <em>this</em> to the value of <em>other</em> with precision <em>p</em>. If <em>p</em>
+<p>These constructors will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to the value of <em>other</em> with precision <em>p</em>. If <em>p</em>
 is smaller than the precision of <em>other</em>, a rounding operation will be performed,
 otherwise the value will be copied exactly.</p>
 <p>After move construction, the only valid operations on <em>other</em> are
@@ -281,6 +281,37 @@ is nonnegative, negative otherwise.</p>
 <li><strong>k</strong> – the desired special value.</li>
 <li><strong>sign</strong> – the desired sign for <code class="docutils literal notranslate"><span class="pre">this</span></code>.</li>
 <li><strong>p</strong> – the desired precision for <code class="docutils literal notranslate"><span class="pre">this</span></code>.</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if <em>p</em> is outside the range established by
+<a class="reference internal" href="#_CPPv4N4mppp13real_prec_minEv" title="mppp::real_prec_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_min()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp13real_prec_maxEv" title="mppp::real_prec_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_max()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp4real4realERK7integerI5SSizeE10mpfr_exp_t11mpfr_prec_t">
+<span id="_CPPv3I_NSt6size_tEEN4mppp4real4realERK7integerI5SSizeE10mpfr_exp_t11mpfr_prec_t"></span><span id="_CPPv2I_NSt6size_tEEN4mppp4real4realERK7integerI5SSizeE10mpfr_exp_t11mpfr_prec_t"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br /><em class="property">explicit</em> <code class="descname">real</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4real4realERK7integerI5SSizeE10mpfr_exp_t11mpfr_prec_t" title="mppp::real::real::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv410mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em>, <a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp4real4realERK7integerI5SSizeE10mpfr_exp_t11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real4realEm10mpfr_exp_t11mpfr_prec_t">
+<span id="_CPPv3N4mppp4real4realEm10mpfr_exp_t11mpfr_prec_t"></span><span id="_CPPv2N4mppp4real4realEm10mpfr_exp_t11mpfr_prec_t"></span><span id="mppp::real::real__unsigned-l.mpfr_exp_t.mpfr_prec_t"></span><em class="property">explicit</em> <code class="descname">real</code><span class="sig-paren">(</span>unsigned long <em>n</em>, <a class="reference internal" href="#_CPPv410mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em>, <a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4realEm10mpfr_exp_t11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real4realEl10mpfr_exp_t11mpfr_prec_t">
+<span id="_CPPv3N4mppp4real4realEl10mpfr_exp_t11mpfr_prec_t"></span><span id="_CPPv2N4mppp4real4realEl10mpfr_exp_t11mpfr_prec_t"></span><span id="mppp::real::real__l.mpfr_exp_t.mpfr_prec_t"></span><em class="property">explicit</em> <code class="descname">real</code><span class="sig-paren">(</span>long <em>n</em>, <a class="reference internal" href="#_CPPv410mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em>, <a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4realEl10mpfr_exp_t11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>Constructors from an integral multiple of a power of two.</p>
+<p>These constructors will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <span class="math notranslate nohighlight">\(n\times 2^e\)</span> with a precision of <em>p</em>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>n</strong> – the integral multiple.</li>
+<li><strong>e</strong> – the power of 2.</li>
+<li><strong>p</strong> – the desired precision.</li>
 </ul>
 </dd>
 <dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if <em>p</em> is outside the range established by
@@ -1550,15 +1581,29 @@ the body of this function is equivalent to</p>
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N4mppp11set_ui_2expERN4mppp4realEm10mpfr_exp_t">
+<span id="_CPPv3N4mppp11set_ui_2expERN4mppp4realEm10mpfr_exp_t"></span><span id="_CPPv2N4mppp11set_ui_2expERN4mppp4realEm10mpfr_exp_t"></span><span id="mppp::set_ui_2exp__mppp::realR.unsigned-l.mpfr_exp_t"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_ui_2exp</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em>, unsigned long <em>n</em>, <a class="reference internal" href="#_CPPv410mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp11set_ui_2expERN4mppp4realEm10mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp11set_si_2expERN4mppp4realEl10mpfr_exp_t">
+<span id="_CPPv3N4mppp11set_si_2expERN4mppp4realEl10mpfr_exp_t"></span><span id="_CPPv2N4mppp11set_si_2expERN4mppp4realEl10mpfr_exp_t"></span><span id="mppp::set_si_2exp__mppp::realR.l.mpfr_exp_t"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_si_2exp</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em>, long <em>n</em>, <a class="reference internal" href="#_CPPv410mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp11set_si_2expERN4mppp4realEl10mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp10set_z_2expERN4mppp4realERN4mppp4realERKN4mppp7integerI5SSizeEE10mpfr_exp_t">
 <span id="_CPPv3I_NSt6size_tEEN4mppp10set_z_2expERN4mppp4realERKN4mppp7integerI5SSizeEE10mpfr_exp_t"></span><span id="_CPPv2I_NSt6size_tEEN4mppp10set_z_2expERN4mppp4realERKN4mppp7integerI5SSizeEE10mpfr_exp_t"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_z_2exp</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em>, <em class="property">const</em> mppp::<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp10set_z_2expERN4mppp4realERN4mppp4realERKN4mppp7integerI5SSizeEE10mpfr_exp_t" title="mppp::set_z_2exp::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv410mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp10set_z_2expERN4mppp4realERN4mppp4realERKN4mppp7integerI5SSizeEE10mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set to <span class="math notranslate nohighlight">\(n\times 2^e\)</span>.</p>
-<p>This function will set <em>r</em> to <span class="math notranslate nohighlight">\(n\times 2^e\)</span>. The precision of <em>r</em>
+<p>These functions will set <em>r</em> to <span class="math notranslate nohighlight">\(n\times 2^e\)</span>. The precision of <em>r</em>
 will not be altered. If <em>n</em> is zero, the result will be positive zero.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20: </span>The <a class="reference internal" href="#_CPPv4N4mppp11set_ui_2expERN4mppp4realEm10mpfr_exp_t" title="mppp::set_ui_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">set_ui_2exp()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp11set_si_2expERN4mppp4realEl10mpfr_exp_t" title="mppp::set_si_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">set_si_2exp()</span></code></a>
+functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>r</strong> – the return value.</li>
-<li><strong>n</strong> – input <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
+<li><strong>n</strong> – the input integer multiplier.</li>
 <li><strong>e</strong> – the exponent.</li>
 </ul>
 </dd>
@@ -1617,7 +1662,7 @@ bit is unspecified.</p>
 <span id="_CPPv3I_N4mppp18real_interoperableEEN4mppp3getER1TRKN4mppp4realE"></span><span id="_CPPv2I_N4mppp18real_interoperableEEN4mppp3getER1TRKN4mppp4realE"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp18real_interoperableE" title="mppp::real_interoperable">real_interoperable</a> <code class="descname">T</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp18real_interoperableEEN4mppp3getEbR1TRKN4mppp4realE" title="mppp::get::T">T</a> &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp18real_interoperableEEN4mppp3getEbR1TRKN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic conversion function.</p>
 <p>This function will convert the input <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> <em>x</em> to
-<cite>T</cite>, storing the result of the conversion into <em>rop</em>.
+<code class="docutils literal notranslate"><span class="pre">T</span></code>, storing the result of the conversion into <em>rop</em>.
 If the conversion is successful, the function
 will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <em>rop</em> will
 not be altered.</p>
@@ -3738,7 +3783,6 @@ to the expressions:</p>
 <dt id="_CPPv4N4mpppmmERN4mppp4realE">
 <span id="_CPPv3N4mpppmmERN4mppp4realE"></span><span id="_CPPv2N4mpppmmERN4mppp4realE"></span><span id="mppp::dec-operator__mppp::realR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator--</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmmERN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Prefix increment/decrement.</p>
-<p>The precision of <em>x</em> will not be altered by the increment/decrement.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input argument.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <em>x</em> after the increment/decrement.</dd>
@@ -3754,7 +3798,6 @@ to the expressions:</p>
 <dt id="_CPPv4N4mpppmmERN4mppp4realEi">
 <span id="_CPPv3N4mpppmmERN4mppp4realEi"></span><span id="_CPPv2N4mpppmmERN4mppp4realEi"></span><span id="mppp::dec-operator__mppp::realR.i"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator--</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em>, int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmmERN4mppp4realEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Suffix increment/decrement.</p>
-<p>The precision of <em>x</em> will not be altered by the increment/decrement.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input argument.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">a copy of <em>x</em> before the increment/decrement.</dd>
