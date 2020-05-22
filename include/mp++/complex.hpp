@@ -795,9 +795,18 @@ private:
 };
 
 template <typename T, typename U>
-using are_complex_op_types = detail::disjunction<detail::conjunction<is_cvr_complex<T>, is_cvr_complex<U>>,
-                                                 detail::conjunction<is_cvr_complex<T>, is_complex_interoperable<U>>,
-                                                 detail::conjunction<is_cvr_complex<U>, is_complex_interoperable<T>>>;
+using are_complex_op_types
+    = detail::disjunction<detail::conjunction<is_cvr_complex<T>, is_cvr_complex<U>>,
+                          detail::conjunction<is_cvr_complex<T>, is_complex_interoperable<U>>,
+                          detail::conjunction<is_cvr_complex<U>, is_complex_interoperable<T>>,
+                          detail::conjunction<is_cvr_real<T>, is_cpp_complex<detail::uncvref_t<U>>>,
+                          detail::conjunction<is_cvr_real<U>, is_cpp_complex<detail::uncvref_t<T>>>
+#if defined(MPPP_WITH_QUADMATH)
+                          ,
+                          detail::conjunction<is_cvr_real<T>, std::is_same<detail::uncvref_t<U>, complex128>>,
+                          detail::conjunction<is_cvr_real<U>, std::is_same<detail::uncvref_t<T>, complex128>>
+#endif
+                          >;
 
 template <typename T, typename U>
 using are_complex_in_place_op_types
@@ -1344,12 +1353,30 @@ inline complex dispatch_complex_binary_add(T &&a, const U &c)
     return ret;
 }
 
-// complex valued interoperable types-comple.
+// complex valued interoperable types-complex.
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
 inline complex dispatch_complex_binary_add(const U &c, T &&a)
 {
     return dispatch_complex_binary_add(std::forward<T>(a), c);
+}
+
+// real-(std::complex or complex128).
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_add(T &&x, const U &c)
+{
+    // NOTE: the binary ctor from real+imag parts will
+    // select the higher precision.
+    return complex{std::forward<T>(x) + c.real(), c.imag()};
+}
+
+// (std::complex or complex128)-real.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<U>, is_cv_complex_interoperable<T>>::value, int> = 0>
+inline complex dispatch_complex_binary_add(const T &c, U &&x)
+{
+    return dispatch_complex_binary_add(std::forward<U>(x), c);
 }
 
 } // namespace detail
@@ -1440,8 +1467,12 @@ inline void dispatch_complex_in_place_add(complex &a, const T &c)
     *im += c.imag();
 }
 
-// complex interoperable-complex.
-template <typename T, typename U, enable_if_t<is_complex_interoperable<T>::value, int> = 0>
+// complex interoperable-complex, or real-complex valued.
+template <typename T, typename U,
+          enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
+                                  conjunction<std::is_same<complex, T>, is_complex_interoperable<U>>,
+                                  conjunction<negation<std::is_same<complex, T>>, negation<is_cvr_complex<U>>>>::value,
+                      int> = 0>
 inline void dispatch_complex_in_place_add(T &x, U &&a)
 {
     x = static_cast<T>(x + std::forward<U>(a));

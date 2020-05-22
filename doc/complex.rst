@@ -618,7 +618,18 @@ Concepts
 
    * ``T`` and ``U`` both satisfy :cpp:concept:`~mppp::cvr_complex`,
    * one type satisfies :cpp:concept:`~mppp::cvr_complex` and the other type
-     satisfies :cpp:concept:`~mppp::complex_interoperable`.
+     satisfies :cpp:concept:`~mppp::complex_interoperable`,
+   * one type satisfies :cpp:concept:`~mppp::cvr_real` and the other type,
+     after the removal of reference and cv qualifiers, either satisfies
+     :cpp:concept:`~mppp::cpp_complex` or it is :cpp:class:`~mppp::complex128`.
+
+.. cpp:concept:: template <typename T, typename U> mppp::complex_in_place_op_types
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic in-place :ref:`operators <complex_operators>`
+   involving :cpp:class:`~mppp::complex`. Specifically, the concept will be ``true`` if
+   ``T`` and ``U`` satisfy :cpp:concept:`~mppp::complex_op_types` and ``T``, after the removal
+   of reference, is not const.
 
 .. _complex_functions:
 
@@ -804,3 +815,36 @@ Mathematical operators
    :param b: the second operand.
 
    :return: the result of the binary operation.
+
+.. cpp:function:: template <typename U, mppp::complex_in_place_op_types<U> T> T &mppp::operator+=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::complex_in_place_op_types<U> T> T &mppp::operator-=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::complex_in_place_op_types<U> T> T &mppp::operator*=(T &a, U &&b)
+.. cpp:function:: template <typename U, mppp::complex_in_place_op_types<U> T> T &mppp::operator/=(T &a, U &&b)
+
+   In-place arithmetic operators.
+
+   If *a* is a :cpp:class:`~mppp::complex`, then these operators are equivalent, respectively,
+   to the expressions:
+
+   .. code-block:: c++
+
+      a = a + b;
+      a = a - b;
+      a = a * b;
+      a = a / b;
+
+   Otherwise, these operators are equivalent to the expressions:
+
+   .. code-block:: c++
+
+      a = static_cast<T>(a + b);
+      a = static_cast<T>(a - b);
+      a = static_cast<T>(a * b);
+      a = static_cast<T>(a / b);
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: a reference to *a*.
+
+   :exception unspecified: any exception thrown by the generic conversion operator of :cpp:class:`~mppp::complex`.

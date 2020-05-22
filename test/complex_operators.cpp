@@ -89,6 +89,10 @@ TEST_CASE("binary plus")
         REQUIRE(ret == complex{0, 12});
         REQUIRE(ret.get_prec() == p);
         REQUIRE((!r1.is_valid() || !r2.is_valid()));
+
+        // Self add.
+        r2 = complex{-4, 6};
+        REQUIRE(r2 + r2 == complex{-8, 12});
     }
     // complex-real.
     {
@@ -356,6 +360,52 @@ TEST_CASE("binary plus")
         REQUIRE(!c1.is_valid());
     }
 #endif
+
+    // real-std::complex.
+    {
+        real r{5, 5};
+        auto ret = r + std::complex<double>{5, 6};
+        REQUIRE(ret == complex{10, 6});
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.));
+        ret = std::complex<double>{5, 6} + r;
+        REQUIRE(ret == complex{10, 6});
+        REQUIRE(std::is_same<complex, decltype(std::complex<double>{5, 6} + r)>::value);
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.));
+
+        // Switch precisions around.
+        r = real{5, detail::real_deduce_precision(5.) + 1};
+        ret = r + std::complex<double>{5, 6};
+        REQUIRE(ret == complex{10, 6});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.) + 1);
+        ret = std::complex<double>{5, 6} + r;
+        REQUIRE(ret == complex{10, 6});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.) + 1);
+    }
+
+#if defined(MPPP_WITH_QUADMATH)
+    // real-complex128.
+    {
+        real r{5, 5};
+        auto ret = r + complex128{5, 6};
+        REQUIRE(ret == complex{10, 6});
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret.get_prec() == 113);
+        ret = complex128{5, 6} + r;
+        REQUIRE(ret == complex{10, 6});
+        REQUIRE(std::is_same<complex, decltype(complex128{5, 6} + r)>::value);
+        REQUIRE(ret.get_prec() == 113);
+
+        // Switch precisions around.
+        r = real{5, 114};
+        ret = r + complex128{5, 6};
+        REQUIRE(ret == complex{10, 6});
+        REQUIRE(ret.get_prec() == 114);
+        ret = complex128{5, 6} + r;
+        REQUIRE(ret == complex{10, 6});
+        REQUIRE(ret.get_prec() == 114);
+    }
+#endif
 }
 
 TEST_CASE("in-place plus")
@@ -380,6 +430,10 @@ TEST_CASE("in-place plus")
         REQUIRE(c3.is_valid());
         REQUIRE(c3 == complex{7, 10});
         REQUIRE(c3.get_prec() == detail::real_deduce_precision(1));
+
+        // Self add.
+        c3 += c3;
+        REQUIRE(c3 == complex{14, 20});
     }
     // complex-real.
     {
@@ -549,6 +603,43 @@ TEST_CASE("in-place plus")
         complex128 cq{4, 5};
         cq += complex{4, 1};
         REQUIRE(cq == complex128{8, 6});
+#endif
+    }
+
+    // real-complex valued
+    {
+        real r{4, 5};
+        r += std::complex<double>{4, 0};
+        REQUIRE(r == 8);
+        REQUIRE(r.get_prec() == detail::real_deduce_precision(1.));
+
+        // Check conversion failure.
+        REQUIRE_THROWS_AS((r += complex{4, 1}), std::domain_error);
+        REQUIRE(r == 8);
+
+#if defined(MPPP_WITH_QUADMATH)
+        r += complex128{4, 0};
+        REQUIRE(r == 12);
+        REQUIRE(r.get_prec() == detail::c_max(detail::real_deduce_precision(1.), mpfr_prec_t(113)));
+#endif
+    }
+
+    // complex valued-real.
+    {
+        std::complex<double> c{1, 2};
+        c += real{2, 5};
+        REQUIRE(c == std::complex<double>{3, 2});
+
+        // Check move semantics.
+        real r{4, detail::real_deduce_precision(1.) + 1};
+        c += std::move(r);
+        REQUIRE(c == std::complex<double>{7, 2});
+        REQUIRE(!r.is_valid());
+
+#if defined(MPPP_WITH_QUADMATH)
+        complex128 c2{3, 4};
+        c2 += real{2, 114};
+        REQUIRE(c2 == complex128{5, 4});
 #endif
     }
 }
