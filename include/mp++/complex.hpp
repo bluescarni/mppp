@@ -1191,6 +1191,12 @@ inline complex operator+(T &&c)
     return std::forward<T>(c);
 }
 
+// Prefix increment.
+MPPP_DLL_PUBLIC complex &operator++(complex &);
+
+// Suffix increment.
+MPPP_DLL_PUBLIC complex operator++(complex &, int);
+
 namespace detail
 {
 
@@ -1428,26 +1434,11 @@ inline void dispatch_complex_in_place_add(complex &a, const T &c)
     *im += c.imag();
 }
 
-// real valued-complex.
-template <typename T, enable_if_t<is_rv_complex_interoperable<T>::value, int> = 0>
-inline void dispatch_complex_in_place_add(T &x, const complex &c)
+// complex interoperable-complex.
+template <typename T, typename U, enable_if_t<is_complex_interoperable<T>::value, int> = 0>
+inline void dispatch_complex_in_place_add(T &x, U &&a)
 {
-    MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(c.get_prec(), real_deduce_precision(x)));
-    tmp.set(x);
-    dispatch_complex_in_place_add(tmp, c);
-    x = static_cast<T>(tmp);
-}
-
-// complex valued-complex.
-template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
-inline void dispatch_complex_in_place_add(T &x, const complex &c)
-{
-    MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(c.get_prec(), real_deduce_precision(x.real())));
-    tmp.set(x);
-    dispatch_complex_in_place_add(tmp, c);
-    x = static_cast<T>(tmp);
+    x = static_cast<T>(x + std::forward<U>(a));
 }
 
 } // namespace detail

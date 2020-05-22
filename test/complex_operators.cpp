@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <complex>
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -40,6 +41,24 @@ TEST_CASE("identity")
     REQUIRE(r2.get_prec() == p);
     REQUIRE(r2 == complex{4, 5});
     REQUIRE(!r1.is_valid());
+}
+
+TEST_CASE("increment")
+{
+    complex r0{0};
+    REQUIRE(++r0 == 1);
+    REQUIRE(r0++ == 1);
+    REQUIRE(r0 == 2);
+
+    // Check precision handling.
+    r0 = complex{0, complex_prec_t(4)};
+    ++r0;
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(1));
+    REQUIRE(r0 == 1);
+    r0 = complex{0, complex_prec_t(4)};
+    r0++;
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(1));
+    REQUIRE(r0 == 1);
 }
 
 TEST_CASE("binary plus")
@@ -501,13 +520,36 @@ TEST_CASE("in-place plus")
     }
 #endif
 
-    // real valued-complex.
+    // complex interoperable-complex.
     {
         int n = 5;
         n += complex{4, 0};
         REQUIRE(n == 9);
 
-        n += complex{4, 1};
+        // Check move semantics.
+        complex c{4, 0, complex_prec_t(detail::real_deduce_precision(1) + 1)};
+        n += std::move(c);
+        REQUIRE(n == 13);
+        REQUIRE(!c.is_valid());
+
+        // Check conversion failure.
+        REQUIRE_THROWS_AS((n += complex{4, 1}), std::domain_error);
+        REQUIRE(n == 13);
+        if (std::numeric_limits<double>::has_infinity) {
+            REQUIRE_THROWS_AS((n += complex{std::numeric_limits<double>::infinity(), 0}), std::domain_error);
+            REQUIRE(n == 13);
+        }
+
+        // Try with complex-valued too.
+        std::complex<double> cd{4, 5};
+        cd += complex{4, 1};
+        REQUIRE(cd == std::complex<double>{8, 6});
+
+#if defined(MPPP_WITH_QUADMATH)
+        complex128 cq{4, 5};
+        cq += complex{4, 1};
+        REQUIRE(cq == complex128{8, 6});
+#endif
     }
 }
 

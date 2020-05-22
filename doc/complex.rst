@@ -610,6 +610,18 @@ Concepts
    is valid (where ``c`` is a non-const :cpp:class:`~mppp::complex` and ``x``, ``y``, ``z``, etc. are const
    references to the types in ``Args``).
 
+.. cpp:concept:: template <typename T, typename U> mppp::complex_op_types
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary :ref:`operators <complex_operators>` and :ref:`functions <complex_functions>`
+   involving :cpp:class:`~mppp::complex`. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` both satisfy :cpp:concept:`~mppp::cvr_complex`,
+   * one type satisfies :cpp:concept:`~mppp::cvr_complex` and the other type
+     satisfies :cpp:concept:`~mppp::complex_interoperable`.
+
+.. _complex_functions:
+
 Functions
 ---------
 
@@ -764,3 +776,31 @@ Arithmetic
    :param z: the argument.
 
    :return: the result of the operation.
+
+.. _complex_operators:
+
+Mathematical operators
+----------------------
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::operator+(T &&c)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::operator-(T &&c)
+
+   Identity and negation operators.
+
+   :param c: the input argument.
+
+   :return: :math:`c` and :math:`-c` respectively.
+
+.. cpp:function:: template <typename T, mppp::complex_op_types<T> U> mppp::complex mppp::operator+(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::complex_op_types<T> U> mppp::complex mppp::operator-(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::complex_op_types<T> U> mppp::complex mppp::operator*(T &&a, U &&b)
+.. cpp:function:: template <typename T, mppp::complex_op_types<T> U> mppp::complex mppp::operator/(T &&a, U &&b)
+
+   Binary arithmetic operators.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: the result of the binary operation.

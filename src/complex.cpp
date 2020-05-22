@@ -331,6 +331,22 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
     return os << c.to_string();
 }
 
+complex &operator++(complex &c)
+{
+    if (mppp_unlikely(c.get_prec() < detail::real_deduce_precision(1))) {
+        c.prec_round(detail::real_deduce_precision(1));
+    }
+    ::mpc_add_ui(c._get_mpc_t(), c.get_mpc_t(), 1ul, MPC_RNDNN);
+    return c;
+}
+
+complex operator++(complex &c, int)
+{
+    auto retval(c);
+    ++c;
+    return retval;
+}
+
 namespace detail
 {
 
