@@ -954,6 +954,11 @@ Types
 Concepts
 --------
 
+.. cpp:concept:: template <typename T> mppp::cvr_real
+
+   This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
+   is the same as :cpp:class:`mppp::real`.
+
 .. cpp:concept:: template <typename T> mppp::real_interoperable
 
    This concept is satisfied if the type ``T`` can interoperate with :cpp:class:`~mppp::real`.
@@ -963,11 +968,6 @@ Concepts
    * an :cpp:class:`~mppp::integer`, or
    * a :cpp:class:`~mppp::rational`, or
    * :cpp:class:`~mppp::real128`.
-
-.. cpp:concept:: template <typename T> mppp::cvr_real
-
-   This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
-   is the same as :cpp:class:`mppp::real`.
 
 .. cpp:concept:: template <typename... Args> mppp::real_set_args
 
