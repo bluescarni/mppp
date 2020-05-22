@@ -137,10 +137,6 @@ inline ::mpfr_prec_t real_deduce_precision(const real128 &)
 
 #endif
 
-// Fwd declare the deducer for real.
-// NOTE: this is currently used only in the complex class.
-::mpfr_prec_t real_deduce_precision(const real &);
-
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
 real &mpfr_nary_op_impl(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
@@ -1107,17 +1103,6 @@ public:
 private:
     mpfr_struct_t m_mpfr;
 };
-
-namespace detail
-{
-
-// Implementation of the prec deducer for real.
-inline ::mpfr_prec_t real_deduce_precision(const real &r)
-{
-    return r.get_prec();
-}
-
-} // namespace detail
 
 template <typename T, typename U>
 using are_real_op_types

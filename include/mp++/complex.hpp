@@ -121,6 +121,12 @@ complex &mpc_nary_op_impl(::mpfr_prec_t, const F &, complex &, Arg0 &&, Args &&.
 template <bool, typename F, typename Arg0, typename... Args>
 complex mpc_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
 
+// Precision deducer for real.
+inline ::mpfr_prec_t real_deduce_precision(const real &r)
+{
+    return r.get_prec();
+}
+
 } // namespace detail
 
 // Strongly typed enum alias for mpfr_prec_t.
