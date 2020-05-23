@@ -470,6 +470,12 @@ complex &complex::proj()
     return self_mpc_unary(::mpc_proj);
 }
 
+// In-place squaring.
+complex &complex::sqr()
+{
+    return self_mpc_unary(::mpc_sqr);
+}
+
 // Free-function abs.
 real &abs(real &rop, const complex &c)
 {

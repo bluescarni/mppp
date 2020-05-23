@@ -134,7 +134,7 @@ enum class complex_prec_t : ::mpfr_prec_t {};
 
 // For the future:
 // - in the sub implementations, we are using the pattern of implementing b-a
-//   as -(a-b). It *might* be that eliminating the negation might be more efficient,
+//   as -(a-b). Probably eliminating the negation is more efficient,
 //   but on the other hand it requires more complex implementations.
 //   Need to verify if this is worth the hassle.
 
@@ -796,6 +796,7 @@ public:
     complex &norm();
     complex &arg();
     complex &proj();
+    complex &sqr();
 
 private:
     mpc_struct_t m_mpc;
@@ -1188,6 +1189,7 @@ inline complex &div(complex &rop, T &&a, U &&b)
 MPPP_COMPLEX_MPC_UNARY_IMPL(neg, ::mpc_neg, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(conj, ::mpc_conj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(sqr, ::mpc_sqr, true)
 
 // NOTE: these functions return a real, thus we need
 // custom implementations.

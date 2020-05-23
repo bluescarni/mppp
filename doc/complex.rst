@@ -523,6 +523,7 @@ The complex class
    .. cpp:function:: complex &abs()
    .. cpp:function:: complex &norm()
    .. cpp:function:: complex &arg()
+   .. cpp:function:: complex &sqr()
 
       In-place basic aritmetic functions.
 
@@ -534,6 +535,7 @@ The complex class
       * :math:`\left| z \right|`,
       * :math:`\left| z \right|^2`,
       * :math:`\arg z`,
+      * :math:`z^2`,
 
       where :math:`z` is the current value of ``this``.
 
@@ -742,6 +744,7 @@ Arithmetic
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::neg(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::conj(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::proj(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqr(mppp::complex &rop, T &&z)
 .. cpp:function:: mppp::real &mppp::abs(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::norm(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::arg(mppp::real &rop, const mppp::complex &z)
@@ -753,6 +756,7 @@ Arithmetic
    * :math:`-z`,
    * :math:`\overline{z}`,
    * the projection of :math:`z` into Riemann sphere,
+   * :math:`z^2`,
    * :math:`\left| z \right|`,
    * :math:`\left| z \right|^2`,
    * :math:`\arg z`.
@@ -767,6 +771,7 @@ Arithmetic
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::neg(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::conj(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::proj(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqr(T &&z)
 .. cpp:function:: mppp::real mppp::abs(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::norm(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::arg(const mppp::complex &z)
@@ -778,6 +783,7 @@ Arithmetic
    * :math:`-z`,
    * :math:`\overline{z}`,
    * the projection of :math:`z` into Riemann sphere,
+   * :math:`z^2`,
    * :math:`\left| z \right|`,
    * :math:`\left| z \right|^2`,
    * :math:`\arg z`.

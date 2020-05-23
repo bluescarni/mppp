@@ -490,3 +490,51 @@ TEST_CASE("proj")
         REQUIRE(!c1.is_valid());
     }
 }
+
+TEST_CASE("sqr")
+{
+    {
+        // Member function.
+        complex c{1, 2};
+        c.sqr();
+        REQUIRE(c == complex{-3, 4});
+        REQUIRE(c.get_prec() == detail::real_deduce_precision(1));
+    }
+    {
+        // rop overload.
+        complex c1, c2{1, 2};
+        const auto p = c2.get_prec();
+        REQUIRE(&sqr(c1, c2) == &c1);
+        REQUIRE(std::is_same<decltype(sqr(c1, c2)), complex &>::value);
+        REQUIRE(c1 == complex{-3, 4});
+        REQUIRE(c1.get_prec() == p);
+
+        // Move, but won't steal because rop
+        // has higher precision.
+        c1 = complex{0, complex_prec_t(c2.get_prec() + 1)};
+        sqr(c1, std::move(c2));
+        REQUIRE(c1 == complex{-3, 4});
+        REQUIRE(c1.get_prec() == p);
+        REQUIRE(c2 == complex{1, 2});
+
+        // Move, will steal.
+        c1 = complex{};
+        sqr(c1, std::move(c2));
+        REQUIRE(c1 == complex{-3, 4});
+        REQUIRE(c1.get_prec() == p);
+        REQUIRE(c2 == complex{});
+    }
+    {
+        // return overload.
+        REQUIRE(sqr(complex{1, 2}) == complex{-3, 4});
+        REQUIRE(std::is_same<decltype(sqr(complex{1, 2})), complex>::value);
+
+        // move, will steal.
+        complex c1{3, 4};
+        const auto p = c1.get_prec();
+        auto c2 = sqr(std::move(c1));
+        REQUIRE(c2 == complex{-7, 24});
+        REQUIRE(c2.get_prec() == p);
+        REQUIRE(!c1.is_valid());
+    }
+}
