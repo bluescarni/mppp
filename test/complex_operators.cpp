@@ -414,6 +414,7 @@ TEST_CASE("in-place plus")
     {
         complex c1{1, 2}, c2{3, 4};
         c1 += c2;
+        REQUIRE(std::is_same<complex &, decltype(c1 += c2)>::value);
         REQUIRE(c1 == complex{4, 6});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
 
@@ -441,6 +442,7 @@ TEST_CASE("in-place plus")
         complex c1{1, 2};
         real r{4};
         c1 += r;
+        REQUIRE(std::is_same<complex &, decltype(c1 += r)>::value);
         REQUIRE(c1 == complex{5, 2});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
 
@@ -461,6 +463,7 @@ TEST_CASE("in-place plus")
         // Other op with same precision.
         complex c1{1, 2};
         c1 += 4;
+        REQUIRE(std::is_same<complex &, decltype(c1 += 4)>::value);
         REQUIRE(c1 == complex{5, 2});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
 
@@ -481,6 +484,7 @@ TEST_CASE("in-place plus")
         // Other op with same precision.
         complex c1{1u, 2u};
         c1 += 4u;
+        REQUIRE(std::is_same<complex &, decltype(c1 += 4u)>::value);
         REQUIRE(c1 == complex{5, 2});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1u));
 
@@ -500,6 +504,7 @@ TEST_CASE("in-place plus")
         // Test with large unsigned integral type.
         c1 = complex{1, 0, complex_prec_t(real_prec_min())};
         c1 += __uint128_t(-1);
+        REQUIRE(std::is_same<complex &, decltype(c1 += __uint128_t(-1))>::value);
         REQUIRE(c1 == 1_z1 + __uint128_t(-1));
         REQUIRE(c1.get_prec() == 128);
 
@@ -514,6 +519,7 @@ TEST_CASE("in-place plus")
         // Other op with same precision.
         complex c1{true, false};
         c1 += true;
+        REQUIRE(std::is_same<complex &, decltype(c1 += true)>::value);
         REQUIRE(c1 == complex{2, 0});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(true));
 
@@ -535,6 +541,7 @@ TEST_CASE("in-place plus")
         // Other op with same precision.
         complex c1{1., 2.};
         c1 += std::complex<double>{3, 4};
+        REQUIRE(std::is_same<complex &, decltype(c1 += std::complex<double>{3, 4})>::value);
         REQUIRE(c1 == complex{4, 6});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1.));
 
@@ -557,6 +564,7 @@ TEST_CASE("in-place plus")
         // Other op with same precision.
         complex c1{1., 2., complex_prec_t(113)};
         c1 += complex128{3, 4};
+        REQUIRE(std::is_same<complex &, decltype(c1 += complex128{3, 4})>::value);
         REQUIRE(c1 == complex{4, 6});
         REQUIRE(c1.get_prec() == 113);
 
@@ -578,6 +586,7 @@ TEST_CASE("in-place plus")
     {
         int n = 5;
         n += complex{4, 0};
+        REQUIRE(std::is_same<int &, decltype(n += complex{4, 0})>::value);
         REQUIRE(n == 9);
 
         // Check move semantics.
@@ -597,11 +606,13 @@ TEST_CASE("in-place plus")
         // Try with complex-valued too.
         std::complex<double> cd{4, 5};
         cd += complex{4, 1};
+        REQUIRE(std::is_same<std::complex<double> &, decltype(cd += complex{4, 1})>::value);
         REQUIRE(cd == std::complex<double>{8, 6});
 
 #if defined(MPPP_WITH_QUADMATH)
         complex128 cq{4, 5};
         cq += complex{4, 1};
+        REQUIRE(std::is_same<complex128 &, decltype(cq += complex{4, 1})>::value);
         REQUIRE(cq == complex128{8, 6});
 #endif
     }
@@ -610,6 +621,7 @@ TEST_CASE("in-place plus")
     {
         real r{4, 5};
         r += std::complex<double>{4, 0};
+        REQUIRE(std::is_same<real &, decltype(r += std::complex<double>{4, 0})>::value);
         REQUIRE(r == 8);
         REQUIRE(r.get_prec() == detail::real_deduce_precision(1.));
 
@@ -619,6 +631,7 @@ TEST_CASE("in-place plus")
 
 #if defined(MPPP_WITH_QUADMATH)
         r += complex128{4, 0};
+        REQUIRE(std::is_same<real &, decltype(r += complex128{4, 0})>::value);
         REQUIRE(r == 12);
         REQUIRE(r.get_prec() == detail::c_max(detail::real_deduce_precision(1.), mpfr_prec_t(113)));
 #endif
@@ -628,6 +641,7 @@ TEST_CASE("in-place plus")
     {
         std::complex<double> c{1, 2};
         c += real{2, 5};
+        REQUIRE(std::is_same<std::complex<double> &, decltype(c += real{2, 5})>::value);
         REQUIRE(c == std::complex<double>{3, 2});
 
         // Check move semantics.
@@ -639,6 +653,7 @@ TEST_CASE("in-place plus")
 #if defined(MPPP_WITH_QUADMATH)
         complex128 c2{3, 4};
         c2 += real{2, 114};
+        REQUIRE(std::is_same<complex128 &, decltype(c2 += real{2, 114})>::value);
         REQUIRE(c2 == complex128{5, 4});
 #endif
     }
