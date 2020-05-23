@@ -1062,7 +1062,7 @@ TEST_CASE("in-place minus")
         REQUIRE(c3.get_prec() == detail::real_deduce_precision(1));
 
         // Self sub.
-        c3 -= c3;
+        c3 -= *&c3;
         REQUIRE(c3 == complex{});
     }
     // complex-real.
