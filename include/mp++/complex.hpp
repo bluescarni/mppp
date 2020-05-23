@@ -133,7 +133,7 @@ inline ::mpfr_prec_t real_deduce_precision(const real &r)
 enum class complex_prec_t : ::mpfr_prec_t {};
 
 // For the future:
-// - in the sub implementations, we are using the pattern of implementing b-a
+// - in some sub implementations, we are using the pattern of implementing b-a
 //   as -(a-b). Probably eliminating the negation is more efficient,
 //   but on the other hand it requires more complex implementations.
 //   Need to verify if this is worth the hassle.
@@ -1322,6 +1322,7 @@ template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_add(T &&a, const bool &n)
 {
     auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -1543,7 +1544,9 @@ inline complex dispatch_complex_binary_sub(T &&a, const real &x)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_sub(const real &x, T &&a)
 {
-    return -dispatch_complex_binary_sub(std::forward<T>(a), x);
+    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_fr_sub(c, x.get_mpfr_t(), o, MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
 }
 
 // complex-(anything real-valued other than unsigned integral or real).
@@ -1602,6 +1605,7 @@ template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_sub(T &&a, const bool &n)
 {
     auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -1610,7 +1614,23 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_cpp_unsigned_integral<T>, is_cvr_complex<U>>::value, int> = 0>
 inline complex dispatch_complex_binary_sub(const T &n, U &&a)
 {
-    return -dispatch_complex_binary_sub(std::forward<U>(a), n);
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+
+        return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<U>(a));
+    } else {
+        return dispatch_complex_binary_sub(integer<2>{n}, std::forward<U>(a));
+    }
+}
+
+// bool-complex.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex dispatch_complex_binary_sub(const bool &n, T &&a)
+{
+    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
 // complex-complex valued interoperable types.
