@@ -132,6 +132,13 @@ inline ::mpfr_prec_t real_deduce_precision(const real &r)
 // Strongly typed enum alias for mpfr_prec_t.
 enum class complex_prec_t : ::mpfr_prec_t {};
 
+// For the future:
+// - in the sub implementations, we are using the pattern of implementing b-a
+//   as -(a-b). It *might* be that eliminating the negation might be more efficient,
+//   but on the other hand it requires more complex implementations.
+//   Need to verify if this is worth the hassle.
+
+// Multiprecision complex class.
 class MPPP_DLL_PUBLIC complex
 {
     // Make friends, for accessing the non-checking prec setting funcs.
@@ -1660,6 +1667,96 @@ template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>
     inline complex operator-(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_sub(std::forward<T>(a), std::forward<U>(b));
+}
+
+namespace detail
+{
+
+// complex-complex.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline void dispatch_complex_in_place_sub(complex &a, T &&b)
+{
+    sub(a, a, std::forward<T>(b));
+}
+
+// complex-real.
+MPPP_DLL_PUBLIC void dispatch_complex_in_place_sub(complex &, const real &);
+
+// complex-(anything real-valued other than unsigned integral or real).
+template <
+    typename T,
+    enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int> = 0>
+inline void dispatch_complex_in_place_sub(complex &a, const T &x)
+{
+    const auto orig_p = a.get_prec();
+
+    complex::re_ref re{a};
+
+    *re -= x;
+
+    const auto new_p = re->get_prec();
+
+    if (new_p != orig_p) {
+        assert(new_p > orig_p);
+        complex::im_ref im{a};
+        im->prec_round(new_p);
+    }
+}
+
+// complex-unsigned integral.
+template <typename T, enable_if_t<conjunction<is_cpp_unsigned_integral<T>>::value, int> = 0>
+inline void dispatch_complex_in_place_sub(complex &a, const T &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+        mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+    } else {
+        dispatch_complex_in_place_sub(a, integer<2>{n});
+    }
+}
+
+// complex-bool.
+// NOTE: make this explicit (rather than letting bool fold into
+// the unsigned integrals overload) in order to avoid MSVC warnings.
+MPPP_DLL_PUBLIC void dispatch_complex_in_place_sub(complex &, bool);
+
+// complex-complex valued.
+template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
+inline void dispatch_complex_in_place_sub(complex &a, const T &c)
+{
+    complex::re_ref re{a};
+    complex::im_ref im{a};
+
+    *re -= c.real();
+    *im -= c.imag();
+}
+
+// complex interoperable-complex, or real-complex valued.
+template <typename T, typename U,
+          enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
+                                  conjunction<std::is_same<complex, T>, is_complex_interoperable<U>>,
+                                  conjunction<negation<std::is_same<complex, T>>, negation<is_cvr_complex<U>>>>::value,
+                      int> = 0>
+inline void dispatch_complex_in_place_sub(T &x, U &&a)
+{
+    x = static_cast<T>(x - std::forward<U>(a));
+}
+
+} // namespace detail
+
+// In-place subtraction.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex_in_place_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
+#endif
+    inline T &operator-=(T &a, U &&b)
+{
+    detail::dispatch_complex_in_place_sub(a, std::forward<U>(b));
+    return a;
 }
 
 // Stream operator.

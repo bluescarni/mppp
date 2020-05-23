@@ -376,6 +376,21 @@ void dispatch_complex_in_place_add(complex &a, const real &x)
 void dispatch_complex_in_place_add(complex &a, bool n)
 {
     auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+    mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
+void dispatch_complex_in_place_sub(complex &a, const real &x)
+{
+    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_sub_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+
+    mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
+}
+
+void dispatch_complex_in_place_sub(complex &a, bool n)
+{
+    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 

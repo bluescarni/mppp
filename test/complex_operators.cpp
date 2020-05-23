@@ -1036,3 +1036,254 @@ TEST_CASE("binary minus")
     }
 #endif
 }
+
+TEST_CASE("in-place minus")
+{
+    // complex-complex.
+    {
+        complex c1{1, 2}, c2{3, 4};
+        c1 -= c2;
+        REQUIRE(std::is_same<complex &, decltype(c1 -= c2)>::value);
+        REQUIRE(c1 == complex{-2, -2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+
+        // Move which does not steal.
+        c1 -= std::move(c2);
+        REQUIRE(c1 == complex{-5, -6});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+        REQUIRE(c2.is_valid());
+
+        // Move which steals.
+        complex c3{4, 5, complex_prec_t(detail::real_deduce_precision(1) + 1)};
+        c1 -= std::move(c3);
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+        REQUIRE(c3.is_valid());
+        REQUIRE(c3 == complex{-5, -6});
+        REQUIRE(c3.get_prec() == detail::real_deduce_precision(1));
+
+        // Self sub.
+        c3 -= c3;
+        REQUIRE(c3 == complex{});
+    }
+    // complex-real.
+    {
+        // Same precision.
+        complex c1{1, 2};
+        real r{4};
+        c1 -= r;
+        REQUIRE(std::is_same<complex &, decltype(c1 -= r)>::value);
+        REQUIRE(c1 == complex{-3, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+
+        // r with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 -= r;
+        REQUIRE(c1 == complex{-3, 1});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+
+        // r with smaller precision.
+        c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(1) + 1)};
+        c1 -= r;
+        REQUIRE(c1 == complex{-3, 1});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+    }
+    // complex-real valued.
+    {
+        // Other op with same precision.
+        complex c1{1, 2};
+        c1 -= 4;
+        REQUIRE(std::is_same<complex &, decltype(c1 -= 4)>::value);
+        REQUIRE(c1 == complex{-3, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+
+        // Other op with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 -= 4.;
+        REQUIRE(c1 == complex{-3, 1});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(4.));
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(detail::real_deduce_precision(1) + 1)};
+        c1 -= 4;
+        REQUIRE(c1 == complex{-3, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+    }
+    // complex-unsigned integral.
+    {
+        // Other op with same precision.
+        complex c1{1u, 2u};
+        c1 -= 4u;
+        REQUIRE(std::is_same<complex &, decltype(c1 -= 4u)>::value);
+        REQUIRE(c1 == complex{-3, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1u));
+
+        // Other op with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 -= 4u;
+        REQUIRE(c1 == complex{-3, 1});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(4u));
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(detail::real_deduce_precision(1u) + 1)};
+        c1 -= 4u;
+        REQUIRE(c1 == complex{-3, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1u) + 1);
+
+#if defined(MPPP_HAVE_GCC_INT128)
+        // Test with large unsigned integral type.
+        c1 = complex{1, 0, complex_prec_t(real_prec_min())};
+        c1 -= __uint128_t(-1);
+        REQUIRE(std::is_same<complex &, decltype(c1 -= __uint128_t(-1))>::value);
+        REQUIRE(c1 == 1_z1 - __uint128_t(-1));
+        REQUIRE(c1.get_prec() == 128);
+
+        c1 = complex{1, 0, complex_prec_t(256)};
+        c1 -= __uint128_t(-1);
+        REQUIRE(c1 == 1_z1 - __uint128_t(-1));
+        REQUIRE(c1.get_prec() == 256);
+#endif
+    }
+    // Special casing for bool.
+    {
+        // Other op with same precision.
+        complex c1{true, false};
+        c1 -= true;
+        REQUIRE(std::is_same<complex &, decltype(c1 -= true)>::value);
+        REQUIRE(c1 == complex{0, 0});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(true));
+
+        // Other op with higher precision.
+        c1 = complex{true, false, complex_prec_t(real_prec_min())};
+        c1 -= true;
+        REQUIRE(c1 == complex{0, 0});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(true));
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(detail::real_deduce_precision(true) + 1)};
+        c1 -= false;
+        REQUIRE(c1 == complex{1, 2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(true) + 1);
+    }
+
+    // complex-std::complex.
+    {
+        // Other op with same precision.
+        complex c1{1., 2.};
+        c1 -= std::complex<double>{3, 4};
+        REQUIRE(std::is_same<complex &, decltype(c1 -= std::complex<double>{3, 4})>::value);
+        REQUIRE(c1 == complex{-2, -2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1.));
+
+        // Other op with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 -= std::complex<double>{3, 4};
+        REQUIRE(c1 == complex{-2, -3});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(4.));
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(detail::real_deduce_precision(1.) + 1)};
+        c1 -= std::complex<double>{3, 4};
+        REQUIRE(c1 == complex{-2, -2});
+        REQUIRE(c1.get_prec() == detail::real_deduce_precision(1.) + 1);
+    }
+
+#if defined(MPPP_WITH_QUADMATH)
+    // complex-complex128.
+    {
+        // Other op with same precision.
+        complex c1{1., 2., complex_prec_t(113)};
+        c1 -= complex128{3, 4};
+        REQUIRE(std::is_same<complex &, decltype(c1 -= complex128{3, 4})>::value);
+        REQUIRE(c1 == complex{-2, -2});
+        REQUIRE(c1.get_prec() == 113);
+
+        // Other op with higher precision.
+        c1 = complex{1, 1, complex_prec_t(real_prec_min())};
+        c1 -= complex128{3, 4};
+        REQUIRE(c1 == complex{-2, -3});
+        REQUIRE(c1.get_prec() == 113);
+
+        // Other op with lower precision.
+        c1 = complex{1, 2, complex_prec_t(114)};
+        c1 -= std::complex<double>{3, 4};
+        REQUIRE(c1 == complex{-2, -2});
+        REQUIRE(c1.get_prec() == 114);
+    }
+#endif
+
+    // complex interoperable-complex.
+    {
+        int n = 5;
+        n -= complex{4, 0};
+        REQUIRE(std::is_same<int &, decltype(n -= complex{4, 0})>::value);
+        REQUIRE(n == 1);
+
+        // Check move semantics.
+        complex c{4, 0, complex_prec_t(detail::real_deduce_precision(1) + 1)};
+        n -= std::move(c);
+        REQUIRE(n == -3);
+        REQUIRE(!c.is_valid());
+
+        // Check conversion failure.
+        REQUIRE_THROWS_AS((n -= complex{4, 1}), std::domain_error);
+        REQUIRE(n == -3);
+        if (std::numeric_limits<double>::has_infinity) {
+            REQUIRE_THROWS_AS((n -= complex{std::numeric_limits<double>::infinity(), 0}), std::domain_error);
+            REQUIRE(n == -3);
+        }
+
+        // Try with complex-valued too.
+        std::complex<double> cd{4, 5};
+        cd -= complex{4, 1};
+        REQUIRE(std::is_same<std::complex<double> &, decltype(cd -= complex{4, 1})>::value);
+        REQUIRE(cd == std::complex<double>{0, 4});
+
+#if defined(MPPP_WITH_QUADMATH)
+        complex128 cq{4, 5};
+        cq -= complex{4, 1};
+        REQUIRE(std::is_same<complex128 &, decltype(cq -= complex{4, 1})>::value);
+        REQUIRE(cq == complex128{0, 4});
+#endif
+    }
+
+    // real-complex valued
+    {
+        real r{4, 5};
+        r -= std::complex<double>{4, 0};
+        REQUIRE(std::is_same<real &, decltype(r -= std::complex<double>{4, 0})>::value);
+        REQUIRE(r == 0);
+        REQUIRE(r.get_prec() == detail::real_deduce_precision(1.));
+
+        // Check conversion failure.
+        REQUIRE_THROWS_AS((r -= complex{4, 1}), std::domain_error);
+        REQUIRE(r == 0);
+
+#if defined(MPPP_WITH_QUADMATH)
+        r -= complex128{4, 0};
+        REQUIRE(std::is_same<real &, decltype(r -= complex128{4, 0})>::value);
+        REQUIRE(r == -4);
+        REQUIRE(r.get_prec() == detail::c_max(detail::real_deduce_precision(1.), mpfr_prec_t(113)));
+#endif
+    }
+
+    // complex valued-real.
+    {
+        std::complex<double> c{1, 2};
+        c -= real{2, 5};
+        REQUIRE(std::is_same<std::complex<double> &, decltype(c -= real{2, 5})>::value);
+        REQUIRE(c == std::complex<double>{-1, 2});
+
+        // Check move semantics.
+        real r{4, detail::real_deduce_precision(1.) + 1};
+        c -= std::move(r);
+        REQUIRE(c == std::complex<double>{-5, 2});
+        REQUIRE(!r.is_valid());
+
+#if defined(MPPP_WITH_QUADMATH)
+        complex128 c2{3, 4};
+        c2 -= real{2, 114};
+        REQUIRE(std::is_same<complex128 &, decltype(c2 -= real{2, 114})>::value);
+        REQUIRE(c2 == complex128{1, 4});
+#endif
+    }
+}
