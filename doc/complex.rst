@@ -848,3 +848,21 @@ Mathematical operators
    :return: a reference to *a*.
 
    :exception unspecified: any exception thrown by the generic conversion operator of :cpp:class:`~mppp::complex`.
+
+.. cpp:function:: mppp::complex &mppp::operator++(mppp::complex &c)
+.. cpp:function:: mppp::complex &mppp::operator--(mppp::complex &c)
+
+   Prefix increment/decrement.
+
+   :param c: the input argument.
+
+   :return: a reference to *c* after the increment/decrement.
+
+.. cpp:function:: mppp::complex mppp::operator++(mppp::complex &c, int)
+.. cpp:function:: mppp::complex mppp::operator--(mppp::complex &c, int)
+
+   Suffix increment/decrement.
+
+   :param c: the input argument.
+
+   :return: a copy of *c* before the increment/decrement.
