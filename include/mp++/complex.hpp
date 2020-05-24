@@ -2096,6 +2096,212 @@ template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_ty
     return a;
 }
 
+namespace detail
+{
+
+// complex-complex.
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_complex<T>, is_cvr_complex<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_div(T &&a, U &&b)
+{
+    return mpc_nary_op_return_impl<true>(0, ::mpc_div, std::forward<T>(a), std::forward<U>(b));
+}
+
+// complex-real.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex dispatch_complex_binary_div(T &&a, const real &x)
+{
+    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_div_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
+}
+
+// real-complex.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex dispatch_complex_binary_div(const real &x, T &&a)
+{
+    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_fr_div(c, x.get_mpfr_t(), o, MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
+}
+
+// complex-(anything real-valued other than unsigned integral or real).
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
+                                  negation<is_cpp_unsigned_integral<U>>>::value,
+                      int> = 0>
+inline complex dispatch_complex_binary_div(T &&a, const U &x)
+{
+    const auto a_prec = a.get_prec();
+    const auto x_prec = real_deduce_precision(x);
+    auto ret = (a_prec >= x_prec) ? complex{std::forward<T>(a)} : complex{a, complex_prec_t(x_prec)};
+
+    {
+        // NOTE: scope the lifetime of re/im, so that
+        // we are sure that ret is updated before
+        // the return statement.
+        complex::re_ref re{ret};
+        complex::im_ref im{ret};
+
+        // Divide the real/imag parts of ret by x.
+        *re /= x;
+        *im /= x;
+    }
+
+    return ret;
+}
+
+// (anything real-valued other than unsigned integral or real)-complex.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
+                                  negation<is_cpp_unsigned_integral<U>>>::value,
+                      int> = 0>
+inline complex dispatch_complex_binary_div(const U &x, T &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+
+    return dispatch_complex_binary_div(tmp, std::forward<T>(a));
+}
+
+// complex-unsigned integral.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_div(T &&a, const U &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+        return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return dispatch_complex_binary_div(std::forward<T>(a), integer<2>{n});
+    }
+}
+
+// complex-bool.
+// NOTE: make this explicit (rather than letting bool fold into
+// the unsigned integrals overload) in order to avoid MSVC warnings.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex dispatch_complex_binary_div(T &&a, const bool &n)
+{
+    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// unsigned integral-complex.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cpp_unsigned_integral<T>, is_cvr_complex<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_div(const T &n, U &&a)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_div(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+
+        return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<U>(a));
+    } else {
+        return dispatch_complex_binary_div(integer<2>{n}, std::forward<U>(a));
+    }
+}
+
+// bool-complex.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex dispatch_complex_binary_div(const bool &n, T &&a)
+{
+    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_div(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// complex-complex valued interoperable types.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_div(T &&a, const U &c)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // U is either std::complex or complex128, for which
+    // the precision deduction rules are the same as for
+    // the underlying real value type (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    MPPP_MAYBE_TLS complex tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set(c);
+
+    return dispatch_complex_binary_div(std::forward<T>(a), tmp);
+}
+
+// complex valued interoperable types-complex.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
+inline complex dispatch_complex_binary_div(const U &c, T &&a)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // U is either std::complex or complex128, for which
+    // the precision deduction rules are the same as for
+    // the underlying real value type (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    MPPP_MAYBE_TLS complex tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set(c);
+
+    return dispatch_complex_binary_div(tmp, std::forward<T>(a));
+}
+
+// real-(std::complex or complex128).
+template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
+inline complex dispatch_complex_binary_div(const real &x, const T &c)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // U is either std::complex or complex128, for which
+    // the precision deduction rules are the same as for
+    // the underlying real value type (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    MPPP_MAYBE_TLS complex tmp1, tmp2;
+
+    const auto p = c_max(x.get_prec(), real_deduce_precision(c.real()));
+
+    tmp1.set_prec(p);
+    tmp1.set(x);
+
+    tmp2.set_prec(p);
+    tmp2.set(c);
+
+    return dispatch_complex_binary_div(tmp1, tmp2);
+}
+
+// (std::complex or complex128)-real.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<U>, is_cv_complex_interoperable<T>>::value, int> = 0>
+inline complex dispatch_complex_binary_div(const T &c, U &&x)
+{
+    // NOTE: don't forward x twice.
+    auto re = c.real() / x;
+    auto im = c.imag() / std::forward<U>(x);
+
+    return complex{std::move(re), std::move(im)};
+}
+
+} // namespace detail
+
+// Binary division.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
+#endif
+    inline complex operator/(T &&a, U &&b)
+{
+    return detail::dispatch_complex_binary_div(std::forward<T>(a), std::forward<U>(b));
+}
+
 // Stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
 

@@ -1022,7 +1022,7 @@ TEST_CASE("binary minus")
         REQUIRE(ret.get_prec() == 113);
         ret = complex128{5, 6} - r;
         REQUIRE(ret == complex{0, 6});
-        REQUIRE(std::is_same<complex, decltype(complex128{5, 6} + r)>::value);
+        REQUIRE(std::is_same<complex, decltype(complex128{5, 6} - r)>::value);
         REQUIRE(ret.get_prec() == 113);
 
         // Switch precisions around.
@@ -1701,7 +1701,7 @@ TEST_CASE("binary mul")
         REQUIRE(ret.get_prec() == 113);
         ret = complex128{5, 6} * r;
         REQUIRE(ret == complex{25, 30});
-        REQUIRE(std::is_same<complex, decltype(complex128{5, 6} + r)>::value);
+        REQUIRE(std::is_same<complex, decltype(complex128{5, 6} * r)>::value);
         REQUIRE(ret.get_prec() == 113);
 
         // Switch precisions around.
@@ -2012,4 +2012,369 @@ TEST_CASE("in-place mul")
         REQUIRE(c2 == complex128{6, 8});
 #endif
     }
+}
+
+TEST_CASE("binary div")
+{
+    // complex-complex.
+    {
+        complex r1{11, 24}, r2{4, 5};
+        const auto p = r1.get_prec();
+        auto ret = r1 / r2;
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret == complex{4, 1});
+        REQUIRE(ret.get_prec() == r1.get_prec());
+
+        // Test moves.
+        ret = std::move(r1) / r2;
+        REQUIRE(ret == complex{4, 1});
+        REQUIRE(ret.get_prec() == p);
+        REQUIRE(!r1.is_valid());
+
+        r1 = complex{11, 24};
+        ret = r1 / std::move(r2);
+        REQUIRE(ret == complex{4, 1});
+        REQUIRE(ret.get_prec() == p);
+        REQUIRE(!r2.is_valid());
+
+        r2 = complex{4, 5};
+        ret = std::move(r1) / std::move(r2);
+        REQUIRE(ret == complex{4, 1});
+        REQUIRE(ret.get_prec() == p);
+        REQUIRE((!r1.is_valid() || !r2.is_valid()));
+
+        // Self div.
+        r2 = complex{-4, 6};
+        REQUIRE(r2 / r2 == complex{1, 0});
+    }
+    // complex-real.
+    {
+        complex c1{44, 4, complex_prec_t(128)};
+        real r1{2, 10};
+        auto ret = c1 / r1;
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret == complex{22, 2, complex_prec_t(128)});
+        REQUIRE(ret.get_prec() == 128);
+        ret = r1 / c1;
+        REQUIRE(std::is_same<complex, decltype(r1 / c1)>::value);
+        REQUIRE(ret == complex{88 / 1952_q1, -8 / 1952_q1, complex_prec_t(128)});
+        REQUIRE(ret.get_prec() == 128);
+
+        // Try with higher precision on the non-complex argument.
+        ret = c1 / real{2, 256};
+        REQUIRE(ret == complex{22, 2, complex_prec_t(128)});
+        REQUIRE(ret.get_prec() == 256);
+        ret = real{2, 256} / c1;
+        REQUIRE(ret == complex{88 / 1952_q1, -8 / 1952_q1, complex_prec_t(256)});
+        REQUIRE(ret.get_prec() == 256);
+
+        // Try with moves.
+        auto c2 = c1;
+        ret = complex{};
+        ret = std::move(c1) / r1;
+        REQUIRE(ret == complex{22, 2, complex_prec_t(128)});
+        REQUIRE(ret.get_prec() == 128);
+        REQUIRE(!c1.is_valid());
+
+        c1 = c2;
+        ret = complex{};
+        ret = r1 / std::move(c1);
+        REQUIRE(ret == complex{88 / 1952_q1, -8 / 1952_q1, complex_prec_t(128)});
+        REQUIRE(ret.get_prec() == 128);
+        REQUIRE(!c1.is_valid());
+    }
+    // complex-rv interoperable.
+    {
+        complex c1{44, 4, complex_prec_t(128)};
+        auto ret = c1 / 2;
+        REQUIRE(ret == complex{22, 2});
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret.get_prec() == std::max<::mpfr_prec_t>(128, detail::real_deduce_precision(2)));
+        ret = 2. / c1;
+        REQUIRE(ret
+                == complex{88 / 1952_q1, -8 / 1952_q1,
+                           complex_prec_t(std::max<::mpfr_prec_t>(128, detail::real_deduce_precision(2.)))});
+        REQUIRE(std::is_same<complex, decltype(2. / c1)>::value);
+        REQUIRE(ret.get_prec() == std::max<::mpfr_prec_t>(128, detail::real_deduce_precision(6.)));
+
+        // Try with higher precision on the non-complex argument.
+        c1 = complex{2, -8, complex_prec_t(real_prec_min())};
+        ret = c1 / 2_z1;
+        REQUIRE(ret == complex{1, -4});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(2_z1));
+        ret = 45_q1 / c1;
+        REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45_q1))});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(45_q1));
+
+        // Moves.
+        auto c2 = c1;
+        ret = std::move(c1) / 2;
+        REQUIRE(ret == complex{1, -4});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(2));
+        REQUIRE(c1.is_valid());
+        c1 = complex{44, 4, complex_prec_t(detail::real_deduce_precision(2) + 1)};
+        ret = std::move(c1) / 2;
+        REQUIRE(ret == complex{22, 2});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(2) + 1);
+        REQUIRE(!c1.is_valid());
+
+        c1 = c2;
+        ret = 45. / std::move(c1);
+        REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45.))});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.));
+        REQUIRE(c1.is_valid());
+        c1 = complex{2, -8, complex_prec_t(detail::real_deduce_precision(45.) + 1)};
+        ret = 45. / std::move(c1);
+        REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45.) + 1)});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.) + 1);
+        REQUIRE(!c1.is_valid());
+
+#if defined(MPPP_WITH_QUADMATH)
+        c1 = c2;
+        ret = 45_rq / std::move(c1);
+        REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(113)});
+        REQUIRE(ret.get_prec() == 113);
+        REQUIRE(c1.is_valid());
+        c1 = complex{2, -8, complex_prec_t(114)};
+        ret = 45_rq / std::move(c1);
+        REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(114)});
+        REQUIRE(ret.get_prec() == 114);
+        REQUIRE(!c1.is_valid());
+#endif
+    }
+    // complex-unsigned integral.
+    {
+        complex c1{44, 4, complex_prec_t(128)};
+        auto ret = c1 / 2u;
+        REQUIRE(ret == complex{22, 2});
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret.get_prec() == std::max<::mpfr_prec_t>(128, detail::real_deduce_precision(2u)));
+        ret = 2u / c1;
+        REQUIRE(ret
+                == complex{88 / 1952_q1, -8 / 1952_q1,
+                           complex_prec_t(std::max<::mpfr_prec_t>(128, detail::real_deduce_precision(2u)))});
+        REQUIRE(std::is_same<complex, decltype(2u / c1)>::value);
+        REQUIRE(ret.get_prec() == std::max<::mpfr_prec_t>(128, detail::real_deduce_precision(2u)));
+
+        // Try with higher precision on the non-complex argument.
+        c1 = complex{2, -8, complex_prec_t(real_prec_min())};
+        ret = c1 / 2u;
+        REQUIRE(ret == complex{1, -4});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(2u));
+        ret = 45u / c1;
+        REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45u))});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+
+        // Moves.
+        auto c2 = c1;
+        ret = std::move(c1) / 2u;
+        REQUIRE(ret == complex{1, -4});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(2u));
+        REQUIRE(c1.is_valid());
+        c1 = complex{44, 4, complex_prec_t(detail::real_deduce_precision(2u) + 1)};
+        ret = std::move(c1) / 2u;
+        REQUIRE(ret == complex{22, 2});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(2u) + 1);
+        REQUIRE(!c1.is_valid());
+
+        c1 = c2;
+        ret = 45u / std::move(c1);
+        REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45u))});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+        REQUIRE(c1.is_valid());
+        c1 = complex{2, -8, complex_prec_t(detail::real_deduce_precision(45u) + 1)};
+        ret = 45u / std::move(c1);
+        REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45u) + 1)});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
+        REQUIRE(!c1.is_valid());
+
+        // Bool special casing.
+        c1 = c2;
+        ret = false / c1;
+        REQUIRE(ret == complex{});
+        ret = c1 / true;
+        REQUIRE(ret == c1);
+        ret = false / std::move(c1);
+        REQUIRE(ret == complex{});
+        c1 = c2;
+        ret = std::move(c1) / true;
+        REQUIRE(ret == c2);
+
+#if defined(MPPP_HAVE_GCC_INT128)
+        // Try with a large integral.
+        c1 = complex{1, complex_prec_t(real_prec_min())};
+        ret = __uint128_t(-1) / std::move(c1);
+        REQUIRE(ret == complex{__uint128_t(-1), 0, complex_prec_t(128)});
+        REQUIRE(ret.get_prec() == 128);
+        REQUIRE(c1.is_valid());
+        c1 = complex{1, complex_prec_t(129)};
+        ret = __uint128_t(-1) / std::move(c1);
+        REQUIRE(ret == complex{__uint128_t(-1), 0, complex_prec_t(129)});
+        REQUIRE(ret.get_prec() == 129);
+        REQUIRE(!c1.is_valid());
+
+        c1 = complex{1, complex_prec_t(real_prec_min())};
+        ret = std::move(c1) / __uint128_t(-1);
+        REQUIRE(ret == complex{1_q1 / __uint128_t(-1), complex_prec_t(128)});
+        REQUIRE(ret.get_prec() == 128);
+        REQUIRE(c1.is_valid());
+        c1 = complex{1, complex_prec_t(129)};
+        ret = std::move(c1) / __uint128_t(-1);
+        REQUIRE(ret == complex{1_q1 / __uint128_t(-1), complex_prec_t(129)});
+        REQUIRE(ret.get_prec() == 129);
+        REQUIRE(!c1.is_valid());
+#endif
+    }
+
+    // Complex-std::complex.
+    {
+        complex c1{11, 24, complex_prec_t(128)};
+        auto ret = c1 / std::complex<double>(4, 5);
+        REQUIRE(ret == complex{4, 1});
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret.get_prec() == std::max<::mpfr_prec_t>(128, detail::real_deduce_precision(6.)));
+        ret = std::complex<double>(35, 13) / c1;
+        REQUIRE(ret == complex{1, -1});
+        REQUIRE(std::is_same<complex, decltype(std::complex<double>(35, 13) / c1)>::value);
+        REQUIRE(ret.get_prec() == std::max<::mpfr_prec_t>(128, detail::real_deduce_precision(6.)));
+
+        // Try with higher precision on the non-complex argument.
+        c1 = complex{4, 0, complex_prec_t(real_prec_min())};
+        ret = c1 / std::complex<double>(2, 2);
+        REQUIRE(ret == complex{1, -1});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        ret = std::complex<double>(8, -12) / c1;
+        REQUIRE(ret == complex{2, -3});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+
+        // Moves.
+        auto c2 = c1;
+        ret = std::move(c1) / std::complex<double>(2, 2);
+        REQUIRE(ret == complex{1, -1});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        REQUIRE(c1.is_valid());
+        c1 = complex{4, -8, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
+        ret = std::move(c1) / std::complex<double>(2, 0);
+        REQUIRE(ret == complex{2, -4});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        REQUIRE(!c1.is_valid());
+
+        c1 = c2;
+        ret = std::complex<double>(8, -12) / std::move(c1);
+        REQUIRE(ret == complex{2, -3});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        REQUIRE(c1.is_valid());
+        c1 = complex{4, 0, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
+        ret = std::complex<double>(8, -12) / std::move(c1);
+        REQUIRE(ret == complex{2, -3});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        REQUIRE(!c1.is_valid());
+    }
+
+#if defined(MPPP_WITH_QUADMATH)
+    // Complex-complex128.
+    {
+        complex c1{11, 24, complex_prec_t(128)};
+        auto ret = c1 / complex128(4, 5);
+        REQUIRE(ret == complex{4, 1});
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret.get_prec() == 128);
+        ret = complex128(35, 13) / c1;
+        REQUIRE(ret == complex{1, -1});
+        REQUIRE(std::is_same<complex, decltype(complex128(6, 7) / c1)>::value);
+        REQUIRE(ret.get_prec() == 128);
+
+        // Try with higher precision on the non-complex argument.
+        c1 = complex{4, 0, complex_prec_t(real_prec_min())};
+        ret = c1 / complex128(2, 2);
+        REQUIRE(ret == complex{1, -1});
+        REQUIRE(ret.get_prec() == 113);
+        ret = complex128(8, -12) / c1;
+        REQUIRE(ret == complex{2, -3});
+        REQUIRE(ret.get_prec() == 113);
+
+        // Moves.
+        auto c2 = c1;
+        ret = std::move(c1) / complex128(2, 2);
+        REQUIRE(ret == complex{1, -1});
+        REQUIRE(ret.get_prec() == 113);
+        REQUIRE(c1.is_valid());
+        c1 = complex{4, -8, complex_prec_t(114)};
+        ret = std::move(c1) / complex128(2, 0);
+        REQUIRE(ret == complex{2, -4});
+        REQUIRE(ret.get_prec() == 114);
+        REQUIRE(!c1.is_valid());
+
+        c1 = c2;
+        ret = complex128(8, -12) / std::move(c1);
+        REQUIRE(ret == complex{2, -3});
+        REQUIRE(ret.get_prec() == 113);
+        REQUIRE(c1.is_valid());
+        c1 = complex{4, 0, complex_prec_t(114)};
+        ret = complex128(8, -12) / std::move(c1);
+        REQUIRE(ret == complex{2, -3});
+        REQUIRE(ret.get_prec() == 114);
+        REQUIRE(!c1.is_valid());
+    }
+#endif
+
+    // real-std::complex.
+    {
+        real r{50, 5};
+        auto ret = r / std::complex<double>{6, -8};
+        REQUIRE(ret == complex{3, 4});
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.));
+        ret = std::complex<double>{50, 600} / r;
+        REQUIRE(ret == complex{1, 12});
+        REQUIRE(std::is_same<complex, decltype(std::complex<double>{5, 6} / r)>::value);
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.));
+
+        // Switch precisions around.
+        r = real{50, detail::real_deduce_precision(5.) + 1};
+        ret = r / std::complex<double>{6, -8};
+        REQUIRE(ret == complex{3, 4});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.) + 1);
+        ret = std::complex<double>{50, 600} / r;
+        REQUIRE(ret == complex{1, 12});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.) + 1);
+
+        // Check moves.
+        r = real{50, detail::real_deduce_precision(5.) + 1};
+        ret = std::complex<double>{50, 600} / std::move(r);
+        REQUIRE(ret == complex{1, 12});
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.) + 1);
+        REQUIRE(!r.is_valid());
+    }
+
+#if defined(MPPP_WITH_QUADMATH)
+    // real-complex128.
+    {
+        real r{50, 5};
+        auto ret = r / complex128{6, -8};
+        REQUIRE(ret == complex{3, 4});
+        REQUIRE(std::is_same<complex, decltype(ret)>::value);
+        REQUIRE(ret.get_prec() == 113);
+        ret = complex128{50, 600} / r;
+        REQUIRE(ret == complex{1, 12});
+        REQUIRE(std::is_same<complex, decltype(complex128{5, 6} / r)>::value);
+        REQUIRE(ret.get_prec() == 113);
+
+        // Switch precisions around.
+        r = real{50, 114};
+        ret = r / complex128{6, -8};
+        REQUIRE(ret == complex{3, 4});
+        REQUIRE(ret.get_prec() == 114);
+        ret = complex128{50, 600} / r;
+        REQUIRE(ret == complex{1, 12});
+        REQUIRE(ret.get_prec() == 114);
+
+        // Check moves.
+        r = real{50, 114};
+        ret = complex128{50, 600} / std::move(r);
+        REQUIRE(ret == complex{1, 12});
+        REQUIRE(ret.get_prec() == 114);
+        REQUIRE(!r.is_valid());
+    }
+#endif
 }
