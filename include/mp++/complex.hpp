@@ -1202,7 +1202,7 @@ template <typename T, cvr_complex_enabler<T> = 0>
 #endif
 inline complex &mul_i(complex &rop, T &&c, int sgn = 0)
 {
-    auto wrapper = [sgn](::mpc_t c, const ::mpc_t o) { ::mpc_mul_i(c, o, sgn, MPC_RNDNN); };
+    auto wrapper = [sgn](::mpc_t rop, const ::mpc_t o) { ::mpc_mul_i(rop, o, sgn, MPC_RNDNN); };
 
     return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(c));
 }
@@ -1214,7 +1214,7 @@ template <typename T, cvr_complex_enabler<T> = 0>
 #endif
 inline complex mul_i(T &&c, int sgn = 0)
 {
-    auto wrapper = [sgn](::mpc_t c, const ::mpc_t o) { ::mpc_mul_i(c, o, sgn, MPC_RNDNN); };
+    auto wrapper = [sgn](::mpc_t rop, const ::mpc_t o) { ::mpc_mul_i(rop, o, sgn, MPC_RNDNN); };
 
     return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(c));
 }
