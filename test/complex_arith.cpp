@@ -538,3 +538,71 @@ TEST_CASE("sqr")
         REQUIRE(!c1.is_valid());
     }
 }
+
+TEST_CASE("mul_i")
+{
+    {
+        // Member function.
+        complex c{1, 2};
+        c.mul_i();
+        REQUIRE(c == complex{-2, 1});
+        REQUIRE(c.get_prec() == detail::real_deduce_precision(1));
+        c.mul_i(-1);
+        REQUIRE(c == complex{1, 2});
+        REQUIRE(c.get_prec() == detail::real_deduce_precision(1));
+    }
+    {
+        // rop overload.
+        complex c1, c2{1, 2};
+        const auto p = c2.get_prec();
+        REQUIRE(&mul_i(c1, c2) == &c1);
+        REQUIRE(std::is_same<decltype(mul_i(c1, c2)), complex &>::value);
+        REQUIRE(c1 == complex{-2, 1});
+        REQUIRE(c1.get_prec() == p);
+        mul_i(c1, c2, -1);
+        REQUIRE(c1 == complex{2, -1});
+
+        // Move, but won't steal because rop
+        // has higher precision.
+        c1 = complex{0, complex_prec_t(c2.get_prec() + 1)};
+        mul_i(c1, std::move(c2));
+        REQUIRE(c1 == complex{-2, 1});
+        REQUIRE(c1.get_prec() == p);
+        REQUIRE(c2 == complex{1, 2});
+        mul_i(c1, std::move(c2), -1);
+        REQUIRE(c1 == complex{2, -1});
+        REQUIRE(c2 == complex{1, 2});
+
+        // Move, will steal.
+        c1 = complex{};
+        mul_i(c1, std::move(c2));
+        REQUIRE(c1 == complex{-2, 1});
+        REQUIRE(c1.get_prec() == p);
+        REQUIRE(c2 == complex{});
+        c2 = complex{1, 2};
+        c1 = complex{};
+        mul_i(c1, std::move(c2), -1);
+        REQUIRE(c1 == complex{2, -1});
+        REQUIRE(c1.get_prec() == p);
+        REQUIRE(c2 == complex{});
+    }
+    {
+        // return overload.
+        REQUIRE(mul_i(complex{1, 2}) == complex{-2, 1});
+        REQUIRE(std::is_same<decltype(mul_i(complex{1, 2})), complex>::value);
+        REQUIRE(mul_i(complex{1, 2}, -2) == complex{2, -1});
+
+        // move, will steal.
+        complex c1{3, 4};
+        const auto p = c1.get_prec();
+        auto c2 = mul_i(std::move(c1));
+        REQUIRE(c2 == complex{-4, 3});
+        REQUIRE(c2.get_prec() == p);
+        REQUIRE(!c1.is_valid());
+        c1 = complex{3, 4};
+        c2 = mul_i(std::move(c1), -3);
+        REQUIRE(c2 == complex{4, -3});
+        REQUIRE(c2.get_prec() == p);
+        REQUIRE(!c1.is_valid());
+    }
+}

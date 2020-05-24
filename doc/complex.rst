@@ -524,6 +524,7 @@ The complex class
    .. cpp:function:: complex &norm()
    .. cpp:function:: complex &arg()
    .. cpp:function:: complex &sqr()
+   .. cpp:function:: complex &mul_i(int s = 0)
 
       In-place basic aritmetic functions.
 
@@ -536,6 +537,7 @@ The complex class
       * :math:`\left| z \right|^2`,
       * :math:`\arg z`,
       * :math:`z^2`,
+      * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
 
       where :math:`z` is the current value of ``this``.
 
@@ -745,6 +747,7 @@ Arithmetic
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::conj(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::proj(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqr(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_i(mppp::complex &rop, T &&z, int s = 0)
 .. cpp:function:: mppp::real &mppp::abs(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::norm(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::arg(mppp::real &rop, const mppp::complex &z)
@@ -757,6 +760,7 @@ Arithmetic
    * :math:`\overline{z}`,
    * the projection of :math:`z` into Riemann sphere,
    * :math:`z^2`,
+   * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
    * :math:`\left| z \right|`,
    * :math:`\left| z \right|^2`,
    * :math:`\arg z`.
@@ -772,6 +776,7 @@ Arithmetic
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::conj(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::proj(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqr(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::mul_i(T &&z, int s = 0)
 .. cpp:function:: mppp::real mppp::abs(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::norm(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::arg(const mppp::complex &z)
@@ -784,6 +789,7 @@ Arithmetic
    * :math:`\overline{z}`,
    * the projection of :math:`z` into Riemann sphere,
    * :math:`z^2`,
+   * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
    * :math:`\left| z \right|`,
    * :math:`\left| z \right|^2`,
    * :math:`\arg z`.

@@ -799,6 +799,7 @@ public:
     complex &arg();
     complex &proj();
     complex &sqr();
+    complex &mul_i(int sgn = 0);
 
 private:
     mpc_struct_t m_mpc;
@@ -1192,6 +1193,31 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(neg, ::mpc_neg, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(conj, ::mpc_conj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqr, ::mpc_sqr, true)
+
+// Multiplication by i.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex &mul_i(complex &rop, T &&c, int sgn = 0)
+{
+    auto wrapper = [sgn](::mpc_t c, const ::mpc_t o) { ::mpc_mul_i(c, o, sgn, MPC_RNDNN); };
+
+    return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(c));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex mul_i(T &&c, int sgn = 0)
+{
+    auto wrapper = [sgn](::mpc_t c, const ::mpc_t o) { ::mpc_mul_i(c, o, sgn, MPC_RNDNN); };
+
+    return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(c));
+}
 
 // NOTE: these functions return a real, thus we need
 // custom implementations.

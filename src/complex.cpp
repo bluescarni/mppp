@@ -490,6 +490,13 @@ complex &complex::sqr()
     return self_mpc_unary(::mpc_sqr);
 }
 
+// In-place mul_i.
+complex &complex::mul_i(int sgn)
+{
+    ::mpc_mul_i(&m_mpc, &m_mpc, sgn, MPC_RNDNN);
+    return *this;
+}
+
 // Free-function abs.
 real &abs(real &rop, const complex &c)
 {
