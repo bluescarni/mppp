@@ -15,6 +15,20 @@
 
 #include "catch.hpp"
 
+#if defined(_MSC_VER)
+
+template <typename... Args>
+auto fma_wrap(Args &&... args) -> decltype(mppp::fma(std::forward<Args>(args)...))
+{
+    return mppp::fma(std::forward<Args>(args)...);
+}
+
+#else
+
+#define fma_wrap fma
+
+#endif
+
 using namespace mppp;
 
 TEST_CASE("add")
@@ -605,4 +619,65 @@ TEST_CASE("mul_i")
         REQUIRE(c2.get_prec() == p);
         REQUIRE(!c1.is_valid());
     }
+}
+
+TEST_CASE("fma")
+{
+    complex r1, r2, r3, r4;
+    REQUIRE(std::is_same<complex &, decltype(mppp::fma(r1, r2, r3, r4))>::value);
+    fma_wrap(r1, r2, r3, r4);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    fma_wrap(r1, complex{2, complex_prec_t(12)}, complex{3, complex_prec_t(7)}, complex{14, complex_prec_t(128)});
+    REQUIRE(r1 == 20);
+    REQUIRE(r1.get_prec() == 128);
+    r1 = 0;
+    fma_wrap(r1, complex{3, complex_prec_t(7)}, complex{2, complex_prec_t(12)}, complex{14, complex_prec_t(128)});
+    REQUIRE(r1 == 20);
+    REQUIRE(r1.get_prec() == 128);
+    r1 = 0;
+    fma_wrap(r1, complex{14, complex_prec_t(128)}, complex{3, complex_prec_t(7)}, complex{2, complex_prec_t(12)});
+    REQUIRE(r1 == 44);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(std::is_same<complex, decltype(mppp::fma(r1, r2, r3))>::value);
+    r1 = fma_wrap(complex{14, complex_prec_t(128)}, complex{3, complex_prec_t(7)}, complex{2, complex_prec_t(12)});
+    REQUIRE(r1 == 44);
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(static_cast<const complex &>(complex{14, complex_prec_t(128)}), complex{3, complex_prec_t(7)},
+                  complex{2, complex_prec_t(12)});
+    REQUIRE(r1 == 44);
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(complex{14, complex_prec_t(128)}, static_cast<const complex &>(complex{3, complex_prec_t(7)}),
+                  complex{2, complex_prec_t(12)});
+    REQUIRE(r1 == 44);
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(complex{14, complex_prec_t(128)}, complex{3, complex_prec_t(7)},
+                  static_cast<const complex &>(complex{2, complex_prec_t(12)}));
+    REQUIRE(r1 == 44);
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(complex{14, complex_prec_t(128)}, static_cast<const complex &>(complex{3, complex_prec_t(7)}),
+                  static_cast<const complex &>(complex{2, complex_prec_t(12)}));
+    REQUIRE(r1 == 44);
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(static_cast<const complex &>(complex{14, complex_prec_t(128)}), complex{3, complex_prec_t(7)},
+                  static_cast<const complex &>(complex{2, complex_prec_t(12)}));
+    REQUIRE(r1 == 44);
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(static_cast<const complex &>(complex{14, complex_prec_t(128)}),
+                  static_cast<const complex &>(complex{3, complex_prec_t(7)}),
+                  static_cast<const complex &>(complex{2, complex_prec_t(12)}));
+    REQUIRE(r1 == 44);
+    REQUIRE(r1.get_prec() == 128);
+    // Overlap + rvalue.
+    r1 = 0;
+    fma_wrap(r1, std::move(r1), std::move(r1), std::move(r1));
+    REQUIRE(r1.zero_p());
+    fma_wrap(r1, r1, std::move(r1), std::move(r1));
+    REQUIRE(r1.zero_p());
+    fma_wrap(r1, r1, r1, std::move(r1));
+    REQUIRE(r1.zero_p());
+    fma_wrap(r1, std::move(r1), r1, std::move(r1));
+    REQUIRE(r1.zero_p());
+    fma_wrap(r1, std::move(r1), std::move(r1), r1);
+    REQUIRE(r1.zero_p());
 }

@@ -770,6 +770,35 @@ Arithmetic
 
    :return: a reference to *rop*.
 
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U, mppp::cvr_complex V> mppp::complex &mppp::fma(mppp::complex &rop, T &&a, U &&b, V &&c)
+
+   Quaternary :cpp:class:`~mppp::complex` multiply-add.
+
+   This function will set *rop* to :math:`a \times b + c`.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param a: the first operand.
+   :param b: the second operand.
+   :param c: the third operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U, mppp::cvr_complex V> mppp::complex mppp::fma(T &&a, U &&b, V &&c)
+
+   Ternary :cpp:class:`~mppp::complex` multiply-add.
+
+   This function will return :math:`a \times b + c`.
+
+   The precision of the result will be the largest precision among the operands.
+
+   :param a: the first operand.
+   :param b: the second operand.
+   :param c: the third operand.
+
+   :return: :math:`a \times b + c`.
+
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::neg(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::conj(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::proj(mppp::complex &rop, T &&z)

@@ -1205,6 +1205,30 @@ inline complex &div(complex &rop, T &&a, U &&b)
     return detail::mpc_nary_op_impl<true>(0, ::mpc_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
+// Quaternary fused multiply–add.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T, cvr_complex U, cvr_complex V>
+#else
+template <typename T, typename U, typename V, cvr_complex_enabler<T, U, V> = 0>
+#endif
+inline complex &fma(complex &rop, T &&a, U &&b, V &&c)
+{
+    return detail::mpc_nary_op_impl<true>(0, ::mpc_fma, rop, std::forward<T>(a), std::forward<U>(b),
+                                          std::forward<V>(c));
+}
+
+// Ternary fused multiply–add.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T, cvr_complex U, cvr_complex V>
+#else
+template <typename T, typename U, typename V, cvr_complex_enabler<T, U, V> = 0>
+#endif
+inline complex fma(T &&a, U &&b, V &&c)
+{
+    return detail::mpc_nary_op_return_impl<true>(0, ::mpc_fma, std::forward<T>(a), std::forward<U>(b),
+                                                 std::forward<V>(c));
+}
+
 MPPP_COMPLEX_MPC_UNARY_IMPL(neg, ::mpc_neg, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(conj, ::mpc_conj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)
