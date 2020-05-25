@@ -1194,7 +1194,7 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(conj, ::mpc_conj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqr, ::mpc_sqr, true)
 
-// Multiplication by i.
+// Multiplication by +-i.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
 #else
@@ -1202,7 +1202,7 @@ template <typename T, cvr_complex_enabler<T> = 0>
 #endif
 inline complex &mul_i(complex &rop, T &&c, int sgn = 0)
 {
-    auto wrapper = [sgn](::mpc_t rop, const ::mpc_t o) { ::mpc_mul_i(rop, o, sgn, MPC_RNDNN); };
+    auto wrapper = [sgn](::mpc_t r, const ::mpc_t o) { ::mpc_mul_i(r, o, sgn, MPC_RNDNN); };
 
     return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(c));
 }
