@@ -2631,3 +2631,201 @@ TEST_CASE("in-place div")
 #endif
     }
 }
+
+TEST_CASE("eq ineq")
+{
+    // complex-complex.
+    {
+        REQUIRE(complex{1, 2} == complex{1, 2});
+        REQUIRE(!(complex{1, 2} != complex{1, 2}));
+        REQUIRE(complex{1, 2} != complex{2, 2});
+        REQUIRE(!(complex{1, 2} == complex{2, 2}));
+
+        // NaN testing.
+        REQUIRE(!(complex{"(nan,0)", complex_prec_t(5)} == complex{"(nan,0)", complex_prec_t(5)}));
+        REQUIRE(complex{"(nan,0)", complex_prec_t(5)} != complex{"(nan,0)", complex_prec_t(5)});
+        REQUIRE(!(complex{"(nan,0)", complex_prec_t(5)} == complex{"(2,0)", complex_prec_t(5)}));
+        REQUIRE(complex{"(nan,0)", complex_prec_t(5)} != complex{"(2,0)", complex_prec_t(5)});
+
+        REQUIRE(!(complex{"(0,nan)", complex_prec_t(5)} == complex{"(0,nan)", complex_prec_t(5)}));
+        REQUIRE(complex{"(0,nan)", complex_prec_t(5)} != complex{"(0,nan)", complex_prec_t(5)});
+        REQUIRE(!(complex{"(0,nan)", complex_prec_t(5)} == complex{"(2,nan)", complex_prec_t(5)}));
+        REQUIRE(complex{"(0,nan)", complex_prec_t(5)} != complex{"(2,nan)", complex_prec_t(5)});
+
+        REQUIRE(!(complex{"(nan,nan)", complex_prec_t(5)} == complex{"(nan,nan)", complex_prec_t(5)}));
+        REQUIRE(complex{"(nan,nan)", complex_prec_t(5)} != complex{"(nan,nan)", complex_prec_t(5)});
+    }
+    // complex-real valued (except signed integral).
+    {
+        REQUIRE(complex{2, 0} == 2.);
+        REQUIRE(complex{-2, -0.} == real{-2});
+        REQUIRE(!(complex{2, 0} != 2_z1));
+        REQUIRE(!(complex{-2, -0.} != -2_q1));
+        REQUIRE(2. == complex{2, 0});
+        REQUIRE(real{-2} == complex{-2, -0.});
+        REQUIRE(!(2_z1 != complex{2, 0}));
+        REQUIRE(!(-2_q1 != complex{-2, -0.}));
+#if defined(MPPP_WITH_QUADMATH)
+        REQUIRE(complex{2, 0} == 2_rq);
+        REQUIRE(!(complex{2, 0} != 2_rq));
+        REQUIRE(2_rq == complex{2, 0});
+        REQUIRE(!(2_rq != complex{2, 0}));
+#endif
+
+        REQUIRE(!(complex{3, 0} == 2.));
+        REQUIRE(!(complex{-3, -0.} == real{-2}));
+        REQUIRE(complex{3, 0} != 2_z1);
+        REQUIRE(complex{-3, -0.} != 2_q1);
+        REQUIRE(!(2. == complex{3, 0}));
+        REQUIRE(!(real{-2} == complex{-3, -0.}));
+        REQUIRE(2_z1 != complex{3, 0});
+        REQUIRE(2_q1 != complex{-3, -0.});
+#if defined(MPPP_WITH_QUADMATH)
+        REQUIRE(!(complex{3, 0} == 2_rq));
+        REQUIRE(complex{3, 0} != 2_rq);
+        REQUIRE(!(2_rq == complex{3, 0}));
+        REQUIRE(2_rq != complex{3, 0});
+#endif
+
+        REQUIRE(!(complex{2, 1} == 2.));
+        REQUIRE(!(complex{-2, -1.} == real{-2}));
+        REQUIRE(complex{2, 1} != 2_z1);
+        REQUIRE(complex{-2, -1.} != 2_q1);
+        REQUIRE(!(2. == complex{2, 1}));
+        REQUIRE(!(real{-2} == complex{-2, -1.}));
+        REQUIRE(2_z1 != complex{2, 1});
+        REQUIRE(2_q1 != complex{-2, -1.});
+#if defined(MPPP_WITH_QUADMATH)
+        REQUIRE(!(complex{3, 1} == 2_rq));
+        REQUIRE(complex{3, 1} != 2_rq);
+        REQUIRE(!(2_rq == complex{3, 1}));
+        REQUIRE(2_rq != complex{3, 1});
+#endif
+
+        // NaN testing.
+        REQUIRE(!(complex{"(nan,0)", complex_prec_t(5)} == 1.));
+        REQUIRE(complex{"(nan,0)", complex_prec_t(5)} != 1.);
+        REQUIRE(!(complex{"(1.,nan)", complex_prec_t(5)} == 1.));
+        REQUIRE(complex{"(1.,nan)", complex_prec_t(5)} != 1.);
+        REQUIRE(!(1. == complex{"(nan,0)", complex_prec_t(5)}));
+        REQUIRE(1. != complex{"(nan,0)", complex_prec_t(5)});
+        REQUIRE(!(1. == complex{"(1.,nan)", complex_prec_t(5)}));
+        REQUIRE(1. != complex{"(1.,nan)", complex_prec_t(5)});
+#if defined(MPPP_WITH_QUADMATH)
+        REQUIRE(!(complex{"(nan,0)", complex_prec_t(5)} == 1_rq));
+        REQUIRE(complex{"(nan,0)", complex_prec_t(5)} != 1_rq);
+        REQUIRE(!(complex{"(1.,nan)", complex_prec_t(5)} == 1_rq));
+        REQUIRE(complex{"(1.,nan)", complex_prec_t(5)} != 1_rq);
+        REQUIRE(!(1_rq == complex{"(nan,0)", complex_prec_t(5)}));
+        REQUIRE(1_rq != complex{"(nan,0)", complex_prec_t(5)});
+        REQUIRE(!(1_rq == complex{"(1.,nan)", complex_prec_t(5)}));
+        REQUIRE(1_rq != complex{"(1.,nan)", complex_prec_t(5)});
+#endif
+    }
+    // complex-signed integral.
+    {
+        REQUIRE(complex{2, 0} == 2);
+        REQUIRE(!(complex{2, 0} != 2l));
+        REQUIRE(2 == complex{2, 0});
+        REQUIRE(!(2l != complex{2, 0}));
+
+        REQUIRE(!(complex{3, 0} == 2));
+        REQUIRE(!(complex{-3, -0.} == -2l));
+        REQUIRE(complex{3, 0} != short(2));
+        REQUIRE(complex{-3, -0.} != static_cast<signed char>(2));
+        REQUIRE(!(2 == complex{3, 0}));
+        REQUIRE(!(-2l == complex{-3, -0.}));
+        REQUIRE(short(2) != complex{3, 0});
+        REQUIRE(static_cast<signed char>(2) != complex{-3, -0.});
+
+        REQUIRE(!(complex{2, 1} == 2));
+        REQUIRE(!(complex{-2, -1.} == -2ll));
+        REQUIRE(complex{2, 1} != 2);
+        REQUIRE(complex{-2, -1.} != 2);
+        REQUIRE(!(2 == complex{2, 1}));
+        REQUIRE(!(-2ll == complex{-2, -1.}));
+        REQUIRE(2 != complex{2, 1});
+        REQUIRE(2 != complex{-2, -1.});
+
+        // NaN testing.
+        REQUIRE(!(complex{"(nan,0)", complex_prec_t(5)} == 1));
+        REQUIRE(complex{"(nan,0)", complex_prec_t(5)} != 1l);
+        REQUIRE(!(complex{"(1.,nan)", complex_prec_t(5)} == 1ll));
+        REQUIRE(complex{"(1.,nan)", complex_prec_t(5)} != 1ll);
+        REQUIRE(!(1 == complex{"(nan,0)", complex_prec_t(5)}));
+        REQUIRE(1l != complex{"(nan,0)", complex_prec_t(5)});
+        REQUIRE(!(1ll == complex{"(1.,nan)", complex_prec_t(5)}));
+        REQUIRE(1ll != complex{"(1.,nan)", complex_prec_t(5)});
+    }
+    // complex-complex valued.
+    {
+        REQUIRE(complex{1, 2} == std::complex<double>{1, 2});
+        REQUIRE(std::complex<double>{1, 2} == complex{1, 2});
+        REQUIRE(!(complex{1, 2} != std::complex<double>{1, 2}));
+        REQUIRE(!(std::complex<double>{1, 2} != complex{1, 2}));
+
+        REQUIRE(complex{1, 3} != std::complex<double>{1, 2});
+        REQUIRE(std::complex<double>{1, 2} != complex{1, 3});
+        REQUIRE(!(complex{1, 3} == std::complex<double>{1, 2}));
+        REQUIRE(!(std::complex<double>{1, 2} == complex{1, 3}));
+
+        REQUIRE(complex{1, 2} != std::complex<double>{2, 2});
+        REQUIRE(std::complex<double>{2, 2} != complex{1, 2});
+        REQUIRE(!(complex{1, 2} == std::complex<double>{2, 2}));
+        REQUIRE(!(std::complex<double>{2, 2} == complex{1, 2}));
+
+#if defined(MPPP_WITH_QUADMATH)
+        REQUIRE(complex{1, 2} == complex128{1, 2});
+        REQUIRE(complex128{1, 2} == complex{1, 2});
+        REQUIRE(!(complex{1, 2} != complex128{1, 2}));
+        REQUIRE(!(complex128{1, 2} != complex{1, 2}));
+
+        REQUIRE(complex{1, 3} != complex128{1, 2});
+        REQUIRE(complex128{1, 2} != complex{1, 3});
+        REQUIRE(!(complex{1, 3} == complex128{1, 2}));
+        REQUIRE(!(complex128{1, 2} == complex{1, 3}));
+
+        REQUIRE(complex{1, 2} != complex128{2, 2});
+        REQUIRE(complex128{2, 2} != complex{1, 2});
+        REQUIRE(!(complex{1, 2} == complex128{2, 2}));
+        REQUIRE(!(complex128{2, 2} == complex{1, 2}));
+#endif
+
+        // NaN testing.
+        if (std::numeric_limits<double>::has_quiet_NaN) {
+            const auto dnan = std::numeric_limits<double>::quiet_NaN();
+
+            REQUIRE(complex{"(1, nan)", complex_prec_t(5)} != std::complex<double>{1, dnan});
+            REQUIRE(std::complex<double>{1, dnan} != complex{"(1, nan)", complex_prec_t(5)});
+            REQUIRE(!(complex{"(1, nan)", complex_prec_t(5)} == std::complex<double>{1, dnan}));
+            REQUIRE(!(std::complex<double>{1, dnan} == complex{"(1, nan)", complex_prec_t(5)}));
+
+            REQUIRE(complex{"(nan,1)", complex_prec_t(5)} != std::complex<double>{dnan, 1});
+            REQUIRE(std::complex<double>{dnan, 1} != complex{"(nan,1)", complex_prec_t(5)});
+            REQUIRE(!(complex{"(nan,1)", complex_prec_t(5)} == std::complex<double>{dnan, 1}));
+            REQUIRE(!(std::complex<double>{dnan, 1} == complex{"(nan,1)", complex_prec_t(5)}));
+
+            REQUIRE(complex{"(nan,nan)", complex_prec_t(5)} != std::complex<double>{dnan, dnan});
+            REQUIRE(std::complex<double>{dnan, dnan} != complex{"(nan,nan)", complex_prec_t(5)});
+            REQUIRE(!(complex{"(nan,nan)", complex_prec_t(5)} == std::complex<double>{dnan, dnan}));
+            REQUIRE(!(std::complex<double>{dnan, dnan} == complex{"(nan,nan)", complex_prec_t(5)}));
+        }
+    }
+
+#if defined(MPPP_WITH_QUADMATH)
+    REQUIRE(complex{"(1, nan)", complex_prec_t(5)} != complex128{"(1,nan)"});
+    REQUIRE(complex128{"(1,nan)"} != complex{"(1, nan)", complex_prec_t(5)});
+    REQUIRE(!(complex{"(1, nan)", complex_prec_t(5)} == complex128{"(1,nan)"}));
+    REQUIRE(!(complex128{"(1,nan)"} == complex{"(1, nan)", complex_prec_t(5)}));
+
+    REQUIRE(complex{"(nan,1)", complex_prec_t(5)} != complex128{"(nan,1)"});
+    REQUIRE(complex128{"(nan,1)"} != complex{"(nan,1)", complex_prec_t(5)});
+    REQUIRE(!(complex{"(nan,1)", complex_prec_t(5)} == complex128{"(nan,1)"}));
+    REQUIRE(!(complex128{"(nan,1)"} == complex{"(nan,1)", complex_prec_t(5)}));
+
+    REQUIRE(complex{"(nan,nan)", complex_prec_t(5)} != complex128{"(nan,nan)"});
+    REQUIRE(complex128{"(nan,nan)"} != complex{"(nan,nan)", complex_prec_t(5)});
+    REQUIRE(!(complex{"(nan,nan)", complex_prec_t(5)} == complex128{"(nan,nan)"}));
+    REQUIRE(!(complex128{"(nan,nan)"} == complex{"(nan,nan)", complex_prec_t(5)}));
+#endif
+}

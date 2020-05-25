@@ -614,15 +614,23 @@ Concepts
    is valid (where ``c`` is a non-const :cpp:class:`~mppp::complex` and ``x``, ``y``, ``z``, etc. are const
    references to the types in ``Args``).
 
+.. cpp:concept:: template <typename T, typename U> mppp::complex_eq_op_types
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   equality/inequality :ref:`operators <complex_operators>`
+   involving :cpp:class:`~mppp::complex`. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` both satisfy :cpp:concept:`~mppp::cvr_complex`, or
+   * one type satisfies :cpp:concept:`~mppp::cvr_complex` and the other type
+     satisfies :cpp:concept:`~mppp::complex_interoperable`.
+
 .. cpp:concept:: template <typename T, typename U> mppp::complex_op_types
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic binary :ref:`operators <complex_operators>` and :ref:`functions <complex_functions>`
    involving :cpp:class:`~mppp::complex`. Specifically, the concept will be ``true`` if either:
 
-   * ``T`` and ``U`` both satisfy :cpp:concept:`~mppp::cvr_complex`,
-   * one type satisfies :cpp:concept:`~mppp::cvr_complex` and the other type
-     satisfies :cpp:concept:`~mppp::complex_interoperable`,
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::complex_eq_op_types`, or
    * one type satisfies :cpp:concept:`~mppp::cvr_real` and the other type,
      after the removal of reference and cv qualifiers, either satisfies
      :cpp:concept:`~mppp::cpp_complex` or it is :cpp:class:`~mppp::complex128`.
@@ -878,3 +886,21 @@ Mathematical operators
    :param c: the input argument.
 
    :return: a copy of *c* before the increment/decrement.
+
+.. cpp:function:: template <typename T, mppp::complex_eq_op_types<T> U> bool mppp::operator==(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::complex_eq_op_types<T> U> bool mppp::operator!=(const T &a, const U &b)
+
+   Comparison operators.
+
+   These operators will compare *a* and *b*, returning ``true`` if, respectively, :math:`a=b` and :math:`a \neq b`,
+   and ``false`` otherwise.
+
+   The comparisons are always exact (i.e., no rounding is involved).
+
+   These operators handle NaN in the same way specified by the IEEE floating-point
+   standard.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: the result of the comparison.
