@@ -164,3 +164,54 @@ TEST_CASE("real is_one")
     REQUIRE(!real{"-nan", 5}.is_one());
     REQUIRE(!::mpfr_erangeflag_p());
 }
+
+TEST_CASE("real cmpabs")
+{
+    REQUIRE(cmpabs(real{}, real{}) == 0);
+    REQUIRE(cmpabs(real{1}, real{1}) == 0);
+    REQUIRE(cmpabs(real{1}, real{0}) > 0);
+    REQUIRE(cmpabs(real{-1}, real{0}) > 0);
+    REQUIRE(cmpabs(real{0}, real{1}) < 0);
+    REQUIRE(cmpabs(real{0}, real{-1}) < 0);
+    REQUIRE(cmpabs(real{"inf", 64}, real{45}) > 0);
+    REQUIRE(cmpabs(-real{"inf", 64}, real{45}) > 0);
+    REQUIRE(cmpabs(real{45}, real{"inf", 64}) < 0);
+    REQUIRE(cmpabs(real{45}, -real{"inf", 64}) < 0);
+    REQUIRE(cmpabs(-real{"inf", 64}, -real{"inf", 4}) == 0);
+    REQUIRE(cmpabs(real{"inf", 64}, -real{"inf", 4}) == 0);
+    REQUIRE_THROWS_PREDICATE(cmpabs(real{"nan", 5}, real{6}), std::domain_error, [](const std::domain_error &ex) {
+        return ex.what()
+               == std::string("Cannot compare the absolute values of two reals if at least one of them is NaN");
+    });
+    REQUIRE_THROWS_PREDICATE(cmpabs(real{6}, real{"nan", 5}), std::domain_error, [](const std::domain_error &ex) {
+        return ex.what()
+               == std::string("Cannot compare the absolute values of two reals if at least one of them is NaN");
+    });
+    REQUIRE_THROWS_PREDICATE(
+        cmpabs(real{"nan", 5}, real{"nan", 5}), std::domain_error, [](const std::domain_error &ex) {
+            return ex.what()
+                   == std::string("Cannot compare the absolute values of two reals if at least one of them is NaN");
+        });
+}
+
+TEST_CASE("real cmp_2_exp")
+{
+    REQUIRE(cmp_ui_2exp(real{}, 0, 0) == 0);
+    REQUIRE(cmp_si_2exp(real{}, 0, 0) == 0);
+
+    REQUIRE(cmp_ui_2exp(real{16}, 4, 2) == 0);
+    REQUIRE(cmp_si_2exp(real{16}, 4, 2) == 0);
+
+    REQUIRE(cmp_ui_2exp(real{2}, 0, 0) > 0);
+    REQUIRE(cmp_si_2exp(real{2}, 0, 0) > 0);
+
+    REQUIRE(cmp_ui_2exp(real{-2}, 4, 2) < 0);
+    REQUIRE(cmp_si_2exp(real{-32}, -4, 2) < 0);
+
+    REQUIRE_THROWS_PREDICATE(cmp_ui_2exp(real{"nan", 5}, 4, 2), std::domain_error, [](const std::domain_error &ex) {
+        return ex.what() == std::string("Cannot compare a real NaN to an integral multiple of a power of 2");
+    });
+    REQUIRE_THROWS_PREDICATE(cmp_si_2exp(real{"nan", 5}, 4, 2), std::domain_error, [](const std::domain_error &ex) {
+        return ex.what() == std::string("Cannot compare a real NaN to an integral multiple of a power of 2");
+    });
+}
