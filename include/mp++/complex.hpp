@@ -480,6 +480,9 @@ public:
     // Set to an mpc_t.
     complex &set(const ::mpc_t);
 
+    // Set to (nan, nan).
+    complex &set_nan();
+
     class re_ref
     {
     public:
@@ -880,6 +883,12 @@ template <typename... Args, detail::enable_if_t<detail::is_detected<detail::comp
 inline complex &set(complex &c, const Args &... args)
 {
     return c.set(args...);
+}
+
+// Set to NaN.
+inline complex &set_nan(complex &c)
+{
+    return c.set_nan();
 }
 
 // Swap.

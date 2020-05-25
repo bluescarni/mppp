@@ -1200,6 +1200,29 @@ TEST_CASE("set")
     }
 }
 
+TEST_CASE("set_nan")
+{
+    complex c{1, 2};
+    c.set_nan();
+    {
+        complex::re_cref re{c};
+        complex::im_cref im{c};
+
+        REQUIRE(re->nan_p());
+        REQUIRE(im->nan_p());
+    }
+
+    c = complex{4, 5};
+    set_nan(c);
+    {
+        complex::re_cref re{c};
+        complex::im_cref im{c};
+
+        REQUIRE(re->nan_p());
+        REQUIRE(im->nan_p());
+    }
+}
+
 TEST_CASE("mpc_t getters")
 {
     complex c{1, 2};

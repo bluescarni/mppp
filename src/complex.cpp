@@ -233,6 +233,13 @@ complex &complex::set(const ::mpc_t c)
     return *this;
 }
 
+complex &complex::set_nan()
+{
+    ::mpc_set_nan(&m_mpc);
+
+    return *this;
+}
+
 // Implementation of the assignment from string.
 void complex::string_assignment_impl(const char *s, int base)
 {

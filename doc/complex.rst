@@ -400,6 +400,15 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex &set_nan()
+
+      Set to NaN.
+
+      This member function will set both the real and imaginary parts of ``this``
+      to NaN.
+
+      :return: a reference to ``this``.
+
    .. cpp:function:: const mpc_struct_t *get_mpc_t() const
    .. cpp:function:: mpc_struct_t *_get_mpc_t()
 
@@ -699,6 +708,16 @@ Assignment
    :return: a reference to *c*.
 
    :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::complex::set()` overload.
+
+.. cpp:function:: mppp::complex &mppp::set_nan(mppp::complex &c)
+
+   Set to NaN.
+
+   This function will set both the real and imaginary parts of *c* to NaN.
+
+   :param c: the input argument.
+
+   :return: a reference to *c*.
 
 .. cpp:function:: void mppp::swap(mppp::complex &a, mppp::complex &b) noexcept
 
