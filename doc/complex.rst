@@ -856,6 +856,47 @@ Arithmetic
 
    :return: the result of the operation.
 
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_2ui(mppp::complex &rop, T &&c, unsigned long n)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_2si(mppp::complex &rop, T &&c, long n)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::div_2ui(mppp::complex &rop, T &&c, unsigned long n)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::div_2si(mppp::complex &rop, T &&c, long n)
+
+   Ternary :cpp:class:`~mppp::complex` primitives for
+   multiplication/division by powers of 2.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`c \times 2^n` (``mul_2`` variants),
+   * :math:`\frac{c}{2^n}` (``div_2`` variants).
+
+   The precision of the result will be equal to the precision of *c*.
+
+   :param rop: the return value.
+   :param c: the operand.
+   :param n: the power of 2.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::mul_2ui(T &&c, unsigned long n)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::mul_2si(T &&c, long n)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::div_2ui(T &&c, unsigned long n)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::div_2si(T &&c, long n)
+
+   Binary :cpp:class:`~mppp::complex` primitives for
+   multiplication/division by powers of 2.
+
+   These functions will return, respectively:
+
+   * :math:`c \times 2^n` (``mul_2`` variants),
+   * :math:`\frac{c}{2^n}` (``div_2`` variants).
+
+   The precision of the result will be equal to the precision of *c*.
+
+   :param c: the operand.
+   :param n: the power of 2.
+
+   :return: *c* multiplied/divided by :math:`2^n`.
+
 Comparison
 ~~~~~~~~~~
 

@@ -1229,6 +1229,95 @@ inline complex fma(T &&a, U &&b, V &&c)
                                                  std::forward<V>(c));
 }
 
+// mul2/div2 primitives.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex mul_2ui(T &&x, unsigned long n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2ui(r, o, n, MPC_RNDNN); };
+    return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex &mul_2ui(complex &rop, T &&x, unsigned long n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2ui(r, o, n, MPC_RNDNN); };
+    return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex mul_2si(T &&x, long n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2si(r, o, n, MPC_RNDNN); };
+    return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex &mul_2si(complex &rop, T &&x, long n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2si(r, o, n, MPC_RNDNN); };
+    return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex div_2ui(T &&x, unsigned long n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2ui(r, o, n, MPC_RNDNN); };
+    return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex &div_2ui(complex &rop, T &&x, unsigned long n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2ui(r, o, n, MPC_RNDNN); };
+    return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex div_2si(T &&x, long n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2si(r, o, n, MPC_RNDNN); };
+    return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex &div_2si(complex &rop, T &&x, long n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2si(r, o, n, MPC_RNDNN); };
+    return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
+}
+
 MPPP_COMPLEX_MPC_UNARY_IMPL(neg, ::mpc_neg, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(conj, ::mpc_conj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)
@@ -2512,6 +2601,25 @@ template <typename T, typename U, detail::enable_if_t<are_complex_eq_op_types<T,
 {
     return !(x == y);
 }
+
+inline namespace literals
+{
+
+#define MPPP_DECLARE_COMPLEX_UDL(prec)                                                                                 \
+    template <char... Chars>                                                                                           \
+    inline complex operator"" _icr##prec()                                                                             \
+    {                                                                                                                  \
+        return complex{real{real_kind::zero, prec}, detail::real_literal_impl<Chars...>(prec)};                        \
+    }
+
+MPPP_DECLARE_COMPLEX_UDL(128)
+MPPP_DECLARE_COMPLEX_UDL(256)
+MPPP_DECLARE_COMPLEX_UDL(512)
+MPPP_DECLARE_COMPLEX_UDL(1024)
+
+#undef MPPP_DECLARE_COMPLEX_UDL
+
+} // namespace literals
 
 } // namespace mppp
 
