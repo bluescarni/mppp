@@ -1249,6 +1249,20 @@ MPPP_DLL_PUBLIC real arg(const complex &);
 #undef MPPP_COMPLEX_MPC_UNARY_HEADER
 #undef MPPP_COMPLEX_MPC_UNARY_IMPL
 
+// Comparison of absolute values.
+MPPP_DLL_PUBLIC int cmp_abs(const complex &, const complex &);
+
+// Detect zero/one.
+inline bool zero_p(const complex &c)
+{
+    return c.zero_p();
+}
+
+inline bool is_one(const complex &c)
+{
+    return c.is_one();
+}
+
 #if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
 #else

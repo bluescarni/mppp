@@ -333,6 +333,18 @@ std::string complex::to_string(int base) const
     return '(' + re->to_string(base) + ',' + im->to_string(base) + ')';
 }
 
+int cmp_abs(const complex &c1, const complex &c2)
+{
+    ::mpfr_clear_erangeflag();
+    auto retval = ::mpc_cmp_abs(c1.get_mpc_t(), c2.get_mpc_t());
+    if (mppp_unlikely(::mpfr_erangeflag_p())) {
+        ::mpfr_clear_erangeflag();
+        throw std::domain_error(
+            "Cannot compare the absolute values of two complex numbers if there are NaNs in the real/imaginary parts");
+    }
+    return retval;
+}
+
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {
     return os << c.to_string();

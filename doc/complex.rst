@@ -827,6 +827,40 @@ Arithmetic
 
    :return: the result of the operation.
 
+Comparison
+~~~~~~~~~~
+
+.. cpp:function:: int mppp::cmp_abs(const mppp::complex &a, const mppp::complex &b)
+
+   Three-way comparison of absolute values.
+
+   This function will compare *a* and *b*, returning:
+
+   * zero if :math:`\left|a\right|=\left|b\right|`,
+   * a negative value if :math:`\left|a\right|<\left|b\right|`,
+   * a positive value if :math:`\left|a\right|>\left|b\right|`.
+
+   If at least one NaN component is involved in the comparison, an error will be raised.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: an integral value expressing how the absolute values of *a* and *b* compare.
+
+   :exception std\:\:domain_error: if at least one of the components of *a* and *b* is NaN.
+
+.. cpp:function:: bool mppp::zero_p(const mppp::complex &c)
+.. cpp:function:: bool mppp::is_one(const mppp::complex &c)
+
+   Detect special values.
+
+   These functions will return ``true`` if *c* is, respectively, zero or one,
+   ``false`` otherwise.
+
+   :param c: the input argument.
+
+   :return: the result of the detection.
+
 .. _complex_operators:
 
 Mathematical operators

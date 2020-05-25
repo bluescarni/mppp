@@ -1237,35 +1237,46 @@ TEST_CASE("special values")
 {
     complex c;
     REQUIRE(c.zero_p());
+    REQUIRE(zero_p(c));
 
     c = 1;
     REQUIRE(!c.zero_p());
+    REQUIRE(!zero_p(c));
 
     c = complex{0, 1};
     REQUIRE(!c.zero_p());
+    REQUIRE(!zero_p(c));
 
     c = complex{1, 1};
     REQUIRE(!c.zero_p());
+    REQUIRE(!zero_p(c));
 
     c = complex{0, 0};
     REQUIRE(c.zero_p());
+    REQUIRE(zero_p(c));
 
     REQUIRE(!c.is_one());
+    REQUIRE(!is_one(c));
 
     c = complex{2, 0};
     REQUIRE(!c.is_one());
+    REQUIRE(!is_one(c));
 
     c = complex{2, 1};
     REQUIRE(!c.is_one());
+    REQUIRE(!is_one(c));
 
     c = complex{1, 1};
     REQUIRE(!c.is_one());
+    REQUIRE(!is_one(c));
 
     c = complex{1, 0};
     REQUIRE(c.is_one());
+    REQUIRE(is_one(c));
 
     c = complex{-1, 0};
     REQUIRE(!c.is_one());
+    REQUIRE(!is_one(c));
 }
 
 TEST_CASE("precision handling")
