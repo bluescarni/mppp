@@ -804,6 +804,9 @@ public:
     complex &sqr();
     complex &mul_i(int sgn = 0);
 
+    // Roots.
+    complex &sqrt();
+
 private:
     mpc_struct_t m_mpc;
 };
@@ -1359,9 +1362,6 @@ MPPP_DLL_PUBLIC real norm(const complex &);
 MPPP_DLL_PUBLIC real &arg(real &, const complex &);
 MPPP_DLL_PUBLIC real arg(const complex &);
 
-#undef MPPP_COMPLEX_MPC_UNARY_HEADER
-#undef MPPP_COMPLEX_MPC_UNARY_IMPL
-
 // Comparison of absolute values.
 MPPP_DLL_PUBLIC int cmp_abs(const complex &, const complex &);
 
@@ -1375,6 +1375,11 @@ inline bool is_one(const complex &c)
 {
     return c.is_one();
 }
+
+MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
+
+#undef MPPP_COMPLEX_MPC_UNARY_HEADER
+#undef MPPP_COMPLEX_MPC_UNARY_IMPL
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>

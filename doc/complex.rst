@@ -552,6 +552,14 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex &sqrt()
+
+      In-place square root.
+
+      This member function will set ``this`` to :math:`\sqrt{z}`, where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -930,6 +938,33 @@ Comparison
    :param c: the input argument.
 
    :return: the result of the detection.
+
+Roots
+~~~~~
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqrt(mppp::complex &rop, T &&op)
+
+   Binary :cpp:class:`~mppp::complex` square root.
+
+   This function will compute the square root of *op* and store it
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqrt(T &&r)
+
+   Unary :cpp:class:`~mppp::complex` square root.
+
+   This function will compute and return the square root of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the square root of *r*.
 
 .. _complex_operators:
 

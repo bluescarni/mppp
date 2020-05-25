@@ -534,6 +534,12 @@ complex &complex::mul_i(int sgn)
     return *this;
 }
 
+// In-place sqrt.
+complex &complex::sqrt()
+{
+    return self_mpc_unary(::mpc_sqrt);
+}
+
 // Free-function abs.
 real &abs(real &rop, const complex &c)
 {
