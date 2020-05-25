@@ -2302,6 +2302,102 @@ template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>
     return detail::dispatch_complex_binary_div(std::forward<T>(a), std::forward<U>(b));
 }
 
+namespace detail
+{
+
+// complex-complex.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline void dispatch_complex_in_place_div(complex &a, T &&b)
+{
+    div(a, a, std::forward<T>(b));
+}
+
+// complex-real.
+MPPP_DLL_PUBLIC void dispatch_complex_in_place_div(complex &, const real &);
+
+// complex-(anything real-valued other than unsigned integral or real).
+template <
+    typename T,
+    enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int> = 0>
+inline void dispatch_complex_in_place_div(complex &a, const T &x)
+{
+    complex::re_ref re{a};
+    complex::im_ref im{a};
+
+    // NOTE: the divisions here may change the
+    // precisions of re/im. Because the original
+    // precisions were identical and because re/im are
+    // divided by the same value, they
+    // will have the same new precision.
+    *re /= x;
+    *im /= x;
+
+    assert(re->get_prec() == im->get_prec());
+}
+
+// complex-unsigned integral.
+template <typename T, enable_if_t<conjunction<is_cpp_unsigned_integral<T>>::value, int> = 0>
+inline void dispatch_complex_in_place_div(complex &a, const T &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+        mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+    } else {
+        dispatch_complex_in_place_div(a, integer<2>{n});
+    }
+}
+
+// complex-bool.
+// NOTE: make this explicit (rather than letting bool fold into
+// the unsigned integrals overload) in order to avoid MSVC warnings.
+MPPP_DLL_PUBLIC void dispatch_complex_in_place_div(complex &, bool);
+
+// complex-complex valued.
+template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
+inline void dispatch_complex_in_place_div(complex &a, const T &c)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // T is either std::complex or complex128, for which
+    // the precision deduction rules are the same as for
+    // the underlying real value type (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    MPPP_MAYBE_TLS complex tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set(c);
+
+    dispatch_complex_in_place_div(a, tmp);
+}
+
+// complex interoperable-complex, or real-complex valued.
+template <typename T, typename U,
+          enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
+                                  conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
+                                  conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
+                      int> = 0>
+inline void dispatch_complex_in_place_div(T &x, U &&a)
+{
+    x = static_cast<T>(x / std::forward<U>(a));
+}
+
+} // namespace detail
+
+// In-place division.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex_in_place_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
+#endif
+    inline T &operator/=(T &a, U &&b)
+{
+    detail::dispatch_complex_in_place_div(a, std::forward<U>(b));
+    return a;
+}
+
 // Stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
 

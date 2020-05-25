@@ -394,11 +394,6 @@ void dispatch_complex_in_place_sub(complex &a, bool n)
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
-bool dispatch_complex_equality(const complex &c1, const complex &c2)
-{
-    return ::mpc_cmp(c1.get_mpc_t(), c2.get_mpc_t()) == 0;
-}
-
 void dispatch_complex_in_place_mul(complex &a, const real &x)
 {
     auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_mul_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
@@ -411,6 +406,25 @@ void dispatch_complex_in_place_mul(complex &a, bool n)
     auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
+void dispatch_complex_in_place_div(complex &a, const real &x)
+{
+    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_div_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+
+    mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
+}
+
+void dispatch_complex_in_place_div(complex &a, bool n)
+{
+    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+    mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
+}
+
+bool dispatch_complex_equality(const complex &c1, const complex &c2)
+{
+    return ::mpc_cmp(c1.get_mpc_t(), c2.get_mpc_t()) == 0;
 }
 
 } // namespace detail
