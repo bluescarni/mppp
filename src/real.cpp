@@ -2411,6 +2411,41 @@ int cmp(const real &a, const real &b)
     return retval;
 }
 
+// Three-way comparison of absolute values.
+int cmpabs(const real &a, const real &b)
+{
+    ::mpfr_clear_erangeflag();
+    auto retval = ::mpfr_cmpabs(a.get_mpfr_t(), b.get_mpfr_t());
+    if (mppp_unlikely(::mpfr_erangeflag_p())) {
+        ::mpfr_clear_erangeflag();
+        throw std::domain_error("Cannot compare the absolute values of two reals if at least one of them is NaN");
+    }
+    return retval;
+}
+
+// Comparison with n*2**e.
+int cmp_ui_2exp(const real &x, unsigned long n, ::mpfr_exp_t e)
+{
+    ::mpfr_clear_erangeflag();
+    auto retval = ::mpfr_cmp_ui_2exp(x.get_mpfr_t(), n, e);
+    if (mppp_unlikely(::mpfr_erangeflag_p())) {
+        ::mpfr_clear_erangeflag();
+        throw std::domain_error("Cannot compare a real NaN to an integral multiple of a power of 2");
+    }
+    return retval;
+}
+
+int cmp_si_2exp(const real &x, long n, ::mpfr_exp_t e)
+{
+    ::mpfr_clear_erangeflag();
+    auto retval = ::mpfr_cmp_si_2exp(x.get_mpfr_t(), n, e);
+    if (mppp_unlikely(::mpfr_erangeflag_p())) {
+        ::mpfr_clear_erangeflag();
+        throw std::domain_error("Cannot compare a real NaN to an integral multiple of a power of 2");
+    }
+    return retval;
+}
+
 // Equality predicate with special NaN handling.
 bool real_equal_to(const real &a, const real &b)
 {

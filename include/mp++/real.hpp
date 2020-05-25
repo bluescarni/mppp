@@ -1703,6 +1703,13 @@ inline bool signbit(const real &r)
 // Comparison.
 MPPP_DLL_PUBLIC int cmp(const real &, const real &);
 
+// Comparison of absolute values.
+MPPP_DLL_PUBLIC int cmpabs(const real &, const real &);
+
+// Comparison with integral multiples of powers of 2.
+MPPP_DLL_PUBLIC int cmp_ui_2exp(const real &, unsigned long, ::mpfr_exp_t);
+MPPP_DLL_PUBLIC int cmp_si_2exp(const real &, long, ::mpfr_exp_t);
+
 // Equality predicate with special NaN handling.
 MPPP_DLL_PUBLIC bool real_equal_to(const real &, const real &);
 

@@ -1382,6 +1382,50 @@ Comparison
 
    :exception std\:\:domain_error: if at least one of the operands is NaN.
 
+.. cpp:function:: int mppp::cmpabs(const mppp::real &a, const mppp::real &b)
+
+   .. versionadded:: 0.20
+
+   Three-way comparison of absolute values.
+
+   This function will compare *a* and *b*, returning:
+
+   * zero if :math:`\left|a\right|=\left|b\right|`,
+   * a negative value if :math:`\left|a\right|<\left|b\right|`,
+   * a positive value if :math:`\left|a\right|>\left|b\right|`.
+
+   If at least one NaN value is involved in the comparison, an error will be raised.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: an integral value expressing how the absolute values of *a* and *b* compare.
+
+   :exception std\:\:domain_error: if at least one of the operands is NaN.
+
+.. cpp:function:: int mppp::cmp_ui_2exp(const mppp::real &a, unsigned long n, mpfr_exp_t e)
+.. cpp:function:: int mppp::cmp_si_2exp(const mppp::real &a, long n, mpfr_exp_t e)
+
+   .. versionadded:: 0.20
+
+   Comparison with integral multiples of powers of 2.
+
+   This function will compare *a* to :math:`n\times 2^e`, returning:
+
+   * zero if :math:`a=n\times 2^e`,
+   * a negative value if :math:`a<n\times 2^e`,
+   * a positive value if :math:`a>n\times 2^e`.
+
+   If *a* is NaN, an error will be raised.
+
+   :param a: the first operand.
+   :param n: the integral multiplier.
+   :param e: the power of 2.
+
+   :return: an integral value expressing how *a* compares to :math:`n\times 2^e`.
+
+   :exception std\:\:domain_error: if *a* is NaN.
+
 .. cpp:function:: bool mppp::real_equal_to(const mppp::real &a, const mppp::real &b)
 
    Equality predicate with special handling for NaN.
