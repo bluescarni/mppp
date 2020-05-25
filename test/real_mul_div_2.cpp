@@ -19,6 +19,7 @@ TEST_CASE("real mul_2ui")
 {
     // The return form.
     REQUIRE(mul_2ui(2_r128, 0) == 2);
+    REQUIRE(std::is_same<real, decltype(mul_2ui(2_r128, 0))>::value);
     REQUIRE(mul_2ui(2_r128, 1) == 4);
     REQUIRE(mul_2ui(2_r128, 2) == 8);
     REQUIRE(mul_2ui(2_r128, 2).get_prec() == 128);
@@ -61,6 +62,7 @@ TEST_CASE("real mul_2si")
 {
     // The return form.
     REQUIRE(mul_2si(2_r128, 0) == 2);
+    REQUIRE(std::is_same<real, decltype(mul_2si(2_r128, 0))>::value);
     REQUIRE(mul_2si(2_r128, -1) == 1);
     REQUIRE(mul_2si(2_r128, -2) == 2_r128 / 4);
     REQUIRE(mul_2si(2_r128, 2).get_prec() == 128);
@@ -103,6 +105,7 @@ TEST_CASE("real div_2ui")
 {
     // The return form.
     REQUIRE(div_2ui(2_r128, 0) == 2);
+    REQUIRE(std::is_same<real, decltype(div_2ui(2_r128, 0))>::value);
     REQUIRE(div_2ui(2_r128, 1) == 1);
     REQUIRE(div_2ui(2_r128, 2) == 2_r128 / 4);
     REQUIRE(div_2ui(2_r128, 2).get_prec() == 128);
@@ -145,6 +148,7 @@ TEST_CASE("real div_2si")
 {
     // The return form.
     REQUIRE(div_2si(2_r128, 0) == 2);
+    REQUIRE(std::is_same<real, decltype(div_2si(2_r128, 0))>::value);
     REQUIRE(div_2si(2_r128, 1) == 1);
     REQUIRE(div_2si(2_r128, -1) == 4);
     REQUIRE(div_2si(2_r128, -2) == 8);
