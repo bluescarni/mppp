@@ -813,6 +813,22 @@ public:
     complex &log();
     complex &log10();
 
+    // Trig.
+    complex &sin();
+    complex &cos();
+    complex &tan();
+    complex &asin();
+    complex &acos();
+    complex &atan();
+
+    // Hyper.
+    complex &sinh();
+    complex &cosh();
+    complex &tanh();
+    complex &asinh();
+    complex &acosh();
+    complex &atanh();
+
 private:
     mpc_struct_t m_mpc;
 };
@@ -1608,6 +1624,51 @@ template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>
 {
     return detail::complex_pow_impl(std::forward<T>(a), std::forward<U>(b));
 }
+
+// Trig.
+MPPP_COMPLEX_MPC_UNARY_IMPL(sin, ::mpc_sin, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(cos, ::mpc_cos, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(tan, ::mpc_tan, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(asin, ::mpc_asin, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(acos, ::mpc_acos, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(atan, ::mpc_atan, true)
+
+// sin and cos at the same time.
+// NOTE: we don't have the machinery to steal resources
+// for multiple retvals, thus we do a manual implementation
+// of this function. We keep the signature with cvr_complex
+// for consistency with the other functions.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline void sin_cos(complex &sop, complex &cop, T &&op)
+{
+    if (mppp_unlikely(&sop == &cop)) {
+        throw std::invalid_argument(
+            "In the complex sin_cos() function, the return values 'sop' and 'cop' must be distinct objects");
+    }
+
+    // Set the precision of sop and cop to the
+    // precision of op.
+    const auto op_prec = op.get_prec();
+    // NOTE: use prec_round() to avoid issues in case
+    // sop/cop overlap with op.
+    sop.prec_round(op_prec);
+    cop.prec_round(op_prec);
+
+    // Run the mpc function.
+    ::mpc_sin_cos(sop._get_mpc_t(), cop._get_mpc_t(), op.get_mpc_t(), MPC_RNDNN, MPC_RNDNN);
+}
+
+// Hyper.
+MPPP_COMPLEX_MPC_UNARY_IMPL(sinh, ::mpc_sinh, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(cosh, ::mpc_cosh, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(tanh, ::mpc_tanh, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(asinh, ::mpc_asinh, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(acosh, ::mpc_acosh, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(atanh, ::mpc_atanh, true)
 
 // Exp/log.
 MPPP_COMPLEX_MPC_UNARY_IMPL(exp, ::mpc_exp, true)

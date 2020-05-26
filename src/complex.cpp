@@ -558,6 +558,68 @@ complex &complex::log10()
     return self_mpc_unary(::mpc_log10);
 }
 
+// In-place trig.
+complex &complex::sin()
+{
+    return self_mpc_unary(::mpc_sin);
+}
+
+complex &complex::cos()
+{
+    return self_mpc_unary(::mpc_cos);
+}
+
+complex &complex::tan()
+{
+    return self_mpc_unary(::mpc_tan);
+}
+
+complex &complex::asin()
+{
+    return self_mpc_unary(::mpc_asin);
+}
+
+complex &complex::acos()
+{
+    return self_mpc_unary(::mpc_acos);
+}
+
+complex &complex::atan()
+{
+    return self_mpc_unary(::mpc_atan);
+}
+
+// In-place hyper.
+complex &complex::sinh()
+{
+    return self_mpc_unary(::mpc_sinh);
+}
+
+complex &complex::cosh()
+{
+    return self_mpc_unary(::mpc_cosh);
+}
+
+complex &complex::tanh()
+{
+    return self_mpc_unary(::mpc_tanh);
+}
+
+complex &complex::asinh()
+{
+    return self_mpc_unary(::mpc_asinh);
+}
+
+complex &complex::acosh()
+{
+    return self_mpc_unary(::mpc_acosh);
+}
+
+complex &complex::atanh()
+{
+    return self_mpc_unary(::mpc_atanh);
+}
+
 complex &set_rootofunity(complex &c, unsigned long n, unsigned long k)
 {
     ::mpc_rootofunity(c._get_mpc_t(), n, k, MPC_RNDNN);

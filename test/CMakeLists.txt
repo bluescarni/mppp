@@ -198,6 +198,8 @@ if(MPPP_WITH_MPC)
   ADD_MPPP_TESTCASE(complex_pow)
   ADD_MPPP_TESTCASE(complex_logexp)
   ADD_MPPP_TESTCASE(complex_rootofunity)
+  ADD_MPPP_TESTCASE(complex_trig)
+  ADD_MPPP_TESTCASE(complex_hyper)
 endif()
 
 if(MPPP_TEST_PYBIND11)

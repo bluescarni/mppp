@@ -576,6 +576,50 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex &sin()
+   .. cpp:function:: complex &cos()
+   .. cpp:function:: complex &tan()
+   .. cpp:function:: complex &asin()
+   .. cpp:function:: complex &acos()
+   .. cpp:function:: complex &atan()
+
+      In-place (inverse) trigonometric functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sin{z}`,
+      * :math:`\cos{z}`,
+      * :math:`\tan{z}`,
+      * :math:`\arcsin{z}`,
+      * :math:`\arccos{z}`,
+      * :math:`\arctan{z}`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: complex &sinh()
+   .. cpp:function:: complex &cosh()
+   .. cpp:function:: complex &tanh()
+   .. cpp:function:: complex &asinh()
+   .. cpp:function:: complex &acosh()
+   .. cpp:function:: complex &atanh()
+
+      In-place (inverse) hyperbolic functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sinh{z}`,
+      * :math:`\cosh{z}`,
+      * :math:`\tanh{z}`,
+      * :math:`\operatorname{arcsinh}{z}`,
+      * :math:`\operatorname{arccosh}{z}`,
+      * :math:`\operatorname{arctanh}{z}`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -1020,6 +1064,124 @@ Exponentiation
    :param op2: the exponent.
 
    :return: *op1* raised to the power of *op2*.
+
+Trigonometry
+~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sin(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::cos(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::tan(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::asin(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::acos(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::atan(mppp::complex &rop, T &&z)
+
+   Binary basic (inverse) trigonometric functions.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`\sin{z}`,
+   * :math:`\cos{z}`,
+   * :math:`\tan{z}`,
+   * :math:`\arcsin{z}`,
+   * :math:`\arccos{z}`,
+   * :math:`\arctan{z}`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   :param rop: the return value.
+   :param z: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sin(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::cos(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::tan(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::asin(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::acos(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::atan(T &&z)
+
+   Unary basic (inverse) trigonometric functions.
+
+   These functions will return, respectively:
+
+   * :math:`\sin{z}`,
+   * :math:`\cos{z}`,
+   * :math:`\tan{z}`,
+   * :math:`\arcsin{z}`,
+   * :math:`\arccos{z}`,
+   * :math:`\arctan{z}`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   :param z: the argument.
+
+   :return: the trigonometric function of *z*.
+
+.. cpp:function:: template <mppp::cvr_complex T> void mppp::sin_cos(mppp::complex &sop, mppp::complex &cop, T &&op)
+
+   Simultaneous sine and cosine.
+
+   This function will set *sop* and *cop* respectively to the sine and cosine of *op*.
+   *sop* and *cop* must be distinct objects. The precision of *sop* and *rop* will be set to the
+   precision of *op*.
+
+   :param sop: the sine return value.
+   :param cop: the cosine return value.
+   :param op: the operand.
+
+   :exception std\:\:invalid_argument: if *sop* and *cop* are the same object.
+
+Hyperbolic functions
+~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sinh(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::cosh(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::tanh(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::asinh(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::acosh(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::atanh(mppp::complex &rop, T &&z)
+
+   Binary basic (inverse) hyperbolic functions.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`\sinh{z}`,
+   * :math:`\cosh{z}`,
+   * :math:`\tanh{z}`,
+   * :math:`\operatorname{arcsinh}{z}`,
+   * :math:`\operatorname{arccosh}{z}`,
+   * :math:`\operatorname{arctanh}{z}`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   :param rop: the return value.
+   :param z: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sinh(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::cosh(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::tanh(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::asinh(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::acosh(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::atanh(T &&z)
+
+   Unary basic (inverse) hyperbolic functions.
+
+   These functions will return, respectively:
+
+   * :math:`\sinh{z}`,
+   * :math:`\cosh{z}`,
+   * :math:`\tanh{z}`,
+   * :math:`\operatorname{arcsinh}{z}`,
+   * :math:`\operatorname{arccosh}{z}`,
+   * :math:`\operatorname{arctanh}{z}`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   :param z: the argument.
+
+   :return: the hyperbolic function of *z*.
 
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
