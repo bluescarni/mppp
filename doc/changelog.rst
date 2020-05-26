@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement additional three-way comparison functions
+  for :cpp:class:`~mppp::real`
+  (`#243 <https://github.com/bluescarni/mppp/pull/243>`__).
 - Add the :cpp:func:`~mppp::set_ui_2exp()` and :cpp:func:`~mppp::set_si_2exp()`
   functions for :cpp:class:`~mppp::real`, and implement constructors
   from an integral multiple of a power of 2
