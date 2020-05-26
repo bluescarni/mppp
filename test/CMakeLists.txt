@@ -195,6 +195,7 @@ if(MPPP_WITH_MPC)
   ADD_MPPP_TESTCASE(complex_cmp)
   ADD_MPPP_TESTCASE(complex_mul_div_2)
   ADD_MPPP_TESTCASE(complex_roots)
+  ADD_MPPP_TESTCASE(complex_pow)
 endif()
 
 if(MPPP_TEST_PYBIND11)

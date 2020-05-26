@@ -14,6 +14,7 @@
 #if defined(MPPP_WITH_MPC)
 
 #include <cassert>
+#include <cstddef>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -1377,6 +1378,228 @@ inline bool is_one(const complex &c)
 }
 
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
+
+// Ternary exponentiation.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T, cvr_complex U>
+#else
+template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
+#endif
+inline complex &pow(complex &rop, T &&op1, U &&op2)
+{
+    return detail::mpc_nary_op_impl<true>(0, ::mpc_pow, rop, std::forward<T>(op1), std::forward<U>(op2));
+}
+
+namespace detail
+{
+
+// complex-complex.
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_complex<T>, is_cvr_complex<U>>::value, int> = 0>
+inline complex complex_pow_impl(T &&a, U &&b)
+{
+    return mpc_nary_op_return_impl<true>(0, ::mpc_pow, std::forward<T>(a), std::forward<U>(b));
+}
+
+// complex-real.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex complex_pow_impl(T &&a, const real &b)
+{
+    auto wrapper = [&b](::mpc_t r, const ::mpc_t o) { ::mpc_pow_fr(r, o, b.get_mpfr_t(), MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(b.get_prec(), wrapper, std::forward<T>(a));
+}
+
+// complex-integer.
+template <typename T, std::size_t SSize, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex complex_pow_impl(T &&a, const integer<SSize> &n)
+{
+    auto wrapper = [&n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_z(r, o, n.get_mpz_view(), MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// Complex-unsigned integral.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cpp_unsigned_integral<U>>::value, int> = 0>
+inline complex complex_pow_impl(T &&a, const U &n)
+{
+    if (n <= nl_max<unsigned long>()) {
+        auto wrapper
+            = [n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ui(r, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+        return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return complex_pow_impl(std::forward<T>(a), integer<2>{n});
+    }
+}
+
+// Special casing for bool.
+template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
+inline complex complex_pow_impl(T &&a, const bool &n)
+{
+    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ui(r, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+
+    return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
+// Complex-signed integral.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cpp_signed_integral<U>>::value, int> = 0>
+inline complex complex_pow_impl(T &&a, const U &n)
+{
+    if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_si(r, o, static_cast<long>(n), MPC_RNDNN); };
+
+        return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+    } else {
+        return complex_pow_impl(std::forward<T>(a), integer<2>{n});
+    }
+}
+
+// Complex-c++ floating point.
+template <typename T, typename U, enable_if_t<conjunction<is_cvr_complex<T>, is_cpp_floating_point<U>>::value, int> = 0>
+inline complex complex_pow_impl(T &&a, const U &x)
+{
+    if (std::is_same<U, float>::value || std::is_same<U, double>::value) {
+        auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_d(r, o, static_cast<double>(x), MPC_RNDNN); };
+
+        return mpc_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
+    } else {
+        auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ld(r, o, static_cast<long double>(x), MPC_RNDNN); };
+
+        return mpc_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
+    }
+}
+
+// Complex-(all remaining real-valued interoperable types).
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, disjunction<is_rational<U>
+#if defined(MPPP_WITH_QUADMATH)
+                                                                 ,
+                                                                 std::is_same<U, real128>
+#endif
+                                                                 >>::value,
+                      int> = 0>
+inline complex complex_pow_impl(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));
+    tmp.set(x);
+
+    return complex_pow_impl(std::forward<T>(a), tmp);
+}
+
+// Complex-(complex-valued interoperable types).
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
+inline complex complex_pow_impl(T &&a, const U &c)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // U is either std::complex or complex128, for which
+    // the precision deduction rules are the same as for
+    // the underlying real value type (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    MPPP_MAYBE_TLS complex tmp;
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set(c);
+
+    return complex_pow_impl(std::forward<T>(a), tmp);
+}
+
+// (real-valued interoperable)-complex.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_rv_complex_interoperable<T>, is_cvr_complex<U>>::value, int> = 0>
+inline complex complex_pow_impl(const T &a, U &&c)
+{
+    MPPP_MAYBE_TLS complex tmp;
+    tmp.set_prec(c_max(real_deduce_precision(a), c.get_prec()));
+    tmp.set(a);
+
+    return complex_pow_impl(tmp, std::forward<U>(c));
+}
+
+// (complex-valued interoperable)-complex.
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cv_complex_interoperable<T>, is_cvr_complex<U>>::value, int> = 0>
+inline complex complex_pow_impl(const T &a, U &&c)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // U is either std::complex or complex128, for which
+    // the precision deduction rules are the same as for
+    // the underlying real value type (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    MPPP_MAYBE_TLS complex tmp;
+    tmp.set_prec(c_max(real_deduce_precision(a.real()), c.get_prec()));
+    tmp.set(a);
+
+    return complex_pow_impl(tmp, std::forward<U>(c));
+}
+
+// real-complex valued.
+template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
+inline complex complex_pow_impl(const real &x, const T &c)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // T is either std::complex or complex128, for which
+    // the precision deduction rules are the same as for
+    // the underlying real value type (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    const auto p = c_max(x.get_prec(), real_deduce_precision(c.real()));
+
+    MPPP_MAYBE_TLS complex tmp1, tmp2;
+
+    tmp1.set_prec(p);
+    tmp1.set(x);
+
+    tmp2.set_prec(p);
+    tmp2.set(c);
+
+    return complex_pow_impl(tmp1, tmp2);
+}
+
+// complex valued-real.
+template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
+inline complex complex_pow_impl(const T &c, const real &x)
+{
+    // NOTE: here we are taking advantage of the fact that
+    // T is either std::complex or complex128, for which
+    // the precision deduction rules are the same as for
+    // the underlying real value type (i.e., compile-time constant independent
+    // of the actual value). If in the future we will have other
+    // complex types (e.g., Gaussian rationals) we will have
+    // to update this.
+    const auto p = c_max(x.get_prec(), real_deduce_precision(c.real()));
+
+    MPPP_MAYBE_TLS complex tmp1, tmp2;
+
+    tmp1.set_prec(p);
+    tmp1.set(c);
+
+    tmp2.set_prec(p);
+    tmp2.set(x);
+
+    return complex_pow_impl(tmp1, tmp2);
+}
+
+} // namespace detail
+
+// Binary exponentiation.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires complex_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
+#endif
+    inline complex pow(T &&a, U &&b)
+{
+    return detail::complex_pow_impl(std::forward<T>(a), std::forward<U>(b));
+}
 
 #undef MPPP_COMPLEX_MPC_UNARY_HEADER
 #undef MPPP_COMPLEX_MPC_UNARY_IMPL

@@ -966,6 +966,34 @@ Roots
 
    :return: the square root of *r*.
 
+Exponentiation
+~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U> mppp::complex &mppp::pow(mppp::complex &rop, T &&op1, U &&op2)
+
+   Ternary exponentiation.
+
+   This function will set *rop* to *op1* raised to the power of *op2*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param op1: the base.
+   :param op2: the exponent.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::complex_op_types<T> U> mppp::complex mppp::pow(T &&op1, U &&op2)
+
+   Binary exponentiation.
+
+   This function will compute and return *op1* raised to the power of *op2*.
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param op1: the base.
+   :param op2: the exponent.
+
+   :return: *op1* raised to the power of *op2*.
+
 .. _complex_operators:
 
 Mathematical operators
