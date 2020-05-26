@@ -900,6 +900,9 @@ inline complex &set_nan(complex &c)
     return c.set_nan();
 }
 
+// N-th root of unity setter.
+MPPP_DLL_PUBLIC complex &set_rootofunity(complex &, unsigned long, unsigned long);
+
 // Swap.
 inline void swap(complex &a, complex &b) noexcept
 {

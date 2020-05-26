@@ -743,6 +743,17 @@ Assignment
 
    :return: a reference to *c*.
 
+.. cpp:function:: mppp::complex &mppp::set_rootofunity(mppp::complex &c, unsigned long n, unsigned long k)
+
+   Set to a power of the standard primitive n-th root of unity.
+
+   This function will set *c* to :math:`e^{2\pi\imath k/n}`. The precision
+   of *c* will not be altered.
+
+   :param c: the input argument.
+   :param n: the root order.
+   :param k: the exponent.
+
 .. cpp:function:: void mppp::swap(mppp::complex &a, mppp::complex &b) noexcept
 
    Swap efficiently *a* and *b*.

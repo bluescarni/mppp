@@ -558,6 +558,12 @@ complex &complex::log10()
     return self_mpc_unary(::mpc_log10);
 }
 
+complex &set_rootofunity(complex &c, unsigned long n, unsigned long k)
+{
+    ::mpc_rootofunity(c._get_mpc_t(), n, k, MPC_RNDNN);
+    return c;
+}
+
 // Free-function abs.
 real &abs(real &rop, const complex &c)
 {
