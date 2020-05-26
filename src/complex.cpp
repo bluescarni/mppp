@@ -540,6 +540,24 @@ complex &complex::sqrt()
     return self_mpc_unary(::mpc_sqrt);
 }
 
+// In-place exp.
+complex &complex::exp()
+{
+    return self_mpc_unary(::mpc_exp);
+}
+
+// In-place log.
+complex &complex::log()
+{
+    return self_mpc_unary(::mpc_log);
+}
+
+// In-place log10.
+complex &complex::log10()
+{
+    return self_mpc_unary(::mpc_log10);
+}
+
 // Free-function abs.
 real &abs(real &rop, const complex &c)
 {

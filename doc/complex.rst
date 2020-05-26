@@ -560,6 +560,22 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex &exp()
+   .. cpp:function:: complex &log()
+   .. cpp:function:: complex &log10()
+
+      In-place logarithms and exponentials.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`e^z`,
+      * :math:`\log z`,
+      * :math:`\log_{10} z`,
+
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -993,6 +1009,46 @@ Exponentiation
    :param op2: the exponent.
 
    :return: *op1* raised to the power of *op2*.
+
+Logarithms and exponentials
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::exp(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::log(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::log10(mppp::complex &rop, T &&z)
+
+   Binary :cpp:class:`~mppp::complex` logarithms and exponentials.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`e^z`,
+   * :math:`\log z`,
+   * :math:`\log_{10} z`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   :param rop: the return value.
+   :param z: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::exp(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::log(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::log10(T &&z)
+
+   Unary :cpp:class:`~mppp::complex` logarithms and exponentials.
+
+   These functions will return, respectively:
+
+   * :math:`e^z`,
+   * :math:`\log z`,
+   * :math:`\log_{10} z`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   :param z: the argument.
+
+   :return: the result of the operation.
 
 .. _complex_operators:
 

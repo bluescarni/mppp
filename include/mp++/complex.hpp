@@ -808,6 +808,11 @@ public:
     // Roots.
     complex &sqrt();
 
+    // Exp/log.
+    complex &exp();
+    complex &log();
+    complex &log10();
+
 private:
     mpc_struct_t m_mpc;
 };
@@ -1600,6 +1605,11 @@ template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>
 {
     return detail::complex_pow_impl(std::forward<T>(a), std::forward<U>(b));
 }
+
+// Exp/log.
+MPPP_COMPLEX_MPC_UNARY_IMPL(exp, ::mpc_exp, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(log, ::mpc_log, true)
+MPPP_COMPLEX_MPC_UNARY_IMPL(log10, ::mpc_log10, true)
 
 #undef MPPP_COMPLEX_MPC_UNARY_HEADER
 #undef MPPP_COMPLEX_MPC_UNARY_IMPL
