@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -381,6 +382,33 @@ public:
         dispatch_construction(x);
     }
 
+    // Constructors from std::complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
+#endif
+    explicit real(const T &c)
+        : real(c.imag() == 0 ? c.real()
+                             : throw std::domain_error(
+                                 "Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
+                                 + detail::to_string(c.imag())))
+    {
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
+#endif
+    explicit real(const T &c, ::mpfr_prec_t p)
+        : real(c.imag() == 0 ? c.real()
+                             : throw std::domain_error(
+                                 "Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
+                                 + detail::to_string(c.imag())),
+               p)
+    {
+    }
+
 private:
     MPPP_DLL_LOCAL void construct_from_c_string(const char *, int, ::mpfr_prec_t);
     explicit real(const ptag &, const char *, int, ::mpfr_prec_t);
@@ -551,6 +579,16 @@ public:
         dispatch_assignment<true>(x);
         return *this;
     }
+    // Assignment from std::complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
+#endif
+    real &operator=(const T &c)
+    {
+        return *this = static_cast<real>(c);
+    }
 #if defined(MPPP_WITH_QUADMATH)
     real &operator=(const complex128 &);
 #endif
@@ -585,6 +623,20 @@ public:
     {
         dispatch_assignment<false>(x);
         return *this;
+    }
+    // Set to std::complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
+#endif
+    real &set(const T &c)
+    {
+        if (mppp_unlikely(c.imag() != 0)) {
+            throw std::domain_error("Cannot set a real to a complex C++ value with a non-zero imaginary part of "
+                                    + detail::to_string(c.imag()));
+        }
+        return set(c.real());
     }
 
 private:
@@ -907,6 +959,18 @@ public:
     {
         return dispatch_conversion<T>();
     }
+    // Conversion to std::complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
+#endif
+    explicit operator T() const
+    {
+        using value_type = typename T::value_type;
+
+        return T{static_cast<value_type>(*this), value_type(0)};
+    }
 
 private:
     template <std::size_t SSize>
@@ -972,6 +1036,17 @@ public:
     bool get(T &rop) const
     {
         return dispatch_get(rop);
+    }
+    // Conversion function to std::complex.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <cpp_complex T>
+#else
+    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
+#endif
+    bool get(T &rop) const
+    {
+        rop = static_cast<T>(*this);
+        return true;
     }
 
     // Convert to string.
@@ -1215,11 +1290,21 @@ inline void swap(real &a, real &b) noexcept
     ::mpfr_swap(a._get_mpfr_t(), b._get_mpfr_t());
 }
 
-// Generic conversion function.
+// Generic conversion functions.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <real_interoperable T>
 #else
 template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
+#endif
+inline bool get(T &rop, const real &x)
+{
+    return x.get(rop);
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cpp_complex T>
+#else
+template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
 #endif
 inline bool get(T &rop, const real &x)
 {
@@ -3399,6 +3484,18 @@ template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types
     return a;
 }
 
+template <typename T, typename U>
+using are_real_eq_op_types
+    = detail::disjunction<are_real_op_types<T, U>, detail::conjunction<std::is_same<T, real>, is_cpp_complex<U>>,
+                          detail::conjunction<std::is_same<U, real>, is_cpp_complex<T>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL real_eq_op_types = are_real_eq_op_types<T, U>::value;
+
+#endif
+
 namespace detail
 {
 
@@ -3470,6 +3567,13 @@ MPPP_DLL_PUBLIC bool dispatch_real_equality(const real &, const real128 &);
 
 #endif
 
+// real-std::complex.
+template <typename T>
+inline bool dispatch_real_equality(const real &r, const std::complex<T> &c)
+{
+    return c.imag() == T(0) && dispatch_real_equality(r, c.real());
+}
+
 // (anything)-real.
 template <typename T>
 inline bool dispatch_real_equality(const T &x, const real &r)
@@ -3482,9 +3586,9 @@ inline bool dispatch_real_equality(const T &x, const real &r)
 // Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+requires real_eq_op_types<T, U>
 #else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_eq_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator==(const T &a, const U &b)
 {
@@ -3494,9 +3598,9 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 // Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+requires real_eq_op_types<T, U>
 #else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_real_eq_op_types<T, U>::value, int> = 0>
 #endif
     inline bool operator!=(const T &a, const U &b)
 {

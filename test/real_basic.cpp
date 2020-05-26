@@ -10,6 +10,7 @@
 
 #include <atomic>
 #include <cmath>
+#include <complex>
 #include <initializer_list>
 #include <iomanip>
 #include <limits>
@@ -574,6 +575,25 @@ TEST_CASE("real constructors")
     REQUIRE(rtmp2.get_prec() == 123);
     REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
 #endif
+
+    using Catch::Matchers::Message;
+
+    // Constructors from std::complex.
+    REQUIRE(real{std::complex<double>{-4, 0}} == -4);
+    REQUIRE(real{std::complex<double>{-4, 0}}.get_prec() == detail::real_deduce_precision(4.));
+    REQUIRE_THROWS_MATCHES((real{std::complex<double>{-4, 1}}), std::domain_error,
+                           Message("Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
+                                   + detail::to_string(1.)));
+
+    REQUIRE(real{std::complex<double>{-4, 0}, 34} == -4);
+    REQUIRE(real{std::complex<double>{-4, 0}, 34}.get_prec() == 34);
+    REQUIRE_THROWS_MATCHES((real{std::complex<double>{-4, 1}, 34}), std::domain_error,
+                           Message("Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
+                                   + detail::to_string(1.)));
+    REQUIRE_THROWS_MATCHES((real{std::complex<double>{4, 0}, -1}), std::invalid_argument,
+                           Message("Cannot init a real with a precision of -1: the maximum allowed precision is "
+                                   + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                                   + detail::to_string(real_prec_min())));
 }
 
 TEST_CASE("real kind constructors")
@@ -1190,6 +1210,40 @@ TEST_CASE("real assignment")
     REQUIRE(r8.get_prec() == 45);
     REQUIRE(r8.sgn() == 0);
     REQUIRE(r8.signbit());
+
+    using Catch::Matchers::Message;
+
+    // Assignment from std::complex.
+    r8 = real{};
+    REQUIRE((r8 = std::complex<double>{-4, 0}) == -4);
+    REQUIRE(r8.get_prec() == detail::real_deduce_precision(4.));
+    REQUIRE_THROWS_MATCHES((r8 = std::complex<double>{-4, 1}), std::domain_error,
+                           Message("Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
+                                   + detail::to_string(1.)));
+    REQUIRE(r8 == -4);
+
+    // Setter to std::complex.
+    r8 = real{};
+    REQUIRE(&r8.set(std::complex<double>{2, 0}) == &r8);
+    REQUIRE(std::is_same<real &, decltype(r8.set(std::complex<double>{2, 0}))>::value);
+    REQUIRE(r8 == 2);
+    REQUIRE(r8.get_prec() == real_prec_min());
+    r8 = real{1, 32};
+    r8.set(std::complex<double>{-42, 0});
+    REQUIRE(r8 == -42);
+    REQUIRE(r8.get_prec() == 32);
+
+    REQUIRE_THROWS_MATCHES(
+        r8.set(std::complex<double>{-4, 1}), std::domain_error,
+        Message("Cannot set a real to a complex C++ value with a non-zero imaginary part of " + detail::to_string(1.)));
+    REQUIRE(r8 == -42);
+    REQUIRE(r8.get_prec() == 32);
+
+    // Try the free function too.
+    REQUIRE(&set(r8, std::complex<double>{-5, 0}) == &r8);
+    REQUIRE(std::is_same<real &, decltype(set(r8, std::complex<double>{-5, 0}))>::value);
+    REQUIRE(r8 == -5);
+    REQUIRE(r8.get_prec() == 32);
 }
 
 struct int_conv_tester {
@@ -1530,6 +1584,17 @@ TEST_CASE("real conversion")
     REQUIRE(get(rrop, real{"-1.1", 10, 300}));
     REQUIRE(abs(rrop - real128{"-1.1"}) < 1E-33);
 #endif
+
+    // Conversions to std::complex.
+    REQUIRE(static_cast<std::complex<double>>(real{45}) == std::complex<double>{45, 0});
+    REQUIRE(static_cast<std::complex<float>>(real{-2}) == std::complex<float>{-2, 0});
+    REQUIRE(static_cast<std::complex<long double>>(real{-12}) == std::complex<long double>{-12, 0});
+
+    std::complex<double> crop{1, 2};
+    REQUIRE(real{45}.get(crop));
+    REQUIRE(crop == std::complex<double>{45, 0});
+    REQUIRE(get(crop, real{88}));
+    REQUIRE(crop == std::complex<double>{88, 0});
 }
 
 TEST_CASE("real set prec")
