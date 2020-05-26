@@ -368,6 +368,9 @@ public:
 #if defined(MPPP_WITH_MPFR)
     rational &operator=(const real &);
 #endif
+#if defined(MPPP_WITH_MPC)
+    rational &operator=(const complex &);
+#endif
 
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)

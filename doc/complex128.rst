@@ -213,6 +213,24 @@ The complex128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex128 &operator=(const complex &c)
+
+      .. note::
+
+         This operator is available only if mp++ was configured with the ``MPPP_WITH_MPC`` option enabled.
+
+      .. versionadded:: 0.20
+
+      Assignment operator from :cpp:class:`~mppp::complex`.
+
+      This operator is formally equivalent to converting *c* to
+      :cpp:class:`~mppp::complex128` and then move-assigning the result
+      to ``this``.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
    .. cpp:function:: template <string_type T> complex128 &operator=(const T &s)
 
       Assignment from string.

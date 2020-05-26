@@ -33,6 +33,7 @@
 
 #if defined(MPPP_WITH_QUADMATH)
 
+#include <mp++/complex128.hpp>
 #include <mp++/real128.hpp>
 
 #endif
@@ -1555,4 +1556,46 @@ TEST_CASE("to_string")
     REQUIRE(c.to_string() == '(' + real{45, 12}.to_string() + ',' + real{67, 12}.to_string() + ')');
     REQUIRE(c.to_string(16) == '(' + real{45, 12}.to_string(16) + ',' + real{67, 12}.to_string(16) + ')');
     REQUIRE(c.to_string(11) == '(' + real{45, 12}.to_string(11) + ',' + real{67, 12}.to_string(11) + ')');
+}
+
+// Assignment to other mp++ classes.
+TEST_CASE("mppp_ass")
+{
+    {
+        integer<1> n;
+        n = complex{3, 0};
+        REQUIRE(n == 3);
+        REQUIRE_THROWS_AS((n = complex{3, 1}), std::domain_error);
+        REQUIRE(n == 3);
+    }
+    {
+        rational<1> n;
+        n = complex{3, 0};
+        REQUIRE(n == 3);
+        REQUIRE_THROWS_AS((n = complex{3, 1}), std::domain_error);
+        REQUIRE(n == 3);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        real128 r;
+        r = complex{-42, 0};
+        REQUIRE(r == -42);
+        REQUIRE_THROWS_AS((r = complex{3, 1}), std::domain_error);
+        REQUIRE(r == -42);
+    }
+    {
+        complex128 r;
+        r = complex{-42, 0};
+        REQUIRE(r == -42);
+        r = complex{3, 1};
+        REQUIRE(r == complex128{3, 1});
+    }
+#endif
+    {
+        real r;
+        r = complex{-42, 0};
+        REQUIRE(r == -42);
+        REQUIRE_THROWS_AS((r = complex{3, 1}), std::domain_error);
+        REQUIRE(r == -42);
+    }
 }

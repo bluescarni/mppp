@@ -222,6 +222,9 @@ public:
     {
         return *this = complex128{c};
     }
+#if defined(MPPP_WITH_MPC)
+    complex128 &operator=(const complex &);
+#endif
 
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)

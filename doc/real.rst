@@ -309,17 +309,19 @@ The real class
         the automatically-deduced precision.
 
    .. cpp:function:: real &operator=(const complex128 &x)
+   .. cpp:function:: real &operator=(const complex &x)
 
       .. note::
 
-         This operator is available only if mp++ was configured with the
-         ``MPPP_WITH_QUADMATH`` option enabled.
+         The :cpp:class:`~mppp::complex128` overload is available only if mp++ was configured with the
+         ``MPPP_WITH_QUADMATH`` option enabled. The :cpp:class:`~mppp::complex` overload
+         is available only if mp++ was configured with the ``MPPP_WITH_MPC`` option enabled.
 
       .. versionadded:: 0.20
 
-      Assignment operator from :cpp:class:`~mppp::complex128`.
+      Assignment operators from other mp++ classes.
 
-      This operator is formally equivalent to converting *x* to
+      These operators are formally equivalent to converting *x* to
       :cpp:class:`~mppp::real` and then move-assigning the result
       to ``this``.
 

@@ -229,6 +229,7 @@ The rational class
    .. cpp:function:: rational &operator=(const real128 &x)
    .. cpp:function:: rational &operator=(const real &x)
    .. cpp:function:: rational &operator=(const complex128 &x)
+   .. cpp:function:: rational &operator=(const complex &x)
 
       .. note::
 
@@ -236,6 +237,8 @@ The rational class
          overloads are available only if mp++ was configured with the ``MPPP_WITH_QUADMATH``
          option enabled. The :cpp:class:`~mppp::real` overload
          is available only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled.
+         The :cpp:class:`~mppp::complex` overload
+         is available only if mp++ was configured with the ``MPPP_WITH_MPC`` option enabled.
 
       .. versionadded:: 0.20
 

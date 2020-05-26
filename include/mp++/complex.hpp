@@ -2923,6 +2923,19 @@ MPPP_DECLARE_COMPLEX_UDL(1024)
 
 } // namespace literals
 
+// Implementations of the assignments of complex to other mp++ classes.
+template <std::size_t SSize>
+inline integer<SSize> &integer<SSize>::operator=(const complex &c)
+{
+    return *this = static_cast<integer<SSize>>(c);
+}
+
+template <std::size_t SSize>
+inline rational<SSize> &rational<SSize>::operator=(const complex &c)
+{
+    return *this = static_cast<rational<SSize>>(c);
+}
+
 } // namespace mppp
 
 // Support for pretty printing in xeus-cling.

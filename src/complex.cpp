@@ -18,7 +18,9 @@
 #include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
+
 #include <string_view>
+
 #endif
 
 #include <mp++/complex.hpp>
@@ -27,6 +29,13 @@
 #include <mp++/detail/parse_complex.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/real.hpp>
+
+#if defined(MPPP_WITH_QUADMATH)
+
+#include <mp++/complex128.hpp>
+#include <mp++/real128.hpp>
+
+#endif
 
 namespace mppp
 {
@@ -670,5 +679,26 @@ real arg(const complex &c)
     ::mpc_arg(ret._get_mpfr_t(), c.get_mpc_t(), MPFR_RNDN);
     return ret;
 }
+
+// Implementations of the assignments of complex to other mp++ classes.
+
+real &real::operator=(const complex &c)
+{
+    return *this = static_cast<real>(c);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+real128 &real128::operator=(const complex &c)
+{
+    return *this = static_cast<real128>(c);
+}
+
+complex128 &complex128::operator=(const complex &c)
+{
+    return *this = static_cast<complex128>(c);
+}
+
+#endif
 
 } // namespace mppp

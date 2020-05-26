@@ -554,6 +554,9 @@ public:
 #if defined(MPPP_WITH_QUADMATH)
     real &operator=(const complex128 &);
 #endif
+#if defined(MPPP_WITH_MPC)
+    real &operator=(const complex &);
+#endif
 
     // Copy assignment from mpfr_t.
     real &operator=(const ::mpfr_t);

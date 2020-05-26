@@ -1443,6 +1443,9 @@ public:
 #if defined(MPPP_WITH_MPFR)
     integer &operator=(const real &);
 #endif
+#if defined(MPPP_WITH_MPC)
+    integer &operator=(const complex &);
+#endif
 
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
