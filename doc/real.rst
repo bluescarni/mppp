@@ -2547,7 +2547,7 @@ Input/Output
 
    :return: a reference to *os*.
 
-   :exception unspecified: any exception thrown by :cpp:func`mppp::real::to_string()`.
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::real::to_string()`.
 
 .. _real_operators:
 
