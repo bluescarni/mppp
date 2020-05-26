@@ -159,6 +159,21 @@ TEST_CASE("real pow")
 
     // Ensure that x**(1/3) is almost identical to cbrt(1.1).
     REQUIRE(abs(pow(1.1_r512, 1_q1 / 3) - cbrt(1.1_r512)) <= pow(2_r512, -500));
+
+    // Special casing for bool.
+    REQUIRE(mppp::pow(real{123}, false) == 1);
+    REQUIRE(mppp::pow(real{123}, false).get_prec()
+            == std::max(detail::real_deduce_precision(123), detail::real_deduce_precision(false)));
+    REQUIRE(mppp::pow(real{123}, true) == 123);
+    REQUIRE(mppp::pow(real{123}, true).get_prec()
+            == std::max(detail::real_deduce_precision(123), detail::real_deduce_precision(false)));
+
+    REQUIRE(mppp::pow(false, real{123}) == 0);
+    REQUIRE(mppp::pow(false, real{123}).get_prec()
+            == std::max(detail::real_deduce_precision(123), detail::real_deduce_precision(false)));
+    REQUIRE(mppp::pow(true, real{123}) == 1);
+    REQUIRE(mppp::pow(true, real{123}).get_prec()
+            == std::max(detail::real_deduce_precision(123), detail::real_deduce_precision(false)));
 }
 
 TEST_CASE("real sqr")
