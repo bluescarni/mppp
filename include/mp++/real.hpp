@@ -1553,8 +1553,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real mul_2ui(T &&x, unsigned long n)
 {
-    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
-    return detail::mpfr_nary_op_return_impl<false>(0, mul_2ui_wrapper, std::forward<T>(x));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1564,8 +1564,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &mul_2ui(real &rop, T &&x, unsigned long n)
 {
-    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
-    return detail::mpfr_nary_op_impl<false>(0, mul_2ui_wrapper, rop, std::forward<T>(x));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1575,8 +1575,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real mul_2si(T &&x, long n)
 {
-    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
-    return detail::mpfr_nary_op_return_impl<false>(0, mul_2si_wrapper, std::forward<T>(x));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1586,8 +1586,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &mul_2si(real &rop, T &&x, long n)
 {
-    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
-    return detail::mpfr_nary_op_impl<false>(0, mul_2si_wrapper, rop, std::forward<T>(x));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1597,8 +1597,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real div_2ui(T &&x, unsigned long n)
 {
-    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
-    return detail::mpfr_nary_op_return_impl<false>(0, div_2ui_wrapper, std::forward<T>(x));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1608,8 +1608,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &div_2ui(real &rop, T &&x, unsigned long n)
 {
-    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
-    return detail::mpfr_nary_op_impl<false>(0, div_2ui_wrapper, rop, std::forward<T>(x));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1619,8 +1619,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real div_2si(T &&x, long n)
 {
-    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
-    return detail::mpfr_nary_op_return_impl<false>(0, div_2si_wrapper, std::forward<T>(x));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1630,8 +1630,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &div_2si(real &rop, T &&x, long n)
 {
-    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
-    return detail::mpfr_nary_op_impl<false>(0, div_2si_wrapper, rop, std::forward<T>(x));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
 // Detect NaN.
@@ -1690,6 +1690,13 @@ inline bool signbit(const real &r)
 
 // Comparison.
 MPPP_DLL_PUBLIC int cmp(const real &, const real &);
+
+// Comparison of absolute values.
+MPPP_DLL_PUBLIC int cmpabs(const real &, const real &);
+
+// Comparison with integral multiples of powers of 2.
+MPPP_DLL_PUBLIC int cmp_ui_2exp(const real &, unsigned long, ::mpfr_exp_t);
+MPPP_DLL_PUBLIC int cmp_si_2exp(const real &, long, ::mpfr_exp_t);
 
 // Equality predicate with special NaN handling.
 MPPP_DLL_PUBLIC bool real_equal_to(const real &, const real &);
@@ -1892,6 +1899,15 @@ inline real dispatch_real_pow(T &&a, const U &n)
     }
 }
 
+// Special casing for bool
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline real dispatch_real_pow(T &&a, const bool &n)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
 // real-signed integral.
 template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const U &n)
@@ -1949,6 +1965,15 @@ inline real dispatch_real_pow(const T &n, U &&a)
     } else {
         return dispatch_real_pow(integer<2>{n}, std::forward<U>(a));
     }
+}
+
+// Special casing for bool.
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline real dispatch_real_pow(const bool &n, T &&a)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
 } // namespace detail

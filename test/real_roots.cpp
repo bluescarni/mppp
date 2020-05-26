@@ -21,12 +21,15 @@ TEST_CASE("real sqrt")
 {
     real r0{0};
     r0.sqrt();
+    REQUIRE(std::is_same<real &, decltype(r0.sqrt())>::value);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(r0.zero_p());
     real rop;
     REQUIRE(sqrt(rop, r0).zero_p());
+    REQUIRE(std::is_same<real &, decltype(sqrt(rop, r0))>::value);
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(sqrt(r0).zero_p());
+    REQUIRE(std::is_same<real, decltype(sqrt(r0))>::value);
     REQUIRE(sqrt(std::move(r0)).zero_p());
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{16, 128};
