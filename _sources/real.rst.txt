@@ -667,6 +667,14 @@ The real class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: real &sqr()
+
+      .. versionadded:: 0.19
+
+      Square ``this`` in place.
+
+      :return: a reference to ``this``.
+
    .. cpp:function:: real &sqrt()
    .. cpp:function:: real &rec_sqrt()
    .. cpp:function:: real &sqrt1pm1()
@@ -701,14 +709,6 @@ The real class
 
       :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
         fails because of (unlikely) overflow conditions.
-
-   .. cpp:function:: real &sqr()
-
-      .. versionadded:: 0.19
-
-      Square ``this`` in place.
-
-      :return: a reference to ``this``.
 
    .. cpp:function:: real &sin()
    .. cpp:function:: real &cos()
@@ -954,6 +954,11 @@ Types
 Concepts
 --------
 
+.. cpp:concept:: template <typename T> mppp::cvr_real
+
+   This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
+   is the same as :cpp:class:`mppp::real`.
+
 .. cpp:concept:: template <typename T> mppp::real_interoperable
 
    This concept is satisfied if the type ``T`` can interoperate with :cpp:class:`~mppp::real`.
@@ -963,11 +968,6 @@ Concepts
    * an :cpp:class:`~mppp::integer`, or
    * a :cpp:class:`~mppp::rational`, or
    * :cpp:class:`~mppp::real128`.
-
-.. cpp:concept:: template <typename T> mppp::cvr_real
-
-   This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
-   is the same as :cpp:class:`mppp::real`.
 
 .. cpp:concept:: template <typename... Args> mppp::real_set_args
 
@@ -1310,6 +1310,34 @@ Arithmetic
 
    :return: *x* multiplied/divided by :math:`2^n`.
 
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
+
+   .. versionadded:: 0.19
+
+   Binary :cpp:class:`~mppp::real` squaring.
+
+   This function will compute the square of *op* and store it
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sqr(T &&r)
+
+   .. versionadded:: 0.19
+
+   Unary :cpp:class:`~mppp::real` squaring.
+
+   This function will compute and return the square of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the square of *r*.
+
 .. _real_comparison:
 
 Comparison
@@ -1379,6 +1407,50 @@ Comparison
    :return: an integral value expressing how *a* compares to *b*.
 
    :exception std\:\:domain_error: if at least one of the operands is NaN.
+
+.. cpp:function:: int mppp::cmpabs(const mppp::real &a, const mppp::real &b)
+
+   .. versionadded:: 0.20
+
+   Three-way comparison of absolute values.
+
+   This function will compare *a* and *b*, returning:
+
+   * zero if :math:`\left|a\right|=\left|b\right|`,
+   * a negative value if :math:`\left|a\right|<\left|b\right|`,
+   * a positive value if :math:`\left|a\right|>\left|b\right|`.
+
+   If at least one NaN value is involved in the comparison, an error will be raised.
+
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: an integral value expressing how the absolute values of *a* and *b* compare.
+
+   :exception std\:\:domain_error: if at least one of the operands is NaN.
+
+.. cpp:function:: int mppp::cmp_ui_2exp(const mppp::real &a, unsigned long n, mpfr_exp_t e)
+.. cpp:function:: int mppp::cmp_si_2exp(const mppp::real &a, long n, mpfr_exp_t e)
+
+   .. versionadded:: 0.20
+
+   Comparison with integral multiples of powers of 2.
+
+   This function will compare *a* to :math:`n\times 2^e`, returning:
+
+   * zero if :math:`a=n\times 2^e`,
+   * a negative value if :math:`a<n\times 2^e`,
+   * a positive value if :math:`a>n\times 2^e`.
+
+   If *a* is NaN, an error will be raised.
+
+   :param a: the first operand.
+   :param n: the integral multiplier.
+   :param e: the power of 2.
+
+   :return: an integral value expressing how *a* compares to :math:`n\times 2^e`.
+
+   :exception std\:\:domain_error: if *a* is NaN.
 
 .. cpp:function:: bool mppp::real_equal_to(const mppp::real &a, const mppp::real &b)
 
@@ -1633,34 +1705,6 @@ Exponentiation
    :param op2: the exponent.
 
    :return: *op1* raised to the power of *op2*.
-
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
-
-   .. versionadded:: 0.19
-
-   Binary :cpp:class:`~mppp::real` squaring.
-
-   This function will compute the square of *op* and store it
-   into *rop*. The precision of the result will be equal to the precision
-   of *op*.
-
-   :param rop: the return value.
-   :param op: the operand.
-
-   :return: a reference to *rop*.
-
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sqr(T &&r)
-
-   .. versionadded:: 0.19
-
-   Unary :cpp:class:`~mppp::real` squaring.
-
-   This function will compute and return the square of *r*.
-   The precision of the result will be equal to the precision of *r*.
-
-   :param r: the operand.
-
-   :return: the square of *r*.
 
 .. _real_trig:
 
@@ -2503,7 +2547,7 @@ Input/Output
 
    :return: a reference to *os*.
 
-   :exception unspecified: any exception thrown by :cpp:func`mppp::real::to_string()`.
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::real::to_string()`.
 
 .. _real_operators:
 

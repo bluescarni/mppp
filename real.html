@@ -948,6 +948,18 @@ to produce exactly the original value when used in one of the constructors from 
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N4mppp4real3sqrEv">
+<span id="_CPPv3N4mppp4real3sqrEv"></span><span id="_CPPv2N4mppp4real3sqrEv"></span><span id="mppp::real::sqr"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">sqr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real3sqrEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>Square <code class="docutils literal notranslate"><span class="pre">this</span></code> in place.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N4mppp4real4sqrtEv">
 <span id="_CPPv3N4mppp4real4sqrtEv"></span><span id="_CPPv2N4mppp4real4sqrtEv"></span><span id="mppp::real::sqrt"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4sqrtEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
@@ -990,18 +1002,6 @@ configured with the <code class="docutils literal notranslate"><span class="pre"
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
 <dt class="field-name">Throws</dt><dd class="field-body"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
 fails because of (unlikely) overflow conditions.</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt id="_CPPv4N4mppp4real3sqrEv">
-<span id="_CPPv3N4mppp4real3sqrEv"></span><span id="_CPPv2N4mppp4real3sqrEv"></span><span id="mppp::real::sqr"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">sqr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real3sqrEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><div class="versionadded">
-<p><span class="versionmodified added">New in version 0.19.</span></p>
-</div>
-<p>Square <code class="docutils literal notranslate"><span class="pre">this</span></code> in place.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
 </dl>
 </dd></dl>
 
@@ -1440,6 +1440,13 @@ one of the three special values NaN, infinity or zero.</p>
 <div class="section" id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp concept">
+<dt id="_CPPv4I0EN4mppp8cvr_realE">
+<span id="_CPPv3I0EN4mppp8cvr_realE"></span><span id="_CPPv2I0EN4mppp8cvr_realE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cvr_real</code><a class="headerlink" href="#_CPPv4I0EN4mppp8cvr_realE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if the type <code class="docutils literal notranslate"><span class="pre">T</span></code>, after the removal of reference and cv qualifiers,
+is the same as <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::real</span></code></a>.</p>
+</dd></dl>
+
+<dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp18real_interoperableE">
 <span id="_CPPv3I0EN4mppp18real_interoperableE"></span><span id="_CPPv2I0EN4mppp18real_interoperableE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_interoperable</code><a class="headerlink" href="#_CPPv4I0EN4mppp18real_interoperableE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if the type <code class="docutils literal notranslate"><span class="pre">T</span></code> can interoperate with <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.
@@ -1450,13 +1457,6 @@ Specifically, this concept will be <code class="docutils literal notranslate"><s
 <li>a <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, or</li>
 <li><a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</li>
 </ul>
-</dd></dl>
-
-<dl class="cpp concept">
-<dt id="_CPPv4I0EN4mppp8cvr_realE">
-<span id="_CPPv3I0EN4mppp8cvr_realE"></span><span id="_CPPv2I0EN4mppp8cvr_realE"></span>template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cvr_real</code><a class="headerlink" href="#_CPPv4I0EN4mppp8cvr_realE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if the type <code class="docutils literal notranslate"><span class="pre">T</span></code>, after the removal of reference and cv qualifiers,
-is the same as <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::real</span></code></a>.</p>
 </dd></dl>
 
 <dl class="cpp concept">
@@ -1938,6 +1938,42 @@ multiplication/division by powers of 2.</p>
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqr</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERN4mppp4realERR1T" title="mppp::sqr::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>Binary <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> squaring.</p>
+<p>This function will compute the square of <em>op</em> and store it
+into <em>rop</em>. The precision of the result will be equal to the precision
+of <em>op</em>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>op</strong> – the operand.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrEN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp3sqrERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp3sqrERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqr</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrEN4mppp4realERR1T" title="mppp::sqr::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>Unary <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> squaring.</p>
+<p>This function will compute and return the square of <em>r</em>.
+The precision of the result will be equal to the precision of <em>r</em>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><strong>r</strong> – the operand.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">the square of <em>r</em>.</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="comparison">
 <span id="real-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
@@ -2034,6 +2070,66 @@ are recommended instead if it is needed to distinguish only two cases.</p>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first">an integral value expressing how <em>a</em> compares to <em>b</em>.</p>
 </dd>
 <dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::domain_error</strong> – if at least one of the operands is NaN.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp6cmpabsERKN4mppp4realERKN4mppp4realE">
+<span id="_CPPv3N4mppp6cmpabsERKN4mppp4realERKN4mppp4realE"></span><span id="_CPPv2N4mppp6cmpabsERKN4mppp4realERKN4mppp4realE"></span><span id="mppp::cmpabs__mppp::realCR.mppp::realCR"></span>int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cmpabs</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>a</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6cmpabsERKN4mppp4realERKN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>Three-way comparison of absolute values.</p>
+<p>This function will compare <em>a</em> and <em>b</em>, returning:</p>
+<ul class="simple">
+<li>zero if <span class="math notranslate nohighlight">\(\left|a\right|=\left|b\right|\)</span>,</li>
+<li>a negative value if <span class="math notranslate nohighlight">\(\left|a\right|&lt;\left|b\right|\)</span>,</li>
+<li>a positive value if <span class="math notranslate nohighlight">\(\left|a\right|&gt;\left|b\right|\)</span>.</li>
+</ul>
+<p>If at least one NaN value is involved in the comparison, an error will be raised.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>a</strong> – the first operand.</li>
+<li><strong>b</strong> – the second operand.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">an integral value expressing how the absolute values of <em>a</em> and <em>b</em> compare.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::domain_error</strong> – if at least one of the operands is NaN.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp11cmp_ui_2expERKN4mppp4realEm10mpfr_exp_t">
+<span id="_CPPv3N4mppp11cmp_ui_2expERKN4mppp4realEm10mpfr_exp_t"></span><span id="_CPPv2N4mppp11cmp_ui_2expERKN4mppp4realEm10mpfr_exp_t"></span><span id="mppp::cmp_ui_2exp__mppp::realCR.unsigned-l.mpfr_exp_t"></span>int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cmp_ui_2exp</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>a</em>, unsigned long <em>n</em>, <a class="reference internal" href="#_CPPv410mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp11cmp_ui_2expERKN4mppp4realEm10mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp11cmp_si_2expERKN4mppp4realEl10mpfr_exp_t">
+<span id="_CPPv3N4mppp11cmp_si_2expERKN4mppp4realEl10mpfr_exp_t"></span><span id="_CPPv2N4mppp11cmp_si_2expERKN4mppp4realEl10mpfr_exp_t"></span><span id="mppp::cmp_si_2exp__mppp::realCR.l.mpfr_exp_t"></span>int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cmp_si_2exp</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>a</em>, long <em>n</em>, <a class="reference internal" href="#_CPPv410mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp11cmp_si_2expERKN4mppp4realEl10mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>Comparison with integral multiples of powers of 2.</p>
+<p>This function will compare <em>a</em> to <span class="math notranslate nohighlight">\(n\times 2^e\)</span>, returning:</p>
+<ul class="simple">
+<li>zero if <span class="math notranslate nohighlight">\(a=n\times 2^e\)</span>,</li>
+<li>a negative value if <span class="math notranslate nohighlight">\(a&lt;n\times 2^e\)</span>,</li>
+<li>a positive value if <span class="math notranslate nohighlight">\(a&gt;n\times 2^e\)</span>.</li>
+</ul>
+<p>If <em>a</em> is NaN, an error will be raised.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>a</strong> – the first operand.</li>
+<li><strong>n</strong> – the integral multiplier.</li>
+<li><strong>e</strong> – the power of 2.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">an integral value expressing how <em>a</em> compares to <span class="math notranslate nohighlight">\(n\times 2^e\)</span>.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::domain_error</strong> – if <em>a</em> is NaN.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2343,42 +2439,6 @@ The precision of the result will be set to the largest precision among the opera
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first last"><em>op1</em> raised to the power of <em>op2</em>.</p>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERN4mppp4realERR1T">
-<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqr</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERN4mppp4realERR1T" title="mppp::sqr::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><div class="versionadded">
-<p><span class="versionmodified added">New in version 0.19.</span></p>
-</div>
-<p>Binary <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> squaring.</p>
-<p>This function will compute the square of <em>op</em> and store it
-into <em>rop</em>. The precision of the result will be equal to the precision
-of <em>op</em>.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
-<li><strong>rop</strong> – the return value.</li>
-<li><strong>op</strong> – the operand.</li>
-</ul>
-</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrEN4mppp4realERR1T">
-<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp3sqrERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp3sqrERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqr</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrEN4mppp4realERR1T" title="mppp::sqr::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3sqrEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><div class="versionadded">
-<p><span class="versionmodified added">New in version 0.19.</span></p>
-</div>
-<p>Unary <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> squaring.</p>
-<p>This function will compute and return the square of <em>r</em>.
-The precision of the result will be equal to the precision of <em>r</em>.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><strong>r</strong> – the operand.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body">the square of <em>r</em>.</dd>
 </dl>
 </dd></dl>
 
@@ -3672,7 +3732,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first">a reference to <em>os</em>.</p>
 </dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by :cpp:func`mppp::real::to_string()`.</p>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>unspecified</strong> – any exception thrown by <a class="reference internal" href="#_CPPv4NK4mppp4real9to_stringEi" title="mppp::real::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::to_string()</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
