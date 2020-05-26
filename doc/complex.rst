@@ -31,7 +31,51 @@ The complex class
    is handled in :cpp:class:`~mppp::complex` differs from the way it is managed in MPC. The most important difference
    is that in operations involving :cpp:class:`~mppp::complex` the precision of the result is usually determined
    by the precision of the operands, whereas in MPC the precision of the operation is determined by the precision
-   of the return value (which is always passed as the first function parameter in the MPC API).
+   of the return value (which is always passed as the first function parameter in the MPC API). For instance,
+   in the following code,
+
+   .. code-block:: c++
+
+      auto c = complex{5, complex_prec_t(200)} + real{6, complex_prec_t(150)};
+
+   the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
+   150 bits. The precision of the result ``c`` will be
+   the maximum precision among the two operands, that is, 200 bits.
+
+   The real and imaginary parts of a :cpp:class:`~mppp::complex` always have the same precision.
+   The precision of a :cpp:class:`~mppp::complex` can be set at construction, or it can be changed later via functions
+   such as :cpp:func:`mppp::complex::set_prec()`, :cpp:func:`mppp::complex::prec_round()`, etc. By default,
+   the precision of a :cpp:class:`~mppp::complex` is automatically deduced upon construction following a set of heuristics
+   aimed at ensuring that the constructed :cpp:class:`~mppp::complex` preserves the value used for initialisation,
+   if possible.
+   For instance, by default the construction of a :cpp:class:`~mppp::complex` from a 32 bit integer will yield a
+   :cpp:class:`~mppp::complex` with a precision of 32 bits. This behaviour can be altered by specifying explicitly
+   the desired precision value.
+
+   Most of the functionality is exposed via plain :ref:`functions <complex_functions>`, with the
+   general convention that the functions are named after the corresponding MPC functions minus the leading ``mpc_``
+   prefix. For instance, the MPC call
+
+   .. code-block:: c++
+
+      mpc_add(rop, a, b, MPC_RNDNN);
+
+   that writes the result of ``a + b``, rounded to nearest, into ``rop``, becomes simply
+
+   .. code-block:: c++
+
+      add(rop, a, b);
+
+   where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
+   are allowed, unless noted otherwise. Unless otherwise specified, the :cpp:class:`~mppp::complex` API always
+   rounds to nearest (that is, the ``MPC_RNDNN`` rounding mode is used).
+
+   Various :ref:`overloaded operators <complex_operators>` are provided. The arithmetic operators always return
+   a :cpp:class:`~mppp::complex` result.
+
+   Member functions are provided to access directly the internal :cpp:type:`mpc_t` instance (see
+   :cpp:func:`mppp::complex::get_mpc_t()` and :cpp:func:`mppp::complex::_get_mpc_t()`), so that
+   it is possible to use transparently the MPC API with :cpp:class:`~mppp::complex` objects.
 
    .. cpp:function:: complex()
 
