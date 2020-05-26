@@ -667,6 +667,14 @@ The real class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: real &sqr()
+
+      .. versionadded:: 0.19
+
+      Square ``this`` in place.
+
+      :return: a reference to ``this``.
+
    .. cpp:function:: real &sqrt()
    .. cpp:function:: real &rec_sqrt()
    .. cpp:function:: real &sqrt1pm1()
@@ -701,14 +709,6 @@ The real class
 
       :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
         fails because of (unlikely) overflow conditions.
-
-   .. cpp:function:: real &sqr()
-
-      .. versionadded:: 0.19
-
-      Square ``this`` in place.
-
-      :return: a reference to ``this``.
 
    .. cpp:function:: real &sin()
    .. cpp:function:: real &cos()
@@ -1310,6 +1310,34 @@ Arithmetic
 
    :return: *x* multiplied/divided by :math:`2^n`.
 
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
+
+   .. versionadded:: 0.19
+
+   Binary :cpp:class:`~mppp::real` squaring.
+
+   This function will compute the square of *op* and store it
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sqr(T &&r)
+
+   .. versionadded:: 0.19
+
+   Unary :cpp:class:`~mppp::real` squaring.
+
+   This function will compute and return the square of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the square of *r*.
+
 .. _real_comparison:
 
 Comparison
@@ -1677,34 +1705,6 @@ Exponentiation
    :param op2: the exponent.
 
    :return: *op1* raised to the power of *op2*.
-
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
-
-   .. versionadded:: 0.19
-
-   Binary :cpp:class:`~mppp::real` squaring.
-
-   This function will compute the square of *op* and store it
-   into *rop*. The precision of the result will be equal to the precision
-   of *op*.
-
-   :param rop: the return value.
-   :param op: the operand.
-
-   :return: a reference to *rop*.
-
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sqr(T &&r)
-
-   .. versionadded:: 0.19
-
-   Unary :cpp:class:`~mppp::real` squaring.
-
-   This function will compute and return the square of *r*.
-   The precision of the result will be equal to the precision of *r*.
-
-   :param r: the operand.
-
-   :return: the square of *r*.
 
 .. _real_trig:
 

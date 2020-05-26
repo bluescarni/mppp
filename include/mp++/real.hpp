@@ -1899,6 +1899,15 @@ inline real dispatch_real_pow(T &&a, const U &n)
     }
 }
 
+// Special casing for bool
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline real dispatch_real_pow(T &&a, const bool &n)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
+}
+
 // real-signed integral.
 template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp_signed_integral<U>>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const U &n)
@@ -1956,6 +1965,15 @@ inline real dispatch_real_pow(const T &n, U &&a)
     } else {
         return dispatch_real_pow(integer<2>{n}, std::forward<U>(a));
     }
+}
+
+// Special casing for bool.
+template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
+inline real dispatch_real_pow(const bool &n, T &&a)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+
+    return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
 } // namespace detail
