@@ -1223,6 +1223,30 @@ Logarithms and exponentials
 
    :return: the result of the operation.
 
+Input/Output
+~~~~~~~~~~~~
+
+.. cpp:function:: std::ostream &mppp::operator<<(std::ostream &os, const mppp::complex &c)
+
+   Output stream operator.
+
+   This operator will insert into the stream *os* a string representation of *c*
+   in base 10 (as returned by :cpp:func:`mppp::complex::to_string()`).
+
+   .. warning::
+
+      In future versions of mp++, the behaviour of this operator will change to support the
+      output stream's formatting flags. For the time being, users are encouraged to use the
+      facilities from the MPC
+      library if precise and forward-compatible control on the printing format is needed.
+
+   :param os: the target stream.
+   :param c: the input argument.
+
+   :return: a reference to *os*.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::complex::to_string()`.
+
 .. _complex_operators:
 
 Mathematical operators
@@ -1319,3 +1343,26 @@ Mathematical operators
    :param b: the second operand.
 
    :return: the result of the comparison.
+
+User-defined literals
+---------------------
+
+.. cpp:function:: template <char... Chars> mppp::complex mppp::literals::operator"" _icr128()
+.. cpp:function:: template <char... Chars> mppp::complex mppp::literals::operator"" _icr256()
+.. cpp:function:: template <char... Chars> mppp::complex mppp::literals::operator"" _icr512()
+.. cpp:function:: template <char... Chars> mppp::complex mppp::literals::operator"" _icr1024()
+
+   User-defined arbitrary-precision imaginary literals.
+
+   These numeric literal operator templates can be used to construct
+   purely imaginary :cpp:class:`~mppp::complex` instances with, respectively, 128, 256, 512
+   and 1024 bits of precision. The real part of the return value will be set to zero,
+   while the imaginary part will be set to the input floating-point literal. Literals in decimal and
+   hexadecimal format are supported.
+
+   .. seealso::
+
+      https://en.cppreference.com/w/cpp/language/floating_literal
+
+   :exception std\:\:invalid_argument: if the input sequence of characters is not
+     a valid floating-point literal (as defined by the C++ standard).
