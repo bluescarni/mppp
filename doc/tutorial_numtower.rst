@@ -28,7 +28,7 @@ a lower rank than floating-point types, and that, within the integral and floati
 types, a higher range or bit width translates to a higher rank. The underlying
 idea is that automatic type coercion should not change the value of an operand [#f1]_.
 
-mp++ extends C++'s type hierarchy in a (hopefully) natural way:
+For real-valued types, mp++ extends C++'s type hierarchy in a (hopefully) natural way:
 
 * :cpp:class:`~mppp::integer` has a rank higher than any integral C++ type, but lower
   than any floating-point C++ type;
@@ -37,7 +37,8 @@ mp++ extends C++'s type hierarchy in a (hopefully) natural way:
 * :cpp:class:`~mppp::real128` has a rank higher than any floating-point C++ type;
 * :cpp:class:`~mppp::real` has a rank higher than :cpp:class:`~mppp::real128`.
 
-In other words, mp++'s type hierarchy (or *numerical tower*) from the lowest rank to the highest is the following:
+In other words, mp++'s real-valued type hierarchy (or *numerical tower*)
+from the lowest rank to the highest is the following:
 
 * integral C++ types,
 * :cpp:class:`~mppp::integer`,
@@ -53,9 +54,33 @@ that :cpp:class:`~mppp::real`'s precision is set at runtime, and it is thus poss
 objects with a precision lower than :cpp:class:`~mppp::real128` or any of the floating-point C++ types. Regardless,
 when it comes to type coercion, :cpp:class:`~mppp::real` is always assigned a rank higher than any other type.
 
-mp++'s type coercion rules extend beyond arithmetic operators. The exponentiation functions ``pow()``, for instance,
-also use the type hierarchy to determine the type of the result. Type coercion is also applied in the comparison operators,
-where arguments of different types are promoted to the common type before actually carrying out the comparison.
+For complex-valued types, the type hierarchy is easily extended. In a binary operation involving
+two different complex-valued types, the real-valued coercion rules can be directly applied:
+
+.. code-block:: c++
+
+   std::complex<double> c1{1, 2}; // The complex counterpart of double.
+   complex128 c2{3, 4};           // The complex counterpart of real128.
+
+   auto res = c1 + c2;            // 'res' will be complex128, because
+                                  // in the type hierarchy real128 > double.
+
+If one of the operands is complex-valued and the other one is real-valued, then
+first the real-valued type is formally promoted to its complex counterpart, and
+then the real-valued coercion rules can be applied again:
+
+.. code-block:: c++
+
+   std::complex<double> c{1, 2};
+   real128 r{4};
+
+   auto res = c + r; // 'res' will be complex128: r is first
+                     // promoted to its complex counterpart,
+                     // complex128, and the rules from the
+                     // previous example are then applied.
+
+mp++'s type coercion rules extend beyond arithmetic operators (e.g., they also apply to binary
+special functions).
 
 .. rubric:: Footnotes
 
