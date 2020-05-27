@@ -505,6 +505,38 @@ inline py::handle real_to_py_handle(const mppp::real &src)
 
 #endif
 
+#if defined(MPPP_WITH_MPC)
+
+inline bool py_handle_to_complex(mppp::complex &value, py::handle src)
+{
+    if (!globals::mpmath || !::PyObject_IsInstance(src.ptr(), globals::mpc_class->ptr())) {
+        return false;
+    }
+
+    mppp::real re, im;
+
+    if (py_handle_to_real(re, src.attr("real")) && py_handle_to_real(im, src.attr("imag"))) {
+        value = mppp::complex{std::move(re), std::move(im)};
+
+        return true;
+    } else {
+        return false;
+    }
+}
+
+inline py::handle complex_to_py_handle(const mppp::complex &src)
+{
+    mppp::complex::re_cref r{src};
+    mppp::complex::im_cref i{src};
+
+    auto re = real_to_py_object(*r);
+    auto im = real_to_py_object(*i);
+
+    return (*globals::mpc_class)(re, im).release();
+}
+
+#endif
+
 } // namespace detail
 
 } // namespace mppp_pybind11
@@ -563,6 +595,23 @@ struct type_caster<mppp::real> {
     static handle cast(const mppp::real &src, return_value_policy, handle)
     {
         return mppp_pybind11::detail::real_to_py_handle(src);
+    }
+};
+
+#endif
+
+#if defined(MPPP_WITH_MPC)
+
+template <>
+struct type_caster<mppp::complex> {
+    PYBIND11_TYPE_CASTER(mppp::complex, _("mppp::complex"));
+    bool load(handle src, bool)
+    {
+        return mppp_pybind11::detail::py_handle_to_complex(value, src);
+    }
+    static handle cast(const mppp::complex &src, return_value_policy, handle)
+    {
+        return mppp_pybind11::detail::complex_to_py_handle(src);
     }
 };
 

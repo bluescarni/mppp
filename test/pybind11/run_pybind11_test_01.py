@@ -33,6 +33,7 @@ class Test01(unittest.TestCase):
 
         self.run_quadmath_conversions()
         self.run_mpfr_conversions()
+        self.run_mpc_conversions()
 
     def run_quadmath_conversions(self):
         import pybind11_test_01 as p
@@ -119,6 +120,7 @@ class Test01(unittest.TestCase):
         # Test that the real128/complex128 overloads are picked before the real one,
         # if instantiated before.
         self.assertTrue(p.test_overload(mpf(2)**-16495) == 0)
+        self.assertTrue(p.test_overload(mpc(2)**-16495) == 0)
         if not p.has_mpfr():
             with workprec(2000):
                 self.assertTrue(p.test_overload(mpf(2)**-16495) != 0)
@@ -178,6 +180,56 @@ class Test01(unittest.TestCase):
             self.assertTrue(p.test_real_conversion(mpf("1.1")) == mpf("1.1"))
             self.assertTrue(p.test_real_conversion(mpf("-1.1")) == mpf("-1.1"))
 
+    def run_mpc_conversions(self):
+        import pybind11_test_01 as p
+
+        if not p.has_mpc():
+            return
+
+        try:
+            from mpmath import mpc, mp, workprec, isnan
+        except ImportError:
+            return
+
+        self.assertTrue(p.test_complex_conversion(mpc()) == 0)
+        self.assertTrue(p.test_complex_conversion(mpc(1)) == 1)
+        self.assertTrue(p.test_complex_conversion(mpc(1, 1)) == mpc(1, 1))
+        self.assertTrue(p.test_complex_conversion(mpc(-1, -1)) == mpc(-1, -1))
+        self.assertTrue(p.test_complex_conversion(
+            mpc("inf", "inf")) == mpc("inf", "inf"))
+        self.assertTrue(
+            p.test_complex_conversion(-mpc("inf", "inf")) == -mpc("inf", "inf"))
+        self.assertTrue(
+            isnan(p.test_complex_conversion(mpc("nan", "nan")).real))
+        self.assertTrue(
+            isnan(p.test_complex_conversion(mpc("nan", "nan")).imag))
+        self.assertTrue(p.test_complex_conversion(mpc(
+            "1.323213210010203", "2.33343456633")) == mpc("1.323213210010203", "2.33343456633"))
+        self.assertTrue(p.test_complex_conversion(-mpc(
+            "1.323213210010203", "2.33343456633")) == -mpc("1.323213210010203", "2.33343456633"))
+
+        # Test with different precision.
+        # Less precision in output from C++ is ok.
+        self.assertTrue(p.test_complex_conversion(mpc(-1), 30) == -1)
+        self.assertTrue(p.test_complex_conversion(
+            mpc("inf"), 30) == mpc("inf"))
+        self.assertTrue(isnan(p.test_complex_conversion(mpc("nan"), 30).real))
+        # More precision in output from C++ will be lossy, so an error
+        # is raised instead.
+        self.assertRaises(
+            ValueError, lambda: p.test_complex_conversion(mpc(-1), 300))
+        self.assertRaises(
+            ValueError, lambda: p.test_complex_conversion(mpc("inf"), 300))
+        self.assertRaises(
+            ValueError, lambda: p.test_complex_conversion(mpc("nan"), 300))
+
+        # Try the workprec construct.
+        with workprec(100):
+            self.assertTrue(p.test_complex_conversion(
+                mpc("1.1", "2.3")) == mpc("1.1", "2.3"))
+            self.assertTrue(p.test_complex_conversion(
+                mpc("-1.1", "-2.3")) == mpc("-1.1", "-2.3"))
+
     def test_stl(self):
         from fractions import Fraction as F
         import pybind11_test_01 as p
@@ -203,6 +255,7 @@ class Test01(unittest.TestCase):
 
         self.run_quadmath_stl()
         self.run_mpfr_stl()
+        self.run_mpc_stl()
 
     def run_quadmath_stl(self):
         import pybind11_test_01 as p
@@ -282,6 +335,39 @@ class Test01(unittest.TestCase):
                 {'a': mpf(1), 'b': mpf(2)**-16495}) == {'a': mpf(1), 'b': mpf(2)**-16495})
             self.assertRaises(TypeError, lambda: p.test_unordered_map_conversion(
                 {'a': mpf(1), 'b': 2}))
+
+    def run_mpc_stl(self):
+        import pybind11_test_01 as p
+
+        if not p.has_mpc():
+            return
+
+        try:
+            from mpmath import mpc, mp, workprec, isnan
+        except ImportError:
+            return
+
+        self.assertTrue(p.test_vector_conversion(
+            [mpc("1.1"), mpc(-2, 1), mpc(3)]) == [mpc("1.1"), mpc(-2, 1), mpc(3)])
+        self.assertTrue(p.test_vector_conversion(
+            [mpc(1), mpc(2)**-16495, mpc(3, "inf")]) == [mpc(1), mpc(2)**-16495, mpc(3, "inf")])
+        self.assertRaises(TypeError, lambda: p.test_vector_conversion(
+            [mpc(1), 2, mpc(3)]))
+
+        self.assertTrue(p.test_unordered_map_conversion(
+            {'a': mpc("1.1", "inf"), 'b': mpc(2, 3)}) == {'a': mpc("1.1", "inf"), 'b': mpc(2, 3)})
+        self.assertTrue(p.test_unordered_map_conversion(
+            {'a': mpc(1, -9), 'b': mpc(2)**-16495}) == {'a': mpc(1, -9), 'b': mpc(2)**-16495})
+        self.assertRaises(TypeError, lambda: p.test_unordered_map_conversion(
+            {'a': mpc(1), 'b': 2}))
+
+        with workprec(2000):
+            self.assertTrue(p.test_unordered_map_conversion(
+                {'a': mpc("1.1"), 'b': mpc(2, 7)}) == {'a': mpc("1.1"), 'b': mpc(2, 7)})
+            self.assertTrue(p.test_unordered_map_conversion(
+                {'a': mpc(0, 1), 'b': mpc(2)**-16495}) == {'a': mpc(0, 1), 'b': mpc(2)**-16495})
+            self.assertRaises(TypeError, lambda: p.test_unordered_map_conversion(
+                {'a': mpc(1), 'b': 2}))
 
     def test_exceptions(self):
         import pybind11_test_01 as p
