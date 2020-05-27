@@ -39,10 +39,11 @@ functions exposed from C++. The translation rules are the following:
 
 * :cpp:class:`~mppp::integer` objects are converted to/from Python :py:class:`integers <int>`,
 * :cpp:class:`~mppp::rational` objects are converted to/from Python :py:class:`fractions <fractions.Fraction>`,
-* :cpp:class:`~mppp::real` and :cpp:class:`~mppp::real128` objects are translated to/from `mpmath's mpf objects <http://mpmath.org/>`__.
+* :cpp:class:`~mppp::real` and :cpp:class:`~mppp::real128` objects are translated to/from `mpmath's mpf objects <http://mpmath.org/>`__,
+* :cpp:class:`~mppp::complex` and :cpp:class:`~mppp::complex128` objects are translated to/from `mpmath's mpc objects <http://mpmath.org/>`__.
 
-If the mpmath library is not installed, the translations for :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real` will be disabled
-at runtime.
+If the mpmath library is not installed, the translations for :cpp:class:`~mppp::real128`, :cpp:class:`~mppp::real`,
+:cpp:class:`~mppp::complex128` and :cpp:class:`~mppp::complex` will be disabled at runtime.
 
 Let's take a look at an example of a pybind11 module enabling automatic translation of mp++ objects:
 
@@ -140,7 +141,8 @@ verify that the value is correctly preserved and translated:
 >>> p.test_real_conversion(mpf("1.1"))
 mpf('1.1000000000000000000000000000000000000000000000000000000000002')
 
-If the precision is set **exactly** to 113, ``mpf`` objects can be converted to :cpp:class:`~mppp::real128`:
+If the precision is set **exactly** to 113, ``mpf`` objects can be converted to :cpp:class:`~mppp::real128`
+(and, similarly, ``mpc`` objects can be converted to :cpp:class:`~mppp::complex128`):
 
 >>> mp.prec = 113
 >>> p.test_real128_conversion(mpf("1.1"))
@@ -164,6 +166,11 @@ ValueError: Cannot convert the real 1.1000000000000000888178419700125 to an mpf:
 >>> p.test_real_conversion(mpf("1.1"), 100)
 mpf('1.1000000000000000000000000000003')
 
+Similarly, a :cpp:class:`~mppp::complex128` will be successfully converted to an ``mpc``
+iff the current mpmath working precision is exactly 113, and a :cpp:class:`~mppp::complex`
+will be successfully converted to an ``mpc`` iff its precision is not greater than the current
+mpmath working precision.
+
 Overloaded functions are supported as well:
 
 >>> p.test_overload(-2)
@@ -175,10 +182,13 @@ mpf('1.2999999999999999999999999999994')
 
 Note that, due to the fact that ``mpf`` arguments can be converted both to :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real`,
 overloads with :cpp:class:`~mppp::real128` arguments should be exposed **before** overloads with :cpp:class:`~mppp::real` arguments
-(otherwise, the :cpp:class:`~mppp::real` overload will always be preferred).
+(otherwise, the :cpp:class:`~mppp::real` overload will always be preferred). The same holds true for
+:cpp:class:`~mppp::complex128` and :cpp:class:`~mppp::complex`.
 
-There's an important caveat to keep in mind when translating to/from :cpp:class:`~mppp::real128`. The IEEE 754 quadruple precision
-format, implemented by :cpp:class:`~mppp::real128`, has a limited exponent range. The value :math:`2^{-30000}`, for instance, becomes
+There's an important caveat to keep in mind when translating to/from :cpp:class:`~mppp::real128` or :cpp:class:`~mppp::complex128`.
+The IEEE 754 quadruple precision
+format, implemented by :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`,
+has a limited exponent range. The value :math:`2^{-30000}`, for instance, becomes
 simply zero in quadruple precision, and :math:`2^{30000}` becomes :math:`+\infty`:
 
 >>> mp.prec = 113
