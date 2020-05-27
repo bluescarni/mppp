@@ -416,6 +416,95 @@ inline py::handle complex128_to_py_handle(const mppp::complex128 &src)
 
 #endif
 
+#if defined(MPPP_WITH_MPFR)
+
+inline bool py_handle_to_real(mppp::real &value, py::handle src)
+{
+    if (!globals::mpmath || !::PyObject_IsInstance(src.ptr(), globals::mpf_class->ptr())) {
+        return false;
+    }
+    const auto prec = src.attr("context").attr("prec").cast<::mpfr_prec_t>();
+    value.set_prec(prec);
+    // NOTE: the _mpf_ tuple contains three elements:
+    // - the sign of the mpf,
+    // - an integral value n,
+    // - an exponent e such that n*2**e equals the mpf.
+    const auto mpf_tuple = src.attr("_mpf_").cast<py::tuple>();
+    // Little helper to negate the value, depending on the sign in the tuple.
+    auto neg_if_needed = [&value, &mpf_tuple]() {
+        if (mpf_tuple[0].cast<int>()) {
+            value.neg();
+        }
+    };
+    if ((*globals::mpf_isinf)(src).cast<bool>()) {
+        // Handle inf.
+        set_inf(value);
+        neg_if_needed();
+    } else if ((*globals::mpf_isnan)(src).cast<bool>()) {
+        // Handle NaN.
+        set_nan(value);
+    } else {
+        // Normal value.
+        mppp::integer<1> sig;
+        // NOTE: the tuple returned by _mpf_ might contain an mpz from gmpy, instead of a Python integer. Thus, we
+        // need to convert to a Python integer in order to be extra sure we pass an object of the correct type
+        // to py_integer_to_mppp_int().
+        // NOTE: we use the explicit pybind11::int_ name because apparently there are
+        // shadowing problems when including other pybind11 header. See the reference to a
+        // similar problem here (in our case the issue came from including pybind11/stl_bind.h):
+        // https://github.com/pybind/pybind11/issues/352
+        if (!py_integer_to_mppp_int(sig, pybind11::int_(mpf_tuple[1]).ptr())) {
+            throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
+        }
+        set_z_2exp(value, sig, mpf_tuple[2].cast<::mpfr_exp_t>());
+        neg_if_needed();
+    }
+    return true;
+}
+
+inline py::object real_to_py_object(const mppp::real &src)
+{
+    if (!globals::mpmath) {
+        throw std::runtime_error("Cannot convert a real to an mpf if mpmath is not available");
+    }
+    const auto prec = globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
+    const auto src_prec = src.get_prec();
+    if (prec < src_prec) {
+        throw std::invalid_argument("Cannot convert the real " + src.to_string()
+                                    + " to an mpf: the precision of the real (" + std::to_string(src_prec)
+                                    + ") is greater than the current mpf precision (" + std::to_string(prec)
+                                    + "). Please increase the current mpf precision to at least "
+                                    + std::to_string(src_prec) + " in order to avoid this error");
+    }
+    // Handle special values first.
+    if (src.inf_p()) {
+        if (std::numeric_limits<double>::has_infinity) {
+            return (*globals::mpf_class)(src.sgn() > 0 ? std::numeric_limits<double>::infinity()
+                                                       : -std::numeric_limits<double>::infinity());
+        } else {
+            return (*globals::mpf_class)(src.sgn() > 0 ? "inf" : "-inf");
+        }
+    }
+    if (src.nan_p()) {
+        if (std::numeric_limits<double>::has_quiet_NaN) {
+            return (*globals::mpf_class)(std::numeric_limits<double>::quiet_NaN());
+        } else {
+            return (*globals::mpf_class)("nan");
+        }
+    }
+    mppp::integer<1> tmp;
+    // NOTE: this function will run internal checks on overflow.
+    const auto exp = get_z_2exp(tmp, src);
+    return (*globals::mpf_class)(py::make_tuple(mppp_int_to_py(tmp), exp));
+}
+
+inline py::handle real_to_py_handle(const mppp::real &src)
+{
+    return real_to_py_object(src).release();
+}
+
+#endif
+
 } // namespace detail
 
 } // namespace mppp_pybind11
@@ -469,85 +558,11 @@ struct type_caster<mppp::real> {
     PYBIND11_TYPE_CASTER(mppp::real, _("mppp::real"));
     bool load(handle src, bool)
     {
-        if (!mppp_pybind11::detail::globals::mpmath
-            || !::PyObject_IsInstance(src.ptr(), mppp_pybind11::detail::globals::mpf_class->ptr())) {
-            return false;
-        }
-        const auto prec = src.attr("context").attr("prec").cast<::mpfr_prec_t>();
-        value.set_prec(prec);
-        // NOTE: the _mpf_ tuple contains three elements:
-        // - the sign of the mpf,
-        // - an integral value n,
-        // - an exponent e such that n*2**e equals the mpf.
-        const auto mpf_tuple = src.attr("_mpf_").cast<tuple>();
-        // Little helper to negate the value, depending on the sign in the tuple.
-        auto neg_if_needed = [this, &mpf_tuple]() {
-            if (mpf_tuple[0].cast<int>()) {
-                this->value.neg();
-            }
-        };
-        if ((*mppp_pybind11::detail::globals::mpf_isinf)(src).cast<bool>()) {
-            // Handle inf.
-            set_inf(value);
-            neg_if_needed();
-        } else if ((*mppp_pybind11::detail::globals::mpf_isnan)(src).cast<bool>()) {
-            // Handle NaN.
-            set_nan(value);
-        } else {
-            // Normal value.
-            mppp::integer<1> sig;
-            // NOTE: the tuple returned by _mpf_ might contain an mpz from gmpy, instead of a Python integer. Thus, we
-            // need to convert to a Python integer in order to be extra sure we pass an object of the correct type
-            // to py_integer_to_mppp_int().
-            // NOTE: we use the explicit pybind11::int_ name because apparently there are
-            // shadowing problems when including other pybind11 header. See the reference to a
-            // similar problem here (in our case the issue came from including pybind11/stl_bind.h):
-            // https://github.com/pybind/pybind11/issues/352
-            if (!mppp_pybind11::detail::py_integer_to_mppp_int(sig, pybind11::int_(mpf_tuple[1]).ptr())) {
-                throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
-            }
-            set_z_2exp(value, sig, mpf_tuple[2].cast<::mpfr_exp_t>());
-            neg_if_needed();
-        }
-        return true;
+        return mppp_pybind11::detail::py_handle_to_real(value, src);
     }
     static handle cast(const mppp::real &src, return_value_policy, handle)
     {
-        if (!mppp_pybind11::detail::globals::mpmath) {
-            throw std::runtime_error("Cannot convert a real to an mpf if mpmath is not available");
-        }
-        const auto prec = mppp_pybind11::detail::globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
-        const auto src_prec = src.get_prec();
-        if (prec < src_prec) {
-            throw std::invalid_argument("Cannot convert the real " + src.to_string()
-                                        + " to an mpf: the precision of the real (" + std::to_string(src_prec)
-                                        + ") is greater than the current mpf precision (" + std::to_string(prec)
-                                        + "). Please increase the current mpf precision to at least "
-                                        + std::to_string(src_prec) + " in order to avoid this error");
-        }
-        // Handle special values first.
-        if (src.inf_p()) {
-            if (std::numeric_limits<double>::has_infinity) {
-                return (*mppp_pybind11::detail::globals::mpf_class)(src.sgn() > 0
-                                                                        ? std::numeric_limits<double>::infinity()
-                                                                        : -std::numeric_limits<double>::infinity())
-                    .release();
-            } else {
-                return (*mppp_pybind11::detail::globals::mpf_class)(src.sgn() > 0 ? "inf" : "-inf").release();
-            }
-        }
-        if (src.nan_p()) {
-            if (std::numeric_limits<double>::has_quiet_NaN) {
-                return (*mppp_pybind11::detail::globals::mpf_class)(std::numeric_limits<double>::quiet_NaN()).release();
-            } else {
-                return (*mppp_pybind11::detail::globals::mpf_class)("nan").release();
-            }
-        }
-        mppp::integer<1> tmp;
-        // NOTE: this function will run internal checks on overflow.
-        const auto exp = get_z_2exp(tmp, src);
-        return (*mppp_pybind11::detail::globals::mpf_class)(make_tuple(mppp_pybind11::detail::mppp_int_to_py(tmp), exp))
-            .release();
+        return mppp_pybind11::detail::real_to_py_handle(src);
     }
 };
 
