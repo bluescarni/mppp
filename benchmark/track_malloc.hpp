@@ -30,8 +30,12 @@ namespace mppp_bench
 struct __attribute__((visibility("default"))) malloc_tracker {
     explicit malloc_tracker(const char *);
     ~malloc_tracker();
-    std::size_t m_count;
+    // NOTE: it is important than m_name
+    // is inited befor m_count, so that
+    // we don't end up counting allocations
+    // from the string.
     std::string m_name;
+    std::size_t m_count;
 };
 
 } // namespace mppp_bench

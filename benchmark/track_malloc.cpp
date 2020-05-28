@@ -14,6 +14,12 @@
 #include <cstddef>
 #include <iostream>
 
+namespace mppp_bench
+{
+
+namespace detail
+{
+
 namespace
 {
 
@@ -24,29 +30,33 @@ std::atomic<std::size_t> malloc_counter(0);
 
 } // namespace
 
+} // namespace detail
+
+} // namespace mppp_bench
+
 // NOTE: see here for an explanation:
 // https://stackoverflow.com/questions/17803456/an-alternative-for-the-deprecated-malloc-hook-functionality-of-glibc
 extern "C" void *__libc_malloc(std::size_t size);
 
-extern "C" __attribute__((visibility("default"))) void *malloc(std::size_t size) throw()
+// NOTE: apparently it is not necessary to declare
+// this function as visible.
+extern "C" void *malloc(std::size_t size)
 {
-    ++malloc_counter;
+    ++mppp_bench::detail::malloc_counter;
     return ::__libc_malloc(size);
 }
 
 namespace mppp_bench
 {
 
-// NOTE: fetch the current count after creating the string,
-// so that we don't record the string allocation in the counter.
-malloc_tracker::malloc_tracker(const char *s) : m_name(s), m_count(malloc_counter.load()) {}
+malloc_tracker::malloc_tracker(const char *s) : m_name(s), m_count(detail::malloc_counter.load()) {}
 
 malloc_tracker::~malloc_tracker()
 {
     // NOTE: compute the total number of allocations
     // before outputting to stream, so that we avoid
     // counting possible allocations from stream operations.
-    const auto tot_nalloc = malloc_counter.load() - m_count;
+    const auto tot_nalloc = detail::malloc_counter.load() - m_count;
     std::cout << "Tracker '" << m_name << "' observed " << tot_nalloc << " malloc() calls." << std::endl;
 }
 

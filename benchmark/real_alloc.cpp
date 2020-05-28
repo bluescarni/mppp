@@ -33,21 +33,24 @@ T test_function(const T &x, bool move = false)
 
 int main()
 {
+    real arg1{42.};
+    mpfr_float arg2{42.};
+
     {
-        mppp_bench::malloc_tracker t{"mppp::real (no move)"};
-        test_function(real{42.});
+        mppp_bench::malloc_tracker t{"bmp::mpfr_float"};
+        test_function(arg2);
     }
     {
-        mppp_bench::malloc_tracker t{"bmp::mpfr_float (no move)"};
-        test_function(mpfr_float{42.});
+        mppp_bench::malloc_tracker t{"mppp::real"};
+        test_function(arg1);
     }
     {
-        mppp_bench::malloc_tracker t{"mppp::real (move)"};
-        test_function(real{42.}, true);
+        mppp_bench::malloc_tracker t{"bmp::mpfr_float + move"};
+        test_function(arg2, true);
     }
     {
-        mppp_bench::malloc_tracker t{"bmp::mpfr_float (move)"};
-        test_function(mpfr_float{42.}, true);
+        mppp_bench::malloc_tracker t{"mppp::real + move"};
+        test_function(arg1, true);
     }
 
     return 0;
