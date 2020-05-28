@@ -75,6 +75,9 @@ The real class
    :cpp:func:`mppp::real::get_mpfr_t()` and :cpp:func:`mppp::real::_get_mpfr_t()`), so that
    it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
 
+   A :ref:`tutorial <tutorial_real>` showcasing various features of :cpp:class:`~mppp::real`
+   is available.
+
    .. cpp:function:: real()
 
       Default constructor.

@@ -77,6 +77,9 @@ The complex class
    :cpp:func:`mppp::complex::get_mpc_t()` and :cpp:func:`mppp::complex::_get_mpc_t()`), so that
    it is possible to use transparently the MPC API with :cpp:class:`~mppp::complex` objects.
 
+   A :ref:`tutorial <tutorial_complex>` showcasing various features of :cpp:class:`~mppp::complex`
+   is available.
+
    .. cpp:function:: complex()
 
       Default constructor.

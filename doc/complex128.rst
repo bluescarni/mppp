@@ -55,6 +55,9 @@ The complex128 class
    :cpp:class:`~mppp::complex128` are marked as ``constexpr``. Some functions which are not ``constexpr`` in the quadmath
    library have been reimplemented as ``constexpr`` functions via compiler builtins.
 
+   A :ref:`tutorial <tutorial_complex128>` showcasing various features of :cpp:class:`~mppp::complex128`
+   is available.
+
    .. seealso::
       https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
 
