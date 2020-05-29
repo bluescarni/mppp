@@ -13,7 +13,7 @@ if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
 fi
 
 if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_BUILD_BENCHMARKS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_BUILD_BENCHMARKS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_QUADMATH=yes ../;
     make -j2 VERBOSE=1 install;
     ctest -V;
 
@@ -28,11 +28,11 @@ if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     make;
     ./main;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "DebugARM64" || "${MPPP_BUILD}" == "DebugPPC64" ]]; then
-    cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_ENABLE_IPO=yes ../;
+    cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_MPC=yes -DMPPP_ENABLE_IPO=yes ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
@@ -47,12 +47,12 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;
 elif [[ "${MPPP_BUILD}" == "OSXDebug" ]]; then
-    CXX=clang++ CC=clang cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_ENABLE_IPO=yes ../;
+    CXX=clang++ CC=clang cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_MPC=yes -DMPPP_ENABLE_IPO=yes ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Run the configure step to create the doc config files.
-    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_ENABLE_IPO=yes ../;
+    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_MPC=yes -DMPPP_ENABLE_IPO=yes ../;
 
     # Install sphinx.
     pip install --user requests[security] sphinx

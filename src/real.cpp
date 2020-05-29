@@ -200,47 +200,6 @@ void mpfr_to_arb(::arb_t rop, const ::mpfr_t op)
     ::mag_zero(arb_radref(rop));
 }
 
-// NOTE: the cleanup machinery relies on a correct implementation
-// of the thread_local keyword. If that is not available, we'll
-// just skip the cleanup step altogether, which may result
-// in "memory leaks" being reported by sanitizers and valgrind.
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-
-// A cleanup functor that will call flint_cleanup()
-// on destruction.
-struct flint_cleanup {
-    // NOTE: marking the ctor constexpr ensures that the initialisation
-    // of objects of this class with static storage duration is sequenced
-    // before the dynamic initialisation of objects with static storage
-    // duration:
-    // https://en.cppreference.com/w/cpp/language/constant_initialization
-    // This essentially means that we are sure that flint_cleanup()
-    // will be called after the destruction of any static real object
-    // (because real doesn't have a constexpr constructor and thus
-    // static reals are destroyed before static objects of this class).
-    constexpr flint_cleanup() {}
-    ~flint_cleanup()
-    {
-#if !defined(NDEBUG)
-        // NOTE: Access to cout from concurrent threads is safe as long as the
-        // cout object is synchronized to the underlying C stream:
-        // https://stackoverflow.com/questions/6374264/is-cout-synchronized-thread-safe
-        // http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio
-        // By default, this is the case, but in theory someone might have changed
-        // the sync setting on cout by the time we execute the following line.
-        // However, we print only in debug mode, so it should not be too much of a problem
-        // in practice.
-        std::cout << "Cleaning up thread local FLINT caches." << std::endl;
-#endif
-        ::flint_cleanup();
-    }
-};
-
-// Instantiate a cleanup object for each thread.
-MPPP_CONSTINIT thread_local const flint_cleanup flint_cleanup_inst;
-
-#endif
-
 #endif
 
 } // namespace
@@ -725,7 +684,7 @@ real::real(const ::mpfr_t x)
 real &real::operator=(const real &other)
 {
     if (mppp_likely(this != &other)) {
-        if (m_mpfr._mpfr_d) {
+        if (is_valid()) {
             // this has not been moved-from.
             // Copy the precision. This will also reset the internal value.
             // No need for prec checking as we assume other has a valid prec.
@@ -1019,120 +978,6 @@ bool real::dispatch_get(real128 &x) const
 }
 
 #endif
-
-namespace detail
-{
-
-namespace
-{
-
-// NOTE: the cleanup machinery relies on a correct implementation
-// of the thread_local keyword. If that is not available, we'll
-// just skip the cleanup step altogether, which may result
-// in "memory leaks" being reported by sanitizers and valgrind.
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-
-#if MPFR_VERSION_MAJOR < 4
-
-// A cleanup functor that will call mpfr_free_cache()
-// on destruction.
-struct mpfr_cleanup {
-    // NOTE: marking the ctor constexpr ensures that the initialisation
-    // of objects of this class with static storage duration is sequenced
-    // before the dynamic initialisation of objects with static storage
-    // duration:
-    // https://en.cppreference.com/w/cpp/language/constant_initialization
-    // This essentially means that we are sure that mpfr_free_cache()
-    // will be called after the destruction of any static real object
-    // (because real doesn't have a constexpr constructor and thus
-    // static reals are destroyed before static objects of this class).
-    constexpr mpfr_cleanup() {}
-    ~mpfr_cleanup()
-    {
-#if !defined(NDEBUG)
-        // NOTE: Access to cout from concurrent threads is safe as long as the
-        // cout object is synchronized to the underlying C stream:
-        // https://stackoverflow.com/questions/6374264/is-cout-synchronized-thread-safe
-        // http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio
-        // By default, this is the case, but in theory someone might have changed
-        // the sync setting on cout by the time we execute the following line.
-        // However, we print only in debug mode, so it should not be too much of a problem
-        // in practice.
-        std::cout << "Cleaning up MPFR caches." << std::endl;
-#endif
-        ::mpfr_free_cache();
-    }
-};
-
-// Instantiate a cleanup object for each thread.
-MPPP_CONSTINIT thread_local const mpfr_cleanup mpfr_cleanup_inst;
-
-#else
-
-// NOTE: in MPFR >= 4, there are both local caches and thread-specific caches.
-// Thus, we use two cleanup functors, one thread local and one global.
-
-struct mpfr_tl_cleanup {
-    constexpr mpfr_tl_cleanup() {}
-    ~mpfr_tl_cleanup()
-    {
-#if !defined(NDEBUG)
-        std::cout << "Cleaning up thread local MPFR caches." << std::endl;
-#endif
-        ::mpfr_free_cache2(MPFR_FREE_LOCAL_CACHE);
-    }
-};
-
-struct mpfr_global_cleanup {
-    constexpr mpfr_global_cleanup() {}
-    ~mpfr_global_cleanup()
-    {
-#if !defined(NDEBUG)
-        std::cout << "Cleaning up global MPFR caches." << std::endl;
-#endif
-        ::mpfr_free_cache2(MPFR_FREE_GLOBAL_CACHE);
-    }
-};
-
-MPPP_CONSTINIT thread_local const mpfr_tl_cleanup mpfr_tl_cleanup_inst;
-// NOTE: because the destruction of thread-local objects
-// always happens before the destruction of objects with
-// static storage duration, the global cleanup will always
-// be performed after thread-local cleanup.
-MPPP_CONSTINIT const mpfr_global_cleanup mpfr_global_cleanup_inst;
-
-#endif
-
-#endif
-
-} // namespace
-
-} // namespace detail
-
-// Destructor.
-real::~real()
-{
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-#if MPFR_VERSION_MAJOR < 4
-    // NOTE: make sure we "use" the cleanup instantiation functor,
-    // so that the compiler is forced to invoke its constructor.
-    // This ensures that, as long as at least one real is created, the mpfr_free_cache()
-    // function is called on shutdown.
-    detail::ignore(&detail::mpfr_cleanup_inst);
-#else
-    detail::ignore(&detail::mpfr_tl_cleanup_inst);
-    detail::ignore(&detail::mpfr_global_cleanup_inst);
-#endif
-#if defined(MPPP_WITH_ARB)
-    detail::ignore(&detail::flint_cleanup_inst);
-#endif
-#endif
-    if (m_mpfr._mpfr_d) {
-        // The object is not moved-from, destroy it.
-        assert(detail::real_prec_check(get_prec()));
-        ::mpfr_clear(&m_mpfr);
-    }
-}
 
 // Wrapper to apply the input unary MPFR function to this with
 // MPFR_RNDN rounding mode. Returns a reference to this.

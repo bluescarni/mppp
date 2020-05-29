@@ -75,6 +75,9 @@ The real class
    :cpp:func:`mppp::real::get_mpfr_t()` and :cpp:func:`mppp::real::_get_mpfr_t()`), so that
    it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
 
+   A :ref:`tutorial <tutorial_real>` showcasing various features of :cpp:class:`~mppp::real`
+   is available.
+
    .. cpp:function:: real()
 
       Default constructor.
@@ -190,6 +193,27 @@ The real class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
+   .. cpp:function:: template <cpp_complex T> explicit real(const T &c)
+   .. cpp:function:: template <cpp_complex T> explicit real(const T &c, mpfr_prec_t p)
+
+      .. versionadded:: 0.20
+
+      Constructors from complex C++ types.
+
+      These constructors will set ``this`` to the real part of *c*. If the imaginary part
+      of *c* is not zero, an error will be raised.
+
+      The precision of ``this`` will be set exactly to *p*, if provided. Otherwise, the precision
+      will be set following the same heuristics explained in the generic constructor for the
+      real-valued floating-point type underlying ``T``.
+
+      :param c: the construction argument.
+      :param p: the desired precision.
+
+      :exception std\:\:domain_error: if the imaginary part of *c* is not zero.
+      :exception std\:\:invalid_argument: if *p* is outside the range established by
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+
    .. cpp:function:: template <string_type T> explicit real(const T &s, int base, mpfr_prec_t p)
    .. cpp:function:: template <string_type T> explicit real(const T &s, mpfr_prec_t p)
 
@@ -283,6 +307,8 @@ The real class
 
       Destructor.
 
+      The destructor will run sanity checks in debug mode.
+
    .. cpp:function:: real &operator=(const real &other)
    .. cpp:function:: real &operator=(real &&other) noexcept
 
@@ -306,18 +332,36 @@ The real class
       :exception std\:\:overflow_error: if an overflow occurs in the computation of
         the automatically-deduced precision.
 
-   .. cpp:function:: real &operator=(const complex128 &x)
-
-      .. note::
-
-         This operator is available only if mp++ was configured with the
-         ``MPPP_WITH_QUADMATH`` option enabled.
+   .. cpp:function:: template <cpp_complex T> real &operator=(const T &c)
 
       .. versionadded:: 0.20
 
-      Assignment operator from :cpp:class:`~mppp::complex128`.
+      Assignment from complex C++ types.
 
-      This operator is formally equivalent to converting *x* to
+      This operator will first attempt to convert *c* to :cpp:class:`~mppp::real`,
+      and it will then assign the result of the conversion to ``this``.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the conversion of *c*
+        to :cpp:class:`~mppp::real`.
+
+   .. cpp:function:: real &operator=(const complex128 &x)
+   .. cpp:function:: real &operator=(const complex &x)
+
+      .. note::
+
+         The :cpp:class:`~mppp::complex128` overload is available only if mp++ was configured with the
+         ``MPPP_WITH_QUADMATH`` option enabled. The :cpp:class:`~mppp::complex` overload
+         is available only if mp++ was configured with the ``MPPP_WITH_MPC`` option enabled.
+
+      .. versionadded:: 0.20
+
+      Assignment operators from other mp++ classes.
+
+      These operators are formally equivalent to converting *x* to
       :cpp:class:`~mppp::real` and then move-assigning the result
       to ``this``.
 
@@ -416,6 +460,25 @@ The real class
       :param x: the value to which ``this`` will be set.
 
       :return: a reference to ``this``.
+
+   .. cpp:function:: template <cpp_complex T> real &set(const T &c)
+
+      .. versionadded:: 0.20
+
+      Setter to complex C++ types.
+
+      This member function will set ``this`` to the value of *c*. Contrary to the generic assignment operator,
+      the precision of the assignment is dictated by the precision of ``this``, rather than
+      being deduced from the type and value of *c*. Consequently, the precision of ``this`` will not be altered
+      by the assignment, and a rounding might occur, depending on the operands.
+
+      If the imaginary part of *c* is not zero, an error will be raised.
+
+      :param c: the value to which ``this`` will be set.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:domain_error: if the imaginary part of *c* is not zero.
 
    .. cpp:function:: template <string_type T> real &set(const T &s, int base = 10)
 
@@ -630,6 +693,17 @@ The real class
       :exception std\:\:domain_error: if ``this`` is not finite and the target type cannot represent non-finite numbers.
       :exception std\:\:overflow_error: if the conversion results in overflow.
 
+   .. cpp:function:: template <cpp_complex T> explicit operator T() const
+
+      .. versionadded:: 0.20
+
+      Conversion to complex C++ types.
+
+      The real part of the return value is constructed by converting ``this`` to the value type
+      of ``T``. The imaginary part of the return value is set to zero.
+
+      :return: ``this`` converted to ``T``.
+
    .. cpp:function:: template <real_interoperable T> bool get(T &rop) const
 
       Generic conversion function.
@@ -644,6 +718,18 @@ The real class
 
       :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
         specified in the documentation of the conversion operator.
+
+   .. cpp:function:: template <cpp_complex T> bool get(T &rop) const
+
+      .. versionadded:: 0.20
+
+      Conversion function to complex C++ types.
+
+      The conversion is always successful.
+
+      :param rop: the variable which will store the result of the conversion.
+
+      :return: ``true``.
 
    .. cpp:function:: std::string to_string(int base = 10) const
 
@@ -1000,6 +1086,17 @@ Concepts
    ``T`` and ``U`` satisfy :cpp:concept:`~mppp::real_op_types` and ``T``, after the removal
    of reference, is not const.
 
+.. cpp:concept:: template <typename T, typename U> mppp::real_eq_op_types
+
+   .. versionadded:: 0.20
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary equality and inequality operators
+   involving :cpp:class:`~mppp::real` and other types. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::real_op_types`, or
+   * one type is :cpp:class:`~mppp::real` and the other is a :cpp:concept:`~mppp::cpp_complex` type.
+
 .. _real_functions:
 
 Functions
@@ -1136,6 +1233,19 @@ Conversion
 
    :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
       specified in the documentation of the conversion operator for :cpp:class:`~mppp::real`.
+
+.. cpp:function:: template <mppp::cpp_complex T> bool mppp::get(T &rop, const mppp::real &x)
+
+   .. versionadded:: 0.20
+
+   Conversion to complex C++ types.
+
+   The conversion is always successful.
+
+   :param rop: the variable which will store the result of the conversion.
+   :param x: the input argument.
+
+   :return: ``true``.
 
 .. cpp:function:: template <std::size_t SSize> mpfr_exp_t mppp::get_z_2exp(mppp::integer<SSize> &n, const mppp::real &r)
 
@@ -2628,8 +2738,8 @@ Mathematical operators
 
    :return: a copy of *x* before the increment/decrement.
 
-.. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator==(const T &a, const U &b)
-.. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator!=(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::real_eq_op_types<T> U> bool mppp::operator==(const T &a, const U &b)
+.. cpp:function:: template <typename T, mppp::real_eq_op_types<T> U> bool mppp::operator!=(const T &a, const U &b)
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator<(const T &a, const U &b)
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator<=(const T &a, const U &b)
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> bool mppp::operator>(const T &a, const U &b)

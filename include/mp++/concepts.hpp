@@ -96,8 +96,8 @@ namespace detail
 
 // NOTE: remove_pointer_t removes the top level qualifiers of the pointer as well:
 // http://en.cppreference.com/w/cpp/types/remove_pointer
-// After removal of pointer, we could still have a type which is cv-qualified. Thus,
-// we remove cv-qualifications after pointer removal.
+// After removal of pointer, we could still have a type which is cv qualified. Thus,
+// we remove cv qualifications after pointer removal.
 template <typename T>
 using is_char_pointer = conjunction<std::is_pointer<T>, std::is_same<remove_cv_t<remove_pointer_t<T>>, char>>;
 

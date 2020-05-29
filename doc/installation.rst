@@ -24,9 +24,11 @@ mp++ has the following dependencies:
   of the :cpp:class:`~mppp::real` class and for providing support
   for the ``long double`` type in :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
   (MPFR 3 or a later version is required);
+* the `GNU MPC <http://www.multiprecision.org/mpc/>`__ multiprecision complex library, *optional*, used in the implementation
+  of the :cpp:class:`~mppp::complex` class;
 * the `Arb <http://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
   used in the implementation of additional special functions for the
-  :cpp:class:`~mppp::real` class;
+  :cpp:class:`~mppp::real` and :cpp:class:`~mppp::complex` classes;
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
   in the implementation of the :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128` classes
   (typically, the quadmath library is part of GCC and it does not need to
@@ -54,6 +56,9 @@ path, etc.). The available configuration options are:
 
 * ``MPPP_WITH_MPFR``: enable features relying on the GNU
   MPFR library (off by default),
+* ``MPPP_WITH_MPC``: enable features relying on the GNU
+  MPC library (off by default, requires the ``MPPP_WITH_MPFR``
+  option to be active),
 * ``MPPP_WITH_ARB``: enable features relying on the Arb library
   (off by default, requires the ``MPPP_WITH_MPFR`` option to be active),
 * ``MPPP_WITH_QUADMATH``: enable features relying on the
@@ -82,7 +87,7 @@ path, etc.). The available configuration options are:
 
 .. versionadded:: 0.20
 
-   The ``MPPP_ENABLE_IPO`` build option.
+   The ``MPPP_WITH_MPC`` and ``MPPP_ENABLE_IPO`` build options.
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions), Clang
@@ -203,7 +208,7 @@ system you can compile this example with the following command:
 
 Because parts of mp++ are implemented using templates,
 users of the library will have to explicitly link to GMP
-and (if enabled) MPFR. Explicit linking to the other optional
+and (if enabled) MPFR and MPC. Explicit linking to the other optional
 dependencies is not necessary, as their use is confined within
 the mp++ compiled library.
 

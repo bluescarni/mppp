@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <complex>
 #include <limits>
 #include <stdexcept>
 #include <utility>
@@ -1740,6 +1741,22 @@ TEST_CASE("real eqineq")
     REQUIRE(pow(2_r128, 65) != (__int128_t{1} << 65) + 1);
     REQUIRE((__int128_t{1} << 65) + 1 != pow(2_r128, 65));
 #endif
+
+    // With std::complex.
+    REQUIRE(real{42} == std::complex<double>{42, 0});
+    REQUIRE(std::complex<double>{42, 0} == real{42});
+    REQUIRE(!(real{42} != std::complex<double>{42, 0}));
+    REQUIRE(!(std::complex<double>{42, 0} != real{42}));
+
+    REQUIRE(real{42} != std::complex<double>{43, 0});
+    REQUIRE(std::complex<double>{43, 0} != real{42});
+    REQUIRE(!(real{42} == std::complex<double>{43, 0}));
+    REQUIRE(!(std::complex<double>{43, 0} == real{42}));
+
+    REQUIRE(real{42} != std::complex<double>{43, 1});
+    REQUIRE(std::complex<double>{43, -1} != real{42});
+    REQUIRE(!(real{42} == std::complex<double>{43, 2}));
+    REQUIRE(!(std::complex<double>{43, -3} == real{42}));
 }
 
 TEST_CASE("real lt")

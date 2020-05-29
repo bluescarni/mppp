@@ -18,4 +18,5 @@ Before perusing the C++ reference, users are encouraged to first go through the 
    real128.rst
    complex128.rst
    real.rst
+   complex.rst
    utilities.rst

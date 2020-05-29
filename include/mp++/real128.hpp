@@ -469,6 +469,9 @@ public:
     real128 &operator=(const real &);
 #endif
     MPPP_CONSTEXPR_14 real128 &operator=(const complex128 &);
+#if defined(MPPP_WITH_MPC)
+    real128 &operator=(const complex &);
+#endif
 
     // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)

@@ -54,6 +54,28 @@ function(ADD_MPPP_BENCHMARK arg1)
   add_custom_command(TARGET benchmark POST_BUILD COMMAND "${arg1}" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
 
+# NOTE: the malloc tracking feature requires glibc.
+# Heuristically, let's enable it only Unix systems
+# which are not OSX. Even on systems which are Unix
+# but don't use glibc, the library should do no harm
+# as long as the platform has sane rpath handling.
+# NOTE: see also the explanation here:
+# https://stackoverflow.com/questions/17803456/an-alternative-for-the-deprecated-malloc-hook-functionality-of-glibc
+if(NOT WIN32 AND UNIX AND NOT APPLE)
+  add_library(track_malloc SHARED track_malloc.cpp)
+  set_target_properties(track_malloc PROPERTIES CXX_VISIBILITY_PRESET hidden)
+  set_target_properties(track_malloc PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
+  target_compile_options(track_malloc PRIVATE
+      "$<$<CONFIG:Debug>:${MPPP_CXX_FLAGS_DEBUG}>"
+      "$<$<CONFIG:Release>:${MPPP_CXX_FLAGS_RELEASE}>"
+      "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
+      "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
+  )
+  set_property(TARGET track_malloc PROPERTY CXX_STANDARD 11)
+  set_property(TARGET track_malloc PROPERTY CXX_STANDARD_REQUIRED YES)
+  set_property(TARGET track_malloc PROPERTY CXX_EXTENSIONS NO)
+endif()
+
 ADD_MPPP_BENCHMARK(integer1_dot_product_unsigned)
 ADD_MPPP_BENCHMARK(integer2_dot_product_unsigned)
 ADD_MPPP_BENCHMARK(integer1_dot_product_signed)
@@ -82,4 +104,7 @@ ADD_MPPP_BENCHMARK(integer2_uint_conversion)
 
 if(MPPP_WITH_MPFR)
   ADD_MPPP_BENCHMARK(real_alloc)
+  if(NOT WIN32 AND UNIX AND NOT APPLE)
+    target_link_libraries(real_alloc PRIVATE track_malloc)
+  endif()
 endif()

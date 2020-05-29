@@ -29,8 +29,9 @@ option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effe
 mark_as_advanced(MPPP_BENCHMARK_BOOST)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_FLINT)
-option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
+option(MPPP_WITH_MPFR "Enable features relying on MPFR." OFF)
 option(MPPP_WITH_ARB "Enable features relying on Arb." OFF)
+option(MPPP_WITH_MPC "Enable features relying on MPC." OFF)
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
@@ -44,6 +45,10 @@ mark_as_advanced(MPPP_ENABLE_IPO)
 
 if(MPPP_WITH_ARB AND NOT MPPP_WITH_MPFR)
     message(FATAL_ERROR "Arb support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
+endif()
+
+if(MPPP_WITH_MPC AND NOT MPPP_WITH_MPFR)
+    message(FATAL_ERROR "MPC support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
 endif()
 
 if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY)
@@ -221,6 +226,13 @@ endif()
 if(MPPP_WITH_MPFR)
     set(MPPP_SRC_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/real.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/mpfr_arb_cleanup.cpp"
+        "${MPPP_SRC_FILES}")
+endif()
+
+if(MPPP_WITH_MPC)
+    set(MPPP_SRC_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/complex.cpp"
         "${MPPP_SRC_FILES}")
 endif()
 
@@ -233,6 +245,7 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/mp++.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/rational.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/real.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/complex.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/real128.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/complex128.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/type_name.hpp"
@@ -243,6 +256,7 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/real_literals.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/real128_literal.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpfr.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpc.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/type_traits.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/visibility.hpp"
@@ -313,6 +327,13 @@ endif()
 # on some platforms (see the comment below).
 find_package(mp++_GMP REQUIRED)
 
+# Optional dependency on MPC.
+if(MPPP_WITH_MPC)
+    find_package(mp++_MPC REQUIRED)
+    target_link_libraries(mp++ PUBLIC mp++::MPC)
+    set(MPPP_ENABLE_MPC "#define MPPP_WITH_MPC")
+endif()
+
 # Optional dependency on MPFR.
 if(MPPP_WITH_MPFR)
     find_package(mp++_MPFR REQUIRED)
@@ -369,11 +390,15 @@ set(_MPPP_CONFIG_OPTIONAL_DEPS)
 if(MPPP_WITH_MPFR)
     set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(mp++_MPFR REQUIRED)\n")
 endif()
+if(MPPP_WITH_MPC)
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(mp++_MPC REQUIRED)\n")
+endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findmp++_GMP.cmake"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findmp++_MPFR.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Findmp++_MPC.cmake"
     DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 # Take care of versioning.

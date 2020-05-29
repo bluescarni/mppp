@@ -52,6 +52,14 @@ PYBIND11_MODULE(pybind11_test_01, m)
 #endif
     });
 
+    m.def("has_mpc", []() {
+#if defined(MPPP_WITH_MPC)
+        return true;
+#else
+        return false;
+#endif
+    });
+
     m.def("test_int1_conversion", [](const mppp::integer<1> &n) { return n; });
     m.def("test_int2_conversion", [](const mppp::integer<2> &n) { return n; });
 
@@ -61,6 +69,13 @@ PYBIND11_MODULE(pybind11_test_01, m)
 #if defined(MPPP_WITH_MPFR)
     m.def("test_real_conversion", [](const mppp::real &r) { return r; });
     m.def("test_real_conversion", [](const mppp::real &r, ::mpfr_prec_t prec) { return mppp::real{r, prec}; });
+#endif
+
+#if defined(MPPP_WITH_MPC)
+    m.def("test_complex_conversion", [](const mppp::complex &c) { return c; });
+    m.def("test_complex_conversion", [](const mppp::complex &c, ::mpfr_prec_t prec) {
+        return mppp::complex{c, mppp::complex_prec_t(prec)};
+    });
 #endif
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -77,6 +92,9 @@ PYBIND11_MODULE(pybind11_test_01, m)
 #if defined(MPPP_WITH_MPFR)
     m.def("test_overload", [](const mppp::real &r) { return r; });
 #endif
+#if defined(MPPP_WITH_MPC)
+    m.def("test_overload", [](const mppp::complex &c) { return c; });
+#endif
 
     m.def("test_vector_conversion", test_vector<mppp::integer<1>>);
     m.def("test_vector_conversion", test_vector<mppp::integer<2>>);
@@ -89,6 +107,9 @@ PYBIND11_MODULE(pybind11_test_01, m)
 #if defined(MPPP_WITH_MPFR)
     m.def("test_vector_conversion", test_vector<mppp::real>);
 #endif
+#if defined(MPPP_WITH_MPC)
+    m.def("test_vector_conversion", test_vector<mppp::complex>);
+#endif
 
     m.def("test_unordered_map_conversion", test_unordered_map<mppp::integer<1>>);
     m.def("test_unordered_map_conversion", test_unordered_map<mppp::integer<2>>);
@@ -100,6 +121,9 @@ PYBIND11_MODULE(pybind11_test_01, m)
 #endif
 #if defined(MPPP_WITH_MPFR)
     m.def("test_unordered_map_conversion", test_unordered_map<mppp::real>);
+#endif
+#if defined(MPPP_WITH_MPC)
+    m.def("test_unordered_map_conversion", test_unordered_map<mppp::complex>);
 #endif
 
     m.def("test_zero_division_error", []() { return mppp::integer<1>{1} / 0; });
