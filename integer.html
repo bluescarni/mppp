@@ -97,6 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="complex128.html">Quadruple-precision complex numbers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex.html">Multiprecision complex numbers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
 </li>
@@ -499,12 +500,19 @@ the real part of <em>c</em> is not finite.</dd>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7integeraSERK10complex128">
 <span id="_CPPv3N4mppp7integeraSERK10complex128"></span><span id="_CPPv2N4mppp7integeraSERK10complex128"></span><span id="mppp::integer::assign-operator__complex128CR"></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128">complex128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integeraSERK10complex128" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7integeraSERK7complex">
+<span id="_CPPv3N4mppp7integeraSERK7complex"></span><span id="_CPPv2N4mppp7integeraSERK7complex"></span><span id="mppp::integer::assign-operator__complexCR"></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integeraSERK7complex" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a>
 overloads are available only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code>
 option enabled. The <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> overload
-is available only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled.</p>
+is available only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled.
+The <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> overload
+is available only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPC</span></code> option enabled.</p>
 </div>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.20.</span></p>

@@ -25,7 +25,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Tutorial" href="tutorial.html" />
-    <link rel="prev" title="Welcome to mp++’s documentation!" href="index.html" />
+    <link rel="prev" title="mp++" href="index.html" />
   
    
 
@@ -40,7 +40,7 @@
           <a href="tutorial.html" title="Tutorial"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to mp++’s documentation!"
+          <a href="index.html" title="mp++"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li> 
       </ul>
@@ -133,9 +133,11 @@ the <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP c
 of the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class and for providing support
 for the <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> type in <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
 (MPFR 3 or a later version is required);</li>
+<li>the <a class="reference external" href="http://www.multiprecision.org/mpc/">GNU MPC</a> multiprecision complex library, <em>optional</em>, used in the implementation
+of the <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> class;</li>
 <li>the <a class="reference external" href="http://arblib.org/">Arb</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>,
 used in the implementation of additional special functions for the
-<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class;</li>
+<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> classes;</li>
 <li>the <a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/">quadmath library</a> from GCC, <em>optional</em>, used
 in the implementation of the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> classes
 (typically, the quadmath library is part of GCC and it does not need to
@@ -165,6 +167,9 @@ path, etc.). The available configuration options are:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code>: enable features relying on the GNU
 MPFR library (off by default),</li>
+<li><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPC</span></code>: enable features relying on the GNU
+MPC library (off by default, requires the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code>
+option to be active),</li>
 <li><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code>: enable features relying on the Arb library
 (off by default, requires the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option to be active),</li>
 <li><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code>: enable features relying on the
@@ -189,7 +194,7 @@ off by default).</li>
 <p><span class="versionmodified added">New in version 0.19: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> build option.</p>
 </div>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 0.20: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_ENABLE_IPO</span></code> build option.</p>
+<p><span class="versionmodified added">New in version 0.20: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPC</span></code> and <code class="docutils literal notranslate"><span class="pre">MPPP_ENABLE_IPO</span></code> build options.</p>
 </div>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only
 using GCC (all the supported versions), Clang
@@ -287,7 +292,7 @@ system you can compile this example with the following command:</p>
 </div>
 <p>Because parts of mp++ are implemented using templates,
 users of the library will have to explicitly link to GMP
-and (if enabled) MPFR. Explicit linking to the other optional
+and (if enabled) MPFR and MPC. Explicit linking to the other optional
 dependencies is not necessary, as their use is confined within
 the mp++ compiled library.</p>
 <p>If you are using CMake, it is highly recommended to make use of the config-file
@@ -420,7 +425,7 @@ test case from the mp++ test suite failing on FreeBSD <a class="footnote-referen
   <div class="footer-relations">
     
       <div class="pull-left">
-        <a class="btn btn-default" href="index.html" title="previous chapter (use the left arrow)">Welcome to mp++’s documentation!</a>
+        <a class="btn btn-default" href="index.html" title="previous chapter (use the left arrow)">mp++</a>
       </div>
     
       <div class="pull-right">
@@ -442,7 +447,7 @@ test case from the mp++ test suite failing on FreeBSD <a class="footnote-referen
           <a href="tutorial.html" title="Tutorial"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to mp++’s documentation!"
+          <a href="index.html" title="mp++"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li> 
       </ul>

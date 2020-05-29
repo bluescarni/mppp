@@ -55,6 +55,9 @@ The complex128 class
    :cpp:class:`~mppp::complex128` are marked as ``constexpr``. Some functions which are not ``constexpr`` in the quadmath
    library have been reimplemented as ``constexpr`` functions via compiler builtins.
 
+   A :ref:`tutorial <tutorial_complex128>` showcasing various features of :cpp:class:`~mppp::complex128`
+   is available.
+
    .. seealso::
       https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
 
@@ -208,6 +211,24 @@ The complex128 class
         This operator is ``constexpr`` only if at least C++14 is being used.
 
       Assignment from complex C++ types.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: complex128 &operator=(const complex &c)
+
+      .. note::
+
+         This operator is available only if mp++ was configured with the ``MPPP_WITH_MPC`` option enabled.
+
+      .. versionadded:: 0.20
+
+      Assignment operator from :cpp:class:`~mppp::complex`.
+
+      This operator is formally equivalent to converting *c* to
+      :cpp:class:`~mppp::complex128` and then move-assigning the result
+      to ``this``.
 
       :param c: the assignment argument.
 

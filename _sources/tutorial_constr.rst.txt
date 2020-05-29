@@ -24,6 +24,17 @@ on curly brackets. Using the same syntax, it is possible to:
 * initialise multiprecision objects from multiprecision objects of a different type,
 * initialise C++ numerical objects from multiprecision objects.
 
+.. note::
+
+   In mp++, most constructors and conversions are ``explicit``! This means that it is not possible
+   to use syntax such as
+
+   .. code-block:: c++
+
+      int_t n = 42;
+
+   or to pass an ``int_t`` to a function which expects an ``int`` parameter.
+
 Let's see a few examples:
 
 .. code-block:: c++

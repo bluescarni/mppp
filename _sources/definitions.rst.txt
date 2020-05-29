@@ -30,6 +30,13 @@ Macros and definitions
    This name is defined if mp++ was configured with support for the MPFR library
    (see the :ref:`installation instructions <installation>`).
 
+.. c:macro:: MPPP_WITH_MPC
+
+   .. versionadded:: 0.20
+
+   This name is defined if mp++ was configured with support for the MPC library
+   (see the :ref:`installation instructions <installation>`).
+
 .. c:macro:: MPPP_WITH_ARB
 
    .. versionadded:: 0.19

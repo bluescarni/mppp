@@ -93,6 +93,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex.html">Multiprecision complex numbers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
 </li>
@@ -178,6 +179,8 @@ leading <code class="docutils literal notranslate"><span class="pre">c</span></c
 <p>The <a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> class is a <a class="reference external" href="https://en.cppreference.com/w/cpp/named_req/LiteralType">literal type</a>, and, whenever possible, operations involving
 <a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> are marked as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code>. Some functions which are not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> in the quadmath
 library have been reimplemented as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> functions via compiler builtins.</p>
+<p>A <a class="reference internal" href="tutorial_complex128.html#tutorial-complex128"><span class="std std-ref">tutorial</span></a> showcasing various features of <a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a>
+is available.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p><a class="reference external" href="https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html">https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html</a></p>
@@ -371,6 +374,26 @@ move assignable.</p>
 <p class="last">This operator is <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
 </div>
 <p>Assignment from complex C++ types.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><strong>c</strong> – the assignment argument.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp10complex128aSERK7complex">
+<span id="_CPPv3N4mppp10complex128aSERK7complex"></span><span id="_CPPv2N4mppp10complex128aSERK7complex"></span><span id="mppp::complex128::assign-operator__complexCR"></span><a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128">complex128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp10complex128aSERK7complex" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This operator is available only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPC</span></code> option enabled.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.20.</span></p>
+</div>
+<p>Assignment operator from <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>.</p>
+<p>This operator is formally equivalent to converting <em>c</em> to
+<a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> and then move-assigning the result
+to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>c</strong> – the assignment argument.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>

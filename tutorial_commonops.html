@@ -73,7 +73,9 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex128.html">Quadruple-precision complex numbers tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex.html">Multiprecision complex numbers tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
 </ul>
 </li>
@@ -239,7 +241,8 @@ that nonzero values convert to <code class="docutils literal notranslate"><span 
 </pre></div>
 </div>
 <p>In addition to the common arithmetic operators, all of mp++’s multiprecision classes support the relational
-operators <span class="math notranslate nohighlight">\(=\)</span>, <span class="math notranslate nohighlight">\(\neq\)</span>, <span class="math notranslate nohighlight">\(&gt;\)</span>, <span class="math notranslate nohighlight">\(\geq\)</span>, <span class="math notranslate nohighlight">\(&lt;\)</span> and <span class="math notranslate nohighlight">\(\leq\)</span>. Any combination
+operators <span class="math notranslate nohighlight">\(=\)</span> and <span class="math notranslate nohighlight">\(\neq\)</span>. Real-valued types also support the comparison operators
+<span class="math notranslate nohighlight">\(&gt;\)</span>, <span class="math notranslate nohighlight">\(\geq\)</span>, <span class="math notranslate nohighlight">\(&lt;\)</span> and <span class="math notranslate nohighlight">\(\leq\)</span>. Any combination
 of multiprecision and numerical C++ types is supported:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
 <span class="n">assert</span><span class="p">(</span><span class="mi">3</span> <span class="o">!=</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">});</span>

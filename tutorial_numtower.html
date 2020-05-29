@@ -73,7 +73,9 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex128.html">Quadruple-precision complex numbers tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex.html">Multiprecision complex numbers tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
 </ul>
 </li>
@@ -138,7 +140,7 @@ a few complications and caveats, the general rule in C++ is that integral types 
 a lower rank than floating-point types, and that, within the integral and floating-point
 types, a higher range or bit width translates to a higher rank. The underlying
 idea is that automatic type coercion should not change the value of an operand <a class="footnote-reference" href="#f1" id="id1">[1]</a>.</p>
-<p>mp++ extends C++’s type hierarchy in a (hopefully) natural way:</p>
+<p>For real-valued types, mp++ extends C++’s type hierarchy in a (hopefully) natural way:</p>
 <ul class="simple">
 <li><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> has a rank higher than any integral C++ type, but lower
 than any floating-point C++ type;</li>
@@ -147,7 +149,8 @@ than any floating-point C++ type;</li>
 <li><a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> has a rank higher than any floating-point C++ type;</li>
 <li><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> has a rank higher than <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</li>
 </ul>
-<p>In other words, mp++’s type hierarchy (or <em>numerical tower</em>) from the lowest rank to the highest is the following:</p>
+<p>In other words, mp++’s real-valued type hierarchy (or <em>numerical tower</em>)
+from the lowest rank to the highest is the following:</p>
 <ul class="simple">
 <li>integral C++ types,</li>
 <li><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>,</li>
@@ -162,9 +165,29 @@ by <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8
 that <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>’s precision is set at runtime, and it is thus possible to create <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 objects with a precision lower than <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> or any of the floating-point C++ types. Regardless,
 when it comes to type coercion, <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is always assigned a rank higher than any other type.</p>
-<p>mp++’s type coercion rules extend beyond arithmetic operators. The exponentiation functions <code class="docutils literal notranslate"><span class="pre">pow()</span></code>, for instance,
-also use the type hierarchy to determine the type of the result. Type coercion is also applied in the comparison operators,
-where arguments of different types are promoted to the common type before actually carrying out the comparison.</p>
+<p>For complex-valued types, the type hierarchy is easily extended. In a binary operation involving
+two different complex-valued types, the real-valued coercion rules can be directly applied:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">complex</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">c1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span> <span class="c1">// The complex counterpart of double.</span>
+<span class="n">complex128</span> <span class="n">c2</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>           <span class="c1">// The complex counterpart of real128.</span>
+
+<span class="k">auto</span> <span class="n">res</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">+</span> <span class="n">c2</span><span class="p">;</span>            <span class="c1">// &#39;res&#39; will be complex128, because</span>
+                               <span class="c1">// in the type hierarchy real128 &gt; double.</span>
+</pre></div>
+</div>
+<p>If one of the operands is complex-valued and the other one is real-valued, then
+first the real-valued type is formally promoted to its complex counterpart, and
+then the real-valued coercion rules can be applied again:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">complex</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
+<span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span>
+
+<span class="k">auto</span> <span class="n">res</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="n">r</span><span class="p">;</span> <span class="c1">// &#39;res&#39; will be complex128: r is first</span>
+                  <span class="c1">// promoted to its complex counterpart,</span>
+                  <span class="c1">// complex128, and the rules from the</span>
+                  <span class="c1">// previous example are then applied.</span>
+</pre></div>
+</div>
+<p>mp++’s type coercion rules extend beyond arithmetic operators (e.g., they also apply to binary
+special functions).</p>
 <p class="rubric">Footnotes</p>
 <table class="docutils footnote" frame="void" id="f1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>

@@ -144,7 +144,8 @@ that nonzero values convert to ``true`` and zero values convert to ``false``:
    }
 
 In addition to the common arithmetic operators, all of mp++'s multiprecision classes support the relational
-operators :math:`=`, :math:`\neq`, :math:`>`, :math:`\geq`, :math:`<` and :math:`\leq`. Any combination
+operators :math:`=` and :math:`\neq`. Real-valued types also support the comparison operators
+:math:`>`, :math:`\geq`, :math:`<` and :math:`\leq`. Any combination
 of multiprecision and numerical C++ types is supported:
 
 .. code-block:: c++

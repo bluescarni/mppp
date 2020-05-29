@@ -207,11 +207,13 @@ The real128 class
 
    .. cpp:function:: real128 &operator=(const real &x)
    .. cpp:function:: constexpr real128 &operator=(const complex128 &x)
+   .. cpp:function:: real128 &operator=(const complex &x)
 
       .. note::
 
          The :cpp:class:`~mppp::real` overload is available only if mp++ was configured with the
-         ``MPPP_WITH_MPFR`` option enabled.
+         ``MPPP_WITH_MPFR`` option enabled. The :cpp:class:`~mppp::complex` overload
+         is available only if mp++ was configured with the ``MPPP_WITH_MPC`` option enabled.
 
       .. note::
 

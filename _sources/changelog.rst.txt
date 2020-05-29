@@ -25,6 +25,12 @@ New
   (`#234 <https://github.com/bluescarni/mppp/pull/234>`__).
 - Add support for C++20's ``constinit``
   (`#233 <https://github.com/bluescarni/mppp/pull/233>`__).
+- :cpp:class:`~mppp::real` can now interact with
+  ``std::complex``
+  (`#232 <https://github.com/bluescarni/mppp/pull/232>`__).
+- Add :cpp:class:`~mppp::complex`, a multiprecision
+  complex number class
+  (`#232 <https://github.com/bluescarni/mppp/pull/232>`__).
 - Improve the interoperability between mp++ classes
   via additional assignment operators
   (`#229 <https://github.com/bluescarni/mppp/pull/229>`__).
@@ -421,7 +427,7 @@ New
   C++ integral types, and introduce corresponding :cpp:func:`~mppp::add_si()` and :cpp:func:`~mppp::sub_si()`
   functions for signed C++ integral types (`#131 <https://github.com/bluescarni/mppp/pull/131>`__).
 - Initial version of the rational tutorial (`#130 <https://github.com/bluescarni/mppp/pull/130>`__).
-- The demangler is now aware of cv-qualifiers and references (`#129 <https://github.com/bluescarni/mppp/pull/129>`__).
+- The demangler is now aware of cv qualifiers and references (`#129 <https://github.com/bluescarni/mppp/pull/129>`__).
 
 Changes
 ~~~~~~~

@@ -13,7 +13,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Welcome to mp++’s documentation! &#8212; mp++ 0.20 documentation</title>
+    <title>mp++ &#8212; mp++ 0.20 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -89,21 +89,23 @@
             <ol class="breadcrumb">
               <li><a href="#">Docs</a></li>
               
-              <li>Welcome to mp++’s documentation!</li>
+              <li>mp++</li>
             </ol>
           </div>
           
           <div class="document clearer body">
             
-  <div class="section" id="welcome-to-mp-s-documentation">
-<h1>Welcome to mp++’s documentation!<a class="headerlink" href="#welcome-to-mp-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>mp++ is a C++11/14/17/20 library for multiprecision arithmetic, currently
+  <div class="section" id="mp">
+<h1>mp++<a class="headerlink" href="#mp" title="Permalink to this headline">¶</a></h1>
+<p>mp++ is a C++11/14/17/20 library for multiprecision arithmetic,
 featuring:</p>
 <ul class="simple">
 <li>arbitrary-precision integers,</li>
 <li>arbitrary-precision rationals,</li>
+<li>quadruple-precision floats,</li>
+<li>quadruple-precision complex numbers,</li>
 <li>arbitrary-precision floats,</li>
-<li>quadruple-precision floats.</li>
+<li>arbitrary-precision complex numbers.</li>
 </ul>
 <p>Design goals include:</p>
 <ul class="simple">
@@ -111,7 +113,8 @@ featuring:</p>
 operands,</li>
 <li>easy embeddability in computer algebra systems and
 generic C++ libraries,</li>
-<li>a large collection of arbitrary-precision special functions.</li>
+<li>a large collection of arbitrary-precision special functions,</li>
+<li>an ergonomic API based on modern C++ idioms.</li>
 </ul>
 <p>Design non-goals include:</p>
 <ul class="simple">
@@ -119,20 +122,21 @@ generic C++ libraries,</li>
 try <a class="reference external" href="https://www.boost.org/doc/libs/1_72_0/libs/multiprecision/doc/html/index.html">Boost Multiprecision</a>
 instead).</li>
 </ul>
-<p>Based on well-known libraries such as <a class="reference external" href="https://gmplib.org/">GMP</a>, <a class="reference external" href="https://www.mpfr.org">MPFR</a> and others,
-mp++ was initially conceived as a <a class="reference external" href="https://gmplib.org/">GMP</a> wrapper with a special focus on performance with
+<p>Built on top of the GNU multiprecision stack (<a class="reference external" href="https://gmplib.org/">GMP</a>,
+<a class="reference external" href="https://www.mpfr.org">MPFR</a>, <a class="reference external" href="http://www.multiprecision.org/mpc/">MPC</a>),
+mp++ was initially conceived as a GMP wrapper with special focus on performance with
 small operands. In particular, a small buffer optimisation and custom
 implementations of basic mathematical primitives are instrumental in
 achieving a performance increase, with respect to GMP and other integer
 multiprecision libraries, which can be
 substantial (see the <a class="reference internal" href="benchmarks.html#benchmarks"><span class="std std-ref">benchmarks</span></a> section).</p>
-<p>Eventually, a multiprecision rational class and two multiprecision
-floating-point classes were added, and today a secondary objective
-of mp++ is to provide a modern, consistent and unified C++ interface
-to several lower-level multiprecision libraries.</p>
+<p>Over time, mp++ has accrued many additional features, including
+multiprecision real and complex number types, and an expanding
+library of special functions (built in part on top of the excellent
+<a class="reference external" href="http://arblib.org/">Arb</a> library).</p>
 <p>mp++ is a spinoff of the <a class="reference external" href="https://github.com/bluescarni/piranha">Piranha</a> library, released under the
-<a class="reference external" href="https://www.mozilla.org/en-US/MPL/2.0/FAQ/">MPL2</a> license.</p>
-<p>If you are using mp++ as part of your research, teaching, or other
+<a class="reference external" href="https://www.mozilla.org/en-US/MPL/2.0/FAQ/">MPL2</a> license.
+If you are using mp++ as part of your research, teaching, or other
 activities, we would be grateful if you could star
 the repository and/or cite our work. The DOI of the latest version
 and other citation resources are available
@@ -169,7 +173,9 @@ not yet available in mp++’s stable releases.</p>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex128.html">Quadruple-precision complex numbers tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex.html">Multiprecision complex numbers tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
 </ul>
 </li>
@@ -183,6 +189,7 @@ not yet available in mp++’s stable releases.</p>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="complex128.html">Quadruple-precision complex numbers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex.html">Multiprecision complex numbers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
 </li>

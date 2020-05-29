@@ -334,6 +334,7 @@ The integer class
    .. cpp:function:: integer &operator=(const real128 &x)
    .. cpp:function:: integer &operator=(const real &x)
    .. cpp:function:: integer &operator=(const complex128 &x)
+   .. cpp:function:: integer &operator=(const complex &x)
 
       .. note::
 
@@ -341,6 +342,8 @@ The integer class
          overloads are available only if mp++ was configured with the ``MPPP_WITH_QUADMATH``
          option enabled. The :cpp:class:`~mppp::real` overload
          is available only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled.
+         The :cpp:class:`~mppp::complex` overload
+         is available only if mp++ was configured with the ``MPPP_WITH_MPC`` option enabled.
 
       .. versionadded:: 0.20
 
