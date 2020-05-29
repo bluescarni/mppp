@@ -788,6 +788,9 @@ TEST_CASE("ref getters")
     {
         REQUIRE(*c.real_cref() == 1);
         REQUIRE(*c.imag_cref() == -2);
+
+        REQUIRE(*real_cref(c) == 1);
+        REQUIRE(*imag_cref(c) == -2);
     }
 #endif
     {
@@ -808,8 +811,14 @@ TEST_CASE("ref getters")
 
         REQUIRE(*c.real_ref() == 42);
         REQUIRE(*c.imag_ref() == -43);
+
+        *real_ref(c) = -5;
+        *imag_ref(c) = -6;
+
+        REQUIRE(*real_ref(c) == -5);
+        REQUIRE(*imag_ref(c) == -6);
     }
-    REQUIRE(c == complex{42, -43});
+    REQUIRE(c == complex{-5, -6});
 #endif
 }
 
@@ -1597,5 +1606,66 @@ TEST_CASE("mppp_ass")
         REQUIRE(r == -42);
         REQUIRE_THROWS_AS((r = complex{3, 1}), std::domain_error);
         REQUIRE(r == -42);
+    }
+}
+
+TEST_CASE("get_real_imag")
+{
+    {
+        complex c{1, 2};
+
+        auto p = std::move(c).get_real_imag();
+
+        REQUIRE(!c.is_valid());
+        REQUIRE(p.first == 1);
+        REQUIRE(p.second == 2);
+
+        c = complex{3, 4};
+        REQUIRE(c.is_valid());
+
+        p = std::move(c).get_real_imag();
+
+        REQUIRE(!c.is_valid());
+        REQUIRE(p.first == 3);
+        REQUIRE(p.second == 4);
+
+        c = complex{-5, -6};
+        REQUIRE(c.is_valid());
+
+        p = get_real_imag(std::move(c));
+
+        REQUIRE(!c.is_valid());
+        REQUIRE(p.first == -5);
+        REQUIRE(p.second == -6);
+    }
+    {
+        complex c{1, 2};
+
+        auto p = c.get_real_imag();
+
+        REQUIRE(c.is_valid());
+        REQUIRE(c == complex{1, 2});
+        REQUIRE(p.first == 1);
+        REQUIRE(p.second == 2);
+
+        c = complex{3, 4};
+        REQUIRE(c.is_valid());
+
+        p = c.get_real_imag();
+
+        REQUIRE(c.is_valid());
+        REQUIRE(c == complex{3, 4});
+        REQUIRE(p.first == 3);
+        REQUIRE(p.second == 4);
+
+        c = complex{-5, -6};
+        REQUIRE(c.is_valid());
+
+        p = get_real_imag(c);
+
+        REQUIRE(c.is_valid());
+        REQUIRE(c == complex{-5, -6});
+        REQUIRE(p.first == -5);
+        REQUIRE(p.second == -6);
     }
 }

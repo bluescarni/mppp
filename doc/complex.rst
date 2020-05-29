@@ -573,6 +573,38 @@ The complex class
 
       :exception unspecified: any exception thrown by :cpp:func:`mppp::real::to_string()`.
 
+   .. cpp:function:: std::pair<real, real> get_real_imag() const &
+   .. cpp:function:: std::pair<real, real> get_real_imag() &&
+
+      Copy or move out the real and imaginary parts.
+
+      After the invocation of the second overload, the only valid operations on ``this`` are
+      destruction, copy/move assignment and the invocation of the :cpp:func:`~mppp::complex::is_valid()`
+      member function. After re-assignment, ``this`` can be used normally again.
+
+      :return: a pair containing the real and imaginary parts of ``this``, represented
+        as :cpp:class:`~mppp::real` objects.
+
+   .. cpp:function:: re_cref real_cref() const
+   .. cpp:function:: im_cref imag_cref() const
+   .. cpp:function:: re_ref real_ref()
+   .. cpp:function:: im_ref imag_ref()
+
+      .. note::
+
+        These member functions are available only if at least C++17 is being used.
+
+      These member functions facilitate the creation of ``const`` or mutable reference
+      wrappers to the real and imaginary parts of ``this``.
+
+      See the documentation of :cpp:class:`~mppp::complex::re_cref`,
+      :cpp:class:`~mppp::complex::im_cref`, :cpp:class:`~mppp::complex::re_ref`
+      and :cpp:class:`~mppp::complex::im_ref` for information on how to
+      use these classes.
+
+      :return: a ``const`` or mutable reference wrapper to the real or
+        imaginary part of ``this``.
+
    .. cpp:function:: complex &neg()
    .. cpp:function:: complex &conj()
    .. cpp:function:: complex &proj()
@@ -771,6 +803,244 @@ Concepts
 
 Functions
 ---------
+
+.. _complex_components_access:
+
+Components access
+~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: std::pair<mppp::real, mppp::real> mppp::get_real_imag(const mppp::complex &c)
+.. cpp:function:: std::pair<mppp::real, mppp::real> mppp::get_real_imag(mppp::complex &&c)
+
+   Copy or move out the real and imaginary parts of a :cpp:class:`~mppp::complex`.
+
+   After the invocation of the second overload, the only valid operations on *c* are
+   destruction, copy/move assignment and the invocation of the :cpp:func:`~mppp::complex::is_valid()`
+   member function. After re-assignment, *c* can be used normally again.
+
+   :param c: the input parameter.
+
+   :return: a pair containing the real and imaginary parts of *c*, represented
+      as :cpp:class:`~mppp::real` objects.
+
+.. cpp:class:: mppp::complex::re_cref
+
+   ``const`` reference wrapper for the
+   real part of a :cpp:class:`~mppp::complex`.
+
+   After construction from a :cpp:class:`~mppp::complex`,
+   an instance of this class can be used to perform read-only operations
+   on the real part of the :cpp:class:`~mppp::complex` number
+   via the :cpp:class:`~mppp::real` API.
+
+   Here's a typical usage pattern:
+
+   .. code-block:: c++
+
+      complex c{1, 2};
+
+      {
+         // Place the re_cref object in a new scope
+         // in order to minimise its lifetime.
+         complex::re_cref re{c};
+
+         // We can use 're' as-if it was a pointer
+         // to an mppp::real.
+         std::cout << "The real part of c is " << *re << '\n';
+         std::cout << "Is the real part of c one? " << re->is_one() << '\n';
+      }
+
+   Because :cpp:class:`~mppp::complex::re_cref` shares data
+   with a :cpp:class:`~mppp::complex`, special care should
+   be taken in order to avoid undefined behaviour. In particular:
+
+   * the lifetime of a :cpp:class:`~mppp::complex::re_cref`
+     is tied to the lifetime of the :cpp:class:`~mppp::complex`
+     from which it was constructed. Thus, a
+     :cpp:class:`~mppp::complex::re_cref` must always be destroyed
+     before the destruction of the :cpp:class:`~mppp::complex`
+     from which it was constructed;
+   * during the lifetime of a :cpp:class:`~mppp::complex::re_cref`,
+     only ``const`` operations on the :cpp:class:`~mppp::complex`
+     from which it was constructed are allowed.
+
+   The easiest way to avoid mistakes is to follow these guidelines:
+
+   * create a :cpp:class:`~mppp::complex::re_cref` object in a new scope,
+   * in the new scope, don't perform non-``const`` operations on the
+     :cpp:class:`~mppp::complex` from which the
+     :cpp:class:`~mppp::complex::re_cref` object was created,
+   * exit the new scope as soon as you are finished interacting
+     with the :cpp:class:`~mppp::complex::re_cref` object.
+
+   When using at least C++17, the creation of a :cpp:class:`~mppp::complex::re_cref`
+   can also be accomplished via the :cpp:func:`mppp::complex::real_cref()`
+   and :cpp:func:`mppp::real_cref()` functions (which slightly reduce
+   the amount of typing).
+
+   .. cpp:function:: explicit re_cref(const complex &c)
+
+      Constructor.
+
+      This is the only constructor available for a :cpp:class:`~mppp::complex::re_cref`
+      object. It will create a reference to the real part of *c*.
+
+      :param c: the input :cpp:class:`~mppp::complex`.
+
+   .. cpp:function:: re_cref(const re_cref &) = delete
+   .. cpp:function:: re_cref(re_cref &&) = delete
+   .. cpp:function:: re_cref &operator=(const re_cref &) = delete
+   .. cpp:function:: re_cref &operator=(re_cref &&) = delete
+
+      :cpp:class:`~mppp::complex::re_cref` cannot be copied or moved.
+
+   .. cpp:function:: const real &operator*() const
+   .. cpp:function:: const real *operator->() const
+
+      Dereference and arrow operators.
+
+      These operators allow to interact with a :cpp:class:`~mppp::complex::re_cref`
+      as-if it was a ``const`` pointer to a :cpp:class:`~mppp::real` object.
+
+      :return: a ``const`` reference/pointer to a :cpp:class:`~mppp::real` object.
+
+.. cpp:class:: mppp::complex::im_cref
+
+   ``const`` reference wrapper for the imaginary part of a :cpp:class:`~mppp::complex`.
+
+   The API is identical to :cpp:class:`~mppp::complex::re_cref`.
+
+.. cpp:class:: mppp::complex::re_ref
+
+   Mutable reference wrapper for the real part of a :cpp:class:`~mppp::complex`.
+
+   After construction from a :cpp:class:`~mppp::complex`,
+   an instance of this class can be used to perform non-``const`` operations
+   on the real part of the :cpp:class:`~mppp::complex` number
+   via the :cpp:class:`~mppp::real` API.
+
+   Here's a typical usage pattern:
+
+   .. code-block:: c++
+
+      complex c{1, 2};
+
+      {
+         // Place the re_ref object in a new scope
+         // in order to minimise its lifetime.
+         complex::re_ref re{c};
+
+         // We can use 're' as-if it was a pointer
+         // to an mppp::real.
+         *re += 5;
+      }
+
+      std::cout << "c is now: " << c << '\n'; // Will print '(6.000..., 2.000...)'.
+
+   On construction, :cpp:class:`~mppp::complex::re_ref` takes ownership of the real
+   part of a :cpp:class:`~mppp::complex`. On destruction,
+   :cpp:class:`~mppp::complex::re_ref` will automatically transfer its content back
+   to the real part of the :cpp:class:`~mppp::complex` from
+   which it was constructed. In order to avoid misuses, it is thus
+   important to keep the following in mind:
+
+   * the lifetime of a :cpp:class:`~mppp::complex::re_ref`
+     is tied to the lifetime of the :cpp:class:`~mppp::complex`
+     from which it was constructed. Thus, a
+     :cpp:class:`~mppp::complex::re_ref` must always be destroyed
+     before the destruction of the :cpp:class:`~mppp::complex`
+     from which it was constructed;
+   * during the lifetime of a :cpp:class:`~mppp::complex::re_ref`,
+     neither ``const`` nor mutable operations can be performed
+     on the :cpp:class:`~mppp::complex` from which it was constructed.
+     The **only** exception to this rule is that it is allowed
+     to create an :cpp:class:`~mppp::complex::im_cref` or an
+     :cpp:class:`~mppp::complex::im_ref` to the :cpp:class:`~mppp::complex`
+     (so that it is possible to operate on both the real and imaginary parts
+     of a :cpp:class:`~mppp::complex` at the same time);
+   * it is the user's responsibility to ensure that any modification to the
+     precision of the real part is propagated to the imaginary part
+     of the :cpp:class:`~mppp::complex` (so that the :cpp:class:`~mppp::complex`
+     class invariant dictating that the real and imaginary parts must always
+     have the same precision is preserved).
+
+   The easiest way to avoid mistakes is to follow these guidelines:
+
+   * create a :cpp:class:`~mppp::complex::re_ref` object in a new scope,
+   * in the new scope, never reuse the :cpp:class:`~mppp::complex`
+     from which the :cpp:class:`~mppp::complex::re_ref` object was created.
+     The **only** exception is that you can create an
+     :cpp:class:`~mppp::complex::im_cref` or an
+     :cpp:class:`~mppp::complex::im_ref` to the same :cpp:class:`~mppp::complex`;
+   * ensure that any modification to the precision of the real part is propagated
+     to the imaginary part;
+   * exit the new scope as soon as you are finished interacting
+     with the :cpp:class:`~mppp::complex::re_ref` object.
+
+   When using at least C++17, the creation of a :cpp:class:`~mppp::complex::re_ref`
+   can also be accomplished via the :cpp:func:`mppp::complex::real_ref()`
+   and :cpp:func:`mppp::real_ref()` functions (which slightly reduce
+   the amount of typing).
+
+   .. cpp:function:: explicit re_ref(complex &c)
+
+      Constructor.
+
+      This is the only constructor available for a :cpp:class:`~mppp::complex::re_ref`
+      object. It will take ownership of the real part of a :cpp:class:`~mppp::complex`.
+
+      :param c: the input :cpp:class:`~mppp::complex`.
+
+   .. cpp:function:: re_ref(const re_ref &) = delete
+   .. cpp:function:: re_ref(re_ref &&) = delete
+   .. cpp:function:: re_ref &operator=(const re_ref &) = delete
+   .. cpp:function:: re_ref &operator=(re_ref &&) = delete
+
+      :cpp:class:`~mppp::complex::re_ref` cannot be copied or moved.
+
+   .. cpp:function:: ~re_ref()
+
+      The destructor will transfer the (possibly modified) real part
+      back to the :cpp:class:`~mppp::complex`
+      from which the :cpp:class:`~mppp::complex::re_ref` object was created.
+
+   .. cpp:function:: real &operator*()
+   .. cpp:function:: real *operator->()
+
+      Dereference and arrow operators.
+
+      These operators allow to interact with a :cpp:class:`~mppp::complex::re_ref`
+      as-if it was a pointer to a :cpp:class:`~mppp::real` object.
+
+      :return: a reference/pointer to a :cpp:class:`~mppp::real` object.
+
+.. cpp:class:: mppp::complex::im_ref
+
+   Mutable reference wrapper for the imaginary part of a :cpp:class:`~mppp::complex`.
+
+   The API is identical to :cpp:class:`~mppp::complex::re_ref`.
+
+.. cpp:function:: mppp::complex::re_cref mppp::real_cref(const mppp::complex &c)
+.. cpp:function:: mppp::complex::im_cref mppp::imag_cref(const mppp::complex &c)
+.. cpp:function:: mppp::complex::re_ref mppp::real_ref(mppp::complex &c)
+.. cpp:function:: mppp::complex::im_ref mppp::imag_ref(mppp::complex &c)
+
+   .. note::
+
+      These functions are available only if at least C++17 is being used.
+
+   These functions facilitate the creation of ``const`` or mutable reference
+   wrappers to the real and imaginary parts of *c*.
+
+   See the documentation of :cpp:class:`~mppp::complex::re_cref`,
+   :cpp:class:`~mppp::complex::im_cref`, :cpp:class:`~mppp::complex::re_ref`
+   and :cpp:class:`~mppp::complex::im_ref` for information on how to
+   use these classes.
+
+   :param c: the input parameter.
+
+   :return: a ``const`` or mutable reference wrapper to the real or
+      imaginary part of *c*.
 
 Precision handling
 ~~~~~~~~~~~~~~~~~~

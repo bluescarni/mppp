@@ -226,6 +226,9 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 //   and mpfr_set_z_2exp()?
 // - Do we need real_equal_to() to work also on invalid reals, the way
 //   real_lt/gt() do?
+// - Not sure what the caching situation is currently. I thought I read somewhere
+//   that MPFR 4 now does some caching, but experiments seem to contradict this.
+//   Re-visit eventually.
 
 // Multiprecision floating-point class.
 class MPPP_DLL_PUBLIC real

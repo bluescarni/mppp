@@ -607,23 +607,36 @@ public:
 #if MPPP_CPLUSPLUS >= 201703L
     // Helpers to construct re/im refs.
     // They require C++17.
-    auto real_cref() const
+    re_cref real_cref() const
     {
         return re_cref{*this};
     }
-    auto imag_cref() const
+    im_cref imag_cref() const
     {
         return im_cref{*this};
     }
-    auto real_ref()
+    re_ref real_ref()
     {
         return re_ref{*this};
     }
-    auto imag_ref()
+    im_ref imag_ref()
     {
         return im_ref{*this};
     }
 #endif
+    // Extract copies of the real/imaginary parts.
+    std::pair<real, real> get_real_imag() const &;
+    // Move out the real/imaginary parts.
+    std::pair<real, real> get_real_imag() &&
+    {
+        auto retval = std::make_pair(real{real::shallow_copy_t{}, mpc_realref(&m_mpc)},
+                                     real{real::shallow_copy_t{}, mpc_imagref(&m_mpc)});
+
+        // Mark this as moved-from.
+        m_mpc.re->_mpfr_d = nullptr;
+
+        return retval;
+    }
 
     // Precision getter.
     ::mpfr_prec_t get_prec() const
@@ -935,6 +948,41 @@ inline bool get(T &rop, const complex &c)
 {
     return c.get(rop);
 }
+
+// Access to the real/imaginary parts.
+inline std::pair<real, real> get_real_imag(complex &&c)
+{
+    return std::move(c).get_real_imag();
+}
+
+inline std::pair<real, real> get_real_imag(const complex &c)
+{
+    return c.get_real_imag();
+}
+
+#if MPPP_CPLUSPLUS >= 201703L
+
+inline complex::re_cref real_cref(const complex &c)
+{
+    return c.real_cref();
+}
+
+inline complex::im_cref imag_cref(const complex &c)
+{
+    return c.imag_cref();
+}
+
+inline complex::re_ref real_ref(complex &c)
+{
+    return c.real_ref();
+}
+
+inline complex::im_ref imag_ref(complex &c)
+{
+    return c.imag_ref();
+}
+
+#endif
 
 namespace detail
 {

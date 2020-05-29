@@ -701,4 +701,10 @@ complex128 &complex128::operator=(const complex &c)
 
 #endif
 
+// Extract copies of the real/imaginary parts.
+std::pair<real, real> complex::get_real_imag() const &
+{
+    return std::make_pair(*re_cref{*this}, *im_cref{*this});
+}
+
 } // namespace mppp
