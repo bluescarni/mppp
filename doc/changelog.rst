@@ -25,6 +25,9 @@ New
   (`#234 <https://github.com/bluescarni/mppp/pull/234>`__).
 - Add support for C++20's ``constinit``
   (`#233 <https://github.com/bluescarni/mppp/pull/233>`__).
+- :cpp:class:`~mppp::real` can now interact with
+  ``std::complex``
+  (`#232 <https://github.com/bluescarni/mppp/pull/232>`__).
 - Add :cpp:class:`~mppp::complex`, a multiprecision
   complex number class
   (`#232 <https://github.com/bluescarni/mppp/pull/232>`__).
