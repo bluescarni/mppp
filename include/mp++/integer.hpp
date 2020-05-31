@@ -1227,6 +1227,7 @@ public:
     // Copy constructor.
     integer(const integer &) = default;
     // Move constructor.
+    // NOLINTNEXTLINE(hicpp-noexcept-move, performance-noexcept-move-constructor)
     integer(integer &&other) = default;
     // Constructor from an array of limbs.
     explicit integer(const ::mp_limb_t *p, std::size_t size) : m_int(p, size) {}
@@ -1291,6 +1292,7 @@ public:
     // Copy assignment operator.
     integer &operator=(const integer &) = default;
     // Move assignment operator.
+    // NOLINTNEXTLINE(hicpp-noexcept-move, performance-noexcept-move-constructor)
     integer &operator=(integer &&) = default;
 
 private:
