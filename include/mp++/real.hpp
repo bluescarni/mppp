@@ -834,7 +834,7 @@ private:
 #endif
     }
     template <typename T, detail::enable_if_t<detail::is_rational<T>::value, int> = 0>
-    T dispatch_conversion() const
+    MPPP_NODISCARD T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a rational");
@@ -896,7 +896,7 @@ private:
               detail::enable_if_t<detail::conjunction<detail::negation<std::is_same<bool, T>>, detail::is_integral<T>,
                                                       detail::is_unsigned<T>>::value,
                                   int> = 0>
-    T dispatch_conversion() const
+    MPPP_NODISCARD T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a C++ unsigned integral type");
@@ -909,7 +909,7 @@ private:
     }
     // bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    T dispatch_conversion() const
+    MPPP_NODISCARD T dispatch_conversion() const
     {
         // NOTE: in C/C++ the conversion of NaN to bool gives true:
         // https://stackoverflow.com/questions/9158567/nan-to-bool-conversion-true-or-false

@@ -1630,7 +1630,7 @@ private:
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
     template <typename T, bool Sign, detail::enable_if_t<(detail::nl_constants<T>::digits <= GMP_NUMB_BITS), int> = 0>
-    std::pair<bool, T> convert_to_unsigned() const
+    MPPP_NODISCARD std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
@@ -1649,7 +1649,7 @@ private:
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
     template <typename T, bool Sign, detail::enable_if_t<(detail::nl_constants<T>::digits > GMP_NUMB_BITS), int> = 0>
-    std::pair<bool, T> convert_to_unsigned() const
+    MPPP_NODISCARD std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
@@ -1687,7 +1687,7 @@ private:
     template <typename T, detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>,
                                                                   detail::negation<std::is_same<bool, T>>>::value,
                                               int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1744,7 +1744,7 @@ private:
     }
     // Overload if not all the absolute values of T fit into a limb.
     template <typename T, detail::enable_if_t<!sconv_is_small<T>::value, int> = 0>
-    std::pair<bool, T> convert_to_signed() const
+    MPPP_NODISCARD std::pair<bool, T> convert_to_signed() const
     {
         // Cache for convenience.
         constexpr auto Tmax = detail::make_unsigned(detail::nl_max<T>());

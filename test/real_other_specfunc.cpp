@@ -13,6 +13,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real eint")
@@ -27,6 +28,7 @@ TEST_CASE("real eint")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(abs(eint(r0) - 1.89511781) < 1E-5);
     REQUIRE(abs(eint(std::move(r0)) - 1.89511781) < 1E-5);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -42,6 +44,7 @@ TEST_CASE("real zeta")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(abs(zeta(r0) + 1. / 12) < 1E-5);
     REQUIRE(abs(zeta(std::move(r0)) + 1. / 12) < 1E-5);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -57,6 +60,7 @@ TEST_CASE("real erf")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(abs(erf(r0) - 0.84270079295) < 1E-5);
     REQUIRE(abs(erf(std::move(r0)) - 0.84270079295) < 1E-5);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -72,6 +76,7 @@ TEST_CASE("real erfc")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(abs(erfc(r0) - 0.15729920705) < 1E-5);
     REQUIRE(abs(erfc(std::move(r0)) - 0.15729920705) < 1E-5);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -89,6 +94,7 @@ TEST_CASE("real beta")
     REQUIRE(abs(r0 - gamma(real{4}) * gamma(real{5}) / gamma(real{9})) < 1E-8);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp1 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
     tmp1 = real{4};
@@ -98,6 +104,7 @@ TEST_CASE("real beta")
     REQUIRE(abs(r0 - gamma(real{4}) * gamma(real{5}) / gamma(real{9})) < 1E-8);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp2 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
 
@@ -132,6 +139,7 @@ TEST_CASE("real ai")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(abs(ai(r0) - 0.3550280538878172) < 1E-5);
     REQUIRE(abs(ai(std::move(r0)) - 0.3550280538878172) < 1E-5);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -147,6 +155,7 @@ TEST_CASE("real hypot")
     REQUIRE(abs(r0 - 6.4031242374328485) < 1E-8);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp1 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
     tmp1 = real{4};
@@ -156,6 +165,7 @@ TEST_CASE("real hypot")
     REQUIRE(abs(r0 - 6.4031242374328485) < 1E-8);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp2 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
 
@@ -188,6 +198,7 @@ TEST_CASE("real agm")
     REQUIRE(abs(r0 - 1.1981402945603952) < 1E-6);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp1 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
     tmp1 = real{1};
@@ -197,6 +208,7 @@ TEST_CASE("real agm")
     REQUIRE(abs(r0 - 1.1981402945603952) < 1E-6);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp2 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
 

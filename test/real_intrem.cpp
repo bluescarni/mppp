@@ -8,12 +8,14 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real integer_p")
@@ -66,10 +68,12 @@ TEST_CASE("real trunc")
     // The binary function.
     real tmp{45.67, 50};
     r0.set_prec(4);
+    // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
     auto tmp_ptr = r0.get_mpfr_t()->_mpfr_d;
     trunc(r0, std::move(tmp));
     REQUIRE(r0 == 45);
     REQUIRE(get_prec(r0) == 50);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp.get_mpfr_t()->_mpfr_d == tmp_ptr);
     r0.set_prec(4);
     tmp = real{-49.99, 50};
@@ -82,6 +86,7 @@ TEST_CASE("real trunc")
     r0 = trunc(std::move(tmp));
     REQUIRE(r0 == 45);
     REQUIRE(get_prec(r0) == 50);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp.get_mpfr_t()->_mpfr_d == nullptr);
     tmp = real{45.67, 50};
     r0 = trunc(tmp);
