@@ -64,6 +64,7 @@ void float128_stream(std::ostream &os, const __float128 &x)
 
 __float128 str_to_float128(const char *s)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     char *endptr;
     auto retval = ::strtoflt128(s, &endptr);
     if (mppp_unlikely(endptr == s || *endptr != '\0')) {
@@ -126,7 +127,7 @@ std::string real128::to_string() const
 // Sign bit.
 bool real128::signbit() const
 {
-    return ::signbitq(m_value);
+    return ::signbitq(m_value) != 0;
 }
 
 // In-place square root.

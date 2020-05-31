@@ -121,6 +121,9 @@ struct copy_move_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
+#if MPPP_CPLUSPLUS >= 201402L
+        REQUIRE(std::is_nothrow_move_constructible<integer>::value);
+#endif
         integer n;
         REQUIRE(n.is_static());
         n = 123;

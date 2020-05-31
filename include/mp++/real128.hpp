@@ -414,11 +414,14 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real128(const T &s) : real128(ptag{}, s)
     {
     }
     // Constructor from range of characters.
     explicit real128(const char *, const char *);
+
+    ~real128() = default;
 
     // Trivial copy assignment operator.
     real128 &operator=(const real128 &) = default;
@@ -440,6 +443,7 @@ public:
 #endif
     MPPP_CONSTEXPR_14 real128 &operator=(const T &x)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = real128{x};
     }
 
@@ -461,6 +465,7 @@ public:
             throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part of "
                                     + detail::to_string(c.imag()) + " to a real128");
         }
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = c.real();
     }
     // Declaration of the assignments from
@@ -481,6 +486,7 @@ public:
 #endif
     real128 &operator=(const T &s)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = real128{s};
     }
 
@@ -503,6 +509,7 @@ private:
     bool mppp_conversion(integer<SSize> &rop) const
     {
         // Build the union and assign the value.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         detail::ieee_float128 ief;
         ief.value = m_value;
         if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
@@ -560,6 +567,7 @@ private:
     bool mppp_conversion(rational<SSize> &rop) const
     {
         // Build the union and assign the value.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         detail::ieee_float128 ief;
         ief.value = m_value;
         if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
@@ -690,19 +698,22 @@ public:
     }
 
     // Convert to string.
-    std::string to_string() const;
+    MPPP_NODISCARD std::string to_string() const;
 
     // Get the IEEE representation of the value.
-    std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t> get_ieee() const
+    MPPP_NODISCARD std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t>
+    get_ieee() const
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         detail::ieee_float128 ie;
         ie.value = m_value;
         return std::make_tuple(std::uint_least8_t(ie.i_eee.negative), std::uint_least16_t(ie.i_eee.exponent),
                                std::uint_least64_t(ie.i_eee.mant_high), std::uint_least64_t(ie.i_eee.mant_low));
     }
     // Sign bit.
-    bool signbit() const;
+    MPPP_NODISCARD bool signbit() const;
     // Categorise the floating point value.
+    MPPP_NODISCARD
 #if !defined(__INTEL_COMPILER)
     constexpr
 #endif
@@ -716,6 +727,7 @@ public:
         return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value);
     }
     // Detect NaN.
+    MPPP_NODISCARD
 #if !defined(__INTEL_COMPILER)
     constexpr
 #endif
@@ -725,6 +737,7 @@ public:
         return fpclassify() == FP_NAN;
     }
     // Detect infinity.
+    MPPP_NODISCARD
 #if !defined(__INTEL_COMPILER)
     constexpr
 #endif
@@ -734,6 +747,7 @@ public:
         return fpclassify() == FP_INFINITE;
     }
     // Detect finite value.
+    MPPP_NODISCARD
 #if !defined(__INTEL_COMPILER)
     constexpr
 #endif
@@ -801,6 +815,7 @@ public:
     real128 &erf();
 
     // The internal value.
+    // NOLINTNEXTLINE(modernize-use-default-member-init)
     __float128 m_value;
 };
 
@@ -2000,6 +2015,7 @@ inline std::size_t hash(const real128 &x)
 {
     // NOTE: in order to detect if x is zero/nan, resort to reading directly into the ieee fields.
     // This avoids calling the fpclassify() function, which internally invokes a compiler library function.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     detail::ieee_float128 ief;
     ief.value = x.m_value;
     const auto is_zero = ief.i_eee.exponent == 0u && ief.i_eee.mant_low == 0u && ief.i_eee.mant_high == 0u;
@@ -2014,6 +2030,7 @@ inline std::size_t hash(const real128 &x)
         __float128 value;
         float128_split_t split;
     };
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     float128_split fs;
     fs.value = x.m_value;
     auto retval = fs.split.part1;
@@ -2024,6 +2041,7 @@ inline std::size_t hash(const real128 &x)
     // - +0.0 and -0.0 have a different bit-level representation, but they are mathematically equal
     //   and they are equal according to operator==();
     // - we want to ensure that all NaN values produce the same hash.
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     retval = (retval & static_cast<unsigned long long>(-!is_zero)) | static_cast<unsigned long long>(-is_nan);
     return static_cast<std::size_t>(retval);
 }
@@ -2075,6 +2093,7 @@ constexpr
 template <std::size_t SSize>
 inline integer<SSize> &integer<SSize>::operator=(const real128 &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<integer<SSize>>(x);
 }
 
@@ -2083,6 +2102,7 @@ inline integer<SSize> &integer<SSize>::operator=(const real128 &x)
 template <std::size_t SSize>
 inline rational<SSize> &rational<SSize>::operator=(const real128 &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<rational<SSize>>(x);
 }
 

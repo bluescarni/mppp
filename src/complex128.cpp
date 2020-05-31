@@ -80,6 +80,7 @@ void complex128::construct_from_nts(const char *str)
     }
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex128::complex128(const ptag &, const char *str)
 {
     construct_from_nts(str);
@@ -87,6 +88,7 @@ complex128::complex128(const ptag &, const char *str)
 
 complex128::complex128(const ptag &, const std::string &s) : complex128(s.c_str()) {}
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex128::complex128(const char *begin, const char *end)
 {
     MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -175,6 +177,7 @@ complex128 complex128_pow_impl(const complex128 &x, const complex128 &y)
 // from complex128.
 real &real::operator=(const complex128 &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<real>(x);
 }
 

@@ -100,6 +100,7 @@ static_assert(test_mpfr_struct_t());
 // Minimal RAII struct to hold
 // arb_t types.
 struct arb_raii {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     arb_raii()
     {
         ::arb_init(m_arb);
@@ -118,6 +119,7 @@ struct arb_raii {
 // Minimal RAII struct to hold
 // arf_t types.
 struct arf_raii {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     arf_raii()
     {
         ::arf_init(m_arf);
@@ -265,7 +267,7 @@ void arb_tan_pi(::mpfr_t rop, const ::mpfr_t op)
     // If op is exactly n/2 (with n an odd integer),
     // the Arb function will return nan rather than +-inf.
     // Handle this case specially.
-    if (!::arf_is_int(arb_midref(arb_op.m_arb)) && ::arf_is_int_2exp_si(arb_midref(arb_op.m_arb), -1)) {
+    if (::arf_is_int(arb_midref(arb_op.m_arb)) == 0 && ::arf_is_int_2exp_si(arb_midref(arb_op.m_arb), -1) != 0) {
         MPPP_MAYBE_TLS arf_raii arf_tmp;
 
         // The strategy is to truncate op and then, based
@@ -276,12 +278,12 @@ void arb_tan_pi(::mpfr_t rop, const ::mpfr_t op)
         if (::arf_sgn(arb_midref(arb_op.m_arb)) == 1) {
             // op > 0.
             ::arf_floor(arf_tmp.m_arf, arb_midref(arb_op.m_arb));
-            ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arf_tmp.m_arf, 1) ? 1 : -1);
+            ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arf_tmp.m_arf, 1) != 0 ? 1 : -1);
         } else {
             // op < 0.
             assert(::arf_sgn(arb_midref(arb_op.m_arb)) == -1);
             ::arf_ceil(arf_tmp.m_arf, arb_midref(arb_op.m_arb));
-            ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arf_tmp.m_arf, 1) ? -1 : 1);
+            ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arf_tmp.m_arf, 1) != 0 ? -1 : 1);
         }
     } else {
         MPPP_MAYBE_TLS arb_raii arb_rop;
@@ -302,8 +304,8 @@ void arb_cot_pi(::mpfr_t rop, const ::mpfr_t op)
     // If op is exactly n (with n an integer),
     // the Arb function will return nan rather than +-inf.
     // Handle this case specially.
-    if (::arf_is_int(arb_midref(arb_op.m_arb))) {
-        ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arb_midref(arb_op.m_arb), 1) ? 1 : -1);
+    if (::arf_is_int(arb_midref(arb_op.m_arb)) != 0) {
+        ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arb_midref(arb_op.m_arb), 1) != 0 ? 1 : -1);
     } else {
         ::arb_cot_pi(arb_rop.m_arb, arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
 
@@ -337,7 +339,7 @@ void arb_sinc_pi(::mpfr_t rop, const ::mpfr_t op)
 // positive infinity.
 void arb_hypgeom_bessel_j(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
 {
-    if (::mpfr_number_p(op1) && mpfr_inf_p(op2) && mpfr_sgn(op2) > 0) {
+    if (::mpfr_number_p(op1) != 0 && mpfr_inf_p(op2) != 0 && mpfr_sgn(op2) > 0) {
         // jx(nu, +infty) is zero for every finite nu.
         ::mpfr_set_zero(rop, 1);
     } else {
@@ -354,7 +356,7 @@ void arb_hypgeom_bessel_j(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
 
 void arb_hypgeom_bessel_y(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
 {
-    if (::mpfr_number_p(op1) && mpfr_inf_p(op2) && mpfr_sgn(op2) > 0) {
+    if (::mpfr_number_p(op1) != 0 && mpfr_inf_p(op2) != 0 && mpfr_sgn(op2) > 0) {
         // yx(nu, +infty) is zero for every finite nu.
         ::mpfr_set_zero(rop, 1);
     } else {
@@ -378,6 +380,7 @@ void arb_hypgeom_bessel_y(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
 void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
 {
     // NOTE: we ignore the sign for consistency with lgamma.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     int signp;
     ::mpfr_lgamma(rop, &signp, op, MPFR_RNDN);
 }
@@ -442,6 +445,7 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 
     // Print the string, inserting a decimal point after the first digit.
     bool dot_added = false;
+    // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
     for (auto cptr = str.get(); *cptr != '\0'; ++cptr) {
         os << (*cptr);
         if (!dot_added) {
@@ -478,7 +482,7 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
     integer<1> z_exp{exp};
     --z_exp;
     const auto exp_sgn = z_exp.sgn();
-    if (exp_sgn && !mpfr_zero_p(r)) {
+    if (exp_sgn != 0 && !mpfr_zero_p(r)) {
         // Add the exponent at the end of the string, if both the value and the exponent
         // are nonzero.
         // NOTE: for bases greater than 10 we need '@' for the exponent, rather than 'e' or 'E'.
@@ -496,6 +500,7 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 } // namespace detail
 
 // Default constructor.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real()
 {
     ::mpfr_init2(&m_mpfr, real_prec_min());
@@ -504,6 +509,7 @@ real::real()
 
 // Init a real with precision p, setting its value to nan. No precision
 // checking is performed.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
 {
     assert(ignore_prec);
@@ -516,6 +522,7 @@ real::real(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
 real::real(const real &other) : real(&other.m_mpfr) {}
 
 // Copy constructor with custom precision.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(const real &other, ::mpfr_prec_t p)
 {
     // Init with custom precision, and then set.
@@ -524,6 +531,7 @@ real::real(const real &other, ::mpfr_prec_t p)
 }
 
 // Move constructor with custom precision.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(real &&other, ::mpfr_prec_t p)
 {
     // Check the precision first of all.
@@ -602,6 +610,7 @@ void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
     }
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
 {
     construct_from_c_string(s, base, p);
@@ -617,6 +626,7 @@ real::real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p)
 #endif
 
 // Constructor from range of characters, base and precision.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
 {
     MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -629,6 +639,7 @@ real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
 real::real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
 
 // Constructor from a special value, sign and precision.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(real_kind k, int sign, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
@@ -660,12 +671,14 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
 real::real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
 
 // Constructors from n*2**e.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(unsigned long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
     set_ui_2exp(*this, n, e);
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
@@ -673,6 +686,7 @@ real::real(long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 }
 
 // Copy constructor from mpfr_t.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(const ::mpfr_t x)
 {
     // Init with the same precision as other, and then set.
@@ -721,6 +735,7 @@ void real::string_assignment_impl(const char *s, int base)
 // from real.
 real128 &real128::operator=(const real &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<real128>(x);
 }
 
@@ -874,7 +889,7 @@ void real::assign_real128(const real128 &x)
         ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p4), MPFR_RNDN);
     };
     // Check if the significand is zero.
-    const bool sig_zero = !std::get<2>(t) && !std::get<3>(t);
+    const bool sig_zero = std::get<2>(t) == 0u && std::get<3>(t) == 0u;
     if (std::get<1>(t) == 0u) {
         // Zero or subnormal numbers.
         if (sig_zero) {
@@ -903,7 +918,7 @@ void real::assign_real128(const real128 &x)
         // Multiply by 2 raised to the adjusted exponent.
         ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);
     }
-    if (std::get<0>(t)) {
+    if (std::get<0>(t) != 0u) {
         // Negate if the sign bit is set.
         ::mpfr_neg(&m_mpfr, &m_mpfr, MPFR_RNDN);
     }
@@ -932,6 +947,7 @@ real128 real::convert_to_real128() const
     // with some modification due to the different padding in MPFR vs GMP (see below).
     const auto prec = get_prec();
     // Number of limbs in this.
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     auto nlimbs = prec / ::mp_bits_per_limb + static_cast<bool>(prec % ::mp_bits_per_limb);
     assert(nlimbs != 0);
     // NOTE: in MPFR the most significant (nonzero) bit of the significand
@@ -950,7 +966,7 @@ real128 real::convert_to_real128() const
     // then the constructor of real128 truncated the input limb value to 113 bits of precision, so effectively
     // we have read 113 bits only in such a case.
     unsigned read_bits = detail::c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits());
-    while (nlimbs && read_bits < real128_sig_digits()) {
+    while (nlimbs != 0 && read_bits < real128_sig_digits()) {
         // Number of bits to be read from the current limb. Either mp_bits_per_limb or less.
         const unsigned rbits
             = detail::c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits() - read_bits);

@@ -46,6 +46,7 @@ namespace
 
 // A cleanup functor that will call mpfr_free_cache()
 // on destruction.
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 struct mpfr_cleanup {
     // NOTE: marking the ctor constexpr ensures that the initialisation
     // of objects of this class with static storage duration is sequenced
@@ -56,7 +57,7 @@ struct mpfr_cleanup {
     // will be called after the destruction of any static real object
     // (because real doesn't have a constexpr constructor and thus
     // static reals are destroyed before static objects of this class).
-    constexpr mpfr_cleanup() {}
+    constexpr mpfr_cleanup() = default;
     ~mpfr_cleanup()
     {
 #if !defined(NDEBUG)
@@ -82,8 +83,9 @@ MPPP_CONSTINIT thread_local const mpfr_cleanup mpfr_cleanup_inst;
 // NOTE: in MPFR >= 4, there are both local caches and thread-specific caches.
 // Thus, we use two cleanup functors, one thread local and one global.
 
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 struct mpfr_tl_cleanup {
-    constexpr mpfr_tl_cleanup() {}
+    constexpr mpfr_tl_cleanup() = default;
     ~mpfr_tl_cleanup()
     {
 #if !defined(NDEBUG)
@@ -93,8 +95,9 @@ struct mpfr_tl_cleanup {
     }
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 struct mpfr_global_cleanup {
-    constexpr mpfr_global_cleanup() {}
+    constexpr mpfr_global_cleanup() = default;
     ~mpfr_global_cleanup()
     {
 #if !defined(NDEBUG)
@@ -117,6 +120,7 @@ MPPP_CONSTINIT const mpfr_global_cleanup mpfr_global_cleanup_inst;
 
 // A cleanup functor that will call flint_cleanup()
 // on destruction.
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions, hicpp-special-member-functions)
 struct flint_cleanup {
     // NOTE: marking the ctor constexpr ensures that the initialisation
     // of objects of this class with static storage duration is sequenced
@@ -127,7 +131,7 @@ struct flint_cleanup {
     // will be called after the destruction of any static real object
     // (because real doesn't have a constexpr constructor and thus
     // static reals are destroyed before static objects of this class).
-    constexpr flint_cleanup() {}
+    constexpr flint_cleanup() = default;
     ~flint_cleanup()
     {
 #if !defined(NDEBUG)

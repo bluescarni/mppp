@@ -14,6 +14,7 @@
 #include <mp++/config.hpp>
 #include <mp++/detail/parse_complex.hpp>
 
+// NOLINTNEXTLINE(modernize-concat-nested-namespaces)
 namespace mppp
 {
 
@@ -46,6 +47,7 @@ std::array<const char *, 4> parse_complex(const char *str)
                                     + "' is not a valid representation of a complex value");
     };
 
+    // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
     auto s = str;
 
     // Skip leading whitespaces.
@@ -65,6 +67,7 @@ std::array<const char *, 4> parse_complex(const char *str)
         // Examine the string until we get either to a comma
         // (the separator between real and imaginary parts)
         // or the end of the string.
+        // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
         auto p = s + 1;
         for (; *p != ',' && *p != '\0'; ++p) {
         }

@@ -14,6 +14,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("sqrt")
@@ -30,7 +31,9 @@ TEST_CASE("sqrt")
     REQUIRE(sqrt(r0).zero_p());
     REQUIRE(std::is_same<complex, decltype(sqrt(r0))>::value);
     REQUIRE(sqrt(std::move(r0)).zero_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     r0 = complex{16, 17, complex_prec_t(128)};
     REQUIRE(abs(sqrt(r0)
                 - (4.4353824558800734853070281844863776932288_r128 + 1.9164074540474820480048239757004444314933_icr128))

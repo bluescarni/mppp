@@ -235,10 +235,13 @@ class MPPP_DLL_PUBLIC real
 {
     // Make friends, for accessing the non-checking prec setting funcs.
     template <bool, typename F, typename Arg0, typename... Args>
+    // NOLINTNEXTLINE(readability-redundant-declaration)
     friend real &detail::mpfr_nary_op_impl(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
     template <bool, typename F, typename Arg0, typename... Args>
+    // NOLINTNEXTLINE(readability-redundant-declaration)
     friend real detail::mpfr_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
     template <typename F>
+    // NOLINTNEXTLINE(readability-redundant-declaration)
     friend real detail::real_constant(const F &, ::mpfr_prec_t);
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
@@ -280,9 +283,9 @@ public:
     real(const real &);
     // Move constructor.
     real(real &&other) noexcept
+        : // Shallow copy other.
+          m_mpfr(other.m_mpfr)
     {
-        // Shallow copy other.
-        m_mpfr = other.m_mpfr;
         // Mark the other as moved-from.
         other.m_mpfr._mpfr_d = nullptr;
     }
@@ -371,6 +374,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &x) : real(ptag{}, detail::real_deduce_precision(x), true)
     {
         dispatch_construction(x);
@@ -391,6 +395,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &c)
         : real(c.imag() == 0 ? c.real()
                              : throw std::domain_error(
@@ -403,6 +408,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &c, ::mpfr_prec_t p)
         : real(c.imag() == 0 ? c.real()
                              : throw std::domain_error(
@@ -427,6 +433,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &s, int base, ::mpfr_prec_t p) : real(ptag{}, s, base, p)
     {
     }
@@ -436,6 +443,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &s, ::mpfr_prec_t p) : real(s, 10, p)
     {
     }
@@ -590,6 +598,7 @@ public:
 #endif
     real &operator=(const T &c)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = static_cast<real>(c);
     }
 #if defined(MPPP_WITH_QUADMATH)
@@ -608,7 +617,7 @@ public:
 #endif
 
     // Check validity.
-    bool is_valid() const noexcept
+    MPPP_NODISCARD bool is_valid() const noexcept
     {
         return m_mpfr._mpfr_d != nullptr;
     }
@@ -676,7 +685,7 @@ public:
     real &set_zero(int sign = 0);
 
     // Const reference to the internal mpfr_t.
-    const mpfr_struct_t *get_mpfr_t() const
+    MPPP_NODISCARD const mpfr_struct_t *get_mpfr_t() const
     {
         return &m_mpfr;
     }
@@ -687,37 +696,37 @@ public:
     }
 
     // Detect NaN.
-    bool nan_p() const
+    MPPP_NODISCARD bool nan_p() const
     {
         return mpfr_nan_p(&m_mpfr) != 0;
     }
     // Detect infinity.
-    bool inf_p() const
+    MPPP_NODISCARD bool inf_p() const
     {
         return mpfr_inf_p(&m_mpfr) != 0;
     }
     // Detect finite number.
-    bool number_p() const
+    MPPP_NODISCARD bool number_p() const
     {
         return mpfr_number_p(&m_mpfr) != 0;
     }
     // Detect zero.
-    bool zero_p() const
+    MPPP_NODISCARD bool zero_p() const
     {
         return mpfr_zero_p(&m_mpfr) != 0;
     }
     // Detect regular number.
-    bool regular_p() const
+    MPPP_NODISCARD bool regular_p() const
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
     // Detect integer.
-    bool integer_p() const;
+    MPPP_NODISCARD bool integer_p() const;
     // Detect one.
-    bool is_one() const;
+    MPPP_NODISCARD bool is_one() const;
 
     // Detect sign.
-    int sgn() const
+    MPPP_NODISCARD int sgn() const
     {
         if (mppp_unlikely(nan_p())) {
             // NOTE: mpfr_sgn() in this case would set an error flag, and we generally
@@ -727,13 +736,13 @@ public:
         return mpfr_sgn(&m_mpfr);
     }
     // Get the sign bit.
-    bool signbit() const
+    MPPP_NODISCARD bool signbit() const
     {
         return mpfr_signbit(&m_mpfr) != 0;
     }
 
     // Get the precision of this.
-    ::mpfr_prec_t get_prec() const
+    MPPP_NODISCARD ::mpfr_prec_t get_prec() const
     {
         return mpfr_get_prec(&m_mpfr);
     }
@@ -772,7 +781,7 @@ private:
     // Generic conversion.
     // integer.
     template <typename T, detail::enable_if_t<detail::is_integer<T>::value, int> = 0>
-    T dispatch_conversion() const
+    MPPP_NODISCARD T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to an integer");
@@ -840,7 +849,7 @@ private:
     }
     // C++ floating-point.
     template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    T dispatch_conversion() const
+    MPPP_NODISCARD T dispatch_conversion() const
     {
         if (std::is_same<T, float>::value) {
             return static_cast<T>(::mpfr_get_flt(&m_mpfr, MPFR_RNDN));
@@ -931,7 +940,7 @@ private:
     }
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
-    T dispatch_conversion() const
+    MPPP_NODISCARD T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a C++ signed integral type");
@@ -944,11 +953,11 @@ private:
     }
 #if defined(MPPP_WITH_QUADMATH)
     template <typename T, detail::enable_if_t<std::is_same<real128, T>::value, int> = 0>
-    T dispatch_conversion() const
+    MPPP_NODISCARD T dispatch_conversion() const
     {
         return convert_to_real128();
     }
-    real128 convert_to_real128() const;
+    MPPP_NODISCARD real128 convert_to_real128() const;
 #endif
 
 public:
@@ -1053,7 +1062,7 @@ public:
     }
 
     // Convert to string.
-    std::string to_string(int base = 10) const;
+    MPPP_NODISCARD std::string to_string(int base = 10) const;
 
 private:
     template <typename T>
@@ -1229,7 +1238,7 @@ namespace detail
 template <typename... Args>
 using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &>()...));
 
-}
+} // namespace detail
 
 #if defined(MPPP_HAVE_CONCEPTS)
 
@@ -1263,6 +1272,7 @@ MPPP_DLL_PUBLIC real &set_si_2exp(real &, long, ::mpfr_exp_t);
 // Implementation of the constructor from n*2**e, integer overload.
 // Place it here so that set_z_2exp() is visible.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 inline real::real(const integer<SSize> &n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
@@ -4191,6 +4201,7 @@ template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::v
 template <std::size_t SSize>
 inline integer<SSize> &integer<SSize>::operator=(const real &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<integer<SSize>>(x);
 }
 
@@ -4199,6 +4210,7 @@ inline integer<SSize> &integer<SSize>::operator=(const real &x)
 template <std::size_t SSize>
 inline rational<SSize> &rational<SSize>::operator=(const real &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<rational<SSize>>(x);
 }
 

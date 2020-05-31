@@ -69,6 +69,7 @@ constexpr bool test_mpz_struct_t()
     // in a compile-time error.
     auto [alloc, size, ptr] = mpz_struct_t{};
     ignore(alloc, size, ptr);
+    // NOLINTNEXTLINE(misc-redundant-expression)
     return std::is_same<decltype(alloc), mpz_alloc_t>::value && std::is_same<decltype(size), mpz_size_t>::value
            && std::is_same<decltype(ptr), ::mp_limb_t *>::value;
 }
@@ -151,7 +152,7 @@ MPPP_CONSTINIT thread_local mpz_alloc_cache mpz_alloc_cache_inst;
 bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)
 {
     auto &mpzc = mpz_alloc_cache_inst;
-    if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
+    if (nlimbs != 0u && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u] != 0u) {
         // LCOV_EXCL_START
         if (mppp_unlikely(nlimbs > make_unsigned(nl_max<mpz_alloc_t>()))) {
             std::abort();
@@ -223,7 +224,7 @@ void mpz_clear_wrap(mpz_struct_t &m)
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     auto &mpzc = mpz_alloc_cache_inst;
     const auto ualloc = make_unsigned(m._mp_alloc);
-    if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
+    if (ualloc != 0u && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
         const auto idx = ualloc - 1u;
         mpzc.caches[idx][mpzc.sizes[idx]] = m._mp_d;
         ++mpzc.sizes[idx];
@@ -309,6 +310,7 @@ std::ostream &integer_stream_operator_impl(std::ostream &os, const mpz_struct_t 
         // - 1 or 2 for the base prefix ('0' for octal, '0x'/'0X' for hex),
         // - the '+' sign, if requested.
         const bool with_plus = (flags & std::ios_base::showpos) != 0;
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<char, 3> prep_buffer;
         const auto prep_n = [&prep_buffer, with_plus, with_base_prefix, base]() -> std::size_t {
             std::size_t ret = 0;
@@ -353,6 +355,7 @@ std::ostream &integer_stream_operator_impl(std::ostream &os, const mpz_struct_t 
         const auto fill_size = safe_cast<decltype(tmp.size())>(make_unsigned(width) - final_size);
         // Get the fill character.
         const auto fill_char = os.fill();
+        // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
         switch (fill) {
             case 1:
                 // Left fill: fill characters at the end.

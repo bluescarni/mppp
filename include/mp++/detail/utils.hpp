@@ -54,7 +54,7 @@ constexpr bool is_zero(const T &n)
 // Small helper to convert the non-negative signed integer n
 // into its unsigned counterpart.
 template <typename T>
-constexpr make_unsigned_t<T> make_unsigned(T n)
+constexpr make_unsigned_t<T> make_unsigned(T n) noexcept
 {
     static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
 #if MPPP_CPLUSPLUS >= 201703L
@@ -100,7 +100,7 @@ MPPP_DLL_PUBLIC std::string to_string(__int128_t);
 // we could init the integer with the wrong value, and we should be able to detect this in the unit tests.
 // Let's keep this in mind in the remote case this ever becomes a problem.
 template <typename T>
-constexpr make_unsigned_t<T> nint_abs(T n)
+constexpr make_unsigned_t<T> nint_abs(T n) noexcept
 {
     // NOTE: we should assert about negative n, but this is guaranteed to work properly only
     // from C++17:
@@ -121,13 +121,13 @@ constexpr make_unsigned_t<T> nint_abs(T n)
 
 // constexpr max/min implementations with copy semantics.
 template <typename T>
-constexpr T c_max(T a, T b)
+constexpr T c_max(T a, T b) noexcept
 {
     return a > b ? a : b;
 }
 
 template <typename T>
-constexpr T c_min(T a, T b)
+constexpr T c_min(T a, T b) noexcept
 {
     return a < b ? a : b;
 }

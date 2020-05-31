@@ -56,8 +56,10 @@ struct detector<Default, void_t<Op<Args...>>, Op, Args...> {
 struct nonesuch {
     nonesuch() = delete;
     ~nonesuch() = delete;
+    nonesuch(nonesuch &&) = delete;
     nonesuch(nonesuch const &) = delete;
     void operator=(nonesuch const &) = delete;
+    void operator=(nonesuch &&) = delete;
 };
 
 template <template <class...> class Op, class... Args>
@@ -205,19 +207,19 @@ using make_unsigned_t = typename make_unsigned_impl<T>::type;
 
 // Various numeric_limits utils.
 template <typename T>
-constexpr int nl_digits()
+constexpr int nl_digits() noexcept
 {
     return std::numeric_limits<T>::digits;
 }
 
 template <typename T>
-constexpr T nl_min()
+constexpr T nl_min() noexcept
 {
     return std::numeric_limits<T>::min();
 }
 
 template <typename T>
-constexpr T nl_max()
+constexpr T nl_max() noexcept
 {
     return std::numeric_limits<T>::max();
 }
@@ -225,37 +227,37 @@ constexpr T nl_max()
 #if defined(MPPP_HAVE_GCC_INT128)
 
 template <>
-constexpr int nl_digits<__uint128_t>()
+constexpr int nl_digits<__uint128_t>() noexcept
 {
     return 128;
 }
 
 template <>
-constexpr int nl_digits<__int128_t>()
+constexpr int nl_digits<__int128_t>() noexcept
 {
     return 127;
 }
 
 template <>
-constexpr __uint128_t nl_max<__uint128_t>()
+constexpr __uint128_t nl_max<__uint128_t>() noexcept
 {
     return ~__uint128_t(0);
 }
 
 template <>
-constexpr __uint128_t nl_min<__uint128_t>()
+constexpr __uint128_t nl_min<__uint128_t>() noexcept
 {
     return 0;
 }
 
 template <>
-constexpr __int128_t nl_max<__int128_t>()
+constexpr __int128_t nl_max<__int128_t>() noexcept
 {
     return static_cast<__int128_t>((__uint128_t(1) << 127u) - 1u);
 }
 
 template <>
-constexpr __int128_t nl_min<__int128_t>()
+constexpr __int128_t nl_min<__int128_t>() noexcept
 {
     return -nl_max<__int128_t>() - 1;
 }

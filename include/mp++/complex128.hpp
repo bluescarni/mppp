@@ -51,8 +51,12 @@ namespace mppp
 // See also:
 // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
 #if (!defined(_ARCH_PPC)) || defined(__LONG_DOUBLE_IEEE128__)
+// NOTE: not sure about the correct syntax for 'using'+attributes
+// here. Let's leave it verbatim like from the quadmath.h header.
+// NOLINTNEXTLINE(modernize-use-using)
 typedef _Complex float __attribute__((mode(TC))) cplex128;
 #else
+// NOLINTNEXTLINE(modernize-use-using)
 typedef _Complex float __attribute__((mode(KC))) cplex128;
 #endif
 
@@ -91,6 +95,7 @@ constexpr complex128 conj(const complex128 &);
 class MPPP_DLL_PUBLIC complex128
 {
 public:
+    // NOLINTNEXTLINE(modernize-use-default-member-init)
     cplex128 m_value;
 
     using value_type = real128;
@@ -183,11 +188,14 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex128(const T &s) : complex128(ptag{}, s)
     {
     }
     // Constructor from range of characters.
     explicit complex128(const char *, const char *);
+
+    ~complex128() = default;
 
     // Trivial copy assignment operator.
     complex128 &operator=(const complex128 &) = default;
@@ -209,6 +217,7 @@ public:
 #endif
     MPPP_CONSTEXPR_14 complex128 &operator=(const T &x)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = complex128{x};
     }
 
@@ -220,6 +229,7 @@ public:
 #endif
     MPPP_CONSTEXPR_14 complex128 &operator=(const T &c)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = complex128{c};
     }
 #if defined(MPPP_WITH_MPC)
@@ -234,15 +244,16 @@ public:
 #endif
     complex128 &operator=(const T &s)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = complex128{s};
     }
 
     // Getters for the real/imaginary parts.
-    constexpr real128 real() const
+    MPPP_NODISCARD constexpr real128 real() const
     {
         return real128{__real__ m_value};
     }
-    constexpr real128 imag() const
+    MPPP_NODISCARD constexpr real128 imag() const
     {
         return real128{__imag__ m_value};
     }
@@ -372,7 +383,7 @@ public:
     }
 
     // Conversion to string.
-    std::string to_string() const;
+    MPPP_NODISCARD std::string to_string() const;
 
     // Complex absolute value.
     complex128 &abs();
@@ -1211,6 +1222,7 @@ inline complex128 operator"" _icq()
 template <std::size_t SSize>
 inline integer<SSize> &integer<SSize>::operator=(const complex128 &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<integer<SSize>>(x);
 }
 
@@ -1219,6 +1231,7 @@ inline integer<SSize> &integer<SSize>::operator=(const complex128 &x)
 template <std::size_t SSize>
 inline rational<SSize> &rational<SSize>::operator=(const complex128 &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<rational<SSize>>(x);
 }
 
@@ -1226,6 +1239,7 @@ inline rational<SSize> &rational<SSize>::operator=(const complex128 &x)
 // from complex128.
 inline MPPP_CONSTEXPR_14 real128 &real128::operator=(const complex128 &x)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<real128>(x);
 }
 

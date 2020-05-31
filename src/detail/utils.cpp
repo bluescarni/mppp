@@ -20,6 +20,7 @@
 
 #include <mp++/detail/utils.hpp>
 
+// NOLINTNEXTLINE(modernize-concat-nested-namespaces)
 namespace mppp
 {
 
@@ -67,6 +68,7 @@ char *to_string_impl(char (&output)[N], __uint128_t n)
 std::string to_string(__uint128_t n)
 {
     char output[40];
+    // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
     auto o = to_string_impl(output, n);
 #if MPPP_CPLUSPLUS >= 201402L
     // Now build the string by reading backwards. When reverse iterators are created,
@@ -85,6 +87,7 @@ std::string to_string(__int128_t n)
 {
     char output[41];
     const bool neg = n < 0;
+    // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
     auto o = to_string_impl(output, neg ? nint_abs(n) : static_cast<__uint128_t>(n));
     // Add the sign, if needed.
     if (neg) {

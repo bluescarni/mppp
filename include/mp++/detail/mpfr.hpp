@@ -71,6 +71,7 @@ constexpr bool real_prec_check(::mpfr_prec_t p)
 struct mpfr_raii {
     // A constructor from a precision value, will set the value to NaN.
     // No check is performed on the precision.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit mpfr_raii(::mpfr_prec_t prec)
     {
         ::mpfr_init2(&m_mpfr, prec);
@@ -91,6 +92,7 @@ struct mpfr_raii {
 static_assert(std::numeric_limits<long double>::max_digits10 < nl_max<int>() / 4, "Overflow error.");
 static_assert(std::numeric_limits<long double>::max_digits10 * 4 < nl_max<::mpfr_prec_t>(), "Overflow error.");
 static_assert(std::numeric_limits<long double>::max_digits10 * 4 < nl_max<::mp_bitcnt_t>(), "Overflow error.");
+// NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
 static_assert(real_prec_check(static_cast<::mpfr_prec_t>(std::numeric_limits<long double>::max_digits10 * 4)),
               "The precision required to represent long double is outside the MPFR min/max precision bounds.");
 

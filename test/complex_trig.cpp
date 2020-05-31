@@ -15,6 +15,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("sin")
@@ -33,7 +34,9 @@ TEST_CASE("sin")
     REQUIRE(sin(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(sin(r0))>::value);
     REQUIRE(sin(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = -3477145.505821145952150948552814901255983599021178846624357468003184819234122082_r128
                      - 11566109.75061239466450916613575380278841378386526844455469668582818457691027414_icr128;
@@ -64,7 +67,9 @@ TEST_CASE("cos")
     REQUIRE(cos(r0) == 1);
     REQUIRE(std::is_same<complex, decltype(cos(r0))>::value);
     REQUIRE(cos(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = -11566109.75061243431101520956556591949723754219053371249017516792370714209598772_r128
                      + 3477145.50582113403313294830227617866277878730213937550348996784857152867760457_icr128;
@@ -95,7 +100,9 @@ TEST_CASE("tan")
     REQUIRE(tan(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(tan(r0))>::value);
     REQUIRE(tan(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp
         = 0.000000000000001890189676714721384220241981190955655135507359104069236873613135618527690521095_r128
@@ -127,7 +134,9 @@ TEST_CASE("asin")
     REQUIRE(asin(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(asin(r0))>::value);
     REQUIRE(asin(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = 0.7546465680316338218183628152858352854952339799986454116643882618292191135655677_r128
                      + 3.843568166588382136361882162833819833941936267903054343013316986770713537294589_icr128;
@@ -158,7 +167,9 @@ TEST_CASE("acos")
     REQUIRE(acos(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(acos(r0))>::value);
     REQUIRE(acos(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = 0.8161497587632627974129588763539161566033507196889074988230840343246890895775313_r128
                      - 3.843568166588382136361882162833819833941936267903054343013316986770713537294589_icr128;
@@ -189,7 +200,9 @@ TEST_CASE("atan")
     REQUIRE(atan(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(atan(r0))>::value);
     REQUIRE(atan(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = 1.541418415437035272780230040413865549360259490637330587415721014670186092931507_r128
                      + 0.03117586962523930896585162884521581712290333191736875549738954416580110376441166_icr128;
