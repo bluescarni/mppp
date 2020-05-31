@@ -175,6 +175,17 @@
 
 #endif
 
+// Wrapper for the C++17 [[nodiscard]] attribute.
+#if MPPP_CPLUSPLUS >= 201703L
+
+#define MPPP_NODISCARD [[nodiscard]]
+
+#else
+
+#define MPPP_NODISCARD
+
+#endif
+
 // C++20 constinit.
 #if defined(__cpp_constinit)
 
