@@ -41,6 +41,7 @@ TEST_CASE("identity")
     auto r2 = +std::move(r1);
     REQUIRE(r2.get_prec() == p);
     REQUIRE(r2 == complex{4, 5});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r1.is_valid());
 }
 
@@ -62,6 +63,7 @@ TEST_CASE("increment")
     REQUIRE(r0 == 1);
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("binary plus")
 {
     // complex-complex.
@@ -77,18 +79,21 @@ TEST_CASE("binary plus")
         ret = std::move(r1) + r2;
         REQUIRE(ret == complex{0, 12});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r1.is_valid());
 
         r1 = complex{4, 5};
         ret = r1 + std::move(r2);
         REQUIRE(ret == complex{0, 12});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r2.is_valid());
 
         r2 = complex{-4, 7};
         ret = std::move(r1) + std::move(r2);
         REQUIRE(ret == complex{0, 12});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE((!r1.is_valid() || !r2.is_valid()));
 
         // Self add.
@@ -122,6 +127,7 @@ TEST_CASE("binary plus")
         ret = std::move(c1) + r1;
         REQUIRE(ret == complex{68, 6, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
@@ -129,6 +135,7 @@ TEST_CASE("binary plus")
         ret = r1 + std::move(c1);
         REQUIRE(ret == complex{68, 6, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
     // complex-rv interoperable.
@@ -157,22 +164,26 @@ TEST_CASE("binary plus")
         ret = std::move(c1) + 45;
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45) + 1)};
         ret = std::move(c1) + 45;
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = 45. + std::move(c1);
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45.) + 1)};
         ret = 45. + std::move(c1);
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -180,11 +191,13 @@ TEST_CASE("binary plus")
         ret = 45_rq + std::move(c1);
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = 45_rq + std::move(c1);
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -214,22 +227,26 @@ TEST_CASE("binary plus")
         ret = std::move(c1) + 45u;
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45u) + 1)};
         ret = std::move(c1) + 45u;
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = 45u + std::move(c1);
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45u) + 1)};
         ret = 45u + std::move(c1);
         REQUIRE(ret == complex{46, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         // Bool special casing.
@@ -250,22 +267,26 @@ TEST_CASE("binary plus")
         ret = __uint128_t(-1) + std::move(c1);
         REQUIRE(ret == complex{1_z1 + __uint128_t(-1), 1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
         ret = __uint128_t(-1) + std::move(c1);
         REQUIRE(ret == complex{1_z1 + __uint128_t(-1), 1, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = std::move(c1) + __uint128_t(-1);
         REQUIRE(ret == complex{1_z1 + __uint128_t(-1), 1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
         ret = std::move(c1) + __uint128_t(-1);
         REQUIRE(ret == complex{1_z1 + __uint128_t(-1), 1, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -296,22 +317,26 @@ TEST_CASE("binary plus")
         ret = std::move(c1) + std::complex<double>(6, 7);
         REQUIRE(ret == complex{7, 8});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
         ret = std::move(c1) + std::complex<double>(6, 7);
         REQUIRE(ret == complex{7, 8});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = std::complex<double>(6, 7) + std::move(c1);
         REQUIRE(ret == complex{7, 8});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
         ret = std::complex<double>(6, 7) + std::move(c1);
         REQUIRE(ret == complex{7, 8});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 
@@ -342,22 +367,26 @@ TEST_CASE("binary plus")
         ret = std::move(c1) + complex128(6, 7);
         REQUIRE(ret == complex{7, 8});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = std::move(c1) + complex128(6, 7);
         REQUIRE(ret == complex{7, 8});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = complex128(6, 7) + std::move(c1);
         REQUIRE(ret == complex{7, 8});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = complex128(6, 7) + std::move(c1);
         REQUIRE(ret == complex{7, 8});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 #endif
@@ -423,12 +452,14 @@ TEST_CASE("in-place plus")
         c1 += std::move(c2);
         REQUIRE(c1 == complex{7, 10});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2.is_valid());
 
         // Move which steals.
         complex c3{4, 5, complex_prec_t(detail::real_deduce_precision(1) + 1)};
         c1 += std::move(c3);
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c3.is_valid());
         REQUIRE(c3 == complex{7, 10});
         REQUIRE(c3.get_prec() == detail::real_deduce_precision(1));
@@ -594,6 +625,7 @@ TEST_CASE("in-place plus")
         complex c{4, 0, complex_prec_t(detail::real_deduce_precision(1) + 1)};
         n += std::move(c);
         REQUIRE(n == 13);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
 
         // Check conversion failure.
@@ -649,6 +681,7 @@ TEST_CASE("in-place plus")
         real r{4, detail::real_deduce_precision(1.) + 1};
         c += std::move(r);
         REQUIRE(c == std::complex<double>{7, 2});
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -670,6 +703,7 @@ TEST_CASE("negation")
     auto r2 = -std::move(r1);
     REQUIRE(r2.get_prec() == p);
     REQUIRE(r2 == complex{-4, -5});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r1.is_valid());
 }
 
@@ -691,6 +725,7 @@ TEST_CASE("decrement")
     REQUIRE(r0 == -1);
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("binary minus")
 {
     // complex-complex.
@@ -706,18 +741,21 @@ TEST_CASE("binary minus")
         ret = std::move(r1) - r2;
         REQUIRE(ret == complex{8, -2});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r1.is_valid());
 
         r1 = complex{4, 5};
         ret = r1 - std::move(r2);
         REQUIRE(ret == complex{8, -2});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r2.is_valid());
 
         r2 = complex{-4, 7};
         ret = std::move(r1) - std::move(r2);
         REQUIRE(ret == complex{8, -2});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE((!r1.is_valid() || !r2.is_valid()));
 
         // Self sub.
@@ -751,6 +789,7 @@ TEST_CASE("binary minus")
         ret = std::move(c1) - r1;
         REQUIRE(ret == complex{22, 6, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
@@ -758,6 +797,7 @@ TEST_CASE("binary minus")
         ret = r1 - std::move(c1);
         REQUIRE(ret == complex{-22, -6, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
     // complex-rv interoperable.
@@ -786,22 +826,26 @@ TEST_CASE("binary minus")
         ret = std::move(c1) - 45;
         REQUIRE(ret == complex{-44, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45) + 1)};
         ret = std::move(c1) - 45;
         REQUIRE(ret == complex{-44, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = 45. - std::move(c1);
         REQUIRE(ret == complex{44, -1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45.) + 1)};
         ret = 45. - std::move(c1);
         REQUIRE(ret == complex{44, -1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -809,11 +853,13 @@ TEST_CASE("binary minus")
         ret = 45_rq - std::move(c1);
         REQUIRE(ret == complex{44, -1});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = 45_rq - std::move(c1);
         REQUIRE(ret == complex{44, -1});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -843,22 +889,26 @@ TEST_CASE("binary minus")
         ret = std::move(c1) - 45u;
         REQUIRE(ret == complex{-44, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45u) + 1)};
         ret = std::move(c1) - 45u;
         REQUIRE(ret == complex{-44, 1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = 45u - std::move(c1);
         REQUIRE(ret == complex{44, -1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45u) + 1)};
         ret = 45u - std::move(c1);
         REQUIRE(ret == complex{44, -1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         // Bool special casing.
@@ -879,22 +929,26 @@ TEST_CASE("binary minus")
         ret = __uint128_t(-1) - std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1) - 1u, -1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
         ret = __uint128_t(-1) - std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1) - 1u, -1, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = std::move(c1) - __uint128_t(-1);
         REQUIRE(ret == complex{1_z1 - __uint128_t(-1), 1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
         ret = std::move(c1) - __uint128_t(-1);
         REQUIRE(ret == complex{1_z1 - __uint128_t(-1), 1, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -925,22 +979,26 @@ TEST_CASE("binary minus")
         ret = std::move(c1) - std::complex<double>(6, 7);
         REQUIRE(ret == complex{-5, -6});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
         ret = std::move(c1) - std::complex<double>(6, 7);
         REQUIRE(ret == complex{-5, -6});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = std::complex<double>(6, 7) - std::move(c1);
         REQUIRE(ret == complex{5, 6});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
         ret = std::complex<double>(6, 7) - std::move(c1);
         REQUIRE(ret == complex{5, 6});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 
@@ -971,22 +1029,26 @@ TEST_CASE("binary minus")
         ret = std::move(c1) - complex128(6, 7);
         REQUIRE(ret == complex{-5, -6});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = std::move(c1) - complex128(6, 7);
         REQUIRE(ret == complex{-5, -6});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = complex128(6, 7) - std::move(c1);
         REQUIRE(ret == complex{5, 6});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = complex128(6, 7) - std::move(c1);
         REQUIRE(ret == complex{5, 6});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 #endif
@@ -1052,12 +1114,14 @@ TEST_CASE("in-place minus")
         c1 -= std::move(c2);
         REQUIRE(c1 == complex{-5, -6});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2.is_valid());
 
         // Move which steals.
         complex c3{4, 5, complex_prec_t(detail::real_deduce_precision(1) + 1)};
         c1 -= std::move(c3);
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c3.is_valid());
         REQUIRE(c3 == complex{-5, -6});
         REQUIRE(c3.get_prec() == detail::real_deduce_precision(1));
@@ -1223,6 +1287,7 @@ TEST_CASE("in-place minus")
         complex c{4, 0, complex_prec_t(detail::real_deduce_precision(1) + 1)};
         n -= std::move(c);
         REQUIRE(n == -3);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
 
         // Check conversion failure.
@@ -1278,6 +1343,7 @@ TEST_CASE("in-place minus")
         real r{4, detail::real_deduce_precision(1.) + 1};
         c -= std::move(r);
         REQUIRE(c == std::complex<double>{-5, 2});
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -1289,6 +1355,7 @@ TEST_CASE("in-place minus")
     }
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("binary mul")
 {
     // complex-complex.
@@ -1304,18 +1371,21 @@ TEST_CASE("binary mul")
         ret = std::move(r1) * r2;
         REQUIRE(ret == complex{-51, 8});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r1.is_valid());
 
         r1 = complex{4, 5};
         ret = r1 * std::move(r2);
         REQUIRE(ret == complex{-51, 8});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r2.is_valid());
 
         r2 = complex{-4, 7};
         ret = std::move(r1) * std::move(r2);
         REQUIRE(ret == complex{-51, 8});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE((!r1.is_valid() || !r2.is_valid()));
 
         // Self mul.
@@ -1349,6 +1419,7 @@ TEST_CASE("binary mul")
         ret = std::move(c1) * r1;
         REQUIRE(ret == complex{1035, 138, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
@@ -1356,6 +1427,7 @@ TEST_CASE("binary mul")
         ret = r1 * std::move(c1);
         REQUIRE(ret == complex{1035, 138, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
     // complex-rv interoperable.
@@ -1384,22 +1456,26 @@ TEST_CASE("binary mul")
         ret = std::move(c1) * 45;
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45) + 1)};
         ret = std::move(c1) * 45;
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = 45. * std::move(c1);
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45.) + 1)};
         ret = 45. * std::move(c1);
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -1407,11 +1483,13 @@ TEST_CASE("binary mul")
         ret = 45_rq * std::move(c1);
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = 45_rq * std::move(c1);
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -1441,22 +1519,26 @@ TEST_CASE("binary mul")
         ret = std::move(c1) * 45u;
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45u) + 1)};
         ret = std::move(c1) * 45u;
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = 45u * std::move(c1);
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45u) + 1)};
         ret = 45u * std::move(c1);
         REQUIRE(ret == complex{45, 45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         // Bool special casing.
@@ -1477,22 +1559,26 @@ TEST_CASE("binary mul")
         ret = __uint128_t(-1) * std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1), __uint128_t(-1), complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
         ret = __uint128_t(-1) * std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1), __uint128_t(-1), complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = std::move(c1) * __uint128_t(-1);
         REQUIRE(ret == complex{__uint128_t(-1), __uint128_t(-1), complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
         ret = std::move(c1) * __uint128_t(-1);
         REQUIRE(ret == complex{__uint128_t(-1), __uint128_t(-1), complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -1522,22 +1608,26 @@ TEST_CASE("binary mul")
         ret = std::move(c1) * -45;
         REQUIRE(ret == complex{-45, -45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(-45));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45) + 1)};
         ret = std::move(c1) * -45;
         REQUIRE(ret == complex{-45, -45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(-45) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = -45 * std::move(c1);
         REQUIRE(ret == complex{-45, -45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(-45));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(45) + 1)};
         ret = -45 * std::move(c1);
         REQUIRE(ret == complex{-45, -45});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(-45) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
 #if defined(MPPP_HAVE_GCC_INT128)
@@ -1547,22 +1637,26 @@ TEST_CASE("binary mul")
         ret = big_n * std::move(c1);
         REQUIRE(ret == complex{big_n, big_n, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
         ret = big_n * std::move(c1);
         REQUIRE(ret == complex{big_n, big_n, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = std::move(c1) * big_n;
         REQUIRE(ret == complex{big_n, big_n, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
         ret = std::move(c1) * big_n;
         REQUIRE(ret == complex{big_n, big_n, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -1593,22 +1687,26 @@ TEST_CASE("binary mul")
         ret = std::move(c1) * std::complex<double>(6, 7);
         REQUIRE(ret == complex{-1, 13});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
         ret = std::move(c1) * std::complex<double>(6, 7);
         REQUIRE(ret == complex{-1, 13});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = std::complex<double>(6, 7) * std::move(c1);
         REQUIRE(ret == complex{-1, 13});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
         ret = std::complex<double>(6, 7) * std::move(c1);
         REQUIRE(ret == complex{-1, 13});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 
@@ -1639,22 +1737,26 @@ TEST_CASE("binary mul")
         ret = std::move(c1) * complex128(6, 7);
         REQUIRE(ret == complex{-1, 13});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = std::move(c1) * complex128(6, 7);
         REQUIRE(ret == complex{-1, 13});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = complex128(6, 7) * std::move(c1);
         REQUIRE(ret == complex{-1, 13});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(114)};
         ret = complex128(6, 7) * std::move(c1);
         REQUIRE(ret == complex{-1, 13});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 #endif
@@ -1684,11 +1786,13 @@ TEST_CASE("binary mul")
         ret = std::move(r) * std::complex<double>{5, 6};
         REQUIRE(ret == complex{25, 30});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
         r = real{5, detail::real_deduce_precision(5.) + 1};
         ret = std::complex<double>{5, 6} * std::move(r);
         REQUIRE(ret == complex{25, 30});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
     }
 
@@ -1718,11 +1822,13 @@ TEST_CASE("binary mul")
         ret = std::move(r) * complex128{5, 6};
         REQUIRE(ret == complex{25, 30});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
         r = real{5, 114};
         ret = complex128{5, 6} * std::move(r);
         REQUIRE(ret == complex{25, 30});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
     }
 #endif
@@ -1742,12 +1848,14 @@ TEST_CASE("in-place mul")
         c1 *= std::move(c2);
         REQUIRE(c1 == complex{-55, 10});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2.is_valid());
 
         // Move which steals.
         complex c3{4, 5, complex_prec_t(detail::real_deduce_precision(1) + 1)};
         c1 *= std::move(c3);
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c3.is_valid());
         REQUIRE(c3 == complex{-55, 10});
         REQUIRE(c3.get_prec() == detail::real_deduce_precision(1));
@@ -1949,6 +2057,7 @@ TEST_CASE("in-place mul")
         complex c{4, 0, complex_prec_t(detail::real_deduce_precision(1) + 1)};
         n *= std::move(c);
         REQUIRE(n == 80);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
 
         // Check conversion failure.
@@ -2004,6 +2113,7 @@ TEST_CASE("in-place mul")
         real r{4, detail::real_deduce_precision(1.) + 1};
         c *= std::move(r);
         REQUIRE(c == std::complex<double>{8, 16});
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -2015,6 +2125,7 @@ TEST_CASE("in-place mul")
     }
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("binary div")
 {
     // complex-complex.
@@ -2030,18 +2141,21 @@ TEST_CASE("binary div")
         ret = std::move(r1) / r2;
         REQUIRE(ret == complex{4, 1});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r1.is_valid());
 
         r1 = complex{11, 24};
         ret = r1 / std::move(r2);
         REQUIRE(ret == complex{4, 1});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r2.is_valid());
 
         r2 = complex{4, 5};
         ret = std::move(r1) / std::move(r2);
         REQUIRE(ret == complex{4, 1});
         REQUIRE(ret.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE((!r1.is_valid() || !r2.is_valid()));
 
         // Self div.
@@ -2075,6 +2189,7 @@ TEST_CASE("binary div")
         ret = std::move(c1) / r1;
         REQUIRE(ret == complex{22, 2, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
@@ -2082,6 +2197,7 @@ TEST_CASE("binary div")
         ret = r1 / std::move(c1);
         REQUIRE(ret == complex{88 / 1952_q1, -8 / 1952_q1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
     // complex-rv interoperable.
@@ -2112,22 +2228,26 @@ TEST_CASE("binary div")
         ret = std::move(c1) / 2;
         REQUIRE(ret == complex{1, -4});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{44, 4, complex_prec_t(detail::real_deduce_precision(2) + 1)};
         ret = std::move(c1) / 2;
         REQUIRE(ret == complex{22, 2});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = 45. / std::move(c1);
         REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45.))});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{2, -8, complex_prec_t(detail::real_deduce_precision(45.) + 1)};
         ret = 45. / std::move(c1);
         REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45.) + 1)});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -2135,11 +2255,13 @@ TEST_CASE("binary div")
         ret = 45_rq / std::move(c1);
         REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(113)});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{2, -8, complex_prec_t(114)};
         ret = 45_rq / std::move(c1);
         REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(114)});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -2171,22 +2293,26 @@ TEST_CASE("binary div")
         ret = std::move(c1) / 2u;
         REQUIRE(ret == complex{1, -4});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{44, 4, complex_prec_t(detail::real_deduce_precision(2u) + 1)};
         ret = std::move(c1) / 2u;
         REQUIRE(ret == complex{22, 2});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = 45u / std::move(c1);
         REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45u))});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{2, -8, complex_prec_t(detail::real_deduce_precision(45u) + 1)};
         ret = 45u / std::move(c1);
         REQUIRE(ret == complex{90 / 68_q1, 360 / 68_q1, complex_prec_t(detail::real_deduce_precision(45u) + 1)});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(45u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         // Bool special casing.
@@ -2207,22 +2333,26 @@ TEST_CASE("binary div")
         ret = __uint128_t(-1) / std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1), 0, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, complex_prec_t(129)};
         ret = __uint128_t(-1) / std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1), 0, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = complex{1, complex_prec_t(real_prec_min())};
         ret = std::move(c1) / __uint128_t(-1);
         REQUIRE(ret == complex{1_q1 / __uint128_t(-1), complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, complex_prec_t(129)};
         ret = std::move(c1) / __uint128_t(-1);
         REQUIRE(ret == complex{1_q1 / __uint128_t(-1), complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 #endif
     }
@@ -2253,22 +2383,26 @@ TEST_CASE("binary div")
         ret = std::move(c1) / std::complex<double>(2, 2);
         REQUIRE(ret == complex{1, -1});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{4, -8, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
         ret = std::move(c1) / std::complex<double>(2, 0);
         REQUIRE(ret == complex{2, -4});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = std::complex<double>(8, -12) / std::move(c1);
         REQUIRE(ret == complex{2, -3});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{4, 0, complex_prec_t(detail::real_deduce_precision(6.) + 1)};
         ret = std::complex<double>(8, -12) / std::move(c1);
         REQUIRE(ret == complex{2, -3});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(6.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 
@@ -2299,22 +2433,26 @@ TEST_CASE("binary div")
         ret = std::move(c1) / complex128(2, 2);
         REQUIRE(ret == complex{1, -1});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{4, -8, complex_prec_t(114)};
         ret = std::move(c1) / complex128(2, 0);
         REQUIRE(ret == complex{2, -4});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
         ret = complex128(8, -12) / std::move(c1);
         REQUIRE(ret == complex{2, -3});
         REQUIRE(ret.get_prec() == 113);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{4, 0, complex_prec_t(114)};
         ret = complex128(8, -12) / std::move(c1);
         REQUIRE(ret == complex{2, -3});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 #endif
@@ -2345,6 +2483,7 @@ TEST_CASE("binary div")
         ret = std::complex<double>{50, 600} / std::move(r);
         REQUIRE(ret == complex{1, 12});
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(5.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
     }
 
@@ -2375,6 +2514,7 @@ TEST_CASE("binary div")
         ret = complex128{50, 600} / std::move(r);
         REQUIRE(ret == complex{1, 12});
         REQUIRE(ret.get_prec() == 114);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
     }
 #endif
@@ -2395,12 +2535,14 @@ TEST_CASE("in-place div")
         c1 /= std::move(c2);
         REQUIRE(c1 == complex{-11, 52});
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2.is_valid());
 
         // Move which steals.
         complex c3{3, 4, complex_prec_t(detail::real_deduce_precision(1) + 1)};
         c1 /= std::move(c3);
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(1) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c3.is_valid());
         REQUIRE(c3 == complex{-11, 52});
         REQUIRE(c1 == complex{7, 8});
@@ -2567,6 +2709,7 @@ TEST_CASE("in-place div")
         complex c{-2, 0, complex_prec_t(detail::real_deduce_precision(1) + 1)};
         n /= std::move(c);
         REQUIRE(n == 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
 
         // Check conversion failure.
@@ -2622,6 +2765,7 @@ TEST_CASE("in-place div")
         real r{2, detail::real_deduce_precision(1.) + 1};
         c /= std::move(r);
         REQUIRE(c == std::complex<double>{1, -2});
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -2633,6 +2777,7 @@ TEST_CASE("in-place div")
     }
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("eq ineq")
 {
     // complex-complex.
