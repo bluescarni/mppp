@@ -4393,7 +4393,14 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     // Verify that all pointers are distinct. Used exclusively for debugging purposes.
     assert(([&q, &r, data1, data2]() -> bool {
         const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), r.m_limbs.data(), data1, data2};
-        std::sort(ptrs, ptrs + 4, std::less<const ::mp_limb_t *>());
+        std::sort(
+            ptrs, ptrs + 4,
+#if MPPP_CPLUSPLUS >= 201402L
+            std::less<> {}
+#else
+            std::less<const ::mp_limb_t *> {}
+#endif
+        );
         return std::unique(ptrs, ptrs + 4) == (ptrs + 4);
     }()));
     // Proceed to the division.
@@ -4627,7 +4634,14 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // Verify that all pointers are distinct.
     assert(([&q, data1, data2]() -> bool {
         const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), data1, data2};
-        std::sort(ptrs, ptrs + 3, std::less<const ::mp_limb_t *>());
+        std::sort(
+            ptrs, ptrs + 3,
+#if MPPP_CPLUSPLUS >= 201402L
+            std::less<> {}
+#else
+            std::less<const ::mp_limb_t *> {}
+#endif
+        );
         return std::unique(ptrs, ptrs + 3) == (ptrs + 3);
     }()));
     // Proceed to the division.
