@@ -7,7 +7,7 @@ set -x
 set -e
 
 # Core deps.
-sudo apt-get install build-essential cmake wget clang ninja
+sudo apt-get install build-essential cmake wget clang ninja-build
 
 # Create the build dir and cd into it.
 mkdir build
