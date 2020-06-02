@@ -83,6 +83,7 @@ static_assert(test_mpc_struct_t());
 
 } // namespace detail
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex()
 {
     ::mpc_init2(&m_mpc, real_prec_min());
@@ -92,6 +93,7 @@ complex::complex()
 
 // Init a complex with precision p, setting its value to (nan,nan). No precision
 // checking is performed.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
 {
     assert(ignore_prec);
@@ -102,6 +104,7 @@ complex::complex(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
 
 complex::complex(const complex &other) : complex(&other.m_mpc) {}
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex(const complex &other, complex_prec_t p)
 {
     // Init with custom precision, and then set.
@@ -109,6 +112,7 @@ complex::complex(const complex &other, complex_prec_t p)
     ::mpc_set(&m_mpc, &other.m_mpc, MPC_RNDNN);
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex(complex &&other, complex_prec_t p_)
 {
     const auto p = static_cast<::mpfr_prec_t>(p_);
@@ -151,6 +155,7 @@ void complex::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
     im._get_mpfr_t()->_mpfr_d = nullptr;
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex(const stag &, const char *s, int base, ::mpfr_prec_t p)
 {
     construct_from_c_string(s, base, p);
@@ -169,6 +174,7 @@ complex::complex(const stag &, const std::string_view &s, int base, ::mpfr_prec_
 #endif
 
 // Constructor from range of characters, base and precision.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex(const char *begin, const char *end, int base, complex_prec_t p)
 {
     MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -178,8 +184,10 @@ complex::complex(const char *begin, const char *end, int base, complex_prec_t p)
 }
 
 // Constructor from range of characters and precision.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex(const char *begin, const char *end, complex_prec_t p) : complex(begin, end, 10, p) {}
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex(const ::mpc_t c)
 {
     // Init with the same precision as other, and then set.
@@ -684,6 +692,7 @@ real arg(const complex &c)
 
 real &real::operator=(const complex &c)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<real>(c);
 }
 
@@ -691,11 +700,13 @@ real &real::operator=(const complex &c)
 
 real128 &real128::operator=(const complex &c)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<real128>(c);
 }
 
 complex128 &complex128::operator=(const complex &c)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<complex128>(c);
 }
 

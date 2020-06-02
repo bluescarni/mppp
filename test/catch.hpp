@@ -2699,7 +2699,7 @@ namespace Catch {
 ///////////////////////////////////////////////////////////////////////////////
 #define INTERNAL_CATCH_TEST( macroName, resultDisposition, ... ) \
     do { \
-        CATCH_INTERNAL_IGNORE_BUT_WARN(__VA_ARGS__); \
+        /*CATCH_INTERNAL_IGNORE_BUT_WARN(__VA_ARGS__);*/ \
         Catch::AssertionHandler catchAssertionHandler( macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, CATCH_INTERNAL_STRINGIFY(__VA_ARGS__), resultDisposition ); \
         INTERNAL_CATCH_TRY { \
             CATCH_INTERNAL_START_WARNINGS_SUPPRESSION \

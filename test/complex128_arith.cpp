@@ -14,6 +14,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 #if MPPP_CPLUSPLUS >= 201402L

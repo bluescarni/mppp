@@ -14,6 +14,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("sinh")
@@ -32,6 +33,7 @@ TEST_CASE("sinh")
     REQUIRE(sinh(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(sinh(r0))>::value);
     REQUIRE(sinh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = -1222565.916559164338912132229897167466665493455533226087690163237624417714978845_r128
@@ -63,6 +65,7 @@ TEST_CASE("cosh")
     REQUIRE(cosh(r0) == 1);
     REQUIRE(std::is_same<complex, decltype(cosh(r0))>::value);
     REQUIRE(cosh(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = -1222565.916559195304466456200916661043574527713755180111165540565160767449106639_r128
@@ -94,6 +97,7 @@ TEST_CASE("tanh")
     REQUIRE(tanh(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(tanh(r0))>::value);
     REQUIRE(tanh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp
@@ -126,6 +130,7 @@ TEST_CASE("asinh")
     REQUIRE(asinh(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(asinh(r0))>::value);
     REQUIRE(asinh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = 3.843512615825144982941941050107557235025371460726574538461989270725752510373571_r128
@@ -157,6 +162,7 @@ TEST_CASE("acosh")
     REQUIRE(acosh(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(acosh(r0))>::value);
     REQUIRE(acosh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = 3.843568166588382136361882162833819833941936267903054343013316986770713537294589_r128
@@ -188,6 +194,7 @@ TEST_CASE("atanh")
     REQUIRE(atanh(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(atanh(r0))>::value);
     REQUIRE(atanh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = 0.02933765080430309053681873024624940489042029904613618413783891238686224174512657_r128

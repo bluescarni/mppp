@@ -13,6 +13,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real mul_2ui")
@@ -28,6 +29,7 @@ TEST_CASE("real mul_2ui")
     auto r0 = 2.1_r128;
     auto r1 = mul_2ui(std::move(r0), 34);
     REQUIRE(abs(r1 - c) / c < mppp::pow(2_r128, -126));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = 2.1_r128;
     r1 = mul_2ui(r0, 34);
@@ -43,6 +45,7 @@ TEST_CASE("real mul_2ui")
     r1 = 2.1_r128;
     r0 = real{1, 12};
     mul_2ui(r0, std::move(r1), 34);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.is_valid());
     REQUIRE(r1.get_prec() == 12);
     REQUIRE(r1 == 1);
@@ -71,6 +74,7 @@ TEST_CASE("real mul_2si")
     auto r0 = 2.1_r128;
     auto r1 = mul_2si(std::move(r0), -34);
     REQUIRE(abs(r1 - c) / c < mppp::pow(2_r128, -126));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = 2.1_r128;
     r1 = mul_2si(r0, -34);
@@ -86,6 +90,7 @@ TEST_CASE("real mul_2si")
     r1 = 2.1_r128;
     r0 = real{1, 12};
     mul_2si(r0, std::move(r1), -34);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.is_valid());
     REQUIRE(r1.get_prec() == 12);
     REQUIRE(r1 == 1);
@@ -114,6 +119,7 @@ TEST_CASE("real div_2ui")
     auto r0 = 2.1_r128;
     auto r1 = div_2ui(std::move(r0), 34);
     REQUIRE(abs(r1 - c) / c < mppp::pow(2_r128, -126));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = 2.1_r128;
     r1 = div_2ui(r0, 34);
@@ -129,6 +135,7 @@ TEST_CASE("real div_2ui")
     r1 = 2.1_r128;
     r0 = real{1, 12};
     div_2ui(r0, std::move(r1), 34);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.is_valid());
     REQUIRE(r1.get_prec() == 12);
     REQUIRE(r1 == 1);
@@ -159,6 +166,7 @@ TEST_CASE("real div_2si")
     auto r0 = 2.1_r128;
     auto r1 = div_2si(std::move(r0), -34);
     REQUIRE(abs(r1 - c) / c < mppp::pow(2_r128, -126));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = 2.1_r128;
     r1 = div_2si(r0, -34);
@@ -174,6 +182,7 @@ TEST_CASE("real div_2si")
     r1 = 2.1_r128;
     r0 = real{1, 12};
     div_2si(r0, std::move(r1), -34);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.is_valid());
     REQUIRE(r1.get_prec() == 12);
     REQUIRE(r1 == 1);

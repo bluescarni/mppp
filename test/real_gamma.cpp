@@ -15,6 +15,7 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real gamma")
@@ -29,6 +30,7 @@ TEST_CASE("real gamma")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(gamma(r0) == 1);
     REQUIRE(gamma(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -44,6 +46,7 @@ TEST_CASE("real lgamma")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(lgamma(r0) == 0);
     REQUIRE(lgamma(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -59,6 +62,7 @@ TEST_CASE("real lngamma")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(lngamma(r0) == 0);
     REQUIRE(lngamma(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -75,6 +79,7 @@ TEST_CASE("real digamma")
     r0 = real{2};
     REQUIRE(abs(digamma(r0) - (digamma(real{3}) - 1 / real{2})) < 1E-8);
     REQUIRE(abs(digamma(std::move(r0)) - (digamma(real{3}) - 1 / real{2})) < 1E-8);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -92,6 +97,7 @@ TEST_CASE("real gamma_inc")
     REQUIRE(abs(r0 - (3 * gamma_inc(real{3}, real{5}) + pow(real{5}, 3) * exp(-real{5}))) < 1E-8);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp1 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
     tmp1 = real{4};
@@ -101,6 +107,7 @@ TEST_CASE("real gamma_inc")
     REQUIRE(abs(r0 - (3 * gamma_inc(real{3}, real{5}) + pow(real{5}, 3) * exp(-real{5}))) < 1E-8);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp2 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
 

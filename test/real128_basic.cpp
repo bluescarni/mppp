@@ -49,6 +49,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 using int_t = integer<1>;
@@ -56,6 +57,7 @@ using rat_t = rational<1>;
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 static constexpr auto delta64 = detail::nl_digits<std::uint_least64_t>() - 64;
@@ -98,6 +100,7 @@ constexpr auto test_cexpr_complex_get2(real128 r)
 
 #endif
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real128 constructors")
 {
     using Catch::Matchers::Message;
@@ -124,8 +127,10 @@ TEST_CASE("real128 constructors")
     REQUIRE((rc4.m_value == 5));
     REQUIRE((rc5.m_value == 45));
     REQUIRE((rc6.m_value == 4));
+    // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     real128 r3{std::move(r)};
     REQUIRE((r3.m_value == 12));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE((r.m_value == 12));
     real128 r4{__float128(-56)};
     REQUIRE((r4.m_value == -56));
@@ -191,7 +196,7 @@ TEST_CASE("real128 constructors")
     for (int i = 0; i < ntries; ++i) {
         const auto hi = dist49(rng);
         const auto lo = dist64(rng);
-        const auto sign = sdist(rng) ? 1 : -1;
+        const auto sign = sdist(rng) != 0 ? 1 : -1;
         const auto ebits = extra_bits(rng);
         auto tmp_r = real128{((int_t{hi} << 64) * sign + lo) << ebits};
         auto cmp_r = ::scalbnq(::scalbnq(__float128(hi) * sign, 64) + lo, ebits);
@@ -371,6 +376,7 @@ TEST_CASE("real128 constructors")
 #endif
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real128 conversions")
 {
     // Conversion to C++ basic types.
@@ -384,7 +390,7 @@ TEST_CASE("real128 conversions")
 #endif
     REQUIRE((static_cast<__float128>(re) == re.m_value));
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    long double xld;
+    long double xld = -1;
     real128{.1l}.get(xld);
     REQUIRE(xld == .1l);
     get(xld, real128{.3l});
@@ -444,7 +450,7 @@ TEST_CASE("real128 conversions")
     // Subnormal numbers.
     const real128 small_factor{"3e-4932"};
     for (int i = 0; i < ntries; ++i) {
-        auto value = dist(rng) * (sdist(rng) ? 1. : -1.);
+        auto value = dist(rng) * (sdist(rng) != 0 ? 1. : -1.);
         real128 tmp{value};
         tmp.m_value *= small_factor.m_value;
         REQUIRE(static_cast<int_t>(tmp) == 0);
@@ -456,7 +462,7 @@ TEST_CASE("real128 conversions")
     for (int i = 0; i < ntries; ++i) {
         const auto hi = dist49(rng);
         const auto lo = dist64(rng);
-        const auto sign = sdist(rng) ? 1 : -1;
+        const auto sign = sdist(rng) != 0 ? 1 : -1;
         const auto ebits = extra_bits(rng);
         auto tmp_int = ((int_t{hi} << 64) * sign + lo) << ebits;
         auto r = ::scalbnq(::scalbnq(__float128(hi) * sign, 64) + lo, ebits);
@@ -471,7 +477,7 @@ TEST_CASE("real128 conversions")
     // Test with small non-integral values.
     dist = std::uniform_real_distribution<double>(100., 1000.);
     for (int i = 0; i < ntries; ++i) {
-        auto tmp_d = dist(rng) * (sdist(rng) ? 1. : -1.);
+        auto tmp_d = dist(rng) * (sdist(rng) != 0 ? 1. : -1.);
         __float128 tmp_r = ::nextafterq(tmp_d, 10000.);
         REQUIRE(static_cast<int_t>(real128{tmp_r}) == int_t{tmp_d});
         REQUIRE(real128{tmp_r}.get(nrop));
@@ -481,7 +487,7 @@ TEST_CASE("real128 conversions")
     // Test with larger values.
     dist = std::uniform_real_distribution<double>(3.6893488147419103e+19, 3.6893488147419103e+19 * 10.);
     for (int i = 0; i < ntries; ++i) {
-        auto tmp_d = dist(rng) * (sdist(rng) ? 1. : -1.);
+        auto tmp_d = dist(rng) * (sdist(rng) != 0 ? 1. : -1.);
         REQUIRE(static_cast<int_t>(real128{tmp_d}) == int_t{tmp_d});
         REQUIRE(real128{tmp_d}.get(nrop));
         REQUIRE(get(nrop, real128{tmp_d}));
@@ -557,7 +563,7 @@ TEST_CASE("real128 conversions")
     REQUIRE(get(rrop, real128{"-3.40917866435610111081769936359662259e-4957"}));
     REQUIRE((rrop == rat_t{-32135, int_t{1} << 16480ul}));
     // Small tests for getters with C++ rop.
-    int int_rop;
+    int int_rop = -1;
     REQUIRE(real128{123}.get(int_rop));
     REQUIRE(int_rop == 123);
     REQUIRE(get(int_rop, real128{-123}));
@@ -567,19 +573,19 @@ TEST_CASE("real128 conversions")
     REQUIRE(get(int_rop, real128{-123.456}));
     REQUIRE(int_rop == -123);
     if (std::numeric_limits<double>::radix == 2) {
-        double d_rop;
+        double d_rop = -1;
         REQUIRE(real128{123.456}.get(d_rop));
         REQUIRE(d_rop == 123.456);
         REQUIRE(get(d_rop, real128{-123.456}));
         REQUIRE(d_rop == -123.456);
     }
 #if defined(MPPP_HAVE_GCC_INT128)
-    __int128_t n128_rop;
+    __int128_t n128_rop = -1;
     REQUIRE(real128{123.456}.get(n128_rop));
     REQUIRE(n128_rop == 123);
     REQUIRE(get(n128_rop, real128{-123.456}));
     REQUIRE(n128_rop == -123);
-    __uint128_t un128_rop;
+    __uint128_t un128_rop = 1;
     REQUIRE(real128{123.456}.get(un128_rop));
     REQUIRE(un128_rop == 123);
 #endif
@@ -645,7 +651,7 @@ TEST_CASE("real128 conversions")
 
 TEST_CASE("real128 frexp")
 {
-    int exp;
+    int exp = -1;
     REQUIRE(frexp(real128{}, &exp) == 0);
     REQUIRE(exp == 0);
     REQUIRE(frexp(real128_inf(), &exp) == real128_inf());
@@ -659,38 +665,61 @@ TEST_CASE("real128 frexp")
 
 TEST_CASE("real128 numeric_limits")
 {
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::is_specialized, "");
     REQUIRE(std::numeric_limits<real128>::min() == real128_min());
     REQUIRE(std::numeric_limits<real128>::max() == real128_max());
     REQUIRE(std::numeric_limits<real128>::lowest() == -std::numeric_limits<real128>::max());
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::digits == real128_sig_digits(), "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::digits10 == 33, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::max_digits10 == 36, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::is_signed, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(!std::numeric_limits<real128>::is_integer, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(!std::numeric_limits<real128>::is_exact, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::radix == 2, "");
     REQUIRE(std::numeric_limits<real128>::epsilon() == real128_epsilon());
     REQUIRE(std::numeric_limits<real128>::round_error() == .5);
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::min_exponent == -16381, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::min_exponent10 == -16381 * 301L / 1000L, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::max_exponent == 16384, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::max_exponent10 == 16384 * 301L / 1000L, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::has_infinity, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::has_quiet_NaN, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(!std::numeric_limits<real128>::has_signaling_NaN, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::has_denorm_loss, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::has_denorm == std::denorm_present, "");
     REQUIRE(std::numeric_limits<real128>::infinity() == real128_inf());
     REQUIRE(isinf(std::numeric_limits<real128>::infinity()));
     REQUIRE(isnan(std::numeric_limits<real128>::quiet_NaN()));
     REQUIRE(std::numeric_limits<real128>::signaling_NaN() == 0);
     REQUIRE(std::numeric_limits<real128>::denorm_min() == real128_denorm_min());
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::is_iec559, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(!std::numeric_limits<real128>::is_bounded, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(!std::numeric_limits<real128>::is_modulo, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(!std::numeric_limits<real128>::traps, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(!std::numeric_limits<real128>::tinyness_before, "");
+    // NOLINTNEXTLINE(modernize-unary-static-assert)
     static_assert(std::numeric_limits<real128>::round_style == std::round_to_nearest, "");
 }
 

@@ -144,8 +144,10 @@ class MPPP_DLL_PUBLIC complex
 {
     // Make friends, for accessing the non-checking prec setting funcs.
     template <bool, typename F, typename Arg0, typename... Args>
+    // NOLINTNEXTLINE(readability-redundant-declaration)
     friend complex &detail::mpc_nary_op_impl(::mpfr_prec_t, const F &, complex &, Arg0 &&, Args &&...);
     template <bool, typename F, typename Arg0, typename... Args>
+    // NOLINTNEXTLINE(readability-redundant-declaration)
     friend complex detail::mpc_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
 
     // Utility function to check the precision upon init.
@@ -176,9 +178,9 @@ public:
     complex(const complex &);
     // Move constructor.
     complex(complex &&other) noexcept
+        : // Shallow copy other.
+          m_mpc(other.m_mpc)
     {
-        // Shallow copy other.
-        m_mpc = other.m_mpc;
         // Mark the other as moved-from.
         other.m_mpc.re->_mpfr_d = nullptr;
     }
@@ -194,6 +196,7 @@ private:
     };
     // From real-valued interoperable types + optional precision.
     template <typename T, typename... Args>
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(gtag, std::true_type, T &&x, const Args &... args)
     {
         // Init the real part from x + optional explicit precision.
@@ -217,6 +220,7 @@ private:
     // NOTE: no need for std::forward, as this constructor will involve
     // only std::complex or complex128.
     template <typename T, typename... Args>
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(gtag, std::false_type, const T &c, const Args &... args) : complex(c.real(), c.imag(), args...)
     {
     }
@@ -228,6 +232,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-forwarding-reference-overload)
     explicit complex(T &&x) : complex(gtag{}, is_rv_complex_interoperable<T>{}, std::forward<T>(x))
     {
     }
@@ -237,6 +242,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(T &&x, complex_prec_t p) : complex(gtag{}, is_rv_complex_interoperable<T>{}, std::forward<T>(x), p)
     {
     }
@@ -268,6 +274,7 @@ public:
               detail::enable_if_t<
                   detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(T &&re, U &&im)
     {
         // NOTE: the precision will be the largest between the
@@ -283,6 +290,7 @@ public:
               detail::enable_if_t<
                   detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(T &&re, U &&im, complex_prec_t p)
     {
         real_imag_ctor_impl(std::forward<T>(re), std::forward<U>(im), static_cast<::mpfr_prec_t>(p));
@@ -306,6 +314,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(const T &s, int base, complex_prec_t p) : complex(stag{}, s, base, static_cast<::mpfr_prec_t>(p))
     {
     }
@@ -315,6 +324,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(const T &s, complex_prec_t p) : complex(s, 10, p)
     {
     }
@@ -399,6 +409,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     complex &operator=(T &&x)
     {
         dispatch_generic_assignment(std::forward<T>(x), is_rv_complex_interoperable<T>{});
@@ -414,7 +425,7 @@ public:
 #endif
 
     // Check validity.
-    bool is_valid() const noexcept
+    MPPP_NODISCARD bool is_valid() const noexcept
     {
         return mpc_realref(&m_mpc)->_mpfr_d != nullptr;
     }
@@ -607,11 +618,11 @@ public:
 #if MPPP_CPLUSPLUS >= 201703L
     // Helpers to construct re/im refs.
     // They require C++17.
-    re_cref real_cref() const
+    [[nodiscard]] re_cref real_cref() const
     {
         return re_cref{*this};
     }
-    im_cref imag_cref() const
+    [[nodiscard]] im_cref imag_cref() const
     {
         return im_cref{*this};
     }
@@ -625,7 +636,7 @@ public:
     }
 #endif
     // Extract copies of the real/imaginary parts.
-    std::pair<real, real> get_real_imag() const &;
+    MPPP_NODISCARD std::pair<real, real> get_real_imag() const &;
     // Move out the real/imaginary parts.
     std::pair<real, real> get_real_imag() &&
     {
@@ -639,7 +650,7 @@ public:
     }
 
     // Precision getter.
-    ::mpfr_prec_t get_prec() const
+    MPPP_NODISCARD ::mpfr_prec_t get_prec() const
     {
         assert(mpfr_get_prec(mpc_realref(&m_mpc)) == mpfr_get_prec(mpc_imagref(&m_mpc)));
 
@@ -679,7 +690,7 @@ public:
     complex &prec_round(::mpfr_prec_t);
 
     // mpc_t getters.
-    const mpc_struct_t *get_mpc_t() const
+    MPPP_NODISCARD const mpc_struct_t *get_mpc_t() const
     {
         return &m_mpc;
     }
@@ -689,16 +700,16 @@ public:
     }
 
     // Detect special values.
-    bool zero_p() const
+    MPPP_NODISCARD bool zero_p() const
     {
         return mpfr_zero_p(mpc_realref(&m_mpc)) != 0 && mpfr_zero_p(mpc_imagref(&m_mpc)) != 0;
     }
-    bool is_one() const;
+    MPPP_NODISCARD bool is_one() const;
 
 private:
     // Implementation of the conversion operator.
     template <typename T>
-    T dispatch_conversion(std::true_type) const
+    MPPP_NODISCARD T dispatch_conversion(std::true_type) const
     {
         if (std::is_same<T, bool>::value) {
             return static_cast<T>(!zero_p());
@@ -714,7 +725,7 @@ private:
         }
     }
     template <typename T>
-    T dispatch_conversion(std::false_type) const
+    MPPP_NODISCARD T dispatch_conversion(std::false_type) const
     {
         using value_type = typename T::value_type;
 
@@ -801,7 +812,7 @@ public:
             std::integral_constant<int, is_rv_complex_interoperable<T>::value + std::is_same<T, real>::value * 2>{});
     }
 
-    std::string to_string(int base = 10) const;
+    MPPP_NODISCARD std::string to_string(int base = 10) const;
 
 private:
     template <typename T>
@@ -903,7 +914,7 @@ namespace detail
 template <typename... Args>
 using complex_set_t = decltype(std::declval<complex &>().set(std::declval<const Args &>()...));
 
-}
+} // namespace detail
 
 #if defined(MPPP_HAVE_CONCEPTS)
 
@@ -2975,12 +2986,14 @@ MPPP_DECLARE_COMPLEX_UDL(1024)
 template <std::size_t SSize>
 inline integer<SSize> &integer<SSize>::operator=(const complex &c)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<integer<SSize>>(c);
 }
 
 template <std::size_t SSize>
 inline rational<SSize> &rational<SSize>::operator=(const complex &c)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<rational<SSize>>(c);
 }
 

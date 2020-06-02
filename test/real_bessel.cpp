@@ -15,6 +15,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real j0")
@@ -29,6 +30,7 @@ TEST_CASE("real j0")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(j0(r0) == 1);
     REQUIRE(j0(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -44,6 +46,7 @@ TEST_CASE("real j1")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(j1(r0) == 0);
     REQUIRE(j1(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -56,6 +59,7 @@ TEST_CASE("real jn")
     REQUIRE(jn(rop, 1, real{45}) == j1(real{45}));
     REQUIRE(jn(0, r0) == 1);
     REQUIRE(jn(0, std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -71,6 +75,7 @@ TEST_CASE("real y0")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(y0(r0) == real{"-inf", 100});
     REQUIRE(y0(std::move(r0)) == real{"-inf", 100});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -86,6 +91,7 @@ TEST_CASE("real y1")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(y1(r0) == real{"-inf", 100});
     REQUIRE(y1(std::move(r0)) == real{"-inf", 100});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -98,6 +104,7 @@ TEST_CASE("real yn")
     REQUIRE(yn(rop, 1, real{45}) == y1(real{45}));
     REQUIRE(yn(0, r0) == real{"-inf", 100});
     REQUIRE(yn(0, std::move(r0)) == real{"-inf", 100});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -128,9 +135,11 @@ TEST_CASE("real jx")
         real r1{1.25, 32}, r2{2.5, 64};
         REQUIRE(jx(r1, r2).get_prec() == 64);
         jx(r1, std::move(r2));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r2.is_valid());
         r2 = real{2.5, 16};
         jx(std::move(r1), r2);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r1.is_valid());
     }
 
@@ -143,6 +152,7 @@ TEST_CASE("real jx")
 
         r = real{};
         jx(r, r1, std::move(r2));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r2 == real{});
         REQUIRE(r2.get_prec() == real_prec_min());
         REQUIRE(r == jx(r1, real{"2.3", 33}));
@@ -150,6 +160,7 @@ TEST_CASE("real jx")
         r = real{};
         r2 = real{"2.3", 33};
         jx(r, std::move(r2), r1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r2 == real{});
         REQUIRE(r2.get_prec() == real_prec_min());
         REQUIRE(r == jx(real{"2.3", 33}, r1));
@@ -157,8 +168,10 @@ TEST_CASE("real jx")
         r = real{};
         r2 = real{"2.3", 33};
         jx(r, std::move(r2), std::move(r1));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r2 == real{});
         REQUIRE(r2.get_prec() == real_prec_min());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r1 == real{"1.1", 32});
         REQUIRE(r1.get_prec() == 32);
         REQUIRE(r == jx(real{"2.3", 33}, r1));
@@ -187,9 +200,11 @@ TEST_CASE("real yx")
         real r1{1.25, 32}, r2{2.5, 64};
         REQUIRE(yx(r1, r2).get_prec() == 64);
         yx(r1, std::move(r2));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r2.is_valid());
         r2 = real{2.5, 16};
         yx(std::move(r1), r2);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r1.is_valid());
     }
 
@@ -202,6 +217,7 @@ TEST_CASE("real yx")
 
         r = real{};
         yx(r, r1, std::move(r2));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r2 == real{});
         REQUIRE(r2.get_prec() == real_prec_min());
         REQUIRE(r == yx(r1, real{"2.3", 33}));
@@ -209,6 +225,7 @@ TEST_CASE("real yx")
         r = real{};
         r2 = real{"2.3", 33};
         yx(r, std::move(r2), r1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r2 == real{});
         REQUIRE(r2.get_prec() == real_prec_min());
         REQUIRE(r == yx(real{"2.3", 33}, r1));
@@ -216,8 +233,10 @@ TEST_CASE("real yx")
         r = real{};
         r2 = real{"2.3", 33};
         yx(r, std::move(r2), std::move(r1));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r2 == real{});
         REQUIRE(r2.get_prec() == real_prec_min());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r1 == real{"1.1", 32});
         REQUIRE(r1.get_prec() == 32);
         REQUIRE(r == yx(real{"2.3", 33}, r1));

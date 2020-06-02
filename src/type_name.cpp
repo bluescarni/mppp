@@ -19,6 +19,7 @@
 
 #include <mp++/type_name.hpp>
 
+// NOLINTNEXTLINE(modernize-concat-nested-namespaces)
 namespace mppp
 {
 
@@ -32,6 +33,7 @@ std::string demangle_from_typeid(const char *s)
     // potential ambiguities when taking the address of std::free().
     // See:
     // https://stackoverflow.com/questions/27440953/stdunique-ptr-for-c-functions-that-need-free
+    // NOLINTNEXTLINE(cppcoreguidelines-no-malloc, cppcoreguidelines-owning-memory, hicpp-no-malloc)
     auto deleter = [](void *ptr) { std::free(ptr); };
 
     // NOTE: abi::__cxa_demangle will return a pointer allocated by std::malloc, which we will delete via std::free().

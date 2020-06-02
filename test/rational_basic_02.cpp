@@ -48,7 +48,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -177,22 +179,27 @@ struct mpq_move_ass_tester {
         rational q;
         ::mpq_t q0;
         ::mpq_init(q0);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "0");
         ::mpq_init(q0);
         ::mpq_set_si(q0, 1234, 1);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "1234");
         ::mpq_init(q0);
         ::mpq_set_si(q0, -1234, 1);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "-1234");
         ::mpq_init(q0);
         ::mpq_set_str(q0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
         ::mpq_init(q0);
         ::mpq_set_str(q0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2", 10);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2");
     }

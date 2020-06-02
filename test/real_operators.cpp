@@ -27,6 +27,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 using int_t = integer<1>;
@@ -45,9 +46,11 @@ TEST_CASE("real identity")
     REQUIRE(::mpfr_cmp_ui((+r0).get_mpfr_t(), 123ul) == 0);
     REQUIRE((+r0).get_prec() == detail::nl_digits<int>() + 1);
     REQUIRE(::mpfr_cmp_ui((+std::move(r0)).get_mpfr_t(), 123ul) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real binary add")
 {
     real r0, r1;
@@ -57,13 +60,17 @@ TEST_CASE("real binary add")
     r1 = -1;
     REQUIRE(r0 + r1 == real{22});
     REQUIRE(std::move(r0) + r1 == real{22});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{23};
     REQUIRE(r0 + std::move(r1) == real{22});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r1.get_mpfr_t()->_mpfr_d);
     r1 = real{-1};
     REQUIRE(std::move(r0) + std::move(r1) == real{22});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_mpfr_t()->_mpfr_d);
     r0 = real{23};
     REQUIRE((real{1, 10} + real{2, 20} == real{3}));
@@ -308,6 +315,7 @@ TEST_CASE("real left in-place add")
     r0 += std::move(r1);
     REQUIRE(r0 == 43);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0) * 10);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1 == 42);
 }
 
@@ -330,6 +338,7 @@ TEST_CASE("real right in-place add")
         real r{123, detail::real_deduce_precision(5) + 1};
         n += std::move(r);
         REQUIRE(n == 122);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
     }
     {
@@ -455,9 +464,11 @@ TEST_CASE("real neg copy")
     REQUIRE(::mpfr_cmp_si((-r0).get_mpfr_t(), -123l) == 0);
     REQUIRE((-r0).get_prec() == detail::nl_digits<int>() + 1);
     REQUIRE(::mpfr_cmp_si((-std::move(r0)).get_mpfr_t(), -123l) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real binary sub")
 {
     real r0, r1;
@@ -467,13 +478,17 @@ TEST_CASE("real binary sub")
     r1 = -1;
     REQUIRE(r0 - r1 == real{24});
     REQUIRE(std::move(r0) - r1 == real{24});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{23};
     REQUIRE(r0 - std::move(r1) == real{24});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r1.get_mpfr_t()->_mpfr_d);
     r1 = real{-1};
     REQUIRE(std::move(r0) - std::move(r1) == real{24});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_mpfr_t()->_mpfr_d);
     r0 = real{23};
     REQUIRE((real{1, 10} - real{2, 20} == real{-1}));
@@ -718,6 +733,7 @@ TEST_CASE("real left in-place sub")
     r0 -= std::move(r1);
     REQUIRE(r0 == 41);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0) * 10);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1 == 42);
 }
 
@@ -740,6 +756,7 @@ TEST_CASE("real right in-place sub")
         real r{123, detail::real_deduce_precision(5) + 1};
         n -= std::move(r);
         REQUIRE(n == -124);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
     }
     {
@@ -852,6 +869,7 @@ TEST_CASE("real right in-place sub")
 #endif
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real binary mul")
 {
     real r0, r1;
@@ -861,13 +879,17 @@ TEST_CASE("real binary mul")
     r1 = -1;
     REQUIRE(r0 * r1 == real{-23});
     REQUIRE(std::move(r0) * r1 == real{-23});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{23};
     REQUIRE(r0 * std::move(r1) == real{-23});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r1.get_mpfr_t()->_mpfr_d);
     r1 = real{-1};
     REQUIRE(std::move(r0) * std::move(r1) == real{-23});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_mpfr_t()->_mpfr_d);
     r0 = real{23};
     REQUIRE((real{1, 10} * real{2, 20} == real{2}));
@@ -1112,6 +1134,7 @@ TEST_CASE("real left in-place mul")
     r0 *= std::move(r1);
     REQUIRE(r0 == 84);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0) * 10);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1 == 42);
 }
 
@@ -1134,6 +1157,7 @@ TEST_CASE("real right in-place mul")
         real r{2, detail::real_deduce_precision(5) + 1};
         n *= std::move(r);
         REQUIRE(n == -4);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
     }
     {
@@ -1246,6 +1270,7 @@ TEST_CASE("real right in-place mul")
 #endif
 }
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real binary div")
 {
     real r0, r1;
@@ -1255,13 +1280,17 @@ TEST_CASE("real binary div")
     r1 = -1;
     REQUIRE(r0 / r1 == real{-23});
     REQUIRE(std::move(r0) / r1 == real{-23});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{23};
     REQUIRE(r0 / std::move(r1) == real{-23});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r1.get_mpfr_t()->_mpfr_d);
     r1 = real{-1};
     REQUIRE(std::move(r0) / std::move(r1) == real{-23});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_mpfr_t()->_mpfr_d);
     r0 = real{23};
     REQUIRE((real{1, 10} / real{2, 20} == real{".5", 10}));
@@ -1504,6 +1533,7 @@ TEST_CASE("real left in-place div")
     r0 /= std::move(r1);
     REQUIRE(r0 == 21);
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0) * 10);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1 == 42);
 }
 
@@ -1522,6 +1552,7 @@ TEST_CASE("real right in-place div")
         real r{2, detail::real_deduce_precision(5) + 1};
         n /= std::move(r);
         REQUIRE(n == 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
     }
     {

@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- mp++ now builds cleanly with ``clang-tidy``
+  (`#244 <https://github.com/bluescarni/mppp/pull/244>`__).
 - Implement additional three-way comparison functions
   for :cpp:class:`~mppp::real`
   (`#243 <https://github.com/bluescarni/mppp/pull/243>`__).

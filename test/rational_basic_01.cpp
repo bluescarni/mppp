@@ -50,7 +50,9 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -513,21 +515,26 @@ struct mpq_move_ctor_tester {
         using rational = rational<S::value>;
         ::mpq_t q0;
         ::mpq_init(q0);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == 0);
         ::mpq_init(q0);
         ::mpz_set_si(mpq_numref(q0), 1234);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == 1234);
         ::mpq_init(q0);
         ::mpz_set_si(mpq_numref(q0), -1234);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == -1234);
         ::mpq_init(q0);
         ::mpz_set_si(mpq_numref(q0), 4);
         ::mpz_set_si(mpq_denref(q0), -3);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(rational{std::move(q0)}) == "4/-3");
         ::mpq_init(q0);
         ::mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237",
                       10);
         ::mpz_set_si(mpq_denref(q0), -3);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(rational{std::move(q0)})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237/-3");
         ::mpq_init(q0);
@@ -535,6 +542,7 @@ struct mpq_move_ctor_tester {
                       10);
         ::mpz_set_str(mpq_denref(q0), "-3218372891372987328917389127389217398271983712987398127398172389712937819237",
                       10);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(rational{std::move(q0)})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237/"
                    "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
@@ -590,6 +598,7 @@ TEST_CASE("mpz_t constructor")
 
 struct copy_move_tester {
     template <typename S>
+    // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
     void operator()(const S &) const
     {
         using rational = rational<S::value>;
@@ -617,6 +626,7 @@ struct copy_move_tester {
         REQUIRE(q3.get_num().is_static());
         REQUIRE(q3.get_den().is_static());
         rational q4{std::move(q2)};
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q2.get_num().is_zero());
         REQUIRE(q2.get_den().is_one());
         REQUIRE(q2.get_num().is_static());
@@ -630,6 +640,7 @@ struct copy_move_tester {
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_static());
         q2 = std::move(q4);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q4.get_num().is_zero());
         REQUIRE(q4.get_den().is_one());
         REQUIRE(q4.get_num().is_static());
@@ -643,6 +654,7 @@ struct copy_move_tester {
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());
         q2 = std::move(q2);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(lex_cast(q2) == "-123");
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());
@@ -656,6 +668,7 @@ struct copy_move_tester {
         // Check that move operations reset to zero the right operand.
         q = "4/5";
         auto qa(std::move(q));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -663,6 +676,7 @@ struct copy_move_tester {
         q = "4/5";
         q._get_num().promote();
         auto qb(std::move(q));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -670,6 +684,7 @@ struct copy_move_tester {
         q = "4/5";
         q._get_den().promote();
         auto qc(std::move(q));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -678,6 +693,7 @@ struct copy_move_tester {
         q._get_num().promote();
         q._get_den().promote();
         auto qd(std::move(q));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -685,6 +701,7 @@ struct copy_move_tester {
         q = "4/5";
         q2 = "3/4";
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -693,6 +710,7 @@ struct copy_move_tester {
         q2 = "3/4";
         q._get_num().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -701,6 +719,7 @@ struct copy_move_tester {
         q2 = "3/4";
         q._get_den().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -710,6 +729,7 @@ struct copy_move_tester {
         q._get_num().promote();
         q._get_den().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -718,6 +738,7 @@ struct copy_move_tester {
         q2 = "3/4";
         q2._get_num().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -726,6 +747,7 @@ struct copy_move_tester {
         q2 = "3/4";
         q2._get_den().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -735,6 +757,7 @@ struct copy_move_tester {
         q2._get_num().promote();
         q2._get_den().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -746,60 +769,7 @@ struct copy_move_tester {
         q2._get_num().promote();
         q2._get_den().promote();
         q2 = std::move(q);
-        REQUIRE(q.get_num().is_zero());
-        REQUIRE(q.get_den().is_one());
-        REQUIRE(q.get_num().is_static());
-        REQUIRE(q.get_den().is_static());
-        REQUIRE(q.get_den().is_static());
-        q = "4/5";
-        q2 = "3/4";
-        q._get_den().promote();
-        q2._get_num().promote();
-        q2._get_den().promote();
-        q2 = std::move(q);
-        REQUIRE(q.get_num().is_zero());
-        REQUIRE(q.get_den().is_one());
-        REQUIRE(q.get_num().is_static());
-        REQUIRE(q.get_den().is_static());
-        REQUIRE(q.get_den().is_static());
-        q = "4/5";
-        q2 = "3/4";
-        q._get_num().promote();
-        q2._get_num().promote();
-        q2._get_den().promote();
-        q2 = std::move(q);
-        REQUIRE(q.get_num().is_zero());
-        REQUIRE(q.get_den().is_one());
-        REQUIRE(q.get_num().is_static());
-        REQUIRE(q.get_den().is_static());
-        REQUIRE(q.get_den().is_static());
-        q = "4/5";
-        q2 = "3/4";
-        q._get_num().promote();
-        q._get_den().promote();
-        q2._get_den().promote();
-        q2 = std::move(q);
-        REQUIRE(q.get_num().is_zero());
-        REQUIRE(q.get_den().is_one());
-        REQUIRE(q.get_num().is_static());
-        REQUIRE(q.get_den().is_static());
-        REQUIRE(q.get_den().is_static());
-        q = "4/5";
-        q2 = "3/4";
-        q._get_num().promote();
-        q._get_den().promote();
-        q2._get_num().promote();
-        q2 = std::move(q);
-        REQUIRE(q.get_num().is_zero());
-        REQUIRE(q.get_den().is_one());
-        REQUIRE(q.get_num().is_static());
-        REQUIRE(q.get_den().is_static());
-        REQUIRE(q.get_den().is_static());
-        q = "4/5";
-        q2 = "3/4";
-        q._get_num().promote();
-        q2._get_num().promote();
-        q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -809,7 +779,67 @@ struct copy_move_tester {
         q2 = "3/4";
         q._get_den().promote();
         q2._get_num().promote();
+        q2._get_den().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q2._get_num().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q._get_den().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q._get_den().promote();
+        q2._get_num().promote();
+        q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q2._get_num().promote();
+        q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_den().promote();
+        q2._get_num().promote();
+        q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -820,6 +850,7 @@ struct copy_move_tester {
         q._get_num().promote();
         q2._get_den().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
@@ -830,6 +861,7 @@ struct copy_move_tester {
         q._get_den().promote();
         q2._get_den().promote();
         q2 = std::move(q);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(q.get_num().is_zero());
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());

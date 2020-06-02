@@ -35,6 +35,7 @@ using mpz_size_t = decltype(std::declval<mpz_struct_t>()._mp_size);
 
 // Simple RAII holder for GMP integers.
 struct mpz_raii {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     mpz_raii()
     {
         ::mpz_init(&m_mpz);
@@ -60,6 +61,7 @@ using mpq_struct_t = std::remove_extent<::mpq_t>::type;
 
 // Simple RAII holder for GMP rationals.
 struct mpq_raii {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     mpq_raii()
     {
         ::mpq_init(&m_mpq);
@@ -80,6 +82,7 @@ using mpf_struct_t = std::remove_extent<::mpf_t>::type;
 
 // Simple RAII holder for GMP floats.
 struct mpf_raii {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit mpf_raii(::mp_bitcnt_t prec)
     {
         ::mpf_init2(&m_mpf, prec);

@@ -17,7 +17,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using uint_types = std::tuple<unsigned char, unsigned short, unsigned, unsigned long, unsigned long long

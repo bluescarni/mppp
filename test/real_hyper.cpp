@@ -15,6 +15,7 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real hyper")
@@ -28,6 +29,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(sinh(r0).zero_p());
     REQUIRE(sinh(std::move(r0)).zero_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -40,6 +42,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(cosh(r0) == 1);
     REQUIRE(cosh(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -52,6 +55,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(tanh(r0) == 0);
     REQUIRE(tanh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -64,6 +68,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(sech(r0) == 1);
     REQUIRE(sech(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -76,6 +81,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(csch(r0).inf_p());
     REQUIRE(csch(std::move(r0)).inf_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -88,6 +94,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(coth(r0).inf_p());
     REQUIRE(coth(std::move(r0)).inf_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -100,6 +107,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(asinh(r0) == 0);
     REQUIRE(asinh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{1};
@@ -112,6 +120,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(acosh(r0) == 0);
     REQUIRE(acosh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -124,6 +133,7 @@ TEST_CASE("real hyper")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(atanh(r0) == 0);
     REQUIRE(atanh(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     // sinh_cosh.

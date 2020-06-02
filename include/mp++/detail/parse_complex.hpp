@@ -19,7 +19,7 @@ namespace detail
 
 std::array<const char *, 4> parse_complex(const char *);
 
-}
+} // namespace detail
 
 } // namespace mppp
 

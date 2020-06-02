@@ -230,6 +230,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
     explicit rational(T &&x) : rational(ptag{}, std::forward<T>(x))
     {
     }
@@ -257,6 +258,7 @@ private:
     void dispatch_c_string_ctor(const char *s, int base)
     {
         MPPP_MAYBE_TLS std::string tmp_str;
+        // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
         auto ptr = s;
         for (; *ptr != '\0' && *ptr != '/'; ++ptr) {
         }
@@ -310,6 +312,9 @@ public:
     // Move constructor from \p mpq_t.
     explicit rational(::mpq_t &&q) : m_num(::mpz_t{*mpq_numref(q)}), m_den(::mpz_t{*mpq_denref(q)}) {}
 #endif
+
+    ~rational() = default;
+
     // Copy-assignment operator.
     // NOTE: as long as copy assignment of integer cannot
     // throw, the default is good.
@@ -352,6 +357,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     rational &operator=(T &&x)
     {
         dispatch_assignment(std::forward<T>(x),
@@ -380,6 +386,7 @@ public:
 #endif
     rational &operator=(const T &s)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = rational{s};
     }
     // Assignment from mpz_t.
@@ -406,7 +413,7 @@ public:
     }
 #endif
     // Convert to string.
-    std::string to_string(int base = 10) const
+    MPPP_NODISCARD std::string to_string(int base = 10) const
     {
         if (m_den.is_one()) {
             return m_num.to_string(base);
@@ -417,13 +424,13 @@ public:
 private:
     // Conversion to int_t.
     template <typename T, detail::enable_if_t<std::is_same<int_t, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_num / m_den);
     }
     // Conversion to bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_num.m_int.m_st._mp_size != 0);
     }
@@ -431,14 +438,14 @@ private:
     template <typename T,
               detail::enable_if_t<
                   detail::conjunction<detail::is_integral<T>, detail::negation<std::is_same<bool, T>>>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return static_cast<int_t>(*this).template dispatch_conversion<T>();
     }
     // Conversion to float/double.
     template <typename T,
               detail::enable_if_t<detail::disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         const auto v = detail::get_mpq_view(*this);
         return std::make_pair(true, static_cast<T>(::mpq_get_d(&v)));
@@ -446,7 +453,7 @@ private:
 #if defined(MPPP_WITH_MPFR)
     // Conversion to long double.
     template <typename T, detail::enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS detail::mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
@@ -457,7 +464,7 @@ private:
 #endif
     // Conversion to std::complex.
     template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, T(static_cast<typename T::value_type>(*this)));
     }
@@ -509,12 +516,12 @@ public:
         return dispatch_get(rop);
     }
     // Const numerator getter.
-    const int_t &get_num() const
+    MPPP_NODISCARD const int_t &get_num() const
     {
         return m_num;
     }
     // Const denominator getter.
-    const int_t &get_den() const
+    MPPP_NODISCARD const int_t &get_den() const
     {
         return m_den;
     }
@@ -555,7 +562,7 @@ public:
         return *this;
     }
     // Check canonical form.
-    bool is_canonical() const
+    MPPP_NODISCARD bool is_canonical() const
     {
         if (m_num.is_zero()) {
             // If num is zero, den must be one.
@@ -575,7 +582,7 @@ public:
         return g.is_one();
     }
     // Sign.
-    int sgn() const
+    MPPP_NODISCARD int sgn() const
     {
         return mppp::sgn(m_num);
     }
@@ -602,17 +609,17 @@ public:
         return *this;
     }
     // Test if the value is zero.
-    bool is_zero() const
+    MPPP_NODISCARD bool is_zero() const
     {
         return mppp::is_zero(m_num);
     }
     // Test if the value is one.
-    bool is_one() const
+    MPPP_NODISCARD bool is_one() const
     {
         return mppp::is_one(m_num) && mppp::is_one(m_den);
     }
     // Test if the value is minus one.
-    bool is_negative_one() const
+    MPPP_NODISCARD bool is_negative_one() const
     {
         return mppp::is_negative_one(m_num) && mppp::is_one(m_den);
     }
@@ -1090,7 +1097,7 @@ namespace detail
 MPPP_DLL_PUBLIC std::ostream &rational_stream_operator_impl(std::ostream &, const mpz_struct_t *, const mpz_struct_t *,
                                                             int, bool);
 
-}
+} // namespace detail
 
 // Output stream operator.
 template <std::size_t SSize>
@@ -2187,6 +2194,7 @@ inline std::size_t hash(const rational<SSize> &q)
 template <std::size_t SSize>
 inline integer<SSize> &integer<SSize>::operator=(const rational<SSize> &q)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<integer<SSize>>(q);
 }
 

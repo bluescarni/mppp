@@ -27,7 +27,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -49,6 +51,7 @@ using is_addable_inplace = detail::is_detected<inplace_add_t, T, U>;
 
 struct add_tester {
     template <typename S>
+    // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
     void operator()(const S &) const
     {
         using rational = rational<S::value>;
@@ -320,6 +323,7 @@ using is_subtractable_inplace = detail::is_detected<inplace_sub_t, T, U>;
 
 struct sub_tester {
     template <typename S>
+    // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
     void operator()(const S &) const
     {
         using rational = rational<S::value>;
@@ -591,6 +595,7 @@ using is_multipliable_inplace = detail::is_detected<inplace_mul_t, T, U>;
 
 struct mul_tester {
     template <typename S>
+    // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
     void operator()(const S &) const
     {
         using rational = rational<S::value>;

@@ -164,7 +164,7 @@ inline std::string lex_cast(__int128_t n)
 // Set mpz to random value with n limbs. Top limb is divided by div.
 inline void random_integer(mppp::detail::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
 {
-    if (!n) {
+    if (n == 0u) {
         ::mpz_set_ui(&m.m_mpz, 0);
         return;
     }
@@ -182,7 +182,7 @@ inline void random_integer(mppp::detail::mpz_raii &m, unsigned n, std::mt19937 &
 // Set mpq to random value with n limbs for num/den.
 inline void random_rational(mppp::detail::mpq_raii &m, unsigned n, std::mt19937 &rng)
 {
-    if (!n) {
+    if (n == 0u) {
         ::mpq_set_ui(&m.m_mpq, 0, 1);
         return;
     }
@@ -209,7 +209,7 @@ inline void random_rational(mppp::detail::mpq_raii &m, unsigned n, std::mt19937 
 // Set mpz to the max value with n limbs.
 inline void max_integer(mppp::detail::mpz_raii &m, unsigned n)
 {
-    if (!n) {
+    if (n == 0u) {
         ::mpz_set_ui(&m.m_mpz, 0);
         return;
     }

@@ -22,7 +22,9 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -43,6 +45,7 @@ using sint_types = std::tuple<signed char, short, int, long, long long
 #endif
                               >;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 struct add_ui_tester {
@@ -90,6 +93,7 @@ struct add_ui_tester {
             // Run a variety of tests with operands with x number of limbs.
             auto random_xy = [&](unsigned x) {
                 for (int i = 0; i < ntries; ++i) {
+                    // NOLINTNEXTLINE(misc-redundant-expression)
                     if (sdist(rng) && sdist(rng) && sdist(rng)) {
                         // Reset rop every once in a while.
                         n1 = integer{};
@@ -287,6 +291,7 @@ struct sub_ui_tester {
             // Run a variety of tests with operands with x number of limbs.
             auto random_xy = [&](unsigned x) {
                 for (int i = 0; i < ntries; ++i) {
+                    // NOLINTNEXTLINE(misc-redundant-expression)
                     if (sdist(rng) && sdist(rng) && sdist(rng)) {
                         // Reset rop every once in a while.
                         n1 = integer{};

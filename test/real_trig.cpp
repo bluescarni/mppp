@@ -17,6 +17,7 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real trig")
@@ -30,6 +31,7 @@ TEST_CASE("real trig")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(sin(r0).zero_p());
     REQUIRE(sin(std::move(r0)).zero_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -42,6 +44,7 @@ TEST_CASE("real trig")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(cos(r0) == 1);
     REQUIRE(cos(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -54,6 +57,7 @@ TEST_CASE("real trig")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(tan(r0) == 0);
     REQUIRE(tan(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -66,6 +70,7 @@ TEST_CASE("real trig")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(sec(r0) == 1);
     REQUIRE(sec(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -78,6 +83,7 @@ TEST_CASE("real trig")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(csc(r0).inf_p());
     REQUIRE(csc(std::move(r0)).inf_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -90,6 +96,7 @@ TEST_CASE("real trig")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(cot(r0).inf_p());
     REQUIRE(cot(std::move(r0)).inf_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -102,6 +109,7 @@ TEST_CASE("real trig")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(asin(r0) == 0);
     REQUIRE(asin(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
@@ -113,7 +121,9 @@ TEST_CASE("real trig")
     REQUIRE(acos(rop, r0) == real_pi(r0.get_prec()) / 2);
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(acos(r0) == real_pi(r0.get_prec()) / 2);
-    REQUIRE(acos(std::move(r0)) == real_pi(r0.get_prec()) / 2);
+    auto p_cmp = r0.get_prec();
+    REQUIRE(acos(std::move(r0)) == real_pi(p_cmp) / 2);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{1};
@@ -125,7 +135,9 @@ TEST_CASE("real trig")
     REQUIRE(atan(rop, r0) == real_pi(r0.get_prec()) / 4);
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(atan(r0) == real_pi(r0.get_prec()) / 4);
-    REQUIRE(atan(std::move(r0)) == real_pi(r0.get_prec()) / 4);
+    p_cmp = r0.get_prec();
+    REQUIRE(atan(std::move(r0)) == real_pi(p_cmp) / 4);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     // sin_cos.
@@ -172,6 +184,7 @@ TEST_CASE("real trig")
     REQUIRE(r0 == atan(real{4} / real{5}));
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp1 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
     tmp1 = real{4};
@@ -181,6 +194,7 @@ TEST_CASE("real trig")
     REQUIRE(r0 == atan(real{4} / real{5}));
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     // Check tmp2 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
 
@@ -205,6 +219,7 @@ TEST_CASE("real trig")
 
 #if defined(MPPP_WITH_ARB)
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real trig arb")
 {
     {
@@ -218,6 +233,7 @@ TEST_CASE("real trig arb")
         REQUIRE(rop.get_prec() == 128);
         REQUIRE(abs(rop - sin(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
         REQUIRE(sin_pi(std::move(r0)) == rop);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
 
         REQUIRE(sin_pi(real{"inf", 128}).nan_p());
@@ -239,6 +255,7 @@ TEST_CASE("real trig arb")
         REQUIRE(rop.get_prec() == 128);
         REQUIRE(abs(rop - cos(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
         REQUIRE(cos_pi(std::move(r0)) == rop);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
 
         REQUIRE(cos_pi(real{"inf", 128}).nan_p());
@@ -260,6 +277,7 @@ TEST_CASE("real trig arb")
         REQUIRE(rop.get_prec() == 128);
         REQUIRE(abs(rop - tan(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
         REQUIRE(tan_pi(std::move(r0)) == rop);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
 
         REQUIRE(tan_pi(real{"inf", 128}).nan_p());
@@ -325,6 +343,7 @@ TEST_CASE("real trig arb")
         REQUIRE(rop.get_prec() == 128);
         REQUIRE(abs(rop - cot(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
         REQUIRE(cot_pi(std::move(r0)) == rop);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
 
         REQUIRE(cot_pi(real{"inf", 128}).nan_p());
@@ -383,6 +402,7 @@ TEST_CASE("real trig arb")
         REQUIRE(rop.get_prec() == 128);
         REQUIRE(abs(rop - sin(1.23_r128) / 1.23_r128) < mppp::pow(2_r128, -126));
         REQUIRE(sinc(std::move(r0)) == rop);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
 
         REQUIRE(sinc(real{"inf", 128}).zero_p());
@@ -406,6 +426,7 @@ TEST_CASE("real trig arb")
         REQUIRE(rop.get_prec() == 128);
         REQUIRE(abs(rop - sin(real_pi(128) * 1.23_r128) / (real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
         REQUIRE(sinc_pi(std::move(r0)) == rop);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
 
         REQUIRE(sinc_pi(real{"inf", 128}).zero_p());

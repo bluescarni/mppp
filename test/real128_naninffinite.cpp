@@ -12,6 +12,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 #if defined(__INTEL_COMPILER)

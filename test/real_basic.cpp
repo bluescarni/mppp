@@ -43,9 +43,12 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 static const int ntrials = 1000;
@@ -162,6 +165,7 @@ struct fp_ctor_tester {
 struct foobar {
 };
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real constructors")
 {
     REQUIRE((!std::is_constructible<real, foobar>::value));
@@ -228,14 +232,16 @@ TEST_CASE("real constructors")
     real r8{42, 50}, r9{std::move(r8)};
     REQUIRE(::mpfr_equal_p(r9.get_mpfr_t(), real{42, 50}.get_mpfr_t()));
     REQUIRE(r9.get_prec() == 50);
-    REQUIRE(r8.get_mpfr_t()->_mpfr_d == nullptr);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r8.is_valid());
     // Revive via assignments.
     r8 = r9;
     REQUIRE(r8.is_valid());
     real r8a(std::move(r8));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r8.is_valid());
     r8 = std::move(r8a);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r8a.is_valid());
     REQUIRE(r8.is_valid());
     // Move ctor with different precision.
@@ -245,6 +251,7 @@ TEST_CASE("real constructors")
     REQUIRE(real{real{1}, real_prec_min()} == 1);
     real r8b{42};
     real r8c{std::move(r8b), 123};
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r8b.is_valid());
     REQUIRE(r8c == 42);
     REQUIRE(r8c.get_prec() == 123);
@@ -254,6 +261,7 @@ TEST_CASE("real constructors")
     REQUIRE(r8b == 56);
     REQUIRE(r8b.get_prec() == 87);
     real r8d{std::move(r8b), 95};
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r8b.is_valid());
     REQUIRE(r8d == 56);
     REQUIRE(r8d.get_prec() == 95);
@@ -571,6 +579,7 @@ TEST_CASE("real constructors")
 #if defined(_MSC_VER) && !defined(__clang__)
     ::mpfr_clear(m);
 #else
+    // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     real rtmp2{std::move(m)};
     REQUIRE(rtmp2.get_prec() == 123);
     REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
@@ -777,6 +786,7 @@ struct fp_ass_tester {
     }
 };
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real assignment")
 {
     REQUIRE((!std::is_assignable<real &, const foobar &>::value));
@@ -792,6 +802,7 @@ TEST_CASE("real assignment")
     // Move assignment.
     real r2{456, 10};
     r2 = std::move(r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 10);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{456, 10}.get_mpfr_t()));
     REQUIRE(r2.get_prec() == r0.get_prec());
@@ -1133,6 +1144,7 @@ TEST_CASE("real assignment")
         ::mpfr_clear(m);
 #else
         real rtmp2{46, 46};
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         rtmp2 = std::move(m);
         REQUIRE(rtmp2.get_prec() == 123);
         REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
@@ -1368,6 +1380,7 @@ struct fp_conv_tester {
     }
 };
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real conversion")
 {
     tuple_for_each(int_types{}, int_conv_tester{});

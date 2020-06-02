@@ -13,7 +13,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using int_t = integer<1>;
@@ -55,6 +57,7 @@ TEST_CASE("real get_z_2exp")
     });
     REQUIRE(n == old_n);
     exp = get_z_2exp(n, real{});
+    (void)exp;
     REQUIRE(n.is_zero());
 }
 

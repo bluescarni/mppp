@@ -26,6 +26,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 // Some tests involving constexpr result in an ICE on GCC < 6.

@@ -128,7 +128,11 @@ struct MPPP_DLL_PUBLIC mpz_alloc_cache {
     // NOTE: use round brackets init for the usual GCC 4.8 workaround.
     // NOTE: this will zero initialise recursively both members: we will
     // have all nullptrs in the caches, and all cache sizes will be zeroes.
-    constexpr mpz_alloc_cache() : caches(), sizes() {}
+    constexpr mpz_alloc_cache() noexcept : caches(), sizes() {}
+    mpz_alloc_cache(const mpz_alloc_cache &) = delete;
+    mpz_alloc_cache(mpz_alloc_cache &&) = delete;
+    mpz_alloc_cache &operator=(const mpz_alloc_cache &) = delete;
+    mpz_alloc_cache &operator=(mpz_alloc_cache &&) = delete;
     // Clear the cache, deallocating all the data in the arrays.
     void clear() noexcept;
     ~mpz_alloc_cache()
@@ -157,6 +161,7 @@ MPPP_DLL_PUBLIC void mpz_init_nlimbs(mpz_struct_t &, std::size_t);
 // Small helper to determine how many GMP limbs we need to fit nbits bits.
 constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
 {
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     return static_cast<::mp_bitcnt_t>(nbits / unsigned(GMP_NUMB_BITS) + ((nbits % unsigned(GMP_NUMB_BITS)) != 0u));
 }
 
@@ -209,6 +214,7 @@ inline void copy_limbs_no(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp
 inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *res)
 {
     *res = a + b;
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     return *res < a;
 }
 
@@ -355,6 +361,7 @@ inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
     //  1 |  0 | 1 * 2 + (0 & 0) = 2
     //  0 |  1 | 0 * 2 + (1 & 1) = 1
     //  0 |  0 | 0 * 2 + (1 & 0) = 0
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     return static_cast<mpz_size_t>(hinz * 2u + (static_cast<unsigned>(!hinz) & lonz));
 }
 
@@ -444,6 +451,7 @@ struct static_int {
         }
     }
     // Same as copy constructor.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     static_int(static_int &&other) noexcept : static_int(other) {}
     // These 2 constructors are used in the generic constructor of integer_union.
     //
@@ -479,6 +487,7 @@ struct static_int {
         // Zero fill the remaining limbs, if needed.
         zero_upper_limbs(asize);
     }
+    // NOLINTNEXTLINE(cert-oop54-cpp)
     static_int &operator=(const static_int &other)
     {
         _mp_size = other._mp_size;
@@ -498,6 +507,7 @@ struct static_int {
     static_int &operator=(static_int &&other) noexcept
     {
         // Just forward to the copy assignment.
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return operator=(other);
     }
     // Swap primitive.
@@ -532,7 +542,7 @@ struct static_int {
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
 
 #endif
-    bool dtor_checks() const
+    MPPP_NODISCARD bool dtor_checks() const
     {
         // LCOV_EXCL_START
         const auto asize = abs_size();
@@ -570,17 +580,19 @@ struct static_int {
         assert(dtor_checks());
     }
     // Size in limbs (absolute value of the _mp_size member).
-    mpz_size_t abs_size() const
+    MPPP_NODISCARD mpz_size_t abs_size() const
     {
         return std::abs(_mp_size);
     }
     // NOTE: the retval here can be used only in read-only mode, otherwise
     // we will have UB due to the const_cast use.
-    mpz_struct_t get_mpz_view() const
+    MPPP_NODISCARD mpz_struct_t get_mpz_view() const
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         return mpz_struct_t{_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
     }
     mpz_alloc_t _mp_alloc = s_alloc;
+    // NOLINTNEXTLINE(modernize-use-default-member-init)
     mpz_size_t _mp_size;
     limbs_type m_limbs;
 };
@@ -593,6 +605,7 @@ union integer_union {
     // Def ctor, will init to static.
     integer_union() : m_st() {}
     // Copy constructor, does a deep copy maintaining the storage class of other.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     integer_union(const integer_union &other)
     {
         if (other.is_static()) {
@@ -604,6 +617,7 @@ union integer_union {
         }
     }
     // Move constructor. Will downgrade other to a static zero integer if other is dynamic.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     integer_union(integer_union &&other) noexcept
     {
         if (other.is_static()) {
@@ -686,6 +700,7 @@ union integer_union {
 #endif
     // The generic constructor.
     template <typename T>
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit integer_union(const T &x)
     {
         dispatch_generic_ctor(x);
@@ -700,7 +715,7 @@ union integer_union {
         }
         MPPP_MAYBE_TLS mpz_raii mpz;
         if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
-            if (base) {
+            if (base != 0) {
                 throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
                                             + to_string(base));
             } else {
@@ -711,11 +726,13 @@ union integer_union {
         dispatch_mpz_ctor(&mpz.m_mpz);
     }
     // Constructor from C string and base.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit integer_union(const char *s, int base)
     {
         dispatch_c_string_ctor(s, base);
     }
     // Constructor from string range and base.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit integer_union(const char *begin, const char *end, int base)
     {
         // Copy the range into a local buffer.
@@ -736,12 +753,14 @@ union integer_union {
             ::new (static_cast<void *>(&m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
         }
     }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit integer_union(const ::mpz_t n)
     {
         dispatch_mpz_ctor(n);
     }
 #if !defined(_MSC_VER)
     // Move ctor from mpz_t.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit integer_union(::mpz_t &&n)
     {
         const auto asize = get_mpz_size(n);
@@ -807,11 +826,13 @@ union integer_union {
         }
     }
     // Constructor from array of limbs.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit integer_union(const ::mp_limb_t *p, std::size_t size)
     {
         construct_from_limb_array<true>(p, size);
     }
     // Constructor from number of bits.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit integer_union(integer_bitcnt_t nbits_)
     {
         const auto nbits = static_cast<::mp_bitcnt_t>(nbits_);
@@ -827,6 +848,7 @@ union integer_union {
         }
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
+    // NOLINTNEXTLINE(cert-oop54-cpp)
     integer_union &operator=(const integer_union &other)
     {
         const bool s1 = is_static(), s2 = other.is_static();
@@ -896,16 +918,16 @@ union integer_union {
         g_dy().~d_storage();
     }
     // Check storage type.
-    bool is_static() const
+    MPPP_NODISCARD bool is_static() const
     {
         return m_st._mp_alloc == s_storage::s_alloc;
     }
-    bool is_dynamic() const
+    MPPP_NODISCARD bool is_dynamic() const
     {
         return m_st._mp_alloc != s_storage::s_alloc;
     }
     // Getters for st and dy.
-    const s_storage &g_st() const
+    MPPP_NODISCARD const s_storage &g_st() const
     {
         assert(is_static());
         return m_st;
@@ -915,7 +937,7 @@ union integer_union {
         assert(is_static());
         return m_st;
     }
-    const d_storage &g_dy() const
+    MPPP_NODISCARD const d_storage &g_dy() const
     {
         assert(is_dynamic());
         return m_dy;
@@ -959,6 +981,7 @@ union integer_union {
             return false;
         }
         // Copy over the limbs to temporary storage.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> tmp;
         copy_limbs_no(g_dy()._mp_d, g_dy()._mp_d + dyn_size, tmp.data());
         const auto signed_size = g_dy()._mp_size;
@@ -997,7 +1020,7 @@ namespace detail
 template <std::size_t SSize>
 void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 
-}
+} // namespace detail
 
 // Detect C++ arithmetic types compatible with integer.
 template <typename T>
@@ -1170,7 +1193,7 @@ class integer
         {
         }
         mpz_view(const mpz_view &) = delete;
-        mpz_view(mpz_view &&other)
+        mpz_view(mpz_view &&other) noexcept
             : m_static_view(other.m_static_view),
               // NOTE: we need to re-init ptr here if other is a static view, because in that case
               // other.m_ptr will be pointing to an mpz_struct_t in other and we want it to point to
@@ -1178,13 +1201,15 @@ class integer
               m_ptr((other.m_ptr == &other.m_static_view) ? &m_static_view : other.m_ptr)
         {
         }
+        ~mpz_view() = default;
         mpz_view &operator=(const mpz_view &) = delete;
         mpz_view &operator=(mpz_view &&) = delete;
+        // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
         operator const detail::mpz_struct_t *() const
         {
             return get();
         }
-        const detail::mpz_struct_t *get() const
+        MPPP_NODISCARD const detail::mpz_struct_t *get() const
         {
             return m_ptr;
         }
@@ -1203,6 +1228,7 @@ public:
     // Copy constructor.
     integer(const integer &) = default;
     // Move constructor.
+    // NOLINTNEXTLINE(hicpp-noexcept-move, performance-noexcept-move-constructor)
     integer(integer &&other) = default;
     // Constructor from an array of limbs.
     explicit integer(const ::mp_limb_t *p, std::size_t size) : m_int(p, size) {}
@@ -1260,11 +1286,14 @@ public:
     explicit integer(const ::mpz_t n) : m_int(n) {}
 #if !defined(_MSC_VER)
     // Move constructor from \p mpz_t.
+    // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     explicit integer(::mpz_t &&n) : m_int(std::move(n)) {}
 #endif
+    ~integer() = default;
     // Copy assignment operator.
     integer &operator=(const integer &) = default;
     // Move assignment operator.
+    // NOLINTNEXTLINE(hicpp-noexcept-move, performance-noexcept-move-constructor)
     integer &operator=(integer &&) = default;
 
 private:
@@ -1430,6 +1459,7 @@ public:
             throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part of "
                                     + detail::to_string(c.imag()) + " to an integer");
         }
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = c.real();
     }
 
@@ -1455,6 +1485,7 @@ public:
 #endif
     integer &operator=(const T &s)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = integer{s};
     }
     // Copy assignment from mpz_t.
@@ -1569,17 +1600,17 @@ public:
         return set_one_impl<false>();
     }
     // Test for static storage.
-    bool is_static() const
+    MPPP_NODISCARD bool is_static() const
     {
         return m_int.is_static();
     }
     // Test for dynamic storage.
-    bool is_dynamic() const
+    MPPP_NODISCARD bool is_dynamic() const
     {
         return m_int.is_dynamic();
     }
     // Conversion to string.
-    std::string to_string(int base = 10) const
+    MPPP_NODISCARD std::string to_string(int base = 10) const
     {
         if (mppp_unlikely(base < 2 || base > 62)) {
             throw std::invalid_argument("Invalid base for string conversion: the base must be between "
@@ -1594,13 +1625,13 @@ public:
 private:
     // Conversion to bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
     template <typename T, bool Sign, detail::enable_if_t<(detail::nl_constants<T>::digits <= GMP_NUMB_BITS), int> = 0>
-    std::pair<bool, T> convert_to_unsigned() const
+    MPPP_NODISCARD std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
@@ -1619,7 +1650,7 @@ private:
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
     template <typename T, bool Sign, detail::enable_if_t<(detail::nl_constants<T>::digits > GMP_NUMB_BITS), int> = 0>
-    std::pair<bool, T> convert_to_unsigned() const
+    MPPP_NODISCARD std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
@@ -1657,7 +1688,7 @@ private:
     template <typename T, detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>,
                                                                   detail::negation<std::is_same<bool, T>>>::value,
                                               int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1687,7 +1718,7 @@ private:
     };
     // Overload if the all the absolute values of T fit into a limb.
     template <typename T, detail::enable_if_t<sconv_is_small<T>::value, int> = 0>
-    std::pair<bool, T> convert_to_signed() const
+    MPPP_NODISCARD std::pair<bool, T> convert_to_signed() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_signed<T>::value, "Invalid type.");
         assert(size());
@@ -1714,7 +1745,7 @@ private:
     }
     // Overload if not all the absolute values of T fit into a limb.
     template <typename T, detail::enable_if_t<!sconv_is_small<T>::value, int> = 0>
-    std::pair<bool, T> convert_to_signed() const
+    MPPP_NODISCARD std::pair<bool, T> convert_to_signed() const
     {
         // Cache for convenience.
         constexpr auto Tmax = detail::make_unsigned(detail::nl_max<T>());
@@ -1742,7 +1773,7 @@ private:
     }
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1769,7 +1800,7 @@ private:
 #endif
     // Conversion to floating-point.
     template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1875,10 +1906,10 @@ public:
         return false;
     }
     // Size in bits.
-    std::size_t nbits() const
+    MPPP_NODISCARD std::size_t nbits() const
     {
         const std::size_t ls = size();
-        if (!ls) {
+        if (ls == 0u) {
             return 0;
         }
         const ::mp_limb_t *lptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
@@ -1894,7 +1925,7 @@ public:
         return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS) + detail::limb_size_nbits(lptr[idx]));
     }
     // Size in limbs.
-    std::size_t size() const
+    MPPP_NODISCARD std::size_t size() const
     {
         // NOTE: the idea here is that, regardless of what mpz_size_t is exactly, the
         // asize of an integer represents ultimately the size of a limb array, and as such
@@ -1903,13 +1934,13 @@ public:
                                           : static_cast<std::size_t>(detail::nint_abs(m_int.m_st._mp_size));
     }
     // Sign.
-    int sgn() const
+    MPPP_NODISCARD int sgn() const
     {
         // NOTE: size is part of the common initial sequence.
         return detail::integral_sign(m_int.m_st._mp_size);
     }
     // Get an mpz_t view.
-    mpz_view get_mpz_view() const
+    MPPP_NODISCARD mpz_view get_mpz_view() const
     {
         return mpz_view(*this);
     }
@@ -1938,7 +1969,7 @@ public:
         return *this;
     }
     // Test primality.
-    int probab_prime_p(int reps = 25) const
+    MPPP_NODISCARD int probab_prime_p(int reps = 25) const
     {
         if (mppp_unlikely(reps < 1)) {
             throw std::invalid_argument("The number of primality tests must be at least 1, but a value of "
@@ -1960,7 +1991,7 @@ public:
         return mppp::sqr(*this, *this);
     }
     // Test if value is odd.
-    bool odd_p() const
+    MPPP_NODISCARD bool odd_p() const
     {
         if (is_static()) {
             if (SSize <= s_storage::opt_size) {
@@ -1975,7 +2006,7 @@ public:
         return mpz_odd_p(&m_int.g_dy());
     }
     // Test if value is even.
-    bool even_p() const
+    MPPP_NODISCARD bool even_p() const
     {
         return !odd_p();
     }
@@ -1985,7 +2016,7 @@ public:
         return m_int;
     }
     // Return a const reference to the internal union.
-    const detail::integer_union<SSize> &_get_union() const
+    MPPP_NODISCARD const detail::integer_union<SSize> &_get_union() const
     {
         return m_int;
     }
@@ -1996,7 +2027,7 @@ public:
         return &m_int.g_dy();
     }
     // Test if the value is zero.
-    bool is_zero() const
+    MPPP_NODISCARD bool is_zero() const
     {
         return m_int.m_st._mp_size == 0;
     }
@@ -2004,7 +2035,7 @@ public:
 private:
     // Implementation of is_one()/is_negative_one().
     template <int One>
-    bool is_one_impl() const
+    MPPP_NODISCARD bool is_one_impl() const
     {
         if (m_int.m_st._mp_size != One) {
             return false;
@@ -2016,12 +2047,12 @@ private:
 
 public:
     // Test if the value is equal to one.
-    bool is_one() const
+    MPPP_NODISCARD bool is_one() const
     {
         return is_one_impl<1>();
     }
     // Test if the value is equal to minus one.
-    bool is_negative_one() const
+    MPPP_NODISCARD bool is_negative_one() const
     {
         return is_one_impl<-1>();
     }
@@ -2032,7 +2063,7 @@ private:
 
 public:
     // Size of the serialised binary representation.
-    std::size_t binary_size() const
+    MPPP_NODISCARD std::size_t binary_size() const
     {
         const auto asize = size();
         // LCOV_EXCL_START
@@ -2051,6 +2082,7 @@ private:
     void binary_save_impl(char *dest, std::size_t bs) const
     {
         assert(bs == binary_size());
+        // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
         auto ptr = reinterpret_cast<const char *>(&m_int.m_st._mp_size);
         // NOTE: std::copy() has the usual aliasing restrictions to take into account.
         // Here it should not matter, unless one is somehow trying to save an integer
@@ -2143,6 +2175,7 @@ private:
     static std::pair<detail::mpz_size_t, detail::make_unsigned_t<detail::mpz_size_t>>
     bl_read_size_asize(const char *src)
     {
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
         detail::mpz_size_t size;
         std::copy(src, src + sizeof(detail::mpz_size_t), detail::make_uai(reinterpret_cast<char *>(&size)));
         // NOTE: we don't use std::size_t here for the asize as we don't have any assurance
@@ -2302,6 +2335,7 @@ public:
     std::size_t binary_load(std::istream &src)
     {
         // Let's start by reading size/asize.
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
         detail::mpz_size_t size;
         src.read(reinterpret_cast<char *>(&size), detail::safe_cast<std::streamsize>(sizeof(detail::mpz_size_t)));
         if (!src.good()) {
@@ -2570,7 +2604,7 @@ inline mpz_size_t integer_sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t 
     assert(s > 0);
     mpz_size_t cur_idx = s - 1;
     for (; cur_idx >= 0; --cur_idx) {
-        if (rdata[cur_idx] & GMP_NUMB_MASK) {
+        if ((rdata[cur_idx] & GMP_NUMB_MASK) != 0u) {
             break;
         }
     }
@@ -2621,6 +2655,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         // Same sign.
         if (asize1 >= asize2) {
             // The number of limbs of op1 >= op2.
+            // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t cy;
             if (asize2 == 1) {
                 // NOTE: we are not masking data2[0] with GMP_NUMB_MASK, I am assuming the mpn function
@@ -2642,6 +2677,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             }
         } else {
             // The number of limbs of op2 > op1.
+            // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t cy;
             if (asize1 == 1) {
                 cy = ::mpn_add_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
@@ -2659,6 +2695,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     } else {
         if (asize1 > asize2 || (asize1 == asize2 && ::mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
             // abs(op1) >= abs(op2).
+            // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t br;
             if (asize2 == 1) {
                 br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
@@ -2674,6 +2711,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             }
         } else {
             // abs(op2) > abs(op1).
+            // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t br;
             if (asize1 == 1) {
                 br = ::mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
@@ -2702,6 +2740,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // NOTE: both asizes have to be 0 or 1 here.
     assert((asize1 == 1 && data1[0] != 0u) || (asize1 == 0 && data1[0] == 0u));
     assert((asize2 == 1 && data2[0] != 0u) || (asize2 == 0 && data2[0] == 0u));
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t tmp;
     if (sign1 == sign2) {
         // When the signs are identical, we can implement addition as a true addition.
@@ -2734,6 +2773,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *data2, mpz_size_t asize)
 {
     // NOTE: this requires no nail bits.
+    // NOLINTNEXTLINE(cert-dcl03-c, hicpp-static-assert, misc-static-assert)
     assert(!GMP_NAIL_BITS);
     assert(asize == 1 || asize == 2);
     // Start comparing from the top.
@@ -2743,7 +2783,7 @@ inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *
     }
     // The top limbs are equal, move down one limb.
     // If we are already at the bottom limb, it means the two numbers are equal.
-    if (!cmp_idx) {
+    if (cmp_idx == 0) {
         return 0;
     }
     --cmp_idx;
@@ -2774,6 +2814,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         //
         // Add the hi and lo limbs.
         const auto a = data1[0], b = data2[0], c = data1[1], d = data2[1];
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
         ::mp_limb_t lo, hi1, hi2;
         const ::mp_limb_t cy_lo = limb_add_overflow(a, b, &lo), cy_hi1 = limb_add_overflow(c, d, &hi1),
                           cy_hi2 = limb_add_overflow(hi1, cy_lo, &hi2);
@@ -2947,6 +2988,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
                                  ::mp_limb_t l2, const std::integral_constant<int, 1> &)
 {
     const auto l1 = op1.m_limbs[0];
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t tmp;
     if ((sign1 >= 0 && AddOrSub) || (sign1 <= 0 && !AddOrSub)) {
         // op1 non-negative and addition, or op1 non-positive and subtraction. Implement
@@ -2988,6 +3030,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
         // op1 non-negative and addition, or op1 non-positive and subtraction. Implement
         // as a true addition.
         // These two limbs will contain the result.
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
         ::mp_limb_t lo, hi;
         // Add l2 to the low limb, placing the result in lo.
         const ::mp_limb_t cy_lo = limb_add_overflow(data1[0], l2, &lo);
@@ -3268,14 +3311,17 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
     }
     auto rdata = rop.m_limbs.data();
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
-    const auto max_asize = std::size_t(asize1 + asize2);
+    // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
+    const auto max_asize = static_cast<std::size_t>(asize1 + asize2);
     // Temporary storage, to be used if we cannot write into rop.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize * 2u> res;
     // We can write directly into rop if these conditions hold:
     // - rop does not overlap with op1 and op2,
     // - SSize is large enough to hold the max size of the result.
     ::mp_limb_t *MPPP_RESTRICT res_data = (rdata != data1 && rdata != data2 && max_asize <= SSize) ? rdata : res.data();
     // Proceed to the multiplication.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t hi;
     if (asize2 == 1) {
         // NOTE: the 1-limb versions do not write the hi limb, we have to write it ourselves.
@@ -3351,6 +3397,7 @@ template <std::size_t SSize>
 inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
                                    mpz_size_t, mpz_size_t, int, int, const std::integral_constant<int, 1> &)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t hi;
     const ::mp_limb_t lo = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &hi);
     if (mppp_unlikely(hi)) {
@@ -3390,6 +3437,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
             // Switch them around if needed.
             a = op2.m_limbs[0], b = op2.m_limbs[1], c = op1.m_limbs[0];
         }
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
         ::mp_limb_t ca_lo, ca_hi, cb_lo, cb_hi, tmp0, tmp1, tmp2;
         ca_lo = dlimb_mul(c, a, &ca_hi);
         cb_lo = dlimb_mul(c, b, &cb_hi);
@@ -3504,6 +3552,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
                                       int sign1, int sign2, const std::integral_constant<int, 1> &)
 {
     // First we do op1 * op2.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t tmp;
     const ::mp_limb_t prod = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &tmp);
     if (mppp_unlikely(tmp)) {
@@ -3548,8 +3597,10 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         return 0u;
     }
     // Handle op1 * op2.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> prod;
     const int sign_prod = sign1 * sign2;
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     mpz_size_t asize_prod;
     if (asize1 == 1 && asize2 == 1) {
         prod[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &prod[1]);
@@ -3571,6 +3622,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             // Switch them around if needed.
             a = op2.m_limbs[0], b = op2.m_limbs[1], c = op1.m_limbs[0];
         }
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
         ::mp_limb_t ca_hi, cb_hi;
         // These are the three operations that build the result, two mults, one add.
         prod[0] = dlimb_mul(c, a, &ca_hi);
@@ -3587,6 +3639,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     // Proceed to the addition.
     if (signr == sign_prod) {
         // Add the hi and lo limbs.
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
         ::mp_limb_t lo, hi1, hi2;
         const ::mp_limb_t cy_lo = limb_add_overflow(rop.m_limbs[0], prod[0], &lo),
                           cy_hi1 = limb_add_overflow(rop.m_limbs[1], prod[1], &hi1),
@@ -3752,6 +3805,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
     if (new_asize == SSize) {
         if (rs) {
             // In this case the operation may fail, so we need to write to temporary storage.
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, SSize> tmp;
             if (::mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
                 return SSize + 1u;
@@ -3864,6 +3918,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
     rop.m_limbs[0u] = lo;
     rop.m_limbs[1u] = hi;
     // asize is at least 1.
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     rop._mp_size = sign * (1 + (hi != 0u));
     return 0u;
 }
@@ -3931,6 +3986,7 @@ inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSiz
     // of using this temporary storage. Need to profile first,
     // however, because I am not sure whether this is worth
     // it or not performance-wise.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize * 2u> res;
     const auto res_data = res.data();
 
@@ -3959,6 +4015,7 @@ template <std::size_t SSize>
 inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSize> &op,
                                    const std::integral_constant<int, 1> &)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t hi;
     const ::mp_limb_t lo = dlimb_mul(op.m_limbs[0], op.m_limbs[0], &hi);
     if (mppp_unlikely(hi)) {
@@ -4103,6 +4160,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
 
     // Temporary storage for mpn_sqr(). The largest possible
     // size needed is twice the static size.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize * 2u> sqr_res;
     const auto sqr_res_data = sqr_res.data();
 
@@ -4125,6 +4183,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
 
     // Temporary storage for the modulo operation.
     // Need space for both quotient and remainder.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize * 2u> q_res, r_res;
     // Run the modulo operation.
     // NOTE: here we could add some logic, like in tdiv_qr(),
@@ -4134,6 +4193,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     // it or not performance-wise.
     // NOTE: ret_size will never be negative, as the
     // dividend is a square and thus also never negative.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     mpz_size_t ret_size;
     if (mod_asize == 1u) {
         // Optimization when the divisor has 1 limb.
@@ -4318,6 +4378,7 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     // both operands are nonzero.
     // We need to take care of potentially overlapping arguments. We know that q and r are distinct, but op1
     // could overlap with q or r, and op2 could overlap with op1, q or r.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
     const ::mp_limb_t *data1 = op1.m_limbs.data();
     const ::mp_limb_t *data2 = op2.m_limbs.data();
@@ -4470,6 +4531,7 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
         return;
     }
     // Perform the division.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t q1, q2, r1, r2;
     dlimb_tdiv_qr(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2, &r1, &r2);
     // Write out.
@@ -4550,6 +4612,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // both operands are nonzero.
     // We need to take care of potentially overlapping arguments. op1 could overlap with q, and op2
     // could overlap with op1 or q.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
     const ::mp_limb_t *data1 = op1.m_limbs.data();
     const ::mp_limb_t *data2 = op2.m_limbs.data();
@@ -4572,6 +4635,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
         // Optimization when the divisor has 1 limb.
         ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> r_unused;
         // General implementation.
         ::mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
@@ -4620,6 +4684,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
         return;
     }
     // Perform the division.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t q1, q2;
     dlimb_tdiv_q(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
     // Write out.
@@ -4741,6 +4806,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
         return;
     }
     // General case.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t q1, q2;
     dlimb_tdiv_q(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
     q._mp_size = sign1 * (Gcd ? 1 : sign2) * size_from_lohi(q1, q2);
@@ -4962,6 +5028,7 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
     rop.m_limbs[1u] = (n.m_limbs[1u] & GMP_NUMB_MASK) >> s;
     // The effective shift was less than 1 entire limb. The new asize must be the old one,
     // or one less than that.
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     rop._mp_size = sign * (asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u));
 }
 } // namespace detail
@@ -5023,8 +5090,9 @@ inline int static_cmp(const static_int<1> &n1, const static_int<1> &n2)
     if (n2._mp_size < n1._mp_size) {
         return 1;
     }
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     int cmp_abs = (n1.m_limbs[0u] & GMP_NUMB_MASK) > (n2.m_limbs[0u] & GMP_NUMB_MASK);
-    if (!cmp_abs) {
+    if (cmp_abs == 0) {
         cmp_abs = -static_cast<int>((n1.m_limbs[0u] & GMP_NUMB_MASK) < (n2.m_limbs[0u] & GMP_NUMB_MASK));
     }
     return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
@@ -5123,6 +5191,7 @@ inline bool static_not_impl(static_int<1> &rop, const static_int<1> &op, mpz_siz
         return true;
     }
     // Size can be zero or 1.
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     rop._mp_size = l != 1u;
     rop.m_limbs[0] = l - 1u;
     return true;
@@ -5139,6 +5208,7 @@ inline bool static_not_impl(static_int<2> &rop, const static_int<2> &op, mpz_siz
         }
         const ::mp_limb_t new_lo = (lo + 1u) & GMP_NUMB_MASK, new_hi = hi + unsigned(lo == GMP_NUMB_MAX);
         // asize can be -1 or -2, never zero.
+        // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = -1 - (new_hi != 0u);
         rop.m_limbs[0] = new_lo;
         rop.m_limbs[1] = new_hi;
@@ -5239,6 +5309,7 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // NOTE: no need to mask, as we masked l1 and l2 already, and OR
         // won't turn on any upper bit.
         ::mp_limb_t ret = l1 | l2;
+        // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
         return;
@@ -5264,6 +5335,7 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
     // NOTE: at least 1 of the operands is strictly negative, so the result
     // has to be negative as well (because of ORing the sign bits).
     rop._mp_size = -1;
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u:
             // op1 negative, op2 nonnegative.
@@ -5307,7 +5379,9 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
         return;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u:
             // op1 negative, op2 nonnegative.
@@ -5331,6 +5405,7 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
     // Size is -1 or -2: we could have 1-limb operands, and even with
     // 2-limbs operands, the final 2sc - in case of negative values - could
     // zero out the upper limb.
+    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
     rop._mp_size = -2 + (rop.m_limbs[1] == 0u);
 }
 
@@ -5346,16 +5421,16 @@ inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
     // Flip the bits.
     ::mpn_com(rop, sp, static_cast<::mp_size_t>(size));
     // Compute the new size.
-    if (!(rop[size - 1] & GMP_NUMB_MASK)) {
+    if ((rop[size - 1] & GMP_NUMB_MASK) == 0u) {
         --size;
-        for (; size && !(rop[size - 1] & GMP_NUMB_MASK); --size) {
+        for (; size != 0 && (rop[size - 1] & GMP_NUMB_MASK) == 0u; --size) {
         }
     }
     // Add 1.
-    if (size) {
+    if (size != 0) {
         // If rop is nonzero, use the mpn_add_1() primitive, storing the carry
         // and updating the size if necessary.
-        if (::mpn_add_1(rop, rop, size, 1)) {
+        if (::mpn_add_1(rop, rop, size, 1) != 0u) {
             // This needs to hold as sp is nonzero: 2sc can never
             // overflow the highest limb.
             assert(size < n);
@@ -5409,7 +5484,9 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         return;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2;
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u:
             // op1 negative, op2 nonnegative.
@@ -5493,17 +5570,20 @@ inline bool static_and_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // NOTE: no need to mask, as we masked l1 and l2 already, and AND
         // won't turn on any upper bit.
         ::mp_limb_t ret = l1 & l2;
+        // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
         return true;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
             // op1 negative, op2 nonnegative.
             // The result will be nonnegative, and it does not need to be masked:
             // nail bits will be switched off by ANDing with l2.
             const ::mp_limb_t ret = (~l1 + 1u) & l2;
+            // NOLINTNEXTLINE(readability-implicit-bool-conversion)
             rop._mp_size = ret != 0u;
             rop.m_limbs[0] = ret;
             return true;
@@ -5512,6 +5592,7 @@ inline bool static_and_impl(static_int<1> &rop, const static_int<1> &op1, const 
             // op1 nonnegative, op2 negative.
             // This is the symmetric of above.
             const ::mp_limb_t ret = l1 & (~l2 + 1u);
+            // NOLINTNEXTLINE(readability-implicit-bool-conversion)
             rop._mp_size = ret != 0u;
             rop.m_limbs[0] = ret;
             return true;
@@ -5528,6 +5609,7 @@ inline bool static_and_impl(static_int<1> &rop, const static_int<1> &op1, const 
             }
             // The NOT here will flip back the nail bits, no need to mask.
             ret = ~ret + 1u;
+            // NOLINTNEXTLINE(readability-implicit-bool-conversion)
             rop._mp_size = -(ret != 0u);
             rop.m_limbs[0] = ret;
             return true;
@@ -5555,7 +5637,9 @@ inline bool static_and_impl(static_int<2> &rop, const static_int<2> &op1, const 
         return true;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u:
             // op1 negative, op2 nonnegative.
@@ -5635,7 +5719,9 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         return true;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u:
             // op1 negative, op2 nonnegative.
@@ -5737,11 +5823,13 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // NOTE: no need to mask, as we masked l1 and l2 already, and XOR
         // won't turn on any upper bit.
         ::mp_limb_t ret = l1 ^ l2;
+        // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
         return false;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
             // op1 negative, op2 nonnegative. In this case, the result will be negative,
@@ -5755,6 +5843,7 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
             }
             // The NOT here will flip back the nail bits, no need to mask.
             ret = ~ret + 1u;
+            // NOLINTNEXTLINE(readability-implicit-bool-conversion)
             rop._mp_size = -(ret != 0u);
             rop.m_limbs[0] = ret;
             return true;
@@ -5766,6 +5855,7 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
                 return false;
             }
             ret = ~ret + 1u;
+            // NOLINTNEXTLINE(readability-implicit-bool-conversion)
             rop._mp_size = -(ret != 0u);
             rop.m_limbs[0] = ret;
             return true;
@@ -5774,6 +5864,7 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
             // Both negative: the result will be nonnegative.
             // NOTE: the XOR will zero the nail bits, no need to mask.
             const ::mp_limb_t ret = (~l1 + 1u) ^ (~l2 + 1u);
+            // NOLINTNEXTLINE(readability-implicit-bool-conversion)
             rop._mp_size = (ret != 0u);
             rop.m_limbs[0] = ret;
             return true;
@@ -5800,7 +5891,9 @@ inline bool static_xor_impl(static_int<2> &rop, const static_int<2> &op1, const 
         return true;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
             // op1 negative, op2 nonnegative. Result will be negative, unless
@@ -5881,7 +5974,9 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         return true;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u:
             // op1 negative, op2 nonnegative.
@@ -6407,6 +6502,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         const auto size = static_cast<make_unsigned_t<mpz_size_t>>(ns._mp_size);
         if (mppp_likely(size)) {
             // In case of overlap we need to go through a tmp variable.
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, SSize> tmp;
             const bool overlap = (&rs == &ns);
             const auto rs_data = rs.m_limbs.data(), out_ptr = overlap ? tmp.data() : rs_data;
@@ -6468,6 +6564,7 @@ inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, con
         // NOTE: rop and n must be separate. rem and n can coincide. See:
         // https://gmplib.org/manual/Low_002dlevel-Functions.html
         // In case of overlap of rop and n, we need to go through a tmp variable.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> tmp;
         const bool overlap = (&rops == &ns);
         const auto rops_data = rops.m_limbs.data(), out_ptr = overlap ? tmp.data() : rops_data,
@@ -6539,6 +6636,7 @@ inline bool perfect_square_p(const integer<SSize> &n)
     if (mppp_likely(size > 0)) {
         // n is positive. Extract a pointer to the limbs
         // and call the mpn function.
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
         const mp_limb_t *ptr;
         if (mppp_likely(n.is_static())) {
             ptr = u.g_st().m_limbs.data();

@@ -15,6 +15,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 using int_t = integer<1>;
@@ -25,10 +26,10 @@ TEST_CASE("real128 get_ieee()")
     // a compiler error with ICC in C++17
     // on these tuple operations below.
 #if !defined(__INTEL_COMPILER) || MPPP_CPLUSPLUS < 201703L
-    std::uint_least8_t sign;
-    std::uint_least16_t exp;
-    std::uint_least64_t hi;
-    std::uint_least64_t lo;
+    std::uint_least8_t sign{};
+    std::uint_least16_t exp{};
+    std::uint_least64_t hi{};
+    std::uint_least64_t lo{};
     std::tie(sign, exp, hi, lo) = real128{}.get_ieee();
     REQUIRE(!sign);
     REQUIRE(!exp);

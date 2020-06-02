@@ -24,6 +24,7 @@
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
+// NOLINTNEXTLINE(modernize-concat-nested-namespaces)
 namespace mppp
 {
 
@@ -50,6 +51,7 @@ constexpr bool test_mpq_struct_t()
 {
     auto [num, den] = mpq_struct_t{};
     ignore(num, den);
+    // NOLINTNEXTLINE(misc-redundant-expression)
     return std::is_same<decltype(num), mpz_struct_t>::value && std::is_same<decltype(den), mpz_struct_t>::value;
 }
 
@@ -119,6 +121,7 @@ std::ostream &rational_stream_operator_impl(std::ostream &os, const mpz_struct_t
         // - 1 or 2 for the base prefix ('0' for octal, '0x'/'0X' for hex),
         // - the '+' sign, if requested.
         const bool with_plus = (flags & std::ios_base::showpos) != 0;
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<char, 3> prep_buffer;
         const auto prep_n = [&prep_buffer, with_plus, with_base_prefix, base]() -> std::size_t {
             std::size_t ret = 0;
@@ -188,6 +191,7 @@ std::ostream &rational_stream_operator_impl(std::ostream &os, const mpz_struct_t
         const auto fill_size = safe_cast<decltype(tmp_num.size())>(make_unsigned(width) - final_size);
         // Get the fill character.
         const auto fill_char = os.fill();
+        // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
         switch (fill) {
             case 1:
                 // Left fill: fill characters at the end.

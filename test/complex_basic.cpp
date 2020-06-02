@@ -40,8 +40,10 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("basic and generic constructors")
 {
     using Catch::Matchers::Message;
@@ -122,6 +124,7 @@ TEST_CASE("basic and generic constructors")
         auto r = 1.1_r512;
 
         complex c1{std::move(r)};
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
 
         complex::re_cref re{c1};
@@ -172,6 +175,7 @@ TEST_CASE("basic and generic constructors")
 
     // Copy ctor.
     {
+        // NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
         complex c1{std::complex<double>{-4, 7}}, c2 = c1;
 
         complex::re_cref re{c2};
@@ -187,6 +191,7 @@ TEST_CASE("basic and generic constructors")
     {
         complex c1{std::complex<double>{-4, 7}}, c2{std::move(c1)};
 
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         complex::re_cref re{c2};
@@ -259,6 +264,7 @@ TEST_CASE("basic and generic constructors")
         auto r = 1.1_r512;
 
         complex c1{std::move(r), complex_prec_t(1024)};
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
 
         complex::re_cref re{c1};
@@ -345,6 +351,7 @@ TEST_CASE("basic and generic constructors")
     // Move ctor with custom precision.
     {
         complex c{1.1_r512}, c1{std::move(c), complex_prec_t(256)};
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
 
         complex::re_cref re{c1};
@@ -360,6 +367,7 @@ TEST_CASE("basic and generic constructors")
                                Message("Cannot init a complex with a precision of -1: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE_THROWS_MATCHES((complex{std::move(c1), complex_prec_t(0)}), std::invalid_argument,
                                Message("Cannot init a complex with a precision of 0: the maximum allowed precision is "
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
@@ -411,7 +419,9 @@ TEST_CASE("basic and generic constructors")
         auto i = 4.56_r256;
         complex c1{std::move(r), std::move(i)};
 
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!i.is_valid());
 
         complex::re_cref re{c1};
@@ -477,7 +487,9 @@ TEST_CASE("basic and generic constructors")
         auto i = 4.56_r256;
         complex c1{std::move(r), std::move(i), complex_prec_t(128)};
 
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r.is_valid());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!i.is_valid());
 
         complex::re_cref re{c1};
@@ -831,6 +843,7 @@ TEST_CASE("mpc move ctor")
     ::mpfr_set_d(mpc_realref(c), 1.1, MPFR_RNDN);
     ::mpfr_set_d(mpc_imagref(c), -2.3, MPFR_RNDN);
 
+    // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     complex c2{std::move(c)};
 
     REQUIRE(c2.get_prec() == 14);
@@ -848,6 +861,7 @@ TEST_CASE("copy move ass")
 
         // Revive moved-from object via copy assignment.
         complex c3{std::move(c1)};
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
         c1 = c2;
         REQUIRE(c1 == complex{3, 4});
@@ -861,17 +875,20 @@ TEST_CASE("copy move ass")
         complex c1, c2{3, 4};
         c1 = std::move(c2);
         REQUIRE(c1 == complex{3, 4});
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2.is_valid());
         REQUIRE(c2 == complex{});
 
         // Revive moved-from object via move assignment.
         complex c3{std::move(c1)};
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
         c1 = complex{45, 46};
         REQUIRE(c1 == complex{45, 46});
 
         // Self move assignment.
         c1 = std::move(*&c1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1 == complex{45, 46});
     }
 }
@@ -957,6 +974,7 @@ TEST_CASE("generic assignment")
         complex c{12, 13, complex_prec_t(12)};
         auto r = 1.1_r256;
         c = std::move(r);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r.is_valid());
         REQUIRE(r == 12);
         REQUIRE(r.get_prec() == 12);
@@ -1008,6 +1026,7 @@ TEST_CASE("mpc_t assignment")
     ::mpc_init2(o, 150);
     ::mpc_set_d_d(o, 1.1, 2.3, MPC_RNDNN);
 
+    // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     c3 = std::move(o);
 
     REQUIRE(c3 == complex{1.1, 2.3, complex_prec_t(150)});
@@ -1020,6 +1039,7 @@ TEST_CASE("is_valid")
     complex c{1, 2};
     REQUIRE(c.is_valid());
     complex c2{std::move(c)};
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!c.is_valid());
 }
 
@@ -1426,7 +1446,7 @@ TEST_CASE("conversions")
 TEST_CASE("get conversions")
 {
     {
-        int n;
+        int n = -1;
         REQUIRE(complex{42, 0}.get(n));
         REQUIRE(n == 42);
 
@@ -1441,7 +1461,7 @@ TEST_CASE("get conversions")
         REQUIRE(n == -43);
     }
     {
-        double x;
+        double x = -1;
         REQUIRE(complex{42, 0}.get(x));
         REQUIRE(x == 42);
 
@@ -1459,7 +1479,7 @@ TEST_CASE("get conversions")
         }
     }
     {
-        integer<1> x;
+        integer<1> x{-1};
         REQUIRE(complex{42, 0}.get(x));
         REQUIRE(x == 42);
 
@@ -1474,7 +1494,7 @@ TEST_CASE("get conversions")
         REQUIRE(x == -43);
     }
     {
-        rational<1> x;
+        rational<1> x{-1};
         REQUIRE(complex{42, 0}.get(x));
         REQUIRE(x == 42);
 
@@ -1490,7 +1510,7 @@ TEST_CASE("get conversions")
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
-        real128 x;
+        real128 x{-1};
         REQUIRE(complex{42.1_rq, 0}.get(x));
         REQUIRE(x == 42.1_rq);
 
@@ -1526,7 +1546,7 @@ TEST_CASE("get conversions")
         REQUIRE(x.get_prec() == 12);
     }
     {
-        std::complex<double> c;
+        std::complex<double> c{1, 2};
         REQUIRE(complex{42, -37}.get(c));
         REQUIRE(c == std::complex<double>{42, -37});
 
@@ -1535,7 +1555,7 @@ TEST_CASE("get conversions")
     }
 #if defined(MPPP_WITH_QUADMATH)
     {
-        complex128 c;
+        complex128 c{1, 2};
         REQUIRE(complex{42, -37}.get(c));
         REQUIRE(c == complex128{42, -37});
 
@@ -1616,6 +1636,7 @@ TEST_CASE("get_real_imag")
 
         auto p = std::move(c).get_real_imag();
 
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         REQUIRE(p.first == 1);
         REQUIRE(p.second == 2);
@@ -1625,6 +1646,7 @@ TEST_CASE("get_real_imag")
 
         p = std::move(c).get_real_imag();
 
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         REQUIRE(p.first == 3);
         REQUIRE(p.second == 4);
@@ -1634,6 +1656,7 @@ TEST_CASE("get_real_imag")
 
         p = get_real_imag(std::move(c));
 
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         REQUIRE(p.first == -5);
         REQUIRE(p.second == -6);

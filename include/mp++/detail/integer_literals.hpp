@@ -138,10 +138,15 @@ inline
         }
     }();
 
+#if MPPP_CPLUSPLUS >= 201703L
+    assert(base == 2 || base == 8 || base == 10 || base == 16);
+#endif
+
     // Run the checks on the rest of the literal,
     // after we already checked the first 2 digits.
     // For bases 2 and 16, we need to have other digits,
     // otherwise the literal is malformed.
+    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (base) {
         case 2:
             if (str_length == 2u) {

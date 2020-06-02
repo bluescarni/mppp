@@ -29,6 +29,7 @@ auto fma_wrap(Args &&... args) -> decltype(mppp::fma(std::forward<Args>(args)...
 
 #endif
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("add")
@@ -57,25 +58,32 @@ TEST_CASE("add")
     REQUIRE(r1.get_prec() == 128);
     // Some tests with rvalue refs/overlapping arguments.
     add(r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 92);
     add(r1, std::move(r1), complex{100, complex_prec_t(150)});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(r1 == 192);
     add(r1, std::move(r1), complex{100, complex_prec_t(50)});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(r1 == 292);
     add(r1, complex{100, complex_prec_t(160)}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(r1 == 392);
     add(r1, complex{100, complex_prec_t(50)}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(r1 == 492);
     r1 = complex{92, complex_prec_t(128)};
     add(r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 184);
     add(r1, std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 368);
     r1 = complex{};
@@ -118,25 +126,32 @@ TEST_CASE("sub")
     REQUIRE(r1.get_prec() == 128);
     // Some tests with rvalue refs/overlapping arguments.
     sub(r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 0);
     sub(r1, std::move(r1), complex{100, complex_prec_t(150)});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(r1 == -100);
     sub(r1, std::move(r1), complex{100, complex_prec_t(50)});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(r1 == -200);
     sub(r1, complex{100, complex_prec_t(160)}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(r1 == 300);
     sub(r1, complex{100, complex_prec_t(50)}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(r1 == -200);
     r1 = complex{92, complex_prec_t(128)};
     sub(r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 0);
     sub(r1, std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 0);
     r1 = complex{};
@@ -179,25 +194,32 @@ TEST_CASE("mul")
     REQUIRE(r1.get_prec() == 128);
     // Some tests with rvalue refs/overlapping arguments.
     mul(r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 166464l);
     mul(r1, std::move(r1), complex{100, complex_prec_t(150)});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(r1 == 16646400ll);
     mul(r1, std::move(r1), complex{100, complex_prec_t(50)});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(r1 == 1664640000ll);
     mul(r1, complex{100, complex_prec_t(160)}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(r1 == 166464000000ll);
     mul(r1, complex{100, complex_prec_t(50)}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(r1 == 16646400000000ll);
     r1 = complex{92, complex_prec_t(128)};
     mul(r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 8464);
     mul(r1, std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 71639296);
     r1 = complex{};
@@ -240,25 +262,32 @@ TEST_CASE("div")
     REQUIRE(r1.get_prec() == 128);
     // Some tests with rvalue refs/overlapping arguments.
     div(r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 1);
     div(r1, std::move(r1), complex{16, complex_prec_t(150)});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(r1 == 1 / 16_q1);
     div(r1, std::move(r1), complex{2, complex_prec_t(50)});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(r1 == 1 / 32_q1);
     div(r1, complex{2, complex_prec_t(160)}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(r1 == 64);
     div(r1, complex{2, complex_prec_t(50)}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(r1 == 1 / 32_q1);
     r1 = complex{92, complex_prec_t(128)};
     div(r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 1);
     div(r1, std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(r1 == 1);
     r1 = complex{};
@@ -299,6 +328,7 @@ TEST_CASE("neg")
         neg(c1, std::move(c2));
         REQUIRE(c1 == complex{-1, -2});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{1, 2});
 
         // Move, will steal.
@@ -306,6 +336,7 @@ TEST_CASE("neg")
         neg(c1, std::move(c2));
         REQUIRE(c1 == complex{-1, -2});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{});
     }
     {
@@ -319,6 +350,7 @@ TEST_CASE("neg")
         auto c2 = neg(std::move(c1));
         REQUIRE(c2 == complex{-3, -4});
         REQUIRE(c2.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 }
@@ -354,6 +386,7 @@ TEST_CASE("conj")
         conj(c1, std::move(c2));
         REQUIRE(c1 == complex{1, -2});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{});
     }
     {
@@ -367,6 +400,7 @@ TEST_CASE("conj")
         auto c2 = conj(std::move(c1));
         REQUIRE(c2 == complex{3, -4});
         REQUIRE(c2.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 }
@@ -481,6 +515,7 @@ TEST_CASE("proj")
         proj(c1, std::move(c2));
         REQUIRE(c1 == complex{1, 2});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{1, 2});
 
         // Move, will steal.
@@ -488,6 +523,7 @@ TEST_CASE("proj")
         proj(c1, std::move(c2));
         REQUIRE(c1 == complex{1, 2});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{});
     }
     {
@@ -501,6 +537,7 @@ TEST_CASE("proj")
         auto c2 = proj(std::move(c1));
         REQUIRE(c2 == complex{3, 4});
         REQUIRE(c2.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 }
@@ -529,6 +566,7 @@ TEST_CASE("sqr")
         sqr(c1, std::move(c2));
         REQUIRE(c1 == complex{-3, 4});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{1, 2});
 
         // Move, will steal.
@@ -536,6 +574,7 @@ TEST_CASE("sqr")
         sqr(c1, std::move(c2));
         REQUIRE(c1 == complex{-3, 4});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{});
     }
     {
@@ -549,6 +588,7 @@ TEST_CASE("sqr")
         auto c2 = sqr(std::move(c1));
         REQUIRE(c2 == complex{-7, 24});
         REQUIRE(c2.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 }
@@ -582,9 +622,11 @@ TEST_CASE("mul_i")
         mul_i(c1, std::move(c2));
         REQUIRE(c1 == complex{-2, 1});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{1, 2});
         mul_i(c1, std::move(c2), -1);
         REQUIRE(c1 == complex{2, -1});
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{1, 2});
 
         // Move, will steal.
@@ -592,12 +634,14 @@ TEST_CASE("mul_i")
         mul_i(c1, std::move(c2));
         REQUIRE(c1 == complex{-2, 1});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{});
         c2 = complex{1, 2};
         c1 = complex{};
         mul_i(c1, std::move(c2), -1);
         REQUIRE(c1 == complex{2, -1});
         REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == complex{});
     }
     {
@@ -612,11 +656,13 @@ TEST_CASE("mul_i")
         auto c2 = mul_i(std::move(c1));
         REQUIRE(c2 == complex{-4, 3});
         REQUIRE(c2.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
         c1 = complex{3, 4};
         c2 = mul_i(std::move(c1), -3);
         REQUIRE(c2 == complex{4, -3});
         REQUIRE(c2.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
     }
 }
@@ -671,13 +717,18 @@ TEST_CASE("fma")
     // Overlap + rvalue.
     r1 = 0;
     fma_wrap(r1, std::move(r1), std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fma_wrap(r1, r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fma_wrap(r1, r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fma_wrap(r1, std::move(r1), r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fma_wrap(r1, std::move(r1), std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
 }
