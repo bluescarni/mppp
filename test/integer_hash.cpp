@@ -21,13 +21,16 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 struct hash_tester {

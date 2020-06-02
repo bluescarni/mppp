@@ -11,6 +11,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("limb_size_nbits")

@@ -15,7 +15,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 TEST_CASE("real pi")

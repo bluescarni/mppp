@@ -17,7 +17,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 TEST_CASE("real naninf")
@@ -113,6 +115,7 @@ TEST_CASE("real real_lt")
     REQUIRE(real_lt(real{2}, real{"nan", 5}));
     real r0, r1{std::move(r0)};
     (void)r1;
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     REQUIRE(real_lt(real{2}, r0));
     REQUIRE(!real_lt(r0, real{2}));
@@ -132,6 +135,7 @@ TEST_CASE("real real_gt")
     REQUIRE(!real_gt(real{2}, real{"nan", 5}));
     real r0, r1{std::move(r0)};
     (void)r1;
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     REQUIRE(!real_gt(real{2}, r0));
     REQUIRE(real_gt(r0, real{2}));

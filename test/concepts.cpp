@@ -20,6 +20,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>

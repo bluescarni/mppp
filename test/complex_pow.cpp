@@ -27,8 +27,10 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("pow")
 {
     // Ternary pow.
@@ -76,6 +78,7 @@ TEST_CASE("pow")
         mppp::pow(c1, std::move(c2), c3);
         REQUIRE(c1 == 81);
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(4));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2.is_valid());
         REQUIRE(c2.zero_p());
         REQUIRE(c2.get_prec() == real_prec_min());
@@ -86,6 +89,7 @@ TEST_CASE("pow")
         mppp::pow(c1, c2, std::move(c3));
         REQUIRE(c1 == 81);
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(4));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c3.is_valid());
         REQUIRE(c3.zero_p());
         REQUIRE(c3.get_prec() == real_prec_min());
@@ -96,9 +100,11 @@ TEST_CASE("pow")
         mppp::pow(c1, std::move(c2), std::move(c3));
         REQUIRE(c1 == 81);
         REQUIRE(c1.get_prec() == detail::real_deduce_precision(4) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c3.is_valid());
         REQUIRE(c3.zero_p());
         REQUIRE(c3.get_prec() == real_prec_min());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c2 == 3);
         REQUIRE(c2.get_prec() == detail::real_deduce_precision(4));
     }
@@ -125,11 +131,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c1), c2);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == 64);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
         c1 = complex{4, complex_prec_t(16)};
         ret = mppp::pow(std::move(c1), std::move(c2));
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == 32);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c2.is_valid());
     }
     // Complex-real.
@@ -155,12 +163,15 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), r);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == 64);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(16)};
         ret = mppp::pow(std::move(c), std::move(r));
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == 32);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(r.is_valid());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
     // Complex-integer.
@@ -181,11 +192,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2_z1) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2_z1) - 1)};
         ret = mppp::pow(std::move(c), std::move(n));
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2_z1));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
     // Complex-unsigned integral.
@@ -206,11 +219,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2u) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2u) - 1)};
-        ret = mppp::pow(std::move(c), std::move(n));
+        ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2u));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
 
 #if defined(MPPP_HAVE_GCC_INT128)
@@ -222,12 +237,14 @@ TEST_CASE("pow")
         ret = mppp::pow(std::move(c), __uint128_t(-1));
         REQUIRE(ret == 0);
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
 
         c = complex{0, complex_prec_t(256)};
         ret = mppp::pow(std::move(c), __uint128_t(-1));
         REQUIRE(ret == 0);
         REQUIRE(ret.get_prec() == 256);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
 #endif
 
@@ -239,6 +256,7 @@ TEST_CASE("pow")
         ret = mppp::pow(std::move(c), false);
         REQUIRE(ret == 1);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(true) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
     }
     // Complex-signed integral.
@@ -259,11 +277,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2) - 1)};
-        ret = mppp::pow(std::move(c), std::move(n));
+        ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
 
 #if defined(MPPP_HAVE_GCC_INT128)
@@ -276,12 +296,14 @@ TEST_CASE("pow")
         ret = mppp::pow(std::move(c), big_n);
         REQUIRE(ret == 0);
         REQUIRE(ret.get_prec() == 128);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
 
         c = complex{0, complex_prec_t(256)};
         ret = mppp::pow(std::move(c), big_n);
         REQUIRE(ret == 0);
         REQUIRE(ret.get_prec() == 256);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
 #endif
     }
@@ -303,11 +325,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2.f) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2.f) - 1)};
-        ret = mppp::pow(std::move(c), std::move(n));
+        ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2.f));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
     // Complex-double.
@@ -328,11 +352,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2.) - 1)};
-        ret = mppp::pow(std::move(c), std::move(n));
+        ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
     // Complex-long double.
@@ -353,11 +379,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2.l) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2.l) - 1)};
-        ret = mppp::pow(std::move(c), std::move(n));
+        ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2.l));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
     // Complex-rational.
@@ -378,11 +406,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2_q1) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2_q1) - 1)};
         ret = mppp::pow(std::move(c), std::move(n));
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2_q1));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
 
         // Check a fractional exponent.
@@ -423,11 +453,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2_rq) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2_rq) - 1)};
-        ret = mppp::pow(std::move(c), std::move(n));
+        ret = mppp::pow(std::move(c), n);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2_rq));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
 #endif
@@ -449,11 +481,14 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), x);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) - 1)};
-        ret = mppp::pow(std::move(c), std::move(x));
+        ret = mppp::pow(std::move(c), x);
         REQUIRE(ret == 16);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
 #if defined(MPPP_WITH_QUADMATH)
@@ -475,11 +510,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(std::move(c), x);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) - 1)};
-        ret = mppp::pow(std::move(c), std::move(x));
+        ret = mppp::pow(std::move(c), x);
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
 #endif
@@ -502,11 +539,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(x, std::move(c));
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2.) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(2.) - 1)};
-        ret = mppp::pow(std::move(x), std::move(c));
+        ret = mppp::pow(x, std::move(c));
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(2.));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
     // complex valued-complex.
@@ -527,11 +566,13 @@ TEST_CASE("pow")
         auto ret = mppp::pow(x, std::move(c));
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()) + 1);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
         c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) - 1)};
-        ret = mppp::pow(std::move(x), std::move(c));
+        ret = mppp::pow(x, std::move(c));
         REQUIRE(ret == 16);
         REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()));
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
 

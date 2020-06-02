@@ -20,13 +20,16 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 struct add_tester {
@@ -70,6 +73,7 @@ struct add_tester {
                     // Promote sometimes, if possible.
                     n3.promote();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -332,6 +336,7 @@ struct sub_tester {
                     // Promote sometimes, if possible.
                     n3.promote();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -581,6 +586,7 @@ struct mul_tester {
                     // Promote sometimes, if possible.
                     n3.promote();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -788,6 +794,7 @@ struct addmul_tester {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -1072,6 +1079,7 @@ struct submul_tester {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -1371,10 +1379,12 @@ struct div_tester {
                 };
                 random_34();
                 // Reset rops every once in a while.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n2 = integer{};
                     ::mpz_set_ui(&m2.m_mpz, 0);
@@ -1498,6 +1508,7 @@ struct lshift_tester {
         auto random_x = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 // Half limb shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1519,6 +1530,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 1 limb shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1543,6 +1555,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 1 and half limb shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1567,6 +1580,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 2 limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1591,6 +1605,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 2 and half limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1615,6 +1630,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 3 limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1639,6 +1655,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 3 and half limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1663,6 +1680,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 4 limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1687,6 +1705,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 4 limbs and half shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1711,6 +1730,7 @@ struct lshift_tester {
                 ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 5 limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1793,6 +1813,7 @@ struct rshift_tester {
         auto random_x = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 // Half limb shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1814,6 +1835,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 1 limb shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1838,6 +1860,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 1 and half limb shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1862,6 +1885,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 2 limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1886,6 +1910,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 2 and half limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1910,6 +1935,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 3 limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1934,6 +1960,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 3 and half limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1958,6 +1985,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 4 limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -1982,6 +2010,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 4 limbs and half shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
@@ -2006,6 +2035,7 @@ struct rshift_tester {
                 ::mpz_tdiv_q_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 5 limbs shift.
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);

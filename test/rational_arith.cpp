@@ -21,13 +21,16 @@
 
 static int ntries = 300;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 struct add_tester {
@@ -83,6 +86,7 @@ struct add_tester {
                     // Promote sometimes, if possible.
                     n3._get_den().promote();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = rational{};
@@ -255,6 +259,7 @@ struct sub_tester {
                     // Promote sometimes, if possible.
                     n3._get_den().promote();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = rational{};
@@ -430,6 +435,7 @@ struct mul_tester {
                     // Promote sometimes, if possible.
                     n3._get_den().promote();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = rational{};
@@ -596,6 +602,7 @@ struct div_tester {
                     // Promote sometimes, if possible.
                     n3._get_den().promote();
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = rational{};

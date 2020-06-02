@@ -430,7 +430,7 @@ private:
     }
     // Conversion to bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_num.m_int.m_st._mp_size != 0);
     }
@@ -438,7 +438,7 @@ private:
     template <typename T,
               detail::enable_if_t<
                   detail::conjunction<detail::is_integral<T>, detail::negation<std::is_same<bool, T>>>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return static_cast<int_t>(*this).template dispatch_conversion<T>();
     }
@@ -464,7 +464,7 @@ private:
 #endif
     // Conversion to std::complex.
     template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, T(static_cast<typename T::value_type>(*this)));
     }

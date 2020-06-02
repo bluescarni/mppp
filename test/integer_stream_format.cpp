@@ -19,7 +19,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -46,6 +48,7 @@ static inline std::string runner(const Int &n, Flags &&... flags)
 
 struct out_tester {
     template <typename S>
+    // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
     inline void operator()(const S &) const
     {
         using integer = integer<S::value>;

@@ -20,13 +20,16 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 struct divexact_gcd_tester {
@@ -87,6 +90,7 @@ struct divexact_gcd_tester {
         detail::mpz_raii tmp;
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};

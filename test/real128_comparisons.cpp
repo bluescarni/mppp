@@ -28,8 +28,10 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 using int_t = integer<1>;

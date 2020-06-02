@@ -13,6 +13,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real exp")
@@ -27,6 +28,7 @@ TEST_CASE("real exp")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(exp(r0) == 1);
     REQUIRE(exp(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -42,6 +44,7 @@ TEST_CASE("real exp2")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(exp2(r0) == 1);
     REQUIRE(exp2(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     REQUIRE(exp2(real{4}) == 16);
@@ -63,6 +66,7 @@ TEST_CASE("real exp10")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(exp10(r0) == 1);
     REQUIRE(exp10(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     REQUIRE(exp10(real{4}) == 10000);
@@ -84,6 +88,7 @@ TEST_CASE("real expm1")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(expm1(r0) == 0);
     REQUIRE(expm1(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     REQUIRE(expm1(real{4}) == exp(real{4}) - 1);
@@ -105,6 +110,7 @@ TEST_CASE("real log")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(log(r0) == 0);
     REQUIRE(log(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
@@ -120,6 +126,7 @@ TEST_CASE("real log2")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(log2(r0) == 0);
     REQUIRE(log2(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     REQUIRE(log2(real{4}) == 2);
@@ -141,6 +148,7 @@ TEST_CASE("real log10")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(log10(r0) == 0);
     REQUIRE(log10(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     REQUIRE(log10(real{100}) == 2);
@@ -162,6 +170,7 @@ TEST_CASE("real log1p")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(log1p(r0) == 0);
     REQUIRE(log1p(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     REQUIRE(log1p(real{99}) == log(real{100}));
@@ -186,6 +195,7 @@ TEST_CASE("real log_hypot")
     REQUIRE(abs(r0 - 1.85678603314) < 1E-8);
     REQUIRE(r0.get_prec() == 32);
     // Check tmp1 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp1 == real{12, 16});
     REQUIRE(tmp1.get_prec() == 16);
     tmp1 = real{4, 32};
@@ -195,6 +205,7 @@ TEST_CASE("real log_hypot")
     REQUIRE(abs(r0 - 1.85678603314) < 1E-8);
     REQUIRE(r0.get_prec() == 32);
     // Check tmp2 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(tmp2 == real{12, 16});
     REQUIRE(tmp2.get_prec() == 16);
 

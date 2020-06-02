@@ -22,7 +22,9 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -47,6 +49,7 @@ struct cache_tester {
                 }
 #endif
             };
+            // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
             std::mt19937 rng;
             rng.seed(x);
             std::uniform_int_distribution<int> sdist(0, 1);

@@ -15,6 +15,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 #if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
@@ -238,6 +239,7 @@ TEST_CASE("integer_literal_check_str_test")
 
 #endif
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("z1_test")
 {
     // A few simple tests.
@@ -556,6 +558,7 @@ TEST_CASE("z1_test")
 // Code from the tutorial.
 TEST_CASE("integer_literals_tutorial")
 {
+    // NOLINTNEXTLINE(google-build-using-namespace)
     using namespace mppp::literals;
 
     auto n1 = 123_z1; // n1 has 1 limb of static storage,

@@ -1625,7 +1625,7 @@ public:
 private:
     // Conversion to bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
@@ -3314,6 +3314,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
     // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
     const auto max_asize = static_cast<std::size_t>(asize1 + asize2);
     // Temporary storage, to be used if we cannot write into rop.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize * 2u> res;
     // We can write directly into rop if these conditions hold:
     // - rop does not overlap with op1 and op2,
@@ -3985,6 +3986,7 @@ inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSiz
     // of using this temporary storage. Need to profile first,
     // however, because I am not sure whether this is worth
     // it or not performance-wise.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize * 2u> res;
     const auto res_data = res.data();
 
@@ -4158,6 +4160,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
 
     // Temporary storage for mpn_sqr(). The largest possible
     // size needed is twice the static size.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize * 2u> sqr_res;
     const auto sqr_res_data = sqr_res.data();
 
@@ -4180,6 +4183,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
 
     // Temporary storage for the modulo operation.
     // Need space for both quotient and remainder.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize * 2u> q_res, r_res;
     // Run the modulo operation.
     // NOTE: here we could add some logic, like in tdiv_qr(),
@@ -4374,6 +4378,7 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     // both operands are nonzero.
     // We need to take care of potentially overlapping arguments. We know that q and r are distinct, but op1
     // could overlap with q or r, and op2 could overlap with op1, q or r.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
     const ::mp_limb_t *data1 = op1.m_limbs.data();
     const ::mp_limb_t *data2 = op2.m_limbs.data();
@@ -6497,6 +6502,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         const auto size = static_cast<make_unsigned_t<mpz_size_t>>(ns._mp_size);
         if (mppp_likely(size)) {
             // In case of overlap we need to go through a tmp variable.
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, SSize> tmp;
             const bool overlap = (&rs == &ns);
             const auto rs_data = rs.m_limbs.data(), out_ptr = overlap ? tmp.data() : rs_data;
@@ -6558,6 +6564,7 @@ inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, con
         // NOTE: rop and n must be separate. rem and n can coincide. See:
         // https://gmplib.org/manual/Low_002dlevel-Functions.html
         // In case of overlap of rop and n, we need to go through a tmp variable.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> tmp;
         const bool overlap = (&rops == &ns);
         const auto rops_data = rops.m_limbs.data(), out_ptr = overlap ? tmp.data() : rops_data,

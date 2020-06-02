@@ -18,7 +18,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -31,7 +33,7 @@ struct view_tester {
     {
         using integer = integer<S::value>;
         integer n;
-        const integer &nc = static_cast<const integer &>(n);
+        const auto &nc = static_cast<const integer &>(n);
         REQUIRE((mpz_sgn(n.get_mpz_view().get()) == 0));
         REQUIRE(n.get_mpz_view().get()->_mp_d == n._get_union().g_st().m_limbs.data());
         REQUIRE(n.get_mpz_view().get()->_mp_d == nc._get_union().g_st().m_limbs.data());
@@ -95,6 +97,7 @@ struct view_tester {
         {
             auto v = n.get_mpz_view();
             auto v2 = std::move(v);
+            // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
             REQUIRE(v.get()->_mp_d == v2.get()->_mp_d);
             REQUIRE(v2.get()->_mp_d == n._get_union().g_st().m_limbs.data());
             REQUIRE(v.m_ptr == &v.m_static_view);
@@ -106,6 +109,7 @@ struct view_tester {
         {
             auto v = n.get_mpz_view();
             auto v2 = std::move(v);
+            // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
             REQUIRE(v.get()->_mp_d == v2.get()->_mp_d);
             REQUIRE(v2.get()->_mp_d == n._get_union().g_dy()._mp_d);
             REQUIRE(v.m_ptr == &n._get_union().g_dy());

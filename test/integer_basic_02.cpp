@@ -37,7 +37,9 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
@@ -71,6 +73,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 // is launched it will be inited with a different seed.
 static std::mt19937::result_type mt_rng_seed(0u);
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 struct no_const {
@@ -137,11 +140,13 @@ struct copy_move_tester {
         REQUIRE(m.is_dynamic());
         integer m2{std::move(m)};
         REQUIRE(m2.is_dynamic());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(m.is_static());
         REQUIRE(m == 0);
         m = 123;
         integer m3{std::move(m)};
         REQUIRE(m3 == 123);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(m.is_static());
         REQUIRE(m3.is_static());
         m3.promote();
@@ -154,6 +159,7 @@ struct copy_move_tester {
         REQUIRE(m4.is_dynamic());
         REQUIRE(m4 == 123);
         m4 = std::move(m4);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(m4.is_dynamic());
         REQUIRE(m4 == 123);
         integer m5{12}, m6{-10};
@@ -182,8 +188,10 @@ struct copy_move_tester {
         m4 = std::move(m5);
         REQUIRE(m4.is_dynamic());
         REQUIRE(m4 == 10);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         m5 = -1;
         m5 = std::move(m4);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(m4.is_static());
         REQUIRE(m4 == 0);
         REQUIRE(m5.is_dynamic());
@@ -262,22 +270,27 @@ struct mpz_move_ass_tester {
         integer n;
         ::mpz_t m0;
         ::mpz_init(m0);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(lex_cast(n) == "0");
         ::mpz_init(m0);
         ::mpz_set_si(m0, 1234);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(n == 1234);
         ::mpz_init(m0);
         ::mpz_set_si(m0, -1234);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(n == -1234);
         ::mpz_init(m0);
         ::mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(n == integer("3218372891372987328917389127389217398271983712987398127398172389712937819237"));
         ::mpz_init(m0);
         ::mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(n == integer("-3218372891372987328917389127389217398271983712987398127398172389712937819237"));
         // Random testing.
@@ -295,6 +308,7 @@ struct mpz_move_ass_tester {
                 if (sdist(eng)) {
                     z.promote();
                 }
+                // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
                 z = std::move(m1);
                 if (z != tmp) {
                     fail.store(false);
