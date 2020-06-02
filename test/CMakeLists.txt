@@ -80,6 +80,11 @@ endfunction()
 
 ADD_MPPP_TESTCASE(concepts)
 ADD_MPPP_TESTCASE(global_header)
+# NOTE: the interop test requires all optional
+# deps to be enabled.
+if(MPPP_WITH_QUADMATH AND MPPP_WITH_MPFR AND MPPP_WITH_MPC)
+  ADD_MPPP_TESTCASE(interop_test)
+endif()
 
 ADD_MPPP_TESTCASE(integer_abs)
 ADD_MPPP_TESTCASE(integer_addsub_ui_si)

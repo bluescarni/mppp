@@ -73,11 +73,35 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_bionic_clang6.sh
+  focal_clang9_msan_00:
+    docker:
+    - image: circleci/buildpack-deps:focal
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_focal_clang9_msan.sh
+        environment:
+          TEST_NSPLIT: 2
+          SPLIT_TEST_NUM: 0
+  focal_clang9_msan_01:
+    docker:
+    - image: circleci/buildpack-deps:focal
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_focal_clang9_msan.sh
+        environment:
+          TEST_NSPLIT: 2
+          SPLIT_TEST_NUM: 1
 
 workflows:
   version: 2
   all_builds:
     jobs:
+    - focal_clang9_msan_00
+    - focal_clang9_msan_01
     - bionic_clang6
     - bionic_gcc7_conda_coverage
     - bionic_gcc7_conda_release
