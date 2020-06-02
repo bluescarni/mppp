@@ -28,20 +28,7 @@ using namespace mppp;
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
-using mppp_types = std::tuple<integer<1>, rational<1>
-#if defined(MPPP_WITH_MPFR)
-                              ,
-                              real
-#endif
-#if defined(MPPP_WITH_QUADMATH)
-                              ,
-                              real128, complex128
-#endif
-#if defined(MPPP_WITH_MPC)
-                              ,
-                              complex
-#endif
-                              >;
+using mppp_types = std::tuple<integer<1>, rational<1>, real, real128, complex128, complex>;
 
 using cpp_types = std::tuple<int, double, std::complex<double>
 #if defined(MPPP_HAVE_GCC_INT128)
@@ -54,21 +41,13 @@ template <typename T>
 struct is_mppp_complex : std::false_type {
 };
 
-#if defined(MPPP_WITH_QUADMATH)
-
 template <>
 struct is_mppp_complex<complex128> : std::true_type {
 };
 
-#endif
-
-#if defined(MPPP_WITH_MPC)
-
 template <>
 struct is_mppp_complex<complex> : std::true_type {
 };
-
-#endif
 
 struct mppp_interop_tester {
     template <typename A, typename B>
