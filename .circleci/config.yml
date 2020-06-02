@@ -100,14 +100,14 @@ workflows:
   version: 2
   all_builds:
     jobs:
-      - focal_clang9_msan_00
-      - focal_clang9_msan_01
-    # - bionic_clang6
-    # - bionic_gcc7_conda_coverage
-    # - bionic_gcc7_conda_release
-    # - focal_gcc9_conda_coverage
-    # - focal_clang9_conda_tsan
-    # - focal_clang9_debuggmp_unstable
-    # - focal_clang9_debuggmp
-    # - bionic_gcc7_conda_asan
-    # - bionic_gcc7_conda_ubsan
+    - focal_clang9_msan_00
+    - focal_clang9_msan_01
+    - bionic_clang6
+    - bionic_gcc7_conda_coverage
+    - bionic_gcc7_conda_release
+    - focal_gcc9_conda_coverage
+    - focal_clang9_conda_tsan
+    - focal_clang9_debuggmp_unstable
+    - focal_clang9_debuggmp
+    - bionic_gcc7_conda_asan
+    - bionic_gcc7_conda_ubsan
