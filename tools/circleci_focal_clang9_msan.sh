@@ -43,8 +43,8 @@ make install
 # Compile mppp and run the tests.
 cd ..
 MPPP_MSAN_FLAGS="-fsanitize=memory -stdlib=libc++ -nostdinc++ -isystem ${LLVM_BUILD_DIR}/include/c++/v1 -L${LLVM_BUILD_DIR}/lib -Wl,-rpath,${LLVM_BUILD_DIR}/lib -Wno-unused-command-line-argument"
-CC=clang CXX=clang++ cmake ../ -DCMAKE_BUILD_TYPE=RelWithDebInfo -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="${MPPP_MSAN_FLAGS}" -DCMAKE_C_FLAGS="${MPPP_MSAN_FLAGS}" -DCMAKE_PREFIX_PATH=/home/circleci/.local -DCMAKE_CXX_STANDARD=17
-make VERBOSE=1
+CC=clang CXX=clang++ cmake ../ -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="${MPPP_MSAN_FLAGS}" -DCMAKE_C_FLAGS="${MPPP_MSAN_FLAGS}" -DCMAKE_PREFIX_PATH=/home/circleci/.local -DCMAKE_CXX_STANDARD=17
+make -j2 VERBOSE=1
 ctest -j4 -V
 
 set +e
