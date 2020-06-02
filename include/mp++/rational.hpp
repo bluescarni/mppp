@@ -357,6 +357,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int> = 0>
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     rational &operator=(T &&x)
     {
         dispatch_assignment(std::forward<T>(x),
@@ -423,7 +424,7 @@ public:
 private:
     // Conversion to int_t.
     template <typename T, detail::enable_if_t<std::is_same<int_t, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_num / m_den);
     }
@@ -444,7 +445,7 @@ private:
     // Conversion to float/double.
     template <typename T,
               detail::enable_if_t<detail::disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         const auto v = detail::get_mpq_view(*this);
         return std::make_pair(true, static_cast<T>(::mpq_get_d(&v)));
@@ -452,7 +453,7 @@ private:
 #if defined(MPPP_WITH_MPFR)
     // Conversion to long double.
     template <typename T, detail::enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS detail::mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));

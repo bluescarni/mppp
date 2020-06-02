@@ -25,7 +25,9 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
@@ -36,6 +38,7 @@ using fp_types = std::tuple<float, double, long double>;
 using int_t = integer<1>;
 using rat_t = rational<1>;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 static const int ntrials = 1000;

@@ -16,6 +16,7 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real128_literal_tests")

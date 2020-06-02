@@ -55,7 +55,9 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
@@ -89,6 +91,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 // is launched it will be inited with a different seed.
 static std::mt19937::result_type mt_rng_seed(0u);
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 struct no_const {
@@ -450,19 +453,24 @@ struct mpz_move_ctor_tester {
         using integer = integer<S::value>;
         ::mpz_t m0;
         ::mpz_init(m0);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "0");
         ::mpz_init(m0);
         ::mpz_set_si(m0, 1234);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "1234");
         ::mpz_init(m0);
         ::mpz_set_si(m0, -1234);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "-1234");
         ::mpz_init(m0);
         ::mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
         ::mpz_init(m0);
         ::mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)})
                 == "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
         // Random testing.
@@ -475,6 +483,7 @@ struct mpz_move_ctor_tester {
                 ::mpz_init(m1);
                 auto tmp = dist(eng);
                 ::mpz_set_si(m1, tmp);
+                // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
                 if (lex_cast(integer{std::move(m1)}) != lex_cast(tmp)) {
                     fail.store(false);
                 }
@@ -624,18 +633,22 @@ struct binary_s11n_tester {
         // Buffers based on std::vector and std::array.
         std::vector<char> vbuffer;
         // Make space for plenty of limbs.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<char, sizeof(detail::mpz_size_t) + sizeof(::mp_limb_t) * 100u> sb;
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset every once in a while.
                     n1 = integer{};
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset every once in a while.
                     n2 = integer{};
                 }
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset every once in a while.
                     vbuffer = std::vector<char>{};
@@ -791,6 +804,7 @@ struct binary_s11n_tester {
         REQUIRE(n1 == 0);
 
         // Test errors in the vector and array interfaces.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<char, 0> zero_arr;
         REQUIRE(binary_save(n1, zero_arr) == 0u);
         std::vector<char> zero_vec;
@@ -806,6 +820,7 @@ struct binary_s11n_tester {
                       "size must be at least "
                           + std::to_string(sizeof(detail::mpz_size_t)) + " bytes, but it is only 0 bytes";
         });
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<char, sizeof(detail::mpz_size_t) + sizeof(::mp_limb_t) * 2u> small_arr;
         const detail::mpz_size_t tmp_size = 3;
         std::copy(reinterpret_cast<const char *>(&tmp_size),

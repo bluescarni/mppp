@@ -499,7 +499,7 @@ public:
 private:
     // Conversion to C++ types.
     template <typename T>
-    constexpr T dispatch_conversion(std::true_type) const
+    MPPP_NODISCARD constexpr T dispatch_conversion(std::true_type) const
     {
         return static_cast<T>(m_value);
     }
@@ -616,7 +616,7 @@ private:
 
     // Conversion to mp++ types.
     template <typename T>
-    T dispatch_conversion(std::false_type) const
+    MPPP_NODISCARD T dispatch_conversion(std::false_type) const
     {
         T retval;
         if (mppp_unlikely(!mppp_conversion(retval))) {

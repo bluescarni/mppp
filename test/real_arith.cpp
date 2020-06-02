@@ -15,6 +15,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 #if defined(_MSC_VER)
@@ -63,10 +64,12 @@ TEST_CASE("real arith nary steal")
     REQUIRE(p.first == &r2);
     REQUIRE(p.second == r1.get_prec());
     p = std::make_pair(&r1, r1.get_prec());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     detail::mpfr_nary_op_check_steal(p, std::move(r2), std::move(r3));
     REQUIRE(p.first == &r1);
     REQUIRE(p.second == r1.get_prec());
     p = std::make_pair(&r1, r1.get_prec());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     detail::mpfr_nary_op_check_steal(p, static_cast<const real &>(r2), r3);
     REQUIRE(p.first == &r1);
     REQUIRE(p.second == r1.get_prec());
@@ -110,25 +113,32 @@ TEST_CASE("real add")
     REQUIRE(r1.get_prec() == 128);
     // Some tests with rvalue refs/overlapping arguments.
     add(r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{92}.get_mpfr_t()));
     add(r1, std::move(r1), real{100, 150});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{192}.get_mpfr_t()));
     add(r1, std::move(r1), real{100, 50});
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 150);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{292}.get_mpfr_t()));
     add(r1, real{100, 160}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{392}.get_mpfr_t()));
     add(r1, real{100, 50}, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 160);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{492}.get_mpfr_t()));
     r1 = real{92, 128};
     add(r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{184}.get_mpfr_t()));
     add(r1, std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{368}.get_mpfr_t()));
     r1 = real{};
@@ -170,14 +180,17 @@ TEST_CASE("real sub")
     REQUIRE(r1.get_prec() == 128);
     // Some tests with rvalue refs/overlapping arguments.
     sub(r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{0}.get_mpfr_t()));
     r1 = real{123, 128};
     sub(r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{0}.get_mpfr_t()));
     r1 = real{123, 128};
     sub(r1, std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{0}.get_mpfr_t()));
     r1 = real{};
@@ -220,12 +233,15 @@ TEST_CASE("real mul")
     // Some tests with rvalue refs/overlapping arguments.
     r1 = real{2, 128};
     mul(r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{4}.get_mpfr_t()));
     mul(r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{16}.get_mpfr_t()));
     mul(r1, std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{256}.get_mpfr_t()));
     r1 = real{};
@@ -268,14 +284,17 @@ TEST_CASE("real div")
     // Some tests with rvalue refs/overlapping arguments.
     r1 = real{256, 128};
     div(r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{1}.get_mpfr_t()));
     r1 = real{256, 128};
     div(r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{1}.get_mpfr_t()));
     r1 = real{256, 128};
     div(r1, std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.get_prec() == 128);
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{1}.get_mpfr_t()));
     r1 = real{};
@@ -336,14 +355,19 @@ TEST_CASE("real fma")
     // Overlap + rvalue.
     r1 = 0;
     fma_wrap(r1, std::move(r1), std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fma_wrap(r1, r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fma_wrap(r1, r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fma_wrap(r1, std::move(r1), r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fma_wrap(r1, std::move(r1), std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
 }
 
@@ -391,13 +415,18 @@ TEST_CASE("real fms")
     // Overlap + rvalue.
     r1 = 0;
     fms_wrap(r1, std::move(r1), std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fms_wrap(r1, r1, std::move(r1), std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fms_wrap(r1, r1, r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fms_wrap(r1, std::move(r1), r1, std::move(r1));
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     fms_wrap(r1, std::move(r1), std::move(r1), r1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
 }

@@ -23,6 +23,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 using int_t = integer<1>;
@@ -56,6 +57,7 @@ TEST_CASE("real pow")
     pow(rop, std::move(r0), r1);
     REQUIRE(rop == real{9});
     REQUIRE(rop.get_prec() == detail::nl_digits<int>() + 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r0.zero_p());
     REQUIRE(r0.get_prec() == real_prec_min());
     r0 = 3;
@@ -63,6 +65,7 @@ TEST_CASE("real pow")
     pow(rop, r0, std::move(r1));
     REQUIRE(rop == real{9});
     REQUIRE(rop.get_prec() == detail::nl_digits<int>() + 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(r1.zero_p());
     REQUIRE(r1.get_prec() == real_prec_min());
     r1 = 2;
@@ -187,6 +190,7 @@ TEST_CASE("real sqr")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(sqr(r0) == 16);
     REQUIRE(sqr(std::move(r0)) == 16);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = real{-16, 128};
     REQUIRE(sqr(r0) == 256);

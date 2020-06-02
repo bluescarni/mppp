@@ -981,6 +981,7 @@ union integer_union {
             return false;
         }
         // Copy over the limbs to temporary storage.
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> tmp;
         copy_limbs_no(g_dy()._mp_d, g_dy()._mp_d + dyn_size, tmp.data());
         const auto signed_size = g_dy()._mp_size;
@@ -1799,7 +1800,7 @@ private:
 #endif
     // Conversion to floating-point.
     template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
+    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -3803,6 +3804,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
     if (new_asize == SSize) {
         if (rs) {
             // In this case the operation may fail, so we need to write to temporary storage.
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, SSize> tmp;
             if (::mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
                 return SSize + 1u;
@@ -4605,6 +4607,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // both operands are nonzero.
     // We need to take care of potentially overlapping arguments. op1 could overlap with q, and op2
     // could overlap with op1 or q.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
     const ::mp_limb_t *data1 = op1.m_limbs.data();
     const ::mp_limb_t *data2 = op2.m_limbs.data();
@@ -4627,6 +4630,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
         // Optimization when the divisor has 1 limb.
         ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> r_unused;
         // General implementation.
         ::mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
@@ -5475,6 +5479,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         return;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
@@ -5709,6 +5714,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         return true;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
@@ -5963,6 +5969,7 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         return true;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {

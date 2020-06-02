@@ -15,6 +15,7 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real sqrt")
@@ -31,6 +32,7 @@ TEST_CASE("real sqrt")
     REQUIRE(sqrt(r0).zero_p());
     REQUIRE(std::is_same<real, decltype(sqrt(r0))>::value);
     REQUIRE(sqrt(std::move(r0)).zero_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{16, 128};
     REQUIRE(sqrt(r0) == 4);
@@ -58,6 +60,7 @@ TEST_CASE("real rec_sqrt")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(rec_sqrt(r0) == 1);
     REQUIRE(rec_sqrt(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{16, 128};
     REQUIRE(rec_sqrt(r0) == 1 / real{4});
@@ -89,6 +92,7 @@ TEST_CASE("real cbrt")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(cbrt(r0).zero_p());
     REQUIRE(cbrt(std::move(r0)).zero_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{-27, 128};
     REQUIRE(cbrt(r0) == -3);
@@ -112,6 +116,7 @@ TEST_CASE("real rootn_ui")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(rootn_ui(r0, 3).zero_p());
     REQUIRE(rootn_ui(std::move(r0), 3).zero_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
     r0 = real{-27, 128};
     REQUIRE(rootn_ui(r0, 3) == -3);
@@ -148,6 +153,7 @@ TEST_CASE("real sqrt1pm1")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(sqrt1pm1(r0).zero_p());
     REQUIRE(sqrt1pm1(std::move(r0)).zero_p());
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = real{15, 128};
     REQUIRE(sqrt1pm1(r0) == 3);

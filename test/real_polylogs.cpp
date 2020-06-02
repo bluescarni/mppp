@@ -13,6 +13,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("real li2")
@@ -31,6 +32,7 @@ TEST_CASE("real li2")
         REQUIRE(abs(li2(r0) + 0.8224670334241132) < 1E-5);
         REQUIRE(std::is_same<real, decltype(li2(r0))>::value);
         REQUIRE(abs(li2(std::move(r0)) + 0.8224670334241132) < 1E-5);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
     }
 
@@ -46,6 +48,7 @@ TEST_CASE("real li2")
         REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
         REQUIRE(li2(r0).nan_p());
         REQUIRE(li2(std::move(r0)).nan_p());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
     }
 
@@ -61,6 +64,7 @@ TEST_CASE("real li2")
         REQUIRE(rop.get_prec() == detail::real_deduce_precision(1.2));
         REQUIRE(li2(r0).nan_p());
         REQUIRE(li2(std::move(r0)).nan_p());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
     }
 
@@ -76,6 +80,7 @@ TEST_CASE("real li2")
         REQUIRE(rop.get_prec() == 113);
         REQUIRE(li2(r0).nan_p());
         REQUIRE(li2(std::move(r0)).nan_p());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
     }
 
@@ -94,6 +99,7 @@ TEST_CASE("real li2")
         REQUIRE(li2(r0).inf_p());
         REQUIRE(li2(r0) < 0);
         REQUIRE(li2(std::move(r0)).inf_p());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
     }
 
@@ -109,6 +115,7 @@ TEST_CASE("real li2")
         REQUIRE(rop.get_prec() == 113);
         REQUIRE(li2(r0).nan_p());
         REQUIRE(li2(std::move(r0)).nan_p());
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!r0.is_valid());
     }
 }

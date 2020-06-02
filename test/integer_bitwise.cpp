@@ -23,17 +23,21 @@
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 struct ior_tester {
     template <typename S>
+    // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
     inline void operator()(const S &) const
     {
         using integer = integer<S::value>;
@@ -49,6 +53,7 @@ struct ior_tester {
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -234,6 +239,7 @@ struct ior_tester {
             bitwise_ior(n1, n3, n2);
             ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 2> arr1;
             arr1 = {{0u, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 2};
@@ -321,6 +327,7 @@ struct ior_tester {
             ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
             // 3 limbs.
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 3> arr1;
             arr1 = {{GMP_NUMB_MAX, GMP_NUMB_MAX, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 3};
@@ -511,6 +518,7 @@ struct not_tester {
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -568,6 +576,7 @@ struct not_tester {
             bitwise_not(n1, n2);
             REQUIRE(n1 == integer{&m1.m_mpz});
             REQUIRE(n1 == ~n2);
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 2> tmp_arr;
             tmp_arr = {{GMP_NUMB_MAX, GMP_NUMB_MAX}};
             n2 = integer{tmp_arr.data(), 2};
@@ -640,6 +649,7 @@ struct not_tester {
             bitwise_not(n1, n2);
             REQUIRE(n1 == integer{&m1.m_mpz});
             REQUIRE(n1 == ~n2);
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 2> tmp_arr;
             tmp_arr = {{GMP_NUMB_MAX, GMP_NUMB_MAX}};
             n2 = integer{tmp_arr.data(), 2};
@@ -669,6 +679,7 @@ struct not_tester {
             bitwise_not(n1, n2);
             REQUIRE(n1 == integer{&m1.m_mpz});
             REQUIRE(n1 == ~n2);
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 3> tmp_arr2;
             tmp_arr2 = {{GMP_NUMB_MAX, GMP_NUMB_MAX, GMP_NUMB_MAX}};
             n2 = integer{tmp_arr2.data(), 3};
@@ -779,6 +790,7 @@ TEST_CASE("integer not")
 
 struct and_tester {
     template <typename S>
+    // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
     inline void operator()(const S &) const
     {
         using integer = integer<S::value>;
@@ -794,6 +806,7 @@ struct and_tester {
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -993,6 +1006,7 @@ struct and_tester {
             bitwise_and(n1, n3, n2);
             ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 2> arr1;
             arr1 = {{0u, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 2};
@@ -1094,6 +1108,7 @@ struct and_tester {
             ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
             // 3 limbs.
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 3> arr1;
             arr1 = {{GMP_NUMB_MAX, GMP_NUMB_MAX, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 3};
@@ -1270,6 +1285,7 @@ TEST_CASE("integer and")
 
 struct xor_tester {
     template <typename S>
+    // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
     inline void operator()(const S &) const
     {
         using integer = integer<S::value>;
@@ -1285,6 +1301,7 @@ struct xor_tester {
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
+                // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
@@ -1502,6 +1519,7 @@ struct xor_tester {
             bitwise_xor(n1, n3, n2);
             ::mpz_xor(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 2> arr1;
             arr1 = {{0u, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 2};
@@ -1619,6 +1637,7 @@ struct xor_tester {
             ::mpz_xor(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
             // 3 limbs.
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, 3> arr1;
             arr1 = {{GMP_NUMB_MAX, GMP_NUMB_MAX, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 3};

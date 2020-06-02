@@ -14,6 +14,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 TEST_CASE("exp")
@@ -32,6 +33,7 @@ TEST_CASE("exp")
     REQUIRE(exp(r0) == 1);
     REQUIRE(std::is_same<complex, decltype(exp(r0))>::value);
     REQUIRE(exp(std::move(r0)) == 1);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = -2445131.833118359643378588430813828510240021169288406198855703802785185164085466_r128
@@ -63,6 +65,7 @@ TEST_CASE("log")
     REQUIRE(log(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(log(r0))>::value);
     REQUIRE(log(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = 3.150392897331622037489037892717694645292975118885874437493760723077541135951419_r128
@@ -94,6 +97,7 @@ TEST_CASE("log10")
     REQUIRE(log10(r0) == 0);
     REQUIRE(std::is_same<complex, decltype(log10(r0))>::value);
     REQUIRE(log10(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.is_valid());
     r0 = complex{16, 17, complex_prec_t(128)};
     const auto cmp = 1.368198251138321219993387206444691129937007320682937570399986537071603805920224_r128

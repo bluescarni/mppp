@@ -23,6 +23,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 using int_t = integer<1>;
@@ -123,6 +124,7 @@ using binary_div_t = decltype(std::declval<const T &>() / std::declval<const U &
 template <typename T, typename U>
 using in_place_div_t = decltype(std::declval<T &>() /= std::declval<const U &>());
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real128 ops")
 {
     real128 x;

@@ -37,6 +37,7 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 #if MPPP_CPLUSPLUS >= 201402L
@@ -45,6 +46,7 @@ constexpr auto test_constexpr_cm_assignment(const complex128 &c)
 {
     complex128 c2{}, c3{};
     c2 = c;
+    // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     c3 = std::move(c);
     return std::make_pair(c2, c3);
 }
@@ -103,6 +105,7 @@ TEST_CASE("basic constructors")
     // Copy and move.
     constexpr auto c1(c0a);
     REQUIRE(c1.m_value == 4);
+    // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     constexpr auto c2(std::move(c1));
     REQUIRE(c2.m_value == 4);
 
@@ -323,6 +326,7 @@ TEST_CASE("assignment operators")
     b = a;
     REQUIRE(b.real() == 1);
     REQUIRE(b.imag() == 2);
+    // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     c = std::move(b);
     REQUIRE(c.real() == 1);
     REQUIRE(c.imag() == 2);
@@ -587,7 +591,7 @@ TEST_CASE("get")
 {
     {
         // To C++ arithmetic types.
-        int n;
+        int n = -1;
 
         REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
         REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
@@ -612,7 +616,7 @@ TEST_CASE("get")
 
 #if defined(MPPP_HAVE_GCC_INT128)
     {
-        __int128_t n;
+        __int128_t n = -1;
 
         REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
         REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
@@ -632,7 +636,7 @@ TEST_CASE("get")
 #endif
 
     {
-        double n;
+        double n = -1;
 
         REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
         REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);
@@ -696,7 +700,7 @@ TEST_CASE("get")
 
     {
         // To real128.
-        real128 n;
+        real128 n{-1};
 
         REQUIRE(std::is_same<bool, decltype(complex128{42}.get(n))>::value);
         REQUIRE(std::is_same<bool, decltype(get(n, complex128{43}))>::value);

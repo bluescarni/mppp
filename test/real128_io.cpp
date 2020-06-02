@@ -13,10 +13,12 @@
 
 #include "catch.hpp"
 
+// NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
 static int ntries = 1000;
 
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
 static std::mt19937 rng;
 
 static inline void check_round_trip(const real128 &r)
@@ -43,15 +45,15 @@ TEST_CASE("real128 io")
     std::uniform_int_distribution<int> sdist(0, 1);
     std::uniform_real_distribution<double> dist1(100., 1000.);
     for (int i = 0; i < ntries; ++i) {
-        check_round_trip(nextafter(real128{dist1(rng)}, real128{10000.}) * (sdist(rng) ? 1 : -1));
+        check_round_trip(nextafter(real128{dist1(rng)}, real128{10000.}) * (sdist(rng) != 0 ? 1 : -1));
     }
     std::uniform_real_distribution<double> dist2(1E-6, 1E-1);
     for (int i = 0; i < ntries; ++i) {
-        check_round_trip(nextafter(real128{dist2(rng)}, real128{1.}) * (sdist(rng) ? 1 : -1));
+        check_round_trip(nextafter(real128{dist2(rng)}, real128{1.}) * (sdist(rng) != 0 ? 1 : -1));
     }
     std::uniform_real_distribution<double> dist3(1E100, 1E120);
     for (int i = 0; i < ntries; ++i) {
-        check_round_trip(nextafter(real128{dist3(rng)}, real128{1E121}) * (sdist(rng) ? 1 : -1));
+        check_round_trip(nextafter(real128{dist3(rng)}, real128{1E121}) * (sdist(rng) != 0 ? 1 : -1));
     }
     // Some subnormals.
     check_round_trip(real128{"1E-4960"});
