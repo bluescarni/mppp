@@ -1,6 +1,20 @@
 Changelog
 =========
 
+0.21 (unreleased)
+-----------------
+
+New
+~~~
+
+- Additional special functions for :cpp:class:`~mppp::complex`
+  (inverse, reciprocal square root)
+  (`#246 <https://github.com/bluescarni/mppp/pull/246>`__).
+- Implement the detection of finite and infinite values
+  for :cpp:class:`~mppp::complex`
+  (`#246 <https://github.com/bluescarni/mppp/pull/246>`__).
+
+
 0.20 (2020-06-03)
 -----------------
 
