@@ -15,34 +15,34 @@
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
-TEST_CASE("cmp_abs")
+TEST_CASE("cmpabs")
 {
     using Catch::Matchers::Message;
 
-    REQUIRE(cmp_abs(complex{1, 2}, complex{1, 2}) == 0);
-    REQUIRE(cmp_abs(complex{1, 2}, complex{-1, 2}) == 0);
-    REQUIRE(cmp_abs(complex{1, -2}, complex{-1, 2}) == 0);
-    REQUIRE(cmp_abs(complex{-1, -2}, complex{-1, 2}) == 0);
+    REQUIRE(cmpabs(complex{1, 2}, complex{1, 2}) == 0);
+    REQUIRE(cmpabs(complex{1, 2}, complex{-1, 2}) == 0);
+    REQUIRE(cmpabs(complex{1, -2}, complex{-1, 2}) == 0);
+    REQUIRE(cmpabs(complex{-1, -2}, complex{-1, 2}) == 0);
 
-    REQUIRE(cmp_abs(complex{-1, -2}, complex{1}) > 0);
-    REQUIRE(cmp_abs(complex{-1, -2}, complex{-1}) > 0);
-    REQUIRE(cmp_abs(complex{2}, complex{-1, -2}) < 0);
-    REQUIRE(cmp_abs(complex{-2}, complex{-1, -2}) < 0);
+    REQUIRE(cmpabs(complex{-1, -2}, complex{1}) > 0);
+    REQUIRE(cmpabs(complex{-1, -2}, complex{-1}) > 0);
+    REQUIRE(cmpabs(complex{2}, complex{-1, -2}) < 0);
+    REQUIRE(cmpabs(complex{-2}, complex{-1, -2}) < 0);
 
     REQUIRE_THROWS_MATCHES(
-        cmp_abs(complex{"(nan,1)", complex_prec_t(5)}, complex{1}), std::domain_error,
+        cmpabs(complex{"(nan,1)", complex_prec_t(5)}, complex{1}), std::domain_error,
         Message(
             "Cannot compare the absolute values of two complex numbers if there are NaNs in the real/imaginary parts"));
     REQUIRE_THROWS_MATCHES(
-        cmp_abs(complex{"(1, nan)", complex_prec_t(5)}, complex{1}), std::domain_error,
+        cmpabs(complex{"(1, nan)", complex_prec_t(5)}, complex{1}), std::domain_error,
         Message(
             "Cannot compare the absolute values of two complex numbers if there are NaNs in the real/imaginary parts"));
     REQUIRE_THROWS_MATCHES(
-        cmp_abs(complex{1}, complex{"(nan, 1)", complex_prec_t(5)}), std::domain_error,
+        cmpabs(complex{1}, complex{"(nan, 1)", complex_prec_t(5)}), std::domain_error,
         Message(
             "Cannot compare the absolute values of two complex numbers if there are NaNs in the real/imaginary parts"));
     REQUIRE_THROWS_MATCHES(
-        cmp_abs(complex{1}, complex{"(1, nan)", complex_prec_t(5)}), std::domain_error,
+        cmpabs(complex{1}, complex{"(1, nan)", complex_prec_t(5)}), std::domain_error,
         Message(
             "Cannot compare the absolute values of two complex numbers if there are NaNs in the real/imaginary parts"));
 }

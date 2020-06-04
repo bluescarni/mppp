@@ -1502,7 +1502,7 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(inv, detail::acb_inv, false)
 #endif
 
 // Comparison of absolute values.
-MPPP_DLL_PUBLIC int cmp_abs(const complex &, const complex &);
+MPPP_DLL_PUBLIC int cmpabs(const complex &, const complex &);
 
 // Detect zero/one.
 inline bool zero_p(const complex &c)

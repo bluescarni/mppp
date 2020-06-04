@@ -1370,7 +1370,7 @@ Arithmetic
 Comparison
 ~~~~~~~~~~
 
-.. cpp:function:: int mppp::cmp_abs(const mppp::complex &a, const mppp::complex &b)
+.. cpp:function:: int mppp::cmpabs(const mppp::complex &a, const mppp::complex &b)
 
    Three-way comparison of absolute values.
 

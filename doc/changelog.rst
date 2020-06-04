@@ -14,6 +14,14 @@ New
   for :cpp:class:`~mppp::complex`
   (`#246 <https://github.com/bluescarni/mppp/pull/246>`__).
 
+Changes
+~~~~~~~
+
+- **BREAKING**: the :cpp:class:`~mppp::complex`
+  ``cmp_abs()`` function has been renamed to
+  ``cmpabs()`` for consistency with
+  :cpp:class:`~mppp::real`.
+
 
 0.20 (2020-06-03)
 -----------------
