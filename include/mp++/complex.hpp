@@ -151,6 +151,7 @@ inline ::mpfr_prec_t real_deduce_precision(const real &r)
 // The Arb MPC wrappers.
 MPPP_DLL_PUBLIC void acb_inv(::mpc_t, const ::mpc_t);
 MPPP_DLL_PUBLIC void acb_rec_sqrt(::mpc_t, const ::mpc_t);
+MPPP_DLL_PUBLIC void acb_rootn_ui(::mpc_t, const ::mpc_t, unsigned long);
 
 #endif
 
@@ -1527,11 +1528,35 @@ inline bool number_p(const complex &c)
     return c.number_p();
 }
 
+// Roots.
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
 
 #if defined(MPPP_WITH_ARB)
 
 MPPP_COMPLEX_MPC_UNARY_IMPL(rec_sqrt, detail::acb_rec_sqrt, false)
+
+// K-th root.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex &rootn_ui(complex &rop, T &&op, unsigned long k)
+{
+    auto wrapper = [k](::mpc_t r, const ::mpc_t o) { detail::acb_rootn_ui(r, o, k); };
+    return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex rootn_ui(T &&r, unsigned long k)
+{
+    auto wrapper = [k](::mpc_t rop, const ::mpc_t op) { detail::acb_rootn_ui(rop, op, k); };
+    return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
+}
 
 #endif
 

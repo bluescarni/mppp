@@ -427,6 +427,29 @@ void acb_rec_sqrt(::mpc_t rop, const ::mpc_t op)
     }
 }
 
+// rootn_ui.
+void acb_rootn_ui(::mpc_t rop, const ::mpc_t op, unsigned long n)
+{
+    if (n == 0u) {
+        // NOTE: like the MPFR function, set rop
+        // to nan if n is zero.
+        ::mpfr_set_nan(mpc_realref(rop));
+        ::mpfr_set_nan(mpc_imagref(rop));
+    } else if (mpc_is_inf(op)) {
+        // inf**(1/n) results in an infinity.
+        ::mpfr_set_inf(mpc_realref(rop), 0);
+    } else {
+        MPPP_MAYBE_TLS acb_raii acb_rop, acb_op;
+
+        mpc_to_acb(acb_op.m_acb, op);
+
+        ::acb_root_ui(acb_rop.m_acb, acb_op.m_acb, safe_cast<::ulong>(n),
+                      mpfr_prec_to_arb_prec(mpfr_get_prec(mpc_realref(rop))));
+
+        acb_to_mpc(rop, acb_rop.m_acb);
+    }
+}
+
 #undef MPPP_UNARY_ACB_WRAPPER
 
 #endif

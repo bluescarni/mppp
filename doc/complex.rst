@@ -1432,10 +1432,11 @@ Roots
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqrt(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::rec_sqrt(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::rootn_ui(mppp::complex &rop, T &&z, unsigned long k)
 
    .. note::
 
-      The ``rec_sqrt()`` function is available only if mp++ was
+      The ``rec_sqrt()`` and ``rootn_ui()`` functions are available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Binary :cpp:class:`~mppp::complex` roots.
@@ -1443,19 +1444,24 @@ Roots
    These functions will set *rop* to, respectively:
 
    * :math:`\sqrt{z}`,
-   * :math:`1 / \sqrt{z}`.
+   * :math:`1 / \sqrt{z}`,
+   * :math:`\sqrt[k]{z}`.
 
    The precision of the result will be equal to the precision of *z*.
 
    The ``rec_sqrt()`` function follows the conventions laid out in Annex G
    of the C99 standard when *z* is zero or an infinity.
 
+   The ``rootn_ui()`` function computes the principal *k*-th root of *z*. If
+   *k* is zero, *rop* will be set to NaN.
+
    .. versionadded:: 0.21
 
-      The ``rec_sqrt()`` function.
+      The ``rec_sqrt()`` and ``rootn_ui()`` functions.
 
    :param rop: the return value.
    :param z: the operand.
+   :param k: the degree of the root.
 
    :return: a reference to *rop*.
 
@@ -1464,10 +1470,11 @@ Roots
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqrt(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::rec_sqrt(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::rootn_ui(T &&z, unsigned long k)
 
    .. note::
 
-      The ``rec_sqrt()`` function is available only if mp++ was
+      The ``rec_sqrt()`` and ``rootn_ui()`` functions are available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Unary :cpp:class:`~mppp::complex` roots.
@@ -1475,15 +1482,23 @@ Roots
    These functions will return, respectively:
 
    * :math:`\sqrt{z}`,
-   * :math:`1 / \sqrt{z}`.
+   * :math:`1 / \sqrt{z}`,
+   * :math:`\sqrt[k]{z}`.
 
    The precision of the result will be equal to the precision of *z*.
 
+   The ``rec_sqrt()`` function follows the conventions laid out in Annex G
+   of the C99 standard when *z* is zero or an infinity.
+
+   The ``rootn_ui()`` function computes the principal *k*-th root of *z*. If
+   *k* is zero, *rop* will be set to NaN.
+
    .. versionadded:: 0.21
 
-      The ``rec_sqrt()`` function.
+      The ``rec_sqrt()`` and ``rootn_ui()`` functions.
 
    :param z: the operand.
+   :param k: the degree of the root.
 
    :return: the result of the operation.
 

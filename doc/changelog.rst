@@ -8,7 +8,7 @@ New
 ~~~
 
 - Additional special functions for :cpp:class:`~mppp::complex`
-  (inverse, reciprocal square root)
+  (inverse, reciprocal square root, n-th root)
   (`#246 <https://github.com/bluescarni/mppp/pull/246>`__).
 - Implement the detection of finite and infinite values
   for :cpp:class:`~mppp::complex`
