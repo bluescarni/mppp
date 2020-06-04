@@ -127,6 +127,12 @@ inline bool mpc_is_finite(const ::mpc_t c)
     return mpfr_number_p(mpc_realref(c)) != 0 && mpfr_number_p(mpc_imagref(c)) != 0;
 }
 
+// Detect complex zero.
+inline bool mpc_is_zero(const ::mpc_t c)
+{
+    return mpfr_zero_p(mpc_realref(c)) != 0 && mpfr_zero_p(mpc_imagref(c)) != 0;
+}
+
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
 complex &mpc_nary_op_impl(::mpfr_prec_t, const F &, complex &, Arg0 &&, Args &&...);
@@ -139,6 +145,13 @@ inline ::mpfr_prec_t real_deduce_precision(const real &r)
 {
     return r.get_prec();
 }
+
+#if defined(MPPP_WITH_ARB)
+
+// The Arb MPC wrappers.
+MPPP_DLL_PUBLIC void acb_inv(::mpc_t, const ::mpc_t);
+
+#endif
 
 } // namespace detail
 
@@ -714,7 +727,7 @@ public:
     // Detect special values.
     MPPP_NODISCARD bool zero_p() const
     {
-        return mpfr_zero_p(mpc_realref(&m_mpc)) != 0 && mpfr_zero_p(mpc_imagref(&m_mpc)) != 0;
+        return detail::mpc_is_zero(&m_mpc);
     }
     MPPP_NODISCARD bool inf_p() const
     {
@@ -837,6 +850,14 @@ public:
 private:
     template <typename T>
     MPPP_DLL_LOCAL complex &self_mpc_unary(T &&);
+    // Wrapper to apply the input unary MPC function to this.
+    // f must not need a rounding mode. Returns a reference to this.
+    template <typename T>
+    MPPP_DLL_LOCAL complex &self_mpc_unary_nornd(T &&f)
+    {
+        std::forward<T>(f)(&m_mpc, &m_mpc);
+        return *this;
+    }
 
 public:
     // In-place arithmetic functions.
@@ -848,6 +869,9 @@ public:
     complex &proj();
     complex &sqr();
     complex &mul_i(int sgn = 0);
+#if defined(MPPP_WITH_ARB)
+    complex &inv();
+#endif
 
     // Roots.
     complex &sqrt();
@@ -1465,6 +1489,13 @@ MPPP_DLL_PUBLIC real norm(const complex &);
 
 MPPP_DLL_PUBLIC real &arg(real &, const complex &);
 MPPP_DLL_PUBLIC real arg(const complex &);
+
+#if defined(MPPP_WITH_ARB)
+
+// inv.
+MPPP_COMPLEX_MPC_UNARY_IMPL(inv, detail::acb_inv, false)
+
+#endif
 
 // Comparison of absolute values.
 MPPP_DLL_PUBLIC int cmp_abs(const complex &, const complex &);

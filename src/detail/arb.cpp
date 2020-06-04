@@ -6,6 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <stdexcept>
 
 #include <flint/flint.h>
@@ -16,11 +18,23 @@
 #include <arf.h>
 #include <mag.h>
 
-#include <mp++/config.hpp>
+#if defined(MPPP_WITH_MPC)
+
+#include <acb.h>
+
+#endif
+
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/real.hpp>
+
+#if defined(MPPP_WITH_MPC)
+
+#include <mp++/complex.hpp>
+#include <mp++/detail/mpc.hpp>
+
+#endif
 
 namespace mppp
 {
@@ -68,6 +82,29 @@ struct arf_raii {
     }
     ::arf_t m_arf;
 };
+
+#if defined(MPPP_WITH_MPC)
+
+// Minimal RAII struct to hold
+// acb_t types.
+struct acb_raii {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+    acb_raii()
+    {
+        ::acb_init(m_acb);
+    }
+    acb_raii(const acb_raii &) = delete;
+    acb_raii(acb_raii &&) = delete;
+    acb_raii &operator=(const acb_raii &) = delete;
+    acb_raii &operator=(acb_raii &&) = delete;
+    ~acb_raii()
+    {
+        ::acb_clear(m_acb);
+    }
+    ::acb_t m_acb;
+};
+
+#endif
 
 // Small helper to turn an MPFR precision
 // into an Arb precision.
@@ -135,6 +172,24 @@ void mpfr_to_arb(::arb_t rop, const ::mpfr_t op)
     // Set the radius to zero.
     ::mag_zero(arb_radref(rop));
 }
+
+#if defined(MPPP_WITH_MPC)
+
+// Helper to convert an mpc_t into an acb_t.
+void mpc_to_acb(::acb_t rop, const ::mpc_t op)
+{
+    mpfr_to_arb(acb_realref(rop), mpc_realref(op));
+    mpfr_to_arb(acb_imagref(rop), mpc_imagref(op));
+}
+
+// Helper to convert an acb_t into an mpc_t.
+void acb_to_mpc(::mpc_t rop, const ::acb_t op)
+{
+    arf_to_mpfr(mpc_realref(rop), arb_midref(acb_realref(op)));
+    arf_to_mpfr(mpc_imagref(rop), arb_midref(acb_imagref(op)));
+}
+
+#endif
 
 } // namespace
 
@@ -303,6 +358,56 @@ void arb_hypgeom_bessel_y(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
 
 #undef MPPP_UNARY_ARB_WRAPPER
 
+#if defined(MPPP_WITH_MPC)
+
+// Helper for the implementation of unary Acb wrappers.
+// NOTE: it would probably pay off to put a bunch of thread-local acb_raii
+// objects in the unnamed namespace above, and use those, instead of function-local
+// statics, to convert to/from MPC. However such a scheme would not work
+// on MinGW due to the thread_local issues, so as long as we support MinGW
+// (or any platform with non-functional thread_local), we cannot adopt this approach.
+#define MPPP_UNARY_ACB_WRAPPER(fname)                                                                                  \
+    void acb_##fname(::mpc_t rop, const ::mpc_t op)                                                                    \
+    {                                                                                                                  \
+        MPPP_MAYBE_TLS acb_raii acb_rop, acb_op;                                                                       \
+        /* Turn op into an acb. */                                                                                     \
+        mpc_to_acb(acb_op.m_acb, op);                                                                                  \
+        /* Run the computation, using the precision of rop to mimic */                                                 \
+        /* the behaviour of MPC functions. */                                                                          \
+        /* NOTE: the precision of rop is taken from its real part, */                                                  \
+        /* as done in the complex class. */                                                                            \
+        ::acb_##fname(acb_rop.m_acb, acb_op.m_acb, mpfr_prec_to_arb_prec(mpfr_get_prec(mpc_realref(rop))));            \
+        /* Write the result into rop. */                                                                               \
+        acb_to_mpc(rop, acb_rop.m_acb);                                                                                \
+    }
+
+// inv() needs special handling for some arguments.
+void acb_inv(::mpc_t rop, const ::mpc_t op)
+{
+    // NOTE: follow Annex G of the C standard:
+    // http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf
+    if (mpc_is_inf(op)) {
+        // 1/inf results in a zero.
+        ::mpfr_set_zero(mpc_realref(rop), 0);
+        ::mpfr_set_zero(mpc_imagref(rop), 0);
+    } else if (mpc_is_zero(op)) {
+        // 1/0 results in an infinity.
+        ::mpfr_set_inf(mpc_realref(rop), 0);
+    } else {
+        MPPP_MAYBE_TLS acb_raii acb_rop, acb_op;
+
+        mpc_to_acb(acb_op.m_acb, op);
+
+        ::acb_inv(acb_rop.m_acb, acb_op.m_acb, mpfr_prec_to_arb_prec(mpfr_get_prec(mpc_realref(rop))));
+
+        acb_to_mpc(rop, acb_rop.m_acb);
+    }
+}
+
+#undef MPPP_UNARY_ACB_WRAPPER
+
+#endif
+
 } // namespace detail
 
 // In-place sqrt1pm1.
@@ -346,5 +451,15 @@ real &real::sinc_pi()
 {
     return self_mpfr_unary_nornd(detail::arb_sinc_pi);
 }
+
+#if defined(MPPP_WITH_MPC)
+
+// In-place inversion.
+complex &complex::inv()
+{
+    return self_mpc_unary_nornd(detail::acb_inv);
+}
+
+#endif
 
 } // namespace mppp

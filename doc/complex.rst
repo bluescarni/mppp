@@ -627,6 +627,12 @@ The complex class
    .. cpp:function:: complex &arg()
    .. cpp:function:: complex &sqr()
    .. cpp:function:: complex &mul_i(int s = 0)
+   .. cpp:function:: complex &inv()
+
+      .. note::
+
+         The ``inv()`` function is available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
 
       In-place basic aritmetic functions.
 
@@ -640,8 +646,16 @@ The complex class
       * :math:`\arg z`,
       * :math:`z^2`,
       * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
+      * :math:`1/z`,
 
       where :math:`z` is the current value of ``this``.
+
+      The ``inv()`` function follows the conventions laid out in Annex G
+      of the C99 standard when ``this`` is zero or an infinity.
+
+      .. versionadded:: 0.21
+
+         The ``inv()`` function.
 
       :return: a reference to ``this``.
 
@@ -1214,9 +1228,15 @@ Arithmetic
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::proj(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqr(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_i(mppp::complex &rop, T &&z, int s = 0)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::inv(mppp::complex &rop, T &&z)
 .. cpp:function:: mppp::real &mppp::abs(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::norm(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::arg(mppp::real &rop, const mppp::complex &z)
+
+   .. note::
+
+      The ``inv()`` function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Basic unary arithmetic functions.
 
@@ -1227,11 +1247,19 @@ Arithmetic
    * the projection of :math:`z` into Riemann sphere,
    * :math:`z^2`,
    * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
+   * :math:`1/z`,
    * :math:`\left| z \right|`,
    * :math:`\left| z \right|^2`,
    * :math:`\arg z`.
 
    The precision of the result will be equal to the precision of *z*.
+
+   The ``inv()`` function follows the conventions laid out in Annex G
+   of the C99 standard when *z* is zero or an infinity.
+
+   .. versionadded:: 0.21
+
+      The ``inv()`` function.
 
    :param rop: the return value.
    :param z: the argument.
@@ -1243,9 +1271,15 @@ Arithmetic
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::proj(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqr(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::mul_i(T &&z, int s = 0)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::inv(T &&z)
 .. cpp:function:: mppp::real mppp::abs(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::norm(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::arg(const mppp::complex &z)
+
+   .. note::
+
+      The ``inv()`` function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Basic unary arithmetic functions.
 
@@ -1256,11 +1290,19 @@ Arithmetic
    * the projection of :math:`z` into Riemann sphere,
    * :math:`z^2`,
    * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
+   * :math:`1/z`,
    * :math:`\left| z \right|`,
    * :math:`\left| z \right|^2`,
    * :math:`\arg z`.
 
    The precision of the result will be equal to the precision of *z*.
+
+   The ``inv()`` function follows the conventions laid out in Annex G
+   of the C99 standard when *z* is zero or an infinity.
+
+   .. versionadded:: 0.21
+
+      The ``inv()`` function.
 
    :param z: the argument.
 
