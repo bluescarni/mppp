@@ -10,6 +10,7 @@
 #include <utility>
 
 #include <mp++/complex.hpp>
+#include <mp++/config.hpp>
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
@@ -51,6 +52,8 @@ TEST_CASE("sqrt")
         < pow(2_r128, -120));
     REQUIRE(r0.get_prec() == 128);
 }
+
+#if defined(MPPP_WITH_ARB)
 
 TEST_CASE("rec_sqrt")
 {
@@ -142,3 +145,5 @@ TEST_CASE("rec_sqrt")
         REQUIRE(rec_sqrt(complex{"(inf, inf)", complex_prec_t(128)}).zero_p());
     }
 }
+
+#endif
