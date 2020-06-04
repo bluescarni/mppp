@@ -51,3 +51,94 @@ TEST_CASE("sqrt")
         < pow(2_r128, -120));
     REQUIRE(r0.get_prec() == 128);
 }
+
+TEST_CASE("rec_sqrt")
+{
+    const auto cmp1
+        = 0.52984103253104949318719835021445625746079_r128 + 0.33391728095862217076724902471316862541707_icr128;
+    {
+        // Member function.
+        auto c = 1.1_r128 - 2.3_icr128;
+        c.rec_sqrt();
+        REQUIRE(abs(c - cmp1) < pow(2_r128, -126));
+        REQUIRE(c.get_prec() == 128);
+    }
+    {
+        // rop overload.
+        complex c1, c2 = 1.1_r128 - 2.3_icr128;
+        const auto p = c2.get_prec();
+        REQUIRE(&rec_sqrt(c1, c2) == &c1);
+        REQUIRE(std::is_same<decltype(rec_sqrt(c1, c2)), complex &>::value);
+        REQUIRE(abs(c1 - cmp1) < pow(2_r128, -126));
+        REQUIRE(c1.get_prec() == p);
+
+        // Move, but won't steal because rop
+        // has higher precision.
+        c1 = complex{0, complex_prec_t(c2.get_prec() + 1)};
+        rec_sqrt(c1, std::move(c2));
+        REQUIRE(abs(c1 - cmp1) < pow(2_r128, -126));
+        REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+        REQUIRE(c2 == 1.1_r128 - 2.3_icr128);
+
+        // Move, will steal.
+        c1 = complex{};
+        rec_sqrt(c1, std::move(c2));
+        REQUIRE(abs(c1 - cmp1) < pow(2_r128, -126));
+        REQUIRE(c1.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+        REQUIRE(c2 == complex{});
+    }
+    {
+        // return overload.
+        REQUIRE(abs(rec_sqrt(1.1_r128 - 2.3_icr128) - cmp1) < pow(2_r128, -126));
+        REQUIRE(std::is_same<decltype(rec_sqrt(complex{1, 2})), complex>::value);
+
+        // move, will steal.
+        complex c1 = 1.1_r128 - 2.3_icr128;
+        const auto p = c1.get_prec();
+        auto c2 = rec_sqrt(std::move(c1));
+        REQUIRE(abs(c2 - cmp1) < pow(2_r128, -126));
+        REQUIRE(c2.get_prec() == p);
+        // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+        REQUIRE(!c1.is_valid());
+    }
+
+    // Test the special cases.
+    {
+        complex c{0, complex_prec_t(128)};
+        REQUIRE(c.rec_sqrt().inf_p());
+        REQUIRE(c.get_prec() == 128);
+        REQUIRE(rec_sqrt(complex{0, complex_prec_t(128)}).inf_p());
+    }
+    {
+        complex c{"(inf, 0)", complex_prec_t(128)};
+        REQUIRE(c.rec_sqrt().zero_p());
+        REQUIRE(c.get_prec() == 128);
+        REQUIRE(rec_sqrt(complex{"(inf, 0)", complex_prec_t(128)}).zero_p());
+    }
+    {
+        complex c{"(inf, nan)", complex_prec_t(128)};
+        REQUIRE(c.rec_sqrt().zero_p());
+        REQUIRE(c.get_prec() == 128);
+        REQUIRE(rec_sqrt(complex{"(inf, nan)", complex_prec_t(128)}).zero_p());
+    }
+    {
+        complex c{"(0, inf)", complex_prec_t(128)};
+        REQUIRE(c.rec_sqrt().zero_p());
+        REQUIRE(c.get_prec() == 128);
+        REQUIRE(rec_sqrt(complex{"(0, inf)", complex_prec_t(128)}).zero_p());
+    }
+    {
+        complex c{"(nan, inf)", complex_prec_t(128)};
+        REQUIRE(c.rec_sqrt().zero_p());
+        REQUIRE(c.get_prec() == 128);
+        REQUIRE(rec_sqrt(complex{"(nan, inf)", complex_prec_t(128)}).zero_p());
+    }
+    {
+        complex c{"(inf, inf)", complex_prec_t(128)};
+        REQUIRE(c.rec_sqrt().zero_p());
+        REQUIRE(c.get_prec() == 128);
+        REQUIRE(rec_sqrt(complex{"(inf, inf)", complex_prec_t(128)}).zero_p());
+    }
+}

@@ -660,10 +660,28 @@ The complex class
       :return: a reference to ``this``.
 
    .. cpp:function:: complex &sqrt()
+   .. cpp:function:: complex &rec_sqrt()
 
-      In-place square root.
+      .. note::
 
-      This member function will set ``this`` to :math:`\sqrt{z}`, where :math:`z` is the current value of ``this``.
+         The ``rec_sqrt()`` function is available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
+
+      In-place roots.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sqrt{z}`,
+      * :math:`1 / \sqrt{z}`,
+
+      where :math:`z` is the current value of ``this``.
+
+      The ``rec_sqrt()`` function follows the conventions laid out in Annex G
+      of the C99 standard when ``this`` is zero or an infinity.
+
+      .. versionadded:: 0.21
+
+         The ``rec_sqrt()`` function.
 
       :return: a reference to ``this``.
 
@@ -1238,7 +1256,7 @@ Arithmetic
       The ``inv()`` function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled.
 
-   Basic unary arithmetic functions.
+   Basic binary arithmetic functions.
 
    These functions will set *rop* to, respectively:
 
@@ -1400,29 +1418,59 @@ Comparison
 Roots
 ~~~~~
 
-.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqrt(mppp::complex &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqrt(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::rec_sqrt(mppp::complex &rop, T &&z)
 
-   Binary :cpp:class:`~mppp::complex` square root.
+   .. note::
 
-   This function will compute the square root of *op* and store it
-   into *rop*. The precision of the result will be equal to the precision
-   of *op*.
+      The ``rec_sqrt()`` function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
+
+   Binary :cpp:class:`~mppp::complex` roots.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`\sqrt{z}`,
+   * :math:`1 / \sqrt{z}`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   The ``rec_sqrt()`` function follows the conventions laid out in Annex G
+   of the C99 standard when *z* is zero or an infinity.
+
+   .. versionadded:: 0.21
+
+      The ``rec_sqrt()`` function.
 
    :param rop: the return value.
-   :param op: the operand.
+   :param z: the operand.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqrt(T &&r)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqrt(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::rec_sqrt(T &&z)
 
-   Unary :cpp:class:`~mppp::complex` square root.
+   .. note::
 
-   This function will compute and return the square root of *r*.
-   The precision of the result will be equal to the precision of *r*.
+      The ``rec_sqrt()`` function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
-   :param r: the operand.
+   Unary :cpp:class:`~mppp::complex` roots.
 
-   :return: the square root of *r*.
+   These functions will return, respectively:
+
+   * :math:`\sqrt{z}`,
+   * :math:`1 / \sqrt{z}`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   .. versionadded:: 0.21
+
+      The ``rec_sqrt()`` function.
+
+   :param z: the operand.
+
+   :return: the result of the operation.
 
 Exponentiation
 ~~~~~~~~~~~~~~

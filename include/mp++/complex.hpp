@@ -150,6 +150,7 @@ inline ::mpfr_prec_t real_deduce_precision(const real &r)
 
 // The Arb MPC wrappers.
 MPPP_DLL_PUBLIC void acb_inv(::mpc_t, const ::mpc_t);
+MPPP_DLL_PUBLIC void acb_rec_sqrt(::mpc_t, const ::mpc_t);
 
 #endif
 
@@ -875,6 +876,9 @@ public:
 
     // Roots.
     complex &sqrt();
+#if defined(MPPP_WITH_ARB)
+    complex &rec_sqrt();
+#endif
 
     // Exp/log.
     complex &exp();
@@ -1524,6 +1528,12 @@ inline bool number_p(const complex &c)
 }
 
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
+
+#if defined(MPPP_WITH_ARB)
+
+MPPP_COMPLEX_MPC_UNARY_IMPL(rec_sqrt, detail::acb_rec_sqrt, false)
+
+#endif
 
 // Ternary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)

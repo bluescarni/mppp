@@ -404,6 +404,29 @@ void acb_inv(::mpc_t rop, const ::mpc_t op)
     }
 }
 
+// rec_sqrt() needs special handling for some arguments.
+void acb_rec_sqrt(::mpc_t rop, const ::mpc_t op)
+{
+    // NOTE: follow Annex G of the C standard:
+    // http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf
+    if (mpc_is_inf(op)) {
+        // 1/sqrt(inf) results in a zero.
+        ::mpfr_set_zero(mpc_realref(rop), 0);
+        ::mpfr_set_zero(mpc_imagref(rop), 0);
+    } else if (mpc_is_zero(op)) {
+        // 1/sqrt(0) results in an infinity.
+        ::mpfr_set_inf(mpc_realref(rop), 0);
+    } else {
+        MPPP_MAYBE_TLS acb_raii acb_rop, acb_op;
+
+        mpc_to_acb(acb_op.m_acb, op);
+
+        ::acb_rsqrt(acb_rop.m_acb, acb_op.m_acb, mpfr_prec_to_arb_prec(mpfr_get_prec(mpc_realref(rop))));
+
+        acb_to_mpc(rop, acb_rop.m_acb);
+    }
+}
+
 #undef MPPP_UNARY_ACB_WRAPPER
 
 #endif
@@ -458,6 +481,12 @@ real &real::sinc_pi()
 complex &complex::inv()
 {
     return self_mpc_unary_nornd(detail::acb_inv);
+}
+
+// In-place reciprocal sqrt.
+complex &complex::rec_sqrt()
+{
+    return self_mpc_unary_nornd(detail::acb_rec_sqrt);
 }
 
 #endif
