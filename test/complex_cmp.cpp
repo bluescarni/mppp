@@ -84,3 +84,41 @@ TEST_CASE("inf_p")
     REQUIRE(!complex{"(nan, -2)", complex_prec_t(32)}.inf_p());
     REQUIRE(!inf_p(complex{"(-nan, 2)", complex_prec_t(32)}));
 }
+
+TEST_CASE("number_p")
+{
+    REQUIRE(complex{}.number_p());
+    REQUIRE(number_p(complex{}));
+
+    REQUIRE(complex{1, 2}.number_p());
+    REQUIRE(number_p(complex{1, 2}));
+
+    REQUIRE(!complex{"(inf, 2)", complex_prec_t(32)}.number_p());
+    REQUIRE(!complex{"(-inf, 2)", complex_prec_t(32)}.number_p());
+    REQUIRE(!number_p(complex{"(inf, 2)", complex_prec_t(32)}));
+    REQUIRE(!number_p(complex{"(-inf, 2)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(2, inf)", complex_prec_t(32)}.number_p());
+    REQUIRE(!complex{"(2, -inf)", complex_prec_t(32)}.number_p());
+    REQUIRE(!number_p(complex{"(2, -inf)", complex_prec_t(32)}));
+    REQUIRE(!number_p(complex{"(2, -inf)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(inf, nan)", complex_prec_t(32)}.number_p());
+    REQUIRE(!complex{"(-inf, nan)", complex_prec_t(32)}.number_p());
+    REQUIRE(!number_p(complex{"(inf, nan)", complex_prec_t(32)}));
+    REQUIRE(!number_p(complex{"(-inf, nan)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(nan, inf)", complex_prec_t(32)}.number_p());
+    REQUIRE(!complex{"(nan, -inf)", complex_prec_t(32)}.number_p());
+    REQUIRE(!number_p(complex{"(nan, -inf)", complex_prec_t(32)}));
+    REQUIRE(!number_p(complex{"(nan, -inf)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(nan, -nan)", complex_prec_t(32)}.number_p());
+    REQUIRE(!number_p(complex{"(-nan, nan)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(2, -nan)", complex_prec_t(32)}.number_p());
+    REQUIRE(!number_p(complex{"(2, -nan)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(nan, -2)", complex_prec_t(32)}.number_p());
+    REQUIRE(!number_p(complex{"(-nan, 2)", complex_prec_t(32)}));
+}

@@ -478,6 +478,7 @@ The complex class
 
    .. cpp:function:: bool zero_p() const
    .. cpp:function:: bool inf_p() const
+   .. cpp:function:: bool number_p() const
    .. cpp:function:: bool is_one() const
 
       Detect special values.
@@ -487,13 +488,15 @@ The complex class
       * zero,
       * a complex infinity (that is, at least one component of ``this``
         is an infinity),
+      * a finite number (that is, both components of ``this`` are finite
+        numbers),
       * one,
 
       ``false`` otherwise.
 
       .. versionadded:: 0.21
 
-         The ``inf_p()`` function.
+         The ``inf_p()`` and ``number_p()`` functions.
 
       :return: the result of the detection.
 
@@ -1328,6 +1331,7 @@ Comparison
 
 .. cpp:function:: bool mppp::zero_p(const mppp::complex &c)
 .. cpp:function:: bool mppp::inf_p(const mppp::complex &c)
+.. cpp:function:: bool mppp::number_p(const mppp::complex &c)
 .. cpp:function:: bool mppp::is_one(const mppp::complex &c)
 
    Detect special values.
@@ -1337,13 +1341,15 @@ Comparison
    * zero,
    * a complex infinity (that is, at least one component of *c*
      is an infinity),
+   * a finite number (that is, both components of *c* are finite
+     numbers),
    * one,
 
    ``false`` otherwise.
 
    .. versionadded:: 0.21
 
-      The ``inf_p()`` function.
+      The ``inf_p()`` and ``number_p()`` functions.
 
    :param c: the input argument.
 

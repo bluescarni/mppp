@@ -121,6 +121,12 @@ inline bool mpc_is_inf(const ::mpc_t c)
     return mpfr_inf_p(mpc_realref(c)) || mpfr_inf_p(mpc_imagref(c));
 }
 
+// Detect finite complex value.
+inline bool mpc_is_finite(const ::mpc_t c)
+{
+    return mpfr_number_p(mpc_realref(c)) != 0 && mpfr_number_p(mpc_imagref(c)) != 0;
+}
+
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
 complex &mpc_nary_op_impl(::mpfr_prec_t, const F &, complex &, Arg0 &&, Args &&...);
@@ -713,6 +719,10 @@ public:
     MPPP_NODISCARD bool inf_p() const
     {
         return detail::mpc_is_inf(&m_mpc);
+    }
+    MPPP_NODISCARD bool number_p() const
+    {
+        return detail::mpc_is_finite(&m_mpc);
     }
     MPPP_NODISCARD bool is_one() const;
 
@@ -1470,10 +1480,16 @@ inline bool is_one(const complex &c)
     return c.is_one();
 }
 
-// Detect complex infinity.
+// Detect complex infinities.
 inline bool inf_p(const complex &c)
 {
     return c.inf_p();
+}
+
+// Detect complex finite numbers.
+inline bool number_p(const complex &c)
+{
+    return c.number_p();
 }
 
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
