@@ -230,6 +230,12 @@ if(MPPP_WITH_MPFR)
         "${MPPP_SRC_FILES}")
 endif()
 
+if(MPPP_WITH_ARB)
+    set(MPPP_SRC_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/arb.cpp"
+        "${MPPP_SRC_FILES}")
+endif()
+
 if(MPPP_WITH_MPC)
     set(MPPP_SRC_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/complex.cpp"

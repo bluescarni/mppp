@@ -1067,8 +1067,14 @@ public:
 private:
     template <typename T>
     MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
+    // Wrapper to apply the input unary MPFR function to this.
+    // f must not need a rounding mode. Returns a reference to this.
     template <typename T>
-    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&);
+    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&f)
+    {
+        std::forward<T>(f)(&m_mpfr, &m_mpfr);
+        return *this;
+    }
 
 public:
     // Negate in-place.
