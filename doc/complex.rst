@@ -659,6 +659,9 @@ The complex class
 
       :return: a reference to ``this``.
 
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+        fails because of (unlikely) overflow conditions.
+
    .. cpp:function:: complex &sqrt()
    .. cpp:function:: complex &rec_sqrt()
 
@@ -684,6 +687,9 @@ The complex class
          The ``rec_sqrt()`` function.
 
       :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+        fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: complex &exp()
    .. cpp:function:: complex &log()
@@ -1284,6 +1290,9 @@ Arithmetic
 
    :return: a reference to *rop*.
 
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
+
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::neg(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::conj(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::proj(T &&z)
@@ -1325,6 +1334,9 @@ Arithmetic
    :param z: the argument.
 
    :return: the result of the operation.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_2ui(mppp::complex &rop, T &&c, unsigned long n)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_2si(mppp::complex &rop, T &&c, long n)
@@ -1447,6 +1459,9 @@ Roots
 
    :return: a reference to *rop*.
 
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
+
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqrt(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::rec_sqrt(T &&z)
 
@@ -1471,6 +1486,9 @@ Roots
    :param z: the operand.
 
    :return: the result of the operation.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
 
 Exponentiation
 ~~~~~~~~~~~~~~
