@@ -477,12 +477,23 @@ The complex class
       :return: a const or mutable pointer to the internal MPC structure.
 
    .. cpp:function:: bool zero_p() const
+   .. cpp:function:: bool inf_p() const
    .. cpp:function:: bool is_one() const
 
       Detect special values.
 
-      These member functions will return ``true`` if ``this`` is, respectively, zero or one,
+      These member functions will return ``true`` if ``this`` is, respectively:
+
+      * zero,
+      * a complex infinity (that is, at least one component of ``this``
+        is an infinity),
+      * one,
+
       ``false`` otherwise.
+
+      .. versionadded:: 0.21
+
+         The ``inf_p()`` function.
 
       :return: the result of the detection.
 
@@ -1316,12 +1327,23 @@ Comparison
    :exception std\:\:domain_error: if at least one of the components of *a* and *b* is NaN.
 
 .. cpp:function:: bool mppp::zero_p(const mppp::complex &c)
+.. cpp:function:: bool mppp::inf_p(const mppp::complex &c)
 .. cpp:function:: bool mppp::is_one(const mppp::complex &c)
 
    Detect special values.
 
-   These functions will return ``true`` if *c* is, respectively, zero or one,
+   These functions will return ``true`` if *c* is, respectively:
+
+   * zero,
+   * a complex infinity (that is, at least one component of *c*
+     is an infinity),
+   * one,
+
    ``false`` otherwise.
+
+   .. versionadded:: 0.21
+
+      The ``inf_p()`` function.
 
    :param c: the input argument.
 

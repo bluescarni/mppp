@@ -46,3 +46,41 @@ TEST_CASE("cmp_abs")
         Message(
             "Cannot compare the absolute values of two complex numbers if there are NaNs in the real/imaginary parts"));
 }
+
+TEST_CASE("inf_p")
+{
+    REQUIRE(!complex{}.inf_p());
+    REQUIRE(!inf_p(complex{}));
+
+    REQUIRE(!complex{1, 2}.inf_p());
+    REQUIRE(!inf_p(complex{1, 2}));
+
+    REQUIRE(complex{"(inf, 2)", complex_prec_t(32)}.inf_p());
+    REQUIRE(complex{"(-inf, 2)", complex_prec_t(32)}.inf_p());
+    REQUIRE(inf_p(complex{"(inf, 2)", complex_prec_t(32)}));
+    REQUIRE(inf_p(complex{"(-inf, 2)", complex_prec_t(32)}));
+
+    REQUIRE(complex{"(2, inf)", complex_prec_t(32)}.inf_p());
+    REQUIRE(complex{"(2, -inf)", complex_prec_t(32)}.inf_p());
+    REQUIRE(inf_p(complex{"(2, -inf)", complex_prec_t(32)}));
+    REQUIRE(inf_p(complex{"(2, -inf)", complex_prec_t(32)}));
+
+    REQUIRE(complex{"(inf, nan)", complex_prec_t(32)}.inf_p());
+    REQUIRE(complex{"(-inf, nan)", complex_prec_t(32)}.inf_p());
+    REQUIRE(inf_p(complex{"(inf, nan)", complex_prec_t(32)}));
+    REQUIRE(inf_p(complex{"(-inf, nan)", complex_prec_t(32)}));
+
+    REQUIRE(complex{"(nan, inf)", complex_prec_t(32)}.inf_p());
+    REQUIRE(complex{"(nan, -inf)", complex_prec_t(32)}.inf_p());
+    REQUIRE(inf_p(complex{"(nan, -inf)", complex_prec_t(32)}));
+    REQUIRE(inf_p(complex{"(nan, -inf)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(nan, -nan)", complex_prec_t(32)}.inf_p());
+    REQUIRE(!inf_p(complex{"(-nan, nan)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(2, -nan)", complex_prec_t(32)}.inf_p());
+    REQUIRE(!inf_p(complex{"(2, -nan)", complex_prec_t(32)}));
+
+    REQUIRE(!complex{"(nan, -2)", complex_prec_t(32)}.inf_p());
+    REQUIRE(!inf_p(complex{"(-nan, 2)", complex_prec_t(32)}));
+}

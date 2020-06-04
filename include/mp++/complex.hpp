@@ -115,6 +115,12 @@ void swap(complex &, complex &) noexcept;
 namespace detail
 {
 
+// Detect complex infinity.
+inline bool mpc_is_inf(const ::mpc_t c)
+{
+    return mpfr_inf_p(mpc_realref(c)) || mpfr_inf_p(mpc_imagref(c));
+}
+
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
 complex &mpc_nary_op_impl(::mpfr_prec_t, const F &, complex &, Arg0 &&, Args &&...);
@@ -703,6 +709,10 @@ public:
     MPPP_NODISCARD bool zero_p() const
     {
         return mpfr_zero_p(mpc_realref(&m_mpc)) != 0 && mpfr_zero_p(mpc_imagref(&m_mpc)) != 0;
+    }
+    MPPP_NODISCARD bool inf_p() const
+    {
+        return detail::mpc_is_inf(&m_mpc);
     }
     MPPP_NODISCARD bool is_one() const;
 
@@ -1458,6 +1468,12 @@ inline bool zero_p(const complex &c)
 inline bool is_one(const complex &c)
 {
     return c.is_one();
+}
+
+// Detect complex infinity.
+inline bool inf_p(const complex &c)
+{
+    return c.inf_p();
 }
 
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
