@@ -477,12 +477,26 @@ The complex class
       :return: a const or mutable pointer to the internal MPC structure.
 
    .. cpp:function:: bool zero_p() const
+   .. cpp:function:: bool inf_p() const
+   .. cpp:function:: bool number_p() const
    .. cpp:function:: bool is_one() const
 
       Detect special values.
 
-      These member functions will return ``true`` if ``this`` is, respectively, zero or one,
+      These member functions will return ``true`` if ``this`` is, respectively:
+
+      * zero,
+      * a complex infinity (that is, at least one component of ``this``
+        is an infinity),
+      * a finite number (that is, both components of ``this`` are finite
+        numbers),
+      * one,
+
       ``false`` otherwise.
+
+      .. versionadded:: 0.21
+
+         The ``inf_p()`` and ``number_p()`` functions.
 
       :return: the result of the detection.
 
@@ -613,6 +627,12 @@ The complex class
    .. cpp:function:: complex &arg()
    .. cpp:function:: complex &sqr()
    .. cpp:function:: complex &mul_i(int s = 0)
+   .. cpp:function:: complex &inv()
+
+      .. note::
+
+         The ``inv()`` function is available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
 
       In-place basic aritmetic functions.
 
@@ -626,18 +646,50 @@ The complex class
       * :math:`\arg z`,
       * :math:`z^2`,
       * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
+      * :math:`1/z`,
 
       where :math:`z` is the current value of ``this``.
 
+      The ``inv()`` function follows the conventions laid out in Annex G
+      of the C99 standard when ``this`` is zero or an infinity.
+
+      .. versionadded:: 0.21
+
+         The ``inv()`` function.
+
       :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+        fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: complex &sqrt()
+   .. cpp:function:: complex &rec_sqrt()
 
-      In-place square root.
+      .. note::
 
-      This member function will set ``this`` to :math:`\sqrt{z}`, where :math:`z` is the current value of ``this``.
+         The ``rec_sqrt()`` function is available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
+
+      In-place roots.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sqrt{z}`,
+      * :math:`1 / \sqrt{z}`,
+
+      where :math:`z` is the current value of ``this``.
+
+      The ``rec_sqrt()`` function follows the conventions laid out in Annex G
+      of the C99 standard when ``this`` is zero or an infinity.
+
+      .. versionadded:: 0.21
+
+         The ``rec_sqrt()`` function.
 
       :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+        fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: complex &exp()
    .. cpp:function:: complex &log()
@@ -1200,11 +1252,17 @@ Arithmetic
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::proj(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqr(mppp::complex &rop, T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_i(mppp::complex &rop, T &&z, int s = 0)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::inv(mppp::complex &rop, T &&z)
 .. cpp:function:: mppp::real &mppp::abs(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::norm(mppp::real &rop, const mppp::complex &z)
 .. cpp:function:: mppp::real &mppp::arg(mppp::real &rop, const mppp::complex &z)
 
-   Basic unary arithmetic functions.
+   .. note::
+
+      The ``inv()`` function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
+
+   Basic binary arithmetic functions.
 
    These functions will set *rop* to, respectively:
 
@@ -1213,25 +1271,42 @@ Arithmetic
    * the projection of :math:`z` into Riemann sphere,
    * :math:`z^2`,
    * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
+   * :math:`1/z`,
    * :math:`\left| z \right|`,
    * :math:`\left| z \right|^2`,
    * :math:`\arg z`.
 
    The precision of the result will be equal to the precision of *z*.
 
+   The ``inv()`` function follows the conventions laid out in Annex G
+   of the C99 standard when *z* is zero or an infinity.
+
+   .. versionadded:: 0.21
+
+      The ``inv()`` function.
+
    :param rop: the return value.
    :param z: the argument.
 
    :return: a reference to *rop*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::neg(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::conj(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::proj(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqr(T &&z)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::mul_i(T &&z, int s = 0)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::inv(T &&z)
 .. cpp:function:: mppp::real mppp::abs(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::norm(const mppp::complex &z)
 .. cpp:function:: mppp::real mppp::arg(const mppp::complex &z)
+
+   .. note::
+
+      The ``inv()`` function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Basic unary arithmetic functions.
 
@@ -1242,15 +1317,26 @@ Arithmetic
    * the projection of :math:`z` into Riemann sphere,
    * :math:`z^2`,
    * :math:`\imath z` (if :math:`s\geq 0`) or :math:`-\imath z` (if :math:`s < 0`),
+   * :math:`1/z`,
    * :math:`\left| z \right|`,
    * :math:`\left| z \right|^2`,
    * :math:`\arg z`.
 
    The precision of the result will be equal to the precision of *z*.
 
+   The ``inv()`` function follows the conventions laid out in Annex G
+   of the C99 standard when *z* is zero or an infinity.
+
+   .. versionadded:: 0.21
+
+      The ``inv()`` function.
+
    :param z: the argument.
 
    :return: the result of the operation.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_2ui(mppp::complex &rop, T &&c, unsigned long n)
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_2si(mppp::complex &rop, T &&c, long n)
@@ -1296,7 +1382,7 @@ Arithmetic
 Comparison
 ~~~~~~~~~~
 
-.. cpp:function:: int mppp::cmp_abs(const mppp::complex &a, const mppp::complex &b)
+.. cpp:function:: int mppp::cmpabs(const mppp::complex &a, const mppp::complex &b)
 
    Three-way comparison of absolute values.
 
@@ -1316,12 +1402,26 @@ Comparison
    :exception std\:\:domain_error: if at least one of the components of *a* and *b* is NaN.
 
 .. cpp:function:: bool mppp::zero_p(const mppp::complex &c)
+.. cpp:function:: bool mppp::inf_p(const mppp::complex &c)
+.. cpp:function:: bool mppp::number_p(const mppp::complex &c)
 .. cpp:function:: bool mppp::is_one(const mppp::complex &c)
 
    Detect special values.
 
-   These functions will return ``true`` if *c* is, respectively, zero or one,
+   These functions will return ``true`` if *c* is, respectively:
+
+   * zero,
+   * a complex infinity (that is, at least one component of *c*
+     is an infinity),
+   * a finite number (that is, both components of *c* are finite
+     numbers),
+   * one,
+
    ``false`` otherwise.
+
+   .. versionadded:: 0.21
+
+      The ``inf_p()`` and ``number_p()`` functions.
 
    :param c: the input argument.
 
@@ -1330,29 +1430,80 @@ Comparison
 Roots
 ~~~~~
 
-.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqrt(mppp::complex &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::sqrt(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::rec_sqrt(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::rootn_ui(mppp::complex &rop, T &&z, unsigned long k)
 
-   Binary :cpp:class:`~mppp::complex` square root.
+   .. note::
 
-   This function will compute the square root of *op* and store it
-   into *rop*. The precision of the result will be equal to the precision
-   of *op*.
+      The ``rec_sqrt()`` and ``rootn_ui()`` functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
+
+   Binary :cpp:class:`~mppp::complex` roots.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`\sqrt{z}`,
+   * :math:`1 / \sqrt{z}`,
+   * :math:`\sqrt[k]{z}`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   The ``rec_sqrt()`` function follows the conventions laid out in Annex G
+   of the C99 standard when *z* is zero or an infinity.
+
+   The ``rootn_ui()`` function computes the principal *k*-th root of *z*. If
+   *k* is zero, *rop* will be set to NaN.
+
+   .. versionadded:: 0.21
+
+      The ``rec_sqrt()`` and ``rootn_ui()`` functions.
 
    :param rop: the return value.
-   :param op: the operand.
+   :param z: the operand.
+   :param k: the degree of the root.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqrt(T &&r)
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
 
-   Unary :cpp:class:`~mppp::complex` square root.
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqrt(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::rec_sqrt(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::rootn_ui(T &&z, unsigned long k)
 
-   This function will compute and return the square root of *r*.
-   The precision of the result will be equal to the precision of *r*.
+   .. note::
 
-   :param r: the operand.
+      The ``rec_sqrt()`` and ``rootn_ui()`` functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
-   :return: the square root of *r*.
+   Unary :cpp:class:`~mppp::complex` roots.
+
+   These functions will return, respectively:
+
+   * :math:`\sqrt{z}`,
+   * :math:`1 / \sqrt{z}`,
+   * :math:`\sqrt[k]{z}`.
+
+   The precision of the result will be equal to the precision of *z*.
+
+   The ``rec_sqrt()`` function follows the conventions laid out in Annex G
+   of the C99 standard when *z* is zero or an infinity.
+
+   The ``rootn_ui()`` function computes the principal *k*-th root of *z*. If
+   *k* is zero, *rop* will be set to NaN.
+
+   .. versionadded:: 0.21
+
+      The ``rec_sqrt()`` and ``rootn_ui()`` functions.
+
+   :param z: the operand.
+   :param k: the degree of the root.
+
+   :return: the result of the operation.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
 
 Exponentiation
 ~~~~~~~~~~~~~~

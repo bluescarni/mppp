@@ -13,7 +13,7 @@
   <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Multiprecision complex numbers &#8212; mp++ 0.20 documentation</title>
+    <title>Multiprecision complex numbers &#8212; mp++ 0.21 documentation</title>
     <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="real.html" title="Multiprecision floats"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.21 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Reference</a> &#187;</li> 
       </ul>
     </div>
@@ -687,11 +687,32 @@ object must contain a valid <a class="reference internal" href="#_CPPv45mpc_t" t
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4NK4mppp7complex5inf_pEv">
+<span id="_CPPv3NK4mppp7complex5inf_pEv"></span><span id="_CPPv2NK4mppp7complex5inf_pEv"></span><span id="mppp::complex::inf_pC"></span>bool <code class="descname">inf_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7complex5inf_pEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK4mppp7complex8number_pEv">
+<span id="_CPPv3NK4mppp7complex8number_pEv"></span><span id="_CPPv2NK4mppp7complex8number_pEv"></span><span id="mppp::complex::number_pC"></span>bool <code class="descname">number_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7complex8number_pEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4NK4mppp7complex6is_oneEv">
 <span id="_CPPv3NK4mppp7complex6is_oneEv"></span><span id="_CPPv2NK4mppp7complex6is_oneEv"></span><span id="mppp::complex::is_oneC"></span>bool <code class="descname">is_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7complex6is_oneEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Detect special values.</p>
-<p>These member functions will return <code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is, respectively, zero or one,
-<code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
+<p>These member functions will return <code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is, respectively:</p>
+<ul class="simple">
+<li>zero,</li>
+<li>a complex infinity (that is, at least one component of <code class="docutils literal notranslate"><span class="pre">this</span></code>
+is an infinity),</li>
+<li>a finite number (that is, both components of <code class="docutils literal notranslate"><span class="pre">this</span></code> are finite
+numbers),</li>
+<li>one,</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inf_p()</span></code> and <code class="docutils literal notranslate"><span class="pre">number_p()</span></code> functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body">the result of the detection.</dd>
 </dl>
@@ -880,7 +901,17 @@ imaginary part of <code class="docutils literal notranslate"><span class="pre">t
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7complex5mul_iEi">
 <span id="_CPPv3N4mppp7complex5mul_iEi"></span><span id="_CPPv2N4mppp7complex5mul_iEi"></span><span id="mppp::complex::mul_i__i"></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descname">mul_i</code><span class="sig-paren">(</span>int <em>s</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7complex5mul_iEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place basic aritmetic functions.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7complex3invEv">
+<span id="_CPPv3N4mppp7complex3invEv"></span><span id="_CPPv2N4mppp7complex3invEv"></span><span id="mppp::complex::inv"></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descname">inv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7complex3invEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function is available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>In-place basic aritmetic functions.</p>
 <p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
 <ul class="simple">
 <li><span class="math notranslate nohighlight">\(-z\)</span>,</li>
@@ -891,20 +922,50 @@ imaginary part of <code class="docutils literal notranslate"><span class="pre">t
 <li><span class="math notranslate nohighlight">\(\arg z\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(z^2\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\imath z\)</span> (if <span class="math notranslate nohighlight">\(s\geq 0\)</span>) or <span class="math notranslate nohighlight">\(-\imath z\)</span> (if <span class="math notranslate nohighlight">\(s &lt; 0\)</span>),</li>
+<li><span class="math notranslate nohighlight">\(1/z\)</span>,</li>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function follows the conventions laid out in Annex G
+of the C99 standard when <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero or an infinity.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7complex4sqrtEv">
 <span id="_CPPv3N4mppp7complex4sqrtEv"></span><span id="_CPPv2N4mppp7complex4sqrtEv"></span><span id="mppp::complex::sqrt"></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7complex4sqrtEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place square root.</p>
-<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <span class="math notranslate nohighlight">\(\sqrt{z}\)</span>, where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7complex8rec_sqrtEv">
+<span id="_CPPv3N4mppp7complex8rec_sqrtEv"></span><span id="_CPPv2N4mppp7complex8rec_sqrtEv"></span><span id="mppp::complex::rec_sqrt"></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descname">rec_sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7complex8rec_sqrtEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> function is available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>In-place roots.</p>
+<p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\sqrt{z}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(1 / \sqrt{z}\)</span>,</li>
+</ul>
+<p>where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> function follows the conventions laid out in Annex G
+of the C99 standard when <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero or an infinity.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</dd>
 </dl>
 </dd></dl>
 
@@ -1682,6 +1743,11 @@ specified in the documentation of the conversion operator for <a class="referenc
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp3invERN4mppp7complexERN4mppp7complexERR1T">
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp3invERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp3invERN4mppp7complexERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">inv</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp3invERN4mppp7complexERN4mppp7complexERR1T" title="mppp::inv::T">T</a> &amp;&amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp3invERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N4mppp3absERN4mppp4realERKN4mppp7complexE">
 <span id="_CPPv3N4mppp3absERN4mppp4realERKN4mppp7complexE"></span><span id="_CPPv2N4mppp3absERN4mppp4realERKN4mppp7complexE"></span><span id="mppp::abs__mppp::realR.mppp::complexCR"></span>mppp::<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">abs</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3absERN4mppp4realERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
@@ -1694,7 +1760,12 @@ specified in the documentation of the conversion operator for <a class="referenc
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp3argERN4mppp4realERKN4mppp7complexE">
 <span id="_CPPv3N4mppp3argERN4mppp4realERKN4mppp7complexE"></span><span id="_CPPv2N4mppp3argERN4mppp4realERKN4mppp7complexE"></span><span id="mppp::arg__mppp::realR.mppp::complexCR"></span>mppp::<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">arg</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3argERN4mppp4realERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Basic unary arithmetic functions.</p>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function is available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Basic binary arithmetic functions.</p>
 <p>These functions will set <em>rop</em> to, respectively:</p>
 <ul class="simple">
 <li><span class="math notranslate nohighlight">\(-z\)</span>,</li>
@@ -1702,18 +1773,27 @@ specified in the documentation of the conversion operator for <a class="referenc
 <li>the projection of <span class="math notranslate nohighlight">\(z\)</span> into Riemann sphere,</li>
 <li><span class="math notranslate nohighlight">\(z^2\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\imath z\)</span> (if <span class="math notranslate nohighlight">\(s\geq 0\)</span>) or <span class="math notranslate nohighlight">\(-\imath z\)</span> (if <span class="math notranslate nohighlight">\(s &lt; 0\)</span>),</li>
+<li><span class="math notranslate nohighlight">\(1/z\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\left| z \right|\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\left| z \right|^2\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\arg z\)</span>.</li>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>z</em>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function follows the conventions laid out in Annex G
+of the C99 standard when <em>z</em> is zero or an infinity.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>rop</strong> – the return value.</li>
 <li><strong>z</strong> – the argument.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1744,6 +1824,11 @@ specified in the documentation of the conversion operator for <a class="referenc
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp3invEN4mppp7complexERR1T">
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp3invERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp3invERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">inv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp3invEN4mppp7complexERR1T" title="mppp::inv::T">T</a> &amp;&amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp3invEN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N4mppp3absERKN4mppp7complexE">
 <span id="_CPPv3N4mppp3absERKN4mppp7complexE"></span><span id="_CPPv2N4mppp3absERKN4mppp7complexE"></span><span id="mppp::abs__mppp::complexCR"></span>mppp::<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">abs</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3absERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
@@ -1756,7 +1841,12 @@ specified in the documentation of the conversion operator for <a class="referenc
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp3argERKN4mppp7complexE">
 <span id="_CPPv3N4mppp3argERKN4mppp7complexE"></span><span id="_CPPv2N4mppp3argERKN4mppp7complexE"></span><span id="mppp::arg__mppp::complexCR"></span>mppp::<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">arg</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3argERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Basic unary arithmetic functions.</p>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function is available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Basic unary arithmetic functions.</p>
 <p>These functions will return, respectively:</p>
 <ul class="simple">
 <li><span class="math notranslate nohighlight">\(-z\)</span>,</li>
@@ -1764,14 +1854,22 @@ specified in the documentation of the conversion operator for <a class="referenc
 <li>the projection of <span class="math notranslate nohighlight">\(z\)</span> into Riemann sphere,</li>
 <li><span class="math notranslate nohighlight">\(z^2\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\imath z\)</span> (if <span class="math notranslate nohighlight">\(s\geq 0\)</span>) or <span class="math notranslate nohighlight">\(-\imath z\)</span> (if <span class="math notranslate nohighlight">\(s &lt; 0\)</span>),</li>
+<li><span class="math notranslate nohighlight">\(1/z\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\left| z \right|\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\left| z \right|^2\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\arg z\)</span>.</li>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>z</em>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function follows the conventions laid out in Annex G
+of the C99 standard when <em>z</em> is zero or an infinity.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>z</strong> – the argument.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">the result of the operation.</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</dd>
 </dl>
 </dd></dl>
 
@@ -1854,8 +1952,8 @@ multiplication/division by powers of 2.</p>
 <div class="section" id="comparison">
 <h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp7cmp_absERKN4mppp7complexERKN4mppp7complexE">
-<span id="_CPPv3N4mppp7cmp_absERKN4mppp7complexERKN4mppp7complexE"></span><span id="_CPPv2N4mppp7cmp_absERKN4mppp7complexERKN4mppp7complexE"></span><span id="mppp::cmp_abs__mppp::complexCR.mppp::complexCR"></span>int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cmp_abs</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>a</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7cmp_absERKN4mppp7complexERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE">
+<span id="_CPPv3N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE"></span><span id="_CPPv2N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE"></span><span id="mppp::cmpabs__mppp::complexCR.mppp::complexCR"></span>int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cmpabs</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>a</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Three-way comparison of absolute values.</p>
 <p>This function will compare <em>a</em> and <em>b</em>, returning:</p>
 <ul class="simple">
@@ -1883,11 +1981,32 @@ multiplication/division by powers of 2.</p>
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N4mppp5inf_pERKN4mppp7complexE">
+<span id="_CPPv3N4mppp5inf_pERKN4mppp7complexE"></span><span id="_CPPv2N4mppp5inf_pERKN4mppp7complexE"></span><span id="mppp::inf_p__mppp::complexCR"></span>bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">inf_p</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5inf_pERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp8number_pERKN4mppp7complexE">
+<span id="_CPPv3N4mppp8number_pERKN4mppp7complexE"></span><span id="_CPPv2N4mppp8number_pERKN4mppp7complexE"></span><span id="mppp::number_p__mppp::complexCR"></span>bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">number_p</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8number_pERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N4mppp6is_oneERKN4mppp7complexE">
 <span id="_CPPv3N4mppp6is_oneERKN4mppp7complexE"></span><span id="_CPPv2N4mppp6is_oneERKN4mppp7complexE"></span><span id="mppp::is_one__mppp::complexCR"></span>bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">is_one</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6is_oneERKN4mppp7complexE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Detect special values.</p>
-<p>These functions will return <code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>c</em> is, respectively, zero or one,
-<code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
+<p>These functions will return <code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>c</em> is, respectively:</p>
+<ul class="simple">
+<li>zero,</li>
+<li>a complex infinity (that is, at least one component of <em>c</em>
+is an infinity),</li>
+<li>a finite number (that is, both components of <em>c</em> are finite
+numbers),</li>
+<li>one,</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inf_p()</span></code> and <code class="docutils literal notranslate"><span class="pre">number_p()</span></code> functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>c</strong> – the input argument.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">the result of the detection.</dd>
@@ -1899,31 +2018,96 @@ multiplication/division by powers of 2.</p>
 <h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T">
-<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T" title="mppp::sqrt::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> square root.</p>
-<p>This function will compute the square root of <em>op</em> and store it
-into <em>rop</em>. The precision of the result will be equal to the precision
-of <em>op</em>.</p>
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T" title="mppp::sqrt::T">T</a> &amp;&amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp8rec_sqrtERN4mppp7complexERN4mppp7complexERR1T">
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp8rec_sqrtERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp8rec_sqrtERN4mppp7complexERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rec_sqrt</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp8rec_sqrtERN4mppp7complexERN4mppp7complexERR1T" title="mppp::rec_sqrt::T">T</a> &amp;&amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp8rec_sqrtERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp8rootn_uiERN4mppp7complexERN4mppp7complexERR1Tm">
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp8rootn_uiERN4mppp7complexERR1Tm"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp8rootn_uiERN4mppp7complexERR1Tm"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rootn_ui</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp8rootn_uiERN4mppp7complexERN4mppp7complexERR1Tm" title="mppp::rootn_ui::T">T</a> &amp;&amp;<em>z</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp8rootn_uiERN4mppp7complexERN4mppp7complexERR1Tm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> and <code class="docutils literal notranslate"><span class="pre">rootn_ui()</span></code> functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Binary <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> roots.</p>
+<p>These functions will set <em>rop</em> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\sqrt{z}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(1 / \sqrt{z}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\sqrt[k]{z}\)</span>.</li>
+</ul>
+<p>The precision of the result will be equal to the precision of <em>z</em>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> function follows the conventions laid out in Annex G
+of the C99 standard when <em>z</em> is zero or an infinity.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rootn_ui()</span></code> function computes the principal <em>k</em>-th root of <em>z</em>. If
+<em>k</em> is zero, <em>rop</em> will be set to NaN.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> and <code class="docutils literal notranslate"><span class="pre">rootn_ui()</span></code> functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>rop</strong> – the return value.</li>
-<li><strong>op</strong> – the operand.</li>
+<li><strong>z</strong> – the operand.</li>
+<li><strong>k</strong> – the degree of the root.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtEN4mppp7complexERR1T">
-<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4sqrtERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4sqrtERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtEN4mppp7complexERR1T" title="mppp::sqrt::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtEN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Unary <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> square root.</p>
-<p>This function will compute and return the square root of <em>r</em>.
-The precision of the result will be equal to the precision of <em>r</em>.</p>
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4sqrtERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4sqrtERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtEN4mppp7complexERR1T" title="mppp::sqrt::T">T</a> &amp;&amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtEN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp8rec_sqrtEN4mppp7complexERR1T">
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp8rec_sqrtERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp8rec_sqrtERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rec_sqrt</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp8rec_sqrtEN4mppp7complexERR1T" title="mppp::rec_sqrt::T">T</a> &amp;&amp;<em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp8rec_sqrtEN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp8rootn_uiEN4mppp7complexERR1Tm">
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp8rootn_uiERR1Tm"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp8rootn_uiERR1Tm"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rootn_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp8rootn_uiEN4mppp7complexERR1Tm" title="mppp::rootn_ui::T">T</a> &amp;&amp;<em>z</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp8rootn_uiEN4mppp7complexERR1Tm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> and <code class="docutils literal notranslate"><span class="pre">rootn_ui()</span></code> functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Unary <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> roots.</p>
+<p>These functions will return, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\sqrt{z}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(1 / \sqrt{z}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\sqrt[k]{z}\)</span>.</li>
+</ul>
+<p>The precision of the result will be equal to the precision of <em>z</em>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> function follows the conventions laid out in Annex G
+of the C99 standard when <em>z</em> is zero or an infinity.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rootn_ui()</span></code> function computes the principal <em>k</em>-th root of <em>z</em>. If
+<em>k</em> is zero, <em>rop</em> will be set to NaN.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> and <code class="docutils literal notranslate"><span class="pre">rootn_ui()</span></code> functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><strong>r</strong> – the operand.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body">the square root of <em>r</em>.</dd>
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>z</strong> – the operand.</li>
+<li><strong>k</strong> – the degree of the root.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the result of the operation.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -2493,7 +2677,7 @@ a valid floating-point literal (as defined by the C++ standard).</dd>
         <li class="right" >
           <a href="real.html" title="Multiprecision floats"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.20 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.21 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" >Reference</a> &#187;</li> 
       </ul>
     </div>

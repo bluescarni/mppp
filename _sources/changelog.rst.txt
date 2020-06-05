@@ -1,6 +1,28 @@
 Changelog
 =========
 
+0.21 (unreleased)
+-----------------
+
+New
+~~~
+
+- Additional special functions for :cpp:class:`~mppp::complex`
+  (inverse, reciprocal square root, n-th root)
+  (`#246 <https://github.com/bluescarni/mppp/pull/246>`__).
+- Implement the detection of finite and infinite values
+  for :cpp:class:`~mppp::complex`
+  (`#246 <https://github.com/bluescarni/mppp/pull/246>`__).
+
+Changes
+~~~~~~~
+
+- **BREAKING**: the :cpp:class:`~mppp::complex`
+  ``cmp_abs()`` function has been renamed to
+  ``cmpabs()`` for consistency with
+  :cpp:class:`~mppp::real`.
+
+
 0.20 (2020-06-03)
 -----------------
 
