@@ -115,6 +115,24 @@ void swap(complex &, complex &) noexcept;
 namespace detail
 {
 
+// Detect complex infinity.
+inline bool mpc_is_inf(const ::mpc_t c)
+{
+    return mpfr_inf_p(mpc_realref(c)) || mpfr_inf_p(mpc_imagref(c));
+}
+
+// Detect finite complex value.
+inline bool mpc_is_finite(const ::mpc_t c)
+{
+    return mpfr_number_p(mpc_realref(c)) != 0 && mpfr_number_p(mpc_imagref(c)) != 0;
+}
+
+// Detect complex zero.
+inline bool mpc_is_zero(const ::mpc_t c)
+{
+    return mpfr_zero_p(mpc_realref(c)) != 0 && mpfr_zero_p(mpc_imagref(c)) != 0;
+}
+
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
 complex &mpc_nary_op_impl(::mpfr_prec_t, const F &, complex &, Arg0 &&, Args &&...);
@@ -127,6 +145,15 @@ inline ::mpfr_prec_t real_deduce_precision(const real &r)
 {
     return r.get_prec();
 }
+
+#if defined(MPPP_WITH_ARB)
+
+// The Arb MPC wrappers.
+MPPP_DLL_PUBLIC void acb_inv(::mpc_t, const ::mpc_t);
+MPPP_DLL_PUBLIC void acb_rec_sqrt(::mpc_t, const ::mpc_t);
+MPPP_DLL_PUBLIC void acb_rootn_ui(::mpc_t, const ::mpc_t, unsigned long);
+
+#endif
 
 } // namespace detail
 
@@ -702,7 +729,15 @@ public:
     // Detect special values.
     MPPP_NODISCARD bool zero_p() const
     {
-        return mpfr_zero_p(mpc_realref(&m_mpc)) != 0 && mpfr_zero_p(mpc_imagref(&m_mpc)) != 0;
+        return detail::mpc_is_zero(&m_mpc);
+    }
+    MPPP_NODISCARD bool inf_p() const
+    {
+        return detail::mpc_is_inf(&m_mpc);
+    }
+    MPPP_NODISCARD bool number_p() const
+    {
+        return detail::mpc_is_finite(&m_mpc);
     }
     MPPP_NODISCARD bool is_one() const;
 
@@ -817,6 +852,14 @@ public:
 private:
     template <typename T>
     MPPP_DLL_LOCAL complex &self_mpc_unary(T &&);
+    // Wrapper to apply the input unary MPC function to this.
+    // f must not need a rounding mode. Returns a reference to this.
+    template <typename T>
+    MPPP_DLL_LOCAL complex &self_mpc_unary_nornd(T &&f)
+    {
+        std::forward<T>(f)(&m_mpc, &m_mpc);
+        return *this;
+    }
 
 public:
     // In-place arithmetic functions.
@@ -828,9 +871,15 @@ public:
     complex &proj();
     complex &sqr();
     complex &mul_i(int sgn = 0);
+#if defined(MPPP_WITH_ARB)
+    complex &inv();
+#endif
 
     // Roots.
     complex &sqrt();
+#if defined(MPPP_WITH_ARB)
+    complex &rec_sqrt();
+#endif
 
     // Exp/log.
     complex &exp();
@@ -1446,8 +1495,15 @@ MPPP_DLL_PUBLIC real norm(const complex &);
 MPPP_DLL_PUBLIC real &arg(real &, const complex &);
 MPPP_DLL_PUBLIC real arg(const complex &);
 
+#if defined(MPPP_WITH_ARB)
+
+// inv.
+MPPP_COMPLEX_MPC_UNARY_IMPL(inv, detail::acb_inv, false)
+
+#endif
+
 // Comparison of absolute values.
-MPPP_DLL_PUBLIC int cmp_abs(const complex &, const complex &);
+MPPP_DLL_PUBLIC int cmpabs(const complex &, const complex &);
 
 // Detect zero/one.
 inline bool zero_p(const complex &c)
@@ -1460,7 +1516,49 @@ inline bool is_one(const complex &c)
     return c.is_one();
 }
 
+// Detect complex infinities.
+inline bool inf_p(const complex &c)
+{
+    return c.inf_p();
+}
+
+// Detect complex finite numbers.
+inline bool number_p(const complex &c)
+{
+    return c.number_p();
+}
+
+// Roots.
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
+
+#if defined(MPPP_WITH_ARB)
+
+MPPP_COMPLEX_MPC_UNARY_IMPL(rec_sqrt, detail::acb_rec_sqrt, false)
+
+// K-th root.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex &rootn_ui(complex &rop, T &&op, unsigned long k)
+{
+    auto wrapper = [k](::mpc_t r, const ::mpc_t o) { detail::acb_rootn_ui(r, o, k); };
+    return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_complex T>
+#else
+template <typename T, cvr_complex_enabler<T> = 0>
+#endif
+inline complex rootn_ui(T &&r, unsigned long k)
+{
+    auto wrapper = [k](::mpc_t rop, const ::mpc_t op) { detail::acb_rootn_ui(rop, op, k); };
+    return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
+}
+
+#endif
 
 // Ternary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)

@@ -350,7 +350,7 @@ std::string complex::to_string(int base) const
     return '(' + re->to_string(base) + ',' + im->to_string(base) + ')';
 }
 
-int cmp_abs(const complex &c1, const complex &c2)
+int cmpabs(const complex &c1, const complex &c2)
 {
     ::mpfr_clear_erangeflag();
     auto retval = ::mpc_cmp_abs(c1.get_mpc_t(), c2.get_mpc_t());

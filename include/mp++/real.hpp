@@ -1067,8 +1067,14 @@ public:
 private:
     template <typename T>
     MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
+    // Wrapper to apply the input unary MPFR function to this.
+    // f must not need a rounding mode. Returns a reference to this.
     template <typename T>
-    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&);
+    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&f)
+    {
+        std::forward<T>(f)(&m_mpfr, &m_mpfr);
+        return *this;
+    }
 
 public:
     // Negate in-place.
@@ -1948,8 +1954,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &rootn_ui(real &rop, T &&op, unsigned long k)
 {
-    auto rootn_ui_wrapper = [k](::mpfr_t r, const ::mpfr_t o) { ::mpfr_rootn_ui(r, o, k, MPFR_RNDN); };
-    return detail::mpfr_nary_op_impl<false>(0, rootn_ui_wrapper, rop, std::forward<T>(op));
+    auto wrapper = [k](::mpfr_t r, const ::mpfr_t o) { ::mpfr_rootn_ui(r, o, k, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1959,8 +1965,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real rootn_ui(T &&r, unsigned long k)
 {
-    auto rootn_ui_wrapper = [k](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_rootn_ui(rop, op, k, MPFR_RNDN); };
-    return detail::mpfr_nary_op_return_impl<false>(0, rootn_ui_wrapper, std::forward<T>(r));
+    auto wrapper = [k](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_rootn_ui(rop, op, k, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
 #endif
