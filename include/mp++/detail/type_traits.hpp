@@ -270,7 +270,9 @@ template <typename T>
 struct nl_constants {
     static constexpr int digits = nl_digits<T>();
 };
+
 } // namespace detail
+
 } // namespace mppp
 
 #endif

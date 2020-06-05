@@ -12,7 +12,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 0.20 LANGUAGES CXX C)
+project(mp++ VERSION 0.21 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -230,6 +230,12 @@ if(MPPP_WITH_MPFR)
         "${MPPP_SRC_FILES}")
 endif()
 
+if(MPPP_WITH_ARB)
+    set(MPPP_SRC_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/arb.cpp"
+        "${MPPP_SRC_FILES}")
+endif()
+
 if(MPPP_WITH_MPC)
     set(MPPP_SRC_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/complex.cpp"
@@ -275,8 +281,8 @@ if(MPPP_BUILD_STATIC_LIBRARY)
 else()
     # Setup of the mp++ shared library.
     add_library(mp++ SHARED "${MPPP_SRC_FILES}")
-    set_property(TARGET mp++ PROPERTY VERSION "6.0")
-    set_property(TARGET mp++ PROPERTY SOVERSION 6)
+    set_property(TARGET mp++ PROPERTY VERSION "7.0")
+    set_property(TARGET mp++ PROPERTY SOVERSION 7)
     set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
     set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
     set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
