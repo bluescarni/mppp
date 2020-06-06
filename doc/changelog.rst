@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add the :cpp:class:`~mppp::integer` LCM primitives
+  (`#247 <https://github.com/bluescarni/mppp/pull/247>`__).
 - Additional special functions for :cpp:class:`~mppp::complex`
   (inverse, reciprocal square root, n-th root)
   (`#246 <https://github.com/bluescarni/mppp/pull/246>`__).
