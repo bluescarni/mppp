@@ -1,15 +1,46 @@
 # NOTE: Boost is always required by the benchmarking code.
-find_package(Boost 1.55.0 REQUIRED)
+find_package(Boost 1.55.0 REQUIRED filesystem)
 if(NOT TARGET Boost::boost)
-  # Depending on the CMake version, Boost::boost might not have been created.
+  # Depending on the CMake version, the Boost targets might not have been created.
   message(STATUS "The 'Boost::boost' target is missing, creating it.")
   add_library(Boost::boost INTERFACE IMPORTED)
   set_target_properties(Boost::boost PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIRS}")
+
+  message(STATUS "The 'Boost::filesystem' target is missing, creating it.")
+  add_library(Boost::filesystem UNKNOWN IMPORTED)
+  set_target_properties(Boost::filesystem PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIRS}")
+  set_target_properties(Boost::filesystem PROPERTIES IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
+    IMPORTED_LOCATION "${Boost_FILESYSTEM_LIBRARY}")
 endif()
+
+# fmt is always required.
+find_package(fmt REQUIRED)
 
 if(MPPP_BENCHMARK_FLINT)
   find_package(mp++_FLINT REQUIRED)
 endif()
+
+# The benchmarking helper library.
+add_library(mp++_benchmark STATIC utils.cpp)
+target_compile_options(mp++_benchmark PRIVATE
+  "$<$<CONFIG:Debug>:${MPPP_CXX_FLAGS_DEBUG}>"
+  "$<$<CONFIG:Release>:${MPPP_CXX_FLAGS_RELEASE}>"
+  "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
+  "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
+)
+target_link_libraries(mp++_benchmark PRIVATE Boost::boost Boost::filesystem)
+# Let's setup the target C++ standard, but only if the user did not provide it manually.
+if(NOT CMAKE_CXX_STANDARD)
+  if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
+    # NOTE: the idea here is that we want to use C++14 if the compilers supports
+    # concepts (as variable concepts are essentially template variables).
+    set_property(TARGET mp++_benchmark PROPERTY CXX_STANDARD 14)
+  else()
+    set_property(TARGET mp++_benchmark PROPERTY CXX_STANDARD 11)
+  endif()
+endif()
+set_property(TARGET mp++_benchmark PROPERTY CXX_STANDARD_REQUIRED YES)
+set_property(TARGET mp++_benchmark PROPERTY CXX_EXTENSIONS NO)
 
 # Custom target to run all benchmarks.
 add_custom_target(benchmark)
@@ -17,10 +48,9 @@ add_custom_target(benchmark)
 # Helper to add a benchmark.
 function(ADD_MPPP_BENCHMARK arg1)
   add_executable(${arg1} ${arg1}.cpp)
-  # NOTE: always link to Boost, as we need its headers
-  # in the benchmarking code.
-  target_link_libraries(${arg1} PRIVATE mp++ Boost::boost)
+  target_link_libraries(${arg1} PRIVATE mp++_benchmark mp++ fmt::fmt)
   if(MPPP_BENCHMARK_BOOST)
+    target_link_libraries(${arg1} PRIVATE Boost::boost)
     target_compile_options(${arg1} PRIVATE "-DMPPP_BENCHMARK_BOOST")
   endif()
   if(MPPP_BENCHMARK_FLINT)
