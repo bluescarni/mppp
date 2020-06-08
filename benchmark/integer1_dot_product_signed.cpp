@@ -50,14 +50,6 @@ using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, bo
 
 #endif
 
-#if defined(MPPP_BENCHMARK_FLINT)
-
-using fmpzxx = flint::fmpzxx;
-
-#endif
-
-using integer_t = mppp::integer<1>;
-
 std::mt19937 rng;
 
 constexpr auto size = 30000000ul;
@@ -88,10 +80,10 @@ int main()
     mppp_benchmark::data_t bdata;
 
     {
-        auto p = get_init_vectors<integer_t>();
+        auto p = get_init_vectors<mppp::integer<1>>();
         constexpr auto name = "mppp::integer<1>";
 
-        integer_t ret(0);
+        mppp::integer<1> ret(0);
 
         mppp_benchmark::simple_timer st;
 
@@ -178,10 +170,10 @@ int main()
 
 #if defined(MPPP_BENCHMARK_FLINT)
     {
-        auto p = get_init_vectors<fmpzxx>();
+        auto p = get_init_vectors<flint::fmpzxx>();
         constexpr auto name = "flint::fmpzxx";
 
-        fmpzxx ret(0);
+        flint::fmpzxx ret(0);
 
         mppp_benchmark::simple_timer st;
 

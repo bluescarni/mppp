@@ -50,7 +50,9 @@ function(ADD_MPPP_BENCHMARK arg1)
   add_executable(${arg1} ${arg1}.cpp)
   target_link_libraries(${arg1} PRIVATE mp++_benchmark mp++ fmt::fmt)
   if(MPPP_BENCHMARK_BOOST)
-    target_link_libraries(${arg1} PRIVATE Boost::boost)
+    # NOTE: when benchmarking the Boost classes,
+    # we make direct use of functions from the GMP API.
+    target_link_libraries(${arg1} PRIVATE Boost::boost mp++::GMP)
     target_compile_options(${arg1} PRIVATE "-DMPPP_BENCHMARK_BOOST")
   endif()
   if(MPPP_BENCHMARK_FLINT)
