@@ -7,125 +7,143 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <mp++/mp++.hpp>
+#include <cstdint>
 #include <numeric>
 #include <random>
-#include <string>
-#include <utility>
 #include <vector>
 
 #if defined(MPPP_BENCHMARK_BOOST)
+
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/gmp.hpp>
-#include <gmp.h>
+
 #endif
 
-#include "constStrings.hpp"
-#include "simple_timer.hpp"
-#include <boost/format.hpp>
+#if defined(MPPP_BENCHMARK_FLINT)
 
-using namespace mppp;
-using namespace mppp_bench;
+#include <flint/flint.h>
+#include <flint/fmpzxx.h>
+
+#endif
+
+#include <fmt/core.h>
+#include <fmt/ostream.h>
+
+#include <mp++/integer.hpp>
 
 #if defined(MPPP_BENCHMARK_BOOST)
-// Make sure we use the cpp_int version that does the overflow check, in order to
-// match mp++'s behaviour.
-using cpp_int
-    = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
-                                        0, 0, boost::multiprecision::signed_magnitude, boost::multiprecision::checked>,
-                                    boost::multiprecision::et_off>;
-using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
+
+#include <mp++/detail/gmp.hpp>
+
 #endif
 
-using integer_t = integer<2>;
-static const std::string name = "integer2_uint_conversion";
+#include "utils.hpp"
+
+namespace
+{
+
+#if defined(MPPP_BENCHMARK_BOOST)
+
+using cpp_int = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_on>;
+using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
+
+#endif
+
+std::mt19937 rng;
 
 constexpr auto size = 30000000ul;
 
-static std::mt19937 rng;
-
 template <typename T>
-static inline std::vector<T> get_init_vector(double &init_time)
+std::vector<T> get_init_vector()
 {
     rng.seed(0);
     std::uniform_int_distribution<unsigned> dist(0u, 10000u);
-    simple_timer st;
     std::vector<T> retval(size);
     std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
-    std::cout << initRuntime;
-    init_time = st.elapsed();
     return retval;
 }
 
+const auto benchmark_name = mppp_benchmark_name();
+
+} // namespace
+
 int main()
 {
+    fmt::print("Benchmark name: {}\n", benchmark_name);
+
     // Warm up.
-    for (auto volatile counter = 0ull; counter < 1000000000ull; ++counter) {
-    }
-    // Setup of the python output.
-    std::string s = pyPrefix;
+    mppp_benchmark::warmup();
+
+    // Prepare the benchmark result data.
+    mppp_benchmark::data_t bdata;
+
     {
-        std::cout << "\nUnsigned Integer Conversion 2\n----------------------------------" << std::endl;
-        std::cout << bench_mpp;
-        simple_timer st1;
-        double init_time;
-        auto v = get_init_vector<integer_t>(init_time);
-        s += "['mp++','init'," + std::to_string(init_time) + "],";
+        auto v = get_init_vector<mppp::integer<2>>();
+        constexpr auto name = "mppp::integer<2>";
+
         std::vector<unsigned> c_out(size);
-        {
-            simple_timer st2;
-            std::transform(v.begin(), v.end(), c_out.begin(),
-                           [](const integer_t &n) { return static_cast<unsigned>(n); });
-            s += "['mp++','convert'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << convRuntime;
-        }
-        s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << " / " << std::accumulate(c_out.begin(), c_out.end(), 0ul);
-        std::cout << totalRuntime;
+
+        mppp_benchmark::simple_timer st;
+
+        std::transform(v.begin(), v.end(), c_out.begin(),
+                       [](const mppp::integer<2> &n) { return static_cast<unsigned>(n); });
+
+        const auto runtime = st.elapsed();
+        bdata.emplace_back(name, runtime);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::accumulate(c_out.begin(), c_out.end(), 0ul));
     }
+
 #if defined(MPPP_BENCHMARK_BOOST)
     {
-        std::cout << bench_cpp_int;
-        simple_timer st1;
-        double init_time;
-        auto v = get_init_vector<cpp_int>(init_time);
-        s += "['Boost (cpp_int)','init'," + std::to_string(init_time) + "],";
+        auto v = get_init_vector<cpp_int>();
+        constexpr auto name = "boost::cpp_int";
+
         std::vector<unsigned> c_out(size);
-        {
-            simple_timer st2;
-            std::transform(v.begin(), v.end(), c_out.begin(),
-                           [](const cpp_int &n) { return static_cast<unsigned>(n); });
-            s += "['Boost (cpp_int)','convert'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << convRuntime;
-        }
-        s += "['Boost (cpp_int)','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << " / " << std::accumulate(c_out.begin(), c_out.end(), 0ul);
-        std::cout << totalRuntime;
+
+        mppp_benchmark::simple_timer st;
+
+        std::transform(v.begin(), v.end(), c_out.begin(), [](const cpp_int &n) { return static_cast<unsigned>(n); });
+
+        const auto runtime = st.elapsed();
+        bdata.emplace_back(name, runtime);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::accumulate(c_out.begin(), c_out.end(), 0ul));
     }
+
     {
-        std::cout << bench_mpz_int;
-        simple_timer st1;
-        double init_time;
-        auto v = get_init_vector<mpz_int>(init_time);
-        s += "['Boost (mpz_int)','init'," + std::to_string(init_time) + "],";
+        auto v = get_init_vector<mpz_int>();
+        constexpr auto name = "boost::gmp_int";
+
         std::vector<unsigned> c_out(size);
-        {
-            simple_timer st2;
-            std::transform(v.begin(), v.end(), c_out.begin(),
-                           [](const mpz_int &n) { return static_cast<unsigned>(::mpz_get_ui(n.backend().data())); });
-            s += "['Boost (mpz_int)','convert'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << convRuntime;
-        }
-        s += "['Boost (mpz_int)','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << " / " << std::accumulate(c_out.begin(), c_out.end(), 0ul);
-        std::cout << totalRuntime;
+
+        mppp_benchmark::simple_timer st;
+
+        std::transform(v.begin(), v.end(), c_out.begin(),
+                       [](const mpz_int &n) { return static_cast<unsigned>(::mpz_get_ui(n.backend().data())); });
+
+        const auto runtime = st.elapsed();
+        bdata.emplace_back(name, runtime);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::accumulate(c_out.begin(), c_out.end(), 0ul));
     }
 #endif
-    s += boost::str(boost::format(pySuffix) % name);
-    std::ofstream of(name + ".py", std::ios_base::trunc);
-    of << s;
-    of.close();
-    std::cout << "\n\n" << std::flush;
+
+#if defined(MPPP_BENCHMARK_FLINT)
+    {
+        auto v = get_init_vector<flint::fmpzxx>();
+        constexpr auto name = "flint::fmpzxx";
+
+        std::vector<unsigned> c_out(size);
+
+        mppp_benchmark::simple_timer st;
+
+        std::transform(v.begin(), v.end(), c_out.begin(),
+                       [](const flint::fmpzxx &n) { return static_cast<unsigned>(::fmpz_get_ui(n._data().inner)); });
+
+        const auto runtime = st.elapsed();
+        bdata.emplace_back(name, runtime);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::accumulate(c_out.begin(), c_out.end(), 0ul));
+    }
+#endif
+
+    // Write out the .py and .rst files.
+    mppp_benchmark::write_out(bdata, benchmark_name);
 }
