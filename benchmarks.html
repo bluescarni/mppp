@@ -4,6 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -21,7 +22,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Integer benchmarks" href="integer_benchmarks.html" />
@@ -42,7 +43,8 @@
         <li class="right" >
           <a href="utilities.html" title="Utility functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.21 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.21 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Benchmarks</a></li> 
       </ul>
     </div>
     <div class="container-wrapper">
@@ -105,25 +107,14 @@
   <div class="section" id="benchmarks">
 <span id="id1"></span><h1>Benchmarks<a class="headerlink" href="#benchmarks" title="Permalink to this headline">¶</a></h1>
 <p>This section contains various benchmarks comparing mp++ to other multiprecision libraries. All benchmarks
-were run on an AMD Ryzen 1700 in a 64-bit GNU/Linux environment, using the GCC compiler.
+were run on an AMD Ryzen 3950x in a 64-bit GNU/Linux environment, using the GCC compiler.
 The benchmarking code is available <a class="reference external" href="https://github.com/bluescarni/mppp/tree/master/benchmark">here</a>.</p>
-<p>In addition to mp++, the following libraries are used in the benchmarks:</p>
+<p>The benchmark results were last updated on <strong>20200609</strong>, using the following package versions:</p>
 <ul class="simple">
-<li>the <a class="reference external" href="https://www.boost.org/doc/libs/1_66_0/libs/multiprecision/doc/html/index.html">Boost.Multiprecision</a> library.
-Specifically, the <code class="docutils literal notranslate"><span class="pre">cpp_int</span></code> and the <code class="docutils literal notranslate"><span class="pre">mpz_int</span></code> integer classes are employed in the benchmarks. The former
-is a multiprecision integer class adopting a small-value optimisation, the latter is a thin wrapper around the GMP
-<a class="reference internal" href="integer.html#_CPPv45mpz_t" title="mpz_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpz_t</span></code></a> type. In the benchmarks, the <code class="docutils literal notranslate"><span class="pre">mpz_int</span></code> class is used only for ease of initialisation
-and destruction of GMP objects: all arithmetic operations are implemented by calling directly the GMP API;</li>
-<li>the <a class="reference external" href="http://flintlib.org/">FLINT</a> library. This library provides a data type called <code class="docutils literal notranslate"><span class="pre">fmpz_t</span></code> which, similarly to
-mp++, provides a small-value optimisation on top of GMP.</li>
-</ul>
-<p>The benchmark results were last updated on <strong>20180214</strong>, using the following package versions:</p>
-<ul class="simple">
-<li>GCC 7.3,</li>
-<li>mp++ 0.9,</li>
-<li>GMP 6.1.2,</li>
-<li>MPFR 3.1.5,</li>
-<li>Boost 1.65.0,</li>
+<li>GCC 10.1,</li>
+<li>mp++ 0.21,</li>
+<li>GMP 6.2.0,</li>
+<li>Boost 1.73.0,</li>
 <li>FLINT 2.5.2.</li>
 </ul>
 <div class="toctree-wrapper compound">
@@ -171,7 +162,8 @@ mp++, provides a small-value optimisation on top of GMP.</li>
         <li class="right" >
           <a href="utilities.html" title="Utility functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.21 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.21 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Benchmarks</a></li> 
       </ul>
     </div>
 <script type="text/javascript">
