@@ -11,8 +11,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <gmp.h>
-
+#include <mp++/detail/gmp.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
@@ -330,4 +329,44 @@ struct lcm_tester {
 TEST_CASE("lcm")
 {
     tuple_for_each(sizes{}, lcm_tester{});
+
+    // Try some tests with integer<1> that will result
+    // in 2-limb results.
+    using int_t = integer<1>;
+
+    int_t n1{::mp_limb_t(-1)}, n2 = n1 - 1, n3;
+    int_t m1{n1}, m2{n2}, m3;
+
+    lcm(n3, n1, n2);
+    ::mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
+
+    REQUIRE(n3 == m3);
+    REQUIRE(lcm(n1, n2) == n3);
+
+    n1.neg();
+    m1.neg();
+
+    lcm(n3, n1, n2);
+    ::mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
+
+    REQUIRE(n3 == m3);
+    REQUIRE(lcm(n1, n2) == n3);
+
+    n2.neg();
+    m2.neg();
+
+    lcm(n3, n1, n2);
+    ::mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
+
+    REQUIRE(n3 == m3);
+    REQUIRE(lcm(n1, n2) == n3);
+
+    n1.neg();
+    m1.neg();
+
+    lcm(n3, n1, n2);
+    ::mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
+
+    REQUIRE(n3 == m3);
+    REQUIRE(lcm(n1, n2) == n3);
 }
