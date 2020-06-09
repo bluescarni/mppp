@@ -6258,8 +6258,11 @@ inline void integer_ternary_lcm_impl(integer<1> &rop, const integer<1> &op1, con
         // here could help us squeeze a bit extra performance,
         // at the price of duplicating the overflow handling
         // logic. Keep in mind for the future.
-        mul(g, g, op2);
-        abs(rop, g);
+        mul(rop, g, op2);
+        // Turn rop into abs(rop).
+        // NOTE: this is always safe to do because
+        // rop will consist of at most 2 limbs.
+        rop._get_union().m_st._mp_size = std::abs(rop._get_union().m_st._mp_size);
     } else {
         // op1/op2 are not both statics. Run
         // the general-purpose implementation.
@@ -6318,7 +6321,10 @@ inline integer<1> integer_binary_lcm_impl(const integer<1> &op1, const integer<1
         static_divexact_gcd(r_st, op1_st, r_st);
 
         mul(retval, retval, op2);
-        abs(retval, retval);
+        // Turn retval into abs(retval).
+        // NOTE: this is always safe to do because
+        // rop will consist of at most 2 limbs.
+        retval._get_union().m_st._mp_size = std::abs(retval._get_union().m_st._mp_size);
 
         return retval;
     } else {
