@@ -326,3 +326,21 @@ For the computation of the GCD of ``std::int64_t`` values, the
 .. figure:: _static/integer1_vec_gcd_signed.png
    :width: 600px
    :align: center
+
+LCM
+^^^
+
+In this benchmark we compute the element-wise LCM of two randomly-generated vectors of
+size :math:`3\times 10^7`, followed by the sum of all the values in the LCM vector.
+
+1-limb signed integers
+........................
+
+In this setup, the vectors are initialised with small positive *and* negative values.
+All the computations fit within a single 64-bit word, and mp++ integers with 1 limb of static size are employed.
+For the computation of the LCM of ``std::int64_t`` values, the
+``std::lcm()`` function from the C++17 standard library is employed.
+
+.. figure:: _static/integer1_vec_lcm_signed.png
+   :width: 600px
+   :align: center
