@@ -31,5 +31,8 @@ make -j2 VERBOSE=1
 # Run the tests.
 ctest -j2 -E integer_hash -V
 
+# Run the benchmarks as well.
+make -j2 VERBOSE=1 benchmark
+
 set +e
 set +x
