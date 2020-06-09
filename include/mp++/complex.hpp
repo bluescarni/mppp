@@ -152,6 +152,7 @@ inline ::mpfr_prec_t real_deduce_precision(const real &r)
 MPPP_DLL_PUBLIC void acb_inv(::mpc_t, const ::mpc_t);
 MPPP_DLL_PUBLIC void acb_rec_sqrt(::mpc_t, const ::mpc_t);
 MPPP_DLL_PUBLIC void acb_rootn_ui(::mpc_t, const ::mpc_t, unsigned long);
+MPPP_DLL_PUBLIC void acb_agm1(::mpc_t, const ::mpc_t);
 
 #endif
 
@@ -901,6 +902,11 @@ public:
     complex &asinh();
     complex &acosh();
     complex &atanh();
+
+#if defined(MPPP_WITH_ARB)
+    // AGM.
+    complex &agm1();
+#endif
 
 private:
     mpc_struct_t m_mpc;
@@ -1831,6 +1837,13 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(atanh, ::mpc_atanh, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(exp, ::mpc_exp, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(log, ::mpc_log, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(log10, ::mpc_log10, true)
+
+#if defined(MPPP_WITH_ARB)
+
+// AGM.
+MPPP_COMPLEX_MPC_UNARY_IMPL(agm1, detail::acb_agm1, false)
+
+#endif
 
 #undef MPPP_COMPLEX_MPC_UNARY_HEADER
 #undef MPPP_COMPLEX_MPC_UNARY_IMPL

@@ -450,6 +450,8 @@ void acb_rootn_ui(::mpc_t rop, const ::mpc_t op, unsigned long n)
     }
 }
 
+MPPP_UNARY_ACB_WRAPPER(agm1)
+
 #undef MPPP_UNARY_ACB_WRAPPER
 
 #endif
@@ -510,6 +512,12 @@ complex &complex::inv()
 complex &complex::rec_sqrt()
 {
     return self_mpc_unary_nornd(detail::acb_rec_sqrt);
+}
+
+// AGM.
+complex &complex::agm1()
+{
+    return self_mpc_unary_nornd(detail::acb_agm1);
 }
 
 #endif

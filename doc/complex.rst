@@ -751,6 +751,26 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex &agm1()
+
+      .. versionadded:: 0.21
+
+      .. note::
+
+         This function is available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
+
+      Arithmetic-geometric mean.
+
+      This member function will set ``this`` to
+      :math:`M\left( z \right) = \operatorname{agm}\left( 1, z \right)`,
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+        fails because of (unlikely) overflow conditions.
+
 Types
 -----
 
@@ -1690,6 +1710,53 @@ Logarithms and exponentials
    :param z: the argument.
 
    :return: the result of the operation.
+
+Other special functions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::agm1(mppp::complex &rop, T &&z)
+
+   .. versionadded:: 0.21
+
+   .. note::
+
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
+
+   Binary :cpp:class:`~mppp::complex` AGM.
+
+   This function will set *rop* to
+   :math:`M\left( z \right) = \operatorname{agm}\left( 1, z \right)`.
+
+   :param rop: the return value.
+   :param z: the operand.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::agm1(T &&z)
+
+   .. versionadded:: 0.21
+
+   .. note::
+
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
+
+   Unary :cpp:class:`~mppp::complex` AGM.
+
+   This function will return
+   :math:`M\left( z \right) = \operatorname{agm}\left( 1, z \right)`.
+   The precision of the result will be equal to the precision of *z*.
+
+   :param z: the operand.
+
+   :return: the result of the operation.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
 
 Input/Output
 ~~~~~~~~~~~~
