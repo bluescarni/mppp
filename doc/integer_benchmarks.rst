@@ -1,16 +1,26 @@
 Integer benchmarks
 ------------------
 
-For each benchmarked library, the timings in the bar charts are split into three parts:
+In these benchmarks, :cpp:class:`~mppp::integer` is compared to
+the following types:
 
-* the ``init`` bar, which accounts for the time needed for the initialisation of the benchmark data,
-* the ``operation`` bar, which represents the time needed to actually perform the operation being benchmarked,
-* the ``total`` bar, which represents the total runtime of the benchmark.
+* the builtin ``std::int64_t`` and ``std::uint64_t`` types,
+* the 128-bit integral types ``__int128_t`` and ``__uint128_t``, available
+  on GCC and Clang,
+* the ``cpp_int`` class from the
+  `Boost.Multiprecision <https://www.boost.org/doc/libs/1_66_0/libs/multiprecision/doc/html/index.html>`__ library.
+  Similarly to :cpp:class:`~mppp::integer`, ``cpp_int`` is a signed multiprecision integer class which uses
+  a small-value optimisation;
+* the ``gmp_int`` GMP wrapper from the
+  `Boost.Multiprecision <https://www.boost.org/doc/libs/1_66_0/libs/multiprecision/doc/html/index.html>`__ library.
+  ``gmp_int`` is a wrapper around the :cpp:type:`mpz_t` type from the GMP library. In the benchmarks,
+  the ``gmp_int`` API is used only for ease of initialisation
+  and destruction of GMP objects: all arithmetic operations are implemented by calling directly the GMP API,
+  and thus we regard the performance of ``gmp_int`` as a proxy for the performance of :cpp:type:`mpz_t`;
+* the ``fmpzxx`` class from the `FLINT <http://flintlib.org/>`__ library. Similarly to :cpp:class:`~mppp::integer`,
+  ``fmpzxx`` is a signed multiprecision integer class which uses a small-value optimisation.
 
-The intent is to provide a breakdown which measures both the performance of the operation
-being benchmarked and the effect of the small value optimisation implemented in mp++ (the latter
-tends to have a noticeable impact in the initialisation phase of the benchmarks, which usually involves
-the creation of a large number of :cpp:class:`~mppp::integer` objects).
+In all benchmarks, a **lower** runtime is **better**.
 
 .. _integer_dot_product:
 
@@ -18,8 +28,8 @@ Dot product
 ^^^^^^^^^^^
 
 This benchmark measures the time needed to compute the dot product of two integer vectors of size
-:math:`3\times 10^7` containing randomly-generated values. The multiply-add primitives of each library
-are used for the accumulation of the dot product. The benchmark is run in a variety of different setups.
+:math:`3\times 10^7` containing randomly-generated values. Multiply-add primitives (if available)
+are used for the accumulation of the dot product.
 
 .. _integer1_dot_product_unsigned:
 
@@ -27,42 +37,34 @@ are used for the accumulation of the dot product. The benchmark is run in a vari
 ........................
 
 In this setup, the integer vectors are initialised with small *non-negative* values, and the final dot product
-is less than :math:`2^{64}`. mp++ integers with 1 limb of static size are employed. For this benchmark,
-we also include timings for 64-bit (``std::uint64_t``) and 128-bit (``__uint128_t``) integers.
+is less than :math:`2^{64}`. mp++ integers with 1 limb of static size are employed.
 
 .. figure:: _static/integer1_dot_product_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
-It can be immediately seen how the initialisation cost for the ``mpz_int`` class is much higher than for the other
-integer types. This is due to the fact that the GMP API always uses dynamically-allocated memory, even for small values.
-The other multiprecision integer types all employ a small-value optimisation, and thus avoid the performance cost of heap allocation.
-
-In this particular benchmark, mp++ is about 3 times faster than GMP (as measured via the ``mpz_int`` wrapper)
-in the ``operation`` portion of the benchmark. mp++ is also faster than ``cpp_int`` and FLINT, albeit by a smaller margin.
-With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the ``operation`` portion of the benchmark.
+In this particular benchmark, mp++ is almost 4 times faster than GMP.
+mp++ is also faster than ``cpp_int`` and FLINT, albeit by a smaller margin.
+With respect to the 64/128-bit builtin integer types, there are x4/x2 slowdowns.
 
 1-limb signed integers
 ......................
 
 This setup is almost identical to the :ref:`previous one <integer1_dot_product_unsigned>`, but this time the vectors
-are initialised with both positive *and* negative values. For this benchmark, we also include timings for 64-bit (``std::int64_t``)
-and 128-bit (``__int128_t``) integers.
+are initialised with both positive *and* negative values.
 
 .. figure:: _static/integer1_dot_product_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 The presence of both positive and negative values has a noticeable performance impact with respect to the previous test
-for all libraries, both during the initialisation of the vectors and in the ``operation`` part of the benchmark.
+for all multiprecision libraries.
 This is due to the fact that sign handling in multiprecision computations is typically implemented
 with branches, and when positive and negative values are equally likely the effectiveness of the CPU's branch predictor
 is much reduced.
 
 The performance advantage of mp++ with respect to the other libraries is retained, albeit by a smaller margin.
-With respect to the 64/128-bit hardware integer types, there are x10/x4 slowdowns in the ``operation`` portion of the benchmark.
-The worse slowdowns (with respect to the previous unsigned test) are due to the high number of mispredicted
-branches in this particular test.
+With respect to the 64/128-bit builtin integer types, there are x8/x4 slowdowns.
 
 .. _integer2_dot_product_unsigned:
 
@@ -74,7 +76,7 @@ the vectors are initialised with larger non-negative values, the final result is
 mp++ integers with 2 limbs of static size are now employed.
 
 .. figure:: _static/integer2_dot_product_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 The benchmark shows that mp++'s specialised arithmetic functions pay off in terms of raw performance in this scenario.
@@ -85,7 +87,7 @@ The benchmark shows that mp++'s specialised arithmetic functions pay off in term
 This setup is the signed version of the :ref:`previous benchmark <integer2_dot_product_unsigned>`.
 
 .. figure:: _static/integer2_dot_product_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 As explained earlier, arithmetic with mixed positive and negative values is more expensive than arithmetic with only
@@ -98,7 +100,8 @@ Vector multiply-add
 
 In this benchmark, we first compute the element-wise multiplication of two random vectors of size :math:`3\times 10^7`,
 followed by the addition to another random vector of the same size. This workload allows to measure the efficiency
-of the multiplication and addition operations (whereas in the dot product benchmark the multiply-add primitives were
+of the multiplication and addition operations (whereas in the :ref:`dot product benchmark <integer_dot_product>`
+the multiply-add primitives were
 employed), and it also increases the pressure on the memory subsystem (due to the need to write into large vectors
 instead of accumulating the result into a single scalar).
 
@@ -108,31 +111,29 @@ instead of accumulating the result into a single scalar).
 ........................
 
 In this setup, the integer vectors are initialised with small *non-negative* values.
-mp++ integers with 1 limb of static size are employed. For this benchmark,
-we also include timings for 64-bit (``std::uint64_t``) and 128-bit (``__uint128_t``) integers.
+mp++ integers with 1 limb of static size are employed.
 
 .. figure:: _static/integer1_vec_mul_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
-This time mp++ is more than 5 times faster than GMP in the ``operation`` portion of the benchmark, while still maintaining
+This time mp++ is more than 7 times faster than GMP, while still maintaining
 a performance advantage over ``cpp_int`` and FLINT.
-The slowdown in the ``operation`` part of the benchmark with respect to 64-bit integers is less than x3, while mp++ performs
+The slowdown with respect to 64-bit integers is less than x3, while mp++ performs
 similarly to 128-bit integers for this particular test.
 
 1-limb signed integers
 ........................
 
-In this setup, the vectors are initialised with both positive *and* negative values. For this benchmark, we also include
-timings for 64-bit (``std::int64_t``) and 128-bit (``__int128_t``) integers.
+In this setup, the vectors are initialised with both positive *and* negative values.
 
 .. figure:: _static/integer1_vec_mul_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 We can see again how the introduction of mixed positive and negative values impacts performance negatively with respect
 to the :ref:`unsigned setup <integer1_vec_mul_unsigned>`.
-With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the ``operation`` portion of the benchmark.
+With respect to the 64/128-bit builtin integer types, there are x4/x2 slowdowns.
 
 .. _integer2_vec_mul_unsigned:
 
@@ -144,7 +145,7 @@ the vectors are initialised with larger non-negative values, and
 mp++ integers with 2 limbs of static size are now employed.
 
 .. figure:: _static/integer2_vec_mul_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 The benchmark shows again that mp++'s specialised arithmetic functions deliver strong performance.
@@ -155,13 +156,13 @@ The benchmark shows again that mp++'s specialised arithmetic functions deliver s
 This setup is the signed version of the :ref:`previous benchmark <integer2_vec_mul_unsigned>`.
 
 .. figure:: _static/integer2_vec_mul_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 Vector division
 ^^^^^^^^^^^^^^^
 
-In this benchmark we compute the element-wise division with remainder of two randomly-generated vectors of
+In this benchmark we compute the element-wise truncated division of two randomly-generated vectors of
 size :math:`3\times 10^7`, followed by the sum of all the values in the quotient vector.
 
 .. _integer1_vec_div_unsigned:
@@ -173,10 +174,10 @@ In this setup, the integer vectors are initialised with small *non-negative* val
 mp++ integers with 1 limb of static size are employed.
 
 .. figure:: _static/integer1_vec_div_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
-mp++ and FLINT perform well on this test, and they are about 5 times faster than GMP.
+mp++ and FLINT perform well on this test, and they are about 8 times faster than GMP.
 
 1-limb signed integers
 ........................
@@ -184,7 +185,7 @@ mp++ and FLINT perform well on this test, and they are about 5 times faster than
 In this setup, the vectors are initialised with both positive *and* negative values.
 
 .. figure:: _static/integer1_vec_div_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 Here we can see FLINT pulling ahead of mp++. FLINT uses a signed integer representation for small values
@@ -202,7 +203,7 @@ the vectors are initialised with larger non-negative values, and
 mp++ integers with 2 limbs of static size are now employed.
 
 .. figure:: _static/integer2_vec_div_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 2-limb signed integers
@@ -211,7 +212,7 @@ mp++ integers with 2 limbs of static size are now employed.
 This setup is the signed version of the :ref:`previous benchmark <integer2_vec_div_unsigned>`.
 
 .. figure:: _static/integer2_vec_div_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 Sorting
@@ -225,7 +226,7 @@ This benchmark consists of the sorting (via ``std::sort()``) of a randomly-gener
 In this setup, the integer vector is initialised with small *non-negative* values. mp++ integers with 1 limb of static size are employed.
 
 .. figure:: _static/integer1_sort_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 Here again it can be seen how the small-value optimisation implemented in mp++, ``cpp_int`` and FLINT pays off on large
@@ -238,7 +239,7 @@ and FLINT.
 In this setup, the vector is initialised with both positive *and* negative values.
 
 .. figure:: _static/integer1_sort_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 2-limb unsigned integers
@@ -248,7 +249,7 @@ In this setup, the integer vector is initialised with *non-negative* values in t
 mp++ integers with 2 limbs of static size are employed.
 
 .. figure:: _static/integer2_sort_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 2-limb signed integers
@@ -258,7 +259,7 @@ In this setup, the vector is initialised with both positive *and* negative value
 mp++ integers with 2 limbs of static size are employed.
 
 .. figure:: _static/integer2_sort_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 Left bit shift
@@ -273,7 +274,7 @@ In this setup, the integer vector is initialised with small *non-negative* value
 by a small random amount (so that the result always fits into a machine word). mp++ integers with 1 limb of static size are employed.
 
 .. figure:: _static/integer1_vec_lshift_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 1-limb signed integers
@@ -283,7 +284,7 @@ In this setup, the integer vector is initialised with small positive *and* negat
 by a small random amount (so that the result always fits into a machine word). mp++ integers with 1 limb of static size are employed.
 
 .. figure:: _static/integer1_vec_lshift_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 2-limb unsigned integers
@@ -294,7 +295,7 @@ which are then left bit shifted by a small random amount (so that the result alw
 with 2 limbs of static size are employed.
 
 .. figure:: _static/integer2_vec_lshift_unsigned.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 2-limb signed integers
@@ -305,7 +306,7 @@ which are then left bit shifted by a small random amount (so that the result alw
 with 2 limbs of static size are employed.
 
 .. figure:: _static/integer2_vec_lshift_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
 
 GCD
@@ -317,14 +318,11 @@ size :math:`3\times 10^7`, followed by the sum of all the values in the GCD vect
 1-limb signed integers
 ........................
 
-In this setup, the vectors are initialised with small positive *and* negative values with an average size, in bits,
-of approximately 49. All the computations fit within a single 64-bit word, and mp++ integers with 1 limb of static size are employed.
-
-.. note::
-
-   Due to the current lack of an optimised assembly implementation of GCD primitives for Ryzen processors in GMP, this test
-   was run on an Intel Xeon E5-2698 v4 CPU instead.
+In this setup, the vectors are initialised with small positive *and* negative values.
+All the computations fit within a single 64-bit word, and mp++ integers with 1 limb of static size are employed.
+For the computation of the GCD of ``std::int64_t`` values, the
+``std::gcd()`` function from the C++17 standard library is employed.
 
 .. figure:: _static/integer1_vec_gcd_signed.png
-   :scale: 50%
+   :width: 600px
    :align: center
