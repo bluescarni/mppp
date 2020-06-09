@@ -40,7 +40,7 @@ Among the features specific to :cpp:class:`~mppp::integer` we find:
 * prime numbers functions (:cpp:func:`~mppp::probab_prime_p()`, :cpp:func:`~mppp::nextprime()`, ...),
 * parity detection (:cpp:func:`~mppp::even_p()`, :cpp:func:`~mppp::odd_p()`),
 * several additional :ref:`division functions <integer_division>`,
-* :ref:`number-theoretic functions <integer_ntheory>` (GCD, factorial, binomial coefficient, ...),
+* :ref:`number-theoretic functions <integer_ntheory>` (GCD/LCM, factorial, binomial coefficient, ...),
 * integer :ref:`roots <integer_roots>` and :ref:`exponentiation <integer_exponentiation>`,
 * hashing (including a :ref:`specialisation <integer_std_specialisations>` of ``std::hash``, so that it is possible to use
   :cpp:class:`~mppp::integer` in standard unordered containers out of the box),

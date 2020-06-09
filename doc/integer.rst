@@ -1275,11 +1275,16 @@ Number theoretic functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::gcd(mppp::integer<SSize> &rop, const mppp::integer<SSize> &op1, const mppp::integer<SSize> &op2)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::lcm(mppp::integer<SSize> &rop, const mppp::integer<SSize> &op1, const mppp::integer<SSize> &op2)
 
-   Ternary GCD.
+   Ternary GCD and LCM.
 
-   This function will set *rop* to the GCD of *op1* and *op2*. The result is always nonnegative.
+   These functions will set *rop* to, respectively, the GCD and LCM of *op1* and *op2*. The result is always nonnegative.
    If both operands are zero, *rop* is set to zero.
+
+   .. versionadded:: 0.21
+
+      The ``lcm()`` function.
 
    :param rop: the return value.
    :param op1: the first operand.
@@ -1288,16 +1293,21 @@ Number theoretic functions
    :return: a reference to *rop*.
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::gcd(const mppp::integer<SSize> &op1, const mppp::integer<SSize> &op2)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::lcm(const mppp::integer<SSize> &op1, const mppp::integer<SSize> &op2)
 
-   Binary GCD.
+   Binary GCD and LCM.
 
-   This function will return the GCD of *op1* and *op2*. The result is always nonnegative.
+   These functions will return, respectively, the GCD and LCM of *op1* and *op2*. The result is always nonnegative.
    If both operands are zero, zero is returned.
+
+   .. versionadded:: 0.21
+
+      The ``lcm()`` function.
 
    :param op1: the first operand.
    :param op2: the second operand.
 
-   :return: the GCD of *op1* and *op2*.
+   :return: the GCD or LCM of *op1* and *op2*.
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::fac_ui(mppp::integer<SSize> &rop, unsigned long n)
 
