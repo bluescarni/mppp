@@ -122,12 +122,12 @@ ADD_MPPP_BENCHMARK(integer1_vec_mul_unsigned)
 ADD_MPPP_BENCHMARK(integer1_vec_mul_signed)
 ADD_MPPP_BENCHMARK(integer2_vec_mul_unsigned)
 ADD_MPPP_BENCHMARK(integer2_vec_mul_signed)
-
 ADD_MPPP_BENCHMARK(integer1_vec_div_unsigned)
 ADD_MPPP_BENCHMARK(integer1_vec_div_signed)
 ADD_MPPP_BENCHMARK(integer2_vec_div_unsigned)
 ADD_MPPP_BENCHMARK(integer2_vec_div_signed)
 ADD_MPPP_BENCHMARK(integer1_vec_gcd_signed)
+
 ADD_MPPP_BENCHMARK(integer1_sort_signed)
 ADD_MPPP_BENCHMARK(integer1_sort_unsigned)
 ADD_MPPP_BENCHMARK(integer2_sort_signed)
