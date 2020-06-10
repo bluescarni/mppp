@@ -244,9 +244,12 @@ TEST_CASE("agm")
         REQUIRE(agm(c, 4.) == 4);
         REQUIRE(agm(c, 4_z1) == 4);
         REQUIRE(agm(c, 4_q1) == 4);
-        REQUIRE(agm(c, 4_rq) == 4);
         REQUIRE(agm(c, std::complex<double>{4, 0}) == 4);
+
+#if defined(MPPP_WITH_QUADMATH)
+        REQUIRE(agm(c, 4_rq) == 4);
         REQUIRE(agm(c, 4_rq + 0_icq) == 4);
+#endif
     }
 
     // (Non complex)-complex.
@@ -295,9 +298,12 @@ TEST_CASE("agm")
         REQUIRE(agm(4., c) == 4);
         REQUIRE(agm(4_z1, c) == 4);
         REQUIRE(agm(4_q1, c) == 4);
-        REQUIRE(agm(4_rq, c) == 4);
         REQUIRE(agm(std::complex<double>{4, 0}, c) == 4);
+
+#if defined(MPPP_WITH_QUADMATH)
+        REQUIRE(agm(4_rq, c) == 4);
         REQUIRE(agm(4_rq + 0_icq, c) == 4);
+#endif
     }
 }
 
