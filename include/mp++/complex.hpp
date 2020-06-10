@@ -1318,6 +1318,78 @@ inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 
         return detail::mpc_nary_op_return_impl<rnd>(0, fname, std::forward<T>(r));                                     \
     }
 
+// Machinery to expose the binary MPC-like function fname as an mppp function called "name".
+//
+// Two overloads of "name" will be provided:
+//
+// - an overload in which the return value is passed by
+//   reference as the first argument,
+// - an overload which returns the result.
+//
+// The first overload accepts only complex arguments.
+//
+// The second overload is generic and it accepts 2 input arguments, at least one of which must be a
+// complex. The other argument, if not complex, will be converted to complex in the usual way.
+//
+// The rnd param (a boolean) indicates if fname requires a rounding mode as last argument or not.
+//
+// The fname function must accept only mpc_t arguments in input (plus the rounding mode if
+// rnd is true).
+
+// These are the headers of the overloads that will be produced. They are different depending
+// on whether concepts are available or not.
+#if defined(MPPP_HAVE_CONCEPTS)
+#define MPPP_COMPLEX_MPC_BINARY_HEADER1 template <cvr_complex T, cvr_complex U>
+#define MPPP_COMPLEX_MPC_BINARY_HEADER2 template <typename T, complex_op_types<T> U>
+#else
+#define MPPP_COMPLEX_MPC_BINARY_HEADER1 template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
+#define MPPP_COMPLEX_MPC_BINARY_HEADER2                                                                                \
+    template <typename T, typename U, detail::enable_if_t<are_complex_op_types<U, T>::value, int> = 0>
+#endif
+
+// The actual macro.
+#define MPPP_COMPLEX_MPC_BINARY_IMPL(name, fname, rnd)                                                                 \
+    /* The overload which accepts the return value in input. */                                                        \
+    MPPP_COMPLEX_MPC_BINARY_HEADER1 inline complex &name(complex &rop, T &&y, U &&x)                                   \
+    {                                                                                                                  \
+        return detail::mpc_nary_op_impl<rnd>(0, fname, rop, std::forward<T>(y), std::forward<U>(x));                   \
+    }                                                                                                                  \
+    /* Implementation details of the other overload. */                                                                \
+    namespace detail                                                                                                   \
+    {                                                                                                                  \
+    /* Both arguments are complex. */                                                                                  \
+    template <typename T, typename U, cvr_complex_enabler<T, U> = 0>                                                   \
+    inline complex dispatch_##name(T &&y, U &&x)                                                                       \
+    {                                                                                                                  \
+        return mpc_nary_op_return_impl<rnd>(0, fname, std::forward<T>(y), std::forward<U>(x));                         \
+    }                                                                                                                  \
+    /* Only the first argument is complex. */                                                                          \
+    template <typename T, typename U,                                                                                  \
+              enable_if_t<conjunction<is_cvr_complex<T>, is_complex_interoperable<U>>::value, int> = 0>                \
+    inline complex dispatch_##name(T &&a, const U &x)                                                                  \
+    {                                                                                                                  \
+        MPPP_MAYBE_TLS complex tmp;                                                                                    \
+        tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));                                                   \
+        tmp.set(x);                                                                                                    \
+        return dispatch_##name(std::forward<T>(a), tmp);                                                               \
+    }                                                                                                                  \
+    /* Only the second argument is complex. */                                                                         \
+    template <typename T, typename U,                                                                                  \
+              enable_if_t<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>::value, int> = 0>                \
+    inline complex dispatch_##name(const T &x, U &&a)                                                                  \
+    {                                                                                                                  \
+        MPPP_MAYBE_TLS complex tmp;                                                                                    \
+        tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(x)));                                                   \
+        tmp.set(x);                                                                                                    \
+        return dispatch_##name(tmp, std::forward<U>(a));                                                               \
+    }                                                                                                                  \
+    }                                                                                                                  \
+    /* The overload which returns the result. */                                                                       \
+    MPPP_COMPLEX_MPC_BINARY_HEADER2 inline complex name(T &&y, U &&x)                                                  \
+    {                                                                                                                  \
+        return detail::dispatch_##name(std::forward<T>(y), std::forward<U>(x));                                        \
+    }
+
 // Basic arithmetics.
 
 // Ternary addition.
@@ -1832,10 +1904,19 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(log10, ::mpc_log10, true)
 // AGM.
 MPPP_COMPLEX_MPC_UNARY_IMPL(agm1, detail::acb_agm1, false)
 
+#if defined(MPPP_ARB_HAVE_ACB_AGM)
+
+MPPP_COMPLEX_MPC_BINARY_IMPL(agm, detail::acb_agm, false)
+
+#endif
+
 #endif
 
 #undef MPPP_COMPLEX_MPC_UNARY_HEADER
 #undef MPPP_COMPLEX_MPC_UNARY_IMPL
+#undef MPPP_COMPLEX_MPC_BINARY_HEADER1
+#undef MPPP_COMPLEX_MPC_BINARY_HEADER2
+#undef MPPP_COMPLEX_MPC_BINARY_IMPL
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>

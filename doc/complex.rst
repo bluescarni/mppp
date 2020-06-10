@@ -1711,47 +1711,65 @@ Logarithms and exponentials
 
    :return: the result of the operation.
 
-Other special functions
-~~~~~~~~~~~~~~~~~~~~~~~
+Arithmetic-geometric mean
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::agm1(mppp::complex &rop, T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::agm1(mppp::complex &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U> mppp::complex &mppp::agm(mppp::complex &rop, T &&x, U &&y)
 
    .. versionadded:: 0.21
 
    .. note::
 
-      This function is available only if mp++ was
+      These functions are available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled.
 
-   Binary :cpp:class:`~mppp::complex` AGM.
+      The ``agm()`` function is available only from
+      Arb 2.18 onwards.
 
-   This function will set *rop* to
-   :math:`M\left( z \right) = \operatorname{agm}\left( 1, z \right)`.
+   :cpp:class:`~mppp::complex` AGM functions.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`\operatorname{agm}\left( 1, x \right)`,
+   * :math:`\operatorname{agm}\left( x, y \right)`.
+
+   The precision of *rop* will be set to the largest precision among the operands.
 
    :param rop: the return value.
-   :param z: the operand.
+   :param x: the first operand.
+   :param y: the second operand.
 
    :return: a reference to *rop*.
 
    :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
      fails because of (unlikely) overflow conditions.
 
-.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::agm1(T &&z)
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::agm1(T &&x)
+.. cpp:function:: template <typename T, mppp::complex_op_types<T> U> mppp::complex mppp::agm(T &&x, U &&y)
 
    .. versionadded:: 0.21
 
    .. note::
 
-      This function is available only if mp++ was
+      These functions are available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled.
 
-   Unary :cpp:class:`~mppp::complex` AGM.
+      The ``agm()`` function is available only from
+      Arb 2.18 onwards.
 
-   This function will return
-   :math:`M\left( z \right) = \operatorname{agm}\left( 1, z \right)`.
-   The precision of the result will be equal to the precision of *z*.
+   :cpp:class:`~mppp::complex` AGM functions.
 
-   :param z: the operand.
+   These functions will return, respectively:
+
+   * :math:`\operatorname{agm}\left( 1, x \right)`,
+   * :math:`\operatorname{agm}\left( x, y \right)`.
+
+   The precision of the result will be equal to the highest precision
+   among the operands.
+
+   :param x: the first operand.
+   :param y: the second operand.
 
    :return: the result of the operation.
 

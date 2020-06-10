@@ -468,6 +468,22 @@ void acb_rootn_ui(::mpc_t rop, const ::mpc_t op, unsigned long n)
 
 MPPP_UNARY_ACB_WRAPPER(agm1)
 
+#if defined(MPPP_ARB_HAVE_ACB_AGM)
+
+void acb_agm(::mpc_t rop, const ::mpc_t op1, const ::mpc_t op2)
+{
+    MPPP_MAYBE_TLS acb_raii acb_rop, acb_op1, acb_op2;
+
+    mpc_to_acb(acb_op1.m_acb, op1);
+    mpc_to_acb(acb_op2.m_acb, op2);
+
+    ::acb_agm(acb_rop.m_acb, acb_op1.m_acb, acb_op2.m_acb, mpfr_prec_to_arb_prec(mpfr_get_prec(mpc_realref(rop))));
+
+    acb_to_mpc(rop, acb_rop.m_acb);
+}
+
+#endif
+
 #undef MPPP_UNARY_ACB_WRAPPER
 
 #endif
