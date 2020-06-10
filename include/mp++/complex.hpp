@@ -154,6 +154,12 @@ MPPP_DLL_PUBLIC void acb_rec_sqrt(::mpc_t, const ::mpc_t);
 MPPP_DLL_PUBLIC void acb_rootn_ui(::mpc_t, const ::mpc_t, unsigned long);
 MPPP_DLL_PUBLIC void acb_agm1(::mpc_t, const ::mpc_t);
 
+#if defined(MPPP_ARB_HAVE_ACB_AGM)
+
+MPPP_DLL_PUBLIC void acb_agm(::mpc_t, const ::mpc_t, const ::mpc_t);
+
+#endif
+
 #endif
 
 } // namespace detail

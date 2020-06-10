@@ -351,6 +351,15 @@ endif()
 if(MPPP_WITH_ARB)
     find_package(mp++_FLINT REQUIRED)
     find_package(mp++_Arb REQUIRED)
+
+    # Check support for certain Arb functions.
+    include(CheckSymbolExists)
+    set(CMAKE_REQUIRED_INCLUDES "${MPPP_ARB_INCLUDE_DIR}")
+    set(CMAKE_REQUIRED_LIBRARIES "${MPPP_ARB_LIBRARY}")
+    check_symbol_exists(acb_agm "acb.h" MPPP_ARB_HAVE_ACB_AGM)
+    unset(CMAKE_REQUIRED_INCLUDES)
+    unset(CMAKE_REQUIRED_LIBRARIES)
+
     target_link_libraries(mp++ PRIVATE mp++::Arb mp++::FLINT)
     set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
 endif()
