@@ -116,7 +116,7 @@ TEST_CASE("pow")
         REQUIRE(mppp::pow(c1, c2) == 16);
         REQUIRE(mppp::pow(c1, c2).get_prec() == detail::real_deduce_precision(4));
 
-        c2 = complex{2, complex_prec_t(1)};
+        c2 = complex{2, complex_prec_t(2)};
         REQUIRE(mppp::pow(c1, c2) == 16);
         REQUIRE(mppp::pow(c1, c2).get_prec() == detail::real_deduce_precision(4));
 
@@ -148,7 +148,7 @@ TEST_CASE("pow")
         REQUIRE(mppp::pow(c, r) == 16);
         REQUIRE(mppp::pow(c, r).get_prec() == detail::real_deduce_precision(4));
 
-        r = real{2, 1};
+        r = real{2, 2};
         REQUIRE(mppp::pow(c, r) == 16);
         REQUIRE(mppp::pow(c, r).get_prec() == detail::real_deduce_precision(4));
 

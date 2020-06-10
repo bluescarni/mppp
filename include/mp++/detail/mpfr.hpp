@@ -38,7 +38,9 @@ namespace mppp
 // Minimum precision for a real.
 constexpr ::mpfr_prec_t real_prec_min()
 {
-    return MPFR_PREC_MIN;
+    // NOTE: Arb wants at least 2 bits, so let's
+    // make sure we don't allow 1-bit numbers.
+    return MPFR_PREC_MIN > 2 ? MPFR_PREC_MIN : 2;
 }
 
 // Maximum precision for a real.
