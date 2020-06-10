@@ -9,7 +9,6 @@
 #include <utility>
 
 #include <mp++/config.hpp>
-#include <mp++/detail/mpfr.hpp>
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
@@ -106,7 +105,7 @@ TEST_CASE("real cbrt")
     REQUIRE(r0.get_prec() == 128);
 }
 
-#if MPFR_VERSION_MAJOR >= 4
+#if defined(MPPP_MPFR_HAVE_MPFR_ROOTN_UI)
 
 TEST_CASE("real rootn_ui")
 {

@@ -795,7 +795,7 @@ private:
     template <std::size_t SSize>
     bool rational_conversion(rational<SSize> &rop) const
     {
-#if MPFR_VERSION_MAJOR >= 4
+#if defined(MPPP_MPFR_HAVE_MPFR_GET_Q)
         MPPP_MAYBE_TLS detail::mpq_raii mpq;
         // NOTE: we already checked outside
         // that rop is a finite number, hence
@@ -1944,7 +1944,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(rec_sqrt, ::mpfr_rec_sqrt, true)
 // Cubic root.
 MPPP_REAL_MPFR_UNARY_IMPL(cbrt, ::mpfr_cbrt, true)
 
-#if MPFR_VERSION_MAJOR >= 4
+#if defined(MPPP_MPFR_HAVE_MPFR_ROOTN_UI)
 
 // K-th root.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2222,7 +2222,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(lngamma, ::mpfr_lngamma, true)
 MPPP_REAL_MPFR_UNARY_IMPL(lgamma, detail::real_lgamma_wrapper, true)
 MPPP_REAL_MPFR_UNARY_IMPL(digamma, ::mpfr_digamma, true)
 
-#if MPFR_VERSION_MAJOR >= 4
+#if defined(MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
 
 // gamma_inc.
 MPPP_REAL_MPFR_BINARY_IMPL(gamma_inc, ::mpfr_gamma_inc, true)
@@ -2299,7 +2299,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(erf, ::mpfr_erf, true)
 MPPP_REAL_MPFR_UNARY_IMPL(erfc, ::mpfr_erfc, true)
 MPPP_REAL_MPFR_UNARY_IMPL(ai, ::mpfr_ai, true)
 
-#if MPFR_VERSION_MAJOR >= 4
+#if defined(MPPP_MPFR_HAVE_MPFR_BETA)
 
 // beta.
 MPPP_REAL_MPFR_BINARY_IMPL(beta, ::mpfr_beta, true)

@@ -8,7 +8,7 @@
 
 #include <utility>
 
-#include <mp++/detail/mpfr.hpp>
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
 
@@ -83,7 +83,7 @@ TEST_CASE("real digamma")
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
-#if MPFR_VERSION_MAJOR >= 4
+#if defined(MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
 
 TEST_CASE("real gamma_inc")
 {
