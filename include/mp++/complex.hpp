@@ -146,6 +146,23 @@ inline ::mpfr_prec_t real_deduce_precision(const real &r)
     return r.get_prec();
 }
 
+// Precision deducer for std::complex.
+template <typename T>
+inline ::mpfr_prec_t real_deduce_precision(const std::complex<T> &c)
+{
+    return real_deduce_precision(c.real());
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+// Precision deducer for complex128.
+inline ::mpfr_prec_t real_deduce_precision(const complex128 &c)
+{
+    return real_deduce_precision(c.real());
+}
+
+#endif
+
 #if defined(MPPP_WITH_ARB)
 
 // The Arb MPC wrappers.
@@ -413,14 +430,8 @@ private:
     template <typename T>
     void dispatch_generic_assignment(const T &c, std::false_type)
     {
-        // Determine the max prec between the real
-        // and imaginary parts.
-        // NOTE: this is not really necessary, as for std::complex
-        // and complex128 (the only two other complex types) the
-        // prec deduction does not depend on the value. However,
-        // this is what we *would* do if we had a complex type
-        // in which the two parts can have different precisions.
-        const auto p = detail::c_max(detail::real_deduce_precision(c.real()), detail::real_deduce_precision(c.imag()));
+        // Deduce the precision.
+        const auto p = detail::real_deduce_precision(c);
 
         re_ref re{*this};
         im_ref im{*this};
@@ -1687,15 +1698,8 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
 inline complex complex_pow_impl(T &&a, const U &c)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // U is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c)));
     tmp.set(c);
 
     return complex_pow_impl(std::forward<T>(a), tmp);
@@ -1718,15 +1722,8 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_cv_complex_interoperable<T>, is_cvr_complex<U>>::value, int> = 0>
 inline complex complex_pow_impl(const T &a, U &&c)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // U is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(real_deduce_precision(a.real()), c.get_prec()));
+    tmp.set_prec(c_max(real_deduce_precision(a), c.get_prec()));
     tmp.set(a);
 
     return complex_pow_impl(tmp, std::forward<U>(c));
@@ -1736,14 +1733,7 @@ inline complex complex_pow_impl(const T &a, U &&c)
 template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
 inline complex complex_pow_impl(const real &x, const T &c)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // T is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
-    const auto p = c_max(x.get_prec(), real_deduce_precision(c.real()));
+    const auto p = c_max(x.get_prec(), real_deduce_precision(c));
 
     MPPP_MAYBE_TLS complex tmp1, tmp2;
 
@@ -1760,14 +1750,7 @@ inline complex complex_pow_impl(const real &x, const T &c)
 template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
 inline complex complex_pow_impl(const T &c, const real &x)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // T is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
-    const auto p = c_max(x.get_prec(), real_deduce_precision(c.real()));
+    const auto p = c_max(x.get_prec(), real_deduce_precision(c));
 
     MPPP_MAYBE_TLS complex tmp1, tmp2;
 
@@ -1990,15 +1973,8 @@ inline complex dispatch_complex_binary_add(T &&a, const U &c)
 {
     // NOTE: same precision-handling scheme as in the
     // complex-real valued overload.
-    // NOTE: here we are taking advantage of the fact that
-    // U is either std::complex<T> or complex128, for which
-    // the precision deduction rules are the same as for T
-    // and real128 (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     const auto a_prec = a.get_prec();
-    const auto c_prec = real_deduce_precision(c.real());
+    const auto c_prec = real_deduce_precision(c);
     auto ret = (a_prec >= c_prec) ? complex{std::forward<T>(a)} : complex{a, complex_prec_t(c_prec)};
 
     {
@@ -2288,7 +2264,7 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_sub(T &&a, const U &c)
 {
     const auto a_prec = a.get_prec();
-    const auto c_prec = real_deduce_precision(c.real());
+    const auto c_prec = real_deduce_precision(c);
     auto ret = (a_prec >= c_prec) ? complex{std::forward<T>(a)} : complex{a, complex_prec_t(c_prec)};
 
     {
@@ -2553,15 +2529,8 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
 inline complex dispatch_complex_binary_mul(T &&a, const U &c)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // U is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c)));
     tmp.set(c);
 
     return std::forward<T>(a) * tmp;
@@ -2677,15 +2646,8 @@ inline void dispatch_complex_in_place_mul(complex &a, const T &n)
 template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
 inline void dispatch_complex_in_place_mul(complex &a, const T &c)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // T is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c)));
     tmp.set(c);
 
     dispatch_complex_in_place_mul(a, tmp);
@@ -2840,15 +2802,8 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
 inline complex dispatch_complex_binary_div(T &&a, const U &c)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // U is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c)));
     tmp.set(c);
 
     return dispatch_complex_binary_div(std::forward<T>(a), tmp);
@@ -2859,15 +2814,8 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_cv_complex_interoperable<U>>::value, int> = 0>
 inline complex dispatch_complex_binary_div(const U &c, T &&a)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // U is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c)));
     tmp.set(c);
 
     return dispatch_complex_binary_div(tmp, std::forward<T>(a));
@@ -2877,16 +2825,9 @@ inline complex dispatch_complex_binary_div(const U &c, T &&a)
 template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
 inline complex dispatch_complex_binary_div(const real &x, const T &c)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // U is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     MPPP_MAYBE_TLS complex tmp1, tmp2;
 
-    const auto p = c_max(x.get_prec(), real_deduce_precision(c.real()));
+    const auto p = c_max(x.get_prec(), real_deduce_precision(c));
 
     tmp1.set_prec(p);
     tmp1.set(x);
@@ -2979,15 +2920,8 @@ MPPP_DLL_PUBLIC void dispatch_complex_in_place_div(complex &, bool);
 template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
 inline void dispatch_complex_in_place_div(complex &a, const T &c)
 {
-    // NOTE: here we are taking advantage of the fact that
-    // T is either std::complex or complex128, for which
-    // the precision deduction rules are the same as for
-    // the underlying real value type (i.e., compile-time constant independent
-    // of the actual value). If in the future we will have other
-    // complex types (e.g., Gaussian rationals) we will have
-    // to update this.
     MPPP_MAYBE_TLS complex tmp;
-    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c.real())));
+    tmp.set_prec(c_max(a.get_prec(), real_deduce_precision(c)));
     tmp.set(c);
 
     dispatch_complex_in_place_div(a, tmp);
