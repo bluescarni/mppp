@@ -333,6 +333,14 @@ endif()
 # on some platforms (see the comment below).
 find_package(mp++_GMP REQUIRED)
 
+# Check support for certain GMP functions.
+include(CheckSymbolExists)
+set(CMAKE_REQUIRED_INCLUDES "${MPPP_GMP_INCLUDE_DIR}")
+set(CMAKE_REQUIRED_LIBRARIES "${MPPP_GMP_LIBRARY}")
+check_symbol_exists(mpn_divexact_1 "gmp.h" MPPP_GMP_HAVE_MPN_DIVEXACT_1)
+unset(CMAKE_REQUIRED_INCLUDES)
+unset(CMAKE_REQUIRED_LIBRARIES)
+
 # Optional dependency on MPC.
 if(MPPP_WITH_MPC)
     find_package(mp++_MPC REQUIRED)
@@ -343,6 +351,17 @@ endif()
 # Optional dependency on MPFR.
 if(MPPP_WITH_MPFR)
     find_package(mp++_MPFR REQUIRED)
+
+    # Check support for certain MPFR functions.
+    set(CMAKE_REQUIRED_INCLUDES "${MPPP_MPFR_INCLUDE_DIR}")
+    set(CMAKE_REQUIRED_LIBRARIES "${MPPP_MPFR_LIBRARY}")
+    check_symbol_exists(mpfr_get_q "mpfr.h" MPPP_MPFR_HAVE_MPFR_GET_Q)
+    check_symbol_exists(mpfr_rootn_ui "mpfr.h" MPPP_MPFR_HAVE_MPFR_ROOTN_UI)
+    check_symbol_exists(mpfr_gamma_inc "mpfr.h" MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
+    check_symbol_exists(mpfr_beta "mpfr.h" MPPP_MPFR_HAVE_MPFR_BETA)
+    unset(CMAKE_REQUIRED_INCLUDES)
+    unset(CMAKE_REQUIRED_LIBRARIES)
+
     target_link_libraries(mp++ PUBLIC mp++::MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
@@ -351,6 +370,14 @@ endif()
 if(MPPP_WITH_ARB)
     find_package(mp++_FLINT REQUIRED)
     find_package(mp++_Arb REQUIRED)
+
+    # Check support for certain Arb functions.
+    set(CMAKE_REQUIRED_INCLUDES "${MPPP_ARB_INCLUDE_DIR}")
+    set(CMAKE_REQUIRED_LIBRARIES "${MPPP_ARB_LIBRARY}")
+    check_symbol_exists(acb_agm "acb.h" MPPP_ARB_HAVE_ACB_AGM)
+    unset(CMAKE_REQUIRED_INCLUDES)
+    unset(CMAKE_REQUIRED_LIBRARIES)
+
     target_link_libraries(mp++ PRIVATE mp++::Arb mp++::FLINT)
     set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
 endif()

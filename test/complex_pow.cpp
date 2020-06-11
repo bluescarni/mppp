@@ -116,7 +116,7 @@ TEST_CASE("pow")
         REQUIRE(mppp::pow(c1, c2) == 16);
         REQUIRE(mppp::pow(c1, c2).get_prec() == detail::real_deduce_precision(4));
 
-        c2 = complex{2, complex_prec_t(1)};
+        c2 = complex{2, complex_prec_t(2)};
         REQUIRE(mppp::pow(c1, c2) == 16);
         REQUIRE(mppp::pow(c1, c2).get_prec() == detail::real_deduce_precision(4));
 
@@ -148,7 +148,7 @@ TEST_CASE("pow")
         REQUIRE(mppp::pow(c, r) == 16);
         REQUIRE(mppp::pow(c, r).get_prec() == detail::real_deduce_precision(4));
 
-        r = real{2, 1};
+        r = real{2, 2};
         REQUIRE(mppp::pow(c, r) == 16);
         REQUIRE(mppp::pow(c, r).get_prec() == detail::real_deduce_precision(4));
 
@@ -470,24 +470,24 @@ TEST_CASE("pow")
         REQUIRE(std::is_same<complex, decltype(mppp::pow(c, x))>::value);
         REQUIRE(mppp::pow(c, x) == 16);
         REQUIRE(mppp::pow(c, x).get_prec()
-                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(x.real())));
+                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(x)));
 
         c = complex{4, complex_prec_t(real_prec_min())};
         REQUIRE(mppp::pow(c, x) == 16);
-        REQUIRE(mppp::pow(c, x).get_prec() == detail::real_deduce_precision(x.real()));
+        REQUIRE(mppp::pow(c, x).get_prec() == detail::real_deduce_precision(x));
 
         // Check moves.
-        c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) + 1)};
+        c = complex{4, complex_prec_t(detail::real_deduce_precision(x) + 1)};
         auto ret = mppp::pow(std::move(c), x);
         REQUIRE(ret == 16);
-        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()) + 1);
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x) + 1);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
-        c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) - 1)};
+        c = complex{4, complex_prec_t(detail::real_deduce_precision(x) - 1)};
         ret = mppp::pow(std::move(c), x);
         REQUIRE(ret == 16);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
-        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()));
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x));
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
@@ -499,23 +499,23 @@ TEST_CASE("pow")
         REQUIRE(std::is_same<complex, decltype(mppp::pow(c, x))>::value);
         REQUIRE(mppp::pow(c, x) == 16);
         REQUIRE(mppp::pow(c, x).get_prec()
-                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(x.real())));
+                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(x)));
 
         c = complex{4, complex_prec_t(real_prec_min())};
         REQUIRE(mppp::pow(c, x) == 16);
-        REQUIRE(mppp::pow(c, x).get_prec() == detail::real_deduce_precision(x.real()));
+        REQUIRE(mppp::pow(c, x).get_prec() == detail::real_deduce_precision(x));
 
         // Check moves.
-        c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) + 1)};
+        c = complex{4, complex_prec_t(detail::real_deduce_precision(x) + 1)};
         auto ret = mppp::pow(std::move(c), x);
         REQUIRE(ret == 16);
-        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()) + 1);
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x) + 1);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
-        c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) - 1)};
+        c = complex{4, complex_prec_t(detail::real_deduce_precision(x) - 1)};
         ret = mppp::pow(std::move(c), x);
         REQUIRE(ret == 16);
-        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()));
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x));
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
@@ -555,23 +555,23 @@ TEST_CASE("pow")
         REQUIRE(std::is_same<complex, decltype(mppp::pow(x, c))>::value);
         REQUIRE(mppp::pow(x, c) == 16);
         REQUIRE(mppp::pow(x, c).get_prec()
-                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(x.real())));
+                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(x)));
 
         c = complex{4, complex_prec_t(real_prec_min())};
         REQUIRE(mppp::pow(x, c) == 16);
-        REQUIRE(mppp::pow(x, c).get_prec() == detail::real_deduce_precision(x.real()));
+        REQUIRE(mppp::pow(x, c).get_prec() == detail::real_deduce_precision(x));
 
         // Check moves.
-        c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) + 1)};
+        c = complex{4, complex_prec_t(detail::real_deduce_precision(x) + 1)};
         auto ret = mppp::pow(x, std::move(c));
         REQUIRE(ret == 16);
-        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()) + 1);
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x) + 1);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c.is_valid());
-        c = complex{4, complex_prec_t(detail::real_deduce_precision(x.real()) - 1)};
+        c = complex{4, complex_prec_t(detail::real_deduce_precision(x) - 1)};
         ret = mppp::pow(x, std::move(c));
         REQUIRE(ret == 16);
-        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x.real()));
+        REQUIRE(ret.get_prec() == detail::real_deduce_precision(x));
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
     }
@@ -583,11 +583,11 @@ TEST_CASE("pow")
         REQUIRE(std::is_same<complex, decltype(mppp::pow(r, c))>::value);
         REQUIRE(mppp::pow(r, c) == 64);
         REQUIRE(mppp::pow(r, c).get_prec()
-                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(c.real())));
+                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(c)));
 
         r = real{4, real_prec_min()};
         REQUIRE(mppp::pow(r, c) == 64);
-        REQUIRE(mppp::pow(r, c).get_prec() == detail::real_deduce_precision(c.real()));
+        REQUIRE(mppp::pow(r, c).get_prec() == detail::real_deduce_precision(c));
     }
 
     // complex valued-real.
@@ -597,10 +597,10 @@ TEST_CASE("pow")
         REQUIRE(std::is_same<complex, decltype(mppp::pow(c, r))>::value);
         REQUIRE(mppp::pow(c, r) == 81);
         REQUIRE(mppp::pow(c, r).get_prec()
-                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(c.real())));
+                == std::max<mpfr_prec_t>(detail::real_deduce_precision(4), detail::real_deduce_precision(c)));
 
         r = real{4, real_prec_min()};
         REQUIRE(mppp::pow(c, r) == 81);
-        REQUIRE(mppp::pow(c, r).get_prec() == detail::real_deduce_precision(c.real()));
+        REQUIRE(mppp::pow(c, r).get_prec() == detail::real_deduce_precision(c));
     }
 }

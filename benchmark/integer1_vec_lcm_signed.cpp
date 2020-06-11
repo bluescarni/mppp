@@ -6,11 +6,19 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <algorithm>
+#include <cstdint>
 #include <random>
-#include <tuple>
 #include <utility>
 #include <vector>
+
+#if MPPP_CPLUSPLUS >= 201703L
+
+#include <numeric>
+
+#endif
 
 #if defined(MPPP_BENCHMARK_BOOST)
 
@@ -29,9 +37,13 @@
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 
-#include <mp++/config.hpp>
-#include <mp++/detail/gmp.hpp>
 #include <mp++/integer.hpp>
+
+#if defined(MPPP_BENCHMARK_BOOST)
+
+#include <mp++/detail/gmp.hpp>
+
+#endif
 
 #include "utils.hpp"
 
@@ -50,17 +62,20 @@ std::mt19937 rng;
 constexpr auto size = 30000000ul;
 
 template <typename T>
-std::tuple<std::vector<T>, std::vector<unsigned>, std::vector<T>> get_init_vectors()
+std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_init_vectors()
 {
-    rng.seed(45);
-    std::uniform_int_distribution<unsigned> dist(1u, 10u);
-    std::uniform_int_distribution<int> sign(0, 1);
-    std::vector<T> v1(size), v3(size);
-    std::vector<unsigned> v2(size);
-    std::generate(v1.begin(), v1.end(), [&dist, &sign]() {
-        return static_cast<T>(T(static_cast<int>(dist(rng)) * (sign(rng) ? 1 : -1)) << GMP_NUMB_BITS);
-    });
-    std::generate(v2.begin(), v2.end(), [&dist]() { return dist(rng); });
+    rng.seed(1);
+    std::uniform_int_distribution<int> dist(1, 10), sign(0, 1);
+    std::vector<T> v1(size), v2(size), v3(size);
+    auto mult_rng = [&dist, &sign](unsigned n) -> T {
+        T retval(dist(rng));
+        for (auto i = 1u; i < n; ++i) {
+            retval *= dist(rng);
+        }
+        return static_cast<T>(retval * (sign(rng) ? 1 : -1));
+    };
+    std::generate(v1.begin(), v1.end(), [&mult_rng]() { return mult_rng(8); });
+    std::generate(v2.begin(), v2.end(), [&mult_rng]() { return mult_rng(8); });
     return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));
 }
 
@@ -79,34 +94,40 @@ int main()
     mppp_benchmark::data_t bdata;
 
     {
-        auto p = get_init_vectors<mppp::integer<2>>();
-        constexpr auto name = "mppp::integer<2>";
+        auto p = get_init_vectors<mppp::integer<1>>();
+        constexpr auto name = "mppp::integer<1>";
+
+        mppp::integer<1> ret(0);
 
         mppp_benchmark::simple_timer st;
 
         for (auto i = 0ul; i < size; ++i) {
-            mul_2exp(std::get<2>(p)[i], std::get<0>(p)[i], std::get<1>(p)[i]);
+            lcm(std::get<2>(p)[i], std::get<0>(p)[i], std::get<1>(p)[i]);
+            ret += std::get<2>(p)[i];
         }
 
         const auto runtime = st.elapsed();
         bdata.emplace_back(name, runtime);
-        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::get<2>(p)[size - 1u]);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, ret);
     }
 
-#if defined(MPPP_HAVE_GCC_INT128)
+#if MPPP_CPLUSPLUS >= 201703L
     {
-        auto p = get_init_vectors<__int128_t>();
-        constexpr auto name = "__int128_t";
+        auto p = get_init_vectors<std::int_least64_t>();
+        constexpr auto name = "std::int64_t";
+
+        std::int_least64_t ret = 0;
 
         mppp_benchmark::simple_timer st;
 
         for (auto i = 0ul; i < size; ++i) {
-            std::get<2>(p)[i] = std::get<0>(p)[i] << std::get<1>(p)[i];
+            std::get<2>(p)[i] = std::lcm(std::get<0>(p)[i], std::get<1>(p)[i]);
+            ret += std::get<2>(p)[i];
         }
 
         const auto runtime = st.elapsed();
         bdata.emplace_back(name, runtime);
-        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::get<2>(p)[size - 1u]);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, ret);
     }
 #endif
 
@@ -115,30 +136,37 @@ int main()
         auto p = get_init_vectors<cpp_int>();
         constexpr auto name = "boost::cpp_int";
 
+        cpp_int ret = 0;
+
         mppp_benchmark::simple_timer st;
 
         for (auto i = 0ul; i < size; ++i) {
-            std::get<2>(p)[i] = std::get<0>(p)[i] << std::get<1>(p)[i];
+            std::get<2>(p)[i] = lcm(std::get<0>(p)[i], std::get<1>(p)[i]);
+            ret += std::get<2>(p)[i];
         }
 
         const auto runtime = st.elapsed();
         bdata.emplace_back(name, runtime);
-        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::get<2>(p)[size - 1u]);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, ret);
     }
 
     {
         auto p = get_init_vectors<mpz_int>();
         constexpr auto name = "boost::gmp_int";
 
+        mpz_int ret = 0;
+
         mppp_benchmark::simple_timer st;
 
         for (auto i = 0ul; i < size; ++i) {
-            ::mpz_mul_2exp(std::get<2>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(), std::get<1>(p)[i]);
+            ::mpz_lcm(std::get<2>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
+                      std::get<1>(p)[i].backend().data());
+            ::mpz_add(ret.backend().data(), ret.backend().data(), std::get<2>(p)[i].backend().data());
         }
 
         const auto runtime = st.elapsed();
         bdata.emplace_back(name, runtime);
-        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::get<2>(p)[size - 1u]);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, ret);
     }
 #endif
 
@@ -147,15 +175,19 @@ int main()
         auto p = get_init_vectors<flint::fmpzxx>();
         constexpr auto name = "flint::fmpzxx";
 
+        flint::fmpzxx ret(0);
+
         mppp_benchmark::simple_timer st;
 
         for (auto i = 0ul; i < size; ++i) {
-            ::fmpz_mul_2exp(std::get<2>(p)[i]._data().inner, std::get<0>(p)[i]._data().inner, std::get<1>(p)[i]);
+            ::fmpz_lcm(std::get<2>(p)[i]._data().inner, std::get<0>(p)[i]._data().inner,
+                       std::get<1>(p)[i]._data().inner);
+            ::fmpz_add(ret._data().inner, ret._data().inner, std::get<2>(p)[i]._data().inner);
         }
 
         const auto runtime = st.elapsed();
         bdata.emplace_back(name, runtime);
-        fmt::print(mppp_benchmark::res_print_format, name, runtime, std::get<2>(p)[size - 1u]);
+        fmt::print(mppp_benchmark::res_print_format, name, runtime, ret);
     }
 #endif
 

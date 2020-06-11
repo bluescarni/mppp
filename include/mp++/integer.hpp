@@ -4748,8 +4748,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
         q._mp_size = 0;
         return;
     }
-#if __GNU_MP_VERSION > 6 || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR >= 1)
-    // NOTE: mpn_divexact_1() is available since GMP 6.1.0.
+#if defined(MPPP_GMP_HAVE_MPN_DIVEXACT_1)
     if (asize2 == 1) {
         // Optimisation in case the dividend has only 1 limb.
         // NOTE: overlapping arguments are fine here.
@@ -6208,6 +6207,144 @@ inline integer<SSize> gcd(const integer<SSize> &op1, const integer<SSize> &op2)
     integer<SSize> retval;
     gcd(retval, op1, op2);
     return retval;
+}
+
+namespace detail
+{
+
+// The general-purpose implementation of ternary LCM.
+template <std::size_t SSize>
+inline void integer_ternary_lcm_generic(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    // Temporary working variable.
+    MPPP_MAYBE_TLS integer<SSize> g;
+
+    // rop = (abs(op1) / gcd(op1, op2)) * abs(op2).
+    gcd(g, op1, op2);
+    divexact_gcd(g, op1, g);
+    mul(g, g, op2);
+    abs(rop, g);
+}
+
+template <std::size_t SSize>
+inline void integer_ternary_lcm_impl(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer_ternary_lcm_generic(rop, op1, op2);
+}
+
+inline void integer_ternary_lcm_impl(integer<1> &rop, const integer<1> &op1, const integer<1> &op2)
+{
+    if (mppp_likely(op1.is_static() && op2.is_static())) {
+        // NOTE: the idea here is that if both op1 and op2
+        // are static, we can use static integer primitives
+        // directly in parts of the algorithm, thus avoiding
+        // branching wrt the general-purpose primitives.
+        integer<1> g;
+
+        auto &g_st = g._get_union().g_st();
+        const auto &op1_st = op1._get_union().g_st();
+        const auto &op2_st = op2._get_union().g_st();
+
+        // Use the static primitives for the first two
+        // steps, as we are sure that no overflow
+        // is possible.
+        static_gcd(g_st, op1_st, op2_st);
+        static_divexact_gcd(g_st, op1_st, g_st);
+
+        // Switch to the general-purpose multiplication,
+        // as the result could overflow.
+        // NOTE: perhaps using the static mul primitive
+        // here could help us squeeze a bit extra performance,
+        // at the price of duplicating the overflow handling
+        // logic. Keep in mind for the future.
+        mul(rop, g, op2);
+        // Turn rop into abs(rop).
+        // NOTE: this is always safe to do because
+        // rop will consist of at most 2 limbs.
+        rop._get_union().m_st._mp_size = std::abs(rop._get_union().m_st._mp_size);
+    } else {
+        // op1/op2 are not both statics. Run
+        // the general-purpose implementation.
+        integer_ternary_lcm_generic(rop, op1, op2);
+    }
+}
+
+} // namespace detail
+
+// LCM (ternary version).
+template <std::size_t SSize>
+inline integer<SSize> &lcm(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    // Handle the special case lcm(0, 0) == 0.
+    if (mppp_unlikely(op1.is_zero() && op2.is_zero())) {
+        rop.set_zero();
+    } else {
+        detail::integer_ternary_lcm_impl(rop, op1, op2);
+    }
+
+    return rop;
+}
+
+namespace detail
+{
+
+// The general-purpose implementation of binary LCM.
+template <std::size_t SSize>
+inline integer<SSize> integer_binary_lcm_generic(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    // retval = (abs(op1) / gcd(op1, op2)) * abs(op2).
+    auto retval = gcd(op1, op2);
+    divexact_gcd(retval, op1, retval);
+    mul(retval, retval, op2);
+    abs(retval, retval);
+
+    return retval;
+}
+
+template <std::size_t SSize>
+inline integer<SSize> integer_binary_lcm_impl(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    return integer_binary_lcm_generic(op1, op2);
+}
+
+inline integer<1> integer_binary_lcm_impl(const integer<1> &op1, const integer<1> &op2)
+{
+    if (mppp_likely(op1.is_static() && op2.is_static())) {
+        integer<1> retval;
+
+        auto &r_st = retval._get_union().g_st();
+        const auto &op1_st = op1._get_union().g_st();
+        const auto &op2_st = op2._get_union().g_st();
+
+        static_gcd(r_st, op1_st, op2_st);
+        static_divexact_gcd(r_st, op1_st, r_st);
+
+        mul(retval, retval, op2);
+        // Turn retval into abs(retval).
+        // NOTE: this is always safe to do because
+        // rop will consist of at most 2 limbs.
+        retval._get_union().m_st._mp_size = std::abs(retval._get_union().m_st._mp_size);
+
+        return retval;
+    } else {
+        return integer_binary_lcm_generic(op1, op2);
+    }
+}
+
+} // namespace detail
+
+// LCM (binary version).
+// NOTE: don't implement on top of the ternary primitives, a custom
+// implementation avoids the creation of an unnecessary temporary.
+template <std::size_t SSize>
+inline integer<SSize> lcm(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    // Handle the special case lcm(0, 0) == 0.
+    if (mppp_unlikely(op1.is_zero() && op2.is_zero())) {
+        return integer<SSize>{};
+    } else {
+        return detail::integer_binary_lcm_impl(op1, op2);
+    }
 }
 
 // Factorial.

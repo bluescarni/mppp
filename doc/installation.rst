@@ -28,12 +28,15 @@ mp++ has the following dependencies:
   of the :cpp:class:`~mppp::complex` class;
 * the `Arb <http://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
   used in the implementation of additional special functions for the
-  :cpp:class:`~mppp::real` and :cpp:class:`~mppp::complex` classes;
+  :cpp:class:`~mppp::real` and :cpp:class:`~mppp::complex` classes, and in the benchmarking
+  suite;
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
   in the implementation of the :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128` classes
   (typically, the quadmath library is part of GCC and it does not need to
   be installed separately);
 * the `Boost <https://www.boost.org/>`__ libraries, *optional*, currently used
+  only in the benchmarking suite;
+* the `{fmt} <https://fmt.dev/latest/index.html>`__ library (at least version 6.2), *optional*, currently used
   only in the benchmarking suite.
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when

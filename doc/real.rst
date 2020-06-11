@@ -1635,8 +1635,7 @@ Roots
    .. note::
 
       This function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled
-      (see the :ref:`installation instructions <installation>`).
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Binary :cpp:class:`~mppp::real` sqrt1pm1.
 
@@ -1659,8 +1658,7 @@ Roots
    .. note::
 
       This function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled
-      (see the :ref:`installation instructions <installation>`).
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Unary :cpp:class:`~mppp::real` sqrt1pm1.
 
@@ -1839,8 +1837,7 @@ Trigonometry
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled
-      (see the :ref:`installation instructions <installation>`).
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Binary basic trigonometric functions.
 
@@ -1892,8 +1889,7 @@ Trigonometry
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled
-      (see the :ref:`installation instructions <installation>`).
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Unary basic trigonometric functions.
 
@@ -2171,8 +2167,7 @@ Logarithms and exponentials
    .. note::
 
       This function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled
-      (see the :ref:`installation instructions <installation>`).
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Ternary log hypot function.
 
@@ -2195,8 +2190,7 @@ Logarithms and exponentials
    .. note::
 
       This function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled
-      (see the :ref:`installation instructions <installation>`).
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Binary log hypot function.
 
@@ -2390,8 +2384,7 @@ Bessel functions
    .. note::
 
       These functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled
-      (see the :ref:`installation instructions <installation>`).
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Bessel functions of the first and second kind of real order.
 
@@ -2419,8 +2412,7 @@ Bessel functions
    .. note::
 
       These functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled
-      (see the :ref:`installation instructions <installation>`).
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Bessel functions of the first and second kind of real order.
 

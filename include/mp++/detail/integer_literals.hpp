@@ -243,7 +243,7 @@ inline integer<SSize> integer_literal_impl()
     // NOTE: earlier clang versions won't properly
     // capture arr in the lambdas below if it is
     // not marked as static.
-#if defined(__clang__) && __clang_major__ <= 5
+#if defined(__clang__) && (defined(__apple_build_version__) || __clang_major__ <= 5)
     static
 #endif
         constexpr char arr[]

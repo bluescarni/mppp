@@ -32,10 +32,6 @@ if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
         conda_pkgs="$conda_pkgs pip"
     fi
 
-    if [[ "${MPPP_BUILD}" == ReleaseGCC48 ]]; then
-        conda_pkgs="$conda_pkgs boost-cpp"
-    fi
-
     conda create -q -p $deps_dir -y $conda_pkgs
     source activate $deps_dir
 fi
