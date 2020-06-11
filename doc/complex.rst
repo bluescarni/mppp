@@ -763,7 +763,7 @@ The complex class
       Arithmetic-geometric mean.
 
       This member function will set ``this`` to
-      :math:`M\left( z \right) = \operatorname{agm}\left( 1, z \right)`,
+      :math:`\operatorname{agm}\left( 1, z \right)`,
       where :math:`z` is the current value of ``this``.
 
       :return: a reference to ``this``.
