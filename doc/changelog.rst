@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement all the MPFR constants in the :cpp:class:`~mppp::real`
+  API
+  (`#252 <https://github.com/bluescarni/mppp/pull/252>`__).
 - Add the :cpp:class:`~mppp::integer` LCM primitives
   (`#247 <https://github.com/bluescarni/mppp/pull/247>`__).
 - Additional special functions for :cpp:class:`~mppp::complex`
