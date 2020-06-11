@@ -92,6 +92,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#trigonometry">Trigonometry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#hyperbolic-functions">Hyperbolic functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#arithmetic-geometric-mean">Arithmetic-geometric mean</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
 </ul>
 </li>
@@ -1082,6 +1083,28 @@ fails because of (unlikely) overflow conditions.</dd>
 <p>where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7complex4agm1Ev">
+<span id="_CPPv3N4mppp7complex4agm1Ev"></span><span id="_CPPv2N4mppp7complex4agm1Ev"></span><span id="mppp::complex::agm1"></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descname">agm1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7complex4agm1Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Arithmetic-geometric mean.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to
+<span class="math notranslate nohighlight">\(\operatorname{agm}\left( 1, z \right)\)</span>,
+where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</dd>
 </dl>
 </dd></dl>
 
@@ -2425,6 +2448,89 @@ precision of <em>op</em>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>z</strong> – the argument.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">the result of the operation.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="arithmetic-geometric-mean">
+<h3>Arithmetic-geometric mean<a class="headerlink" href="#arithmetic-geometric-mean" title="Permalink to this headline">¶</a></h3>
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERN4mppp7complexERR1T">
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">agm1</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERN4mppp7complexERR1T" title="mppp::agm1::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3agmERN4mppp7complexERN4mppp7complexERR1TRR1U">
+<span id="_CPPv3I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3agmERN4mppp7complexERR1TRR1U"></span><span id="_CPPv2I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3agmERN4mppp7complexERR1TRR1U"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">agm</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3agmERN4mppp7complexERN4mppp7complexERR1TRR1U" title="mppp::agm::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3agmERN4mppp7complexERN4mppp7complexERR1TRR1U" title="mppp::agm::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3agmERN4mppp7complexERN4mppp7complexERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>These functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">agm()</span></code> function is available only from
+Arb 2.18 onwards.</p>
+</div>
+<p><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> AGM functions.</p>
+<p>These functions will set <em>rop</em> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\operatorname{agm}\left( 1, x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{agm}\left( x, y \right)\)</span>.</li>
+</ul>
+<p>The precision of <em>rop</em> will be set to the largest precision among the operands.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>x</strong> – the first operand.</li>
+<li><strong>y</strong> – the second operand.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1EN4mppp7complexERR1T">
+<span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4agm1ERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4agm1ERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex">cvr_complex</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">agm1</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1EN4mppp7complexERR1T" title="mppp::agm1::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1EN4mppp7complexERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp16complex_op_typesI1TEEEN4mppp3agmEN4mppp7complexERR1TRR1U">
+<span id="_CPPv3I0_N4mppp16complex_op_typesI1TEEEN4mppp3agmERR1TRR1U"></span><span id="_CPPv2I0_N4mppp16complex_op_typesI1TEEEN4mppp3agmERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16complex_op_typesE" title="mppp::complex_op_types">complex_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16complex_op_typesI1TEEEN4mppp3agmEN4mppp7complexERR1TRR1U" title="mppp::agm::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex">complex</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">agm</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp16complex_op_typesI1TEEEN4mppp3agmEN4mppp7complexERR1TRR1U" title="mppp::agm::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp16complex_op_typesI1TEEEN4mppp3agmEN4mppp7complexERR1TRR1U" title="mppp::agm::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16complex_op_typesI1TEEEN4mppp3agmEN4mppp7complexERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>These functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">agm()</span></code> function is available only from
+Arb 2.18 onwards.</p>
+</div>
+<p><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> AGM functions.</p>
+<p>These functions will return, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\operatorname{agm}\left( 1, x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{agm}\left( x, y \right)\)</span>.</li>
+</ul>
+<p>The precision of the result will be equal to the highest precision
+among the operands.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the first operand.</li>
+<li><strong>y</strong> – the second operand.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the result of the operation.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPC types
+fails because of (unlikely) overflow conditions.</p>
+</dd>
 </dl>
 </dd></dl>
 
