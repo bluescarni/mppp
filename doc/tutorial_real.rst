@@ -82,7 +82,7 @@ Let's see a few examples:
    assert(x2.nan_p());
 
 The constructors from string currently always require the
-precision to be passed explicitly (this restriction might
+precision to be passed explicitly (this restriction may
 be lifted in the future):
 
 .. code-block:: c++
@@ -193,7 +193,7 @@ Let's see a few concrete examples:
                                     // precision (because 32 > 4).
    assert(x2.get_prec() == 32);
 
-   auto x3 = pow(x3, 0.5);          // The deduced precision of the literal '0.5' is the
+   auto x3 = pow(x2, 0.5);          // The deduced precision of the literal '0.5' is the
                                     // bit width of the significand of the 'double' type
                                     // (typically 53). Hence, the exponentiation will be
                                     // performed with 53 bits of precision (because 53 > 32).
@@ -233,14 +233,12 @@ This is the evaluation of the polynomial of degree 6
 
 for some :cpp:class:`~mppp::real` :math:`x` via
 `Horner's method <https://en.wikipedia.org/wiki/Horner%27s_method>`__.
-Because every :cpp:class:`~mppp::real` object requires dynamic memory allocation,
-the creation of the array of polynomial coefficients ``a`` incurs in
-7 memory allocations which cannot be prevented. The interesting bit
-in the snippet above is the expression in the return statement:
+The polynomial coefficients are stored in the array ``a``.
+Let's focus on the expression in the return statement:
 
 .. code-block:: c++
 
-   (((((a[6] * x + a[5]) * x + a[4]) * x + a[3]) * x + a[2]) * x + a[1]) * x + a[0];
+   (((((a[6] * x + a[5]) * x + a[4]) * x + a[3]) * x + a[2]) * x + a[1]) * x + a[0]
 
 Due to the way operators are parsed in the C++ language,
 this expression is decomposed in multiple subexpressions,
@@ -283,3 +281,106 @@ API are *move-aware*. This means that the real API is able to detect
 when a :cpp:class:`~mppp::real` argument is a temporary (technically,
 an *rvalue*) and it is able to re-use the memory provided by such
 a temporary to construct the result of the operation.
+
+For instance, consider the subexpression:
+
+.. code-block:: c++
+
+   a[6] * x + a[5]
+
+Here the multiplication ``a[6] * x`` produces a new :cpp:class:`~mppp::real`, which
+is then added to ``a[5]``. The binary addition operator of :cpp:class:`~mppp::real`
+recognises that the first argument is an rvalue, and accordingly it will use the
+memory provided by the result of ``a[6] * x`` to create the result of the full
+subexpression, thus avoiding an unnecessary memory allocation.
+
+The end result is that in the expression
+
+.. code-block:: c++
+
+   (((((a[6] * x + a[5]) * x + a[4]) * x + a[3]) * x + a[2]) * x + a[1]) * x + a[0]
+
+only a **single** memory allocation is performed, instead of 12.
+
+Moreover, it turns out that in this specific case it is even possible to elide that
+last memory allocation. Observe that in the expression above, the only memory
+allocation originates from the first subexpression encountered by the compiler, that is:
+
+.. code-block:: c++
+
+   a[6] * x
+
+In this subexpression there are no rvalues whose memory can be pilfered. However, we can notice how the variable
+``a[6]`` from the coefficient array is never used again in the rest of the ``horner_6()``
+function. We can then "cast" ``a[6]`` to an rvalue via the ``std::move()`` utility function:
+
+.. code-block:: c++
+
+   std::move(a[6]) * x
+
+Now the memory necessary to represent the result of the multiplication will be "stolen" from
+``a[6]``. We have thus avoided the last remaining memory allocation.
+
+.. warning::
+
+   Extreme care must be taken when using manually ``std::move()`` on a :cpp:class:`~mppp::real`
+   object. Only a very narrow set of operations is valid on a moved-from :cpp:class:`~mppp::real`
+   (see the documentation of the move constructor), and any other operation will result
+   in undefined behaviour.
+
+   Generally speaking, use-after-move is considered a pattern to
+   avoid in modern C++. Static analysis tools such as `clang-tidy <https://clang.llvm.org/extra/clang-tidy/>`__
+   are very effective at detecting use-after-move occurrences in source code.
+
+It is important to emphasise how move-awareness in the :cpp:class:`~mppp::real` API is not
+limited to mathematical operators: all functions accepting one or more :cpp:class:`~mppp::real`
+objects as input arguments are move-aware.
+
+Special functions
+-----------------
+
+One of the design goals of the :cpp:class:`~mppp::real` class is to provide a
+comprehensive library of special functions. :cpp:class:`~mppp::real` currently
+wraps all the special functions provided by the MPFR library, including:
+
+* roots and exponentiation,
+* (inverse) trigonometric functions,
+* (inverse) hyperbolic functions,
+* logarithms and exponentials,
+* Gamma functions,
+* Bessel functions,
+* error functions,
+
+and more. Additionally, :cpp:class:`~mppp::real` can also use
+the `Arb <http://arblib.org/>`__ library to provide additional special functions
+not available in MPFR.
+
+Constants
+---------
+
+Comparisons
+-----------
+
+Interacting with the MPFR API
+-----------------------------
+
+Because :cpp:class:`~mppp::real` internally stores an :cpp:type:`mpfr_t`
+instance, it is trivial to use a :cpp:class:`~mppp::real` in the MPFR API.
+Two member functions are provided for direct access to the internal
+:cpp:type:`mpfr_t` instance:
+
+* :cpp:func:`mppp::real::get_mpfr_t()`, which returns a ``const`` :cpp:type:`mpfr_t`,
+* :cpp:func:`mppp::real::_get_mpfr_t()`, which returns a mutable :cpp:type:`mpfr_t`.
+
+When using :cpp:func:`mppp::real::_get_mpfr_t()`, it is the user's responsibility to ensure
+that the internal :cpp:type:`mpfr_t` is kept in a state which respects the invariants
+of the :cpp:class:`~mppp::real` class. Specifically, the precision value
+must be in the bounds established by :cpp:func:`mppp::real_prec_min()` and
+:cpp:func:`mppp::real_prec_max()`, and, upon destruction, a :cpp:class:`~mppp::real`
+object must contain a valid :cpp:type:`mpfr_t` object.
+
+Additionally, a variety of constructors, assignment operators and setters from
+:cpp:type:`mpfr_t` are also available.
+
+User-defined literals
+---------------------
