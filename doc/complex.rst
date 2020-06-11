@@ -751,6 +751,26 @@ The complex class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: complex &agm1()
+
+      .. versionadded:: 0.21
+
+      .. note::
+
+         This function is available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
+
+      Arithmetic-geometric mean.
+
+      This member function will set ``this`` to
+      :math:`\operatorname{agm}\left( 1, z \right)`,
+      where :math:`z` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+        fails because of (unlikely) overflow conditions.
+
 Types
 -----
 
@@ -1690,6 +1710,71 @@ Logarithms and exponentials
    :param z: the argument.
 
    :return: the result of the operation.
+
+Arithmetic-geometric mean
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::agm1(mppp::complex &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_complex T, mppp::cvr_complex U> mppp::complex &mppp::agm(mppp::complex &rop, T &&x, U &&y)
+
+   .. versionadded:: 0.21
+
+   .. note::
+
+      These functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
+
+      The ``agm()`` function is available only from
+      Arb 2.18 onwards.
+
+   :cpp:class:`~mppp::complex` AGM functions.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`\operatorname{agm}\left( 1, x \right)`,
+   * :math:`\operatorname{agm}\left( x, y \right)`.
+
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
+
+.. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::agm1(T &&x)
+.. cpp:function:: template <typename T, mppp::complex_op_types<T> U> mppp::complex mppp::agm(T &&x, U &&y)
+
+   .. versionadded:: 0.21
+
+   .. note::
+
+      These functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
+
+      The ``agm()`` function is available only from
+      Arb 2.18 onwards.
+
+   :cpp:class:`~mppp::complex` AGM functions.
+
+   These functions will return, respectively:
+
+   * :math:`\operatorname{agm}\left( 1, x \right)`,
+   * :math:`\operatorname{agm}\left( x, y \right)`.
+
+   The precision of the result will be equal to the highest precision
+   among the operands.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the result of the operation.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+     fails because of (unlikely) overflow conditions.
 
 Input/Output
 ~~~~~~~~~~~~

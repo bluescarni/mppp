@@ -207,6 +207,10 @@ if(MPPP_WITH_MPC)
   ADD_MPPP_TESTCASE(complex_hyper)
   ADD_MPPP_TESTCASE(complex_literals)
   ADD_MPPP_TESTCASE(complex_io)
+
+  if(MPPP_WITH_ARB)
+    ADD_MPPP_TESTCASE(complex_agm)
+  endif()
 endif()
 
 if(MPPP_TEST_PYBIND11)
