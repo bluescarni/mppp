@@ -7,12 +7,14 @@ Changelog
 New
 ~~~
 
-- Implement all the MPFR constants in the :cpp:class:`~mppp::real`
-  API
+- Add a tutorial for :cpp:class:`~mppp::real`
+  (`#252 <https://github.com/bluescarni/mppp/pull/252>`__).
+- Expose all the constants provided by MPFR in the
+  :cpp:class:`~mppp::real` API
   (`#252 <https://github.com/bluescarni/mppp/pull/252>`__).
 - Add the :cpp:class:`~mppp::integer` LCM primitives
   (`#247 <https://github.com/bluescarni/mppp/pull/247>`__).
-- Additional special functions for :cpp:class:`~mppp::complex`
+- Implement additional special functions for :cpp:class:`~mppp::complex`
   (inverse, reciprocal square root, n-th root, AGM)
   (`#250 <https://github.com/bluescarni/mppp/pull/250>`__,
   `#246 <https://github.com/bluescarni/mppp/pull/246>`__).

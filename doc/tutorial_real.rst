@@ -75,6 +75,7 @@ Let's see a few examples:
    // of the value '42'.
    x2.prec_round(4);
    assert(x2.get_prec() == 4);
+   assert(x2 == real{42, 4});
 
    // Destructively extend the precision of x2
    // to 1024 bits. The value will be set to NaN.
@@ -351,20 +352,86 @@ wraps all the special functions provided by the MPFR library, including:
 * Bessel functions,
 * error functions,
 
-and more. Additionally, :cpp:class:`~mppp::real` can also use
+and many more. Additionally, :cpp:class:`~mppp::real` can also (optionally) use
 the `Arb <http://arblib.org/>`__ library to provide additional special functions
 not available in MPFR.
 
 Constants
 ---------
 
+The MPFR API provides the ability to compute a handful of
+constants in arbitrary precision. This capability is
+:ref:`exposed <real_constants>`
+in the :cpp:class:`~mppp::real` API. Here's an example
+with the :math:`\pi` constant:
+
+.. code-block:: c++
+
+   real r0 = real_pi(42);        // r0 is the 42-bit approximation of pi,
+                                 // that is, 3.14159265359012.
+
+   real r1{real_kind::zero, 10}; // Init a real zero with 10 bits of precision.
+
+   real_pi(r1);                  // r1 is now set to the 10-bit approximation of
+                                 // pi, that is, 3.1406.
+
 Comparisons
 -----------
+
+In addition to the :ref:`common comparison operators <tutorial_commonops>`
+available for all of mp++'s multiprecision classes,
+:cpp:class:`~mppp::real` supports additional comparison functions.
+
+For instance, it is possible to detect special :cpp:class:`~mppp::real` values:
+
+.. code-block:: c++
+
+   // Check that default construction
+   // initialises to zero.
+   real r0;
+   assert(r0.zero_p());
+
+   // Detection of non-finite values.
+   real r1{"inf", 42};
+   assert(r1.inf_p());
+   real r2{"nan", 42};
+   assert(r2.nan_p());
+
+   // Check if a real is an exact
+   // integral value.
+   real r3{3};
+   assert(r3.integer_p());
+
+:cpp:class:`~mppp::real` values can be compared by absolute value:
+
+.. code-block:: c++
+
+   assert(cmpabs(real{1}, real{-1}) == 0); // |1| == |-1|.
+   assert(cmpabs(real{-2}, real{1}) > 0);  // |-2| > |1|.
+   assert(cmpabs(real{0}, real{-1}) < 0);  // |0| < |-1|.
+
+And they can also be compared efficiently to integral multiples
+of powers of 2:
+
+.. code-block:: c++
+
+   assert(cmp_ui_2exp(real{50}, 3, 4) > 0); // 50 > 3*2**4.
+
+The :cpp:class:`~mppp::real` API also provides comparison
+functions that handle NaN values in a special way. Specifically,
+these functions consider all NaN values equal to each other
+and greater than non-NaN values:
+
+.. code-block:: c++
+
+   assert(real_equal_to(real{"nan", 10}, real{"nan", 20})); // NaN == NaN.
+   assert(real_gt(real{"nan", 10}, real{100}));             // NaN > 100.
+   assert(real_lt(real{"inf", 20}, real{"nan", 10}));       // inf < NaN.
 
 Interacting with the MPFR API
 -----------------------------
 
-Because :cpp:class:`~mppp::real` internally stores an :cpp:type:`mpfr_t`
+Because :cpp:class:`~mppp::real` wraps an :cpp:type:`mpfr_t`
 instance, it is trivial to use a :cpp:class:`~mppp::real` in the MPFR API.
 Two member functions are provided for direct access to the internal
 :cpp:type:`mpfr_t` instance:
@@ -384,3 +451,27 @@ Additionally, a variety of constructors, assignment operators and setters from
 
 User-defined literals
 ---------------------
+
+User-defined literals are available for :cpp:class:`~mppp::real`.
+The :ref:`literals <real_literals>`
+are defined within
+the inline namespace ``mppp::literals``, they support
+decimal and hexadecimal representations, and they currently
+allow to construct :cpp:class:`~mppp::real` instances
+with 128, 256, 512 and 1024 bits of precision:
+
+.. code-block:: c++
+
+   using namespace mppp::literals;
+
+   auto r1 = 123.456_r128;   // r1 contains the 128-bit
+                             // approximation of 123.456 (that is,
+                             // 123.45599999999999999999999999999999999988).
+
+   auto r2 = 4.2e1_r256;     // Scientific notation can be used.
+
+   auto r3 = 0x1.12p-1_r512; // Hexadecimal floats are supported too.
+
+.. seealso::
+
+   https://en.cppreference.com/w/cpp/language/floating_literal
