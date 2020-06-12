@@ -385,7 +385,7 @@ endif()
 # Optional dependency on quadmath.
 if(MPPP_WITH_QUADMATH)
     include(CheckTypeSize)
-    set(CMAKE_REQUIRED_FLAGS ${MPPP_CXX_FLAGS_RELEASE})
+    set(CMAKE_REQUIRED_FLAGS "-mcpu=power9")
     check_type_size(__float128 _MPPP_FLOAT128_EXISTS BUILTIN_TYPES_ONLY LANGUAGE CXX)
     unset(CMAKE_REQUIRED_FLAGS)
     if(NOT _MPPP_FLOAT128_EXISTS)
