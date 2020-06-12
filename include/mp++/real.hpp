@@ -154,11 +154,14 @@ MPPP_DLL_PUBLIC void real_lgamma_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t)
 // Wrapper for calling mpfr_li2().
 MPPP_DLL_PUBLIC void real_li2_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t);
 
-// Wrappers for calling integer and remainder-related functions.
+// Wrappers for calling integer and remainder-related functions
+// with NaN checking.
 MPPP_DLL_PUBLIC void real_ceil_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void real_floor_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void real_round_wrapper(::mpfr_t, const ::mpfr_t);
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
 MPPP_DLL_PUBLIC void real_roundeven_wrapper(::mpfr_t, const ::mpfr_t);
+#endif
 MPPP_DLL_PUBLIC void real_trunc_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void real_frac_wrapper(::mpfr_t, const ::mpfr_t);
 
@@ -1202,7 +1205,9 @@ public:
     real &ceil();
     real &floor();
     real &round();
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
     real &roundeven();
+#endif
     real &trunc();
     real &frac();
 
@@ -2333,7 +2338,9 @@ MPPP_REAL_MPFR_BINARY_IMPL(agm, ::mpfr_agm, true)
 MPPP_REAL_MPFR_UNARY_IMPL(ceil, detail::real_ceil_wrapper, false)
 MPPP_REAL_MPFR_UNARY_IMPL(floor, detail::real_floor_wrapper, false)
 MPPP_REAL_MPFR_UNARY_IMPL(round, detail::real_round_wrapper, false)
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
 MPPP_REAL_MPFR_UNARY_IMPL(roundeven, detail::real_roundeven_wrapper, false)
+#endif
 MPPP_REAL_MPFR_UNARY_IMPL(trunc, detail::real_trunc_wrapper, false)
 MPPP_REAL_MPFR_UNARY_IMPL(frac, detail::real_frac_wrapper, false)
 
@@ -2354,7 +2361,7 @@ inline void modf(real &iop, real &fop, T &&op)
             "In the real modf() function, the return values 'iop' and 'fop' must be distinct objects");
     }
     if (mppp_unlikely(op.nan_p())) {
-        throw std::domain_error("In the real modf() function, input argument cannot be NaN");
+        throw std::domain_error("In the real modf() function, the input argument cannot be NaN");
     }
 
     // Set the precision of iop and fop to the

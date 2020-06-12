@@ -109,7 +109,8 @@ void real_li2_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd)
     }
 }
 
-// Wrappers for calling integer and remainder-related functions.
+// Wrappers for calling integer and remainder-related functions
+// with NaN checking.
 void real_ceil_wrapper(::mpfr_t rop, const ::mpfr_t op)
 {
     if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
@@ -137,6 +138,8 @@ void real_round_wrapper(::mpfr_t rop, const ::mpfr_t op)
     ::mpfr_round(rop, op);
 }
 
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+
 void real_roundeven_wrapper(::mpfr_t rop, const ::mpfr_t op)
 {
     if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
@@ -145,6 +148,8 @@ void real_roundeven_wrapper(::mpfr_t rop, const ::mpfr_t op)
 
     ::mpfr_roundeven(rop, op);
 }
+
+#endif
 
 void real_trunc_wrapper(::mpfr_t rop, const ::mpfr_t op)
 {
@@ -1080,10 +1085,14 @@ real &real::round()
     return self_mpfr_unary_nornd(detail::real_round_wrapper);
 }
 
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+
 real &real::roundeven()
 {
     return self_mpfr_unary_nornd(detail::real_roundeven_wrapper);
 }
+
+#endif
 
 real &real::trunc()
 {

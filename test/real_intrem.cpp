@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
 
@@ -304,6 +305,8 @@ TEST_CASE("real round")
     REQUIRE(round(real{"-2.5", 20}) == -3);
 }
 
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+
 TEST_CASE("real roundeven")
 {
     real r0{0};
@@ -382,6 +385,8 @@ TEST_CASE("real roundeven")
     REQUIRE(roundeven(real{"-2.5", 20}) == -2);
 }
 
+#endif
+
 TEST_CASE("real frac")
 {
     real r0{0};
@@ -458,7 +463,7 @@ TEST_CASE("real modf")
                        "In the real modf() function, the return values 'iop' and 'fop' must be distinct objects"};
         });
     REQUIRE_THROWS_PREDICATE(modf(iop, fop, real{"nan", 10}), std::domain_error, [](const std::domain_error &ex) {
-        return ex.what() == std::string{"In the real modf() function, input argument cannot be NaN"};
+        return ex.what() == std::string{"In the real modf() function, the input argument cannot be NaN"};
     });
 
     // Try with overlapping op/sop and op/cop.

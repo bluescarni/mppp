@@ -360,6 +360,7 @@ if(MPPP_WITH_MPFR)
     check_symbol_exists(mpfr_rootn_ui "mpfr.h" MPPP_MPFR_HAVE_MPFR_ROOTN_UI)
     check_symbol_exists(mpfr_gamma_inc "mpfr.h" MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
     check_symbol_exists(mpfr_beta "mpfr.h" MPPP_MPFR_HAVE_MPFR_BETA)
+    check_symbol_exists(mpfr_roundeven "mpfr.h" MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
     unset(CMAKE_REQUIRED_INCLUDES)
     unset(CMAKE_REQUIRED_LIBRARIES)
 
