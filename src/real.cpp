@@ -109,7 +109,43 @@ void real_li2_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd)
     }
 }
 
-// Wrapper for calling mpfr_trunc().
+// Wrappers for calling integer and remainder-related functions.
+void real_ceil_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot compute the ceiling of a NaN value");
+    }
+
+    ::mpfr_ceil(rop, op);
+}
+
+void real_floor_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot compute the floor of a NaN value");
+    }
+
+    ::mpfr_floor(rop, op);
+}
+
+void real_round_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot round a NaN value");
+    }
+
+    ::mpfr_round(rop, op);
+}
+
+void real_roundeven_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot round a NaN value");
+    }
+
+    ::mpfr_roundeven(rop, op);
+}
+
 void real_trunc_wrapper(::mpfr_t rop, const ::mpfr_t op)
 {
     if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
@@ -117,6 +153,15 @@ void real_trunc_wrapper(::mpfr_t rop, const ::mpfr_t op)
     }
 
     ::mpfr_trunc(rop, op);
+}
+
+void real_frac_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot compute the fractional part of a NaN value");
+    }
+
+    ::mpfr_frac(rop, op, MPFR_RNDN);
 }
 
 void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
@@ -1019,10 +1064,35 @@ bool real::integer_p() const
     return ::mpfr_integer_p(&m_mpfr) != 0;
 }
 
-// In-place truncation.
+// In-place integer and remainder-related functions.
+real &real::ceil()
+{
+    return self_mpfr_unary_nornd(detail::real_ceil_wrapper);
+}
+
+real &real::floor()
+{
+    return self_mpfr_unary_nornd(detail::real_floor_wrapper);
+}
+
+real &real::round()
+{
+    return self_mpfr_unary_nornd(detail::real_round_wrapper);
+}
+
+real &real::roundeven()
+{
+    return self_mpfr_unary_nornd(detail::real_roundeven_wrapper);
+}
+
 real &real::trunc()
 {
     return self_mpfr_unary_nornd(detail::real_trunc_wrapper);
+}
+
+real &real::frac()
+{
+    return self_mpfr_unary_nornd(detail::real_frac_wrapper);
 }
 
 // Set to n*2**e.
