@@ -154,8 +154,16 @@ MPPP_DLL_PUBLIC void real_lgamma_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t)
 // Wrapper for calling mpfr_li2().
 MPPP_DLL_PUBLIC void real_li2_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t);
 
-// A small helper to check the input of the trunc() overloads.
-MPPP_DLL_PUBLIC void real_check_trunc_arg(const real &);
+// Wrappers for calling integer and remainder-related functions
+// with NaN checking.
+MPPP_DLL_PUBLIC void real_ceil_wrapper(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void real_floor_wrapper(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void real_round_wrapper(::mpfr_t, const ::mpfr_t);
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+MPPP_DLL_PUBLIC void real_roundeven_wrapper(::mpfr_t, const ::mpfr_t);
+#endif
+MPPP_DLL_PUBLIC void real_trunc_wrapper(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void real_frac_wrapper(::mpfr_t, const ::mpfr_t);
 
 #if defined(MPPP_WITH_ARB)
 
@@ -1193,8 +1201,15 @@ public:
     // In-place Airy function.
     real &ai();
 
-    // In-place truncation.
+    // In-place integer and remainder-related functions.
+    real &ceil();
+    real &floor();
+    real &round();
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+    real &roundeven();
+#endif
     real &trunc();
+    real &frac();
 
 private:
     mpfr_struct_t m_mpfr;
@@ -2319,6 +2334,51 @@ MPPP_REAL_MPFR_BINARY_IMPL(log_hypot, detail::arb_log_hypot, false)
 // agm.
 MPPP_REAL_MPFR_BINARY_IMPL(agm, ::mpfr_agm, true)
 
+// Integer and remainder-related functions.
+MPPP_REAL_MPFR_UNARY_IMPL(ceil, detail::real_ceil_wrapper, false)
+MPPP_REAL_MPFR_UNARY_IMPL(floor, detail::real_floor_wrapper, false)
+MPPP_REAL_MPFR_UNARY_IMPL(round, detail::real_round_wrapper, false)
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+MPPP_REAL_MPFR_UNARY_IMPL(roundeven, detail::real_roundeven_wrapper, false)
+#endif
+MPPP_REAL_MPFR_UNARY_IMPL(trunc, detail::real_trunc_wrapper, false)
+MPPP_REAL_MPFR_UNARY_IMPL(frac, detail::real_frac_wrapper, false)
+
+// modf.
+// NOTE: we don't have the machinery to steal resources
+// for multiple retvals, thus we do a manual implementation
+// of this function. We keep the signature with cvr_real
+// for consistency with the other functions.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline void modf(real &iop, real &fop, T &&op)
+{
+    if (mppp_unlikely(&iop == &fop)) {
+        throw std::invalid_argument(
+            "In the real modf() function, the return values 'iop' and 'fop' must be distinct objects");
+    }
+    if (mppp_unlikely(op.nan_p())) {
+        throw std::domain_error("In the real modf() function, the input argument cannot be NaN");
+    }
+
+    // Set the precision of iop and fop to the
+    // precision of op.
+    const auto op_prec = op.get_prec();
+    // NOTE: use prec_round() to avoid issues in case
+    // iop/fop overlap with op.
+    iop.prec_round(op_prec);
+    fop.prec_round(op_prec);
+
+    // Run the mpfr function.
+    ::mpfr_modf(iop._get_mpfr_t(), fop._get_mpfr_t(), op.get_mpfr_t(), MPFR_RNDN);
+}
+
+MPPP_REAL_MPFR_BINARY_IMPL(fmod, ::mpfr_fmod, true)
+MPPP_REAL_MPFR_BINARY_IMPL(remainder, ::mpfr_remainder, true)
+
 #undef MPPP_REAL_MPFR_UNARY_HEADER
 #undef MPPP_REAL_MPFR_UNARY_IMPL
 #undef MPPP_REAL_MPFR_BINARY_HEADER1
@@ -2337,30 +2397,6 @@ MPPP_DLL_PUBLIC real real_euler(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_euler(real &);
 MPPP_DLL_PUBLIC real real_catalan(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_catalan(real &);
-
-// Binary truncation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &trunc(real &rop, T &&op)
-{
-    detail::real_check_trunc_arg(op);
-    return detail::mpfr_nary_op_impl<false>(0, ::mpfr_trunc, rop, std::forward<T>(op));
-}
-
-// Unary truncation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real trunc(T &&r)
-{
-    detail::real_check_trunc_arg(r);
-    return detail::mpfr_nary_op_return_impl<false>(0, ::mpfr_trunc, std::forward<T>(r));
-}
 
 // Identity operator.
 #if defined(MPPP_HAVE_CONCEPTS)

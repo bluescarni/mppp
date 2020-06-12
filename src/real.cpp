@@ -109,12 +109,64 @@ void real_li2_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd)
     }
 }
 
-// A small helper to check the input of the trunc() overloads.
-void real_check_trunc_arg(const real &r)
+// Wrappers for calling integer and remainder-related functions
+// with NaN checking.
+void real_ceil_wrapper(::mpfr_t rop, const ::mpfr_t op)
 {
-    if (mppp_unlikely(r.nan_p())) {
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot compute the ceiling of a NaN value");
+    }
+
+    ::mpfr_ceil(rop, op);
+}
+
+void real_floor_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot compute the floor of a NaN value");
+    }
+
+    ::mpfr_floor(rop, op);
+}
+
+void real_round_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot round a NaN value");
+    }
+
+    ::mpfr_round(rop, op);
+}
+
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+
+void real_roundeven_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot round a NaN value");
+    }
+
+    ::mpfr_roundeven(rop, op);
+}
+
+#endif
+
+void real_trunc_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
         throw std::domain_error("Cannot truncate a NaN value");
     }
+
+    ::mpfr_trunc(rop, op);
+}
+
+void real_frac_wrapper(::mpfr_t rop, const ::mpfr_t op)
+{
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
+        throw std::domain_error("Cannot compute the fractional part of a NaN value");
+    }
+
+    ::mpfr_frac(rop, op, MPFR_RNDN);
 }
 
 void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
@@ -1017,11 +1069,39 @@ bool real::integer_p() const
     return ::mpfr_integer_p(&m_mpfr) != 0;
 }
 
-// In-place truncation.
+// In-place integer and remainder-related functions.
+real &real::ceil()
+{
+    return self_mpfr_unary_nornd(detail::real_ceil_wrapper);
+}
+
+real &real::floor()
+{
+    return self_mpfr_unary_nornd(detail::real_floor_wrapper);
+}
+
+real &real::round()
+{
+    return self_mpfr_unary_nornd(detail::real_round_wrapper);
+}
+
+#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+
+real &real::roundeven()
+{
+    return self_mpfr_unary_nornd(detail::real_roundeven_wrapper);
+}
+
+#endif
+
 real &real::trunc()
 {
-    detail::real_check_trunc_arg(*this);
-    return self_mpfr_unary_nornd(::mpfr_trunc);
+    return self_mpfr_unary_nornd(detail::real_trunc_wrapper);
+}
+
+real &real::frac()
+{
+    return self_mpfr_unary_nornd(detail::real_frac_wrapper);
 }
 
 // Set to n*2**e.
