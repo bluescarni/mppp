@@ -2767,25 +2767,49 @@ Constants
 ---------
 
 .. cpp:function:: mppp::real mppp::real_pi(mpfr_prec_t p)
+.. cpp:function:: mppp::real mppp::real_log2(mpfr_prec_t p)
+.. cpp:function:: mppp::real mppp::real_euler(mpfr_prec_t p)
+.. cpp:function:: mppp::real mppp::real_catalan(mpfr_prec_t p)
 
-   :math:`\pi` constant.
+   These functions will return, respectively:
 
-   This function will return a :cpp:class:`~mppp::real` :math:`\pi`
+   * the :math:`\pi` constant,
+   * the :math:`\log 2` constant,
+   * the Euler-Mascheroni constant (0.577…),
+   * Catalan's constant (0.915…),
+
    with a precision of *p*.
+
+   .. versionadded:: 0.21
+
+      The ``real_log2()``, ``real_euler()`` and ``real_catalan()``
+      functions.
 
    :param p: the desired precision.
 
-   :return: an approximation of :math:`\pi`.
+   :return: an approximation of a constant.
 
    :exception std\:\:invalid_argument: if *p* is outside the range established by
      :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
 .. cpp:function:: mppp::real &mppp::real_pi(mppp::real &rop)
+.. cpp:function:: mppp::real &mppp::real_log2(mppp::real &rop)
+.. cpp:function:: mppp::real &mppp::real_euler(mppp::real &rop)
+.. cpp:function:: mppp::real &mppp::real_catalan(mppp::real &rop)
 
-   Set to :math:`\pi`.
+   These functions will set *rop* to, respectively:
 
-   This function will set *rop* to :math:`\pi`. The precision
-   of *rop* will not be altered.
+   * the :math:`\pi` constant,
+   * the :math:`\log 2` constant,
+   * the Euler-Mascheroni constant (0.577…),
+   * Catalan's constant (0.915…).
+
+   The precision of *rop* will not be altered.
+
+   .. versionadded:: 0.21
+
+      The ``real_log2()``, ``real_euler()`` and ``real_catalan()``
+      functions.
 
    :param rop: the return value.
 

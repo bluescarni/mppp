@@ -4058,12 +4058,36 @@ specially are available.</p>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7real_piE11mpfr_prec_t">
 <span id="_CPPv3N4mppp7real_piE11mpfr_prec_t"></span><span id="_CPPv2N4mppp7real_piE11mpfr_prec_t"></span><span id="mppp::real_pi__mpfr_prec_t"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_pi</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real_piE11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p><span class="math notranslate nohighlight">\(\pi\)</span> constant.</p>
-<p>This function will return a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> <span class="math notranslate nohighlight">\(\pi\)</span>
-with a precision of <em>p</em>.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp9real_log2E11mpfr_prec_t">
+<span id="_CPPv3N4mppp9real_log2E11mpfr_prec_t"></span><span id="_CPPv2N4mppp9real_log2E11mpfr_prec_t"></span><span id="mppp::real_log2__mpfr_prec_t"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_log2</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp9real_log2E11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp10real_eulerE11mpfr_prec_t">
+<span id="_CPPv3N4mppp10real_eulerE11mpfr_prec_t"></span><span id="_CPPv2N4mppp10real_eulerE11mpfr_prec_t"></span><span id="mppp::real_euler__mpfr_prec_t"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_euler</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp10real_eulerE11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp12real_catalanE11mpfr_prec_t">
+<span id="_CPPv3N4mppp12real_catalanE11mpfr_prec_t"></span><span id="_CPPv2N4mppp12real_catalanE11mpfr_prec_t"></span><span id="mppp::real_catalan__mpfr_prec_t"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_catalan</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp12real_catalanE11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>These functions will return, respectively:</p>
+<ul class="simple">
+<li>the <span class="math notranslate nohighlight">\(\pi\)</span> constant,</li>
+<li>the <span class="math notranslate nohighlight">\(\log 2\)</span> constant,</li>
+<li>the Euler-Mascheroni constant (0.577…),</li>
+<li>Catalan’s constant (0.915…),</li>
+</ul>
+<p>with a precision of <em>p</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">real_log2()</span></code>, <code class="docutils literal notranslate"><span class="pre">real_euler()</span></code> and <code class="docutils literal notranslate"><span class="pre">real_catalan()</span></code>
+functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>p</strong> – the desired precision.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body">an approximation of <span class="math notranslate nohighlight">\(\pi\)</span>.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">an approximation of a constant.</dd>
 <dt class="field-name">Throws</dt><dd class="field-body"><strong>std::invalid_argument</strong> – if <em>p</em> is outside the range established by
 <a class="reference internal" href="#_CPPv4N4mppp13real_prec_minEv" title="mppp::real_prec_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_min()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp13real_prec_maxEv" title="mppp::real_prec_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_max()</span></code></a>.</dd>
 </dl>
@@ -4072,9 +4096,33 @@ with a precision of <em>p</em>.</p>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7real_piERN4mppp4realE">
 <span id="_CPPv3N4mppp7real_piERN4mppp4realE"></span><span id="_CPPv2N4mppp7real_piERN4mppp4realE"></span><span id="mppp::real_pi__mppp::realR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_pi</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real_piERN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Set to <span class="math notranslate nohighlight">\(\pi\)</span>.</p>
-<p>This function will set <em>rop</em> to <span class="math notranslate nohighlight">\(\pi\)</span>. The precision
-of <em>rop</em> will not be altered.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp9real_log2ERN4mppp4realE">
+<span id="_CPPv3N4mppp9real_log2ERN4mppp4realE"></span><span id="_CPPv2N4mppp9real_log2ERN4mppp4realE"></span><span id="mppp::real_log2__mppp::realR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_log2</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp9real_log2ERN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp10real_eulerERN4mppp4realE">
+<span id="_CPPv3N4mppp10real_eulerERN4mppp4realE"></span><span id="_CPPv2N4mppp10real_eulerERN4mppp4realE"></span><span id="mppp::real_euler__mppp::realR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_euler</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp10real_eulerERN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp12real_catalanERN4mppp4realE">
+<span id="_CPPv3N4mppp12real_catalanERN4mppp4realE"></span><span id="_CPPv2N4mppp12real_catalanERN4mppp4realE"></span><span id="mppp::real_catalan__mppp::realR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">real_catalan</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp12real_catalanERN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>These functions will set <em>rop</em> to, respectively:</p>
+<ul class="simple">
+<li>the <span class="math notranslate nohighlight">\(\pi\)</span> constant,</li>
+<li>the <span class="math notranslate nohighlight">\(\log 2\)</span> constant,</li>
+<li>the Euler-Mascheroni constant (0.577…),</li>
+<li>Catalan’s constant (0.915…).</li>
+</ul>
+<p>The precision of <em>rop</em> will not be altered.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">real_log2()</span></code>, <code class="docutils literal notranslate"><span class="pre">real_euler()</span></code> and <code class="docutils literal notranslate"><span class="pre">real_catalan()</span></code>
+functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>rop</strong> – the return value.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <em>rop</em>.</dd>
