@@ -154,8 +154,8 @@ MPPP_DLL_PUBLIC void real_lgamma_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t)
 // Wrapper for calling mpfr_li2().
 MPPP_DLL_PUBLIC void real_li2_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t);
 
-// A small helper to check the input of the trunc() overloads.
-MPPP_DLL_PUBLIC void real_check_trunc_arg(const real &);
+// Wrapper for calling mpfr_trunc().
+MPPP_DLL_PUBLIC void real_trunc_wrapper(::mpfr_t, const ::mpfr_t);
 
 #if defined(MPPP_WITH_ARB)
 
@@ -2319,6 +2319,9 @@ MPPP_REAL_MPFR_BINARY_IMPL(log_hypot, detail::arb_log_hypot, false)
 // agm.
 MPPP_REAL_MPFR_BINARY_IMPL(agm, ::mpfr_agm, true)
 
+// Truncation.
+MPPP_REAL_MPFR_UNARY_IMPL(trunc, detail::real_trunc_wrapper, false)
+
 #undef MPPP_REAL_MPFR_UNARY_HEADER
 #undef MPPP_REAL_MPFR_UNARY_IMPL
 #undef MPPP_REAL_MPFR_BINARY_HEADER1
@@ -2337,30 +2340,6 @@ MPPP_DLL_PUBLIC real real_euler(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_euler(real &);
 MPPP_DLL_PUBLIC real real_catalan(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_catalan(real &);
-
-// Binary truncation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &trunc(real &rop, T &&op)
-{
-    detail::real_check_trunc_arg(op);
-    return detail::mpfr_nary_op_impl<false>(0, ::mpfr_trunc, rop, std::forward<T>(op));
-}
-
-// Unary truncation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real trunc(T &&r)
-{
-    detail::real_check_trunc_arg(r);
-    return detail::mpfr_nary_op_return_impl<false>(0, ::mpfr_trunc, std::forward<T>(r));
-}
 
 // Identity operator.
 #if defined(MPPP_HAVE_CONCEPTS)

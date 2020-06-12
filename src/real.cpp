@@ -109,12 +109,14 @@ void real_li2_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd)
     }
 }
 
-// A small helper to check the input of the trunc() overloads.
-void real_check_trunc_arg(const real &r)
+// Wrapper for calling mpfr_trunc().
+void real_trunc_wrapper(::mpfr_t rop, const ::mpfr_t op)
 {
-    if (mppp_unlikely(r.nan_p())) {
+    if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
         throw std::domain_error("Cannot truncate a NaN value");
     }
+
+    ::mpfr_trunc(rop, op);
 }
 
 void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
@@ -1020,8 +1022,7 @@ bool real::integer_p() const
 // In-place truncation.
 real &real::trunc()
 {
-    detail::real_check_trunc_arg(*this);
-    return self_mpfr_unary_nornd(::mpfr_trunc);
+    return self_mpfr_unary_nornd(detail::real_trunc_wrapper);
 }
 
 // Set to n*2**e.
