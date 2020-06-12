@@ -2183,10 +2183,42 @@ real real_pi(::mpfr_prec_t p)
     return detail::real_constant(::mpfr_const_pi, p);
 }
 
-// Set to pi.
 real &real_pi(real &rop)
 {
     ::mpfr_const_pi(rop._get_mpfr_t(), MPFR_RNDN);
+    return rop;
+}
+
+real real_log2(::mpfr_prec_t p)
+{
+    return detail::real_constant(::mpfr_const_log2, p);
+}
+
+real &real_log2(real &rop)
+{
+    ::mpfr_const_log2(rop._get_mpfr_t(), MPFR_RNDN);
+    return rop;
+}
+
+real real_euler(::mpfr_prec_t p)
+{
+    return detail::real_constant(::mpfr_const_euler, p);
+}
+
+real &real_euler(real &rop)
+{
+    ::mpfr_const_euler(rop._get_mpfr_t(), MPFR_RNDN);
+    return rop;
+}
+
+real real_catalan(::mpfr_prec_t p)
+{
+    return detail::real_constant(::mpfr_const_catalan, p);
+}
+
+real &real_catalan(real &rop)
+{
+    ::mpfr_const_catalan(rop._get_mpfr_t(), MPFR_RNDN);
     return rop;
 }
 

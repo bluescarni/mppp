@@ -2331,6 +2331,12 @@ MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
 // Constants.
 MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_pi(real &);
+MPPP_DLL_PUBLIC real real_log2(::mpfr_prec_t);
+MPPP_DLL_PUBLIC real &real_log2(real &);
+MPPP_DLL_PUBLIC real real_euler(::mpfr_prec_t);
+MPPP_DLL_PUBLIC real &real_euler(real &);
+MPPP_DLL_PUBLIC real real_catalan(::mpfr_prec_t);
+MPPP_DLL_PUBLIC real &real_catalan(real &);
 
 // Binary truncation.
 #if defined(MPPP_HAVE_CONCEPTS)
