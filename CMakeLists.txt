@@ -17,6 +17,7 @@ project(mp++ VERSION 0.21 LANGUAGES CXX C)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
 message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "System processor: ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "mp++ version: ${mp++_VERSION}")
 
 include(YACMACompilerLinkerSettings)
