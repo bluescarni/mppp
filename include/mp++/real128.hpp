@@ -810,8 +810,9 @@ public:
     // In-place lgamma function.
     real128 &lgamma();
 
-    // In-place error function.
+    // In-place error functions.
     real128 &erf();
+    real128 &erfc();
 
     // Integer and remainder-related functions.
     real128 &ceil();
@@ -1099,11 +1100,9 @@ inline real128 lgamma(real128 x)
     return x.lgamma();
 }
 
-// Error function.
-inline real128 erf(real128 x)
-{
-    return x.erf();
-}
+// Error functions.
+MPPP_DLL_PUBLIC real128 erf(const real128 &);
+MPPP_DLL_PUBLIC real128 erfc(const real128 &);
 
 // Next real128 from 'from' to 'to'.
 MPPP_DLL_PUBLIC real128 nextafter(const real128 &, const real128 &);

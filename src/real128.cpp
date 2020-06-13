@@ -239,12 +239,6 @@ real128 &real128::lgamma()
     return *this = ::lgammaq(m_value);
 }
 
-// In-place error function.
-real128 &real128::erf()
-{
-    return *this = ::erfq(m_value);
-}
-
 // Decompose into a normalized fraction and an integral power of two.
 real128 frexp(const real128 &x, int *exp)
 {
@@ -312,6 +306,9 @@ MPPP_REAL128_IMPLEMENT_UNARY(nearbyint)
 MPPP_REAL128_IMPLEMENT_UNARY(rint)
 MPPP_REAL128_IMPLEMENT_UNARY(round)
 MPPP_REAL128_IMPLEMENT_UNARY(trunc)
+
+MPPP_REAL128_IMPLEMENT_UNARY(erf)
+MPPP_REAL128_IMPLEMENT_UNARY(erfc)
 
 #undef MPPP_REAL128_IMPLEMENT_UNARY
 

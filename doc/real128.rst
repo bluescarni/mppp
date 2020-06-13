@@ -517,11 +517,20 @@ The real128 class
       :return: a reference to ``this``.
 
    .. cpp:function:: real128 &erf()
+   .. cpp:function:: real128 &erfc()
 
-      In-place error function.
+      In-place error functions.
 
-      This member function will set ``this`` to :math:`\operatorname{erf}\left( x \right)`,
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\operatorname{erf}\left( x \right)`,
+      * :math:`\operatorname{erfc}\left( x \right)`,
+
       where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.21
+
+         The ``erfc()`` function.
 
       :return: a reference to ``this``.
 
@@ -994,12 +1003,22 @@ Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. cpp:function:: mppp::real128 mppp::erf(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::erfc(mppp::real128 x)
 
-   Error function.
+   Error functions.
+
+   These functions will return, respectively:
+
+   * :math:`\operatorname{erf}\left( x \right)`,
+   * :math:`\operatorname{erfc}\left( x \right)`.
+
+   .. versionadded:: 0.21
+
+      The ``erfc()`` function.
 
    :param x: the input value.
 
-   :return: :math:`\operatorname{erf}\left( x \right)`.
+   :return: the (complementary) error function of :math:`x`.
 
 .. _real128_fpmanip:
 
