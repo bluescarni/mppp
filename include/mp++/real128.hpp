@@ -83,7 +83,6 @@ union ieee_float128 {
 // we don't have to include quadmath.h here).
 MPPP_DLL_PUBLIC __float128 scalbnq(__float128, int);
 MPPP_DLL_PUBLIC __float128 scalblnq(__float128, long);
-MPPP_DLL_PUBLIC __float128 powq(__float128, __float128);
 MPPP_DLL_PUBLIC __float128 atan2q(__float128, __float128);
 
 // For internal use only.
@@ -965,30 +964,18 @@ MPPP_DLL_PUBLIC real128 hypot(const real128 &, const real128 &);
 namespace detail
 {
 
-MPPP_DLL_PUBLIC real128 dispatch_pow(const real128 &, const real128 &);
+MPPP_DLL_PUBLIC real128 dispatch_real128_pow(const real128 &, const real128 &);
 
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_pow(const real128 &x, const T &y)
+template <typename T>
+inline real128 dispatch_real128_pow(const real128 &x, const T &y)
 {
-    return real128{detail::powq(x.m_value, y)};
+    return dispatch_real128_pow(x, real128{y});
 }
 
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_pow(const T &x, const real128 &y)
+template <typename T>
+inline real128 dispatch_real128_pow(const T &x, const real128 &y)
 {
-    return real128{detail::powq(x, y.m_value)};
-}
-
-template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_pow(const real128 &x, const T &y)
-{
-    return dispatch_pow(x, real128{y});
-}
-
-template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_pow(const T &x, const real128 &y)
-{
-    return dispatch_pow(real128{x}, y);
+    return dispatch_real128_pow(real128{x}, y);
 }
 
 } // namespace detail
@@ -1002,7 +989,7 @@ template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>
 #endif
     inline real128 pow(const T &x, const U &y)
 {
-    return detail::dispatch_pow(x, y);
+    return detail::dispatch_real128_pow(x, y);
 }
 
 // Exponential function.

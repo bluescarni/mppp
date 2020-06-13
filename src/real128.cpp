@@ -89,11 +89,6 @@ __float128 scalblnq(__float128 x, long exp)
     return ::scalblnq(x, exp);
 }
 
-__float128 powq(__float128 x, __float128 y)
-{
-    return ::powq(x, y);
-}
-
 __float128 atan2q(__float128 y, __float128 x)
 {
     return ::atan2q(y, x);
@@ -289,9 +284,9 @@ std::ostream &operator<<(std::ostream &os, const real128 &x)
 namespace detail
 {
 
-real128 dispatch_pow(const real128 &x, const real128 &y)
+real128 dispatch_real128_pow(const real128 &x, const real128 &y)
 {
-    return real128{detail::powq(x.m_value, y.m_value)};
+    return real128{::powq(x.m_value, y.m_value)};
 }
 
 real128 dispatch_atan2(const real128 &y, const real128 &x)

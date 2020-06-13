@@ -69,8 +69,8 @@ TEST_CASE("real128 pow")
     REQUIRE(pow(__uint128_t{2}, real128{5}) == 32);
 #endif
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    REQUIRE(pow(real128{5}, 3.5l).m_value == detail::powq(5, 3.5l));
-    REQUIRE(pow(3.5l, real128{5}).m_value == detail::powq(3.5l, 5));
+    REQUIRE(abs(pow(real128{5}, 3.5l) - 279.508497187473712051146708591409519_rq) < 1E-30);
+    REQUIRE(abs(pow(3.5l, real128{5}) - 525.21875_rq) < 1E-30);
 #else
     REQUIRE(!detail::is_detected<pow_t, real128, long double>::value);
     REQUIRE(!detail::is_detected<pow_t, long double, real128>::value);
