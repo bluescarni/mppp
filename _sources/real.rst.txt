@@ -986,11 +986,34 @@ The real class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: real &ceil()
+   .. cpp:function:: real &floor()
+   .. cpp:function:: real &round()
+   .. cpp:function:: real &roundeven()
    .. cpp:function:: real &trunc()
+   .. cpp:function:: real &frac()
 
-      In-place truncation.
+      .. note::
 
-      This member function will set ``this`` to its truncated counterpart.
+         The ``roundeven()`` function is available from MPFR 4 onwards.
+
+      In-place integer and remainder-related functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\left\lceil x \right\rceil`,
+      * :math:`\left\lfloor x \right\rfloor`,
+      * *x* rounded to nearest (IEEE ``roundTiesToAway`` mode),
+      * *x* rounded to nearest (IEEE ``roundTiesToEven`` mode),
+      * :math:`\operatorname{trunc}\left( x \right)`,
+      * the fractional part of *x*,
+
+      where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.21
+
+         The ``ceil()``, ``floor()``, ``round()``, ``roundeven()`` and ``frac()``
+         functions.
 
       :return: a reference to ``this``.
 
@@ -2597,34 +2620,139 @@ Other special functions
 Integer and remainder related functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::trunc(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::ceil(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::floor(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::round(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::roundeven(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::trunc(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::frac(mppp::real &rop, T &&x)
 
-   Binary truncation.
+   .. note::
 
-   This function will truncate *op* and store the result
-   into *rop*. The precision of the result will be equal to the precision
-   of *op*.
+      The ``roundeven()`` function is available from MPFR 4 onwards.
+
+   Binary integer and remainder-related functions.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`\left\lceil x \right\rceil`,
+   * :math:`\left\lfloor x \right\rfloor`,
+   * *x* rounded to nearest (IEEE ``roundTiesToAway`` mode),
+   * *x* rounded to nearest (IEEE ``roundTiesToEven`` mode),
+   * :math:`\operatorname{trunc}\left( x \right)`,
+   * the fractional part of *x*.
+
+   The precision of the result will be equal to the precision
+   of *x*.
+
+   .. versionadded:: 0.21
+
+      The ``ceil()``, ``floor()``, ``round()``, ``roundeven()`` and ``frac()``
+      functions.
 
    :param rop: the return value.
-   :param op: the operand.
+   :param x: the operand.
 
    :return: a reference to *rop*.
 
+   :exception std\:\:domain_error: if *x* is NaN.
+
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::ceil(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::floor(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::round(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::roundeven(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::trunc(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::frac(T &&x)
+
+   .. note::
+
+      The ``roundeven()`` function is available from MPFR 4 onwards.
+
+   Unary integer and remainder-related functions.
+
+   These functions will return, respectively:
+
+   * :math:`\left\lceil x \right\rceil`,
+   * :math:`\left\lfloor x \right\rfloor`,
+   * *x* rounded to nearest (IEEE ``roundTiesToAway`` mode),
+   * *x* rounded to nearest (IEEE ``roundTiesToEven`` mode),
+   * :math:`\operatorname{trunc}\left( x \right)`,
+   * the fractional part of *x*.
+
+   The precision of the result will be equal to the precision
+   of *x*.
+
+   .. versionadded:: 0.21
+
+      The ``ceil()``, ``floor()``, ``round()``, ``roundeven()`` and ``frac()``
+      functions.
+
+   :param x: the operand.
+
+   :return: the result of the operation.
+
+   :exception std\:\:domain_error: if *x* is NaN.
+
+.. cpp:function:: template <mppp::cvr_real T> void mppp::modf(mppp::real &iop, mppp::real &fop, T &&op)
+
+   Simultaneous integral and fractional parts.
+
+   This function will set *iop* and *fop* respectively to the integral and
+   fractional parts of *op*.
+   *iop* and *fop* must be distinct objects. The precision of *iop* and *fop* will be set to the
+   precision of *op*.
+
+   :param iop: the integral part return value.
+   :param fop: the fractional part return value.
+   :param op: the operand.
+
+   :exception std\:\:invalid_argument: if *iop* and *fop* are the same object.
    :exception std\:\:domain_error: if *op* is NaN.
 
-.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::trunc(T &&r)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::fmod(mppp::real &rop, T &&x, U &&y)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::remainder(mppp::real &rop, T &&x, U &&y)
 
-   Unary truncation.
+   Ternary floating modulus and remainder.
 
-   This function will return the truncated counterpart of *r*.
-   The precision of the result will be equal to the precision
-   of *r*.
+   These functions will set *rop* to, respectively, the floating modulus and the remainder of the
+   division :math:`x/y`.
 
-   :param r: the operand.
+   The floating modulus is :math:`x - n\times y`, where :math:`n` is :math:`x/y` with its fractional part truncated.
 
-   :return: the truncated counterpart of *r*.
+   The remainder is :math:`x - m\times y`, where :math:`m` is the integral value nearest the exact value
+   :math:`x/y`.
 
-   :exception std\:\:domain_error: if *r* is NaN.
+   Special values are handled as described in the C99 standard.
+
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param x: the numerator.
+   :param y: the denominator.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::fmod(T &&x, U &&y)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::remainder(T &&x, U &&y)
+
+   Binary floating modulus and remainder.
+
+   These functions will return, respectively, the floating modulus and the remainder of the
+   division :math:`x/y`.
+
+   The floating modulus is :math:`x - n\times y`, where :math:`n` is :math:`x/y` with its fractional part truncated.
+
+   The remainder is :math:`x - m\times y`, where :math:`m` is the integral value nearest the exact value
+   :math:`x/y`.
+
+   Special values are handled as described in the C99 standard.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param x: the numerator.
+   :param y: the denominator.
+
+   :return: the floating modulus or remainder of :math:`x/y`.
 
 .. _real_io:
 

@@ -1470,10 +1470,52 @@ fails because of (unlikely) overflow conditions.</dd>
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N4mppp4real4ceilEv">
+<span id="_CPPv3N4mppp4real4ceilEv"></span><span id="_CPPv2N4mppp4real4ceilEv"></span><span id="mppp::real::ceil"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">ceil</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4ceilEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real5floorEv">
+<span id="_CPPv3N4mppp4real5floorEv"></span><span id="_CPPv2N4mppp4real5floorEv"></span><span id="mppp::real::floor"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">floor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real5floorEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real5roundEv">
+<span id="_CPPv3N4mppp4real5roundEv"></span><span id="_CPPv2N4mppp4real5roundEv"></span><span id="mppp::real::round"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">round</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real5roundEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real9roundevenEv">
+<span id="_CPPv3N4mppp4real9roundevenEv"></span><span id="_CPPv2N4mppp4real9roundevenEv"></span><span id="mppp::real::roundeven"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">roundeven</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real9roundevenEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N4mppp4real5truncEv">
 <span id="_CPPv3N4mppp4real5truncEv"></span><span id="_CPPv2N4mppp4real5truncEv"></span><span id="mppp::real::trunc"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">trunc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real5truncEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place truncation.</p>
-<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its truncated counterpart.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real4fracEv">
+<span id="_CPPv3N4mppp4real4fracEv"></span><span id="_CPPv2N4mppp4real4fracEv"></span><span id="mppp::real::frac"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">frac</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4fracEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">roundeven()</span></code> function is available from MPFR 4 onwards.</p>
+</div>
+<p>In-place integer and remainder-related functions.</p>
+<p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\left\lceil x \right\rceil\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\left\lfloor x \right\rfloor\)</span>,</li>
+<li><em>x</em> rounded to nearest (IEEE <code class="docutils literal notranslate"><span class="pre">roundTiesToAway</span></code> mode),</li>
+<li><em>x</em> rounded to nearest (IEEE <code class="docutils literal notranslate"><span class="pre">roundTiesToEven</span></code> mode),</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{trunc}\left( x \right)\)</span>,</li>
+<li>the fractional part of <em>x</em>,</li>
+</ul>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">ceil()</span></code>, <code class="docutils literal notranslate"><span class="pre">floor()</span></code>, <code class="docutils literal notranslate"><span class="pre">round()</span></code>, <code class="docutils literal notranslate"><span class="pre">roundeven()</span></code> and <code class="docutils literal notranslate"><span class="pre">frac()</span></code>
+functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
 <dt class="field-name">Throws</dt><dd class="field-body"><strong>std::domain_error</strong> – if <code class="docutils literal notranslate"><span class="pre">this</span></code> represents a NaN value.</dd>
@@ -3810,36 +3852,196 @@ The precision of the result will be set to the largest precision among the opera
 <div class="section" id="integer-and-remainder-related-functions">
 <span id="real-intrem"></span><h3>Integer and remainder related functions<a class="headerlink" href="#integer-and-remainder-related-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4ceilERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp4ceilERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp4ceilERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">ceil</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4ceilERN4mppp4realERN4mppp4realERR1T" title="mppp::ceil::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4ceilERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5floorERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5floorERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5floorERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">floor</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5floorERN4mppp4realERN4mppp4realERR1T" title="mppp::floor::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5floorERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5roundERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5roundERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5roundERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">round</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5roundERN4mppp4realERN4mppp4realERR1T" title="mppp::round::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5roundERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp9roundevenERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp9roundevenERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp9roundevenERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">roundeven</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp9roundevenERN4mppp4realERN4mppp4realERR1T" title="mppp::roundeven::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp9roundevenERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERN4mppp4realERR1T">
-<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">trunc</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERN4mppp4realERR1T" title="mppp::trunc::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary truncation.</p>
-<p>This function will truncate <em>op</em> and store the result
-into <em>rop</em>. The precision of the result will be equal to the precision
-of <em>op</em>.</p>
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">trunc</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERN4mppp4realERR1T" title="mppp::trunc::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5truncERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4fracERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp4fracERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp4fracERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">frac</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4fracERN4mppp4realERN4mppp4realERR1T" title="mppp::frac::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4fracERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">roundeven()</span></code> function is available from MPFR 4 onwards.</p>
+</div>
+<p>Binary integer and remainder-related functions.</p>
+<p>These functions will set <em>rop</em> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\left\lceil x \right\rceil\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\left\lfloor x \right\rfloor\)</span>,</li>
+<li><em>x</em> rounded to nearest (IEEE <code class="docutils literal notranslate"><span class="pre">roundTiesToAway</span></code> mode),</li>
+<li><em>x</em> rounded to nearest (IEEE <code class="docutils literal notranslate"><span class="pre">roundTiesToEven</span></code> mode),</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{trunc}\left( x \right)\)</span>,</li>
+<li>the fractional part of <em>x</em>.</li>
+</ul>
+<p>The precision of the result will be equal to the precision
+of <em>x</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">ceil()</span></code>, <code class="docutils literal notranslate"><span class="pre">floor()</span></code>, <code class="docutils literal notranslate"><span class="pre">round()</span></code>, <code class="docutils literal notranslate"><span class="pre">roundeven()</span></code> and <code class="docutils literal notranslate"><span class="pre">frac()</span></code>
+functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>rop</strong> – the return value.</li>
-<li><strong>op</strong> – the operand.</li>
+<li><strong>x</strong> – the operand.</li>
 </ul>
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first">a reference to <em>rop</em>.</p>
 </dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::domain_error</strong> – if <em>op</em> is NaN.</p>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::domain_error</strong> – if <em>x</em> is NaN.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4ceilEN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp4ceilERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp4ceilERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">ceil</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4ceilEN4mppp4realERR1T" title="mppp::ceil::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4ceilEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5floorEN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5floorERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5floorERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">floor</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5floorEN4mppp4realERR1T" title="mppp::floor::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5floorEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5roundEN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5roundERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5roundERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">round</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5roundEN4mppp4realERR1T" title="mppp::round::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5roundEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp9roundevenEN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp9roundevenERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp9roundevenERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">roundeven</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp9roundevenEN4mppp4realERR1T" title="mppp::roundeven::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp9roundevenEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5truncEN4mppp4realERR1T">
-<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5truncERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5truncERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">trunc</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5truncEN4mppp4realERR1T" title="mppp::trunc::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5truncEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Unary truncation.</p>
-<p>This function will return the truncated counterpart of <em>r</em>.
-The precision of the result will be equal to the precision
-of <em>r</em>.</p>
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5truncERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5truncERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">trunc</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5truncEN4mppp4realERR1T" title="mppp::trunc::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5truncEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4fracEN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp4fracERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp4fracERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">frac</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4fracEN4mppp4realERR1T" title="mppp::frac::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4fracEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">roundeven()</span></code> function is available from MPFR 4 onwards.</p>
+</div>
+<p>Unary integer and remainder-related functions.</p>
+<p>These functions will return, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\left\lceil x \right\rceil\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\left\lfloor x \right\rfloor\)</span>,</li>
+<li><em>x</em> rounded to nearest (IEEE <code class="docutils literal notranslate"><span class="pre">roundTiesToAway</span></code> mode),</li>
+<li><em>x</em> rounded to nearest (IEEE <code class="docutils literal notranslate"><span class="pre">roundTiesToEven</span></code> mode),</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{trunc}\left( x \right)\)</span>,</li>
+<li>the fractional part of <em>x</em>.</li>
+</ul>
+<p>The precision of the result will be equal to the precision
+of <em>x</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">ceil()</span></code>, <code class="docutils literal notranslate"><span class="pre">floor()</span></code>, <code class="docutils literal notranslate"><span class="pre">round()</span></code>, <code class="docutils literal notranslate"><span class="pre">roundeven()</span></code> and <code class="docutils literal notranslate"><span class="pre">frac()</span></code>
+functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><strong>r</strong> – the operand.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body">the truncated counterpart of <em>r</em>.</dd>
-<dt class="field-name">Throws</dt><dd class="field-body"><strong>std::domain_error</strong> – if <em>r</em> is NaN.</dd>
+<dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the operand.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">the result of the operation.</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><strong>std::domain_error</strong> – if <em>x</em> is NaN.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4modfEvRN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp4modfERN4mppp4realERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp4modfERN4mppp4realERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">modf</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>iop</em>, mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>fop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4modfEvRN4mppp4realERN4mppp4realERR1T" title="mppp::modf::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4modfEvRN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Simultaneous integral and fractional parts.</p>
+<p>This function will set <em>iop</em> and <em>fop</em> respectively to the integral and
+fractional parts of <em>op</em>.
+<em>iop</em> and <em>fop</em> must be distinct objects. The precision of <em>iop</em> and <em>fop</em> will be set to the
+precision of <em>op</em>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>iop</strong> – the integral part return value.</li>
+<li><strong>fop</strong> – the fractional part return value.</li>
+<li><strong>op</strong> – the operand.</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>std::invalid_argument</strong> – if <em>iop</em> and <em>fop</em> are the same object.</li>
+<li><strong>std::domain_error</strong> – if <em>op</em> is NaN.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp4fmodERN4mppp4realERN4mppp4realERR1TRR1U">
+<span id="_CPPv3I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp4fmodERN4mppp4realERR1TRR1U"></span><span id="_CPPv2I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp4fmodERN4mppp4realERR1TRR1U"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">fmod</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp4fmodERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::fmod::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp4fmodERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::fmod::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp4fmodERN4mppp4realERN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERN4mppp4realERR1TRR1U">
+<span id="_CPPv3I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERR1TRR1U"></span><span id="_CPPv2I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERR1TRR1U"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">remainder</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::remainder::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::remainder::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Ternary floating modulus and remainder.</p>
+<p>These functions will set <em>rop</em> to, respectively, the floating modulus and the remainder of the
+division <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+<p>The floating modulus is <span class="math notranslate nohighlight">\(x - n\times y\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(x/y\)</span> with its fractional part truncated.</p>
+<p>The remainder is <span class="math notranslate nohighlight">\(x - m\times y\)</span>, where <span class="math notranslate nohighlight">\(m\)</span> is the integral value nearest the exact value
+<span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+<p>Special values are handled as described in the C99 standard.</p>
+<p>The precision of <em>rop</em> will be set to the largest precision among the operands.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>x</strong> – the numerator.</li>
+<li><strong>y</strong> – the denominator.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp4fmodEN4mppp4realERR1TRR1U">
+<span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mppp4fmodERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mppp4fmodERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types">real_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp4fmodEN4mppp4realERR1TRR1U" title="mppp::fmod::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">fmod</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp4fmodEN4mppp4realERR1TRR1U" title="mppp::fmod::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp4fmodEN4mppp4realERR1TRR1U" title="mppp::fmod::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp4fmodEN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U">
+<span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types">real_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U" title="mppp::remainder::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">remainder</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U" title="mppp::remainder::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U" title="mppp::remainder::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary floating modulus and remainder.</p>
+<p>These functions will return, respectively, the floating modulus and the remainder of the
+division <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+<p>The floating modulus is <span class="math notranslate nohighlight">\(x - n\times y\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(x/y\)</span> with its fractional part truncated.</p>
+<p>The remainder is <span class="math notranslate nohighlight">\(x - m\times y\)</span>, where <span class="math notranslate nohighlight">\(m\)</span> is the integral value nearest the exact value
+<span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+<p>Special values are handled as described in the C99 standard.</p>
+<p>The precision of the result will be set to the largest precision among the operands.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the numerator.</li>
+<li><strong>y</strong> – the denominator.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the floating modulus or remainder of <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+</dd>
 </dl>
 </dd></dl>
 
