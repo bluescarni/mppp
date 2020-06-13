@@ -2300,7 +2300,10 @@ private:
         // Size in bytes of the limbs portion of the data.
         const auto lsize = src.size() - sizeof(detail::mpz_size_t);
 #if MPPP_CPLUSPLUS >= 201703L && !defined(_MSC_VER)
+        // NOTE: not sure why the coverage is not detected here.
+        // LCOV_EXCL_START
         const auto [size, asize] = bl_read_size_asize(src.data());
+        // LCOV_EXCL_STOP
 #else
         detail::mpz_size_t size;
         detail::make_unsigned_t<detail::mpz_size_t> asize;

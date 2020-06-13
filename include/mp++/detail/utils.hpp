@@ -58,7 +58,9 @@ constexpr make_unsigned_t<T> make_unsigned(T n) noexcept
 {
     static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
 #if MPPP_CPLUSPLUS >= 201703L
+    // LCOV_EXCL_START
     assert(n >= T(0));
+    // LCOV_EXCL_STOP
 #endif
     return static_cast<make_unsigned_t<T>>(n);
 }
@@ -106,7 +108,9 @@ constexpr make_unsigned_t<T> nint_abs(T n) noexcept
     // from C++17:
     // https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
 #if MPPP_CPLUSPLUS >= 201703L
+    // LCOV_EXCL_START
     assert(n < T(0));
+    // LCOV_EXCL_STOP
 #endif
     static_assert(is_integral<T>::value && is_signed<T>::value,
                   "The sint_abs() function can be used only with signed integral types.");
@@ -195,10 +199,12 @@ inline
     negate_unsigned(U n)
 {
     const auto retval = unsigned_to_nsigned<T>(n);
+    // LCOV_EXCL_START
     return retval.first ? retval.second
                         : throw std::overflow_error(
                             "Error while trying to negate the unsigned integral value " + to_string(n)
                             + ": the result does not fit in the range of the target type '" + type_name<T>() + "'");
+    // LCOV_EXCL_STOP
 }
 
 // Safe casting functionality between integral types. It will throw if the conversion overflows the range
