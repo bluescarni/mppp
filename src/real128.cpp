@@ -301,4 +301,44 @@ real128 dispatch_atan2(const real128 &y, const real128 &x)
 
 } // namespace detail
 
+#define MPPP_REAL128_IMPLEMENT_UNARY(func)                                                                             \
+    real128 func(const real128 &c)                                                                                     \
+    {                                                                                                                  \
+        return real128{::func##q(c.m_value)};                                                                          \
+    }                                                                                                                  \
+                                                                                                                       \
+    real128 &real128::func()                                                                                           \
+    {                                                                                                                  \
+        return *this = mppp::func(*this);                                                                              \
+    }
+
+MPPP_REAL128_IMPLEMENT_UNARY(ceil)
+MPPP_REAL128_IMPLEMENT_UNARY(floor)
+MPPP_REAL128_IMPLEMENT_UNARY(nearbyint)
+MPPP_REAL128_IMPLEMENT_UNARY(rint)
+MPPP_REAL128_IMPLEMENT_UNARY(round)
+MPPP_REAL128_IMPLEMENT_UNARY(trunc)
+
+#undef MPPP_REAL128_IMPLEMENT_UNARY
+
+long long llrint(const real128 &x)
+{
+    return ::llrintq(x.m_value);
+}
+
+long lrint(const real128 &x)
+{
+    return ::lrintq(x.m_value);
+}
+
+long long llround(const real128 &x)
+{
+    return ::llroundq(x.m_value);
+}
+
+long lround(const real128 &x)
+{
+    return ::lroundq(x.m_value);
+}
+
 } // namespace mppp

@@ -525,6 +525,32 @@ The real128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: real128 &ceil()
+   .. cpp:function:: real128 &floor()
+   .. cpp:function:: real128 &nearbyint()
+   .. cpp:function:: real128 &rint()
+   .. cpp:function:: real128 &round()
+   .. cpp:function:: real128 &trunc()
+
+      .. versionadded:: 0.21
+
+      Integer rounding functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\left\lceil x \right\rceil`,
+      * :math:`\left\lfloor x \right\rfloor`,
+      * the nearest integer value to *x*, according to the current rounding mode,
+        without raising the ``FE_INEXACT`` exception,
+      * the nearest integer value to *x*, according to the current rounding mode,
+        possibly raising the ``FE_INEXACT`` exception,
+      * the nearest integer value to *x* rounding halfway cases away from zero,
+      * :math:`\operatorname{trunc}\left( x \right)`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -984,6 +1010,50 @@ Floating-point manipulation
    :param to: the direction of the next representable value.
 
    :return: the next representable value of *from* in the direction of *to*.
+
+Integer and remainder-related functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mppp::real128 mppp::ceil(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::floor(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::nearbyint(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::rint(mppp::real128 x)
+.. cpp:function:: long long mppp::llrint(mppp::real128 x)
+.. cpp:function:: long mppp::lrint(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::round(mppp::real128 x)
+.. cpp:function:: long long mppp::llround(mppp::real128 x)
+.. cpp:function:: long mppp::lround(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::trunc(mppp::real128 x)
+
+   .. versionadded:: 0.21
+
+   Integer rounding functions.
+
+   These member functions will return, respectively:
+
+   * :math:`\left\lceil x \right\rceil`,
+   * :math:`\left\lfloor x \right\rfloor`,
+   * the nearest integer value to *x*, according to the current rounding mode,
+     without raising the ``FE_INEXACT`` exception,
+   * the nearest integer value to *x*, according to the current rounding mode,
+     possibly raising the ``FE_INEXACT`` exception, represented as a:
+
+     * :cpp:class:`~mppp::real128` (``rint()``),
+     * ``long long`` (``llrint()``),
+     * ``long`` (``lrint()``),
+
+   * the nearest integer value to *x* rounding halfway cases away from zero,
+     represented as a:
+
+     * :cpp:class:`~mppp::real128` (``round()``),
+     * ``long long`` (``llround()``),
+     * ``long`` (``lround()``),
+
+   * :math:`\operatorname{trunc}\left( x \right)`.
+
+   :param x: the input argument.
+
+   :return: the result of the operation.
 
 .. _real128_io:
 

@@ -815,6 +815,14 @@ public:
     // In-place error function.
     real128 &erf();
 
+    // Integer and remainder-related functions.
+    real128 &ceil();
+    real128 &floor();
+    real128 &nearbyint();
+    real128 &rint();
+    real128 &round();
+    real128 &trunc();
+
     // The internal value.
     // NOLINTNEXTLINE(modernize-use-default-member-init)
     __float128 m_value;
@@ -1150,6 +1158,18 @@ inline real128 erf(real128 x)
 
 // Next real128 from 'from' to 'to'.
 MPPP_DLL_PUBLIC real128 nextafter(const real128 &, const real128 &);
+
+// Integer and remainder-related functions.
+MPPP_DLL_PUBLIC real128 ceil(const real128 &);
+MPPP_DLL_PUBLIC real128 floor(const real128 &);
+MPPP_DLL_PUBLIC real128 nearbyint(const real128 &);
+MPPP_DLL_PUBLIC real128 rint(const real128 &);
+MPPP_DLL_PUBLIC real128 round(const real128 &);
+MPPP_DLL_PUBLIC real128 trunc(const real128 &);
+MPPP_DLL_PUBLIC long long llrint(const real128 &);
+MPPP_DLL_PUBLIC long lrint(const real128 &);
+MPPP_DLL_PUBLIC long long llround(const real128 &);
+MPPP_DLL_PUBLIC long lround(const real128 &);
 
 // Identity operator.
 constexpr real128 operator+(real128 x)
