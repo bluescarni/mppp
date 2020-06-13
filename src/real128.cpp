@@ -94,6 +94,11 @@ __float128 powq(__float128 x, __float128 y)
     return ::powq(x, y);
 }
 
+__float128 atan2q(__float128 y, __float128 x)
+{
+    return ::atan2q(y, x);
+}
+
 } // namespace detail
 
 // Private string constructors.
@@ -280,5 +285,20 @@ std::ostream &operator<<(std::ostream &os, const real128 &x)
     detail::float128_stream(os, x.m_value);
     return os;
 }
+
+namespace detail
+{
+
+real128 dispatch_pow(const real128 &x, const real128 &y)
+{
+    return real128{detail::powq(x.m_value, y.m_value)};
+}
+
+real128 dispatch_atan2(const real128 &y, const real128 &x)
+{
+    return real128{detail::atan2q(y.m_value, x.m_value)};
+}
+
+} // namespace detail
 
 } // namespace mppp

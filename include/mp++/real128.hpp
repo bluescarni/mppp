@@ -84,6 +84,7 @@ union ieee_float128 {
 MPPP_DLL_PUBLIC __float128 scalbnq(__float128, int);
 MPPP_DLL_PUBLIC __float128 scalblnq(__float128, long);
 MPPP_DLL_PUBLIC __float128 powq(__float128, __float128);
+MPPP_DLL_PUBLIC __float128 atan2q(__float128, __float128);
 
 // For internal use only.
 template <typename T>
@@ -956,10 +957,7 @@ MPPP_DLL_PUBLIC real128 hypot(const real128 &, const real128 &);
 namespace detail
 {
 
-inline real128 dispatch_pow(const real128 &x, const real128 &y)
-{
-    return real128{detail::powq(x.m_value, y.m_value)};
-}
+MPPP_DLL_PUBLIC real128 dispatch_pow(const real128 &, const real128 &);
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const real128 &x, const T &y)
@@ -1057,6 +1055,49 @@ inline real128 acos(real128 x)
 inline real128 atan(real128 x)
 {
     return x.atan();
+}
+
+namespace detail
+{
+
+MPPP_DLL_PUBLIC real128 dispatch_atan2(const real128 &, const real128 &);
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+inline real128 dispatch_atan2(const real128 &x, const T &y)
+{
+    return real128{detail::atan2q(x.m_value, y)};
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+inline real128 dispatch_atan2(const T &x, const real128 &y)
+{
+    return real128{detail::atan2q(x, y.m_value)};
+}
+
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
+inline real128 dispatch_atan2(const real128 &x, const T &y)
+{
+    return dispatch_atan2(x, real128{y});
+}
+
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
+inline real128 dispatch_atan2(const T &x, const real128 &y)
+{
+    return dispatch_atan2(real128{x}, y);
+}
+
+} // namespace detail
+
+// atan2.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires real128_op_types<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
+#endif
+    inline real128 atan2(const T &y, const U &x)
+{
+    return detail::dispatch_atan2(y, x);
 }
 
 // Hyperbolic sine.

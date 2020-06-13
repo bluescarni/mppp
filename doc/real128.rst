@@ -869,7 +869,23 @@ Trigonometry
 
    :return: a trigonometric function of *x*.
 
-.. real128_hyper:
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::atan2(const T &y, const U &x)
+
+   .. versionadded:: 0.21
+
+   Two-arguments arctangent.
+
+   This function will compute :math:`\arctan\left( y,x \right)`. Internally,
+   the implementation uses the ``atan2q()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param y: the sine argument.
+   :param x: the cosine argument.
+
+   :return: :math:`\arctan\left( y,x \right)`.
+
+.. _real128_hyper:
 
 Hyperbolic functions
 ~~~~~~~~~~~~~~~~~~~~
