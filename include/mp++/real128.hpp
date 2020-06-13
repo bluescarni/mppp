@@ -83,7 +83,6 @@ union ieee_float128 {
 // we don't have to include quadmath.h here).
 MPPP_DLL_PUBLIC __float128 scalbnq(__float128, int);
 MPPP_DLL_PUBLIC __float128 scalblnq(__float128, long);
-MPPP_DLL_PUBLIC __float128 atan2q(__float128, __float128);
 
 // For internal use only.
 template <typename T>
@@ -958,39 +957,42 @@ inline real128 cbrt(real128 x)
     return x.cbrt();
 }
 
+// Machinery to define binary operations involving real128.
+#if defined(MPPP_HAVE_CONCEPTS)
+#define REAL128_BINARY_OP_HEADER                                                                                       \
+    template <typename T, typename U>                                                                                  \
+    requires real128_op_types<T, U>
+#else
+#define REAL128_BINARY_OP_HEADER                                                                                       \
+    template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
+#endif
+
+#define REAL128_IMPLEMENT_BINARY_OPERATION(fname)                                                                      \
+    namespace detail                                                                                                   \
+    {                                                                                                                  \
+    MPPP_DLL_PUBLIC real128 dispatch_real128_##fname(const real128 &, const real128 &);                                \
+    template <typename T>                                                                                              \
+    inline real128 dispatch_real128_##fname(const real128 &x, const T &y)                                              \
+    {                                                                                                                  \
+        return dispatch_real128_##fname(x, real128{y});                                                                \
+    }                                                                                                                  \
+    template <typename T>                                                                                              \
+    inline real128 dispatch_real128_##fname(const T &x, const real128 &y)                                              \
+    {                                                                                                                  \
+        return dispatch_real128_##fname(real128{x}, y);                                                                \
+    }                                                                                                                  \
+    }                                                                                                                  \
+    REAL128_BINARY_OP_HEADER                                                                                           \
+    inline real128 fname(const T &x, const U &y)                                                                       \
+    {                                                                                                                  \
+        return detail::dispatch_real128_##fname(x, y);                                                                 \
+    }
+
 // Euclidean distance.
-MPPP_DLL_PUBLIC real128 hypot(const real128 &, const real128 &);
-
-namespace detail
-{
-
-MPPP_DLL_PUBLIC real128 dispatch_real128_pow(const real128 &, const real128 &);
-
-template <typename T>
-inline real128 dispatch_real128_pow(const real128 &x, const T &y)
-{
-    return dispatch_real128_pow(x, real128{y});
-}
-
-template <typename T>
-inline real128 dispatch_real128_pow(const T &x, const real128 &y)
-{
-    return dispatch_real128_pow(real128{x}, y);
-}
-
-} // namespace detail
+REAL128_IMPLEMENT_BINARY_OPERATION(hypot)
 
 // Exponentiation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
-    inline real128 pow(const T &x, const U &y)
-{
-    return detail::dispatch_real128_pow(x, y);
-}
+REAL128_IMPLEMENT_BINARY_OPERATION(pow)
 
 // Exponential function.
 inline real128 exp(real128 x)
@@ -1052,48 +1054,8 @@ inline real128 atan(real128 x)
     return x.atan();
 }
 
-namespace detail
-{
-
-MPPP_DLL_PUBLIC real128 dispatch_atan2(const real128 &, const real128 &);
-
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_atan2(const real128 &x, const T &y)
-{
-    return real128{detail::atan2q(x.m_value, y)};
-}
-
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_atan2(const T &x, const real128 &y)
-{
-    return real128{detail::atan2q(x, y.m_value)};
-}
-
-template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_atan2(const real128 &x, const T &y)
-{
-    return dispatch_atan2(x, real128{y});
-}
-
-template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_atan2(const T &x, const real128 &y)
-{
-    return dispatch_atan2(real128{x}, y);
-}
-
-} // namespace detail
-
 // atan2.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
-    inline real128 atan2(const T &y, const U &x)
-{
-    return detail::dispatch_atan2(y, x);
-}
+REAL128_IMPLEMENT_BINARY_OPERATION(atan2)
 
 // Hyperbolic sine.
 inline real128 sinh(real128 x)
@@ -1146,6 +1108,9 @@ inline real128 erf(real128 x)
 // Next real128 from 'from' to 'to'.
 MPPP_DLL_PUBLIC real128 nextafter(const real128 &, const real128 &);
 
+// Copy sign.
+REAL128_IMPLEMENT_BINARY_OPERATION(copysign)
+
 // Integer and remainder-related functions.
 MPPP_DLL_PUBLIC real128 ceil(const real128 &);
 MPPP_DLL_PUBLIC real128 floor(const real128 &);
@@ -1157,6 +1122,9 @@ MPPP_DLL_PUBLIC long long llrint(const real128 &);
 MPPP_DLL_PUBLIC long lrint(const real128 &);
 MPPP_DLL_PUBLIC long long llround(const real128 &);
 MPPP_DLL_PUBLIC long lround(const real128 &);
+
+#undef REAL128_BINARY_OP_HEADER
+#undef REAL128_IMPLEMENT_BINARY_OPERATION
 
 // Identity operator.
 constexpr real128 operator+(real128 x)

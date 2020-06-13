@@ -6,6 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"
@@ -23,4 +25,18 @@ TEST_CASE("real128 nextafter")
     REQUIRE(isinf(nextafter(real128{"inf"}, real128{"inf"})));
     REQUIRE(isinf(nextafter(real128{"-inf"}, real128{"-inf"})));
     REQUIRE(!isinf(nextafter(real128{"-inf"}, real128{1})));
+}
+
+TEST_CASE("real128 copysign")
+{
+    REQUIRE(copysign(-1_rq, -1_rq) == -1);
+    REQUIRE(copysign(1_rq, -1_rq) == -1);
+    REQUIRE(copysign(-1_rq, 1_rq) == 1);
+    REQUIRE(copysign(1_rq, 1_rq) == 1);
+
+    // Couple of small tests with non-real128 args.
+    REQUIRE(copysign(-1_rq, -1) == -1);
+    REQUIRE(copysign(1., -1_rq) == -1);
+    REQUIRE(copysign(-1_rq, 1_z1) == 1);
+    REQUIRE(copysign(1_q1, 1_rq) == 1);
 }

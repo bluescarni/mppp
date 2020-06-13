@@ -89,11 +89,6 @@ __float128 scalblnq(__float128 x, long exp)
     return ::scalblnq(x, exp);
 }
 
-__float128 atan2q(__float128 y, __float128 x)
-{
-    return ::atan2q(y, x);
-}
-
 } // namespace detail
 
 // Private string constructors.
@@ -262,12 +257,6 @@ real128 fma(const real128 &x, const real128 &y, const real128 &z)
     return real128{::fmaq(x.m_value, y.m_value, z.m_value)};
 }
 
-// Euclidean distance.
-real128 hypot(const real128 &x, const real128 &y)
-{
-    return real128{::hypotq(x.m_value, y.m_value)};
-}
-
 // Next real128 from 'from' to 'to'.
 real128 nextafter(const real128 &from, const real128 &to)
 {
@@ -284,14 +273,24 @@ std::ostream &operator<<(std::ostream &os, const real128 &x)
 namespace detail
 {
 
+real128 dispatch_real128_hypot(const real128 &x, const real128 &y)
+{
+    return real128{::hypotq(x.m_value, y.m_value)};
+}
+
 real128 dispatch_real128_pow(const real128 &x, const real128 &y)
 {
     return real128{::powq(x.m_value, y.m_value)};
 }
 
-real128 dispatch_atan2(const real128 &y, const real128 &x)
+real128 dispatch_real128_atan2(const real128 &y, const real128 &x)
 {
-    return real128{detail::atan2q(y.m_value, x.m_value)};
+    return real128{::atan2q(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_copysign(const real128 &y, const real128 &x)
+{
+    return real128{::copysignq(y.m_value, x.m_value)};
 }
 
 } // namespace detail

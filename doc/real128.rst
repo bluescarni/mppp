@@ -838,13 +838,21 @@ Roots
 
    :return: the square or cubic root of *x*.
 
-.. cpp:function:: mppp::real128 mppp::hypot(const mppp::real128 &x, const mppp::real128 &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::hypot(const T &x, const U &y)
 
    Euclidean distance.
 
    This function will return :math:`\sqrt{x^2+y^2}`.
    The calculation is performed without undue overflow or underflow during the intermediate
    steps of the calculation.
+   Internally,
+   the implementation uses the ``hypotq()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   .. versionadded:: 0.21
+
+      Support for types other than :cpp:class:`~mppp::real128`.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -1010,6 +1018,22 @@ Floating-point manipulation
    :param to: the direction of the next representable value.
 
    :return: the next representable value of *from* in the direction of *to*.
+
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::copysign(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Copy sign.
+
+   This function composes a floating point value with the magnitude of *x* and the sign of *y*.
+   Internally, the implementation uses the ``copysignq()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a value with the magnitude of *x* and the sign of *y*.
 
 Integer and remainder-related functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
