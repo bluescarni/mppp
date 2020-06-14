@@ -268,6 +268,16 @@ real128 dispatch_real128_fdim(const real128 &y, const real128 &x)
     return real128{::fdimq(y.m_value, x.m_value)};
 }
 
+real128 dispatch_real128_fmax(const real128 &y, const real128 &x)
+{
+    return real128{::fmaxq(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_fmin(const real128 &y, const real128 &x)
+{
+    return real128{::fminq(y.m_value, x.m_value)};
+}
+
 } // namespace detail
 
 #define MPPP_REAL128_IMPLEMENT_UNARY(func)                                                                             \

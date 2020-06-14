@@ -747,6 +747,24 @@ Comparison
 
    :return: the category of the value of *x*, as established by :cpp:func:`mppp::real128::fpclassify()`.
 
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fmax(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fmin(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Max/min.
+
+   These functions will return, respectively, the maximum and minimum of the two input operands.
+   NaNs are treated as missing data (between a NaN and a numeric value, the numeric value is chosen).
+   Internally, the implementation uses the ``fmaxq()`` and ``fminq()`` functions from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the maximum and minimum of the two input operands.
+
 .. cpp:function:: constexpr bool mppp::isnan(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::isinf(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::finite(const mppp::real128 &x)

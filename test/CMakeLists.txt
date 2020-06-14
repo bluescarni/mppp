@@ -160,6 +160,7 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_literal)
   ADD_MPPP_TESTCASE(real128_intrem)
   ADD_MPPP_TESTCASE(real128_fdim)
+  ADD_MPPP_TESTCASE(real128_fmax_fmin)
 
   ADD_MPPP_TESTCASE(complex128_basic)
   ADD_MPPP_TESTCASE(complex128_arith)

@@ -1098,6 +1098,10 @@ MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(copysign)
 // fdim.
 MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fdim)
 
+// fmax/fmin.
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fmax)
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fmin)
+
 // Integer and remainder-related functions.
 MPPP_DLL_PUBLIC real128 ceil(const real128 &);
 MPPP_DLL_PUBLIC real128 floor(const real128 &);
