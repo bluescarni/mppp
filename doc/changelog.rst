@@ -7,9 +7,10 @@ Changelog
 New
 ~~~
 
-- Expose additional integer and remainder-related functions
+- Expose more MPFR functions
   for :cpp:class:`~mppp::real`
-  (`#254 <https://github.com/bluescarni/mppp/pull/254>`__).
+  (`#255 <https://github.com/bluescarni/mppp/pull/255>`__,
+  `#254 <https://github.com/bluescarni/mppp/pull/254>`__).
 - Add a tutorial for :cpp:class:`~mppp::real`
   (`#252 <https://github.com/bluescarni/mppp/pull/252>`__).
 - Expose all the constants provided by MPFR in the
