@@ -1034,6 +1034,23 @@ Other special functions
 
    :return: the (complementary) error function of :math:`x`.
 
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fdim(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Positive difference.
+
+   This function returns the positive difference between *x* and *y*.
+   That is, if :math:`x>y`, returns :math:`x-y`, otherwise returns :math:`+0`.
+   Internally, the implementation uses the ``fdimq()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the positive difference of *x* and *y*.
+
 .. _real128_fpmanip:
 
 Floating-point manipulation
