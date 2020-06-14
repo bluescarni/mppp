@@ -530,11 +530,20 @@ The real128 class
       :return: a reference to ``this``.
 
    .. cpp:function:: real128 &lgamma()
+   .. cpp:function:: real128 &tgamma()
 
-      In-place logarithm of the gamma function.
+      In-place gamma functions.
 
-      This member function will set ``this`` to :math:`\log\Gamma\left( x \right)`,
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\log\Gamma\left( x \right)`,
+      * :math:`\Gamma\left( x \right)`,
+
       where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.21
+
+         The ``tgamma()`` function.
 
       :return: a reference to ``this``.
 
@@ -1104,13 +1113,23 @@ Logarithms and exponentials
 Gamma functions
 ~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::lgamma(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::lgamma(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::tgamma(const mppp::real128 &x)
 
-   Natural logarithm of the gamma function.
+   Gamma functions.
+
+   These functions will return, respectively:
+
+   * :math:`\log\Gamma\left( x \right)`,
+   * :math:`\Gamma\left( x \right)`.
+
+   .. versionadded:: 0.21
+
+      The ``tgamma()`` function.
 
    :param x: the input value.
 
-   :return: :math:`\log\Gamma\left( x \right)`.
+   :return: the result of the operation.
 
 Bessel functions
 ~~~~~~~~~~~~~~~~

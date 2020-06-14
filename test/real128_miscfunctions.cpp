@@ -36,3 +36,11 @@ TEST_CASE("real128 lgamma")
     REQUIRE(x.lgamma() == 0);
     REQUIRE(abs(lgamma(real128{"1.234"}) - real128{"-0.094478407681159572584826666218660204"}) < 1E-34);
 }
+
+TEST_CASE("real128 tgamma")
+{
+    REQUIRE(tgamma(real128{1}) == 1);
+    real128 x(1);
+    REQUIRE(x.tgamma() == 1);
+    REQUIRE(abs(tgamma(real128{"1.234"}) - real128{"0.909847380128661106639623421763461722"}) < 1E-34);
+}

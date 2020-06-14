@@ -813,10 +813,11 @@ public:
     real128 &log2();
     real128 &log1p();
 
-    // In-place lgamma function.
+    // In-place gamma functions.
     real128 &lgamma();
+    real128 &tgamma();
 
-    // Bessel functions.
+    // In-place Bessel functions.
     real128 &j0();
     real128 &j1();
     real128 &y0();
@@ -1094,11 +1095,9 @@ inline real128 atanh(real128 x)
     return x.atanh();
 }
 
-// Natural logarithm of the gamma function.
-inline real128 lgamma(real128 x)
-{
-    return x.lgamma();
-}
+// Gamma functions.
+MPPP_DLL_PUBLIC real128 lgamma(const real128 &);
+MPPP_DLL_PUBLIC real128 tgamma(const real128 &);
 
 // Bessel functions.
 MPPP_DLL_PUBLIC real128 j0(const real128 &);

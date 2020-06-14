@@ -209,12 +209,6 @@ real128 &real128::atanh()
     return *this = ::atanhq(m_value);
 }
 
-// In-place lgamma function.
-real128 &real128::lgamma()
-{
-    return *this = ::lgammaq(m_value);
-}
-
 // Decompose into a normalized fraction and an integral power of two.
 real128 frexp(const real128 &x, int *exp)
 {
@@ -336,6 +330,9 @@ MPPP_REAL128_IMPLEMENT_UNARY(log1p)
 
 MPPP_REAL128_IMPLEMENT_UNARY(erf)
 MPPP_REAL128_IMPLEMENT_UNARY(erfc)
+
+MPPP_REAL128_IMPLEMENT_UNARY(lgamma)
+MPPP_REAL128_IMPLEMENT_UNARY(tgamma)
 
 MPPP_REAL128_IMPLEMENT_UNARY(j0)
 MPPP_REAL128_IMPLEMENT_UNARY(j1)
