@@ -343,4 +343,14 @@ long lround(const real128 &x)
     return ::lroundq(x.m_value);
 }
 
+int real128::ilogb() const
+{
+    return ::ilogbq(m_value);
+}
+
+int ilogb(const real128 &x)
+{
+    return x.ilogb();
+}
+
 } // namespace mppp

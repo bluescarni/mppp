@@ -699,6 +699,9 @@ public:
     // Convert to string.
     MPPP_NODISCARD std::string to_string() const;
 
+    // Unbiased exponent.
+    MPPP_NODISCARD int ilogb() const;
+
     // Get the IEEE representation of the value.
     MPPP_NODISCARD std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t>
     get_ieee() const
@@ -841,6 +844,9 @@ inline MPPP_CONSTEXPR_14 auto get(T &rop, const real128 &x) -> decltype(x.get(ro
 
 // Decompose into a normalized fraction and an integral power of two.
 MPPP_DLL_PUBLIC real128 frexp(const real128 &, int *);
+
+// Unbiased exponent.
+MPPP_DLL_PUBLIC int ilogb(const real128 &);
 
 // Fused multiply-add.
 MPPP_DLL_PUBLIC real128 fma(const real128 &, const real128 &, const real128 &);

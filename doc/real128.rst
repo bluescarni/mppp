@@ -349,6 +349,10 @@ The real128 class
       :return: a tuple containing the IEEE quadruple-precision floating-point representation of the value stored
         in ``this``.
 
+   .. cpp:function:: int ilogb() const
+
+      :return: the unbiased exponent of ``this``.
+
    .. cpp:function:: bool signbit() const
 
       Sign bit.
@@ -684,6 +688,16 @@ Conversion
    :param exp: a pointer to the value that will store the exponent.
 
    :return: the binary significand of *x*.
+
+.. cpp:function:: int mppp::ilogb(const mppp::real128 &x)
+
+   .. versionadded:: 0.21
+
+   Unbiased exponent.
+
+   :param x: the input argument.
+
+   :return: the unbiased exponent of *x*.
 
 .. _real128_arithmetic:
 
