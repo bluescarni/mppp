@@ -441,3 +441,12 @@ TEST_CASE("real trig arb")
 }
 
 #endif
+
+TEST_CASE("real sincos")
+{
+    real128 s, c;
+    sincos(1.2_rq, &s, &c);
+
+    REQUIRE(s == sin(1.2_rq));
+    REQUIRE(c == cos(1.2_rq));
+}

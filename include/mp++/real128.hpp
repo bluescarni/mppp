@@ -1055,6 +1055,9 @@ inline real128 atan(real128 x)
 // atan2.
 MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(atan2)
 
+// Sine and cosine at the same time.
+MPPP_DLL_PUBLIC void sincos(const real128 &, real128 *, real128 *);
+
 // Hyperbolic sine.
 inline real128 sinh(real128 x)
 {

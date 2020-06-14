@@ -1021,6 +1021,19 @@ Trigonometry
 
    :return: :math:`\arctan\left( y,x \right)`.
 
+.. cpp:function:: void mppp::sincos(const mppp::real128 &x, mppp::real128 *s, mppp::real128 *c)
+
+   .. versionadded:: 0.21
+
+   Simultaneous sine and cosine.
+
+   This function will set the variables pointed to by *s* and *c* to, respectively,
+   :math:`\sin x` and :math:`\cos x`.
+
+   :param x: the input argument.
+   :param s: a pointer to the sine return value.
+   :param c: a pointer to the cosine return value.
+
 .. _real128_hyper:
 
 Hyperbolic functions
@@ -1279,7 +1292,7 @@ Integer and remainder-related functions
    the integral part of *x* into the variable pointed to by *iptr*.
 
    :param x: the input argument.
-   :param iptr: the pointer to the return value for the integral part.
+   :param iptr: a pointer to the return value for the integral part.
 
    :return: the fractional part of *x*.
 

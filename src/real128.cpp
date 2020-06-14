@@ -404,4 +404,9 @@ real128 remquo(const real128 &x, const real128 &y, int *quo)
     return real128{::remquoq(x.m_value, y.m_value, quo)};
 }
 
+void sincos(const real128 &x, real128 *s, real128 *c)
+{
+    ::sincosq(x.m_value, &s->m_value, &c->m_value);
+}
+
 } // namespace mppp
