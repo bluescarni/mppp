@@ -1254,6 +1254,20 @@ Integer and remainder-related functions
 
    :return: the floating modulus or remainder of :math:`x/y`.
 
+.. cpp:function:: mppp::real128 mppp::modf(const mppp::real128 &x, mppp::real128 *iptr)
+
+   .. versionadded:: 0.21
+
+   Decompose in integral and fractional parts.
+
+   This function will return the fractional part of *x*, and it will store
+   the integral part of *x* into the variable pointed to by *iptr*.
+
+   :param x: the input argument.
+   :param iptr: the pointer to the return value for the integral part.
+
+   :return: the fractional part of *x*.
+
 .. _real128_io:
 
 Input/Output

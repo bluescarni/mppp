@@ -249,3 +249,19 @@ TEST_CASE("real128 remainder")
     REQUIRE(remainder(1_rq, 2_q1) == 1);
     REQUIRE(remainder(10_rq, 3_q1) == 1);
 }
+
+TEST_CASE("real128 modf")
+{
+    real128 out;
+
+    REQUIRE(modf(1.25_rq, &out) == .25_rq);
+    REQUIRE(out == 1);
+
+    REQUIRE(modf(-1.25_rq, &out) == -.25_rq);
+    REQUIRE(out == -1);
+
+    // Try overlap.
+    out = 1.25_rq;
+    REQUIRE(modf(out, &out) == .25_rq);
+    REQUIRE(out == 1);
+}

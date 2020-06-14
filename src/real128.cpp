@@ -342,6 +342,8 @@ MPPP_REAL128_IMPLEMENT_UNARY(j1)
 MPPP_REAL128_IMPLEMENT_UNARY(y0)
 MPPP_REAL128_IMPLEMENT_UNARY(y1)
 
+#undef MPPP_REAL128_IMPLEMENT_UNARY
+
 real128 jn(int n, const real128 &x)
 {
     return real128{::jnq(n, x.m_value)};
@@ -351,8 +353,6 @@ real128 yn(int n, const real128 &x)
 {
     return real128{::ynq(n, x.m_value)};
 }
-
-#undef MPPP_REAL128_IMPLEMENT_UNARY
 
 long long llrint(const real128 &x)
 {
@@ -392,6 +392,11 @@ real128 real128::logb() const
 real128 logb(const real128 &x)
 {
     return x.logb();
+}
+
+real128 modf(const real128 &x, real128 *iptr)
+{
+    return real128{::modfq(x.m_value, &iptr->m_value)};
 }
 
 } // namespace mppp
