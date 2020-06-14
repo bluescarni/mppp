@@ -265,3 +265,14 @@ TEST_CASE("real128 modf")
     REQUIRE(modf(out, &out) == .25_rq);
     REQUIRE(out == 1);
 }
+
+TEST_CASE("real128 remquo")
+{
+    int quo = 0;
+
+    REQUIRE(remquo(3_rq, 2.5_rq, &quo) == .5_rq);
+    REQUIRE(remquo(4_rq, 1.5_rq, &quo) == -.5_rq);
+    REQUIRE(remquo(-3_rq, -2.5_rq, &quo) == -.5_rq);
+    REQUIRE(remquo(-1_rq, 2_rq, &quo) == -1);
+    REQUIRE(remquo(1_rq, 2_rq, &quo) == 1);
+}

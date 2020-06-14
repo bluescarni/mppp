@@ -1254,6 +1254,21 @@ Integer and remainder-related functions
 
    :return: the floating modulus or remainder of :math:`x/y`.
 
+.. cpp:function:: mppp::real128 mppp::remquo(const mppp::real128 &x, const mppp::real128 &y, int *quo)
+
+   .. versionadded:: 0.21
+
+   Remainder and quotient.
+
+   This function will return the remainder of the division :math:`x/y`. Additionally,
+   it will store the sign and at least three of the least significant bits of :math:`x/y` in *quo*.
+
+   :param x: the numerator.
+   :param y: the denominator.
+   :param quo: a pointer to the quotient return value.
+
+   :return: the remainder of :math:`x/y`.
+
 .. cpp:function:: mppp::real128 mppp::modf(const mppp::real128 &x, mppp::real128 *iptr)
 
    .. versionadded:: 0.21

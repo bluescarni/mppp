@@ -399,4 +399,9 @@ real128 modf(const real128 &x, real128 *iptr)
     return real128{::modfq(x.m_value, &iptr->m_value)};
 }
 
+real128 remquo(const real128 &x, const real128 &y, int *quo)
+{
+    return real128{::remquoq(x.m_value, y.m_value, quo)};
+}
+
 } // namespace mppp
