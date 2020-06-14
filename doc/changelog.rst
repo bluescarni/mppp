@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Finish exposing the functions from ``libquadmath``
+  for :cpp:class:`~mppp::real128`
+  (`#255 <https://github.com/bluescarni/mppp/pull/255>`__).
 - Expose more MPFR functions
   for :cpp:class:`~mppp::real`
   (`#255 <https://github.com/bluescarni/mppp/pull/255>`__,
