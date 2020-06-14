@@ -752,8 +752,13 @@ Arithmetic
 
 .. cpp:function:: mppp::real128 mppp::scalbn(const mppp::real128 &x, int n)
 .. cpp:function:: mppp::real128 mppp::scalbln(const mppp::real128 &x, long n)
+.. cpp:function:: mppp::real128 mppp::ldexp(const mppp::real128 &x, int n)
 
    Multiply by power of 2.
+
+   .. versionadded:: 0.21
+
+      The ``ldexp()`` function.
 
    :param x: the input :cpp:class:`~mppp::real128`.
    :param n: the power of 2 by which *x* will be multiplied.

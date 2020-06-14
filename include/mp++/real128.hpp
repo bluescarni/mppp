@@ -872,15 +872,9 @@ constexpr
 }
 
 // Multiply by power of 2.
-inline real128 scalbn(const real128 &x, int n)
-{
-    return real128{detail::scalbnq(x.m_value, n)};
-}
-
-inline real128 scalbln(const real128 &x, long n)
-{
-    return real128{detail::scalblnq(x.m_value, n)};
-}
+MPPP_DLL_PUBLIC real128 scalbn(const real128 &, int);
+MPPP_DLL_PUBLIC real128 scalbln(const real128 &, long);
+MPPP_DLL_PUBLIC real128 ldexp(const real128 &, int);
 
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real128 &);

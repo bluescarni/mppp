@@ -221,6 +221,22 @@ real128 frexp(const real128 &x, int *exp)
     return real128{::frexpq(x.m_value, exp)};
 }
 
+// Multiply by a power of 2.
+real128 ldexp(const real128 &x, int exp)
+{
+    return real128{::ldexpq(x.m_value, exp)};
+}
+
+real128 scalbn(const real128 &x, int n)
+{
+    return real128{detail::scalbnq(x.m_value, n)};
+}
+
+real128 scalbln(const real128 &x, long n)
+{
+    return real128{detail::scalblnq(x.m_value, n)};
+}
+
 // Fused multiply-add.
 real128 fma(const real128 &x, const real128 &y, const real128 &z)
 {
