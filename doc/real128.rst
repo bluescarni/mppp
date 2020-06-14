@@ -497,6 +497,11 @@ The real128 class
    .. cpp:function:: real128 &log2()
    .. cpp:function:: real128 &log1p()
 
+      .. note::
+
+         The ``exp2()`` function is available only in ``libquadmath``
+         from GCC 9 onwards.
+
       In-place logarithms and exponentials.
 
       These member functions will set ``this`` to, respectively:
@@ -720,6 +725,23 @@ Arithmetic
    :param n: the power of 2 by which *x* will be multiplied.
 
    :return: :math:`x \times 2^n`.
+
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fdim(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Positive difference.
+
+   This function returns the positive difference between *x* and *y*.
+   That is, if :math:`x>y`, returns :math:`x-y`, otherwise returns :math:`+0`.
+   Internally, the implementation uses the ``fdimq()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the positive difference of *x* and *y*.
 
 .. _real128_comparison:
 
@@ -996,6 +1018,11 @@ Logarithms and exponentials
 .. cpp:function:: mppp::real128 mppp::log2(mppp::real128 x)
 .. cpp:function:: mppp::real128 mppp::log1p(mppp::real128 x)
 
+   .. note::
+
+      The ``exp2()`` function is available only in ``libquadmath``
+      from GCC 9 onwards.
+
    Logarithms and exponentials.
 
    These functions will return, respectively:
@@ -1051,23 +1078,6 @@ Other special functions
    :param x: the input value.
 
    :return: the (complementary) error function of :math:`x`.
-
-.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fdim(const T &x, const U &y)
-
-   .. versionadded:: 0.21
-
-   Positive difference.
-
-   This function returns the positive difference between *x* and *y*.
-   That is, if :math:`x>y`, returns :math:`x-y`, otherwise returns :math:`+0`.
-   Internally, the implementation uses the ``fdimq()`` function from the quadmath library,
-   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
-   (if necessary).
-
-   :param x: the first argument.
-   :param y: the second argument.
-
-   :return: the positive difference of *x* and *y*.
 
 .. _real128_fpmanip:
 
