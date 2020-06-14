@@ -384,4 +384,14 @@ int ilogb(const real128 &x)
     return x.ilogb();
 }
 
+real128 real128::logb() const
+{
+    return real128{::logbq(m_value)};
+}
+
+real128 logb(const real128 &x)
+{
+    return x.logb();
+}
+
 } // namespace mppp

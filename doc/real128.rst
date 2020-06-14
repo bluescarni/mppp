@@ -350,8 +350,11 @@ The real128 class
         in ``this``.
 
    .. cpp:function:: int ilogb() const
+   .. cpp:function:: real128 logb() const
 
-      :return: the unbiased exponent of ``this``.
+      .. versionadded:: 0.21
+
+      :return: the unbiased exponent of ``this``, as a ``int`` or as a :cpp:class:`~mppp::real128`.
 
    .. cpp:function:: bool signbit() const
 
@@ -710,6 +713,7 @@ Conversion
    :return: the binary significand of *x*.
 
 .. cpp:function:: int mppp::ilogb(const mppp::real128 &x)
+.. cpp:function:: real128 mppp::logb(const mppp::real128 &x)
 
    .. versionadded:: 0.21
 
@@ -717,7 +721,7 @@ Conversion
 
    :param x: the input argument.
 
-   :return: the unbiased exponent of *x*.
+   :return: the unbiased exponent of *x*, as a ``int`` or as a :cpp:class:`~mppp::real128`.
 
 .. _real128_arithmetic:
 

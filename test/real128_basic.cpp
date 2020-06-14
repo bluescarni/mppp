@@ -671,6 +671,12 @@ TEST_CASE("real128 ilogb")
 
     REQUIRE(x.ilogb() == std::get<1>(tup) - 16383);
     REQUIRE(ilogb(x) == std::get<1>(tup) - 16383);
+    REQUIRE(std::is_same<int, decltype(x.ilogb())>::value);
+    REQUIRE(std::is_same<int, decltype(ilogb(x))>::value);
+    REQUIRE(x.logb() == std::get<1>(tup) - 16383);
+    REQUIRE(logb(x) == std::get<1>(tup) - 16383);
+    REQUIRE(std::is_same<real128, decltype(x.logb())>::value);
+    REQUIRE(std::is_same<real128, decltype(logb(x))>::value);
 }
 
 TEST_CASE("real128 numeric_limits")
