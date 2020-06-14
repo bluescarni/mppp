@@ -27,6 +27,7 @@
 @MPPP_ENABLE_MPC@
 @MPPP_ENABLE_QUADMATH@
 #cmakedefine MPPP_QUADMATH_HAVE_EXP2Q
+#cmakedefine MPPP_QUADMATH_HAVE_LOGBQ
 @MPPP_STATIC_BUILD@
 // clang-format on
 // End of defines instantiated by CMake.

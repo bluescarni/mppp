@@ -314,6 +314,8 @@ int ilogb(const real128 &x)
     return x.ilogb();
 }
 
+#if defined(MPPP_QUADMATH_HAVE_LOGBQ)
+
 real128 real128::logb() const
 {
     return real128{::logbq(m_value)};
@@ -323,6 +325,8 @@ real128 logb(const real128 &x)
 {
     return x.logb();
 }
+
+#endif
 
 real128 modf(const real128 &x, real128 *iptr)
 {

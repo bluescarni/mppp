@@ -697,7 +697,9 @@ public:
 
     // Unbiased exponent.
     MPPP_NODISCARD int ilogb() const;
+#if defined(MPPP_QUADMATH_HAVE_LOGBQ)
     MPPP_NODISCARD real128 logb() const;
+#endif
 
     // Get the IEEE representation of the value.
     MPPP_NODISCARD std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t>
@@ -838,7 +840,9 @@ MPPP_DLL_PUBLIC real128 frexp(const real128 &, int *);
 
 // Unbiased exponent.
 MPPP_DLL_PUBLIC int ilogb(const real128 &);
+#if defined(MPPP_QUADMATH_HAVE_LOGBQ)
 MPPP_DLL_PUBLIC real128 logb(const real128 &);
+#endif
 
 // Fused multiply-add.
 MPPP_DLL_PUBLIC real128 fma(const real128 &, const real128 &, const real128 &);

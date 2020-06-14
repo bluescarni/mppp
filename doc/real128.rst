@@ -352,9 +352,14 @@ The real128 class
    .. cpp:function:: int ilogb() const
    .. cpp:function:: real128 logb() const
 
+      .. note::
+
+         The ``logb()`` function is available in ``libquadmath``
+         from GCC 6 onwards.
+
       .. versionadded:: 0.21
 
-      :return: the unbiased exponent of ``this``, as a ``int`` or as a :cpp:class:`~mppp::real128`.
+      :return: the unbiased exponent of ``this``, as an ``int`` or as a :cpp:class:`~mppp::real128`.
 
    .. cpp:function:: bool signbit() const
 
@@ -506,7 +511,7 @@ The real128 class
 
       .. note::
 
-         The ``exp2()`` function is available only in ``libquadmath``
+         The ``exp2()`` function is available in ``libquadmath``
          from GCC 9 onwards.
 
       In-place logarithms and exponentials.
@@ -724,13 +729,18 @@ Conversion
 .. cpp:function:: int mppp::ilogb(const mppp::real128 &x)
 .. cpp:function:: real128 mppp::logb(const mppp::real128 &x)
 
+   .. note::
+
+      The ``logb()`` function is available in ``libquadmath``
+      from GCC 6 onwards.
+
    .. versionadded:: 0.21
 
    Unbiased exponent.
 
    :param x: the input argument.
 
-   :return: the unbiased exponent of *x*, as a ``int`` or as a :cpp:class:`~mppp::real128`.
+   :return: the unbiased exponent of *x*, as an ``int`` or as a :cpp:class:`~mppp::real128`.
 
 .. _real128_arithmetic:
 
@@ -1085,7 +1095,7 @@ Logarithms and exponentials
 
    .. note::
 
-      The ``exp2()`` function is available only in ``libquadmath``
+      The ``exp2()`` function is available in ``libquadmath``
       from GCC 9 onwards.
 
    Logarithms and exponentials.
