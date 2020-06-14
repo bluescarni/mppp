@@ -1157,6 +1157,32 @@ Integer and remainder-related functions
 
    :return: the result of the operation.
 
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fmod(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::remainder(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Floating modulus and remainder.
+
+   These functions will return, respectively, the floating modulus and the remainder of the
+   division :math:`x/y`.
+
+   The floating modulus is :math:`x - n\times y`, where :math:`n` is :math:`x/y` with its fractional part truncated.
+
+   The remainder is :math:`x - m\times y`, where :math:`m` is the integral value nearest the exact value
+   :math:`x/y`.
+
+   Special values are handled as described in the C99 standard.
+
+   Internally, the implementation uses the ``fmodq()`` and ``remainderq()`` functions from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the numerator.
+   :param y: the denominator.
+
+   :return: the floating modulus or remainder of :math:`x/y`.
+
 .. _real128_io:
 
 Input/Output

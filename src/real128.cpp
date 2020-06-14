@@ -278,6 +278,16 @@ real128 dispatch_real128_fmin(const real128 &y, const real128 &x)
     return real128{::fminq(y.m_value, x.m_value)};
 }
 
+real128 dispatch_real128_fmod(const real128 &y, const real128 &x)
+{
+    return real128{::fmodq(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_remainder(const real128 &y, const real128 &x)
+{
+    return real128{::remainderq(y.m_value, x.m_value)};
+}
+
 } // namespace detail
 
 #define MPPP_REAL128_IMPLEMENT_UNARY(func)                                                                             \

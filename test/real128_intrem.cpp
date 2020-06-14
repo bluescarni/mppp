@@ -8,6 +8,8 @@
 
 #include <type_traits>
 
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"
@@ -215,4 +217,35 @@ TEST_CASE("real128 lround")
     REQUIRE(lround(2.5_rq) == 3);
     REQUIRE(lround(-2.1_rq) == -2);
     REQUIRE(lround(-2.5_rq) == -3);
+}
+
+TEST_CASE("real128 fmod")
+{
+    REQUIRE(fmod(3_rq, 2.5_rq) == .5_rq);
+    REQUIRE(fmod(-3_rq, -2.5_rq) == -.5_rq);
+    REQUIRE(fmod(-1_rq, 2_rq) == -1);
+    REQUIRE(fmod(1_rq, 2_rq) == 1);
+
+    // Couple of small tests with non-real128 args.
+    REQUIRE(fmod(3, 2.5_rq) == .5_rq);
+    REQUIRE(fmod(-3., -2.5_rq) == -.5_rq);
+    REQUIRE(fmod(-1_rq, 2_z1) == -1);
+    REQUIRE(fmod(1_rq, 2_q1) == 1);
+}
+
+TEST_CASE("real128 remainder")
+{
+    REQUIRE(remainder(3_rq, 2.5_rq) == .5_rq);
+    REQUIRE(remainder(4_rq, 1.5_rq) == -.5_rq);
+    REQUIRE(remainder(-3_rq, -2.5_rq) == -.5_rq);
+    REQUIRE(remainder(-1_rq, 2_rq) == -1);
+    REQUIRE(remainder(1_rq, 2_rq) == 1);
+
+    // Couple of small tests with non-real128 args.
+    REQUIRE(remainder(3, 2.5_rq) == .5_rq);
+    REQUIRE(remainder(4, 1.5_rq) == -.5_rq);
+    REQUIRE(remainder(-3., -2.5_rq) == -.5_rq);
+    REQUIRE(remainder(-1_rq, 2_z1) == -1);
+    REQUIRE(remainder(1_rq, 2_q1) == 1);
+    REQUIRE(remainder(10_rq, 3_q1) == 1);
 }
