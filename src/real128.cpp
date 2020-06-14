@@ -209,30 +209,6 @@ real128 &real128::atanh()
     return *this = ::atanhq(m_value);
 }
 
-// In-place natural exponential function.
-real128 &real128::exp()
-{
-    return *this = ::expq(m_value);
-}
-
-// In-place natural logarithm.
-real128 &real128::log()
-{
-    return *this = ::logq(m_value);
-}
-
-// In-place base-10 logarithm.
-real128 &real128::log10()
-{
-    return *this = ::log10q(m_value);
-}
-
-// In-place base-2 logarithm.
-real128 &real128::log2()
-{
-    return *this = ::log2q(m_value);
-}
-
 // In-place lgamma function.
 real128 &real128::lgamma()
 {
@@ -306,6 +282,14 @@ MPPP_REAL128_IMPLEMENT_UNARY(nearbyint)
 MPPP_REAL128_IMPLEMENT_UNARY(rint)
 MPPP_REAL128_IMPLEMENT_UNARY(round)
 MPPP_REAL128_IMPLEMENT_UNARY(trunc)
+
+MPPP_REAL128_IMPLEMENT_UNARY(exp)
+MPPP_REAL128_IMPLEMENT_UNARY(exp2)
+MPPP_REAL128_IMPLEMENT_UNARY(expm1)
+MPPP_REAL128_IMPLEMENT_UNARY(log)
+MPPP_REAL128_IMPLEMENT_UNARY(log10)
+MPPP_REAL128_IMPLEMENT_UNARY(log2)
+MPPP_REAL128_IMPLEMENT_UNARY(log1p)
 
 MPPP_REAL128_IMPLEMENT_UNARY(erf)
 MPPP_REAL128_IMPLEMENT_UNARY(erfc)

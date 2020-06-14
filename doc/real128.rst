@@ -490,20 +490,30 @@ The real128 class
       :return: a reference to ``this``.
 
    .. cpp:function:: real128 &exp()
+   .. cpp:function:: real128 &exp2()
+   .. cpp:function:: real128 &expm1()
    .. cpp:function:: real128 &log()
    .. cpp:function:: real128 &log10()
    .. cpp:function:: real128 &log2()
+   .. cpp:function:: real128 &log1p()
 
       In-place logarithms and exponentials.
 
       These member functions will set ``this`` to, respectively:
 
       * :math:`e^x`,
+      * :math:`2^x`,
+      * :math:`e^x - 1`,
       * :math:`\log{x}`,
       * :math:`\log_{10}{x}`,
       * :math:`\log_2{x}`,
+      * :math:`\log{\left( 1 + x \right)}`,
 
       where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.21
+
+         The ``exp2()``, ``expm1()`` and ``log1p()`` functions.
 
       :return: a reference to ``this``.
 
@@ -961,28 +971,32 @@ Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. cpp:function:: mppp::real128 mppp::exp(mppp::real128 x)
-
-   Exponential function.
-
-   :param x: the input value.
-
-   :return: :math:`e^x`.
-
+.. cpp:function:: mppp::real128 mppp::exp2(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::expm1(mppp::real128 x)
 .. cpp:function:: mppp::real128 mppp::log(mppp::real128 x)
 .. cpp:function:: mppp::real128 mppp::log10(mppp::real128 x)
 .. cpp:function:: mppp::real128 mppp::log2(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::log1p(mppp::real128 x)
 
-   Logarithms.
+   Logarithms and exponentials.
 
    These functions will return, respectively:
 
-   * :math:`\log x`,
-   * :math:`\log_{10} x`,
-   * :math:`\log_2 x`.
+   * :math:`e^x`,
+   * :math:`2^x`,
+   * :math:`e^x - 1`,
+   * :math:`\log{x}`,
+   * :math:`\log_{10}{x}`,
+   * :math:`\log_2{x}`,
+   * :math:`\log{\left( 1 + x \right)}`.
+
+   .. versionadded:: 0.21
+
+      The ``exp2()``, ``expm1()`` and ``log1p()`` functions.
 
    :param x: the input value.
 
-   :return: a logarithm of *x*.
+   :return: a logarithm/exponential of *x*.
 
 .. _real128_gamma:
 

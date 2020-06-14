@@ -798,14 +798,14 @@ public:
     // In-place inverse hyperbolic tangent.
     real128 &atanh();
 
-    // In-place natural exponential function.
+    // In-place exponentials and logarithms.
     real128 &exp();
-    // In-place natural logarithm.
+    real128 &exp2();
+    real128 &expm1();
     real128 &log();
-    // In-place base-10 logarithm.
     real128 &log10();
-    // In-place base-2 logarithm.
     real128 &log2();
+    real128 &log1p();
 
     // In-place lgamma function.
     real128 &lgamma();
@@ -995,29 +995,14 @@ REAL128_IMPLEMENT_BINARY_OPERATION(hypot)
 // Exponentiation.
 REAL128_IMPLEMENT_BINARY_OPERATION(pow)
 
-// Exponential function.
-inline real128 exp(real128 x)
-{
-    return x.exp();
-}
-
-// Natural logarithm.
-inline real128 log(real128 x)
-{
-    return x.log();
-}
-
-// Base-10 logarithm.
-inline real128 log10(real128 x)
-{
-    return x.log10();
-}
-
-// Base-2 logarithm.
-inline real128 log2(real128 x)
-{
-    return x.log2();
-}
+// Logarithms and exponentials.
+MPPP_DLL_PUBLIC real128 exp(const real128 &);
+MPPP_DLL_PUBLIC real128 exp2(const real128 &);
+MPPP_DLL_PUBLIC real128 expm1(const real128 &);
+MPPP_DLL_PUBLIC real128 log(const real128 &);
+MPPP_DLL_PUBLIC real128 log10(const real128 &);
+MPPP_DLL_PUBLIC real128 log2(const real128 &);
+MPPP_DLL_PUBLIC real128 log1p(const real128 &);
 
 // Sine.
 inline real128 sin(real128 x)
