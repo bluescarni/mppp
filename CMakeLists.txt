@@ -361,6 +361,7 @@ if(MPPP_WITH_MPFR)
     check_symbol_exists(mpfr_gamma_inc "mpfr.h" MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
     check_symbol_exists(mpfr_beta "mpfr.h" MPPP_MPFR_HAVE_MPFR_BETA)
     check_symbol_exists(mpfr_roundeven "mpfr.h" MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+    check_symbol_exists(mpfr_fmodquo "mpfr.h" MPPP_MPFR_HAVE_MPFR_FMODQUO)
     unset(CMAKE_REQUIRED_INCLUDES)
     unset(CMAKE_REQUIRED_LIBRARIES)
 
