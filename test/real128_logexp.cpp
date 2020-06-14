@@ -6,6 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"
@@ -47,6 +48,7 @@ TEST_CASE("real128 logexp")
     x.log2();
     REQUIRE(x == log2(real128{2}));
 
+#if defined(MPPP_QUADMATH_HAVE_EXP2Q)
     // exp2.
     REQUIRE(exp2(real128{}) == 1);
     REQUIRE(abs(exp2(real128{1}) - 2) < 1E-32);
@@ -55,6 +57,7 @@ TEST_CASE("real128 logexp")
     x = 2;
     x.exp2();
     REQUIRE(x == exp2(real128{2}));
+#endif
 
     // expm1.
     REQUIRE(expm1(real128{}) == 0);

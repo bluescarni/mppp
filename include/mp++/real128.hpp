@@ -800,7 +800,9 @@ public:
 
     // In-place exponentials and logarithms.
     real128 &exp();
+#if defined(MPPP_QUADMATH_HAVE_EXP2Q)
     real128 &exp2();
+#endif
     real128 &expm1();
     real128 &log();
     real128 &log10();
@@ -997,7 +999,9 @@ MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(pow)
 
 // Logarithms and exponentials.
 MPPP_DLL_PUBLIC real128 exp(const real128 &);
+#if defined(MPPP_QUADMATH_HAVE_EXP2Q)
 MPPP_DLL_PUBLIC real128 exp2(const real128 &);
+#endif
 MPPP_DLL_PUBLIC real128 expm1(const real128 &);
 MPPP_DLL_PUBLIC real128 log(const real128 &);
 MPPP_DLL_PUBLIC real128 log10(const real128 &);
