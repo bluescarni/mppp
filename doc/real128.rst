@@ -535,6 +535,26 @@ The real128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: real128 &j0()
+   .. cpp:function:: real128 &j1()
+   .. cpp:function:: real128 &y0()
+   .. cpp:function:: real128 &y1()
+
+      .. versionadded:: 0.21
+
+      In-place Bessel functions of the first and second kind.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`J_0\left( x \right)`,
+      * :math:`J_1\left( x \right)`,
+      * :math:`Y_0\left( x \right)`,
+      * :math:`Y_1\left( x \right)`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
    .. cpp:function:: real128 &erf()
    .. cpp:function:: real128 &erfc()
 
@@ -1070,13 +1090,41 @@ Gamma functions
 
    :return: :math:`\log\Gamma\left( x \right)`.
 
+Bessel functions
+~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mppp::real128 mppp::j0(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::j1(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::jn(int n, const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::y0(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::y1(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::yn(int n, const mppp::real128 &x)
+
+   .. versionadded:: 0.21
+
+   Bessel functions of the first and second kind of integral order.
+
+   These functions will return, respectively,
+
+   * :math:`J_0\left( x \right)`,
+   * :math:`J_1\left( x \right)`,
+   * :math:`J_n\left( x \right)`,
+   * :math:`Y_0\left( x \right)`,
+   * :math:`Y_1\left( x \right)`,
+   * :math:`Y_n\left( x \right)`.
+
+   :param n: the order of the Bessel function.
+   :param x: the argument.
+
+   :return: a Bessel function of *x*.
+
 .. _real128_miscfuncts:
 
 Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::erf(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::erfc(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::erf(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::erfc(const mppp::real128 &x)
 
    Error functions.
 

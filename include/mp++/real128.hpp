@@ -815,6 +815,12 @@ public:
     // In-place lgamma function.
     real128 &lgamma();
 
+    // Bessel functions.
+    real128 &j0();
+    real128 &j1();
+    real128 &y0();
+    real128 &y1();
+
     // In-place error functions.
     real128 &erf();
     real128 &erfc();
@@ -1094,6 +1100,15 @@ inline real128 lgamma(real128 x)
 {
     return x.lgamma();
 }
+
+// Bessel functions.
+MPPP_DLL_PUBLIC real128 j0(const real128 &);
+MPPP_DLL_PUBLIC real128 j1(const real128 &);
+MPPP_DLL_PUBLIC real128 y0(const real128 &);
+MPPP_DLL_PUBLIC real128 y1(const real128 &);
+
+MPPP_DLL_PUBLIC real128 jn(int, const real128 &);
+MPPP_DLL_PUBLIC real128 yn(int, const real128 &);
 
 // Error functions.
 MPPP_DLL_PUBLIC real128 erf(const real128 &);

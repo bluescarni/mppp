@@ -321,6 +321,21 @@ MPPP_REAL128_IMPLEMENT_UNARY(log1p)
 MPPP_REAL128_IMPLEMENT_UNARY(erf)
 MPPP_REAL128_IMPLEMENT_UNARY(erfc)
 
+MPPP_REAL128_IMPLEMENT_UNARY(j0)
+MPPP_REAL128_IMPLEMENT_UNARY(j1)
+MPPP_REAL128_IMPLEMENT_UNARY(y0)
+MPPP_REAL128_IMPLEMENT_UNARY(y1)
+
+real128 jn(int n, const real128 &x)
+{
+    return real128{::jnq(n, x.m_value)};
+}
+
+real128 yn(int n, const real128 &x)
+{
+    return real128{::ynq(n, x.m_value)};
+}
+
 #undef MPPP_REAL128_IMPLEMENT_UNARY
 
 long long llrint(const real128 &x)
