@@ -125,90 +125,6 @@ bool real128::signbit() const
     return ::signbitq(m_value) != 0;
 }
 
-// In-place square root.
-real128 &real128::sqrt()
-{
-    return *this = ::sqrtq(m_value);
-}
-
-// In-place cube root.
-real128 &real128::cbrt()
-{
-    return *this = ::cbrtq(m_value);
-}
-
-// In-place sine.
-real128 &real128::sin()
-{
-    return *this = ::sinq(m_value);
-}
-
-// In-place cosine.
-real128 &real128::cos()
-{
-    return *this = ::cosq(m_value);
-}
-
-// In-place tangent.
-real128 &real128::tan()
-{
-    return *this = ::tanq(m_value);
-}
-
-// In-place inverse sine.
-real128 &real128::asin()
-{
-    return *this = ::asinq(m_value);
-}
-
-// In-place inverse cosine.
-real128 &real128::acos()
-{
-    return *this = ::acosq(m_value);
-}
-
-// In-place inverse tangent.
-real128 &real128::atan()
-{
-    return *this = ::atanq(m_value);
-}
-
-// In-place hyperbolic sine.
-real128 &real128::sinh()
-{
-    return *this = ::sinhq(m_value);
-}
-
-// In-place hyperbolic cosine.
-real128 &real128::cosh()
-{
-    return *this = ::coshq(m_value);
-}
-
-// In-place hyperbolic tangent.
-real128 &real128::tanh()
-{
-    return *this = ::tanhq(m_value);
-}
-
-// In-place inverse hyperbolic sine.
-real128 &real128::asinh()
-{
-    return *this = ::asinhq(m_value);
-}
-
-// In-place inverse hyperbolic cosine.
-real128 &real128::acosh()
-{
-    return *this = ::acoshq(m_value);
-}
-
-// In-place inverse hyperbolic tangent.
-real128 &real128::atanh()
-{
-    return *this = ::atanhq(m_value);
-}
-
 // Decompose into a normalized fraction and an integral power of two.
 real128 frexp(const real128 &x, int *exp)
 {
@@ -338,6 +254,23 @@ MPPP_REAL128_IMPLEMENT_UNARY(j0)
 MPPP_REAL128_IMPLEMENT_UNARY(j1)
 MPPP_REAL128_IMPLEMENT_UNARY(y0)
 MPPP_REAL128_IMPLEMENT_UNARY(y1)
+
+MPPP_REAL128_IMPLEMENT_UNARY(sqrt)
+MPPP_REAL128_IMPLEMENT_UNARY(cbrt)
+
+MPPP_REAL128_IMPLEMENT_UNARY(sin)
+MPPP_REAL128_IMPLEMENT_UNARY(cos)
+MPPP_REAL128_IMPLEMENT_UNARY(tan)
+MPPP_REAL128_IMPLEMENT_UNARY(asin)
+MPPP_REAL128_IMPLEMENT_UNARY(acos)
+MPPP_REAL128_IMPLEMENT_UNARY(atan)
+
+MPPP_REAL128_IMPLEMENT_UNARY(sinh)
+MPPP_REAL128_IMPLEMENT_UNARY(cosh)
+MPPP_REAL128_IMPLEMENT_UNARY(tanh)
+MPPP_REAL128_IMPLEMENT_UNARY(asinh)
+MPPP_REAL128_IMPLEMENT_UNARY(acosh)
+MPPP_REAL128_IMPLEMENT_UNARY(atanh)
 
 #undef MPPP_REAL128_IMPLEMENT_UNARY
 

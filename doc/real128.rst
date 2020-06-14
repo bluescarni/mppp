@@ -935,8 +935,8 @@ Comparison
 Roots
 ~~~~~
 
-.. cpp:function:: mppp::real128 mppp::sqrt(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::cbrt(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sqrt(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::cbrt(const mppp::real128 &x)
 
    Root functions.
 
@@ -992,12 +992,12 @@ Exponentiation
 Trigonometry
 ~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::sin(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::cos(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::tan(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::asin(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::acos(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::atan(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sin(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::cos(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::tan(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::asin(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::acos(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::atan(const mppp::real128 &x)
 
    Trigonometric functions.
 
@@ -1048,12 +1048,12 @@ Trigonometry
 Hyperbolic functions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::sinh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::cosh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::tanh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::asinh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::acosh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::atanh(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sinh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::cosh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::tanh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::asinh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::acosh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::atanh(const mppp::real128 &x)
 
    Hyperbolic functions.
 
@@ -1075,13 +1075,13 @@ Hyperbolic functions
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::exp(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::exp2(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::expm1(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::log(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::log10(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::log2(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::log1p(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::exp(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::exp2(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::expm1(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::log(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::log10(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::log2(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::log1p(const mppp::real128 &x)
 
    .. note::
 
@@ -1219,16 +1219,16 @@ Floating-point manipulation
 Integer and remainder-related functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::ceil(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::floor(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::nearbyint(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::rint(mppp::real128 x)
-.. cpp:function:: long long mppp::llrint(mppp::real128 x)
-.. cpp:function:: long mppp::lrint(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::round(mppp::real128 x)
-.. cpp:function:: long long mppp::llround(mppp::real128 x)
-.. cpp:function:: long mppp::lround(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::trunc(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::ceil(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::floor(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::nearbyint(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::rint(const mppp::real128 &x)
+.. cpp:function:: long long mppp::llrint(const mppp::real128 &x)
+.. cpp:function:: long mppp::lrint(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::round(const mppp::real128 &x)
+.. cpp:function:: long long mppp::llround(const mppp::real128 &x)
+.. cpp:function:: long mppp::lround(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::trunc(const mppp::real128 &x)
 
    .. versionadded:: 0.21
 
@@ -1362,8 +1362,8 @@ Other
 Mathematical operators
 ----------------------
 
-.. cpp:function:: constexpr mppp::real128 mppp::operator+(mppp::real128 x)
-.. cpp:function:: constexpr mppp::real128 mppp::operator-(mppp::real128 x)
+.. cpp:function:: constexpr mppp::real128 mppp::operator+(const mppp::real128 &x)
+.. cpp:function:: constexpr mppp::real128 mppp::operator-(const mppp::real128 &x)
 
    Identity and negation.
 

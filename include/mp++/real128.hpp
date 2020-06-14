@@ -213,16 +213,12 @@ constexpr
     abs(const real128 &);
 
 // For the future:
-// - finish wrapping up the quadmath API
 // - the constructor from integer *may* be implemented in a faster way by reading directly the hi/lo parts
 //   and writing them to the ieee union (instead right now we are using __float128 arithmetics and quadmath
 //   functions). Make sure to benchmark first though...
 // - initial code for stream formatting at 687b86d9380a534048f62aac3815c31b094e52d2. The problem to be
 //   solved is the segfault in MinGW.
 // - should we change the cast operator to C++ types to check the result of the conversion?
-// - the pattern of implementing the member function and then using it to implement the free function
-//   (e.g., for sqrt()) seems to incur in more copies than necessary. Consider the reverse, implementing
-//   the free function first and then the member function.
 
 // Quadruple-precision floating-point class.
 class MPPP_DLL_PUBLIC real128
@@ -769,37 +765,24 @@ public:
         return *this = mppp::abs(*this);
     }
 
-    // In-place square root.
+    // In-place roots.
     real128 &sqrt();
-    // In-place cube root.
     real128 &cbrt();
 
-    // In-place sine.
+    // In-place trigonometric functions.
     real128 &sin();
-    // In-place cosine.
     real128 &cos();
-    // In-place tangent.
     real128 &tan();
-
-    // In-place inverse sine.
     real128 &asin();
-    // In-place inverse cosine.
     real128 &acos();
-    // In-place inverse tangent.
     real128 &atan();
 
-    // In-place hyperbolic sine.
+    // In-place hyperbolic functions.
     real128 &sinh();
-    // In-place hyperbolic cosine.
     real128 &cosh();
-    // In-place hyperbolic tangent.
     real128 &tanh();
-
-    // In-place inverse hyperbolic sine.
     real128 &asinh();
-    // In-place inverse hyperbolic cosine.
     real128 &acosh();
-    // In-place inverse hyperbolic tangent.
     real128 &atanh();
 
     // In-place exponentials and logarithms.
@@ -957,17 +940,9 @@ constexpr
     bool
     real128_gt(const real128 &, const real128 &);
 
-// Unary square root.
-inline real128 sqrt(real128 x)
-{
-    return x.sqrt();
-}
-
-// Unary cube root.
-inline real128 cbrt(real128 x)
-{
-    return x.cbrt();
-}
+// Roots.
+MPPP_DLL_PUBLIC real128 sqrt(const real128 &);
+MPPP_DLL_PUBLIC real128 cbrt(const real128 &);
 
 // Machinery to define binary operations involving real128.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1017,41 +992,13 @@ MPPP_DLL_PUBLIC real128 log10(const real128 &);
 MPPP_DLL_PUBLIC real128 log2(const real128 &);
 MPPP_DLL_PUBLIC real128 log1p(const real128 &);
 
-// Sine.
-inline real128 sin(real128 x)
-{
-    return x.sin();
-}
-
-// Cosine.
-inline real128 cos(real128 x)
-{
-    return x.cos();
-}
-
-// Tangent.
-inline real128 tan(real128 x)
-{
-    return x.tan();
-}
-
-// Inverse sine.
-inline real128 asin(real128 x)
-{
-    return x.asin();
-}
-
-// Inverse cosine.
-inline real128 acos(real128 x)
-{
-    return x.acos();
-}
-
-// Inverse tangent.
-inline real128 atan(real128 x)
-{
-    return x.atan();
-}
+// Trigonometric functions.
+MPPP_DLL_PUBLIC real128 sin(const real128 &);
+MPPP_DLL_PUBLIC real128 cos(const real128 &);
+MPPP_DLL_PUBLIC real128 tan(const real128 &);
+MPPP_DLL_PUBLIC real128 asin(const real128 &);
+MPPP_DLL_PUBLIC real128 acos(const real128 &);
+MPPP_DLL_PUBLIC real128 atan(const real128 &);
 
 // atan2.
 MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(atan2)
@@ -1059,41 +1006,13 @@ MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(atan2)
 // Sine and cosine at the same time.
 MPPP_DLL_PUBLIC void sincos(const real128 &, real128 *, real128 *);
 
-// Hyperbolic sine.
-inline real128 sinh(real128 x)
-{
-    return x.sinh();
-}
-
-// Hyperbolic cosine.
-inline real128 cosh(real128 x)
-{
-    return x.cosh();
-}
-
-// Hyperbolic tangent.
-inline real128 tanh(real128 x)
-{
-    return x.tanh();
-}
-
-// Inverse hyperbolic sine.
-inline real128 asinh(real128 x)
-{
-    return x.asinh();
-}
-
-// Inverse hyperbolic cosine.
-inline real128 acosh(real128 x)
-{
-    return x.acosh();
-}
-
-// Inverse hyperbolic tangent.
-inline real128 atanh(real128 x)
-{
-    return x.atanh();
-}
+// Hyperbolic functions.
+MPPP_DLL_PUBLIC real128 sinh(const real128 &);
+MPPP_DLL_PUBLIC real128 cosh(const real128 &);
+MPPP_DLL_PUBLIC real128 tanh(const real128 &);
+MPPP_DLL_PUBLIC real128 asinh(const real128 &);
+MPPP_DLL_PUBLIC real128 acosh(const real128 &);
+MPPP_DLL_PUBLIC real128 atanh(const real128 &);
 
 // Gamma functions.
 MPPP_DLL_PUBLIC real128 lgamma(const real128 &);
@@ -1147,7 +1066,7 @@ MPPP_DLL_PUBLIC real128 remquo(const real128 &, const real128 &, int *);
 #undef MPPP_REAL128_IMPLEMENT_BINARY_OPERATION
 
 // Identity operator.
-constexpr real128 operator+(real128 x)
+constexpr real128 operator+(const real128 &x)
 {
     return x;
 }
