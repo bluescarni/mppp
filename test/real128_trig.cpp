@@ -129,3 +129,12 @@ TEST_CASE("real128 atan2")
     REQUIRE(!detail::is_detected<atan2_t, long double, real128>::value);
 #endif
 }
+
+TEST_CASE("real128 sincos sim")
+{
+    real128 s, c;
+    sincos(1.2_rq, &s, &c);
+
+    REQUIRE(s == sin(1.2_rq));
+    REQUIRE(c == cos(1.2_rq));
+}
