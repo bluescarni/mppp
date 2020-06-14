@@ -1471,6 +1471,35 @@ Arithmetic
 
    :return: the square of *r*.
 
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::dim(mppp::real &rop, T &&x, U &&y)
+
+   .. versionadded:: 0.21
+
+   Ternary positive difference.
+
+   This function will set *rop* to the positive difference of *x* and *y*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::dim(T &&x, U &&y)
+
+   .. versionadded:: 0.21
+
+   Binary positive difference.
+
+   This function will compute and return the positive difference of *x* and *y*.
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the positive difference of *x* and *y*.
+
 .. _real_comparison:
 
 Comparison

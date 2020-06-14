@@ -1943,6 +1943,9 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
 MPPP_REAL_MPFR_UNARY_IMPL(neg, ::mpfr_neg, true)
 MPPP_REAL_MPFR_UNARY_IMPL(abs, ::mpfr_abs, true)
 
+// Positive difference.
+MPPP_REAL_MPFR_BINARY_IMPL(dim, ::mpfr_dim, true)
+
 // Square root.
 MPPP_REAL_MPFR_UNARY_IMPL(sqrt, ::mpfr_sqrt, true)
 
