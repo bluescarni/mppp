@@ -63,6 +63,10 @@ namespace
 
 // Minimal RAII struct to hold
 // arb_t types.
+// NOTE: we used to have an arf_raii struct here as well,
+// but it is not used any more. This is the last commit
+// where it is still present:
+// 4c1b916e68e124ababb18311ca217715134ced3a
 struct arb_raii {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     arb_raii()
@@ -78,25 +82,6 @@ struct arb_raii {
         ::arb_clear(m_arb);
     }
     ::arb_t m_arb;
-};
-
-// Minimal RAII struct to hold
-// arf_t types.
-struct arf_raii {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-    arf_raii()
-    {
-        ::arf_init(m_arf);
-    }
-    arf_raii(const arf_raii &) = delete;
-    arf_raii(arf_raii &&) = delete;
-    arf_raii &operator=(const arf_raii &) = delete;
-    arf_raii &operator=(arf_raii &&) = delete;
-    ~arf_raii()
-    {
-        ::arf_clear(m_arf);
-    }
-    ::arf_t m_arf;
 };
 
 #if defined(MPPP_WITH_MPC)
@@ -255,65 +240,21 @@ void arb_log_hypot(::mpfr_t rop, const ::mpfr_t x, const ::mpfr_t y)
     }
 }
 
-MPPP_UNARY_ARB_WRAPPER(sin_pi)
-MPPP_UNARY_ARB_WRAPPER(cos_pi)
-
-// NOTE: tan_pi needs special handling for certain
-// input values.
-void arb_tan_pi(::mpfr_t rop, const ::mpfr_t op)
-{
-    MPPP_MAYBE_TLS arb_raii arb_op;
-    mpfr_to_arb(arb_op.m_arb, op);
-
-    // If op is exactly n/2 (with n an odd integer),
-    // the Arb function will return nan rather than +-inf.
-    // Handle this case specially.
-    if (::arf_is_int(arb_midref(arb_op.m_arb)) == 0 && ::arf_is_int_2exp_si(arb_midref(arb_op.m_arb), -1) != 0) {
-        MPPP_MAYBE_TLS arf_raii arf_tmp;
-
-        // The strategy is to truncate op and then, based
-        // on the parity of the result, return +inf or -inf.
-        // Because Arb does not have a truncation primitive,
-        // we need to use floor/ceil depending on the sign
-        // of op.
-        if (::arf_sgn(arb_midref(arb_op.m_arb)) == 1) {
-            // op > 0.
-            ::arf_floor(arf_tmp.m_arf, arb_midref(arb_op.m_arb));
-            ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arf_tmp.m_arf, 1) != 0 ? 1 : -1);
-        } else {
-            // op < 0.
-            assert(::arf_sgn(arb_midref(arb_op.m_arb)) == -1);
-            ::arf_ceil(arf_tmp.m_arf, arb_midref(arb_op.m_arb));
-            ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arf_tmp.m_arf, 1) != 0 ? -1 : 1);
-        }
-    } else {
-        MPPP_MAYBE_TLS arb_raii arb_rop;
-
-        ::arb_tan_pi(arb_rop.m_arb, arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
-
-        arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
-    }
-}
-
-// NOTE: cot_pi needs special handling for certain
-// input values.
-void arb_cot_pi(::mpfr_t rop, const ::mpfr_t op)
+void arb_log_base_ui(::mpfr_t rop, const ::mpfr_t op, unsigned long b)
 {
     MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
+
     mpfr_to_arb(arb_op.m_arb, op);
 
-    // If op is exactly n (with n an integer),
-    // the Arb function will return nan rather than +-inf.
-    // Handle this case specially.
-    if (::arf_is_int(arb_midref(arb_op.m_arb)) != 0) {
-        ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arb_midref(arb_op.m_arb), 1) != 0 ? 1 : -1);
-    } else {
-        ::arb_cot_pi(arb_rop.m_arb, arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+    ::arb_log_base_ui(arb_rop.m_arb, arb_op.m_arb, safe_cast<::ulong>(b), mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
 
-        arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
-    }
+    arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
 }
 
+MPPP_UNARY_ARB_WRAPPER(sin_pi)
+MPPP_UNARY_ARB_WRAPPER(cos_pi)
+MPPP_UNARY_ARB_WRAPPER(tan_pi)
+MPPP_UNARY_ARB_WRAPPER(cot_pi)
 MPPP_UNARY_ARB_WRAPPER(sinc)
 
 // NOTE: sinc_pi needs special handling for certain

@@ -171,6 +171,7 @@ MPPP_DLL_PUBLIC void real_frac_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void arb_sqrt1pm1(::mpfr_t, const ::mpfr_t);
 
 MPPP_DLL_PUBLIC void arb_log_hypot(::mpfr_t, const ::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_log_base_ui(::mpfr_t, const ::mpfr_t, unsigned long);
 
 MPPP_DLL_PUBLIC void arb_sin_pi(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void arb_cos_pi(::mpfr_t, const ::mpfr_t);
@@ -2235,6 +2236,36 @@ MPPP_REAL_MPFR_UNARY_IMPL(log2, ::mpfr_log2, true)
 MPPP_REAL_MPFR_UNARY_IMPL(log10, ::mpfr_log10, true)
 MPPP_REAL_MPFR_UNARY_IMPL(log1p, ::mpfr_log1p, true)
 
+#if defined(MPPP_WITH_ARB)
+
+// log_hypot.
+MPPP_REAL_MPFR_BINARY_IMPL(log_hypot, detail::arb_log_hypot, false)
+
+// log_base_ui.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log_base_ui(real &rop, T &&op, unsigned long b)
+{
+    auto wrapper = [b](::mpfr_t r, const ::mpfr_t o) { detail::arb_log_base_ui(r, o, b); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log_base_ui(T &&r, unsigned long b)
+{
+    auto wrapper = [b](::mpfr_t rop, const ::mpfr_t op) { detail::arb_log_base_ui(rop, op, b); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
+}
+
+#endif
+
 // Gamma functions.
 MPPP_REAL_MPFR_UNARY_IMPL(gamma, ::mpfr_gamma, true)
 MPPP_REAL_MPFR_UNARY_IMPL(lngamma, ::mpfr_lngamma, true)
@@ -2327,13 +2358,6 @@ MPPP_REAL_MPFR_BINARY_IMPL(beta, ::mpfr_beta, true)
 
 // hypot.
 MPPP_REAL_MPFR_BINARY_IMPL(hypot, ::mpfr_hypot, true)
-
-#if defined(MPPP_WITH_ARB)
-
-// log_hypot.
-MPPP_REAL_MPFR_BINARY_IMPL(log_hypot, detail::arb_log_hypot, false)
-
-#endif
 
 // agm.
 MPPP_REAL_MPFR_BINARY_IMPL(agm, ::mpfr_agm, true)

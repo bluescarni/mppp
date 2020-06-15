@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement additional special functions for :cpp:class:`~mppp::real`
+  (``log_base_ui()``)
+  (`#256 <https://github.com/bluescarni/mppp/pull/256>`__).
 - Finish exposing the functions from ``libquadmath``
   for :cpp:class:`~mppp::real128`
   (`#255 <https://github.com/bluescarni/mppp/pull/255>`__).
@@ -44,6 +47,9 @@ Changes
 Fix
 ~~~
 
+- Fix the return value of the :cpp:class:`~mppp::real`
+  ``tan_pi()`` and ``cot_pi()`` functions at the poles
+  (`#256 <https://github.com/bluescarni/mppp/pull/256>`__).
 - Implement a workaround for a build issue with Xcode
   (`#251 <https://github.com/bluescarni/mppp/pull/251>`__).
 
