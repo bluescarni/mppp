@@ -291,45 +291,35 @@ TEST_CASE("real trig arb")
         REQUIRE(tan_pi(0_r128).zero_p());
         REQUIRE(tan_pi(0_r128).get_prec() == 128);
 
-        REQUIRE(tan_pi(0.5_r128).inf_p());
+        REQUIRE(tan_pi(0.5_r128).nan_p());
         REQUIRE(tan_pi(0.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(0.5_r128) > 0);
 
-        REQUIRE(tan_pi(1.5_r128).inf_p());
+        REQUIRE(tan_pi(1.5_r128).nan_p());
         REQUIRE(tan_pi(1.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(1.5_r128) < 0);
 
-        REQUIRE(tan_pi(2.5_r128).inf_p());
+        REQUIRE(tan_pi(2.5_r128).nan_p());
         REQUIRE(tan_pi(2.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(2.5_r128) > 0);
 
-        REQUIRE(tan_pi(3.5_r128).inf_p());
+        REQUIRE(tan_pi(3.5_r128).nan_p());
         REQUIRE(tan_pi(3.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(3.5_r128) < 0);
 
-        REQUIRE(tan_pi(650.5_r128).inf_p());
+        REQUIRE(tan_pi(650.5_r128).nan_p());
         REQUIRE(tan_pi(650.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(650.5_r128) > 0);
 
-        REQUIRE(tan_pi(-0.5_r128).inf_p());
+        REQUIRE(tan_pi(-0.5_r128).nan_p());
         REQUIRE(tan_pi(-0.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(-0.5_r128) < 0);
 
-        REQUIRE(tan_pi(-1.5_r128).inf_p());
+        REQUIRE(tan_pi(-1.5_r128).nan_p());
         REQUIRE(tan_pi(-1.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(-1.5_r128) > 0);
 
-        REQUIRE(tan_pi(-2.5_r128).inf_p());
+        REQUIRE(tan_pi(-2.5_r128).nan_p());
         REQUIRE(tan_pi(-2.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(-2.5_r128) < 0);
 
-        REQUIRE(tan_pi(-3.5_r128).inf_p());
+        REQUIRE(tan_pi(-3.5_r128).nan_p());
         REQUIRE(tan_pi(-3.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(-3.5_r128) > 0);
 
-        REQUIRE(tan_pi(-650.5_r128).inf_p());
+        REQUIRE(tan_pi(-650.5_r128).nan_p());
         REQUIRE(tan_pi(-650.5_r128).get_prec() == 128);
-        REQUIRE(tan_pi(-650.5_r128) < 0);
     }
 
     {
@@ -354,41 +344,32 @@ TEST_CASE("real trig arb")
         REQUIRE(cot_pi(real{"nan", 128}).get_prec() == 128);
 
         // Special values.
-        REQUIRE(cot_pi(0_r128).inf_p());
+        REQUIRE(cot_pi(0_r128).nan_p());
         REQUIRE(cot_pi(0_r128).get_prec() == 128);
-        REQUIRE(cot_pi(0_r128) > 0);
 
-        REQUIRE(cot_pi(1_r128).inf_p());
+        REQUIRE(cot_pi(1_r128).nan_p());
         REQUIRE(cot_pi(1_r128).get_prec() == 128);
-        REQUIRE(cot_pi(1_r128) < 0);
 
-        REQUIRE(cot_pi(2._r128).inf_p());
+        REQUIRE(cot_pi(2._r128).nan_p());
         REQUIRE(cot_pi(2._r128).get_prec() == 128);
-        REQUIRE(cot_pi(2._r128) > 0);
 
-        REQUIRE(cot_pi(3_r128).inf_p());
+        REQUIRE(cot_pi(3_r128).nan_p());
         REQUIRE(cot_pi(3_r128).get_prec() == 128);
-        REQUIRE(cot_pi(3_r128) < 0);
 
-        REQUIRE(cot_pi(650_r128).inf_p());
+        REQUIRE(cot_pi(650_r128).nan_p());
         REQUIRE(cot_pi(650_r128).get_prec() == 128);
-        REQUIRE(cot_pi(650_r128) > 0);
 
-        REQUIRE(cot_pi(-1_r128).inf_p());
+        REQUIRE(cot_pi(-1_r128).nan_p());
         REQUIRE(cot_pi(-1_r128).get_prec() == 128);
-        REQUIRE(cot_pi(-1_r128) < 0);
 
-        REQUIRE(cot_pi(-2._r128).inf_p());
+        REQUIRE(cot_pi(-2._r128).nan_p());
         REQUIRE(cot_pi(-2._r128).get_prec() == 128);
-        REQUIRE(cot_pi(-2._r128) > 0);
 
-        REQUIRE(cot_pi(-3_r128).inf_p());
+        REQUIRE(cot_pi(-3_r128).nan_p());
         REQUIRE(cot_pi(-3_r128).get_prec() == 128);
-        REQUIRE(cot_pi(-3_r128) < 0);
 
-        REQUIRE(cot_pi(-650_r128).inf_p());
+        REQUIRE(cot_pi(-650_r128).nan_p());
         REQUIRE(cot_pi(-650_r128).get_prec() == 128);
-        REQUIRE(cot_pi(-650_r128) > 0);
     }
 
     {

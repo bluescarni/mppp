@@ -44,6 +44,9 @@ Changes
 Fix
 ~~~
 
+- Fix the return value of the :cpp:class:`~mppp::real`
+  ``tan_pi()`` and ``cot_pi()`` functions at the poles
+  (`#256 <https://github.com/bluescarni/mppp/pull/256>`__).
 - Implement a workaround for a build issue with Xcode
   (`#251 <https://github.com/bluescarni/mppp/pull/251>`__).
 

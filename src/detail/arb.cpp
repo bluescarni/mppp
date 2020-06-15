@@ -257,63 +257,8 @@ void arb_log_hypot(::mpfr_t rop, const ::mpfr_t x, const ::mpfr_t y)
 
 MPPP_UNARY_ARB_WRAPPER(sin_pi)
 MPPP_UNARY_ARB_WRAPPER(cos_pi)
-
-// NOTE: tan_pi needs special handling for certain
-// input values.
-void arb_tan_pi(::mpfr_t rop, const ::mpfr_t op)
-{
-    MPPP_MAYBE_TLS arb_raii arb_op;
-    mpfr_to_arb(arb_op.m_arb, op);
-
-    // If op is exactly n/2 (with n an odd integer),
-    // the Arb function will return nan rather than +-inf.
-    // Handle this case specially.
-    if (::arf_is_int(arb_midref(arb_op.m_arb)) == 0 && ::arf_is_int_2exp_si(arb_midref(arb_op.m_arb), -1) != 0) {
-        MPPP_MAYBE_TLS arf_raii arf_tmp;
-
-        // The strategy is to truncate op and then, based
-        // on the parity of the result, return +inf or -inf.
-        // Because Arb does not have a truncation primitive,
-        // we need to use floor/ceil depending on the sign
-        // of op.
-        if (::arf_sgn(arb_midref(arb_op.m_arb)) == 1) {
-            // op > 0.
-            ::arf_floor(arf_tmp.m_arf, arb_midref(arb_op.m_arb));
-            ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arf_tmp.m_arf, 1) != 0 ? 1 : -1);
-        } else {
-            // op < 0.
-            assert(::arf_sgn(arb_midref(arb_op.m_arb)) == -1);
-            ::arf_ceil(arf_tmp.m_arf, arb_midref(arb_op.m_arb));
-            ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arf_tmp.m_arf, 1) != 0 ? -1 : 1);
-        }
-    } else {
-        MPPP_MAYBE_TLS arb_raii arb_rop;
-
-        ::arb_tan_pi(arb_rop.m_arb, arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
-
-        arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
-    }
-}
-
-// NOTE: cot_pi needs special handling for certain
-// input values.
-void arb_cot_pi(::mpfr_t rop, const ::mpfr_t op)
-{
-    MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
-    mpfr_to_arb(arb_op.m_arb, op);
-
-    // If op is exactly n (with n an integer),
-    // the Arb function will return nan rather than +-inf.
-    // Handle this case specially.
-    if (::arf_is_int(arb_midref(arb_op.m_arb)) != 0) {
-        ::mpfr_set_inf(rop, ::arf_is_int_2exp_si(arb_midref(arb_op.m_arb), 1) != 0 ? 1 : -1);
-    } else {
-        ::arb_cot_pi(arb_rop.m_arb, arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
-
-        arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
-    }
-}
-
+MPPP_UNARY_ARB_WRAPPER(tan_pi)
+MPPP_UNARY_ARB_WRAPPER(cot_pi)
 MPPP_UNARY_ARB_WRAPPER(sinc)
 
 // NOTE: sinc_pi needs special handling for certain
