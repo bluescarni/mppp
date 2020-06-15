@@ -1943,6 +1943,9 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
 MPPP_REAL_MPFR_UNARY_IMPL(neg, ::mpfr_neg, true)
 MPPP_REAL_MPFR_UNARY_IMPL(abs, ::mpfr_abs, true)
 
+// Positive difference.
+MPPP_REAL_MPFR_BINARY_IMPL(dim, ::mpfr_dim, true)
+
 // Square root.
 MPPP_REAL_MPFR_UNARY_IMPL(sqrt, ::mpfr_sqrt, true)
 
@@ -2256,8 +2259,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &jn(real &rop, long n, T &&op)
 {
-    auto jn_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_jn(r, n, o, MPFR_RNDN); };
-    return detail::mpfr_nary_op_impl<false>(0, jn_wrapper, rop, std::forward<T>(op));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_jn(r, n, o, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2267,8 +2270,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real jn(long n, T &&r)
 {
-    auto jn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_jn(rop, n, op, MPFR_RNDN); };
-    return detail::mpfr_nary_op_return_impl<false>(0, jn_wrapper, std::forward<T>(r));
+    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_jn(rop, n, op, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
 MPPP_REAL_MPFR_UNARY_IMPL(y0, ::mpfr_y0, true)
@@ -2282,8 +2285,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &yn(real &rop, long n, T &&op)
 {
-    auto yn_wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_yn(r, n, o, MPFR_RNDN); };
-    return detail::mpfr_nary_op_impl<false>(0, yn_wrapper, rop, std::forward<T>(op));
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_yn(r, n, o, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2293,8 +2296,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real yn(long n, T &&r)
 {
-    auto yn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_yn(rop, n, op, MPFR_RNDN); };
-    return detail::mpfr_nary_op_return_impl<false>(0, yn_wrapper, std::forward<T>(r));
+    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_yn(rop, n, op, MPFR_RNDN); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
 #if defined(MPPP_WITH_ARB)
@@ -2378,6 +2381,32 @@ inline void modf(real &iop, real &fop, T &&op)
 
 MPPP_REAL_MPFR_BINARY_IMPL(fmod, ::mpfr_fmod, true)
 MPPP_REAL_MPFR_BINARY_IMPL(remainder, ::mpfr_remainder, true)
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T, cvr_real U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &remquo(real &rop, long *q, T &&x, U &&y)
+{
+    auto wrapper = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_remquo(r, q, o1, o2, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x), std::forward<U>(y));
+}
+
+#if defined(MPPP_MPFR_HAVE_MPFR_FMODQUO)
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T, cvr_real U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
+{
+    auto wrapper = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_fmodquo(r, q, o1, o2, MPFR_RNDN); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x), std::forward<U>(y));
+}
+
+#endif
 
 #undef MPPP_REAL_MPFR_UNARY_HEADER
 #undef MPPP_REAL_MPFR_UNARY_IMPL

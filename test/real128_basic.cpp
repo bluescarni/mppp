@@ -21,6 +21,7 @@
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -661,6 +662,23 @@ TEST_CASE("real128 frexp")
     REQUIRE(exp == 5);
     REQUIRE(frexp(1 / real128{16}, &exp) == real128{"0.5"});
     REQUIRE(exp == -3);
+}
+
+TEST_CASE("real128 logb")
+{
+    const auto x = 1.234_rq;
+    const auto tup = x.get_ieee();
+
+    REQUIRE(x.ilogb() == std::get<1>(tup) - 16383);
+    REQUIRE(ilogb(x) == std::get<1>(tup) - 16383);
+    REQUIRE(std::is_same<int, decltype(x.ilogb())>::value);
+    REQUIRE(std::is_same<int, decltype(ilogb(x))>::value);
+#if defined(MPPP_QUADMATH_HAVE_LOGBQ)
+    REQUIRE(x.logb() == std::get<1>(tup) - 16383);
+    REQUIRE(logb(x) == std::get<1>(tup) - 16383);
+    REQUIRE(std::is_same<real128, decltype(x.logb())>::value);
+    REQUIRE(std::is_same<real128, decltype(logb(x))>::value);
+#endif
 }
 
 TEST_CASE("real128 numeric_limits")

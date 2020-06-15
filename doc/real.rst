@@ -1471,6 +1471,35 @@ Arithmetic
 
    :return: the square of *r*.
 
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::dim(mppp::real &rop, T &&x, U &&y)
+
+   .. versionadded:: 0.21
+
+   Ternary positive difference.
+
+   This function will set *rop* to the positive difference of *x* and *y*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::dim(T &&x, U &&y)
+
+   .. versionadded:: 0.21
+
+   Binary positive difference.
+
+   This function will compute and return the positive difference of *x* and *y*.
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the positive difference of *x* and *y*.
+
 .. _real_comparison:
 
 Comparison
@@ -2695,6 +2724,8 @@ Integer and remainder related functions
 
 .. cpp:function:: template <mppp::cvr_real T> void mppp::modf(mppp::real &iop, mppp::real &fop, T &&op)
 
+   .. versionadded:: 0.21
+
    Simultaneous integral and fractional parts.
 
    This function will set *iop* and *fop* respectively to the integral and
@@ -2711,6 +2742,8 @@ Integer and remainder related functions
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::fmod(mppp::real &rop, T &&x, U &&y)
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::remainder(mppp::real &rop, T &&x, U &&y)
+
+   .. versionadded:: 0.21
 
    Ternary floating modulus and remainder.
 
@@ -2735,6 +2768,8 @@ Integer and remainder related functions
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::fmod(T &&x, U &&y)
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::remainder(T &&x, U &&y)
 
+   .. versionadded:: 0.21
+
    Binary floating modulus and remainder.
 
    These functions will return, respectively, the floating modulus and the remainder of the
@@ -2753,6 +2788,31 @@ Integer and remainder related functions
    :param y: the denominator.
 
    :return: the floating modulus or remainder of :math:`x/y`.
+
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::fmodquo(mppp::real &rop, long *q, T &&x, U &&y)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::remquo(mppp::real &rop, long *q, T &&x, U &&y)
+
+   .. note::
+
+      The ``fmodquo()`` function is available from MPFR 4 onwards.
+
+   .. versionadded:: 0.21
+
+   Floating modulus and remainder with quotient.
+
+   These functions will set *rop* to, respectively, the floating modulus and the remainder of the
+   division :math:`x/y`. Additionally, they will also store the low significant bits from the quotient
+   in the value pointed to by *q* (more precisely the number of bits in a ``long`` minus one),
+   with the sign of *x* divided by *y* (except if those low bits are all zero, in which case zero is returned).
+
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param q: a pointer to the quotient return value.
+   :param x: the numerator.
+   :param y: the denominator.
+
+   :return: a reference to *rop*.
 
 .. _real_io:
 

@@ -571,3 +571,65 @@ TEST_CASE("real remainder")
     REQUIRE(remainder(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
     REQUIRE(remainder(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
+
+TEST_CASE("real remquo")
+{
+    long q = 0;
+
+    real r0{12, 450};
+    remquo(r0, &q, real{1}, sqrt(real{2}));
+    REQUIRE(abs(r0 - -0.414213562384) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    real tmp1{1}, tmp2{sqrt(real{2})};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    remquo(r0, &q, std::move(tmp1), tmp2);
+    REQUIRE(abs(r0 - -0.414213562384) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp1 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+    REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
+    tmp1 = real{1};
+    tmp2 = real{sqrt(real{2})};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    remquo(r0, &q, tmp1, std::move(tmp2));
+    REQUIRE(abs(r0 - -0.414213562384) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp2 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+    REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
+}
+
+#if defined(MPPP_MPFR_HAVE_MPFR_FMODQUO)
+
+TEST_CASE("real fmodquo")
+{
+    long q = 0;
+
+    real r0{12, 450};
+    fmodquo(r0, &q, real{1}, sqrt(real{2}));
+    REQUIRE(abs(r0 - 1) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    real tmp1{1}, tmp2{sqrt(real{2})};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    fmodquo(r0, &q, std::move(tmp1), tmp2);
+    REQUIRE(abs(r0 - 1) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp1 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+    REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
+    tmp1 = real{1};
+    tmp2 = real{sqrt(real{2})};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    fmodquo(r0, &q, tmp1, std::move(tmp2));
+    REQUIRE(abs(r0 - 1) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp2 was swapped for r0.
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+    REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
+}
+
+#endif

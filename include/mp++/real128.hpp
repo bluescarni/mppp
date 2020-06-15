@@ -83,7 +83,6 @@ union ieee_float128 {
 // we don't have to include quadmath.h here).
 MPPP_DLL_PUBLIC __float128 scalbnq(__float128, int);
 MPPP_DLL_PUBLIC __float128 scalblnq(__float128, long);
-MPPP_DLL_PUBLIC __float128 powq(__float128, __float128);
 
 // For internal use only.
 template <typename T>
@@ -214,16 +213,12 @@ constexpr
     abs(const real128 &);
 
 // For the future:
-// - finish wrapping up the quadmath API
 // - the constructor from integer *may* be implemented in a faster way by reading directly the hi/lo parts
 //   and writing them to the ieee union (instead right now we are using __float128 arithmetics and quadmath
 //   functions). Make sure to benchmark first though...
 // - initial code for stream formatting at 687b86d9380a534048f62aac3815c31b094e52d2. The problem to be
 //   solved is the segfault in MinGW.
 // - should we change the cast operator to C++ types to check the result of the conversion?
-// - the pattern of implementing the member function and then using it to implement the free function
-//   (e.g., for sqrt()) seems to incur in more copies than necessary. Consider the reverse, implementing
-//   the free function first and then the member function.
 
 // Quadruple-precision floating-point class.
 class MPPP_DLL_PUBLIC real128
@@ -700,6 +695,12 @@ public:
     // Convert to string.
     MPPP_NODISCARD std::string to_string() const;
 
+    // Unbiased exponent.
+    MPPP_NODISCARD int ilogb() const;
+#if defined(MPPP_QUADMATH_HAVE_LOGBQ)
+    MPPP_NODISCARD real128 logb() const;
+#endif
+
     // Get the IEEE representation of the value.
     MPPP_NODISCARD std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t>
     get_ieee() const
@@ -766,53 +767,58 @@ public:
         return *this = mppp::abs(*this);
     }
 
-    // In-place square root.
+    // In-place roots.
     real128 &sqrt();
-    // In-place cube root.
     real128 &cbrt();
 
-    // In-place sine.
+    // In-place trigonometric functions.
     real128 &sin();
-    // In-place cosine.
     real128 &cos();
-    // In-place tangent.
     real128 &tan();
-
-    // In-place inverse sine.
     real128 &asin();
-    // In-place inverse cosine.
     real128 &acos();
-    // In-place inverse tangent.
     real128 &atan();
 
-    // In-place hyperbolic sine.
+    // In-place hyperbolic functions.
     real128 &sinh();
-    // In-place hyperbolic cosine.
     real128 &cosh();
-    // In-place hyperbolic tangent.
     real128 &tanh();
-
-    // In-place inverse hyperbolic sine.
     real128 &asinh();
-    // In-place inverse hyperbolic cosine.
     real128 &acosh();
-    // In-place inverse hyperbolic tangent.
     real128 &atanh();
 
-    // In-place natural exponential function.
+    // In-place exponentials and logarithms.
     real128 &exp();
-    // In-place natural logarithm.
+#if defined(MPPP_QUADMATH_HAVE_EXP2Q)
+    real128 &exp2();
+#endif
+    real128 &expm1();
     real128 &log();
-    // In-place base-10 logarithm.
     real128 &log10();
-    // In-place base-2 logarithm.
     real128 &log2();
+    real128 &log1p();
 
-    // In-place lgamma function.
+    // In-place gamma functions.
     real128 &lgamma();
+    real128 &tgamma();
 
-    // In-place error function.
+    // In-place Bessel functions.
+    real128 &j0();
+    real128 &j1();
+    real128 &y0();
+    real128 &y1();
+
+    // In-place error functions.
     real128 &erf();
+    real128 &erfc();
+
+    // Integer and remainder-related functions.
+    real128 &ceil();
+    real128 &floor();
+    real128 &nearbyint();
+    real128 &rint();
+    real128 &round();
+    real128 &trunc();
 
     // The internal value.
     // NOLINTNEXTLINE(modernize-use-default-member-init)
@@ -832,6 +838,12 @@ inline MPPP_CONSTEXPR_14 auto get(T &rop, const real128 &x) -> decltype(x.get(ro
 // Decompose into a normalized fraction and an integral power of two.
 MPPP_DLL_PUBLIC real128 frexp(const real128 &, int *);
 
+// Unbiased exponent.
+MPPP_DLL_PUBLIC int ilogb(const real128 &);
+#if defined(MPPP_QUADMATH_HAVE_LOGBQ)
+MPPP_DLL_PUBLIC real128 logb(const real128 &);
+#endif
+
 // Fused multiply-add.
 MPPP_DLL_PUBLIC real128 fma(const real128 &, const real128 &, const real128 &);
 
@@ -850,15 +862,9 @@ constexpr
 }
 
 // Multiply by power of 2.
-inline real128 scalbn(const real128 &x, int n)
-{
-    return real128{detail::scalbnq(x.m_value, n)};
-}
-
-inline real128 scalbln(const real128 &x, long n)
-{
-    return real128{detail::scalblnq(x.m_value, n)};
-}
+MPPP_DLL_PUBLIC real128 scalbn(const real128 &, int);
+MPPP_DLL_PUBLIC real128 scalbln(const real128 &, long);
+MPPP_DLL_PUBLIC real128 ldexp(const real128 &, int);
 
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real128 &);
@@ -938,180 +944,133 @@ constexpr
     bool
     real128_gt(const real128 &, const real128 &);
 
-// Unary square root.
-inline real128 sqrt(real128 x)
-{
-    return x.sqrt();
-}
+// Roots.
+MPPP_DLL_PUBLIC real128 sqrt(const real128 &);
+MPPP_DLL_PUBLIC real128 cbrt(const real128 &);
 
-// Unary cube root.
-inline real128 cbrt(real128 x)
-{
-    return x.cbrt();
-}
+// Machinery to define binary operations involving real128.
+#if defined(MPPP_HAVE_CONCEPTS)
+#define MPPP_REAL128_BINARY_OP_HEADER                                                                                  \
+    template <typename T, typename U>                                                                                  \
+    requires real128_op_types<T, U>
+#else
+#define MPPP_REAL128_BINARY_OP_HEADER                                                                                  \
+    template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
+#endif
+
+#define MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fname)                                                                 \
+    namespace detail                                                                                                   \
+    {                                                                                                                  \
+    MPPP_DLL_PUBLIC real128 dispatch_real128_##fname(const real128 &, const real128 &);                                \
+    template <typename T>                                                                                              \
+    inline real128 dispatch_real128_##fname(const real128 &x, const T &y)                                              \
+    {                                                                                                                  \
+        return dispatch_real128_##fname(x, real128{y});                                                                \
+    }                                                                                                                  \
+    template <typename T>                                                                                              \
+    inline real128 dispatch_real128_##fname(const T &x, const real128 &y)                                              \
+    {                                                                                                                  \
+        return dispatch_real128_##fname(real128{x}, y);                                                                \
+    }                                                                                                                  \
+    }                                                                                                                  \
+    MPPP_REAL128_BINARY_OP_HEADER                                                                                      \
+    inline real128 fname(const T &x, const U &y)                                                                       \
+    {                                                                                                                  \
+        return detail::dispatch_real128_##fname(x, y);                                                                 \
+    }
 
 // Euclidean distance.
-MPPP_DLL_PUBLIC real128 hypot(const real128 &, const real128 &);
-
-namespace detail
-{
-
-inline real128 dispatch_pow(const real128 &x, const real128 &y)
-{
-    return real128{detail::powq(x.m_value, y.m_value)};
-}
-
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_pow(const real128 &x, const T &y)
-{
-    return real128{detail::powq(x.m_value, y)};
-}
-
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_pow(const T &x, const real128 &y)
-{
-    return real128{detail::powq(x, y.m_value)};
-}
-
-template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_pow(const real128 &x, const T &y)
-{
-    return dispatch_pow(x, real128{y});
-}
-
-template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
-inline real128 dispatch_pow(const T &x, const real128 &y)
-{
-    return dispatch_pow(real128{x}, y);
-}
-
-} // namespace detail
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(hypot)
 
 // Exponentiation.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(pow)
+
+// Logarithms and exponentials.
+MPPP_DLL_PUBLIC real128 exp(const real128 &);
+#if defined(MPPP_QUADMATH_HAVE_EXP2Q)
+MPPP_DLL_PUBLIC real128 exp2(const real128 &);
 #endif
-    inline real128 pow(const T &x, const U &y)
-{
-    return detail::dispatch_pow(x, y);
-}
+MPPP_DLL_PUBLIC real128 expm1(const real128 &);
+MPPP_DLL_PUBLIC real128 log(const real128 &);
+MPPP_DLL_PUBLIC real128 log10(const real128 &);
+MPPP_DLL_PUBLIC real128 log2(const real128 &);
+MPPP_DLL_PUBLIC real128 log1p(const real128 &);
 
-// Exponential function.
-inline real128 exp(real128 x)
-{
-    return x.exp();
-}
+// Trigonometric functions.
+MPPP_DLL_PUBLIC real128 sin(const real128 &);
+MPPP_DLL_PUBLIC real128 cos(const real128 &);
+MPPP_DLL_PUBLIC real128 tan(const real128 &);
+MPPP_DLL_PUBLIC real128 asin(const real128 &);
+MPPP_DLL_PUBLIC real128 acos(const real128 &);
+MPPP_DLL_PUBLIC real128 atan(const real128 &);
 
-// Natural logarithm.
-inline real128 log(real128 x)
-{
-    return x.log();
-}
+// atan2.
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(atan2)
 
-// Base-10 logarithm.
-inline real128 log10(real128 x)
-{
-    return x.log10();
-}
+// Sine and cosine at the same time.
+MPPP_DLL_PUBLIC void sincos(const real128 &, real128 *, real128 *);
 
-// Base-2 logarithm.
-inline real128 log2(real128 x)
-{
-    return x.log2();
-}
+// Hyperbolic functions.
+MPPP_DLL_PUBLIC real128 sinh(const real128 &);
+MPPP_DLL_PUBLIC real128 cosh(const real128 &);
+MPPP_DLL_PUBLIC real128 tanh(const real128 &);
+MPPP_DLL_PUBLIC real128 asinh(const real128 &);
+MPPP_DLL_PUBLIC real128 acosh(const real128 &);
+MPPP_DLL_PUBLIC real128 atanh(const real128 &);
 
-// Sine.
-inline real128 sin(real128 x)
-{
-    return x.sin();
-}
+// Gamma functions.
+MPPP_DLL_PUBLIC real128 lgamma(const real128 &);
+MPPP_DLL_PUBLIC real128 tgamma(const real128 &);
 
-// Cosine.
-inline real128 cos(real128 x)
-{
-    return x.cos();
-}
+// Bessel functions.
+MPPP_DLL_PUBLIC real128 j0(const real128 &);
+MPPP_DLL_PUBLIC real128 j1(const real128 &);
+MPPP_DLL_PUBLIC real128 y0(const real128 &);
+MPPP_DLL_PUBLIC real128 y1(const real128 &);
 
-// Tangent.
-inline real128 tan(real128 x)
-{
-    return x.tan();
-}
+MPPP_DLL_PUBLIC real128 jn(int, const real128 &);
+MPPP_DLL_PUBLIC real128 yn(int, const real128 &);
 
-// Inverse sine.
-inline real128 asin(real128 x)
-{
-    return x.asin();
-}
-
-// Inverse cosine.
-inline real128 acos(real128 x)
-{
-    return x.acos();
-}
-
-// Inverse tangent.
-inline real128 atan(real128 x)
-{
-    return x.atan();
-}
-
-// Hyperbolic sine.
-inline real128 sinh(real128 x)
-{
-    return x.sinh();
-}
-
-// Hyperbolic cosine.
-inline real128 cosh(real128 x)
-{
-    return x.cosh();
-}
-
-// Hyperbolic tangent.
-inline real128 tanh(real128 x)
-{
-    return x.tanh();
-}
-
-// Inverse hyperbolic sine.
-inline real128 asinh(real128 x)
-{
-    return x.asinh();
-}
-
-// Inverse hyperbolic cosine.
-inline real128 acosh(real128 x)
-{
-    return x.acosh();
-}
-
-// Inverse hyperbolic tangent.
-inline real128 atanh(real128 x)
-{
-    return x.atanh();
-}
-
-// Natural logarithm of the gamma function.
-inline real128 lgamma(real128 x)
-{
-    return x.lgamma();
-}
-
-// Error function.
-inline real128 erf(real128 x)
-{
-    return x.erf();
-}
+// Error functions.
+MPPP_DLL_PUBLIC real128 erf(const real128 &);
+MPPP_DLL_PUBLIC real128 erfc(const real128 &);
 
 // Next real128 from 'from' to 'to'.
 MPPP_DLL_PUBLIC real128 nextafter(const real128 &, const real128 &);
 
+// Copy sign.
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(copysign)
+
+// fdim.
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fdim)
+
+// fmax/fmin.
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fmax)
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fmin)
+
+// Integer and remainder-related functions.
+MPPP_DLL_PUBLIC real128 ceil(const real128 &);
+MPPP_DLL_PUBLIC real128 floor(const real128 &);
+MPPP_DLL_PUBLIC real128 nearbyint(const real128 &);
+MPPP_DLL_PUBLIC real128 rint(const real128 &);
+MPPP_DLL_PUBLIC real128 round(const real128 &);
+MPPP_DLL_PUBLIC real128 trunc(const real128 &);
+MPPP_DLL_PUBLIC long long llrint(const real128 &);
+MPPP_DLL_PUBLIC long lrint(const real128 &);
+MPPP_DLL_PUBLIC long long llround(const real128 &);
+MPPP_DLL_PUBLIC long lround(const real128 &);
+
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fmod)
+MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(remainder)
+
+MPPP_DLL_PUBLIC real128 modf(const real128 &, real128 *);
+MPPP_DLL_PUBLIC real128 remquo(const real128 &, const real128 &, int *);
+
+#undef MPPP_REAL128_BINARY_OP_HEADER
+#undef MPPP_REAL128_IMPLEMENT_BINARY_OPERATION
+
 // Identity operator.
-constexpr real128 operator+(real128 x)
+constexpr real128 operator+(const real128 &x)
 {
     return x;
 }

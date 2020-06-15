@@ -89,11 +89,6 @@ __float128 scalblnq(__float128 x, long exp)
     return ::scalblnq(x, exp);
 }
 
-__float128 powq(__float128 x, __float128 y)
-{
-    return ::powq(x, y);
-}
-
 } // namespace detail
 
 // Private string constructors.
@@ -130,142 +125,32 @@ bool real128::signbit() const
     return ::signbitq(m_value) != 0;
 }
 
-// In-place square root.
-real128 &real128::sqrt()
-{
-    return *this = ::sqrtq(m_value);
-}
-
-// In-place cube root.
-real128 &real128::cbrt()
-{
-    return *this = ::cbrtq(m_value);
-}
-
-// In-place sine.
-real128 &real128::sin()
-{
-    return *this = ::sinq(m_value);
-}
-
-// In-place cosine.
-real128 &real128::cos()
-{
-    return *this = ::cosq(m_value);
-}
-
-// In-place tangent.
-real128 &real128::tan()
-{
-    return *this = ::tanq(m_value);
-}
-
-// In-place inverse sine.
-real128 &real128::asin()
-{
-    return *this = ::asinq(m_value);
-}
-
-// In-place inverse cosine.
-real128 &real128::acos()
-{
-    return *this = ::acosq(m_value);
-}
-
-// In-place inverse tangent.
-real128 &real128::atan()
-{
-    return *this = ::atanq(m_value);
-}
-
-// In-place hyperbolic sine.
-real128 &real128::sinh()
-{
-    return *this = ::sinhq(m_value);
-}
-
-// In-place hyperbolic cosine.
-real128 &real128::cosh()
-{
-    return *this = ::coshq(m_value);
-}
-
-// In-place hyperbolic tangent.
-real128 &real128::tanh()
-{
-    return *this = ::tanhq(m_value);
-}
-
-// In-place inverse hyperbolic sine.
-real128 &real128::asinh()
-{
-    return *this = ::asinhq(m_value);
-}
-
-// In-place inverse hyperbolic cosine.
-real128 &real128::acosh()
-{
-    return *this = ::acoshq(m_value);
-}
-
-// In-place inverse hyperbolic tangent.
-real128 &real128::atanh()
-{
-    return *this = ::atanhq(m_value);
-}
-
-// In-place natural exponential function.
-real128 &real128::exp()
-{
-    return *this = ::expq(m_value);
-}
-
-// In-place natural logarithm.
-real128 &real128::log()
-{
-    return *this = ::logq(m_value);
-}
-
-// In-place base-10 logarithm.
-real128 &real128::log10()
-{
-    return *this = ::log10q(m_value);
-}
-
-// In-place base-2 logarithm.
-real128 &real128::log2()
-{
-    return *this = ::log2q(m_value);
-}
-
-// In-place lgamma function.
-real128 &real128::lgamma()
-{
-    return *this = ::lgammaq(m_value);
-}
-
-// In-place error function.
-real128 &real128::erf()
-{
-    return *this = ::erfq(m_value);
-}
-
 // Decompose into a normalized fraction and an integral power of two.
 real128 frexp(const real128 &x, int *exp)
 {
     return real128{::frexpq(x.m_value, exp)};
 }
 
+// Multiply by a power of 2.
+real128 ldexp(const real128 &x, int exp)
+{
+    return real128{::ldexpq(x.m_value, exp)};
+}
+
+real128 scalbn(const real128 &x, int n)
+{
+    return real128{detail::scalbnq(x.m_value, n)};
+}
+
+real128 scalbln(const real128 &x, long n)
+{
+    return real128{detail::scalblnq(x.m_value, n)};
+}
+
 // Fused multiply-add.
 real128 fma(const real128 &x, const real128 &y, const real128 &z)
 {
     return real128{::fmaq(x.m_value, y.m_value, z.m_value)};
-}
-
-// Euclidean distance.
-real128 hypot(const real128 &x, const real128 &y)
-{
-    return real128{::hypotq(x.m_value, y.m_value)};
 }
 
 // Next real128 from 'from' to 'to'.
@@ -279,6 +164,183 @@ std::ostream &operator<<(std::ostream &os, const real128 &x)
 {
     detail::float128_stream(os, x.m_value);
     return os;
+}
+
+namespace detail
+{
+
+real128 dispatch_real128_hypot(const real128 &x, const real128 &y)
+{
+    return real128{::hypotq(x.m_value, y.m_value)};
+}
+
+real128 dispatch_real128_pow(const real128 &x, const real128 &y)
+{
+    return real128{::powq(x.m_value, y.m_value)};
+}
+
+real128 dispatch_real128_atan2(const real128 &y, const real128 &x)
+{
+    return real128{::atan2q(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_copysign(const real128 &y, const real128 &x)
+{
+    return real128{::copysignq(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_fdim(const real128 &y, const real128 &x)
+{
+    return real128{::fdimq(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_fmax(const real128 &y, const real128 &x)
+{
+    return real128{::fmaxq(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_fmin(const real128 &y, const real128 &x)
+{
+    return real128{::fminq(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_fmod(const real128 &y, const real128 &x)
+{
+    return real128{::fmodq(y.m_value, x.m_value)};
+}
+
+real128 dispatch_real128_remainder(const real128 &y, const real128 &x)
+{
+    return real128{::remainderq(y.m_value, x.m_value)};
+}
+
+} // namespace detail
+
+#define MPPP_REAL128_IMPLEMENT_UNARY(func)                                                                             \
+    real128 func(const real128 &c)                                                                                     \
+    {                                                                                                                  \
+        return real128{::func##q(c.m_value)};                                                                          \
+    }                                                                                                                  \
+                                                                                                                       \
+    real128 &real128::func()                                                                                           \
+    {                                                                                                                  \
+        return *this = mppp::func(*this);                                                                              \
+    }
+
+MPPP_REAL128_IMPLEMENT_UNARY(ceil)
+MPPP_REAL128_IMPLEMENT_UNARY(floor)
+MPPP_REAL128_IMPLEMENT_UNARY(nearbyint)
+MPPP_REAL128_IMPLEMENT_UNARY(rint)
+MPPP_REAL128_IMPLEMENT_UNARY(round)
+MPPP_REAL128_IMPLEMENT_UNARY(trunc)
+
+MPPP_REAL128_IMPLEMENT_UNARY(exp)
+#if defined(MPPP_QUADMATH_HAVE_EXP2Q)
+MPPP_REAL128_IMPLEMENT_UNARY(exp2)
+#endif
+MPPP_REAL128_IMPLEMENT_UNARY(expm1)
+MPPP_REAL128_IMPLEMENT_UNARY(log)
+MPPP_REAL128_IMPLEMENT_UNARY(log10)
+MPPP_REAL128_IMPLEMENT_UNARY(log2)
+MPPP_REAL128_IMPLEMENT_UNARY(log1p)
+
+MPPP_REAL128_IMPLEMENT_UNARY(erf)
+MPPP_REAL128_IMPLEMENT_UNARY(erfc)
+
+MPPP_REAL128_IMPLEMENT_UNARY(lgamma)
+MPPP_REAL128_IMPLEMENT_UNARY(tgamma)
+
+MPPP_REAL128_IMPLEMENT_UNARY(j0)
+MPPP_REAL128_IMPLEMENT_UNARY(j1)
+MPPP_REAL128_IMPLEMENT_UNARY(y0)
+MPPP_REAL128_IMPLEMENT_UNARY(y1)
+
+MPPP_REAL128_IMPLEMENT_UNARY(sqrt)
+MPPP_REAL128_IMPLEMENT_UNARY(cbrt)
+
+MPPP_REAL128_IMPLEMENT_UNARY(sin)
+MPPP_REAL128_IMPLEMENT_UNARY(cos)
+MPPP_REAL128_IMPLEMENT_UNARY(tan)
+MPPP_REAL128_IMPLEMENT_UNARY(asin)
+MPPP_REAL128_IMPLEMENT_UNARY(acos)
+MPPP_REAL128_IMPLEMENT_UNARY(atan)
+
+MPPP_REAL128_IMPLEMENT_UNARY(sinh)
+MPPP_REAL128_IMPLEMENT_UNARY(cosh)
+MPPP_REAL128_IMPLEMENT_UNARY(tanh)
+MPPP_REAL128_IMPLEMENT_UNARY(asinh)
+MPPP_REAL128_IMPLEMENT_UNARY(acosh)
+MPPP_REAL128_IMPLEMENT_UNARY(atanh)
+
+#undef MPPP_REAL128_IMPLEMENT_UNARY
+
+real128 jn(int n, const real128 &x)
+{
+    return real128{::jnq(n, x.m_value)};
+}
+
+real128 yn(int n, const real128 &x)
+{
+    return real128{::ynq(n, x.m_value)};
+}
+
+long long llrint(const real128 &x)
+{
+    return ::llrintq(x.m_value);
+}
+
+long lrint(const real128 &x)
+{
+    return ::lrintq(x.m_value);
+}
+
+long long llround(const real128 &x)
+{
+    return ::llroundq(x.m_value);
+}
+
+long lround(const real128 &x)
+{
+    return ::lroundq(x.m_value);
+}
+
+int real128::ilogb() const
+{
+    return ::ilogbq(m_value);
+}
+
+int ilogb(const real128 &x)
+{
+    return x.ilogb();
+}
+
+#if defined(MPPP_QUADMATH_HAVE_LOGBQ)
+
+real128 real128::logb() const
+{
+    return real128{::logbq(m_value)};
+}
+
+real128 logb(const real128 &x)
+{
+    return x.logb();
+}
+
+#endif
+
+real128 modf(const real128 &x, real128 *iptr)
+{
+    return real128{::modfq(x.m_value, &iptr->m_value)};
+}
+
+real128 remquo(const real128 &x, const real128 &y, int *quo)
+{
+    return real128{::remquoq(x.m_value, y.m_value, quo)};
+}
+
+void sincos(const real128 &x, real128 *s, real128 *c)
+{
+    ::sincosq(x.m_value, &s->m_value, &c->m_value);
 }
 
 } // namespace mppp

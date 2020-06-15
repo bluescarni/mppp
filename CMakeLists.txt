@@ -361,6 +361,7 @@ if(MPPP_WITH_MPFR)
     check_symbol_exists(mpfr_gamma_inc "mpfr.h" MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
     check_symbol_exists(mpfr_beta "mpfr.h" MPPP_MPFR_HAVE_MPFR_BETA)
     check_symbol_exists(mpfr_roundeven "mpfr.h" MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
+    check_symbol_exists(mpfr_fmodquo "mpfr.h" MPPP_MPFR_HAVE_MPFR_FMODQUO)
     unset(CMAKE_REQUIRED_INCLUDES)
     unset(CMAKE_REQUIRED_LIBRARIES)
 
@@ -392,7 +393,24 @@ if(MPPP_WITH_QUADMATH)
         message(FATAL_ERROR "The 'MPPP_WITH_QUADMATH' option was enabled but the '__float128' type does not exist.")
     endif()
     unset(_MPPP_FLOAT128_EXISTS)
+
     find_package(mp++_quadmath REQUIRED)
+
+    # Check support for certain quadmath functions.
+    # NOTE: the CMAKE_REQUIRED_INCLUDES variable
+    # needs to be defined only if we are not using
+    # libquadmath directly.
+    if(NOT MPPP_QUADMATH_USE_DIRECTLY)
+        set(CMAKE_REQUIRED_INCLUDES "${MPPP_QUADMATH_INCLUDE_DIR}")
+    endif()
+    set(CMAKE_REQUIRED_LIBRARIES "${MPPP_QUADMATH_LIBRARY}")
+    check_symbol_exists(exp2q "quadmath.h" MPPP_QUADMATH_HAVE_EXP2Q)
+    check_symbol_exists(logbq "quadmath.h" MPPP_QUADMATH_HAVE_LOGBQ)
+    if(NOT MPPP_QUADMATH_USE_DIRECTLY)
+        unset(CMAKE_REQUIRED_INCLUDES)
+    endif()
+    unset(CMAKE_REQUIRED_LIBRARIES)
+
     target_link_libraries(mp++ PRIVATE mp++::quadmath)
     set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
 endif()

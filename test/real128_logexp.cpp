@@ -6,6 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"
@@ -46,4 +47,33 @@ TEST_CASE("real128 logexp")
     x = 2;
     x.log2();
     REQUIRE(x == log2(real128{2}));
+
+#if defined(MPPP_QUADMATH_HAVE_EXP2Q)
+    // exp2.
+    REQUIRE(exp2(real128{}) == 1);
+    REQUIRE(abs(exp2(real128{1}) - 2) < 1E-32);
+    REQUIRE(abs(exp2(real128{-1}) - 1_rq / 2) < 1E-32);
+    REQUIRE(abs(exp2(real128{2}) - 2 * 2) < 1e-32);
+    x = 2;
+    x.exp2();
+    REQUIRE(x == exp2(real128{2}));
+#endif
+
+    // expm1.
+    REQUIRE(expm1(real128{}) == 0);
+    REQUIRE(abs(expm1(real128{1}) - real128_e() + 1) < 1E-32);
+    REQUIRE(abs(expm1(real128{-1}) + 1 - 1 / real128_e()) < 1E-32);
+    REQUIRE(abs(expm1(real128{2}) + 1 - (real128_e() * real128_e())) < 1e-32);
+    x = 2;
+    x.expm1();
+    REQUIRE(x == expm1(real128{2}));
+
+    // log1p.
+    REQUIRE(log1p(real128{}) == 0);
+    REQUIRE(log1p(real128{1}) == log(2_rq));
+    REQUIRE(log1p(real128{-2}).isnan());
+    REQUIRE(abs(log1p(real128{2}) - 1.09861228866810969139524523692252561_rq) < 1e-32);
+    x = 2;
+    x.log1p();
+    REQUIRE(x == log1p(real128{2}));
 }

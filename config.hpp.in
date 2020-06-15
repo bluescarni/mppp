@@ -21,10 +21,13 @@
 #cmakedefine MPPP_MPFR_HAVE_MPFR_GAMMA_INC
 #cmakedefine MPPP_MPFR_HAVE_MPFR_BETA
 #cmakedefine MPPP_MPFR_HAVE_MPFR_ROUNDEVEN
+#cmakedefine MPPP_MPFR_HAVE_MPFR_FMODQUO
 @MPPP_ENABLE_ARB@
 #cmakedefine MPPP_ARB_HAVE_ACB_AGM
 @MPPP_ENABLE_MPC@
 @MPPP_ENABLE_QUADMATH@
+#cmakedefine MPPP_QUADMATH_HAVE_EXP2Q
+#cmakedefine MPPP_QUADMATH_HAVE_LOGBQ
 @MPPP_STATIC_BUILD@
 // clang-format on
 // End of defines instantiated by CMake.
