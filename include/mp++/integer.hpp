@@ -64,7 +64,7 @@
 #include <Winnt.h>
 // clang-format on
 
-// We use the BitScanReverse(64) intrinsic in the implementation of limb_msnb(), but
+// We use the BitScanReverse(64) intrinsic in the implementation of limb_size_nbits(), but
 // only if we are *not* on clang-cl: there, we can use GCC-style intrinsics.
 // https://msdn.microsoft.com/en-us/library/fbxyd7zd.aspx
 #if !defined(__clang__)
