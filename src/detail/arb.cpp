@@ -63,6 +63,10 @@ namespace
 
 // Minimal RAII struct to hold
 // arb_t types.
+// NOTE: we used to have an arf_raii struct here as well,
+// but it is not used any more. This is the last commit
+// where it is still present:
+// 4c1b916e68e124ababb18311ca217715134ced3a
 struct arb_raii {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     arb_raii()
@@ -78,25 +82,6 @@ struct arb_raii {
         ::arb_clear(m_arb);
     }
     ::arb_t m_arb;
-};
-
-// Minimal RAII struct to hold
-// arf_t types.
-struct arf_raii {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-    arf_raii()
-    {
-        ::arf_init(m_arf);
-    }
-    arf_raii(const arf_raii &) = delete;
-    arf_raii(arf_raii &&) = delete;
-    arf_raii &operator=(const arf_raii &) = delete;
-    arf_raii &operator=(arf_raii &&) = delete;
-    ~arf_raii()
-    {
-        ::arf_clear(m_arf);
-    }
-    ::arf_t m_arf;
 };
 
 #if defined(MPPP_WITH_MPC)
