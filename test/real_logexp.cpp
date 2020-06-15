@@ -6,6 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <type_traits>
 #include <utility>
 
 #include <mp++/config.hpp>
@@ -262,6 +263,51 @@ TEST_CASE("real log_hypot")
 
     REQUIRE(log_hypot(real{"nan", 25}, real{"nan", 32}).nan_p());
     REQUIRE(log_hypot(real{"nan", 25}, real{"nan", 32}).get_prec() == 32);
+}
+
+TEST_CASE("real log_base_ui")
+{
+    const auto cmp = 0.055385892956318409565552851937651923559275_r128;
+
+    real rop, r0{1};
+    REQUIRE(log_base_ui(rop, r0, 42) == 0);
+    REQUIRE(std::is_same<real &, decltype(log_base_ui(rop, r0, 42))>::value);
+    REQUIRE(std::is_same<real, decltype(log_base_ui(r0, 42))>::value);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(log_base_ui(std::move(r0), 42) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+    REQUIRE(!r0.is_valid());
+    r0 = 1.23_r128;
+    auto tmp = log_base_ui(std::move(r0), 42);
+    REQUIRE(abs(tmp - cmp) <= 1E-35);
+    REQUIRE(tmp.get_prec() == 128);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+    REQUIRE(!r0.is_valid());
+
+    r0 = real{};
+    log_base_ui(r0, 1.23_r128, 42);
+    REQUIRE(abs(r0 - cmp) <= 1E-35);
+    REQUIRE(r0.get_prec() == 128);
+    REQUIRE(abs(log_base_ui(1.23_r128, 42) - cmp) <= 1e-35);
+
+    REQUIRE(log_base_ui(real{-100}, 42).nan_p());
+    log_base_ui(r0, real{-100}, 42);
+    REQUIRE(r0.nan_p());
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+
+    REQUIRE(log_base_ui(real{"inf", 100}, 42).inf_p());
+    REQUIRE(log_base_ui(real{"inf", 100}, 42) > 0);
+    REQUIRE(log_base_ui(real{"inf", 100}, 42).get_prec() == 100);
+    log_base_ui(r0, real{"inf", 100}, 42);
+    REQUIRE(r0.inf_p());
+    REQUIRE(r0 > 0);
+    REQUIRE(r0.get_prec() == 100);
+
+    REQUIRE(log_base_ui(real{"-inf", 100}, 42).nan_p());
+    REQUIRE(log_base_ui(real{"-inf", 100}, 42).get_prec() == 100);
+    log_base_ui(r0, real{"-inf", 100}, 42);
+    REQUIRE(r0.nan_p());
+    REQUIRE(r0.get_prec() == 100);
 }
 
 #endif

@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement additional special functions for :cpp:class:`~mppp::real`
+  (``log_base_ui()``)
+  (`#256 <https://github.com/bluescarni/mppp/pull/256>`__).
 - Finish exposing the functions from ``libquadmath``
   for :cpp:class:`~mppp::real128`
   (`#255 <https://github.com/bluescarni/mppp/pull/255>`__).

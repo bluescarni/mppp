@@ -255,6 +255,17 @@ void arb_log_hypot(::mpfr_t rop, const ::mpfr_t x, const ::mpfr_t y)
     }
 }
 
+void arb_log_base_ui(::mpfr_t rop, const ::mpfr_t op, unsigned long b)
+{
+    MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
+
+    mpfr_to_arb(arb_op.m_arb, op);
+
+    ::arb_log_base_ui(arb_rop.m_arb, arb_op.m_arb, safe_cast<::ulong>(b), mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+    arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+}
+
 MPPP_UNARY_ARB_WRAPPER(sin_pi)
 MPPP_UNARY_ARB_WRAPPER(cos_pi)
 MPPP_UNARY_ARB_WRAPPER(tan_pi)

@@ -2175,6 +2175,12 @@ Logarithms and exponentials
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::log2(mppp::real &rop, T &&x)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::log10(mppp::real &rop, T &&x)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::log1p(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::log_base_ui(mppp::real &rop, T &&x, unsigned long b)
+
+   .. note::
+
+      The ``log_base_ui()`` function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Binary logarithms.
 
@@ -2183,19 +2189,34 @@ Logarithms and exponentials
    * :math:`\log x`,
    * :math:`\log_2 x`,
    * :math:`\log_{10} x`,
-   * :math:`\log\left( 1+x \right)`.
+   * :math:`\log\left( 1+x \right)`,
+   * :math:`\log_b x`.
 
    The precision of the result will be equal to the precision of *x*.
 
+   .. versionadded:: 0.21
+
+      The ``log_base_ui()`` function.
+
    :param rop: the return value.
    :param x: the operand.
+   :param b: the base of the logarithm.
 
    :return: a reference to *rop*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log(T &&x)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log2(T &&x)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log10(T &&x)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log1p(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log_base_ui(T &&x, unsigned long b)
+
+   .. note::
+
+      The ``log_base_ui()`` function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Unary logarithms.
 
@@ -2204,13 +2225,22 @@ Logarithms and exponentials
    * :math:`\log x`,
    * :math:`\log_2 x`,
    * :math:`\log_{10} x`,
-   * :math:`\log\left( 1+x \right)`.
+   * :math:`\log\left( 1+x \right)`,
+   * :math:`\log_b x`.
 
    The precision of the result will be equal to the precision of *x*.
 
+   .. versionadded:: 0.21
+
+      The ``log_base_ui()`` function.
+
    :param x: the operand.
+   :param b: the base of the logarithm.
 
    :return: the logarithm of *x*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::log_hypot(mppp::real &rop, T &&x, U &&y)
 
