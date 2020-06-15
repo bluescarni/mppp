@@ -2158,6 +2158,47 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3dimERN4mppp4realERN4mppp4realERR1TRR1U">
+<span id="_CPPv3I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3dimERN4mppp4realERR1TRR1U"></span><span id="_CPPv2I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3dimERN4mppp4realERR1TRR1U"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">dim</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3dimERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::dim::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3dimERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::dim::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3dimERN4mppp4realERN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Ternary positive difference.</p>
+<p>This function will set <em>rop</em> to the positive difference of <em>x</em> and <em>y</em>.
+The precision of <em>rop</em> will be set to the largest precision among the operands.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>x</strong> – the first operand.</li>
+<li><strong>y</strong> – the second operand.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3dimEN4mppp4realERR1TRR1U">
+<span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mppp3dimERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mppp3dimERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types">real_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3dimEN4mppp4realERR1TRR1U" title="mppp::dim::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">dim</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3dimEN4mppp4realERR1TRR1U" title="mppp::dim::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3dimEN4mppp4realERR1TRR1U" title="mppp::dim::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp3dimEN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Binary positive difference.</p>
+<p>This function will compute and return the positive difference of <em>x</em> and <em>y</em>.
+The precision of the result will be set to the largest precision among the operands.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the first operand.</li>
+<li><strong>y</strong> – the second operand.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the positive difference of <em>x</em> and <em>y</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="comparison">
 <span id="real-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
@@ -3970,7 +4011,10 @@ functions.</p>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4modfEvRN4mppp4realERN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp8cvr_realEEN4mppp4modfERN4mppp4realERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp4modfERN4mppp4realERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">modf</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>iop</em>, mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>fop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4modfEvRN4mppp4realERN4mppp4realERR1T" title="mppp::modf::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp4modfEvRN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Simultaneous integral and fractional parts.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Simultaneous integral and fractional parts.</p>
 <p>This function will set <em>iop</em> and <em>fop</em> respectively to the integral and
 fractional parts of <em>op</em>.
 <em>iop</em> and <em>fop</em> must be distinct objects. The precision of <em>iop</em> and <em>fop</em> will be set to the
@@ -3998,7 +4042,10 @@ precision of <em>op</em>.</p>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERN4mppp4realERR1TRR1U">
 <span id="_CPPv3I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERR1TRR1U"></span><span id="_CPPv2I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERR1TRR1U"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">remainder</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::remainder::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::remainder::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp9remainderERN4mppp4realERN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary floating modulus and remainder.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Ternary floating modulus and remainder.</p>
 <p>These functions will set <em>rop</em> to, respectively, the floating modulus and the remainder of the
 division <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
 <p>The floating modulus is <span class="math notranslate nohighlight">\(x - n\times y\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(x/y\)</span> with its fractional part truncated.</p>
@@ -4026,7 +4073,10 @@ division <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
 <dl class="cpp function">
 <dt id="_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U">
 <span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderERR1TRR1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types">real_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U" title="mppp::remainder::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">remainder</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U" title="mppp::remainder::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U" title="mppp::remainder::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp9remainderEN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary floating modulus and remainder.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Binary floating modulus and remainder.</p>
 <p>These functions will return, respectively, the floating modulus and the remainder of the
 division <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
 <p>The floating modulus is <span class="math notranslate nohighlight">\(x - n\times y\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(x/y\)</span> with its fractional part truncated.</p>
@@ -4041,6 +4091,40 @@ division <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
 </ul>
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the floating modulus or remainder of <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7fmodquoERN4mppp4realERN4mppp4realEPlRR1TRR1U">
+<span id="_CPPv3I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7fmodquoERN4mppp4realEPlRR1TRR1U"></span><span id="_CPPv2I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7fmodquoERN4mppp4realEPlRR1TRR1U"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">fmodquo</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, long *<em>q</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7fmodquoERN4mppp4realERN4mppp4realEPlRR1TRR1U" title="mppp::fmodquo::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7fmodquoERN4mppp4realERN4mppp4realEPlRR1TRR1U" title="mppp::fmodquo::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7fmodquoERN4mppp4realERN4mppp4realEPlRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp6remquoERN4mppp4realERN4mppp4realEPlRR1TRR1U">
+<span id="_CPPv3I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp6remquoERN4mppp4realEPlRR1TRR1U"></span><span id="_CPPv2I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp6remquoERN4mppp4realEPlRR1TRR1U"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">remquo</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, long *<em>q</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp6remquoERN4mppp4realERN4mppp4realEPlRR1TRR1U" title="mppp::remquo::T">T</a> &amp;&amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp6remquoERN4mppp4realERN4mppp4realEPlRR1TRR1U" title="mppp::remquo::U">U</a> &amp;&amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp6remquoERN4mppp4realERN4mppp4realEPlRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">fmodquo()</span></code> function is available from MPFR 4 onwards.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Floating modulus and remainder with quotient.</p>
+<p>These functions will set <em>rop</em> to, respectively, the floating modulus and the remainder of the
+division <span class="math notranslate nohighlight">\(x/y\)</span>. Additionally, they will also store the low significant bits from the quotient
+in the value pointed to by <em>q</em> (more precisely the number of bits in a <code class="docutils literal notranslate"><span class="pre">long</span></code> minus one),
+with the sign of <em>x</em> divided by <em>y</em> (except if those low bits are all zero, in which case zero is returned).</p>
+<p>The precision of <em>rop</em> will be set to the largest precision among the operands.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>q</strong> – a pointer to the quotient return value.</li>
+<li><strong>x</strong> – the numerator.</li>
+<li><strong>y</strong> – the denominator.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
 </dd>
 </dl>
 </dd></dl>

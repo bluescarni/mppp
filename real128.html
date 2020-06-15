@@ -87,8 +87,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#hyperbolic-functions">Hyperbolic functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gamma-functions">Gamma functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bessel-functions">Bessel functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#other-special-functions">Other special functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#floating-point-manipulation">Floating-point manipulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#integer-and-remainder-related-functions">Integer and remainder-related functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#other">Other</a></li>
 </ul>
@@ -536,6 +538,27 @@ in <code class="docutils literal notranslate"><span class="pre">this</span></cod
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4NK4mppp7real1285ilogbEv">
+<span id="_CPPv3NK4mppp7real1285ilogbEv"></span><span id="_CPPv2NK4mppp7real1285ilogbEv"></span><span id="mppp::real128::ilogbC"></span>int <code class="descname">ilogb</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7real1285ilogbEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK4mppp7real1284logbEv">
+<span id="_CPPv3NK4mppp7real1284logbEv"></span><span id="_CPPv2NK4mppp7real1284logbEv"></span><span id="mppp::real128::logbC"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descname">logb</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7real1284logbEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">logb()</span></code> function is available when using <code class="docutils literal notranslate"><span class="pre">libquadmath</span></code>
+from GCC 6 onwards.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the unbiased exponent of <code class="docutils literal notranslate"><span class="pre">this</span></code>, as an <code class="docutils literal notranslate"><span class="pre">int</span></code> or as a <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4NK4mppp7real1287signbitEv">
 <span id="_CPPv3NK4mppp7real1287signbitEv"></span><span id="_CPPv2NK4mppp7real1287signbitEv"></span><span id="mppp::real128::signbitC"></span>bool <code class="descname">signbit</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7real1287signbitEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Sign bit.</p>
@@ -745,6 +768,16 @@ is being used.</p>
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1284exp2Ev">
+<span id="_CPPv3N4mppp7real1284exp2Ev"></span><span id="_CPPv2N4mppp7real1284exp2Ev"></span><span id="mppp::real128::exp2"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">exp2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1284exp2Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1285expm1Ev">
+<span id="_CPPv3N4mppp7real1285expm1Ev"></span><span id="_CPPv2N4mppp7real1285expm1Ev"></span><span id="mppp::real128::expm1"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">expm1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1285expm1Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N4mppp7real1283logEv">
 <span id="_CPPv3N4mppp7real1283logEv"></span><span id="_CPPv2N4mppp7real1283logEv"></span><span id="mppp::real128::log"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1283logEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
@@ -757,15 +790,31 @@ is being used.</p>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7real1284log2Ev">
 <span id="_CPPv3N4mppp7real1284log2Ev"></span><span id="_CPPv2N4mppp7real1284log2Ev"></span><span id="mppp::real128::log2"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">log2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1284log2Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place logarithms and exponentials.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1285log1pEv">
+<span id="_CPPv3N4mppp7real1285log1pEv"></span><span id="_CPPv2N4mppp7real1285log1pEv"></span><span id="mppp::real128::log1p"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">log1p</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1285log1pEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">exp2()</span></code> function is available when using <code class="docutils literal notranslate"><span class="pre">libquadmath</span></code>
+from GCC 9 onwards.</p>
+</div>
+<p>In-place logarithms and exponentials.</p>
 <p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
 <ul class="simple">
 <li><span class="math notranslate nohighlight">\(e^x\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(2^x\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(e^x - 1\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\log{x}\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\log_{10}{x}\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\log_2{x}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\log{\left( 1 + x \right)}\)</span>,</li>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">exp2()</span></code>, <code class="docutils literal notranslate"><span class="pre">expm1()</span></code> and <code class="docutils literal notranslate"><span class="pre">log1p()</span></code> functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
 </dl>
@@ -774,9 +823,56 @@ is being used.</p>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7real1286lgammaEv">
 <span id="_CPPv3N4mppp7real1286lgammaEv"></span><span id="_CPPv2N4mppp7real1286lgammaEv"></span><span id="mppp::real128::lgamma"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">lgamma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1286lgammaEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place logarithm of the gamma function.</p>
-<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <span class="math notranslate nohighlight">\(\log\Gamma\left( x \right)\)</span>,
-where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1286tgammaEv">
+<span id="_CPPv3N4mppp7real1286tgammaEv"></span><span id="_CPPv2N4mppp7real1286tgammaEv"></span><span id="mppp::real128::tgamma"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">tgamma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1286tgammaEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place gamma functions.</p>
+<p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\log\Gamma\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\Gamma\left( x \right)\)</span>,</li>
+</ul>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">tgamma()</span></code> function.</p>
+</div>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1282j0Ev">
+<span id="_CPPv3N4mppp7real1282j0Ev"></span><span id="_CPPv2N4mppp7real1282j0Ev"></span><span id="mppp::real128::j0"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">j0</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1282j0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1282j1Ev">
+<span id="_CPPv3N4mppp7real1282j1Ev"></span><span id="_CPPv2N4mppp7real1282j1Ev"></span><span id="mppp::real128::j1"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">j1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1282j1Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1282y0Ev">
+<span id="_CPPv3N4mppp7real1282y0Ev"></span><span id="_CPPv2N4mppp7real1282y0Ev"></span><span id="mppp::real128::y0"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">y0</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1282y0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1282y1Ev">
+<span id="_CPPv3N4mppp7real1282y1Ev"></span><span id="_CPPv2N4mppp7real1282y1Ev"></span><span id="mppp::real128::y1"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">y1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1282y1Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>In-place Bessel functions of the first and second kind.</p>
+<p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(J_0\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(J_1\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(Y_0\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(Y_1\left( x \right)\)</span>,</li>
+</ul>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
 </dl>
@@ -785,9 +881,70 @@ where <span class="math notranslate nohighlight">\(x\)</span> is the current val
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7real1283erfEv">
 <span id="_CPPv3N4mppp7real1283erfEv"></span><span id="_CPPv2N4mppp7real1283erfEv"></span><span id="mppp::real128::erf"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">erf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1283erfEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place error function.</p>
-<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <span class="math notranslate nohighlight">\(\operatorname{erf}\left( x \right)\)</span>,
-where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1284erfcEv">
+<span id="_CPPv3N4mppp7real1284erfcEv"></span><span id="_CPPv2N4mppp7real1284erfcEv"></span><span id="mppp::real128::erfc"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">erfc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1284erfcEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place error functions.</p>
+<p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\operatorname{erf}\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{erfc}\left( x \right)\)</span>,</li>
+</ul>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">erfc()</span></code> function.</p>
+</div>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1284ceilEv">
+<span id="_CPPv3N4mppp7real1284ceilEv"></span><span id="_CPPv2N4mppp7real1284ceilEv"></span><span id="mppp::real128::ceil"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">ceil</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1284ceilEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1285floorEv">
+<span id="_CPPv3N4mppp7real1285floorEv"></span><span id="_CPPv2N4mppp7real1285floorEv"></span><span id="mppp::real128::floor"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">floor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1285floorEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1289nearbyintEv">
+<span id="_CPPv3N4mppp7real1289nearbyintEv"></span><span id="_CPPv2N4mppp7real1289nearbyintEv"></span><span id="mppp::real128::nearbyint"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">nearbyint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1289nearbyintEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1284rintEv">
+<span id="_CPPv3N4mppp7real1284rintEv"></span><span id="_CPPv2N4mppp7real1284rintEv"></span><span id="mppp::real128::rint"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">rint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1284rintEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1285roundEv">
+<span id="_CPPv3N4mppp7real1285roundEv"></span><span id="_CPPv2N4mppp7real1285roundEv"></span><span id="mppp::real128::round"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">round</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1285roundEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7real1285truncEv">
+<span id="_CPPv3N4mppp7real1285truncEv"></span><span id="_CPPv2N4mppp7real1285truncEv"></span><span id="mppp::real128::trunc"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">trunc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7real1285truncEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Integer rounding functions.</p>
+<p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\left\lceil x \right\rceil\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\left\lfloor x \right\rfloor\)</span>,</li>
+<li>the nearest integer value to <em>x</em>, according to the current rounding mode,
+without raising the <code class="docutils literal notranslate"><span class="pre">FE_INEXACT</span></code> exception,</li>
+<li>the nearest integer value to <em>x</em>, according to the current rounding mode,
+possibly raising the <code class="docutils literal notranslate"><span class="pre">FE_INEXACT</span></code> exception,</li>
+<li>the nearest integer value to <em>x</em> rounding halfway cases away from zero,</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{trunc}\left( x \right)\)</span>,</li>
+</ul>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Returns</dt><dd class="field-body">a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
 </dl>
@@ -930,6 +1087,29 @@ value will be <em>x</em> and an unspecified value will be stored in <em>exp</em>
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp5ilogbERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5ilogbERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5ilogbERKN4mppp7real128E"></span><span id="mppp::ilogb__mppp::real128CR"></span>int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">ilogb</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5ilogbERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4logbERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4logbERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4logbERKN4mppp7real128E"></span><span id="mppp::logb__mppp::real128CR"></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">logb</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4logbERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">logb()</span></code> function is available when using <code class="docutils literal notranslate"><span class="pre">libquadmath</span></code>
+from GCC 6 onwards.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Unbiased exponent.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input argument.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">the unbiased exponent of <em>x</em>, as an <code class="docutils literal notranslate"><span class="pre">int</span></code> or as a <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="arithmetic">
 <span id="real128-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
@@ -974,7 +1154,15 @@ is being used.</p>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7scalblnERKN4mppp7real128El">
 <span id="_CPPv3N4mppp7scalblnERKN4mppp7real128El"></span><span id="_CPPv2N4mppp7scalblnERKN4mppp7real128El"></span><span id="mppp::scalbln__mppp::real128CR.l"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">scalbln</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, long <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7scalblnERKN4mppp7real128El" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp5ldexpERKN4mppp7real128Ei">
+<span id="_CPPv3N4mppp5ldexpERKN4mppp7real128Ei"></span><span id="_CPPv2N4mppp5ldexpERKN4mppp7real128Ei"></span><span id="mppp::ldexp__mppp::real128CR.i"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">ldexp</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, int <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5ldexpERKN4mppp7real128Ei" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Multiply by power of 2.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">ldexp()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>x</strong> – the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</li>
@@ -982,6 +1170,29 @@ is being used.</p>
 </ul>
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first last"><span class="math notranslate nohighlight">\(x \times 2^n\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fdimEN4mppp7real128ERK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp4fdimERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp4fdimERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fdimEN4mppp7real128ERK1TRK1U" title="mppp::fdim::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">fdim</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fdimEN4mppp7real128ERK1TRK1U" title="mppp::fdim::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fdimEN4mppp7real128ERK1TRK1U" title="mppp::fdim::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fdimEN4mppp7real128ERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Positive difference.</p>
+<p>This function returns the positive difference between <em>x</em> and <em>y</em>.
+That is, if <span class="math notranslate nohighlight">\(x&gt;y\)</span>, returns <span class="math notranslate nohighlight">\(x-y\)</span>, otherwise returns <span class="math notranslate nohighlight">\(+0\)</span>.
+Internally, the implementation uses the <code class="docutils literal notranslate"><span class="pre">fdimq()</span></code> function from the quadmath library,
+after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+(if necessary).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the first argument.</li>
+<li><strong>y</strong> – the second argument.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the positive difference of <em>x</em> and <em>y</em>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1011,6 +1222,34 @@ is being used.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the value whose floating-point category will be returned.</dd>
 <dt class="field-name">Returns</dt><dd class="field-body">the category of the value of <em>x</em>, as established by <a class="reference internal" href="#_CPPv4NK4mppp7real12810fpclassifyEv" title="mppp::real128::fpclassify"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128::fpclassify()</span></code></a>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmaxEN4mppp7real128ERK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmaxERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmaxERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmaxEN4mppp7real128ERK1TRK1U" title="mppp::fmax::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">fmax</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmaxEN4mppp7real128ERK1TRK1U" title="mppp::fmax::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmaxEN4mppp7real128ERK1TRK1U" title="mppp::fmax::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmaxEN4mppp7real128ERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fminEN4mppp7real128ERK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp4fminERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp4fminERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fminEN4mppp7real128ERK1TRK1U" title="mppp::fmin::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">fmin</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fminEN4mppp7real128ERK1TRK1U" title="mppp::fmin::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fminEN4mppp7real128ERK1TRK1U" title="mppp::fmin::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fminEN4mppp7real128ERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Max/min.</p>
+<p>These functions will return, respectively, the maximum and minimum of the two input operands.
+NaNs are treated as missing data (between a NaN and a numeric value, the numeric value is chosen).
+Internally, the implementation uses the <code class="docutils literal notranslate"><span class="pre">fmaxq()</span></code> and <code class="docutils literal notranslate"><span class="pre">fminq()</span></code> functions from the quadmath library,
+after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+(if necessary).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the first argument.</li>
+<li><strong>y</strong> – the second argument.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the maximum and minimum of the two input operands.</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1130,13 +1369,13 @@ standard library (e.g., <code class="docutils literal notranslate"><span class="
 <div class="section" id="roots">
 <span id="real128-roots"></span><h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4sqrtEN4mppp7real128E">
-<span id="_CPPv3N4mppp4sqrtEN4mppp7real128E"></span><span id="_CPPv2N4mppp4sqrtEN4mppp7real128E"></span><span id="mppp::sqrt__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4sqrtEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4sqrtERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4sqrtERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4sqrtERKN4mppp7real128E"></span><span id="mppp::sqrt__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4sqrtERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4cbrtEN4mppp7real128E">
-<span id="_CPPv3N4mppp4cbrtEN4mppp7real128E"></span><span id="_CPPv2N4mppp4cbrtEN4mppp7real128E"></span><span id="mppp::cbrt__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cbrt</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4cbrtEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4cbrtERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4cbrtERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4cbrtERKN4mppp7real128E"></span><span id="mppp::cbrt__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cbrt</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4cbrtERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Root functions.</p>
 <p>These functions will return, respectively:</p>
 <ul class="simple">
@@ -1150,12 +1389,19 @@ standard library (e.g., <code class="docutils literal notranslate"><span class="
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp5hypotERKN4mppp7real128ERKN4mppp7real128E">
-<span id="_CPPv3N4mppp5hypotERKN4mppp7real128ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5hypotERKN4mppp7real128ERKN4mppp7real128E"></span><span id="mppp::hypot__mppp::real128CR.mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">hypot</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5hypotERKN4mppp7real128ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5hypotEN4mppp7real128ERK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp5hypotERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp5hypotERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5hypotEN4mppp7real128ERK1TRK1U" title="mppp::hypot::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">hypot</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5hypotEN4mppp7real128ERK1TRK1U" title="mppp::hypot::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5hypotEN4mppp7real128ERK1TRK1U" title="mppp::hypot::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5hypotEN4mppp7real128ERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Euclidean distance.</p>
 <p>This function will return <span class="math notranslate nohighlight">\(\sqrt{x^2+y^2}\)</span>.
 The calculation is performed without undue overflow or underflow during the intermediate
-steps of the calculation.</p>
+steps of the calculation.
+Internally,
+the implementation uses the <code class="docutils literal notranslate"><span class="pre">hypotq()</span></code> function from the quadmath library,
+after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+(if necessary).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>Support for types other than <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>x</strong> – the first argument.</li>
@@ -1192,33 +1438,33 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <div class="section" id="trigonometry">
 <span id="real128-trig"></span><h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp3sinEN4mppp7real128E">
-<span id="_CPPv3N4mppp3sinEN4mppp7real128E"></span><span id="_CPPv2N4mppp3sinEN4mppp7real128E"></span><span id="mppp::sin__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sin</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3sinEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp3sinERKN4mppp7real128E">
+<span id="_CPPv3N4mppp3sinERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3sinERKN4mppp7real128E"></span><span id="mppp::sin__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sin</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3sinERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp3cosEN4mppp7real128E">
-<span id="_CPPv3N4mppp3cosEN4mppp7real128E"></span><span id="_CPPv2N4mppp3cosEN4mppp7real128E"></span><span id="mppp::cos__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cos</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3cosEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp3cosERKN4mppp7real128E">
+<span id="_CPPv3N4mppp3cosERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3cosERKN4mppp7real128E"></span><span id="mppp::cos__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cos</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3cosERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp3tanEN4mppp7real128E">
-<span id="_CPPv3N4mppp3tanEN4mppp7real128E"></span><span id="_CPPv2N4mppp3tanEN4mppp7real128E"></span><span id="mppp::tan__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">tan</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3tanEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp3tanERKN4mppp7real128E">
+<span id="_CPPv3N4mppp3tanERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3tanERKN4mppp7real128E"></span><span id="mppp::tan__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">tan</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3tanERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4asinEN4mppp7real128E">
-<span id="_CPPv3N4mppp4asinEN4mppp7real128E"></span><span id="_CPPv2N4mppp4asinEN4mppp7real128E"></span><span id="mppp::asin__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">asin</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4asinEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4asinERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4asinERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4asinERKN4mppp7real128E"></span><span id="mppp::asin__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">asin</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4asinERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4acosEN4mppp7real128E">
-<span id="_CPPv3N4mppp4acosEN4mppp7real128E"></span><span id="_CPPv2N4mppp4acosEN4mppp7real128E"></span><span id="mppp::acos__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">acos</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4acosEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4acosERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4acosERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4acosERKN4mppp7real128E"></span><span id="mppp::acos__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">acos</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4acosERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4atanEN4mppp7real128E">
-<span id="_CPPv3N4mppp4atanEN4mppp7real128E"></span><span id="_CPPv2N4mppp4atanEN4mppp7real128E"></span><span id="mppp::atan__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">atan</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4atanEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4atanERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4atanERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4atanERKN4mppp7real128E"></span><span id="mppp::atan__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">atan</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4atanERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Trigonometric functions.</p>
 <p>These functions will return, respectively:</p>
 <ul class="simple">
@@ -1235,37 +1481,78 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5atan2EN4mppp7real128ERK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp5atan2ERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp5atan2ERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5atan2EN4mppp7real128ERK1TRK1U" title="mppp::atan2::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">atan2</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5atan2EN4mppp7real128ERK1TRK1U" title="mppp::atan2::T">T</a> &amp;<em>y</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5atan2EN4mppp7real128ERK1TRK1U" title="mppp::atan2::U">U</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp5atan2EN4mppp7real128ERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Two-arguments arctangent.</p>
+<p>This function will compute <span class="math notranslate nohighlight">\(\arctan\left( y,x \right)\)</span>. Internally,
+the implementation uses the <code class="docutils literal notranslate"><span class="pre">atan2q()</span></code> function from the quadmath library,
+after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+(if necessary).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>y</strong> – the sine argument.</li>
+<li><strong>x</strong> – the cosine argument.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last"><span class="math notranslate nohighlight">\(\arctan\left( y,x \right)\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp6sincosERKN4mppp7real128EPN4mppp7real128EPN4mppp7real128E">
+<span id="_CPPv3N4mppp6sincosERKN4mppp7real128EPN4mppp7real128EPN4mppp7real128E"></span><span id="_CPPv2N4mppp6sincosERKN4mppp7real128EPN4mppp7real128EPN4mppp7real128E"></span><span id="mppp::sincos__mppp::real128CR.mppp::real128P.mppp::real128P"></span>void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sincos</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> *<em>s</em>, mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> *<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6sincosERKN4mppp7real128EPN4mppp7real128EPN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Simultaneous sine and cosine.</p>
+<p>This function will set the variables pointed to by <em>s</em> and <em>c</em> to, respectively,
+<span class="math notranslate nohighlight">\(\sin x\)</span> and <span class="math notranslate nohighlight">\(\cos x\)</span>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>x</strong> – the input argument.</li>
+<li><strong>s</strong> – a pointer to the sine return value.</li>
+<li><strong>c</strong> – a pointer to the cosine return value.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="hyperbolic-functions">
-<h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this headline">¶</a></h3>
+<span id="real128-hyper"></span><h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4sinhEN4mppp7real128E">
-<span id="_CPPv3N4mppp4sinhEN4mppp7real128E"></span><span id="_CPPv2N4mppp4sinhEN4mppp7real128E"></span><span id="mppp::sinh__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sinh</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4sinhEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4sinhERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4sinhERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4sinhERKN4mppp7real128E"></span><span id="mppp::sinh__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sinh</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4sinhERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4coshEN4mppp7real128E">
-<span id="_CPPv3N4mppp4coshEN4mppp7real128E"></span><span id="_CPPv2N4mppp4coshEN4mppp7real128E"></span><span id="mppp::cosh__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cosh</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4coshEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4coshERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4coshERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4coshERKN4mppp7real128E"></span><span id="mppp::cosh__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cosh</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4coshERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4tanhEN4mppp7real128E">
-<span id="_CPPv3N4mppp4tanhEN4mppp7real128E"></span><span id="_CPPv2N4mppp4tanhEN4mppp7real128E"></span><span id="mppp::tanh__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">tanh</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4tanhEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4tanhERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4tanhERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4tanhERKN4mppp7real128E"></span><span id="mppp::tanh__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">tanh</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4tanhERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp5asinhEN4mppp7real128E">
-<span id="_CPPv3N4mppp5asinhEN4mppp7real128E"></span><span id="_CPPv2N4mppp5asinhEN4mppp7real128E"></span><span id="mppp::asinh__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">asinh</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5asinhEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp5asinhERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5asinhERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5asinhERKN4mppp7real128E"></span><span id="mppp::asinh__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">asinh</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5asinhERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp5acoshEN4mppp7real128E">
-<span id="_CPPv3N4mppp5acoshEN4mppp7real128E"></span><span id="_CPPv2N4mppp5acoshEN4mppp7real128E"></span><span id="mppp::acosh__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">acosh</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5acoshEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp5acoshERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5acoshERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5acoshERKN4mppp7real128E"></span><span id="mppp::acosh__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">acosh</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5acoshERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp5atanhEN4mppp7real128E">
-<span id="_CPPv3N4mppp5atanhEN4mppp7real128E"></span><span id="_CPPv2N4mppp5atanhEN4mppp7real128E"></span><span id="mppp::atanh__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">atanh</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5atanhEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp5atanhERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5atanhERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5atanhERKN4mppp7real128E"></span><span id="mppp::atanh__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">atanh</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5atanhERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Hyperbolic functions.</p>
 <p>These functions will return, respectively:</p>
 <ul class="simple">
@@ -1286,38 +1573,60 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <div class="section" id="logarithms-and-exponentials">
 <span id="real128-logexp"></span><h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp3expEN4mppp7real128E">
-<span id="_CPPv3N4mppp3expEN4mppp7real128E"></span><span id="_CPPv2N4mppp3expEN4mppp7real128E"></span><span id="mppp::exp__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">exp</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3expEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Exponential function.</p>
-<dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input value.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><span class="math notranslate nohighlight">\(e^x\)</span>.</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt id="_CPPv4N4mppp3logEN4mppp7real128E">
-<span id="_CPPv3N4mppp3logEN4mppp7real128E"></span><span id="_CPPv2N4mppp3logEN4mppp7real128E"></span><span id="mppp::log__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3logEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp3expERKN4mppp7real128E">
+<span id="_CPPv3N4mppp3expERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3expERKN4mppp7real128E"></span><span id="mppp::exp__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">exp</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3expERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp5log10EN4mppp7real128E">
-<span id="_CPPv3N4mppp5log10EN4mppp7real128E"></span><span id="_CPPv2N4mppp5log10EN4mppp7real128E"></span><span id="mppp::log10__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log10</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5log10EN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mppp4exp2ERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4exp2ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4exp2ERKN4mppp7real128E"></span><span id="mppp::exp2__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">exp2</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4exp2ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp4log2EN4mppp7real128E">
-<span id="_CPPv3N4mppp4log2EN4mppp7real128E"></span><span id="_CPPv2N4mppp4log2EN4mppp7real128E"></span><span id="mppp::log2__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log2</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4log2EN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Logarithms.</p>
+<dt id="_CPPv4N4mppp5expm1ERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5expm1ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5expm1ERKN4mppp7real128E"></span><span id="mppp::expm1__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">expm1</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5expm1ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp3logERKN4mppp7real128E">
+<span id="_CPPv3N4mppp3logERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3logERKN4mppp7real128E"></span><span id="mppp::log__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3logERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp5log10ERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5log10ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5log10ERKN4mppp7real128E"></span><span id="mppp::log10__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log10</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5log10ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4log2ERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4log2ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4log2ERKN4mppp7real128E"></span><span id="mppp::log2__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log2</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4log2ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp5log1pERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5log1pERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5log1pERKN4mppp7real128E"></span><span id="mppp::log1p__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log1p</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5log1pERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">exp2()</span></code> function is available when using <code class="docutils literal notranslate"><span class="pre">libquadmath</span></code>
+from GCC 9 onwards.</p>
+</div>
+<p>Logarithms and exponentials.</p>
 <p>These functions will return, respectively:</p>
 <ul class="simple">
-<li><span class="math notranslate nohighlight">\(\log x\)</span>,</li>
-<li><span class="math notranslate nohighlight">\(\log_{10} x\)</span>,</li>
-<li><span class="math notranslate nohighlight">\(\log_2 x\)</span>.</li>
+<li><span class="math notranslate nohighlight">\(e^x\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(2^x\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(e^x - 1\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\log{x}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\log_{10}{x}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\log_2{x}\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\log{\left( 1 + x \right)}\)</span>.</li>
 </ul>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">exp2()</span></code>, <code class="docutils literal notranslate"><span class="pre">expm1()</span></code> and <code class="docutils literal notranslate"><span class="pre">log1p()</span></code> functions.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input value.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body">a logarithm of <em>x</em>.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">a logarithm/exponential of <em>x</em>.</dd>
 </dl>
 </dd></dl>
 
@@ -1325,12 +1634,80 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <div class="section" id="gamma-functions">
 <span id="real128-gamma"></span><h3>Gamma functions<a class="headerlink" href="#gamma-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp6lgammaEN4mppp7real128E">
-<span id="_CPPv3N4mppp6lgammaEN4mppp7real128E"></span><span id="_CPPv2N4mppp6lgammaEN4mppp7real128E"></span><span id="mppp::lgamma__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">lgamma</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6lgammaEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Natural logarithm of the gamma function.</p>
+<dt id="_CPPv4N4mppp6lgammaERKN4mppp7real128E">
+<span id="_CPPv3N4mppp6lgammaERKN4mppp7real128E"></span><span id="_CPPv2N4mppp6lgammaERKN4mppp7real128E"></span><span id="mppp::lgamma__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">lgamma</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6lgammaERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp6tgammaERKN4mppp7real128E">
+<span id="_CPPv3N4mppp6tgammaERKN4mppp7real128E"></span><span id="_CPPv2N4mppp6tgammaERKN4mppp7real128E"></span><span id="mppp::tgamma__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">tgamma</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6tgammaERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Gamma functions.</p>
+<p>These functions will return, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\log\Gamma\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\Gamma\left( x \right)\)</span>.</li>
+</ul>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">tgamma()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input value.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><span class="math notranslate nohighlight">\(\log\Gamma\left( x \right)\)</span>.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">the result of the operation.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="bessel-functions">
+<h3>Bessel functions<a class="headerlink" href="#bessel-functions" title="Permalink to this headline">¶</a></h3>
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp2j0ERKN4mppp7real128E">
+<span id="_CPPv3N4mppp2j0ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp2j0ERKN4mppp7real128E"></span><span id="mppp::j0__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">j0</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp2j0ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp2j1ERKN4mppp7real128E">
+<span id="_CPPv3N4mppp2j1ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp2j1ERKN4mppp7real128E"></span><span id="mppp::j1__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">j1</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp2j1ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp2jnEiRKN4mppp7real128E">
+<span id="_CPPv3N4mppp2jnEiRKN4mppp7real128E"></span><span id="_CPPv2N4mppp2jnEiRKN4mppp7real128E"></span><span id="mppp::jn__i.mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">jn</code><span class="sig-paren">(</span>int <em>n</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp2jnEiRKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp2y0ERKN4mppp7real128E">
+<span id="_CPPv3N4mppp2y0ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp2y0ERKN4mppp7real128E"></span><span id="mppp::y0__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">y0</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp2y0ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp2y1ERKN4mppp7real128E">
+<span id="_CPPv3N4mppp2y1ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp2y1ERKN4mppp7real128E"></span><span id="mppp::y1__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">y1</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp2y1ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp2ynEiRKN4mppp7real128E">
+<span id="_CPPv3N4mppp2ynEiRKN4mppp7real128E"></span><span id="_CPPv2N4mppp2ynEiRKN4mppp7real128E"></span><span id="mppp::yn__i.mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">yn</code><span class="sig-paren">(</span>int <em>n</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp2ynEiRKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Bessel functions of the first and second kind of integral order.</p>
+<p>These functions will return, respectively,</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(J_0\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(J_1\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(J_n\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(Y_0\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(Y_1\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(Y_n\left( x \right)\)</span>.</li>
+</ul>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>n</strong> – the order of the Bessel function.</li>
+<li><strong>x</strong> – the argument.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a Bessel function of <em>x</em>.</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1338,12 +1715,25 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <div class="section" id="other-special-functions">
 <span id="real128-miscfuncts"></span><h3>Other special functions<a class="headerlink" href="#other-special-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
-<dt id="_CPPv4N4mppp3erfEN4mppp7real128E">
-<span id="_CPPv3N4mppp3erfEN4mppp7real128E"></span><span id="_CPPv2N4mppp3erfEN4mppp7real128E"></span><span id="mppp::erf__mppp::real128"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">erf</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3erfEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Error function.</p>
+<dt id="_CPPv4N4mppp3erfERKN4mppp7real128E">
+<span id="_CPPv3N4mppp3erfERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3erfERKN4mppp7real128E"></span><span id="mppp::erf__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">erf</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3erfERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4erfcERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4erfcERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4erfcERKN4mppp7real128E"></span><span id="mppp::erfc__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">erfc</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4erfcERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Error functions.</p>
+<p>These functions will return, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\operatorname{erf}\left( x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{erfc}\left( x \right)\)</span>.</li>
+</ul>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">erfc()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input value.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><span class="math notranslate nohighlight">\(\operatorname{erf}\left( x \right)\)</span>.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">the (complementary) error function of <span class="math notranslate nohighlight">\(x\)</span>.</dd>
 </dl>
 </dd></dl>
 
@@ -1365,6 +1755,184 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </ul>
 </dd>
 <dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the next representable value of <em>from</em> in the direction of <em>to</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp8copysignEN4mppp7real128ERK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp8copysignERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp8copysignERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp8copysignEN4mppp7real128ERK1TRK1U" title="mppp::copysign::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">copysign</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp8copysignEN4mppp7real128ERK1TRK1U" title="mppp::copysign::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp8copysignEN4mppp7real128ERK1TRK1U" title="mppp::copysign::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp8copysignEN4mppp7real128ERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Copy sign.</p>
+<p>This function composes a floating point value with the magnitude of <em>x</em> and the sign of <em>y</em>.
+Internally, the implementation uses the <code class="docutils literal notranslate"><span class="pre">copysignq()</span></code> function from the quadmath library,
+after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+(if necessary).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the first argument.</li>
+<li><strong>y</strong> – the second argument.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a value with the magnitude of <em>x</em> and the sign of <em>y</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="integer-and-remainder-related-functions">
+<h3>Integer and remainder-related functions<a class="headerlink" href="#integer-and-remainder-related-functions" title="Permalink to this headline">¶</a></h3>
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4ceilERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4ceilERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4ceilERKN4mppp7real128E"></span><span id="mppp::ceil__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">ceil</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4ceilERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp5floorERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5floorERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5floorERKN4mppp7real128E"></span><span id="mppp::floor__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">floor</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5floorERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp9nearbyintERKN4mppp7real128E">
+<span id="_CPPv3N4mppp9nearbyintERKN4mppp7real128E"></span><span id="_CPPv2N4mppp9nearbyintERKN4mppp7real128E"></span><span id="mppp::nearbyint__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">nearbyint</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp9nearbyintERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4rintERKN4mppp7real128E">
+<span id="_CPPv3N4mppp4rintERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4rintERKN4mppp7real128E"></span><span id="mppp::rint__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rint</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4rintERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp6llrintERKN4mppp7real128E">
+<span id="_CPPv3N4mppp6llrintERKN4mppp7real128E"></span><span id="_CPPv2N4mppp6llrintERKN4mppp7real128E"></span><span id="mppp::llrint__mppp::real128CR"></span>long long <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">llrint</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6llrintERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp5lrintERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5lrintERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5lrintERKN4mppp7real128E"></span><span id="mppp::lrint__mppp::real128CR"></span>long <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">lrint</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5lrintERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp5roundERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5roundERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5roundERKN4mppp7real128E"></span><span id="mppp::round__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">round</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5roundERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp7llroundERKN4mppp7real128E">
+<span id="_CPPv3N4mppp7llroundERKN4mppp7real128E"></span><span id="_CPPv2N4mppp7llroundERKN4mppp7real128E"></span><span id="mppp::llround__mppp::real128CR"></span>long long <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">llround</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7llroundERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp6lroundERKN4mppp7real128E">
+<span id="_CPPv3N4mppp6lroundERKN4mppp7real128E"></span><span id="_CPPv2N4mppp6lroundERKN4mppp7real128E"></span><span id="mppp::lround__mppp::real128CR"></span>long <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">lround</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6lroundERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp5truncERKN4mppp7real128E">
+<span id="_CPPv3N4mppp5truncERKN4mppp7real128E"></span><span id="_CPPv2N4mppp5truncERKN4mppp7real128E"></span><span id="mppp::trunc__mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">trunc</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp5truncERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Integer rounding functions.</p>
+<p>These member functions will return, respectively:</p>
+<ul class="simple">
+<li><span class="math notranslate nohighlight">\(\left\lceil x \right\rceil\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\left\lfloor x \right\rfloor\)</span>,</li>
+<li>the nearest integer value to <em>x</em>, according to the current rounding mode,
+without raising the <code class="docutils literal notranslate"><span class="pre">FE_INEXACT</span></code> exception,</li>
+<li>the nearest integer value to <em>x</em>, according to the current rounding mode,
+possibly raising the <code class="docutils literal notranslate"><span class="pre">FE_INEXACT</span></code> exception, represented as a:<ul>
+<li><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<code class="docutils literal notranslate"><span class="pre">rint()</span></code>),</li>
+<li><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">long</span></code> (<code class="docutils literal notranslate"><span class="pre">llrint()</span></code>),</li>
+<li><code class="docutils literal notranslate"><span class="pre">long</span></code> (<code class="docutils literal notranslate"><span class="pre">lrint()</span></code>),</li>
+</ul>
+</li>
+<li>the nearest integer value to <em>x</em> rounding halfway cases away from zero,
+represented as a:<ul>
+<li><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<code class="docutils literal notranslate"><span class="pre">round()</span></code>),</li>
+<li><code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">long</span></code> (<code class="docutils literal notranslate"><span class="pre">llround()</span></code>),</li>
+<li><code class="docutils literal notranslate"><span class="pre">long</span></code> (<code class="docutils literal notranslate"><span class="pre">lround()</span></code>),</li>
+</ul>
+</li>
+<li><span class="math notranslate nohighlight">\(\operatorname{trunc}\left( x \right)\)</span>.</li>
+</ul>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the input argument.</dd>
+<dt class="field-name">Returns</dt><dd class="field-body">the result of the operation.</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmodEN4mppp7real128ERK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmodERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmodERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmodEN4mppp7real128ERK1TRK1U" title="mppp::fmod::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">fmod</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmodEN4mppp7real128ERK1TRK1U" title="mppp::fmod::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmodEN4mppp7real128ERK1TRK1U" title="mppp::fmod::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp4fmodEN4mppp7real128ERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp9remainderEN4mppp7real128ERK1TRK1U">
+<span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp9remainderERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp9remainderERK1TRK1U"></span>template&lt;typename <code class="descname">T</code>, mppp::<a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types">real128_op_types</a>&lt;<a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp9remainderEN4mppp7real128ERK1TRK1U" title="mppp::remainder::T">T</a>&gt; <code class="descname">U</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">remainder</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp9remainderEN4mppp7real128ERK1TRK1U" title="mppp::remainder::T">T</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp9remainderEN4mppp7real128ERK1TRK1U" title="mppp::remainder::U">U</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp9remainderEN4mppp7real128ERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Floating modulus and remainder.</p>
+<p>These functions will return, respectively, the floating modulus and the remainder of the
+division <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+<p>The floating modulus is <span class="math notranslate nohighlight">\(x - n\times y\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(x/y\)</span> with its fractional part truncated.</p>
+<p>The remainder is <span class="math notranslate nohighlight">\(x - m\times y\)</span>, where <span class="math notranslate nohighlight">\(m\)</span> is the integral value nearest the exact value
+<span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+<p>Special values are handled as described in the C99 standard.</p>
+<p>Internally, the implementation uses the <code class="docutils literal notranslate"><span class="pre">fmodq()</span></code> and <code class="docutils literal notranslate"><span class="pre">remainderq()</span></code> functions from the quadmath library,
+after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+(if necessary).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the numerator.</li>
+<li><strong>y</strong> – the denominator.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the floating modulus or remainder of <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp6remquoERKN4mppp7real128ERKN4mppp7real128EPi">
+<span id="_CPPv3N4mppp6remquoERKN4mppp7real128ERKN4mppp7real128EPi"></span><span id="_CPPv2N4mppp6remquoERKN4mppp7real128ERKN4mppp7real128EPi"></span><span id="mppp::remquo__mppp::real128CR.mppp::real128CR.iP"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">remquo</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>y</em>, int *<em>quo</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6remquoERKN4mppp7real128ERKN4mppp7real128EPi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Remainder and quotient.</p>
+<p>This function will return the remainder of the division <span class="math notranslate nohighlight">\(x/y\)</span>. Additionally,
+it will store the sign and at least three of the least significant bits of <span class="math notranslate nohighlight">\(x/y\)</span> in <em>quo</em>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the numerator.</li>
+<li><strong>y</strong> – the denominator.</li>
+<li><strong>quo</strong> – a pointer to the quotient return value.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the remainder of <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4modfERKN4mppp7real128EPN4mppp7real128E">
+<span id="_CPPv3N4mppp4modfERKN4mppp7real128EPN4mppp7real128E"></span><span id="_CPPv2N4mppp4modfERKN4mppp7real128EPN4mppp7real128E"></span><span id="mppp::modf__mppp::real128CR.mppp::real128P"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">modf</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> *<em>iptr</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4modfERKN4mppp7real128EPN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21.</span></p>
+</div>
+<p>Decompose in integral and fractional parts.</p>
+<p>This function will return the fractional part of <em>x</em>, and it will store
+the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the input argument.</li>
+<li><strong>iptr</strong> – a pointer to the return value for the integral part.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the fractional part of <em>x</em>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1421,13 +1989,13 @@ guarantees that <code class="docutils literal notranslate"><span class="pre">x</
 <div class="section" id="mathematical-operators">
 <span id="real128-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp function">
-<dt id="_CPPv4N4mpppplEN4mppp7real128E">
-<span id="_CPPv3N4mpppplEN4mppp7real128E"></span><span id="_CPPv2N4mpppplEN4mppp7real128E"></span><span id="mppp::add-operator__mppp::real128CE"></span><em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator+</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppplEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mpppplERKN4mppp7real128E">
+<span id="_CPPv3N4mpppplERKN4mppp7real128E"></span><span id="_CPPv2N4mpppplERKN4mppp7real128E"></span><span id="mppp::add-operator__mppp::real128CRCE"></span><em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppplERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N4mpppmiEN4mppp7real128E">
-<span id="_CPPv3N4mpppmiEN4mppp7real128E"></span><span id="_CPPv2N4mpppmiEN4mppp7real128E"></span><span id="mppp::sub-operator__mppp::real128CE"></span><em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator-</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmiEN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N4mpppmiERKN4mppp7real128E">
+<span id="_CPPv3N4mpppmiERKN4mppp7real128E"></span><span id="_CPPv2N4mpppmiERKN4mppp7real128E"></span><span id="mppp::sub-operator__mppp::real128CRCE"></span><em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmiERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Identity and negation.</p>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the argument.</dd>

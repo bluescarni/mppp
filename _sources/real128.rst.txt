@@ -349,6 +349,18 @@ The real128 class
       :return: a tuple containing the IEEE quadruple-precision floating-point representation of the value stored
         in ``this``.
 
+   .. cpp:function:: int ilogb() const
+   .. cpp:function:: real128 logb() const
+
+      .. note::
+
+         The ``logb()`` function is available when using ``libquadmath``
+         from GCC 6 onwards.
+
+      .. versionadded:: 0.21
+
+      :return: the unbiased exponent of ``this``, as an ``int`` or as a :cpp:class:`~mppp::real128`.
+
    .. cpp:function:: bool signbit() const
 
       Sign bit.
@@ -490,37 +502,116 @@ The real128 class
       :return: a reference to ``this``.
 
    .. cpp:function:: real128 &exp()
+   .. cpp:function:: real128 &exp2()
+   .. cpp:function:: real128 &expm1()
    .. cpp:function:: real128 &log()
    .. cpp:function:: real128 &log10()
    .. cpp:function:: real128 &log2()
+   .. cpp:function:: real128 &log1p()
+
+      .. note::
+
+         The ``exp2()`` function is available when using ``libquadmath``
+         from GCC 9 onwards.
 
       In-place logarithms and exponentials.
 
       These member functions will set ``this`` to, respectively:
 
       * :math:`e^x`,
+      * :math:`2^x`,
+      * :math:`e^x - 1`,
       * :math:`\log{x}`,
       * :math:`\log_{10}{x}`,
       * :math:`\log_2{x}`,
+      * :math:`\log{\left( 1 + x \right)}`,
 
       where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.21
+
+         The ``exp2()``, ``expm1()`` and ``log1p()`` functions.
 
       :return: a reference to ``this``.
 
    .. cpp:function:: real128 &lgamma()
+   .. cpp:function:: real128 &tgamma()
 
-      In-place logarithm of the gamma function.
+      In-place gamma functions.
 
-      This member function will set ``this`` to :math:`\log\Gamma\left( x \right)`,
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\log\Gamma\left( x \right)`,
+      * :math:`\Gamma\left( x \right)`,
+
+      where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.21
+
+         The ``tgamma()`` function.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &j0()
+   .. cpp:function:: real128 &j1()
+   .. cpp:function:: real128 &y0()
+   .. cpp:function:: real128 &y1()
+
+      .. versionadded:: 0.21
+
+      In-place Bessel functions of the first and second kind.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`J_0\left( x \right)`,
+      * :math:`J_1\left( x \right)`,
+      * :math:`Y_0\left( x \right)`,
+      * :math:`Y_1\left( x \right)`,
+
       where :math:`x` is the current value of ``this``.
 
       :return: a reference to ``this``.
 
    .. cpp:function:: real128 &erf()
+   .. cpp:function:: real128 &erfc()
 
-      In-place error function.
+      In-place error functions.
 
-      This member function will set ``this`` to :math:`\operatorname{erf}\left( x \right)`,
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\operatorname{erf}\left( x \right)`,
+      * :math:`\operatorname{erfc}\left( x \right)`,
+
+      where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.21
+
+         The ``erfc()`` function.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &ceil()
+   .. cpp:function:: real128 &floor()
+   .. cpp:function:: real128 &nearbyint()
+   .. cpp:function:: real128 &rint()
+   .. cpp:function:: real128 &round()
+   .. cpp:function:: real128 &trunc()
+
+      .. versionadded:: 0.21
+
+      Integer rounding functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\left\lceil x \right\rceil`,
+      * :math:`\left\lfloor x \right\rfloor`,
+      * the nearest integer value to *x*, according to the current rounding mode,
+        without raising the ``FE_INEXACT`` exception,
+      * the nearest integer value to *x*, according to the current rounding mode,
+        possibly raising the ``FE_INEXACT`` exception,
+      * the nearest integer value to *x* rounding halfway cases away from zero,
+      * :math:`\operatorname{trunc}\left( x \right)`,
+
       where :math:`x` is the current value of ``this``.
 
       :return: a reference to ``this``.
@@ -635,6 +726,22 @@ Conversion
 
    :return: the binary significand of *x*.
 
+.. cpp:function:: int mppp::ilogb(const mppp::real128 &x)
+.. cpp:function:: real128 mppp::logb(const mppp::real128 &x)
+
+   .. note::
+
+      The ``logb()`` function is available when using ``libquadmath``
+      from GCC 6 onwards.
+
+   .. versionadded:: 0.21
+
+   Unbiased exponent.
+
+   :param x: the input argument.
+
+   :return: the unbiased exponent of *x*, as an ``int`` or as a :cpp:class:`~mppp::real128`.
+
 .. _real128_arithmetic:
 
 Arithmetic
@@ -668,13 +775,35 @@ Arithmetic
 
 .. cpp:function:: mppp::real128 mppp::scalbn(const mppp::real128 &x, int n)
 .. cpp:function:: mppp::real128 mppp::scalbln(const mppp::real128 &x, long n)
+.. cpp:function:: mppp::real128 mppp::ldexp(const mppp::real128 &x, int n)
 
    Multiply by power of 2.
+
+   .. versionadded:: 0.21
+
+      The ``ldexp()`` function.
 
    :param x: the input :cpp:class:`~mppp::real128`.
    :param n: the power of 2 by which *x* will be multiplied.
 
    :return: :math:`x \times 2^n`.
+
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fdim(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Positive difference.
+
+   This function returns the positive difference between *x* and *y*.
+   That is, if :math:`x>y`, returns :math:`x-y`, otherwise returns :math:`+0`.
+   Internally, the implementation uses the ``fdimq()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the positive difference of *x* and *y*.
 
 .. _real128_comparison:
 
@@ -701,6 +830,24 @@ Comparison
    :param x: the value whose floating-point category will be returned.
 
    :return: the category of the value of *x*, as established by :cpp:func:`mppp::real128::fpclassify()`.
+
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fmax(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fmin(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Max/min.
+
+   These functions will return, respectively, the maximum and minimum of the two input operands.
+   NaNs are treated as missing data (between a NaN and a numeric value, the numeric value is chosen).
+   Internally, the implementation uses the ``fmaxq()`` and ``fminq()`` functions from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the maximum and minimum of the two input operands.
 
 .. cpp:function:: constexpr bool mppp::isnan(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::isinf(const mppp::real128 &x)
@@ -798,8 +945,8 @@ Comparison
 Roots
 ~~~~~
 
-.. cpp:function:: mppp::real128 mppp::sqrt(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::cbrt(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sqrt(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::cbrt(const mppp::real128 &x)
 
    Root functions.
 
@@ -812,13 +959,21 @@ Roots
 
    :return: the square or cubic root of *x*.
 
-.. cpp:function:: mppp::real128 mppp::hypot(const mppp::real128 &x, const mppp::real128 &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::hypot(const T &x, const U &y)
 
    Euclidean distance.
 
    This function will return :math:`\sqrt{x^2+y^2}`.
    The calculation is performed without undue overflow or underflow during the intermediate
    steps of the calculation.
+   Internally,
+   the implementation uses the ``hypotq()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   .. versionadded:: 0.21
+
+      Support for types other than :cpp:class:`~mppp::real128`.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -847,12 +1002,12 @@ Exponentiation
 Trigonometry
 ~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::sin(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::cos(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::tan(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::asin(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::acos(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::atan(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sin(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::cos(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::tan(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::asin(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::acos(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::atan(const mppp::real128 &x)
 
    Trigonometric functions.
 
@@ -869,17 +1024,46 @@ Trigonometry
 
    :return: a trigonometric function of *x*.
 
-.. real128_hyper:
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::atan2(const T &y, const U &x)
+
+   .. versionadded:: 0.21
+
+   Two-arguments arctangent.
+
+   This function will compute :math:`\arctan\left( y,x \right)`. Internally,
+   the implementation uses the ``atan2q()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param y: the sine argument.
+   :param x: the cosine argument.
+
+   :return: :math:`\arctan\left( y,x \right)`.
+
+.. cpp:function:: void mppp::sincos(const mppp::real128 &x, mppp::real128 *s, mppp::real128 *c)
+
+   .. versionadded:: 0.21
+
+   Simultaneous sine and cosine.
+
+   This function will set the variables pointed to by *s* and *c* to, respectively,
+   :math:`\sin x` and :math:`\cos x`.
+
+   :param x: the input argument.
+   :param s: a pointer to the sine return value.
+   :param c: a pointer to the cosine return value.
+
+.. _real128_hyper:
 
 Hyperbolic functions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::sinh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::cosh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::tanh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::asinh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::acosh(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::atanh(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sinh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::cosh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::tanh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::asinh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::acosh(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::atanh(const mppp::real128 &x)
 
    Hyperbolic functions.
 
@@ -901,55 +1085,112 @@ Hyperbolic functions
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::exp(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::exp(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::exp2(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::expm1(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::log(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::log10(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::log2(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::log1p(const mppp::real128 &x)
 
-   Exponential function.
+   .. note::
 
-   :param x: the input value.
+      The ``exp2()`` function is available when using ``libquadmath``
+      from GCC 9 onwards.
 
-   :return: :math:`e^x`.
-
-.. cpp:function:: mppp::real128 mppp::log(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::log10(mppp::real128 x)
-.. cpp:function:: mppp::real128 mppp::log2(mppp::real128 x)
-
-   Logarithms.
+   Logarithms and exponentials.
 
    These functions will return, respectively:
 
-   * :math:`\log x`,
-   * :math:`\log_{10} x`,
-   * :math:`\log_2 x`.
+   * :math:`e^x`,
+   * :math:`2^x`,
+   * :math:`e^x - 1`,
+   * :math:`\log{x}`,
+   * :math:`\log_{10}{x}`,
+   * :math:`\log_2{x}`,
+   * :math:`\log{\left( 1 + x \right)}`.
+
+   .. versionadded:: 0.21
+
+      The ``exp2()``, ``expm1()`` and ``log1p()`` functions.
 
    :param x: the input value.
 
-   :return: a logarithm of *x*.
+   :return: a logarithm/exponential of *x*.
 
 .. _real128_gamma:
 
 Gamma functions
 ~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::lgamma(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::lgamma(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::tgamma(const mppp::real128 &x)
 
-   Natural logarithm of the gamma function.
+   Gamma functions.
+
+   These functions will return, respectively:
+
+   * :math:`\log\Gamma\left( x \right)`,
+   * :math:`\Gamma\left( x \right)`.
+
+   .. versionadded:: 0.21
+
+      The ``tgamma()`` function.
 
    :param x: the input value.
 
-   :return: :math:`\log\Gamma\left( x \right)`.
+   :return: the result of the operation.
+
+Bessel functions
+~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mppp::real128 mppp::j0(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::j1(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::jn(int n, const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::y0(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::y1(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::yn(int n, const mppp::real128 &x)
+
+   .. versionadded:: 0.21
+
+   Bessel functions of the first and second kind of integral order.
+
+   These functions will return, respectively,
+
+   * :math:`J_0\left( x \right)`,
+   * :math:`J_1\left( x \right)`,
+   * :math:`J_n\left( x \right)`,
+   * :math:`Y_0\left( x \right)`,
+   * :math:`Y_1\left( x \right)`,
+   * :math:`Y_n\left( x \right)`.
+
+   :param n: the order of the Bessel function.
+   :param x: the argument.
+
+   :return: a Bessel function of *x*.
 
 .. _real128_miscfuncts:
 
 Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 mppp::erf(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::erf(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::erfc(const mppp::real128 &x)
 
-   Error function.
+   Error functions.
+
+   These functions will return, respectively:
+
+   * :math:`\operatorname{erf}\left( x \right)`,
+   * :math:`\operatorname{erfc}\left( x \right)`.
+
+   .. versionadded:: 0.21
+
+      The ``erfc()`` function.
 
    :param x: the input value.
 
-   :return: :math:`\operatorname{erf}\left( x \right)`.
+   :return: the (complementary) error function of :math:`x`.
 
 .. _real128_fpmanip:
 
@@ -968,6 +1209,121 @@ Floating-point manipulation
    :param to: the direction of the next representable value.
 
    :return: the next representable value of *from* in the direction of *to*.
+
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::copysign(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Copy sign.
+
+   This function composes a floating point value with the magnitude of *x* and the sign of *y*.
+   Internally, the implementation uses the ``copysignq()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a value with the magnitude of *x* and the sign of *y*.
+
+Integer and remainder-related functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mppp::real128 mppp::ceil(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::floor(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::nearbyint(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::rint(const mppp::real128 &x)
+.. cpp:function:: long long mppp::llrint(const mppp::real128 &x)
+.. cpp:function:: long mppp::lrint(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::round(const mppp::real128 &x)
+.. cpp:function:: long long mppp::llround(const mppp::real128 &x)
+.. cpp:function:: long mppp::lround(const mppp::real128 &x)
+.. cpp:function:: mppp::real128 mppp::trunc(const mppp::real128 &x)
+
+   .. versionadded:: 0.21
+
+   Integer rounding functions.
+
+   These member functions will return, respectively:
+
+   * :math:`\left\lceil x \right\rceil`,
+   * :math:`\left\lfloor x \right\rfloor`,
+   * the nearest integer value to *x*, according to the current rounding mode,
+     without raising the ``FE_INEXACT`` exception,
+   * the nearest integer value to *x*, according to the current rounding mode,
+     possibly raising the ``FE_INEXACT`` exception, represented as a:
+
+     * :cpp:class:`~mppp::real128` (``rint()``),
+     * ``long long`` (``llrint()``),
+     * ``long`` (``lrint()``),
+
+   * the nearest integer value to *x* rounding halfway cases away from zero,
+     represented as a:
+
+     * :cpp:class:`~mppp::real128` (``round()``),
+     * ``long long`` (``llround()``),
+     * ``long`` (``lround()``),
+
+   * :math:`\operatorname{trunc}\left( x \right)`.
+
+   :param x: the input argument.
+
+   :return: the result of the operation.
+
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::fmod(const T &x, const U &y)
+.. cpp:function:: template <typename T, mppp::real128_op_types<T> U> mppp::real128 mppp::remainder(const T &x, const U &y)
+
+   .. versionadded:: 0.21
+
+   Floating modulus and remainder.
+
+   These functions will return, respectively, the floating modulus and the remainder of the
+   division :math:`x/y`.
+
+   The floating modulus is :math:`x - n\times y`, where :math:`n` is :math:`x/y` with its fractional part truncated.
+
+   The remainder is :math:`x - m\times y`, where :math:`m` is the integral value nearest the exact value
+   :math:`x/y`.
+
+   Special values are handled as described in the C99 standard.
+
+   Internally, the implementation uses the ``fmodq()`` and ``remainderq()`` functions from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the numerator.
+   :param y: the denominator.
+
+   :return: the floating modulus or remainder of :math:`x/y`.
+
+.. cpp:function:: mppp::real128 mppp::remquo(const mppp::real128 &x, const mppp::real128 &y, int *quo)
+
+   .. versionadded:: 0.21
+
+   Remainder and quotient.
+
+   This function will return the remainder of the division :math:`x/y`. Additionally,
+   it will store the sign and at least three of the least significant bits of :math:`x/y` in *quo*.
+
+   :param x: the numerator.
+   :param y: the denominator.
+   :param quo: a pointer to the quotient return value.
+
+   :return: the remainder of :math:`x/y`.
+
+.. cpp:function:: mppp::real128 mppp::modf(const mppp::real128 &x, mppp::real128 *iptr)
+
+   .. versionadded:: 0.21
+
+   Decompose in integral and fractional parts.
+
+   This function will return the fractional part of *x*, and it will store
+   the integral part of *x* into the variable pointed to by *iptr*.
+
+   :param x: the input argument.
+   :param iptr: a pointer to the return value for the integral part.
+
+   :return: the fractional part of *x*.
 
 .. _real128_io:
 
@@ -1016,8 +1372,8 @@ Other
 Mathematical operators
 ----------------------
 
-.. cpp:function:: constexpr mppp::real128 mppp::operator+(mppp::real128 x)
-.. cpp:function:: constexpr mppp::real128 mppp::operator-(mppp::real128 x)
+.. cpp:function:: constexpr mppp::real128 mppp::operator+(const mppp::real128 &x)
+.. cpp:function:: constexpr mppp::real128 mppp::operator-(const mppp::real128 &x)
 
    Identity and negation.
 
