@@ -3213,22 +3213,40 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5log1pERN4mppp4realERN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5log1pERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5log1pERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log1p</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5log1pERN4mppp4realERN4mppp4realERR1T" title="mppp::log1p::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5log1pERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary logarithms.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp11log_base_uiERN4mppp4realERN4mppp4realERR1Tm">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp11log_base_uiERN4mppp4realERR1Tm"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp11log_base_uiERN4mppp4realERR1Tm"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log_base_ui</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp11log_base_uiERN4mppp4realERN4mppp4realERR1Tm" title="mppp::log_base_ui::T">T</a> &amp;&amp;<em>x</em>, unsigned long <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp11log_base_uiERN4mppp4realERN4mppp4realERR1Tm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">log_base_ui()</span></code> function is available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Binary logarithms.</p>
 <p>These functions will set <em>rop</em> to, respectively,</p>
 <ul class="simple">
 <li><span class="math notranslate nohighlight">\(\log x\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\log_2 x\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\log_{10} x\)</span>,</li>
-<li><span class="math notranslate nohighlight">\(\log\left( 1+x \right)\)</span>.</li>
+<li><span class="math notranslate nohighlight">\(\log\left( 1+x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\log_b x\)</span>.</li>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>x</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">log_base_ui()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
 <dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
 <li><strong>rop</strong> – the return value.</li>
 <li><strong>x</strong> – the operand.</li>
+<li><strong>b</strong> – the base of the logarithm.</li>
 </ul>
 </dd>
-<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3251,18 +3269,40 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5log1pEN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp8cvr_realEEN4mppp5log1pERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp5log1pERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log1p</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5log1pEN4mppp4realERR1T" title="mppp::log1p::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp5log1pEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Unary logarithms.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp11log_base_uiEN4mppp4realERR1Tm">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp11log_base_uiERR1Tm"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp11log_base_uiERR1Tm"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real">cvr_real</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log_base_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp11log_base_uiEN4mppp4realERR1Tm" title="mppp::log_base_ui::T">T</a> &amp;&amp;<em>x</em>, unsigned long <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp11log_base_uiEN4mppp4realERR1Tm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">log_base_ui()</span></code> function is available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Unary logarithms.</p>
 <p>These functions will return, respectively,</p>
 <ul class="simple">
 <li><span class="math notranslate nohighlight">\(\log x\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\log_2 x\)</span>,</li>
 <li><span class="math notranslate nohighlight">\(\log_{10} x\)</span>,</li>
-<li><span class="math notranslate nohighlight">\(\log\left( 1+x \right)\)</span>.</li>
+<li><span class="math notranslate nohighlight">\(\log\left( 1+x \right)\)</span>,</li>
+<li><span class="math notranslate nohighlight">\(\log_b x\)</span>.</li>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>x</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">log_base_ui()</span></code> function.</p>
+</div>
 <dl class="docutils field-list" frame="void" rules="none">
-<dt class="field-name">Parameters</dt><dd class="field-body"><strong>x</strong> – the operand.</dd>
-<dt class="field-name">Returns</dt><dd class="field-body">the logarithm of <em>x</em>.</dd>
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>x</strong> – the operand.</li>
+<li><strong>b</strong> – the base of the logarithm.</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first">the logarithm of <em>x</em>.</p>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><p class="first last"><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
+</dd>
 </dl>
 </dd></dl>
 
