@@ -1514,48 +1514,48 @@ but inline variables are more convenient if C++17 is an option.
    The number of binary digits in the
    significand of a :cpp:class:`~mppp::real128` (113).
 
-.. cpp:function:: constexpr unsigned mppp::real128_max()
-.. cpp:var:: constexpr unsigned mppp::max_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_max()
+.. cpp:var:: constexpr mppp::real128 mppp::max_128
 
    The maximum positive finite value representable by :cpp:class:`~mppp::real128`.
 
-.. cpp:function:: constexpr unsigned mppp::real128_min()
-.. cpp:var:: constexpr unsigned mppp::min_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_min()
+.. cpp:var:: constexpr mppp::real128 mppp::min_128
 
    The minimum positive value representable by :cpp:class:`~mppp::real128`
    with full precision.
 
-.. cpp:function:: constexpr unsigned mppp::real128_epsilon()
-.. cpp:var:: constexpr unsigned mppp::epsilon_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_epsilon()
+.. cpp:var:: constexpr mppp::real128 mppp::epsilon_128
 
    The difference between 1 and the next larger number representable
    by :cpp:class:`~mppp::real128` (:math:`2^{-112}`).
 
-.. cpp:function:: constexpr unsigned mppp::real128_denorm_min()
-.. cpp:var:: constexpr unsigned mppp::denorm_min_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_denorm_min()
+.. cpp:var:: constexpr mppp::real128 mppp::denorm_min_128
 
    The smallest positive denormalized number representable by
    :cpp:class:`~mppp::real128`.
 
-.. cpp:function:: constexpr unsigned mppp::real128_inf()
-.. cpp:var:: constexpr unsigned mppp::inf_128
-.. cpp:function:: constexpr unsigned mppp::real128_nan()
-.. cpp:var:: constexpr unsigned mppp::nan_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_inf()
+.. cpp:var:: constexpr mppp::real128 mppp::inf_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_nan()
+.. cpp:var:: constexpr mppp::real128 mppp::nan_128
 
    Positive infinity and NaN.
 
-.. cpp:function:: constexpr unsigned mppp::real128_pi()
-.. cpp:var:: constexpr unsigned mppp::pi_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_pi()
+.. cpp:var:: constexpr mppp::real128 mppp::pi_128
 
    Quadruple-precision :math:`\pi` constant.
 
-.. cpp:function:: constexpr unsigned mppp::real128_e()
-.. cpp:var:: constexpr unsigned mppp::e_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_e()
+.. cpp:var:: constexpr mppp::real128 mppp::e_128
 
    Quadruple-precision :math:`\text{e}` constant (Euler's number).
 
-.. cpp:function:: constexpr unsigned mppp::real128_sqrt2()
-.. cpp:var:: constexpr unsigned mppp::sqrt2_128
+.. cpp:function:: constexpr mppp::real128 mppp::real128_sqrt2()
+.. cpp:var:: constexpr mppp::real128 mppp::sqrt2_128
 
    Quadruple-precision :math:`\sqrt{2}` constant.
 

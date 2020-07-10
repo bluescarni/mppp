@@ -1282,10 +1282,10 @@ public:
     }
     // Constructor from range of characters.
     explicit integer(const char *begin, const char *end, int base = 10) : m_int(begin, end, base) {}
-    // Copy constructor from \p mpz_t.
+    // Copy constructor from mpz_t.
     explicit integer(const ::mpz_t n) : m_int(n) {}
 #if !defined(_MSC_VER)
-    // Move constructor from \p mpz_t.
+    // Move constructor from mpz_t.
     // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     explicit integer(::mpz_t &&n) : m_int(std::move(n)) {}
 #endif
@@ -8085,7 +8085,7 @@ template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_ty
 namespace std
 {
 
-// Specialisation of \p std::hash for mppp::integer.
+// Specialisation of std::hash for mppp::integer.
 template <size_t SSize>
 struct hash<mppp::integer<SSize>> {
 // NOTE: these typedefs have been deprecated in C++17.
