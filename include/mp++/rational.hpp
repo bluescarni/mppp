@@ -309,7 +309,7 @@ public:
     // Constructor from mpq_t.
     explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q)) {}
 #if !defined(_MSC_VER)
-    // Move constructor from \p mpq_t.
+    // Move constructor from mpq_t.
     explicit rational(::mpq_t &&q) : m_num(::mpz_t{*mpq_numref(q)}), m_den(::mpz_t{*mpq_denref(q)}) {}
 #endif
 
