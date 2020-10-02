@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -130,8 +130,8 @@ in an arithmetic operation, all operands are converted (or <em>coerced</em>) int
 common type determined from the types of the operands. The converted operands
 are then used in place of the original operands to perform the operation,
 and the type of the result will be the common type. For instance:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">5l</span><span class="p">;</span>   <span class="c1">// &#39;4&#39; is int, &#39;5l&#39; is long: a will be long.</span>
-<span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">4.f</span> <span class="o">+</span> <span class="mi">5l</span><span class="p">;</span> <span class="c1">// &#39;4.f&#39; is float, &#39;5l&#39; is long: b will be float.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="mf">5l</span><span class="p">;</span>   <span class="c1">// &#39;4&#39; is int, &#39;5l&#39; is long: a will be long.</span>
+<span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">4.f</span> <span class="o">+</span> <span class="mf">5l</span><span class="p">;</span> <span class="c1">// &#39;4.f&#39; is float, &#39;5l&#39; is long: b will be float.</span>
 <span class="k">auto</span> <span class="n">c</span> <span class="o">=</span> <span class="mf">4.f</span> <span class="o">+</span> <span class="mf">5.</span><span class="p">;</span> <span class="c1">// &#39;4.f&#39; is float, &#39;5.&#39; is double: c will be double.</span>
 </pre></div>
 </div>

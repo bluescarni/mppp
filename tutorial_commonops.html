@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -143,8 +143,8 @@ by the <a class="reference internal" href="tutorial_numtower.html#tutorial-numto
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">4</span><span class="p">}</span> <span class="o">+</span> <span class="mi">3</span><span class="p">;</span>        <span class="c1">// r1 will be of type int_t.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">r1</span> <span class="o">==</span> <span class="mi">7</span><span class="p">);</span>
 
-<span class="k">auto</span> <span class="n">r2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.75</span> <span class="o">+</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span> <span class="c1">// r2 will be of type double.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r2</span> <span class="o">==</span> <span class="o">-</span><span class="mf">.25</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">r2</span> <span class="o">=</span> <span class="mf">-0.75</span> <span class="o">+</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span> <span class="c1">// r2 will be of type double.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r2</span> <span class="o">==</span> <span class="mf">-.25</span><span class="p">);</span>
 
 <span class="k">auto</span> <span class="n">r3</span> <span class="o">=</span> <span class="n">real128</span><span class="p">{</span><span class="mi">5</span><span class="p">}</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>      <span class="c1">// r3 will be of type real128.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">r3</span> <span class="o">==</span> <span class="mf">10.</span><span class="p">);</span>
@@ -182,7 +182,7 @@ corresponding in-place counterpart behaves as a binary operation followed by ass
 
 <span class="n">rat_t</span> <span class="n">r2</span><span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span>
 <span class="n">r2</span> <span class="o">-=</span> <span class="mf">1.5</span><span class="p">;</span>                  <span class="c1">// Equivalent to: r2 = r2 - 1.5</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r2</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">});</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r2</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">-1</span><span class="p">,</span> <span class="mi">6</span><span class="p">});</span>
 
 <span class="n">real128</span> <span class="n">r3</span><span class="p">{</span><span class="mi">5</span><span class="p">};</span>
 <span class="n">r3</span> <span class="o">*=</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>          <span class="c1">// Equivalent to: r3 = r3 * rat_t{1, 2}</span>
@@ -221,7 +221,7 @@ mp++’s multiprecision classes:</p>
 
 <span class="n">rat_t</span> <span class="n">q</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="o">+</span><span class="n">q</span> <span class="o">==</span> <span class="n">q</span><span class="p">);</span>
-<span class="n">assert</span><span class="p">(</span><span class="o">-</span><span class="n">q</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">});</span>
+<span class="n">assert</span><span class="p">(</span><span class="o">-</span><span class="n">q</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">-1</span><span class="p">,</span> <span class="mi">2</span><span class="p">});</span>
 </pre></div>
 </div>
 <p>All of mp++’s multiprecision classes are contextually convertible to <code class="docutils literal notranslate"><span class="pre">bool</span></code>, following the usual rule

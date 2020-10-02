@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -148,7 +148,7 @@ a few additional capabilities:</p>
 of arguments representing the numerator and the denominator:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>                <span class="c1">// Construction from int numerator and denominator.</span>
 
-<span class="n">rat_t</span> <span class="n">q2</span><span class="p">{</span><span class="kt">long</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">),</span> <span class="kt">short</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">)};</span> <span class="c1">// Construction from mixed numerator and denominator types.</span>
+<span class="n">rat_t</span> <span class="n">q2</span><span class="p">{</span><span class="kt">long</span><span class="p">(</span><span class="mi">-6</span><span class="p">),</span> <span class="kt">short</span><span class="p">(</span><span class="mi">-8</span><span class="p">)};</span> <span class="c1">// Construction from mixed numerator and denominator types.</span>
 
 <span class="n">assert</span><span class="p">(</span><span class="n">q1</span> <span class="o">==</span> <span class="n">q2</span><span class="p">);</span>              <span class="c1">// Construction canonicalises the rational.</span>
 </pre></div>
@@ -200,10 +200,10 @@ with the <a class="reference external" href="https://gmplib.org/">GMP</a> librar
 <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects being able to be constructed and assigned from both <a class="reference internal" href="integer.html#_CPPv45mpz_t" title="mpz_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpz_t</span></code></a>
 and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> objects:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
-<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>      <span class="c1">// Init an mpz_t with the value -4.</span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">-4</span><span class="p">);</span>      <span class="c1">// Init an mpz_t with the value -4.</span>
 
 <span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="n">m</span><span class="p">};</span>                 <span class="c1">// Init a rat_t from the mpz_t.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">q1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>            <span class="c1">// Verify that the value is correct.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">q1</span> <span class="o">==</span> <span class="mi">-4</span><span class="p">);</span>            <span class="c1">// Verify that the value is correct.</span>
 
 <span class="n">mpq_t</span> <span class="n">q</span><span class="p">;</span>
 <span class="n">mpq_init</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
@@ -214,7 +214,7 @@ and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></c
 
 <span class="n">rat_t</span> <span class="n">q3</span><span class="p">;</span>
 <span class="n">q3</span> <span class="o">=</span> <span class="n">m</span><span class="p">;</span>                      <span class="c1">// Assign the mpz_t to another rat_t.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">q3</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>            <span class="c1">// Verify that the value is correct.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">q3</span> <span class="o">==</span> <span class="mi">-4</span><span class="p">);</span>            <span class="c1">// Verify that the value is correct.</span>
 
 <span class="n">rat_t</span> <span class="n">q4</span><span class="p">;</span>
 <span class="n">q4</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>                      <span class="c1">// Assign the mpq_t to another rat_t.</span>
@@ -241,7 +241,7 @@ binary, octal, decimal and hexadecimal representations:</p>
 <span class="k">auto</span> <span class="n">q1</span> <span class="o">=</span> <span class="mi">123</span><span class="n">_q1</span><span class="p">;</span>      <span class="c1">// q1 has 1 limb of static storage,</span>
                        <span class="c1">// and it contains the value 123.</span>
 
-<span class="k">auto</span> <span class="n">q2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">0</span><span class="n">b10011_q2</span><span class="p">;</span> <span class="c1">// q2 has 2 limbs of static storage,</span>
+<span class="k">auto</span> <span class="n">q2</span> <span class="o">=</span> <span class="mb">-0b10011</span><span class="n">_q2</span><span class="p">;</span> <span class="c1">// q2 has 2 limbs of static storage,</span>
                        <span class="c1">// and it contains the value -19</span>
                        <span class="c1">// (-10011 in base 2).</span>
 

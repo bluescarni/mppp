@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -217,10 +217,10 @@ be lifted in the future):</p>
 <p>In additions to the <a class="reference internal" href="tutorial_constr.html#tutorial-constr"><span class="std std-ref">constructors</span></a> common to
 all of mp++’s classes, <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> features additional
 specialised constructors:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">};</span> <span class="c1">// x0 is set to -infinity with 64</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">inf</span><span class="p">,</span> <span class="mi">-1</span><span class="p">,</span> <span class="mi">64</span><span class="p">};</span> <span class="c1">// x0 is set to -infinity with 64</span>
                                  <span class="c1">// bits of precision.</span>
 
-<span class="n">real</span> <span class="n">x1</span><span class="p">{</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">112</span><span class="p">};</span>             <span class="c1">// x1 is set to -4*2**8 with 112</span>
+<span class="n">real</span> <span class="n">x1</span><span class="p">{</span><span class="mi">-4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">112</span><span class="p">};</span>             <span class="c1">// x1 is set to -4*2**8 with 112</span>
                                  <span class="c1">// bits of precision.</span>
 </pre></div>
 </div>
@@ -245,9 +245,9 @@ family of functions:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">zero</span><span class="p">,</span> <span class="mi">112</span><span class="p">};</span> <span class="c1">// Create a positive zero with 112 bits of precision.</span>
 
 <span class="n">x0</span><span class="p">.</span><span class="n">set_inf</span><span class="p">();</span>                  <span class="c1">// Set x0 to +infinity, precision is not altered.</span>
-<span class="n">x0</span><span class="p">.</span><span class="n">set_inf</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>                <span class="c1">// Set x0 to -infinity, precision is not altered.</span>
+<span class="n">x0</span><span class="p">.</span><span class="n">set_inf</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span>                <span class="c1">// Set x0 to -infinity, precision is not altered.</span>
 
-<span class="n">set_ui_2exp</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">);</span>        <span class="c1">// Set x0 to the 112-bit approximation of</span>
+<span class="n">set_ui_2exp</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">-5</span><span class="p">);</span>        <span class="c1">// Set x0 to the 112-bit approximation of</span>
                                <span class="c1">// 4*2**(-5).</span>
 </pre></div>
 </div>
@@ -475,9 +475,9 @@ available for all of mp++’s multiprecision classes,
 </pre></div>
 </div>
 <p><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> values can be compared by absolute value:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">1</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">})</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// |1| == |-1|.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="o">-</span><span class="mi">2</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mi">1</span><span class="p">})</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>  <span class="c1">// |-2| &gt; |1|.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">0</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">})</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">);</span>  <span class="c1">// |0| &lt; |-1|.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">1</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mi">-1</span><span class="p">})</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// |1| == |-1|.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">-2</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mi">1</span><span class="p">})</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>  <span class="c1">// |-2| &gt; |1|.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">0</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mi">-1</span><span class="p">})</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">);</span>  <span class="c1">// |0| &lt; |-1|.</span>
 </pre></div>
 </div>
 <p>And they can also be compared efficiently to integral multiples
@@ -531,7 +531,7 @@ with 128, 256, 512 and 1024 bits of precision:</p>
 
 <span class="k">auto</span> <span class="n">r2</span> <span class="o">=</span> <span class="mf">4.2e1</span><span class="n">_r256</span><span class="p">;</span>     <span class="c1">// Scientific notation can be used.</span>
 
-<span class="k">auto</span> <span class="n">r3</span> <span class="o">=</span> <span class="mh">0x1</span><span class="mf">.12</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="n">_r512</span><span class="p">;</span> <span class="c1">// Hexadecimal floats are supported too.</span>
+<span class="k">auto</span> <span class="n">r3</span> <span class="o">=</span> <span class="mf">0x1.12p-1</span><span class="n">_r512</span><span class="p">;</span> <span class="c1">// Hexadecimal floats are supported too.</span>
 </pre></div>
 </div>
 <div class="admonition seealso">

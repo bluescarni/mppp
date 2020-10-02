@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -213,15 +213,15 @@ following set of overloads:</p>
 <li>a GMP-style binary function.</li>
 </ul>
 <p>As a concrete example, let’s take a look at different ways of computing the absolute value of an integer:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="o">-</span><span class="mi">5</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="mi">-5</span><span class="p">};</span>
 <span class="n">n1</span><span class="p">.</span><span class="n">abs</span><span class="p">();</span>              <span class="c1">// In-place nullary member function.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
 
-<span class="n">int_t</span> <span class="n">n2</span><span class="p">{</span><span class="o">-</span><span class="mi">5</span><span class="p">};</span>
+<span class="n">int_t</span> <span class="n">n2</span><span class="p">{</span><span class="mi">-5</span><span class="p">};</span>
 <span class="k">auto</span> <span class="n">n2_abs</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">n2</span><span class="p">);</span> <span class="c1">// Unary function.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n2_abs</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
 
-<span class="n">int_t</span> <span class="n">n3</span><span class="p">{</span><span class="o">-</span><span class="mi">5</span><span class="p">},</span> <span class="n">n3_abs</span><span class="p">;</span>
+<span class="n">int_t</span> <span class="n">n3</span><span class="p">{</span><span class="mi">-5</span><span class="p">},</span> <span class="n">n3_abs</span><span class="p">;</span>
 <span class="n">abs</span><span class="p">(</span><span class="n">n3_abs</span><span class="p">,</span> <span class="n">n3</span><span class="p">);</span>       <span class="c1">// GMP-style binary function.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n3_abs</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
 </pre></div>
@@ -232,9 +232,9 @@ binary <code class="docutils literal notranslate"><span class="pre">abs()</span>
 <p>The nullary member function overload is provided to cater to the common use case in which a value is mutated in-place
 through a unary operation (e.g., <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">abs(n)</span></code>). Since the nullary member function overloads return a reference
 to the calling object, they can be chained to perform a sequence of in-place operations on the same value:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="o">-</span><span class="mi">16</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="mi">-16</span><span class="p">};</span>
 <span class="n">n1</span><span class="p">.</span><span class="n">abs</span><span class="p">().</span><span class="n">sqrt</span><span class="p">().</span><span class="n">neg</span><span class="p">();</span> <span class="c1">// Equivalent to: n1 = neg(sqrt(abs(n1)))</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="mi">-4</span><span class="p">);</span>
 </pre></div>
 </div>
 <p class="rubric">Footnotes</p>

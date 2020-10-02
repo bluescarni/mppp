@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -173,13 +173,13 @@ functions exposed from C++. The translation rules are the following:</p>
 <span class="cp">#include</span> <span class="cpf">&lt;pybind11/stl.h&gt;</span><span class="cp"></span>
 
 <span class="c1">// A couple of functions accepting and returning C++ containers.</span>
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
 <span class="k">static</span> <span class="kr">inline</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">test_vector</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span>
 <span class="k">static</span> <span class="kr">inline</span> <span class="n">std</span><span class="o">::</span><span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">test_unordered_map</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">um</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="n">um</span><span class="p">;</span>

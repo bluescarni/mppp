@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -179,14 +179,14 @@ There are a few reasons why one would want to use <a class="reference internal" 
 </ul>
 <p>To start with, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is constructible and assignable from <a class="reference internal" href="integer.html#_CPPv45mpz_t" title="mpz_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpz_t</span></code></a> objects:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
-<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>  <span class="c1">// Init an mpz_t with the value -4.</span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">-4</span><span class="p">);</span>  <span class="c1">// Init an mpz_t with the value -4.</span>
 
 <span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="n">m</span><span class="p">};</span>             <span class="c1">// Init an int_t from the mpz_t.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>        <span class="c1">// Verify that the value is correct.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="mi">-4</span><span class="p">);</span>        <span class="c1">// Verify that the value is correct.</span>
 
 <span class="n">int_t</span> <span class="n">n2</span><span class="p">;</span>
 <span class="n">n2</span> <span class="o">=</span> <span class="n">m</span><span class="p">;</span>                  <span class="c1">// Assign the mpz_t to another int_t.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>        <span class="c1">// Verify that the value is correct.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n2</span> <span class="o">==</span> <span class="mi">-4</span><span class="p">);</span>        <span class="c1">// Verify that the value is correct.</span>
 
 <span class="n">mpz_clear</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>            <span class="c1">// Clear the mpz_t.</span>
 </pre></div>
@@ -198,13 +198,13 @@ first switch the calling <a class="reference internal" href="integer.html#_CPPv4
 a raw non-owning pointer which can be used both as a const and mutable parameter in the GMP API.
 For example:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">b</span><span class="p">;</span>
-<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>                   <span class="c1">// Init an mpz_t with the value -4.</span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">-4</span><span class="p">);</span>                   <span class="c1">// Init an mpz_t with the value -4.</span>
 
 <span class="n">int_t</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>                            <span class="c1">// Init two integers.</span>
 
 <span class="n">mpz_add</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">get_mpz_t</span><span class="p">(),</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">.</span><span class="n">get_mpz_t</span><span class="p">());</span> <span class="c1">// Compute b + c via the GMP API, storing the result in a.</span>
 
-<span class="n">assert</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>                          <span class="c1">// Verify that the result is correct.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="mi">-2</span><span class="p">);</span>                          <span class="c1">// Verify that the result is correct.</span>
 
 <span class="n">mpz_clear</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>                             <span class="c1">// Clear the mpz_t.</span>
 </pre></div>
@@ -219,13 +219,13 @@ and, crucially, it does not force the use of dynamic storage in the calling <a c
 We can slightly modify to previous example to use a read-only view as the third parameter in the <code class="docutils literal notranslate"><span class="pre">mpz_add()</span></code> call,
 and verify that the creation of the read-only view did not trigger a promotion from static to dynamic storage:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">b</span><span class="p">;</span>
-<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>                      <span class="c1">// Init an mpz_t with the value -4.</span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">-4</span><span class="p">);</span>                      <span class="c1">// Init an mpz_t with the value -4.</span>
 
 <span class="n">int_t</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>                               <span class="c1">// Init two integers.</span>
 
 <span class="n">mpz_add</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">get_mpz_t</span><span class="p">(),</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">.</span><span class="n">get_mpz_view</span><span class="p">());</span> <span class="c1">// Compute b + c via the GMP API, storing the result in a.</span>
 
-<span class="n">assert</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>                             <span class="c1">// Verify that the result is correct.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="mi">-2</span><span class="p">);</span>                             <span class="c1">// Verify that the result is correct.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">is_static</span><span class="p">());</span>                       <span class="c1">// Verify that c is still using static storage.</span>
 
 <span class="n">mpz_clear</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>                                <span class="c1">// Clear the mpz_t.</span>
@@ -335,7 +335,7 @@ binary, octal, decimal and hexadecimal representations:</p>
 <span class="k">auto</span> <span class="n">n1</span> <span class="o">=</span> <span class="mi">123</span><span class="n">_z1</span><span class="p">;</span>      <span class="c1">// n1 has 1 limb of static storage,</span>
                        <span class="c1">// and it contains the value 123.</span>
 
-<span class="k">auto</span> <span class="n">n2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">0</span><span class="n">b10011_z2</span><span class="p">;</span> <span class="c1">// n2 has 2 limbs of static storage,</span>
+<span class="k">auto</span> <span class="n">n2</span> <span class="o">=</span> <span class="mb">-0b10011</span><span class="n">_z2</span><span class="p">;</span> <span class="c1">// n2 has 2 limbs of static storage,</span>
                        <span class="c1">// and it contains the value -19</span>
                        <span class="c1">// (-10011 in base 2).</span>
 

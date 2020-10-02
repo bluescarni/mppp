@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Licensed under the Apache 2.0 License -->
   <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
@@ -169,8 +169,8 @@ with a floating-point value results in truncation:</p>
 </div>
 <p>In a similar fashion, initialising an <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> with a <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> also
 results in truncation:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">}};</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="mi">-7</span><span class="p">,</span> <span class="mi">3</span><span class="p">}};</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">-2</span><span class="p">);</span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> cannot represent non-finite values, thus construction
@@ -196,16 +196,16 @@ even if it does not preserve the exact value:</p>
 <p>All of mp++’s multiprecision classes can also be initialised from string-like entities (see the
 <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11string_typeE" title="mppp::string_type"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">string_type</span></code></a> concept for a full list). By default, string input is interpreted as the base-10 representation
 of the desired value, and parsing follows (hopefully) intuitive rules:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-42&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">)</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-42&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="mi">-42</span><span class="p">)</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">rat_t</span><span class="p">{</span><span class="s">&quot;3/2&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="mf">1.5</span><span class="p">)</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">real128</span><span class="p">{</span><span class="s">&quot;2.5&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">);</span>
-<span class="n">assert</span><span class="p">((</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;-3.125E-2&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mf">0.03125</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">((</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;-3.125E-2&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">}</span> <span class="o">==</span> <span class="mf">-0.03125</span><span class="p">));</span>
 </pre></div>
 </div>
 <p>Note that for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> we need to provide the precision as an additional parameter when constructing from string (in
 this specific example, 100 bits of precision are used). Depending on the multiprecision class, additional string constructors are available
 which allow to specify a different base for the representation of the value:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">((</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-101010&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">))</span>          <span class="c1">// Base 2.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">((</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-101010&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">}</span> <span class="o">==</span> <span class="mi">-42</span><span class="p">))</span>          <span class="c1">// Base 2.</span>
 <span class="n">assert</span><span class="p">((</span><span class="n">rat_t</span><span class="p">{</span><span class="s">&quot;2a/1c&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">}</span> <span class="o">==</span> <span class="mf">1.5</span><span class="p">))</span>           <span class="c1">// Base 16.</span>
 <span class="n">assert</span><span class="p">((</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;7B.1&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">100</span><span class="p">}</span> <span class="o">==</span> <span class="mf">235.03125</span><span class="p">));</span> <span class="c1">// Base 32, 100 bits of precision.</span>
 </pre></div>
@@ -232,10 +232,10 @@ of the assignment operators mirrors the behaviour of the corresponding construct
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
-<span class="n">n</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.7</span><span class="p">;</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">3</span><span class="p">);</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mf">-3.7</span><span class="p">;</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">-3</span><span class="p">);</span>
 <span class="n">n</span> <span class="o">=</span> <span class="s">&quot;-128&quot;</span><span class="p">;</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">128</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">-128</span><span class="p">);</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">quiet_NaN</span><span class="p">();</span> <span class="c1">// Raises std::domain_error.</span>
 
 <span class="n">rat_t</span> <span class="n">q</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>
@@ -244,7 +244,7 @@ of the assignment operators mirrors the behaviour of the corresponding construct
 <span class="n">q</span> <span class="o">=</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">10</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">q</span> <span class="o">==</span> <span class="mi">10</span><span class="p">);</span>
 <span class="n">q</span> <span class="o">=</span> <span class="s">&quot;-5/6&quot;</span><span class="p">;</span>
-<span class="n">assert</span><span class="p">((</span><span class="n">q</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">}));</span>
+<span class="n">assert</span><span class="p">((</span><span class="n">q</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">-5</span><span class="p">,</span> <span class="mi">6</span><span class="p">}));</span>
 <span class="n">q</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">infinity</span><span class="p">();</span>  <span class="c1">// Raises std::domain_error.</span>
 </pre></div>
 </div>
