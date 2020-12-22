@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.8.0)
 # NOTE: policy for using the CheckIPOSupported module:
 # https://cmake.org/cmake/help/latest/policy/CMP0069.html
 cmake_policy(SET CMP0069 NEW)
@@ -176,13 +176,6 @@ if(MINGW)
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-Wa,-mbig-obj")
 endif()
 
-# Concepts detection.
-if(YACMA_COMPILER_IS_GNUCXX)
-    # This is just a hackish way of detecting concepts, need to revisit once
-    # more compilers support them.
-    check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
-endif()
-
 # Explanation: on MSVC, when building static libraries, it is good practice to link
 # to the static runtime. CMake, however, is hard-coded to link to the dynamic runtime.
 # Hence we hackishly replace the /MD flag with /MT. This is the approach suggested
@@ -296,18 +289,12 @@ target_compile_options(mp++ PRIVATE
     "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
     "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
 )
-# Let's setup the target C++ standard, but only if the user did not provide it manually.
-if(NOT CMAKE_CXX_STANDARD)
-    if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
-        # NOTE: the idea here is that we want to use C++14 if the compilers supports
-        # concepts (as variable concepts are essentially template variables).
-        set_property(TARGET mp++ PROPERTY CXX_STANDARD 14)
-    else()
-        set_property(TARGET mp++ PROPERTY CXX_STANDARD 11)
-    endif()
-endif()
-set_property(TARGET mp++ PROPERTY CXX_STANDARD_REQUIRED YES)
+
+# Ensure that C++11 is employed when both compiling and consuming mp++.
+target_compile_features(mp++ PUBLIC cxx_std_11)
+# Enforce vanilla C++ when compiling mp++.
 set_property(TARGET mp++ PROPERTY CXX_EXTENSIONS NO)
+
 target_include_directories(mp++ PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>

@@ -1,6 +1,3 @@
-# mp++ needs at least CMake 3.3.
-cmake_minimum_required(VERSION 3.3.0)
-
 # The name of our project.
 project(sample_project)
 
@@ -13,8 +10,3 @@ find_package(mp++ REQUIRED)
 # dependencies (e.g., GMP) are transitively linked to 'main'.
 add_executable(main main.cpp)
 target_link_libraries(main mp++::mp++)
-
-# This line is necessary to instruct your compiler
-# that C++11 is needed for the compilation.
-# Not strictly necessary with a recent-enough compiler.
-set_property(TARGET main PROPERTY CXX_STANDARD 11)

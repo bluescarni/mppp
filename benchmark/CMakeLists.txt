@@ -31,17 +31,7 @@ target_compile_options(mp++_benchmark PRIVATE
   "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
 )
 target_link_libraries(mp++_benchmark PRIVATE Boost::boost Boost::filesystem)
-# Let's setup the target C++ standard, but only if the user did not provide it manually.
-if(NOT CMAKE_CXX_STANDARD)
-  if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
-    # NOTE: the idea here is that we want to use C++14 if the compilers supports
-    # concepts (as variable concepts are essentially template variables).
-    set_property(TARGET mp++_benchmark PROPERTY CXX_STANDARD 14)
-  else()
-    set_property(TARGET mp++_benchmark PROPERTY CXX_STANDARD 11)
-  endif()
-endif()
-set_property(TARGET mp++_benchmark PROPERTY CXX_STANDARD_REQUIRED YES)
+target_compile_features(mp++_benchmark PRIVATE cxx_std_11)
 set_property(TARGET mp++_benchmark PROPERTY CXX_EXTENSIONS NO)
 
 # Custom target to run all benchmarks.
@@ -68,18 +58,9 @@ function(ADD_MPPP_BENCHMARK arg1)
     "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
     "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
   )
-  # Let's setup the target C++ standard, but only if the user did not provide it manually.
-  if(NOT CMAKE_CXX_STANDARD)
-    if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
-      # NOTE: the idea here is that we want to use C++14 if the compilers supports
-      # concepts (as variable concepts are essentially template variables).
-      set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 14)
-    else()
-      set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
-    endif()
-  endif()
-  set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
+  target_compile_features(${arg1} PRIVATE cxx_std_11)
   set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
+
   # Visibility settings.
   set_target_properties(${arg1} PROPERTIES CXX_VISIBILITY_PRESET hidden)
   set_target_properties(${arg1} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
@@ -105,8 +86,7 @@ if(NOT WIN32 AND UNIX AND NOT APPLE)
       "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
       "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
   )
-  set_property(TARGET track_malloc PROPERTY CXX_STANDARD 11)
-  set_property(TARGET track_malloc PROPERTY CXX_STANDARD_REQUIRED YES)
+  target_compile_features(track_malloc PRIVATE cxx_std_11)
   set_property(TARGET track_malloc PROPERTY CXX_EXTENSIONS NO)
 endif()
 
