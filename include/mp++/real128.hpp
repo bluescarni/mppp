@@ -725,6 +725,25 @@ public:
     {
         return !isnan() && !isinf();
     }
+    MPPP_NODISCARD
+#if !defined(__INTEL_COMPILER)
+    constexpr
+#endif
+        bool
+        isfinite() const
+    {
+        return finite();
+    }
+    // Detect normal value.
+    MPPP_NODISCARD
+#if !defined(__INTEL_COMPILER)
+    constexpr
+#endif
+        bool
+        isnormal() const
+    {
+        return fpclassify() == FP_NORMAL;
+    }
 
     // In-place absolute value.
 #if !defined(__INTEL_COMPILER)
@@ -889,6 +908,29 @@ constexpr
     finite(const real128 &x)
 {
     return x.finite();
+}
+
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    bool
+    isfinite(const real128 &x)
+{
+    return x.isfinite();
+}
+
+// Detect normal value.
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    bool
+    isnormal(const real128 &x)
+{
+    return x.isnormal();
 }
 
 // Equality predicate with special NaN handling.

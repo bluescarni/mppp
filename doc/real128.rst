@@ -395,16 +395,23 @@ The real128 class
    .. cpp:function:: constexpr bool isnan() const
    .. cpp:function:: constexpr bool isinf() const
    .. cpp:function:: constexpr bool finite() const
+   .. cpp:function:: constexpr bool isfinite() const
+   .. cpp:function:: constexpr bool isnormal() const
 
       .. note::
 
          These functions are not ``constexpr`` if the Intel C++ compiler
          is being used.
 
-      Detect NaN, infinity or finite value.
+      Detect NaN, infinity, finite value (``finite()`` and ``isfinite()``) or
+      normal value.
+
+      .. versionadded:: 0.22
+
+         ``isfinite()`` and ``isnormal()``.
 
       :return: ``true`` is the value of ``this`` is, respectively,
-        NaN, an infinity or finite, ``false`` otherwise.
+        NaN, an infinity, finite or normal, ``false`` otherwise.
 
    .. cpp:function:: constexpr real128 &abs()
 
@@ -852,6 +859,8 @@ Comparison
 .. cpp:function:: constexpr bool mppp::isnan(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::isinf(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::finite(const mppp::real128 &x)
+.. cpp:function:: constexpr bool mppp::isfinite(const mppp::real128 &x)
+.. cpp:function:: constexpr bool mppp::isnormal(const mppp::real128 &x)
 
    .. note::
 
@@ -864,13 +873,18 @@ Comparison
 
    * NaN,
    * an infinity,
-   * a finite value,
+   * a finite value (``finite()`` and ``isfinite()``),
+   * a normal value,
 
    and ``false`` otherwise.
 
+   .. versionadded:: 0.22
+
+      ``isfinite()`` and ``isnormal()``.
+
    :param x: the input value.
 
-   :return: a boolean flag indicating if *x* is NaN, an infinity or a finite value.
+   :return: a boolean flag indicating if *x* is NaN, an infinity, a finite value or a normal value.
 
 .. cpp:function:: constexpr bool mppp::real128_equal_to(const mppp::real128 &x, const mppp::real128 &y)
 
