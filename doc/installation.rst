@@ -261,6 +261,16 @@ program presented earlier may look like this:
    add_executable(main main.cpp)
    target_link_libraries(main mp++::mp++)
 
+.. versionadded:: 0.22
+
+mp++'s config-file package also exports the following boolean
+variables to signal with which optional dependencies mp++ was compiled:
+
+* ``mp++_WITH_MPFR`` if MPFR support was enabled,
+* ``mp++_WITH_MPC`` if MPC support was enabled,
+* ``mp++_WITH_ARB`` if Arb support was enabled,
+* ``mp++_WITH_QUADMATH`` if quadmath support was enabled.
+
 Compiler and platform specific notes
 ------------------------------------
 
