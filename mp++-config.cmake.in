@@ -4,8 +4,25 @@ get_filename_component(_MPPP_CONFIG_SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 # Find the deps. Alter the cmake module path.
 set(_MPPP_CONFIG_OLD_MODULE_PATH "${CMAKE_MODULE_PATH}")
 list(APPEND CMAKE_MODULE_PATH "${_MPPP_CONFIG_SELF_DIR}")
+
+# Mandatory dep on GMP.
 find_package(mp++_GMP REQUIRED)
-@_MPPP_CONFIG_OPTIONAL_DEPS@
+
+# Public optional deps.
+if(@MPPP_WITH_MPFR@)
+    find_package(mp++_MPFR REQUIRED)
+endif()
+set(mp++_WITH_MPFR @MPPP_WITH_MPFR@)
+
+if(@MPPP_WITH_MPC@)
+    find_package(mp++_MPC REQUIRED)
+endif()
+set(mp++_WITH_MPC @MPPP_WITH_MPC@)
+
+# Private optional deps.
+set(mp++_WITH_ARB @MPPP_WITH_ARB@)
+set(mp++_WITH_QUADMATH @MPPP_WITH_QUADMATH@)
+
 # Restore original module path.
 set(CMAKE_MODULE_PATH "${_MPPP_CONFIG_OLD_MODULE_PATH}")
 unset(_MPPP_CONFIG_OLD_MODULE_PATH)

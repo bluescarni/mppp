@@ -425,14 +425,7 @@ install(TARGETS mp++
     RUNTIME DESTINATION bin
 )
 
-# Setup of the optional deps.
-set(_MPPP_CONFIG_OPTIONAL_DEPS)
-if(MPPP_WITH_MPFR)
-    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(mp++_MPFR REQUIRED)\n")
-endif()
-if(MPPP_WITH_MPC)
-    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(mp++_MPC REQUIRED)\n")
-endif()
+# Configure mp++-config.cmake.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake"
