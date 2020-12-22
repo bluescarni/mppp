@@ -25,6 +25,15 @@ Macros and definitions
    This name is defined if mp++ was configured with support for the quadmath library
    (see the :ref:`installation instructions <installation>`).
 
+.. c:macro:: MPPP_FLOAT128_WITH_LONG_DOUBLE
+
+   .. versionadded:: 0.22
+
+   This macro is defined if mp++ was configured with support for the quadmath library
+   and the ``__float128`` type can be used in mixed-mode operations with ``long double``
+   (see the :ref:`installation instructions <installation>` and the
+   :ref:`platform-specific notes <inst_plat_specific>`).
+
 .. c:macro:: MPPP_WITH_MPFR
 
    This name is defined if mp++ was configured with support for the MPFR library

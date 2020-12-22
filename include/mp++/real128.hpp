@@ -120,40 +120,8 @@ using is_real128_mppp_interoperable = disjunction<is_integer<T>, is_rational<T>>
 // double, clang and GCC diverge, and we follow whatever the compiler is doing. So we just hard-code the behaviour
 // here, we can always write a more sophisticated solution later if the need arises.
 //
-// NOTE: since version 7 the behaviour of clang changed, now matching GCC.
-
-// Define the MPPP_FLOAT128_WITH_LONG_DOUBLE name
-// if __float128 can interact with long double.
-#if defined(__clang__)
-
-#if defined(__apple_build_version__)
-
-// NOTE: according to https://en.wikipedia.org/wiki/Xcode#Toolchain_versions,
-// clang 7 starts in Xcode 10.2.
-#if __clang_major__ > 10 || (__clang_major__ == 10 && __clang_minor__ >= 2)
-
-#define MPPP_FLOAT128_WITH_LONG_DOUBLE
-
-#endif
-
-#else
-
-// Vanilla clang.
-#if __clang_major__ >= 7
-
-#define MPPP_FLOAT128_WITH_LONG_DOUBLE
-
-#endif
-
-#endif
-
-#else
-
-// On non-clang, let's always assume that __float128
-// can interact with long double.
-#define MPPP_FLOAT128_WITH_LONG_DOUBLE
-
-#endif
+// NOTE: since version 7 the behaviour of clang changed, now matching GCC. See the logic implemented
+// in config.hpp.
 
 // For internal use only.
 template <typename T>

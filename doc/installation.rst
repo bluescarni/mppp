@@ -271,6 +271,8 @@ variables to signal with which optional dependencies mp++ was compiled:
 * ``mp++_WITH_ARB`` if Arb support was enabled,
 * ``mp++_WITH_QUADMATH`` if quadmath support was enabled.
 
+.. _inst_plat_specific:
+
 Compiler and platform specific notes
 ------------------------------------
 
