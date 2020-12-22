@@ -265,12 +265,44 @@ constexpr int ignore(Args &&...)
     return 0;
 }
 
+// Given an input unsigned integer n, this function will return
+// a signed integer whose absolute value is n and whose sign is
+// s (following the usual convention: s = 0 means zero,
+// s = 1 means positive, s = -1 means negative).
+// No overflow check is performed: if the value of the result
+// does not fit in the return type, the behaviour will be undefined.
+template <typename T>
+inline make_signed_t<T> make_signed(const T &n, int s)
+{
+    static_assert(is_unsigned<T>::value, "make_signed() can be invoked only on unsigned integral types.");
+    // NOTE: avoid integral promotion bullshit.
+    static_assert(std::is_same<T, decltype(n + n)>::value, "make_signed() cannot be used with short integral types.");
+
+    // Consistency checks: s must be one of [0, -1, 1], and, if s is zero,
+    // then n must also be zero.
+    assert(s == 0 || s == -1 || s == 1);
+    assert(s != 0 || n == 0u);
+
+    // NOTE: s_ex will be:
+    // - 0 if s is 0 or 1,
+    // - the max value representable by T if s is -1 (this is because the
+    //   right shift produces the int -1, which is then converted to the
+    //   unsigned T).
+    const auto s_ex = static_cast<T>(s >> (std::numeric_limits<int>::digits - 1));
+
+    // (n ^ s_ex) - s_ex returns n if s_ex is 0, -n (still represented
+    // as an unsigned) otherwise.
+    return static_cast<make_signed_t<T>>((n ^ s_ex) - s_ex);
+}
+
 #if defined(_MSC_VER)
 
 #pragma warning(pop)
 
 #endif
+
 } // namespace detail
+
 } // namespace mppp
 
 #endif

@@ -2738,37 +2738,55 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
                             const std::integral_constant<int, 1> &)
 {
     ignore(asize1, asize2);
+
+    // Cache the output pointer.
     auto rdata = rop.m_limbs.data();
-    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
+
+    // Cache the input limbs.
+    const auto l1 = op1.m_limbs[0], l2 = op2.m_limbs[0];
+
     // NOTE: both asizes have to be 0 or 1 here.
-    assert((asize1 == 1 && data1[0] != 0u) || (asize1 == 0 && data1[0] == 0u));
-    assert((asize2 == 1 && data2[0] != 0u) || (asize2 == 0 && data2[0] == 0u));
-    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
-    ::mp_limb_t tmp;
-    if (sign1 == sign2) {
-        // When the signs are identical, we can implement addition as a true addition.
-        if (mppp_unlikely(limb_add_overflow(data1[0], data2[0], &tmp))) {
-            return false;
-        }
-        // Assign the output. asize can be zero (sign1 == sign2 == 0) or 1.
-        rop._mp_size = sign1;
-        rdata[0] = tmp;
+    assert((asize1 == 1 && l1 != 0u) || (asize1 == 0 && l1 == 0u));
+    assert((asize2 == 1 && l2 != 0u) || (asize2 == 0 && l2 == 0u));
+
+    if (l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2))) {
+        const auto x = make_signed(l1, sign1);
+        const auto y = make_signed(l2, sign2);
+
+        const auto ret = x + y;
+        rop._mp_size = integral_sign(ret);
+
+        rdata[0] = static_cast<::mp_limb_t>(std::abs(ret));
+
+        return true;
     } else {
-        // When the signs differ, we need to implement addition as a subtraction.
-        // NOTE: this also includes the case in which only one of the operands is zero.
-        if (data1[0] >= data2[0]) {
-            // op1 is not smaller than op2.
-            tmp = data1[0] - data2[0];
-            // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
-            rop._mp_size = sign1 * (data1[0] != data2[0]);
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+        ::mp_limb_t tmp;
+        if (sign1 == sign2) {
+            // When the signs are identical, we can implement addition as a true addition.
+            if (mppp_unlikely(limb_add_overflow(l1, l2, &tmp))) {
+                return false;
+            }
+            // Assign the output. asize can be zero (sign1 == sign2 == 0) or 1.
+            rop._mp_size = sign1;
             rdata[0] = tmp;
         } else {
-            // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
-            rop._mp_size = sign2;
-            rdata[0] = data2[0] - data1[0];
+            // When the signs differ, we need to implement addition as a subtraction.
+            // NOTE: this also includes the case in which only one of the operands is zero.
+            if (l1 >= l2) {
+                // op1 is not smaller than op2.
+                tmp = l1 - l2;
+                // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
+                rop._mp_size = sign1 * (l1 != l2);
+                rdata[0] = tmp;
+            } else {
+                // NOTE: this has to be one, as l2 and l1 cannot be equal.
+                rop._mp_size = sign2;
+                rdata[0] = l2 - l1;
+            }
         }
+        return true;
     }
-    return true;
 }
 
 // Optimization for two-limbs statics with no nails.
@@ -3561,32 +3579,46 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     if (mppp_unlikely(tmp)) {
         return 3u;
     }
+
     // Determine the sign of the product: 0, 1 or -1.
     const int sign_prod = sign1 * sign2;
+
     // Now add/sub.
-    if (signr == sign_prod) {
-        // Same sign, do addition with overflow check.
-        if (mppp_unlikely(limb_add_overflow(rop.m_limbs[0], prod, &tmp))) {
-            return 2u;
-        }
-        // Assign the output.
-        rop._mp_size = signr;
-        rop.m_limbs[0] = tmp;
+    if (rop.m_limbs[0] < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && prod < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2))) {
+        const auto x = make_signed(rop.m_limbs[0], signr);
+        const auto y = make_signed(prod, sign_prod);
+
+        const auto ret = x + y;
+        rop._mp_size = integral_sign(ret);
+
+        rop.m_limbs[0] = static_cast<::mp_limb_t>(std::abs(ret));
+
+        return 0u;
     } else {
-        // When the signs differ, we need to implement addition as a subtraction.
-        if (rop.m_limbs[0] >= prod) {
-            // abs(rop) >= abs(prod).
-            tmp = rop.m_limbs[0] - prod;
-            // asize is either 1 or 0 (0 iff rop == prod).
-            rop._mp_size = signr * static_cast<int>(tmp != 0u);
+        if (signr == sign_prod) {
+            // Same sign, do addition with overflow check.
+            if (mppp_unlikely(limb_add_overflow(rop.m_limbs[0], prod, &tmp))) {
+                return 2u;
+            }
+            // Assign the output.
+            rop._mp_size = signr;
             rop.m_limbs[0] = tmp;
         } else {
-            // NOTE: this cannot be zero, as rop and prod cannot be equal.
-            rop._mp_size = sign_prod;
-            rop.m_limbs[0] = prod - rop.m_limbs[0];
+            // When the signs differ, we need to implement addition as a subtraction.
+            if (rop.m_limbs[0] >= prod) {
+                // abs(rop) >= abs(prod).
+                tmp = rop.m_limbs[0] - prod;
+                // asize is either 1 or 0 (0 iff rop == prod).
+                rop._mp_size = signr * static_cast<int>(tmp != 0u);
+                rop.m_limbs[0] = tmp;
+            } else {
+                // NOTE: this cannot be zero, as rop and prod cannot be equal.
+                rop._mp_size = sign_prod;
+                rop.m_limbs[0] = prod - rop.m_limbs[0];
+            }
         }
+        return 0u;
     }
-    return 0u;
 }
 
 template <std::size_t SSize>
