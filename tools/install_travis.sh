@@ -51,14 +51,8 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Run the configure step to create the doc config files.
     CXX=g++-5 CC=gcc-5 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_MPC=yes -DMPPP_ENABLE_IPO=yes ../;
 
-    # Install sphinx.
-    pip install --user requests[security] sphinx
-
-    # Install the GIT head of the guzzle theme.
-    git clone https://github.com/guzzle/guzzle_sphinx_theme.git
-    cd guzzle_sphinx_theme
-    python setup.py install --user
-    cd ..
+    # Install sphinx and the theme.
+    pip install --user requests[security] sphinx sphinx-book-theme
 
     cd ../doc;
     # Ignore some warnings.
