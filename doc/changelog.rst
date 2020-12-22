@@ -1,6 +1,34 @@
 Changelog
 =========
 
+0.22 (unreleased)
+-----------------
+
+New
+~~~
+
+- Add a couple of new categorisation functions
+  for :cpp:class:`~mppp::real128`
+  (`#261 <https://github.com/bluescarni/mppp/pull/261>`__).
+- Make ``MPPP_FLOAT128_WITH_LONG_DOUBLE`` a public definition
+  (`#261 <https://github.com/bluescarni/mppp/pull/261>`__).
+
+Changes
+~~~~~~~
+
+- Change the sphinx theme for the documentation
+  (`#261 <https://github.com/bluescarni/mppp/pull/261>`__).
+- mp++ now requires CMake >= 3.8 when compiling from source
+  (`#261 <https://github.com/bluescarni/mppp/pull/261>`__).
+
+Fix
+~~~
+
+- Various build system fixes and enhancements
+  (`#261 <https://github.com/bluescarni/mppp/pull/261>`__).
+- Workaround for a compiler issue with older versions of Clang
+  (`#260 <https://github.com/bluescarni/mppp/pull/260>`__).
+
 0.21 (2020-06-17)
 -----------------
 
