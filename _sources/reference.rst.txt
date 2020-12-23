@@ -20,3 +20,4 @@ Before perusing the C++ reference, users are encouraged to first go through the 
    real.rst
    complex.rst
    utilities.rst
+   fwd_decl.rst

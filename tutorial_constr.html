@@ -5,120 +5,308 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- Licensed under the Apache 2.0 License -->
-  <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
-  <!-- Licensed under the SIL Open Font License -->
-  <link rel="stylesheet" type="text/css" href="_static/fonts/source-serif-pro/source-serif-pro.css" />
-  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap.min.css" />
-  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
     <title>Construction, conversion and assignment &#8212; mp++ 0.22 documentation</title>
-    <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
+    
+  <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.40e2e510f6b7d1648584402491bb10fe.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.3da636dd464baa7582d2.js">
+
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/sphinx-book-theme.d31b09fe5c1d09cb49b26a786de4a05d.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Input and output" href="tutorial_io.html" />
     <link rel="prev" title="Preliminaries" href="tutorial_prelim.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
   
-   
-
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="tutorial_io.html" title="Input and output"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="tutorial_prelim.html" title="Preliminaries"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.22 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="tutorial.html" accesskey="U">Tutorial</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Construction, conversion and assignment</a></li> 
-      </ul>
-    </div>
-    <div class="container-wrapper">
-
-      <div id="mobile-toggle">
-        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
-      </div>
-  <div id="left-column">
-    <div class="sphinxsidebar"><a href="
-    index.html" class="text-logo">mp++</a>
-<div class="sidebar-block">
-  <div class="sidebar-wrapper">
-    <h2>Table Of Contents</h2>
-  </div>
-  <div class="sidebar-toc">
-    
-    
-      <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Construction, conversion and assignment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_complex128.html">Quadruple-precision complex numbers tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_complex.html">Multiprecision complex numbers tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+  
+  <h1 class="site-logo" id="site-title">mp++ 0.22 documentation</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="installation.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1 current active collapsible-parent">
+  <a class="reference internal" href="tutorial.html">
+   Tutorial
+  </a>
+  <ul class="current collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_prelim.html">
+     Preliminaries
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Construction, conversion and assignment
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_io.html">
+     Input and output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_numtower.html">
+     The numerical tower and type coercion
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_commonops.html">
+     Common operators
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_api.html">
+     API overview
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_integer.html">
+     Integer tutorial
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_rational.html">
+     Rational tutorial
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_real128.html">
+     Quadruple-precision float tutorial
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_complex128.html">
+     Quadruple-precision complex numbers tutorial
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_real.html">
+     Multiprecision float tutorial
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_complex.html">
+     Multiprecision complex numbers tutorial
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_pybind11.html">
+     Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="reference.html">
+   Reference
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="definitions.html">
+     Macros and definitions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="namespaces.html">
+     Namespaces
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="exceptions.html">
+     Exceptions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="concepts.html">
+     Common concepts
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="integer.html">
+     Multiprecision integers
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rational.html">
+     Multiprecision rationals
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="real128.html">
+     Quadruple-precision floats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="complex128.html">
+     Quadruple-precision complex numbers
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="real.html">
+     Multiprecision floats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="complex.html">
+     Multiprecision complex numbers
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="utilities.html">
+     Utility functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="fwd_decl.html">
+     Forward declarations
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="benchmarks.html">
+   Benchmarks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="integer_benchmarks.html">
+     Integer benchmarks
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="changelog.html">
+   Changelog
+  </a>
+ </li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
 
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
     
-  </div>
-</div>
-<div class="sidebar-block">
-  <div class="sidebar-wrapper">
-    <div id="main-search">
-      <form class="form-inline" action="search.html" method="GET" role="form">
-        <div class="input-group">
-          <input name="q" type="text" class="form-control" placeholder="Search...">
-        </div>
-        <input type="hidden" name="check_keywords" value="yes" />
-        <input type="hidden" name="area" value="default" />
-      </form>
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
     </div>
-  </div>
-</div>
-      
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/tutorial_constr.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
-  </div>
-        <div id="right-column">
-          
-          <div role="navigation" aria-label="breadcrumbs navigation">
-            <ol class="breadcrumb">
-              <li><a href="index.html">Docs</a></li>
-              
-                <li><a href="tutorial.html">Tutorial</a></li>
-              
-              <li>Construction, conversion and assignment</li>
-            </ol>
-          </div>
-          
-          <div class="document clearer body">
-            
+</div>
+
+        <!-- Source interaction buttons -->
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
   <div class="section" id="construction-conversion-and-assignment">
 <span id="tutorial-constr"></span><h1>Construction, conversion and assignment<a class="headerlink" href="#construction-conversion-and-assignment" title="Permalink to this headline">¶</a></h1>
 <p>All of mp++’s multiprecision classes default-construct to zero:</p>
@@ -138,18 +326,18 @@
 <p>All of mp++’s multiprecision classes support a uniform style of initialisastion and conversion based
 on curly brackets. Using the same syntax, it is possible to:</p>
 <ul class="simple">
-<li>initialise multiprecision objects from objects of C++’s numerical types,</li>
-<li>initialise multiprecision objects from multiprecision objects of a different type,</li>
-<li>initialise C++ numerical objects from multiprecision objects.</li>
+<li><p>initialise multiprecision objects from objects of C++’s numerical types,</p></li>
+<li><p>initialise multiprecision objects from multiprecision objects of a different type,</p></li>
+<li><p>initialise C++ numerical objects from multiprecision objects.</p></li>
 </ul>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>In mp++, most constructors and conversions are <code class="docutils literal notranslate"><span class="pre">explicit</span></code>! This means that it is not possible
 to use syntax such as</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
 </pre></div>
 </div>
-<p class="last">or to pass an <code class="docutils literal notranslate"><span class="pre">int_t</span></code> to a function which expects an <code class="docutils literal notranslate"><span class="pre">int</span></code> parameter.</p>
+<p>or to pass an <code class="docutils literal notranslate"><span class="pre">int_t</span></code> to a function which expects an <code class="docutils literal notranslate"><span class="pre">int</span></code> parameter.</p>
 </div>
 <p>Let’s see a few examples:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>
@@ -259,48 +447,38 @@ Explicitly casting the multiprecision value before the assignment will however w
 </div>
 
 
-          </div>
-            
-  <div class="footer-relations">
-    
-      <div class="pull-left">
-        <a class="btn btn-default" href="tutorial_prelim.html" title="previous chapter (use the left arrow)">Preliminaries</a>
-      </div>
-    
-      <div class="pull-right">
-        <a class="btn btn-default" href="tutorial_io.html" title="next chapter (use the right arrow)">Input and output</a>
-      </div>
-    </div>
-    <div class="clearer"></div>
-  
+              </div>
+              
         </div>
-        <div class="clearfix"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="tutorial_io.html" title="Input and output"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="tutorial_prelim.html" title="Preliminaries"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.22 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="tutorial.html" >Tutorial</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Construction, conversion and assignment</a></li> 
-      </ul>
+    
+    
+    <div class='prev-next-bottom'>
+        
+    <a class='left-prev' id="prev-link" href="tutorial_prelim.html" title="previous page">Preliminaries</a>
+    <a class='right-next' id="next-link" href="tutorial_io.html" title="next page">Input and output</a>
+
     </div>
-<script type="text/javascript">
-  $("#mobile-toggle a").click(function () {
-    $("#left-column").toggle();
-  });
-</script>
-<script type="text/javascript" src="_static/js/bootstrap.js"></script>
-  <div class="footer">
-    &copy; Copyright 2016-2020, Francesco Biscani. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
-  </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Francesco Biscani<br/>
+        
+            &copy; Copyright 2016-2020, Francesco Biscani.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
   </body>
 </html>

@@ -346,7 +346,9 @@ The complex class
       Check validity.
 
       A :cpp:class:`~mppp::complex` becomes invalid after it is used
-      as an argument to the move constructor.
+      as an argument to the move constructor, or after the extraction
+      of the real/imaginary parts via the move overload
+      of :cpp:func:`~mppp::get_real_imag()`.
 
       :return: ``true`` if ``this`` is valid, ``false`` otherwise.
 
