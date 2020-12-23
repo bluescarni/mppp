@@ -30,12 +30,12 @@
 #endif
 
 #include <mp++/concepts.hpp>
-#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/detail/visibility.hpp>
 #include <mp++/exceptions.hpp>
+#include <mp++/fwd.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/type_name.hpp>
 

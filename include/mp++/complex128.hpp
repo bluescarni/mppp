@@ -26,9 +26,9 @@
 #endif
 
 #include <mp++/concepts.hpp>
-#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/visibility.hpp>
+#include <mp++/fwd.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>

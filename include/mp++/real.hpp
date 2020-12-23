@@ -32,12 +32,12 @@
 #endif
 
 #include <mp++/concepts.hpp>
-#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/detail/visibility.hpp>
+#include <mp++/fwd.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/type_name.hpp>
@@ -1276,7 +1276,7 @@ template <real_set_args... Args>
 #else
 template <typename... Args, detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int> = 0>
 #endif
-inline real &set(real &r, const Args &... args)
+inline real &set(real &r, const Args &...args)
 {
     return r.set(args...);
 }
@@ -1401,7 +1401,7 @@ template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value,
 void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
-inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
+inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
     // update the max prec.
@@ -1410,7 +1410,7 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
 }
 
 template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int>>
-inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
+inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     const auto prec0 = arg0.get_prec();
     if (!p.first || prec0 > p.first->get_prec()) {
@@ -1428,13 +1428,13 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
 // A small wrapper to call an MPFR function f with arguments args. If the first param is true_type,
 // the rounding mode MPFR_RNDN will be appended at the end of the function arguments list.
 template <typename F, typename... Args>
-inline void mpfr_nary_func_wrapper(const std::true_type &, const F &f, Args &&... args)
+inline void mpfr_nary_func_wrapper(const std::true_type &, const F &f, Args &&...args)
 {
     f(std::forward<Args>(args)..., MPFR_RNDN);
 }
 
 template <typename F, typename... Args>
-inline void mpfr_nary_func_wrapper(const std::false_type &, const F &f, Args &&... args)
+inline void mpfr_nary_func_wrapper(const std::false_type &, const F &f, Args &&...args)
 {
     f(std::forward<Args>(args)...);
 }
@@ -1461,7 +1461,7 @@ inline void mpfr_nary_func_wrapper(const std::false_type &, const F &f, Args &&.
 // This function requires that the MPFR-like function object being called supports
 // overlapping arguments (both input and output).
 template <bool Rnd, typename F, typename Arg0, typename... Args>
-inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&... args)
+inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&...args)
 {
     // Make sure min_prec is valid.
     // NOTE: min_prec == 0 is ok, it just means
@@ -1550,7 +1550,7 @@ inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Ar
 // This function requires that the MPFR-like function object being called supports
 // overlapping arguments (both input and output).
 template <bool Rnd, typename F, typename Arg0, typename... Args>
-inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
+inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&...args)
 {
     // Make sure min_prec is valid.
     // NOTE: min_prec == 0 is ok, it just means

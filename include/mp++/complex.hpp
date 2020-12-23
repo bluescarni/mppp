@@ -26,12 +26,12 @@
 #endif
 
 #include <mp++/concepts.hpp>
-#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/mpc.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/detail/visibility.hpp>
+#include <mp++/fwd.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
@@ -248,7 +248,7 @@ private:
     // From real-valued interoperable types + optional precision.
     template <typename T, typename... Args>
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-    explicit complex(gtag, std::true_type, T &&x, const Args &... args)
+    explicit complex(gtag, std::true_type, T &&x, const Args &...args)
     {
         // Init the real part from x + optional explicit precision.
         real re{std::forward<T>(x), static_cast<::mpfr_prec_t>(args)...};
@@ -272,7 +272,7 @@ private:
     // only std::complex or complex128.
     template <typename T, typename... Args>
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-    explicit complex(gtag, std::false_type, const T &c, const Args &... args) : complex(c.real(), c.imag(), args...)
+    explicit complex(gtag, std::false_type, const T &c, const Args &...args) : complex(c.real(), c.imag(), args...)
     {
     }
 
@@ -1001,7 +1001,7 @@ template <complex_set_args... Args>
 #else
 template <typename... Args, detail::enable_if_t<detail::is_detected<detail::complex_set_t, Args...>::value, int> = 0>
 #endif
-inline complex &set(complex &c, const Args &... args)
+inline complex &set(complex &c, const Args &...args)
 {
     return c.set(args...);
 }
@@ -1104,7 +1104,7 @@ template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value,
 void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
-inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
+inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
     // update the max prec.
@@ -1113,7 +1113,7 @@ inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0
 }
 
 template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int>>
-inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
+inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     const auto prec0 = arg0.get_prec();
     if (!p.first || prec0 > p.first->get_prec()) {
@@ -1131,13 +1131,13 @@ inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0
 // A small wrapper to call an MPC function f with arguments args. If the first param is true_type,
 // the rounding mode MPC_RNDNN will be appended at the end of the function arguments list.
 template <typename F, typename... Args>
-inline void mpc_nary_func_wrapper(const std::true_type &, const F &f, Args &&... args)
+inline void mpc_nary_func_wrapper(const std::true_type &, const F &f, Args &&...args)
 {
     f(std::forward<Args>(args)..., MPC_RNDNN);
 }
 
 template <typename F, typename... Args>
-inline void mpc_nary_func_wrapper(const std::false_type &, const F &f, Args &&... args)
+inline void mpc_nary_func_wrapper(const std::false_type &, const F &f, Args &&...args)
 {
     f(std::forward<Args>(args)...);
 }
@@ -1164,7 +1164,7 @@ inline void mpc_nary_func_wrapper(const std::false_type &, const F &f, Args &&..
 // This function requires that the MPC-like function object being called supports
 // overlapping arguments (both input and output).
 template <bool Rnd, typename F, typename Arg0, typename... Args>
-inline complex &mpc_nary_op_impl(::mpfr_prec_t min_prec, const F &f, complex &rop, Arg0 &&arg0, Args &&... args)
+inline complex &mpc_nary_op_impl(::mpfr_prec_t min_prec, const F &f, complex &rop, Arg0 &&arg0, Args &&...args)
 {
     // Make sure min_prec is valid.
     // NOTE: min_prec == 0 is ok, it just means
@@ -1253,7 +1253,7 @@ inline complex &mpc_nary_op_impl(::mpfr_prec_t min_prec, const F &f, complex &ro
 // This function requires that the MPC-like function object being called supports
 // overlapping arguments (both input and output).
 template <bool Rnd, typename F, typename Arg0, typename... Args>
-inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
+inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&...args)
 {
     // Make sure min_prec is valid.
     // NOTE: min_prec == 0 is ok, it just means
