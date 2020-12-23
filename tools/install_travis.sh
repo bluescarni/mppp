@@ -39,7 +39,7 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     CXX=g++-6 CC=gcc-6 ABI=32 ./configure --disable-shared;
     make -j2;
     cd ..;
-    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -fconcepts" -DMPPP_GMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.2.0 -DMPPP_GMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.2.0/.libs/libgmp.a ../;
+    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage" -DMPPP_GMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.2.0 -DMPPP_GMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.2.0/.libs/libgmp.a ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;
@@ -51,14 +51,8 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Run the configure step to create the doc config files.
     CXX=g++-5 CC=gcc-5 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_MPC=yes -DMPPP_ENABLE_IPO=yes ../;
 
-    # Install sphinx.
-    pip install --user requests[security] sphinx
-
-    # Install the GIT head of the guzzle theme.
-    git clone https://github.com/guzzle/guzzle_sphinx_theme.git
-    cd guzzle_sphinx_theme
-    python setup.py install --user
-    cd ..
+    # Install sphinx and the theme.
+    pip install --user requests[security] sphinx sphinx-book-theme
 
     cd ../doc;
     # Ignore some warnings.

@@ -40,7 +40,7 @@ mp++ has the following dependencies:
   only in the benchmarking suite.
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
-installing from source (the minimum required version is 3.3).
+installing from source (the minimum required version is 3.8).
 
 .. rubric:: Footnotes
 
@@ -233,7 +233,8 @@ Including mp++ in your project via CMake
 
 As a part of the mp++ installation, a group of CMake files is installed into
 ``CMAKE_INSTALL_PREFIX/lib/cmake/mp++``.
-This bundle, which is known in the CMake lingo as a `config-file package <https://cmake.org/cmake/help/v3.3/manual/cmake-packages.7.html>`__,
+This bundle, which is known in the CMake lingo as a
+`config-file package <https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html>`__,
 facilitates the detection and use of mp++ from other CMake-based projects.
 mp++'s config-file package, once loaded, provides
 an imported target called ``mp++::mp++`` which encapsulates all the information
@@ -247,8 +248,8 @@ program presented earlier may look like this:
 
 .. code-block:: cmake
 
-   # mp++ needs at least CMake 3.3.
-   cmake_minimum_required(VERSION 3.3.0)
+  # mp++ requires at least CMake 3.8.
+  cmake_minimum_required(VERSION 3.8.0)
 
    # The name of our project.
    project(sample_project)
@@ -263,10 +264,17 @@ program presented earlier may look like this:
    add_executable(main main.cpp)
    target_link_libraries(main mp++::mp++)
 
-   # This line indicates to your compiler
-   # that C++11 is needed for the compilation.
-   # Not strictly necessary with a recent-enough compiler.
-   set_property(TARGET main PROPERTY CXX_STANDARD 11)
+.. versionadded:: 0.22
+
+mp++'s config-file package also exports the following boolean
+variables to signal with which optional dependencies mp++ was compiled:
+
+* ``mp++_WITH_MPFR`` if MPFR support was enabled,
+* ``mp++_WITH_MPC`` if MPC support was enabled,
+* ``mp++_WITH_ARB`` if Arb support was enabled,
+* ``mp++_WITH_QUADMATH`` if quadmath support was enabled.
+
+.. _inst_plat_specific:
 
 Compiler and platform specific notes
 ------------------------------------

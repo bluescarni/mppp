@@ -25,7 +25,11 @@ TEST_CASE("real128 naninffinite")
 {
     real128 r;
     REQUIRE(r.finite());
+    REQUIRE(r.isfinite());
+    REQUIRE(!r.isnormal());
     REQUIRE(finite(r));
+    REQUIRE(isfinite(r));
+    REQUIRE(!isnormal(r));
     REQUIRE(!r.isinf());
     REQUIRE(!isinf(r));
     REQUIRE(!r.isnan());
@@ -47,7 +51,11 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(c6);
     r = -1;
     REQUIRE(r.finite());
+    REQUIRE(r.isfinite());
+    REQUIRE(r.isnormal());
     REQUIRE(finite(r));
+    REQUIRE(isfinite(r));
+    REQUIRE(isnormal(r));
     REQUIRE(!r.isinf());
     REQUIRE(!isinf(r));
     REQUIRE(!r.isnan());
@@ -69,14 +77,22 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(d6);
     r = 123;
     REQUIRE(r.finite());
+    REQUIRE(r.isfinite());
+    REQUIRE(r.isnormal());
     REQUIRE(finite(r));
+    REQUIRE(isfinite(r));
+    REQUIRE(isnormal(r));
     REQUIRE(!r.isinf());
     REQUIRE(!isinf(r));
     REQUIRE(!r.isnan());
     REQUIRE(!isnan(r));
     r = "inf";
     REQUIRE(!r.finite());
+    REQUIRE(!r.isfinite());
+    REQUIRE(!r.isnormal());
     REQUIRE(!finite(r));
+    REQUIRE(!isfinite(r));
+    REQUIRE(!isnormal(r));
     REQUIRE(r.isinf());
     REQUIRE(isinf(r));
     REQUIRE(!r.isnan());
@@ -105,7 +121,11 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(!isnan(r));
     r = "nan";
     REQUIRE(!r.finite());
+    REQUIRE(!r.isfinite());
+    REQUIRE(!r.isnormal());
     REQUIRE(!finite(r));
+    REQUIRE(!isfinite(r));
+    REQUIRE(!isnormal(r));
     REQUIRE(!r.isinf());
     REQUIRE(!isinf(r));
     REQUIRE(r.isnan());
@@ -128,9 +148,21 @@ TEST_CASE("real128 naninffinite")
     // Subnormals.
     REQUIRE(fpclassify(real128{"1E-4940"}) == FP_SUBNORMAL);
     REQUIRE(fpclassify(real128{"-1E-4940"}) == FP_SUBNORMAL);
+    REQUIRE(real128{"1E-4940"}.finite());
+    REQUIRE(real128{"1E-4940"}.isfinite());
+    REQUIRE(!real128{"1E-4940"}.isnormal());
+    REQUIRE(finite(real128{"1E-4940"}));
+    REQUIRE(isfinite(real128{"1E-4940"}));
+    REQUIRE(!isnormal(real128{"1E-4940"}));
     // Large but not infinite.
     REQUIRE(fpclassify(real128{"1E4930"}) == FP_NORMAL);
     REQUIRE(fpclassify(-real128{"1E4930"}) == FP_NORMAL);
+    REQUIRE(real128{"1E4930"}.finite());
+    REQUIRE(real128{"1E4930"}.isfinite());
+    REQUIRE(real128{"1E4930"}.isnormal());
+    REQUIRE(finite(real128{"1E4930"}));
+    REQUIRE(isfinite(real128{"1E4930"}));
+    REQUIRE(isnormal(real128{"1E4930"}));
     // Small but not subnormal.
     REQUIRE(fpclassify(real128{"1E-4931"}) == FP_NORMAL);
     REQUIRE(fpclassify(-real128{"1E-4931"}) == FP_NORMAL);

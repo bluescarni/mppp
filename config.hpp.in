@@ -207,4 +207,42 @@
 
 #endif
 
+#if defined(MPPP_WITH_QUADMATH)
+
+// Define the MPPP_FLOAT128_WITH_LONG_DOUBLE name
+// if __float128 can interact with long double.
+
+#if defined(__clang__)
+
+#if defined(__apple_build_version__)
+
+// NOTE: according to https://en.wikipedia.org/wiki/Xcode#Toolchain_versions,
+// clang 7 starts in Xcode 10.2.
+#if __clang_major__ > 10 || (__clang_major__ == 10 && __clang_minor__ >= 2)
+
+#define MPPP_FLOAT128_WITH_LONG_DOUBLE
+
+#endif
+
+#else
+
+// Vanilla clang.
+#if __clang_major__ >= 7
+
+#define MPPP_FLOAT128_WITH_LONG_DOUBLE
+
+#endif
+
+#endif
+
+#else
+
+// On non-clang, let's always assume that __float128
+// can interact with long double.
+#define MPPP_FLOAT128_WITH_LONG_DOUBLE
+
+#endif
+
+#endif
+
 #endif

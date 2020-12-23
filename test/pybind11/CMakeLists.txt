@@ -23,17 +23,7 @@ function(ADD_MPPP_PYBIND11_TESTCASE arg1)
         "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
         "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
     )
-    # Let's setup the target C++ standard, but only if the user did not provide it manually.
-    if(NOT CMAKE_CXX_STANDARD)
-        if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
-            # NOTE: the idea here is that we want to use C++14 if the compilers supports
-            # concepts (as variable concepts are essentially template variables).
-            set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 14)
-        else()
-            set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
-        endif()
-    endif()
-    set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
+    target_compile_features(${arg1} PRIVATE cxx_std_11)
     set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
     # Copy over the Python test runner.
     # NOTE: need to use file(GENERATE) because in multi-config build systems (e.g., MSVC) we need to copy
