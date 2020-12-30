@@ -36,12 +36,6 @@
 #include <mp++/detail/utils.hpp>
 #include <mp++/real128.hpp>
 
-#if defined(MPPP_WITH_BOOST_S11N)
-
-#include <mp++/detail/visibility.hpp>
-
-#endif
-
 namespace mppp
 {
 
@@ -361,26 +355,23 @@ void sincos(const real128 &x, real128 *s, real128 *c)
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
-template <>
-MPPP_DLL_PUBLIC void real128::save(boost::archive::binary_oarchive &ar, unsigned) const
+// Fast serialization implementations for Boost's binary archives.
+void real128::save(boost::archive::binary_oarchive &ar, unsigned) const
 {
     ar << boost::serialization::make_binary_object(&m_value, sizeof(m_value));
 }
 
-template <>
-MPPP_DLL_PUBLIC void real128::save(boost::archive::polymorphic_binary_oarchive &ar, unsigned) const
+void real128::save(boost::archive::polymorphic_binary_oarchive &ar, unsigned) const
 {
     ar << boost::serialization::make_binary_object(&m_value, sizeof(m_value));
 }
 
-template <>
-MPPP_DLL_PUBLIC void real128::load(boost::archive::binary_iarchive &ar, unsigned)
+void real128::load(boost::archive::binary_iarchive &ar, unsigned)
 {
     ar >> boost::serialization::make_binary_object(&m_value, sizeof(m_value));
 }
 
-template <>
-MPPP_DLL_PUBLIC void real128::load(boost::archive::polymorphic_binary_iarchive &ar, unsigned)
+void real128::load(boost::archive::polymorphic_binary_iarchive &ar, unsigned)
 {
     ar >> boost::serialization::make_binary_object(&m_value, sizeof(m_value));
 }
