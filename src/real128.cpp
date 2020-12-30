@@ -19,12 +19,28 @@
 
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/polymorphic_binary_iarchive.hpp>
+#include <boost/archive/polymorphic_binary_oarchive.hpp>
+#include <boost/serialization/binary_object.hpp>
+
+#endif
+
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
 #include <quadmath.h>
 
 #include <mp++/detail/utils.hpp>
 #include <mp++/real128.hpp>
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <mp++/detail/visibility.hpp>
+
+#endif
 
 namespace mppp
 {
@@ -342,5 +358,33 @@ void sincos(const real128 &x, real128 *s, real128 *c)
 {
     ::sincosq(x.m_value, &s->m_value, &c->m_value);
 }
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+template <>
+MPPP_DLL_PUBLIC void real128::save(boost::archive::binary_oarchive &ar, unsigned) const
+{
+    ar << boost::serialization::make_binary_object(&m_value, sizeof(m_value));
+}
+
+template <>
+MPPP_DLL_PUBLIC void real128::save(boost::archive::polymorphic_binary_oarchive &ar, unsigned) const
+{
+    ar << boost::serialization::make_binary_object(&m_value, sizeof(m_value));
+}
+
+template <>
+MPPP_DLL_PUBLIC void real128::load(boost::archive::binary_iarchive &ar, unsigned)
+{
+    ar >> boost::serialization::make_binary_object(&m_value, sizeof(m_value));
+}
+
+template <>
+MPPP_DLL_PUBLIC void real128::load(boost::archive::polymorphic_binary_iarchive &ar, unsigned)
+{
+    ar >> boost::serialization::make_binary_object(&m_value, sizeof(m_value));
+}
+
+#endif
 
 } // namespace mppp

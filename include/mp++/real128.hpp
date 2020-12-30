@@ -26,7 +26,20 @@
 #include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
+
 #include <string_view>
+
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/polymorphic_binary_iarchive.hpp>
+#include <boost/archive/polymorphic_binary_oarchive.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+
 #endif
 
 #include <mp++/concepts.hpp>
@@ -193,6 +206,28 @@ class MPPP_DLL_PUBLIC real128
 {
     // Number of digits in the significand.
     static constexpr unsigned sig_digits = 113;
+
+#if defined(MPPP_WITH_BOOST_S11N)
+    // Serialization support.
+    friend class boost::serialization::access;
+
+    template <typename Archive>
+    void save(Archive &ar, unsigned) const
+    {
+        ar << to_string();
+    }
+
+    template <typename Archive>
+    void load(Archive &ar, unsigned)
+    {
+        std::string tmp;
+        ar >> tmp;
+
+        *this = real128{tmp};
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
 
 public:
     // Default constructor.
@@ -2074,6 +2109,24 @@ inline rational<SSize> &rational<SSize>::operator=(const real128 &x)
     // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     return *this = static_cast<rational<SSize>>(x);
 }
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Instantiate explicit specialisation for certain archives.
+
+template <>
+MPPP_DLL_PUBLIC void real128::save(boost::archive::binary_oarchive &, unsigned) const;
+
+template <>
+MPPP_DLL_PUBLIC void real128::save(boost::archive::polymorphic_binary_oarchive &, unsigned) const;
+
+template <>
+MPPP_DLL_PUBLIC void real128::load(boost::archive::binary_iarchive &, unsigned);
+
+template <>
+MPPP_DLL_PUBLIC void real128::load(boost::archive::polymorphic_binary_iarchive &, unsigned);
+
+#endif
 
 } // namespace mppp
 

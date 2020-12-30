@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <limits>
 #include <random>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -28,6 +29,17 @@
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/polymorphic_binary_iarchive.hpp>
+#include <boost/archive/polymorphic_binary_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
 #endif
 
 #include <gmp.h>
@@ -746,6 +758,37 @@ TEST_CASE("real128 numeric_limits")
 TEST_CASE("real128 nts")
 {
     REQUIRE(std::is_nothrow_swappable_v<real128>);
+}
+
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+template <typename OA, typename IA>
+void test_s11n()
+{
+    std::stringstream ss;
+
+    auto x = 1.1_rq;
+    {
+        OA oa(ss);
+        oa << x;
+    }
+
+    x = 0;
+    {
+        IA ia(ss);
+        ia >> x;
+    }
+
+    REQUIRE(x == 1.1_rq);
+}
+
+TEST_CASE("real128 boost_s11n")
+{
+    test_s11n<boost::archive::text_oarchive, boost::archive::text_iarchive>();
+    test_s11n<boost::archive::binary_oarchive, boost::archive::binary_iarchive>();
+    test_s11n<boost::archive::polymorphic_binary_oarchive, boost::archive::polymorphic_binary_iarchive>();
 }
 
 #endif

@@ -19,6 +19,11 @@ if(@MPPP_WITH_MPC@)
 endif()
 set(mp++_WITH_MPC @MPPP_WITH_MPC@)
 
+if(@MPPP_WITH_BOOST_S11N@)
+    find_package(Boost @_MPPP_MIN_BOOST_VERSION@ REQUIRED COMPONENTS serialization)
+endif()
+set(mp++_WITH_BOOST_S11N @MPPP_WITH_BOOST_S11N@)
+
 # Private optional deps.
 set(mp++_WITH_ARB @MPPP_WITH_ARB@)
 set(mp++_WITH_QUADMATH @MPPP_WITH_QUADMATH@)
