@@ -35,8 +35,6 @@
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/polymorphic_binary_iarchive.hpp>
-#include <boost/archive/polymorphic_binary_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 
@@ -788,7 +786,6 @@ TEST_CASE("real128 boost_s11n")
 {
     test_s11n<boost::archive::text_oarchive, boost::archive::text_iarchive>();
     test_s11n<boost::archive::binary_oarchive, boost::archive::binary_iarchive>();
-    test_s11n<boost::archive::polymorphic_binary_oarchive, boost::archive::polymorphic_binary_iarchive>();
 }
 
 #endif

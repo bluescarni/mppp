@@ -25,6 +25,14 @@
 
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/tracking.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/visibility.hpp>
@@ -94,6 +102,34 @@ constexpr complex128 conj(const complex128 &);
 
 class MPPP_DLL_PUBLIC complex128
 {
+#if defined(MPPP_WITH_BOOST_S11N)
+    // Serialization support.
+    friend class boost::serialization::access;
+
+    template <typename Archive>
+    void save(Archive &ar, unsigned) const
+    {
+        ar << real();
+        ar << imag();
+    }
+
+    template <typename Archive>
+    void load(Archive &ar, unsigned)
+    {
+        // NOTE: use tmp variables
+        // for exception safety.
+        real128 re, im;
+
+        ar >> re;
+        ar >> im;
+
+        set_real(re);
+        set_imag(im);
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
+
 public:
     // NOLINTNEXTLINE(modernize-use-default-member-init)
     cplex128 m_value;
@@ -1244,6 +1280,14 @@ inline MPPP_CONSTEXPR_14 real128 &real128::operator=(const complex128 &x)
 }
 
 } // namespace mppp
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Never track the address of complex128 objects
+// during serialization.
+BOOST_CLASS_TRACKING(mppp::complex128, boost::serialization::track_never)
+
+#endif
 
 // Support for pretty printing in xeus-cling.
 #if defined(__CLING__)

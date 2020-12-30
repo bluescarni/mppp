@@ -23,8 +23,6 @@
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/polymorphic_binary_iarchive.hpp>
-#include <boost/archive/polymorphic_binary_oarchive.hpp>
 #include <boost/serialization/binary_object.hpp>
 
 #endif
@@ -361,17 +359,7 @@ void real128::save(boost::archive::binary_oarchive &ar, unsigned) const
     ar << boost::serialization::make_binary_object(&m_value, sizeof(m_value));
 }
 
-void real128::save(boost::archive::polymorphic_binary_oarchive &ar, unsigned) const
-{
-    ar << boost::serialization::make_binary_object(&m_value, sizeof(m_value));
-}
-
 void real128::load(boost::archive::binary_iarchive &ar, unsigned)
-{
-    ar >> boost::serialization::make_binary_object(&m_value, sizeof(m_value));
-}
-
-void real128::load(boost::archive::polymorphic_binary_iarchive &ar, unsigned)
 {
     ar >> boost::serialization::make_binary_object(&m_value, sizeof(m_value));
 }
