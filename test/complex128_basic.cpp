@@ -875,7 +875,7 @@ void test_s11n()
     REQUIRE(x == 1.1_rq + 1.3_icq);
 }
 
-TEST_CASE("real128 boost_s11n")
+TEST_CASE("boost_s11n")
 {
     test_s11n<boost::archive::text_oarchive, boost::archive::text_iarchive>();
     test_s11n<boost::archive::binary_oarchive, boost::archive::binary_iarchive>();

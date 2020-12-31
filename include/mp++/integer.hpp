@@ -37,7 +37,21 @@
 #include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
+
 #include <string_view>
+
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/binary_object.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/tracking.hpp>
+
 #endif
 
 #include <mp++/concepts.hpp>
@@ -1149,6 +1163,53 @@ using is_integer_cpp_floating_point = detail::conjunction<is_cpp_floating_point<
 template <std::size_t SSize>
 class integer
 {
+#if defined(MPPP_WITH_BOOST_S11N)
+    // Serialization support.
+    friend class boost::serialization::access;
+
+    template <typename Archive>
+    void save(Archive &ar, unsigned) const
+    {
+        ar << to_string();
+    }
+
+    template <typename Archive>
+    void load(Archive &ar, unsigned)
+    {
+        std::string tmp;
+        ar >> tmp;
+
+        *this = integer{tmp};
+    }
+
+    // Overloads for binary archives.
+    void save(boost::archive::binary_oarchive &ar, unsigned) const
+    {
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        binary_save(buffer);
+
+        // Record the size and the raw data.
+        ar << buffer.size();
+        ar << boost::serialization::make_binary_object(buffer.data(), detail::safe_cast<std::size_t>(buffer.size()));
+    }
+
+    void load(boost::archive::binary_iarchive &ar, unsigned)
+    {
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+
+        // Recover the size.
+        decltype(buffer.size()) s;
+        ar >> s;
+        buffer.resize(s);
+
+        ar >> boost::serialization::make_binary_object(buffer.data(), detail::safe_cast<std::size_t>(buffer.size()));
+
+        binary_load(buffer);
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
+
     // Typedefs for ease of use.
     using s_storage = detail::static_int<SSize>;
     using d_storage = detail::mpz_struct_t;
@@ -8081,6 +8142,33 @@ template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_ty
 }
 
 } // namespace mppp
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Disable tracking for mppp::integer.
+// NOTE: this code has been lifted from the Boost
+// macro, which does not support directly
+// class templates.
+
+namespace boost
+{
+
+namespace serialization
+{
+
+template <std::size_t SSize>
+struct tracking_level<mppp::integer<SSize>> {
+    typedef mpl::integral_c_tag tag;
+    typedef mpl::int_<track_never> type;
+    BOOST_STATIC_CONSTANT(int, value = tracking_level::type::value);
+    BOOST_STATIC_ASSERT((mpl::greater<implementation_level<mppp::integer<SSize>>, mpl::int_<primitive_type>>::value));
+};
+
+} // namespace serialization
+
+} // namespace boost
+
+#endif
 
 namespace std
 {
