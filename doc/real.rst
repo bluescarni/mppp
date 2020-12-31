@@ -135,12 +135,17 @@ The real class
 
       The second overload invokes the first one with a *sign* of zero.
 
+      If *k* is not one of :cpp:enumerator:`~mppp::real_kind::nan`,
+      :cpp:enumerator:`~mppp::real_kind::inf` or
+      :cpp:enumerator:`~mppp::real_kind::zero`, an error will be raised.
+
       :param k: the desired special value.
       :param sign: the desired sign for ``this``.
       :param p: the desired precision for ``this``.
 
       :exception std\:\:invalid_argument: if *p* is outside the range established by
-        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
+        :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`,
+        or *k* is an invalid enumerator.
 
    .. cpp:function:: template <std::size_t SSize> explicit real(const integer<SSize> &n, mpfr_exp_t e, mpfr_prec_t p)
    .. cpp:function:: explicit real(unsigned long n, mpfr_exp_t e, mpfr_prec_t p)
@@ -1047,7 +1052,7 @@ Types
    An integral type defined by the MPFR library, used to represent the exponent of :cpp:type:`mpfr_t`
    and (by extension) :cpp:class:`~mppp::real` objects.
 
-.. cpp:enum-class:: mppp::real_kind
+.. cpp:enum-class:: mppp::real_kind : std::underlying_type<mpfr_kind_t>::type
 
    This scoped enum is used to initialise a :cpp:class:`~mppp::real` with
    one of the three special values NaN, infinity or zero.
