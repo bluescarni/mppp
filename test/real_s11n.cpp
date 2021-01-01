@@ -33,6 +33,7 @@ TEST_CASE("real binary_save_load")
         real r;
         const auto orig_bs = r.binary_size();
         REQUIRE(orig_bs > 0u);
+        REQUIRE(orig_bs == binary_size(r));
         std::vector<char> buffer;
         buffer.resize(orig_bs);
         REQUIRE(r.binary_save(buffer.data()) == orig_bs);
@@ -63,6 +64,14 @@ TEST_CASE("real binary_save_load")
         REQUIRE(r.binary_save(ss) == orig_bs);
         r = 1.23_r256;
         REQUIRE(r.binary_load(ss) == orig_bs);
+        REQUIRE(r == 0);
+        REQUIRE(r.get_prec() == real_prec_min());
+
+        // Test the free function interface.
+        buffer.resize(orig_bs);
+        REQUIRE(binary_save(r, buffer.data()) == orig_bs);
+        r = 1.23_r256;
+        REQUIRE(binary_load(r, buffer.data()) == orig_bs);
         REQUIRE(r == 0);
         REQUIRE(r.get_prec() == real_prec_min());
 
@@ -139,6 +148,7 @@ TEST_CASE("real binary_save_load")
         real r{"1.3", 419};
         const auto orig_bs = r.binary_size();
         REQUIRE(orig_bs > 0u);
+        REQUIRE(orig_bs == binary_size(r));
         std::vector<char> buffer;
         buffer.resize(orig_bs);
         REQUIRE(r.binary_save(buffer.data()) == orig_bs);
@@ -169,6 +179,15 @@ TEST_CASE("real binary_save_load")
         REQUIRE(r.binary_save(ss) == orig_bs);
         r = 1.23_r256;
         REQUIRE(r.binary_load(ss) == orig_bs);
+        REQUIRE(r == real{"1.3", 419});
+        REQUIRE(r.get_prec() == 419);
+
+        // Test the free function interface.
+        buffer.clear();
+        REQUIRE(binary_save(r, buffer) == orig_bs);
+        REQUIRE(buffer.size() == orig_bs);
+        r = 1.23_r256;
+        REQUIRE(binary_load(r, buffer) == orig_bs);
         REQUIRE(r == real{"1.3", 419});
         REQUIRE(r.get_prec() == 419);
 
@@ -231,6 +250,7 @@ TEST_CASE("real binary_save_load")
         real r{"1.3", 128};
         const auto orig_bs = r.binary_size();
         REQUIRE(orig_bs > 0u);
+        REQUIRE(orig_bs == binary_size(r));
         std::vector<char> buffer;
         buffer.resize(orig_bs);
         REQUIRE(r.binary_save(buffer.data()) == orig_bs);
@@ -261,6 +281,15 @@ TEST_CASE("real binary_save_load")
         REQUIRE(r.binary_save(ss) == orig_bs);
         r = 1.23_r256;
         REQUIRE(r.binary_load(ss) == orig_bs);
+        REQUIRE(r == real{"1.3", 128});
+        REQUIRE(r.get_prec() == 128);
+
+        // Test the free function interface.
+        ss.str("");
+        REQUIRE(binary_save(r, ss) == orig_bs);
+        REQUIRE(buffer.size() == orig_bs);
+        r = 1.23_r256;
+        REQUIRE(binary_load(r, ss) == orig_bs);
         REQUIRE(r == real{"1.3", 128});
         REQUIRE(r.get_prec() == 128);
 

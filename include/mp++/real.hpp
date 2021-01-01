@@ -2476,6 +2476,23 @@ inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
 
+// Binary serialization.
+MPPP_DLL_PUBLIC std::size_t binary_size(const real &);
+
+// Save in binary format.
+template <typename T>
+inline auto binary_save(const real &x, T &&dest) -> decltype(x.binary_save(std::forward<T>(dest)))
+{
+    return x.binary_save(std::forward<T>(dest));
+}
+
+// Load in binary format.
+template <typename T>
+inline auto binary_load(real &x, T &&src) -> decltype(x.binary_load(std::forward<T>(src)))
+{
+    return x.binary_load(std::forward<T>(src));
+}
+
 // Constants.
 MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_pi(real &);
