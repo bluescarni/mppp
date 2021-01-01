@@ -48,7 +48,7 @@ using namespace mppp;
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
 
-// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
 static const int ntrials = 1000;
