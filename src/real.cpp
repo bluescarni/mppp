@@ -6,6 +6,12 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#if defined(_MSC_VER)
+
+#define _SCL_SECURE_NO_WARNINGS
+
+#endif
+
 #include <mp++/config.hpp>
 
 #include <algorithm>
@@ -2606,3 +2612,9 @@ std::size_t real::binary_load(std::istream &src)
 }
 
 } // namespace mppp
+
+#if defined(_MSC_VER)
+
+#undef _SCL_SECURE_NO_WARNINGS
+
+#endif
