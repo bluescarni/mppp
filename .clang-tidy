@@ -1,7 +1,6 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,*,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-modernize-use-trailing-return-type,-readability-named-parameter,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-no-array-decay,-llvm-header-guard,-cppcoreguidelines-macro-usage,-google-runtime-references,-readability-isolate-declaration,-fuchsia-default-arguments-calls,-fuchsia-overloaded-operator,-fuchsia-default-arguments-declarations,-readability-else-after-return,-google-runtime-int,-hicpp-signed-bitwise,-cert-dcl21-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-avoid-c-arrays,-hicpp-avoid-c-arrays,-modernize-avoid-c-arrays,-modernize-use-transparent-functors,-cert-dcl16-c,-cppcoreguidelines-pro-type-union-access,-bugprone-branch-clone,-fuchsia-statically-constructed-objects,-cppcoreguidelines-pro-bounds-constant-array-index,-readability-static-accessed-through-instance,-cppcoreguidelines-pro-type-vararg,-hicpp-vararg'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,*,-hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,-modernize-use-trailing-return-type,-readability-named-parameter,-hicpp-named-parameter,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-no-array-decay,-llvm-header-guard,-cppcoreguidelines-macro-usage,-google-runtime-references,-readability-isolate-declaration,-fuchsia-default-arguments-calls,-fuchsia-overloaded-operator,-fuchsia-default-arguments-declarations,-readability-else-after-return,-google-runtime-int,-hicpp-signed-bitwise,-cert-dcl21-cpp,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-avoid-c-arrays,-hicpp-avoid-c-arrays,-modernize-avoid-c-arrays,-modernize-use-transparent-functors,-cert-dcl16-c,-cppcoreguidelines-pro-type-union-access,-bugprone-branch-clone,-fuchsia-statically-constructed-objects,-cppcoreguidelines-pro-bounds-constant-array-index,-readability-static-accessed-through-instance,-cppcoreguidelines-pro-type-vararg,-hicpp-vararg,-llvmlibc-restrict-system-libc-headers,-llvmlibc-callee-namespace,-llvmlibc-implementation-in-namespace,-llvm-else-after-return'
 WarningsAsErrors: '*'
-HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            yardbird
@@ -190,8 +189,6 @@ CheckOptions:
     value:           '1'
   - key:             hicpp-multiway-paths-covered.WarnOnMissingElse
     value:           '0'
-  - key:             hicpp-named-parameter.IgnoreFailedSplit
-    value:           '0'
   - key:             hicpp-no-malloc.Allocations
     value:           '::malloc;::calloc'
   - key:             hicpp-no-malloc.Deallocations
@@ -254,8 +251,6 @@ CheckOptions:
     value:           CamelCase
   - key:             modernize-make-shared.IgnoreMacros
     value:           '1'
-  - key:             modernize-make-shared.IncludeStyle
-    value:           '0'
   - key:             modernize-make-shared.MakeSmartPtrFunction
     value:           'std::make_shared'
   - key:             modernize-make-shared.MakeSmartPtrFunctionHeader
