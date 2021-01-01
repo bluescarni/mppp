@@ -20,7 +20,7 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
-static int ntries = 1000;
+static const int ntries = 1000;
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
