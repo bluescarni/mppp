@@ -175,6 +175,7 @@ if(MPPP_WITH_MPFR)
   ADD_MPPP_TESTCASE(real_literals)
   ADD_MPPP_TESTCASE(real_mul_div_2)
   ADD_MPPP_TESTCASE(real_polylogs)
+  ADD_MPPP_TESTCASE(real_s11n)
 endif()
 
 if(MPPP_WITH_MPC)
