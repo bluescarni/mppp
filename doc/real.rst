@@ -75,6 +75,10 @@ The real class
    :cpp:func:`mppp::real::get_mpfr_t()` and :cpp:func:`mppp::real::_get_mpfr_t()`), so that
    it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
 
+   The :cpp:class:`~mppp::real` class supports a simple binary serialisation API, through member functions
+   such as :cpp:func:`~mppp::real::binary_save()` and :cpp:func:`~mppp::real::binary_load()`, and the
+   corresponding :ref:`free function overloads <real_s11n>`.
+
    A :ref:`tutorial <tutorial_real>` showcasing various features of :cpp:class:`~mppp::real`
    is available.
 
@@ -1023,6 +1027,116 @@ The real class
       :return: a reference to ``this``.
 
       :exception std\:\:domain_error: if ``this`` represents a NaN value.
+
+   .. cpp:function:: std::size_t binary_size() const
+
+      .. versionadded:: 0.22
+
+      Size of the serialised binary representation.
+
+      This member function will return a value representing the number of bytes necessary
+      to serialise ``this`` into a memory buffer in binary format via one of the available
+      :cpp:func:`~mppp::real::binary_save()` overloads. The returned value
+      is platform-dependent.
+
+      :return: the number of bytes needed for the binary serialisation of ``this``.
+
+      :exception std\:\:overflow_error: if the size in limbs of ``this`` is larger than an
+        implementation-defined limit.
+
+   .. cpp:function:: std::size_t binary_save(char *dest) const
+   .. cpp:function:: std::size_t binary_save(std::vector<char> &dest) const
+   .. cpp:function:: template <std::size_t S> std::size_t binary_save(std::array<char, S> &dest) const
+   .. cpp:function:: std::size_t binary_save(std::ostream &dest) const
+
+      .. versionadded:: 0.22
+
+      Serialise into a memory buffer or an output stream.
+
+      These member functions will write into *dest* a binary representation of ``this``. The serialised
+      representation produced by these member functions can be read back with one of the
+      :cpp:func:`~mppp::real::binary_load()` overloads.
+
+      For the first overload, *dest* must point to a memory area whose size is at least equal to the value returned
+      by :cpp:func:`~mppp::real::binary_size()`, otherwise the behaviour will be undefined.
+      *dest* does not have any special alignment requirements.
+
+      For the second overload, the size of *dest* must be at least equal to the value returned by
+      :cpp:func:`~mppp::real::binary_size()`. If that is not the case, *dest* will be resized
+      to :cpp:func:`~mppp::real::binary_size()`.
+
+      For the third overload, the size of *dest* must be at least equal to the value returned by
+      :cpp:func:`~mppp::real::binary_size()`. If that is not the case, no data
+      will be written to *dest* and zero will be returned.
+
+      For the fourth overload, if the serialisation is successful (that is, no stream error state is ever detected
+      in *dest* after write
+      operations), then the binary size of ``this`` (that is, the number of bytes written into *dest*) will be
+      returned. Otherwise, zero will be returned. Note that a return value of zero does not necessarily imply that no
+      bytes were written into *dest*, just that an error occurred at some point during the serialisation process.
+
+      .. warning::
+
+         The binary representation produced by these member functions is compiler, platform and architecture
+         specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+         it should not be used as an exchange format or for long-term data storage.
+
+      :param dest: the output buffer or stream.
+
+      :return: the number of bytes written into ``dest`` (i.e., the output of :cpp:func:`~mppp::real::binary_size()`,
+        if the serialisation was successful).
+
+      :exception std\:\:overflow_error: in case of (unlikely) overflow errors.
+      :exception unspecified: any exception thrown by :cpp:func:`~mppp::real::binary_size()`, by memory errors in
+        standard containers, or by the public interface of ``std::ostream``.
+
+   .. cpp:function:: std::size_t binary_load(const char *src)
+   .. cpp:function:: std::size_t binary_load(const std::vector<char> &src)
+   .. cpp:function:: template <std::size_t S> std::size_t binary_load(const std::array<char, S> &src)
+   .. cpp:function:: std::size_t binary_load(std::istream &src)
+
+      .. versionadded:: 0.22
+
+      Deserialise from a memory buffer or an input stream.
+
+      These member functions will load into ``this`` the content of the memory buffer or input stream
+      *src*, which must contain the serialised representation of a :cpp:class:`~mppp::real`
+      produced by one of the :cpp:func:`~mppp::real::binary_save()` overloads.
+
+      For the first overload, *src* does not have any special alignment requirements.
+
+      For the second and third overloads, the serialised representation of the
+      :cpp:class:`~mppp::real` must start at the beginning of *src*,
+      but it can end before the end of *src*. Data
+      past the end of the serialised representation of the :cpp:class:`~mppp::real`
+      will be ignored.
+
+      For the fourth overload, the serialised representation of the :cpp:class:`~mppp::real`
+      must start at
+      the current position of *src*, but *src* can contain other data before and after
+      the serialised :cpp:class:`~mppp::real` value. Data
+      past the end of the serialised representation of the :cpp:class:`~mppp::real`
+      will be ignored. If a stream error state is detected at any point of the deserialisation
+      process after a read operation, zero will be returned and ``this`` will not have been modified.
+      Note that a return value of zero does not necessarily imply that no
+      bytes were read from *src*, just that an error occurred at some point during the serialisation process.
+
+      .. warning::
+
+         Although these member functions perform a few consistency checks on the data in *src*,
+         they cannot ensure complete safety against maliciously-crafted data. Users are
+         advised to use these member functions only with trusted data.
+
+      :param src: the source memory buffer or stream.
+
+      :return: the number of bytes read from *src* (that is, the output of :cpp:func:`~mppp::real::binary_size()`
+        after the deserialisation into ``this`` has successfully completed).
+
+      :exception std\:\:overflow_error: in case of (unlikely) overflow errors.
+      :exception std\:\:invalid_argument: if invalid data is detected in *src*.
+      :exception unspecified: any exception thrown by memory errors in standard containers,
+        the public interface of ``std::istream``, :cpp:func:`~mppp::real::binary_size()`
+        or :cpp:func:`~mppp::real::set_prec()`.
 
 Types
 -----
@@ -2873,6 +2987,77 @@ Input/Output
    :return: a reference to *os*.
 
    :exception unspecified: any exception thrown by :cpp:func:`mppp::real::to_string()`.
+
+.. _real_s11n:
+
+Serialisation
+~~~~~~~~~~~~~
+
+.. versionadded:: 0.22
+
+.. cpp:function:: std::size_t mppp::binary_size(const mppp::real &x)
+
+   Binary size.
+
+   This function is the free function equivalent of the
+   :cpp:func:`mppp::real::binary_size()` member function.
+
+   :param x: the input argument.
+
+   :return: the output of :cpp:func:`mppp::real::binary_size()` called on *x*.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::real::binary_size()`.
+
+.. cpp:function:: template <typename T> std::size_t mppp::binary_save(const mppp::real &x, T &&dest)
+
+   Binary serialisation.
+
+   .. note::
+
+      This function participates in overload resolution only if the expression
+
+      .. code-block:: c++
+
+         return x.binary_save(std::forward<T>(dest));
+
+      is well-formed.
+
+   This function is the free function equivalent of the
+   :cpp:func:`mppp::real::binary_save()` overloads.
+
+   :param x: the input argument.
+   :param dest: the object into which *x* will be serialised.
+
+   :return: the output of the invoked :cpp:func:`mppp::real::binary_save()`
+     overload called on *x* with *dest* as argument.
+
+   :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::real::binary_save()` overload.
+
+.. cpp:function:: template <typename T> std::size_t mppp::binary_load(mppp::real &x, T &&src)
+
+   Binary deserialisation.
+
+   .. note::
+
+      This function participates in overload resolution only if the expression
+
+      .. code-block:: c++
+
+         return x.binary_load(std::forward<T>(src));
+
+      is well-formed.
+
+   This function is the free function equivalent of the
+   :cpp:func:`mppp::real::binary_load()` overloads.
+
+   :param x: the output argument.
+   :param src: the object containing the serialised :cpp:class:`~mppp::real`
+     that will be loaded into *x*.
+
+   :return: the output of the invoked :cpp:func:`mppp::real::binary_load()`
+     overload called on *x* with *src* as argument.
+
+   :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::real::binary_load()` overload.
 
 .. _real_operators:
 
