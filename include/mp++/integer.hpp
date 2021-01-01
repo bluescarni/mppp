@@ -6900,53 +6900,16 @@ inline std::size_t binary_size(const integer<SSize> &n)
     return n.binary_size();
 }
 
-namespace detail
-{
-
-// Detector for the presence of binary_save().
-template <typename T, typename Integer>
-using integer_binary_save_t = decltype(std::declval<const Integer &>().binary_save(std::declval<T>()));
-
-template <typename T, std::size_t SSize>
-using has_integer_binary_save = is_detected<integer_binary_save_t, T, integer<SSize>>;
-
-// Detector for the presence of binary_load().
-template <typename T, typename Integer>
-using integer_binary_load_t = decltype(std::declval<Integer &>().binary_load(std::declval<T>()));
-
-template <typename T, std::size_t SSize>
-using has_integer_binary_load = is_detected<integer_binary_load_t, T, integer<SSize>>;
-
-} // namespace detail
-
-#if defined(MPPP_HAVE_CONCEPTS)
-
-template <typename T, std::size_t SSize>
-MPPP_CONCEPT_DECL integer_binary_save_dest = detail::has_integer_binary_save<T, SSize>::value;
-
-template <typename T, std::size_t SSize>
-MPPP_CONCEPT_DECL integer_binary_load_src = detail::has_integer_binary_load<T, SSize>::value;
-
-#endif
-
 // Save in binary format.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize, integer_binary_save_dest<SSize> T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<detail::has_integer_binary_save<T, SSize>::value, int> = 0>
-#endif
-inline std::size_t binary_save(const integer<SSize> &n, T &&dest)
+template <std::size_t SSize, typename T>
+inline auto binary_save(const integer<SSize> &n, T &&dest) -> decltype(n.binary_save(std::forward<T>(dest)))
 {
     return n.binary_save(std::forward<T>(dest));
 }
 
 // Load in binary format.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize, integer_binary_load_src<SSize> T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<detail::has_integer_binary_load<T, SSize>::value, int> = 0>
-#endif
-inline std::size_t binary_load(integer<SSize> &n, T &&src)
+template <std::size_t SSize, typename T>
+inline auto binary_load(integer<SSize> &n, T &&src) -> decltype(n.binary_load(std::forward<T>(src)))
 {
     return n.binary_load(std::forward<T>(src));
 }
