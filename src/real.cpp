@@ -2385,6 +2385,11 @@ std::size_t real::binary_size() const
     return detail::rbs_checked_add(detail::rbs_base_size(), detail::rbs_prec_to_size(get_prec()));
 }
 
+std::size_t binary_size(const real &x)
+{
+    return x.binary_size();
+}
+
 // Save to a char buffer, given a binary size computed
 // via binary_size().
 void real::binary_save_impl(char *dest, std::size_t bs) const
