@@ -410,6 +410,11 @@
      Input/Output
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#serialisation">
+     Serialisation
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -501,6 +506,9 @@ are needed).</p>
 <p>Member functions are provided to access directly the internal <a class="reference internal" href="#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a> instance (see
 <a class="reference internal" href="#_CPPv4NK4mppp4real10get_mpfr_tEv" title="mppp::real::get_mpfr_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::get_mpfr_t()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp4real11_get_mpfr_tEv" title="mppp::real::_get_mpfr_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::_get_mpfr_t()</span></code></a>), so that
 it is possible to use transparently the MPFR API with <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects.</p>
+<p>The <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class supports a simple binary serialisation API, through member functions
+such as <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_saveEPc" title="mppp::real::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_save()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp4real11binary_loadEPKc" title="mppp::real::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_load()</span></code></a>, and the
+corresponding <a class="reference internal" href="#real-s11n"><span class="std std-ref">free function overloads</span></a>.</p>
 <p>A <a class="reference internal" href="tutorial_real.html#tutorial-real"><span class="std std-ref">tutorial</span></a> showcasing various features of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 is available.</p>
 <dl class="cpp function">
@@ -578,6 +586,9 @@ will be <em>p</em>.</p>
 <p>If <em>k</em> is not NaN, the sign bit will be set to positive if <em>sign</em>
 is nonnegative, negative otherwise.</p>
 <p>The second overload invokes the first one with a <em>sign</em> of zero.</p>
+<p>If <em>k</em> is not one of <a class="reference internal" href="#_CPPv4N4mppp9real_kind3nanE" title="mppp::real_kind::nan"><code class="xref cpp cpp-enumerator docutils literal notranslate"><span class="pre">nan</span></code></a>,
+<a class="reference internal" href="#_CPPv4N4mppp9real_kind3infE" title="mppp::real_kind::inf"><code class="xref cpp cpp-enumerator docutils literal notranslate"><span class="pre">inf</span></code></a> or
+<a class="reference internal" href="#_CPPv4N4mppp9real_kind4zeroE" title="mppp::real_kind::zero"><code class="xref cpp cpp-enumerator docutils literal notranslate"><span class="pre">zero</span></code></a>, an error will be raised.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -588,7 +599,8 @@ is nonnegative, negative otherwise.</p>
 </dd>
 <dt class="field-even">Throws</dt>
 <dd class="field-even"><p><strong>std::invalid_argument</strong> – if <em>p</em> is outside the range established by
-<a class="reference internal" href="#_CPPv4N4mppp13real_prec_minEv" title="mppp::real_prec_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_min()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp13real_prec_maxEv" title="mppp::real_prec_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_max()</span></code></a>.</p>
+<a class="reference internal" href="#_CPPv4N4mppp13real_prec_minEv" title="mppp::real_prec_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_min()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp13real_prec_maxEv" title="mppp::real_prec_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_max()</span></code></a>,
+or <em>k</em> is an invalid enumerator.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1964,6 +1976,157 @@ functions.</p>
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4NK4mppp4real11binary_sizeEv">
+<span id="_CPPv3NK4mppp4real11binary_sizeEv"></span><span id="_CPPv2NK4mppp4real11binary_sizeEv"></span><span id="mppp::real::binary_sizeC"></span>std::size_t <code class="sig-name descname">binary_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.22.</span></p>
+</div>
+<p>Size of the serialised binary representation.</p>
+<p>This member function will return a value representing the number of bytes necessary
+to serialise <code class="docutils literal notranslate"><span class="pre">this</span></code> into a memory buffer in binary format via one of the available
+<a class="reference internal" href="#_CPPv4NK4mppp4real11binary_saveEPc" title="mppp::real::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_save()</span></code></a> overloads. The returned value
+is platform-dependent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of bytes needed for the binary serialisation of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</dd>
+<dt class="field-even">Throws</dt>
+<dd class="field-even"><p><strong>std::overflow_error</strong> – if the size in limbs of <code class="docutils literal notranslate"><span class="pre">this</span></code> is larger than an
+implementation-defined limit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK4mppp4real11binary_saveEPc">
+<span id="_CPPv3NK4mppp4real11binary_saveEPc"></span><span id="_CPPv2NK4mppp4real11binary_saveEPc"></span><span id="mppp::real::binary_save__cPC"></span>std::size_t <code class="sig-name descname">binary_save</code><span class="sig-paren">(</span>char *<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp4real11binary_saveEPc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK4mppp4real11binary_saveERNSt6vectorIcEE">
+<span id="_CPPv3NK4mppp4real11binary_saveERNSt6vectorIcEE"></span><span id="_CPPv2NK4mppp4real11binary_saveERNSt6vectorIcEE"></span><span id="mppp::real::binary_save__std::vector:c:RC"></span>std::size_t <code class="sig-name descname">binary_save</code><span class="sig-paren">(</span>std::vector&lt;char&gt; &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp4real11binary_saveERNSt6vectorIcEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_NSt6size_tEENK4mppp4real11binary_saveENSt6size_tERNSt5arrayIc1SEE">
+<span id="_CPPv3I_NSt6size_tEENK4mppp4real11binary_saveERNSt5arrayIc1SEE"></span><span id="_CPPv2I_NSt6size_tEENK4mppp4real11binary_saveERNSt5arrayIc1SEE"></span>template&lt;std::size_t <code class="sig-name descname">S</code>&gt;<br />std::size_t <code class="sig-name descname">binary_save</code><span class="sig-paren">(</span>std::array&lt;char, <a class="reference internal" href="#_CPPv4I_NSt6size_tEENK4mppp4real11binary_saveENSt6size_tERNSt5arrayIc1SEE" title="mppp::real::binary_save::S">S</a>&gt; &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_NSt6size_tEENK4mppp4real11binary_saveENSt6size_tERNSt5arrayIc1SEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4NK4mppp4real11binary_saveERNSt7ostreamE">
+<span id="_CPPv3NK4mppp4real11binary_saveERNSt7ostreamE"></span><span id="_CPPv2NK4mppp4real11binary_saveERNSt7ostreamE"></span><span id="mppp::real::binary_save__osRC"></span>std::size_t <code class="sig-name descname">binary_save</code><span class="sig-paren">(</span>std::ostream &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp4real11binary_saveERNSt7ostreamE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.22.</span></p>
+</div>
+<p>Serialise into a memory buffer or an output stream.</p>
+<p>These member functions will write into <em>dest</em> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>. The serialised
+representation produced by these member functions can be read back with one of the
+<a class="reference internal" href="#_CPPv4N4mppp4real11binary_loadEPKc" title="mppp::real::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_load()</span></code></a> overloads.</p>
+<p>For the first overload, <em>dest</em> must point to a memory area whose size is at least equal to the value returned
+by <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>, otherwise the behaviour will be undefined.
+<em>dest</em> does not have any special alignment requirements.</p>
+<p>For the second overload, the size of <em>dest</em> must be at least equal to the value returned by
+<a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>. If that is not the case, <em>dest</em> will be resized
+to <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>.</p>
+<p>For the third overload, the size of <em>dest</em> must be at least equal to the value returned by
+<a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>. If that is not the case, no data
+will be written to <em>dest</em> and zero will be returned.</p>
+<p>For the fourth overload, if the serialisation is successful (that is, no stream error state is ever detected
+in <em>dest</em> after write
+operations), then the binary size of <code class="docutils literal notranslate"><span class="pre">this</span></code> (that is, the number of bytes written into <em>dest</em>) will be
+returned. Otherwise, zero will be returned. Note that a return value of zero does not necessarily imply that no
+bytes were written into <em>dest</em>, just that an error occurred at some point during the serialisation process.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The binary representation produced by these member functions is compiler, platform and architecture
+specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+it should not be used as an exchange format or for long-term data storage.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dest</strong> – the output buffer or stream.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the number of bytes written into <code class="docutils literal notranslate"><span class="pre">dest</span></code> (i.e., the output of <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>,
+if the serialisation was successful).</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors.</p></li>
+<li><p><strong>unspecified</strong> – any exception thrown by <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>, by memory errors in
+standard containers, or by the public interface of <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real11binary_loadEPKc">
+<span id="_CPPv3N4mppp4real11binary_loadEPKc"></span><span id="_CPPv2N4mppp4real11binary_loadEPKc"></span><span id="mppp::real::binary_load__cCP"></span>std::size_t <code class="sig-name descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real11binary_loadEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real11binary_loadERKNSt6vectorIcEE">
+<span id="_CPPv3N4mppp4real11binary_loadERKNSt6vectorIcEE"></span><span id="_CPPv2N4mppp4real11binary_loadERKNSt6vectorIcEE"></span><span id="mppp::real::binary_load__std::vector:c:CR"></span>std::size_t <code class="sig-name descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;char&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real11binary_loadERKNSt6vectorIcEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp4real11binary_loadENSt6size_tERKNSt5arrayIc1SEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp4real11binary_loadERKNSt5arrayIc1SEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp4real11binary_loadERKNSt5arrayIc1SEE"></span>template&lt;std::size_t <code class="sig-name descname">S</code>&gt;<br />std::size_t <code class="sig-name descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> std::array&lt;char, <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4real11binary_loadENSt6size_tERKNSt5arrayIc1SEE" title="mppp::real::binary_load::S">S</a>&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp4real11binary_loadENSt6size_tERKNSt5arrayIc1SEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real11binary_loadERNSt7istreamE">
+<span id="_CPPv3N4mppp4real11binary_loadERNSt7istreamE"></span><span id="_CPPv2N4mppp4real11binary_loadERNSt7istreamE"></span><span id="mppp::real::binary_load__isR"></span>std::size_t <code class="sig-name descname">binary_load</code><span class="sig-paren">(</span>std::istream &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real11binary_loadERNSt7istreamE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.22.</span></p>
+</div>
+<p>Deserialise from a memory buffer or an input stream.</p>
+<p>These member functions will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of the memory buffer or input stream
+<em>src</em>, which must contain the serialised representation of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+produced by one of the <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_saveEPc" title="mppp::real::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_save()</span></code></a> overloads.</p>
+<p>For the first overload, <em>src</em> does not have any special alignment requirements.</p>
+<p>For the second and third overloads, the serialised representation of the
+<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> must start at the beginning of <em>src</em>,
+but it can end before the end of <em>src</em>. Data
+past the end of the serialised representation of the <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+will be ignored.</p>
+<p>For the fourth overload, the serialised representation of the <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+must start at
+the current position of <em>src</em>, but <em>src</em> can contain other data before and after
+the serialised <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> value. Data
+past the end of the serialised representation of the <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+will be ignored. If a stream error state is detected at any point of the deserialisation
+process after a read operation, zero will be returned and <code class="docutils literal notranslate"><span class="pre">this</span></code> will not have been modified.
+Note that a return value of zero does not necessarily imply that no
+bytes were read from <em>src</em>, just that an error occurred at some point during the serialisation process.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Although these member functions perform a few consistency checks on the data in <em>src</em>,
+they cannot ensure complete safety against maliciously-crafted data. Users are
+advised to use these member functions only with trusted data.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>src</strong> – the source memory buffer or stream.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the number of bytes read from <em>src</em> (that is, the output of <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>
+after the deserialisation into <code class="docutils literal notranslate"><span class="pre">this</span></code> has successfully completed).</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors.</p></li>
+<li><p><strong>std::invalid_argument</strong> – if invalid data is detected in <em>src</em>.</p></li>
+<li><p><strong>unspecified</strong> – any exception thrown by memory errors in standard containers,
+the public interface of <code class="docutils literal notranslate"><span class="pre">std::istream</span></code>, <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>
+or <a class="reference internal" href="#_CPPv4N4mppp4real8set_precE11mpfr_prec_t" title="mppp::real::set_prec"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">set_prec()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -2004,7 +2167,7 @@ and (by extension) <a class="reference internal" href="#_CPPv4N4mppp4realE" titl
 
 <dl class="cpp enum-class">
 <dt id="_CPPv4N4mppp9real_kindE">
-<span id="_CPPv3N4mppp9real_kindE"></span><span id="_CPPv2N4mppp9real_kindE"></span><em class="property">enum class </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">real_kind</code><a class="headerlink" href="#_CPPv4N4mppp9real_kindE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N4mppp9real_kindE"></span><span id="_CPPv2N4mppp9real_kindE"></span><em class="property">enum class </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">real_kind</code> : std::underlying_type&lt;mpfr_kind_t&gt;::type<a class="headerlink" href="#_CPPv4N4mppp9real_kindE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This scoped enum is used to initialise a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> with
 one of the three special values NaN, infinity or zero.</p>
 <dl class="cpp enumerator">
@@ -4871,6 +5034,94 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt class="field-odd">Throws</dt>
 <dd class="field-odd"><p><strong>unspecified</strong> – any exception thrown by <a class="reference internal" href="#_CPPv4NK4mppp4real9to_stringEi" title="mppp::real::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::to_string()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="serialisation">
+<span id="real-s11n"></span><h3>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.22.</span></p>
+</div>
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp11binary_sizeERKN4mppp4realE">
+<span id="_CPPv3N4mppp11binary_sizeERKN4mppp4realE"></span><span id="_CPPv2N4mppp11binary_sizeERKN4mppp4realE"></span><span id="mppp::binary_size__mppp::realCR"></span>std::size_t <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">binary_size</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp11binary_sizeERKN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary size.</p>
+<p>This function is the free function equivalent of the
+<a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_size()</span></code></a> member function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – the input argument.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the output of <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_size()</span></code></a> called on <em>x</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>unspecified</strong> – any exception thrown by <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_sizeEv" title="mppp::real::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_size()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0EN4mppp11binary_saveENSt6size_tERKN4mppp4realERR1T">
+<span id="_CPPv3I0EN4mppp11binary_saveERKN4mppp4realERR1T"></span><span id="_CPPv2I0EN4mppp11binary_saveERKN4mppp4realERR1T"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />std::size_t <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">binary_save</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0EN4mppp11binary_saveENSt6size_tERKN4mppp4realERR1T" title="mppp::binary_save::T">T</a> &amp;&amp;<em>dest</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mppp11binary_saveENSt6size_tERKN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary serialisation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function participates in overload resolution only if the expression</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">x</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">dest</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>is well-formed.</p>
+</div>
+<p>This function is the free function equivalent of the
+<a class="reference internal" href="#_CPPv4NK4mppp4real11binary_saveEPc" title="mppp::real::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_save()</span></code></a> overloads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – the input argument.</p></li>
+<li><p><strong>dest</strong> – the object into which <em>x</em> will be serialised.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the output of the invoked <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_saveEPc" title="mppp::real::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_save()</span></code></a>
+overload called on <em>x</em> with <em>dest</em> as argument.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>unspecified</strong> – any exception thrown by the invoked <a class="reference internal" href="#_CPPv4NK4mppp4real11binary_saveEPc" title="mppp::real::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_save()</span></code></a> overload.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0EN4mppp11binary_loadENSt6size_tERN4mppp4realERR1T">
+<span id="_CPPv3I0EN4mppp11binary_loadERN4mppp4realERR1T"></span><span id="_CPPv2I0EN4mppp11binary_loadERN4mppp4realERR1T"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br />std::size_t <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">binary_load</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>x</em>, <a class="reference internal" href="#_CPPv4I0EN4mppp11binary_loadENSt6size_tERN4mppp4realERR1T" title="mppp::binary_load::T">T</a> &amp;&amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mppp11binary_loadENSt6size_tERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary deserialisation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function participates in overload resolution only if the expression</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">x</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">src</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>is well-formed.</p>
+</div>
+<p>This function is the free function equivalent of the
+<a class="reference internal" href="#_CPPv4N4mppp4real11binary_loadEPKc" title="mppp::real::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_load()</span></code></a> overloads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – the output argument.</p></li>
+<li><p><strong>src</strong> – the object containing the serialised <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+that will be loaded into <em>x</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the output of the invoked <a class="reference internal" href="#_CPPv4N4mppp4real11binary_loadEPKc" title="mppp::real::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_load()</span></code></a>
+overload called on <em>x</em> with <em>src</em> as argument.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>unspecified</strong> – any exception thrown by the invoked <a class="reference internal" href="#_CPPv4N4mppp4real11binary_loadEPKc" title="mppp::real::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_load()</span></code></a> overload.</p>
 </dd>
 </dl>
 </dd></dl>

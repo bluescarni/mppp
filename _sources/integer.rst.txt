@@ -876,18 +876,6 @@ Concepts
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size, or
    * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::cpp_integral` type.
 
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::integer_binary_save_dest
-
-   This concept is satisfied if ``T`` is a type into which the serialised binary representation of an
-   :cpp:class:`~mppp::integer` with static size ``SSize`` can be written. In other words, the concept is satisfied if
-   an object of type ``T`` can be passed as an argument to one of the :cpp:func:`mppp::integer::binary_save()` overloads.
-
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::integer_binary_load_src
-
-   This concept is satisfied if ``T`` is a type from which the serialised binary representation of an
-   :cpp:class:`~mppp::integer` with static size ``SSize`` can be loaded. In other words, the concept is satisfied if
-   an object of type ``T`` can be passed as an argument to one of the :cpp:func:`mppp::integer::binary_load()` overloads.
-
 .. _integer_functions:
 
 Functions
@@ -1604,9 +1592,19 @@ Serialisation
 
    :exception unspecified: any exception thrown by :cpp:func:`mppp::integer::binary_size()`.
 
-.. cpp:function:: template <std::size_t SSize, mppp::integer_binary_save_dest<SSize> T> std::size_t mppp::binary_save(const mppp::integer<SSize> &n, T &&dest)
+.. cpp:function:: template <std::size_t SSize, typename T> std::size_t mppp::binary_save(const mppp::integer<SSize> &n, T &&dest)
 
-   Serialisation.
+   Binary serialisation.
+
+   .. note::
+
+      This function participates in overload resolution only if the expression
+
+      .. code-block:: c++
+
+         return n.binary_save(std::forward<T>(dest));
+
+      is well-formed.
 
    This function is the free function equivalent of the
    :cpp:func:`mppp::integer::binary_save()` overloads.
@@ -1619,9 +1617,19 @@ Serialisation
 
    :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::integer::binary_save()` overload.
 
-.. cpp:function:: template <std::size_t SSize, mppp::integer_binary_load_src<SSize> T> std::size_t mppp::binary_load(mppp::integer<SSize> &n, T &&src)
+.. cpp:function:: template <std::size_t SSize, typename T> std::size_t mppp::binary_load(mppp::integer<SSize> &n, T &&src)
 
-   Deserialisation.
+   Binary deserialisation.
+
+   .. note::
+
+      This function participates in overload resolution only if the expression
+
+      .. code-block:: c++
+
+         return n.binary_load(std::forward<T>(src));
+
+      is well-formed.
 
    This function is the free function equivalent of the
    :cpp:func:`mppp::integer::binary_load()` overloads.

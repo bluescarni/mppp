@@ -341,6 +341,11 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#serialisation">
+   Serialisation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#user-defined-literals">
    User-defined literals
   </a>
@@ -740,6 +745,30 @@ must be in the bounds established by <a class="reference internal" href="real.ht
 object must contain a valid <a class="reference internal" href="real.html#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a> object.</p>
 <p>Additionally, a variety of constructors, assignment operators and setters from
 <a class="reference internal" href="real.html#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a> are also available.</p>
+</div>
+<div class="section" id="serialisation">
+<h2>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.22.</span></p>
+</div>
+<p>mp++ provides a simple <a class="reference internal" href="real.html#real-s11n"><span class="std std-ref">API for the (de)serialisation</span></a> of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects
+into/from memory buffers and C++ streams. Possible uses of the serialisation API include persistence (e.g.,
+saving/loading <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> values to/from a file), the transmission of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects over
+the network (e.g., in distributed computing applications), inter-process communication, etc. The API consists of two main
+overloaded functions, <a class="reference internal" href="real.html#_CPPv4NK4mppp4real11binary_saveEPc" title="mppp::real::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_save()</span></code></a> and <a class="reference internal" href="real.html#_CPPv4N4mppp4real11binary_loadEPKc" title="mppp::real::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::binary_load()</span></code></a> (plus their
+free-function counterparts).</p>
+<p>Because the API is identical, we refer to the tutorial section on
+<a class="reference internal" href="tutorial_integer.html#tutorial-integer-s11n"><span class="std std-ref">integer serialisation</span></a> for usage examples.</p>
+<p>As already pointed out in the <a class="reference internal" href="tutorial_integer.html#tutorial-integer-s11n"><span class="std std-ref">integer serialisation section</span></a>,
+the following points must be emphasised:</p>
+<ul class="simple">
+<li><p>although mp++ does run some consistency checks during deserialisation, the API is not built to protect
+against maliciously-crafted data. Users are thus advised not to load data from untrusted sources;</p></li>
+<li><p>the current binary serialisation format is compiler, platform and architecture specific, it is not portable
+and it might be subject to changes in future versions of mp++. Users are thus advised not to use
+the binary serialisation format for long-term persistence or as a data exchange format: for such
+purposes, it is better to use the string representation of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects.</p></li>
+</ul>
 </div>
 <div class="section" id="user-defined-literals">
 <h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>

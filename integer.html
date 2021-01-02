@@ -1571,22 +1571,6 @@ if either:</p>
 </ul>
 </dd></dl>
 
-<dl class="cpp concept">
-<dt id="_CPPv4I0_NSt6size_tEEN4mppp24integer_binary_save_destE">
-<span id="_CPPv3I0_NSt6size_tEEN4mppp24integer_binary_save_destE"></span><span id="_CPPv2I0_NSt6size_tEEN4mppp24integer_binary_save_destE"></span>template&lt;typename <code class="sig-name descname">T</code>, std::size_t <code class="sig-name descname">SSize</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">integer_binary_save_dest</code><a class="headerlink" href="#_CPPv4I0_NSt6size_tEEN4mppp24integer_binary_save_destE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a type into which the serialised binary representation of an
-<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> with static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code> can be written. In other words, the concept is satisfied if
-an object of type <code class="docutils literal notranslate"><span class="pre">T</span></code> can be passed as an argument to one of the <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_save()</span></code></a> overloads.</p>
-</dd></dl>
-
-<dl class="cpp concept">
-<dt id="_CPPv4I0_NSt6size_tEEN4mppp23integer_binary_load_srcE">
-<span id="_CPPv3I0_NSt6size_tEEN4mppp23integer_binary_load_srcE"></span><span id="_CPPv2I0_NSt6size_tEEN4mppp23integer_binary_load_srcE"></span>template&lt;typename <code class="sig-name descname">T</code>, std::size_t <code class="sig-name descname">SSize</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">integer_binary_load_src</code><a class="headerlink" href="#_CPPv4I0_NSt6size_tEEN4mppp23integer_binary_load_srcE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a type from which the serialised binary representation of an
-<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> with static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code> can be loaded. In other words, the concept is satisfied if
-an object of type <code class="docutils literal notranslate"><span class="pre">T</span></code> can be passed as an argument to one of the <a class="reference internal" href="#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_load()</span></code></a> overloads.</p>
-</dd></dl>
-
 </div>
 <div class="section" id="functions">
 <span id="integer-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
@@ -2701,9 +2685,17 @@ with <span class="math notranslate nohighlight">\(b&gt;1\)</span>, such that <em
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I_NSt6size_tE_N4mppp24integer_binary_save_destI5SSizeEEEN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T">
-<span id="_CPPv3I_NSt6size_tE_N4mppp24integer_binary_save_destI5SSizeEEEN4mppp11binary_saveERKN4mppp7integerI5SSizeEERR1T"></span><span id="_CPPv2I_NSt6size_tE_N4mppp24integer_binary_save_destI5SSizeEEEN4mppp11binary_saveERKN4mppp7integerI5SSizeEERR1T"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>, mppp::<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp24integer_binary_save_destE" title="mppp::integer_binary_save_dest">integer_binary_save_dest</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp24integer_binary_save_destI5SSizeEEEN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T" title="mppp::binary_save::SSize">SSize</a>&gt; <code class="sig-name descname">T</code>&gt;<br />std::size_t <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">binary_save</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp24integer_binary_save_destI5SSizeEEEN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T" title="mppp::binary_save::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp24integer_binary_save_destI5SSizeEEEN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T" title="mppp::binary_save::T">T</a> &amp;&amp;<em>dest</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tE_N4mppp24integer_binary_save_destI5SSizeEEEN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Serialisation.</p>
+<dt id="_CPPv4I_NSt6size_tE0EN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T">
+<span id="_CPPv3I_NSt6size_tE0EN4mppp11binary_saveERKN4mppp7integerI5SSizeEERR1T"></span><span id="_CPPv2I_NSt6size_tE0EN4mppp11binary_saveERKN4mppp7integerI5SSizeEERR1T"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>, typename <code class="sig-name descname">T</code>&gt;<br />std::size_t <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">binary_save</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T" title="mppp::binary_save::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T" title="mppp::binary_save::T">T</a> &amp;&amp;<em>dest</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tE0EN4mppp11binary_saveENSt6size_tERKN4mppp7integerI5SSizeEERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary serialisation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function participates in overload resolution only if the expression</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">n</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">dest</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>is well-formed.</p>
+</div>
 <p>This function is the free function equivalent of the
 <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_save()</span></code></a> overloads.</p>
 <dl class="field-list simple">
@@ -2724,9 +2716,17 @@ overload called on <em>n</em> with <em>dest</em> as argument.</p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4I_NSt6size_tE_N4mppp23integer_binary_load_srcI5SSizeEEEN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T">
-<span id="_CPPv3I_NSt6size_tE_N4mppp23integer_binary_load_srcI5SSizeEEEN4mppp11binary_loadERN4mppp7integerI5SSizeEERR1T"></span><span id="_CPPv2I_NSt6size_tE_N4mppp23integer_binary_load_srcI5SSizeEEEN4mppp11binary_loadERN4mppp7integerI5SSizeEERR1T"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>, mppp::<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp23integer_binary_load_srcE" title="mppp::integer_binary_load_src">integer_binary_load_src</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp23integer_binary_load_srcI5SSizeEEEN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T" title="mppp::binary_load::SSize">SSize</a>&gt; <code class="sig-name descname">T</code>&gt;<br />std::size_t <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">binary_load</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp23integer_binary_load_srcI5SSizeEEEN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T" title="mppp::binary_load::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp23integer_binary_load_srcI5SSizeEEEN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T" title="mppp::binary_load::T">T</a> &amp;&amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tE_N4mppp23integer_binary_load_srcI5SSizeEEEN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Deserialisation.</p>
+<dt id="_CPPv4I_NSt6size_tE0EN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T">
+<span id="_CPPv3I_NSt6size_tE0EN4mppp11binary_loadERN4mppp7integerI5SSizeEERR1T"></span><span id="_CPPv2I_NSt6size_tE0EN4mppp11binary_loadERN4mppp7integerI5SSizeEERR1T"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>, typename <code class="sig-name descname">T</code>&gt;<br />std::size_t <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">binary_load</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T" title="mppp::binary_load::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T" title="mppp::binary_load::T">T</a> &amp;&amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tE0EN4mppp11binary_loadENSt6size_tERN4mppp7integerI5SSizeEERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary deserialisation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function participates in overload resolution only if the expression</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">n</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">src</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>is well-formed.</p>
+</div>
 <p>This function is the free function equivalent of the
 <a class="reference internal" href="#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_load()</span></code></a> overloads.</p>
 <dl class="field-list simple">

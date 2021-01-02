@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add a binary serialisation API for :cpp:class:`~mppp::real`
+  (`#263 <https://github.com/bluescarni/mppp/pull/263>`__).
 - Add a header file containing the forward declarations
   of all the number classes
   (`#261 <https://github.com/bluescarni/mppp/pull/261>`__).
@@ -27,8 +29,11 @@ Changes
 Fix
 ~~~
 
+- Fix build with recent versions of ``clang-tidy``
+  (`#263 <https://github.com/bluescarni/mppp/pull/263>`__).
 - Various build system/docs fixes and enhancements
-  (`#261 <https://github.com/bluescarni/mppp/pull/261>`__).
+  (`#263 <https://github.com/bluescarni/mppp/pull/263>`__,
+  `#261 <https://github.com/bluescarni/mppp/pull/261>`__).
 - Workaround for a compiler issue with older versions of Clang
   (`#260 <https://github.com/bluescarni/mppp/pull/260>`__).
 
