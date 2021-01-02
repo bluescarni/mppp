@@ -66,9 +66,9 @@ using namespace mppp;
 using int_t = integer<1>;
 using rat_t = rational<1>;
 
-static int ntries = 1000;
+static const int ntries = 1000;
 
-// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
 static constexpr auto delta64 = detail::nl_digits<std::uint_least64_t>() - 64;
