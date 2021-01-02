@@ -6,13 +6,21 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <cassert>
 #include <iostream>
 
-#include <mp++/config.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/real.hpp>
+
+#if defined(MPPP_WITH_MPC)
+
+#include <mp++/complex.hpp>
+#include <mp++/detail/mpc.hpp>
+
+#endif
 
 #if defined(MPPP_WITH_ARB)
 
@@ -33,13 +41,6 @@
 #pragma warning(pop)
 
 #endif
-
-#endif
-
-#if defined(MPPP_WITH_MPC)
-
-#include <mp++/complex.hpp>
-#include <mp++/detail/mpc.hpp>
 
 #endif
 

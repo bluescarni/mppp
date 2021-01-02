@@ -6,21 +6,21 @@ branches:
 
 environment:
   matrix:
-    # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    #   BUILD_TYPE: MSVC15_clang_64
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      BUILD_TYPE: MSVC15_clang_64
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       BUILD_TYPE: MSVC17_64
-    # - BUILD_TYPE: MSVC15_64
-    # - BUILD_TYPE: MinGW
-    #   TEST_NSPLIT: "2"
-    #   SPLIT_TEST_NUM: "0"
-    #   COMPILER: MinGW
-    #   PLATFORM: x64
-    # - BUILD_TYPE: MinGW
-    #   TEST_NSPLIT: "2"
-    #   SPLIT_TEST_NUM: "1"
-    #   COMPILER: MinGW
-    #   PLATFORM: x64
+    - BUILD_TYPE: MSVC15_64
+    - BUILD_TYPE: MinGW
+      TEST_NSPLIT: "2"
+      SPLIT_TEST_NUM: "0"
+      COMPILER: MinGW
+      PLATFORM: x64
+    - BUILD_TYPE: MinGW
+      TEST_NSPLIT: "2"
+      SPLIT_TEST_NUM: "1"
+      COMPILER: MinGW
+      PLATFORM: x64
 
 install:
 - if [%BUILD_TYPE%]==[MSVC15_64] call "C:\\Miniconda36-x64\\Scripts\\activate.bat"
@@ -106,5 +106,5 @@ test_script:
 # Enable this to be able to login to the build worker. You can use the
 # `remmina` program in Ubuntu, use the login information that the line below
 # prints into the log.
-on_finish:
-- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# on_finish:
+# - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
