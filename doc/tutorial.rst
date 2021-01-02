@@ -22,4 +22,5 @@ on to the full :ref:`C++ reference <reference>`.
    tutorial_complex128.rst
    tutorial_real.rst
    tutorial_complex.rst
+   tutorial_boost_s11n.rst
    tutorial_pybind11.rst
