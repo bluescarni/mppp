@@ -2637,6 +2637,7 @@ void real::load(boost::archive::binary_iarchive &ar, unsigned)
     MPPP_MAYBE_TLS std::vector<char> buffer;
 
     // Recover the size.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     decltype(buffer.size()) s;
     ar >> s;
     buffer.resize(s);
