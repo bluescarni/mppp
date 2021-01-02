@@ -9,6 +9,9 @@ New
 
 - Add a binary serialisation API for :cpp:class:`~mppp::real`
   (`#263 <https://github.com/bluescarni/mppp/pull/263>`__).
+- Implement optional support for Boost.serialization for all
+  multiprecision classes
+  (`#262 <https://github.com/bluescarni/mppp/pull/262>`__).
 - Add a header file containing the forward declarations
   of all the number classes
   (`#261 <https://github.com/bluescarni/mppp/pull/261>`__).

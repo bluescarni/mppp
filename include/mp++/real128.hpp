@@ -26,7 +26,20 @@
 #include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
+
 #include <string_view>
+
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/tracking.hpp>
+
 #endif
 
 #include <mp++/concepts.hpp>
@@ -191,6 +204,32 @@ constexpr
 // Quadruple-precision floating-point class.
 class MPPP_DLL_PUBLIC real128
 {
+#if defined(MPPP_WITH_BOOST_S11N)
+    // Boost serialization support.
+    friend class boost::serialization::access;
+
+    template <typename Archive>
+    void save(Archive &ar, unsigned) const
+    {
+        ar << to_string();
+    }
+
+    template <typename Archive>
+    void load(Archive &ar, unsigned)
+    {
+        std::string tmp;
+        ar >> tmp;
+
+        *this = real128{tmp};
+    }
+
+    // Overloads for binary archives.
+    void save(boost::archive::binary_oarchive &, unsigned) const;
+    void load(boost::archive::binary_iarchive &, unsigned);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
+
     // Number of digits in the significand.
     static constexpr unsigned sig_digits = 113;
 
@@ -2076,6 +2115,14 @@ inline rational<SSize> &rational<SSize>::operator=(const real128 &x)
 }
 
 } // namespace mppp
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Never track the address of real128 objects
+// during serialization.
+BOOST_CLASS_TRACKING(mppp::real128, boost::serialization::track_never)
+
+#endif
 
 namespace std
 {

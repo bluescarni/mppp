@@ -25,6 +25,15 @@
 #include <string_view>
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/tracking.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/mpc.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -193,6 +202,35 @@ enum class complex_prec_t : ::mpfr_prec_t {};
 // Multiprecision complex class.
 class MPPP_DLL_PUBLIC complex
 {
+#if defined(MPPP_WITH_BOOST_S11N)
+    // Boost serialization support.
+    friend class boost::serialization::access;
+
+    template <typename Archive>
+    void save(Archive &ar, unsigned) const
+    {
+        re_cref re{*this};
+        im_cref im{*this};
+
+        ar << *re;
+        ar << *im;
+    }
+
+    template <typename Archive>
+    void load(Archive &ar, unsigned)
+    {
+        MPPP_MAYBE_TLS real re, im;
+
+        ar >> re;
+        ar >> im;
+
+        *this = complex{re, im};
+    }
+    void load(boost::archive::binary_iarchive &, unsigned);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
+
     // Make friends, for accessing the non-checking prec setting funcs.
     template <bool, typename F, typename Arg0, typename... Args>
     // NOLINTNEXTLINE(readability-redundant-declaration)
@@ -3130,6 +3168,14 @@ inline rational<SSize> &rational<SSize>::operator=(const complex &c)
 }
 
 } // namespace mppp
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Never track the address of complex objects
+// during serialization.
+BOOST_CLASS_TRACKING(mppp::complex, boost::serialization::track_never)
+
+#endif
 
 // Support for pretty printing in xeus-cling.
 #if defined(__CLING__)

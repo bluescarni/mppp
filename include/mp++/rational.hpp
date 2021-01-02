@@ -29,6 +29,15 @@
 #include <string_view>
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/tracking.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>
@@ -138,6 +147,45 @@ mpq_struct_t get_mpq_view(const rational<SSize> &);
 template <std::size_t SSize>
 class rational
 {
+#if defined(MPPP_WITH_BOOST_S11N)
+    // Boost serialization support.
+    friend class boost::serialization::access;
+
+    template <typename Archive>
+    void save(Archive &ar, unsigned) const
+    {
+        ar << get_num();
+        ar << get_den();
+    }
+
+    template <typename Archive>
+    void load(Archive &ar, unsigned)
+    {
+        // NOTE: use tmp variables
+        // for exception safety.
+        int_t num, den;
+
+        ar >> num;
+        ar >> den;
+
+        *this = rational{std::move(num), std::move(den)};
+    }
+    void load(boost::archive::binary_iarchive &ar, unsigned)
+    {
+        // NOTE: for the binary archive, avoid calling the constructor,
+        // but still do it in 2 stages for exception safety.
+        int_t num, den;
+
+        ar >> num;
+        ar >> den;
+
+        _get_num() = std::move(num);
+        _get_den() = std::move(den);
+    }
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
+
 public:
     // Underlying integral type.
     using int_t = integer<SSize>;
@@ -2199,6 +2247,33 @@ inline integer<SSize> &integer<SSize>::operator=(const rational<SSize> &q)
 }
 
 } // namespace mppp
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Disable tracking for mppp::rational.
+// NOTE: this code has been lifted from the Boost
+// macro, which does not support directly
+// class templates.
+
+namespace boost
+{
+
+namespace serialization
+{
+
+template <std::size_t SSize>
+struct tracking_level<mppp::rational<SSize>> {
+    typedef mpl::integral_c_tag tag;
+    typedef mpl::int_<track_never> type;
+    BOOST_STATIC_CONSTANT(int, value = tracking_level::type::value);
+    BOOST_STATIC_ASSERT((mpl::greater<implementation_level<mppp::rational<SSize>>, mpl::int_<primitive_type>>::value));
+};
+
+} // namespace serialization
+
+} // namespace boost
+
+#endif
 
 namespace std
 {

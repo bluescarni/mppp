@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <limits>
 #include <random>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -28,6 +29,15 @@
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
 #endif
 
 #include <gmp.h>
@@ -56,9 +66,9 @@ using namespace mppp;
 using int_t = integer<1>;
 using rat_t = rational<1>;
 
-static int ntries = 1000;
+static const int ntries = 1000;
 
-// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
 static constexpr auto delta64 = detail::nl_digits<std::uint_least64_t>() - 64;
@@ -746,6 +756,36 @@ TEST_CASE("real128 numeric_limits")
 TEST_CASE("real128 nts")
 {
     REQUIRE(std::is_nothrow_swappable_v<real128>);
+}
+
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+template <typename OA, typename IA>
+void test_s11n()
+{
+    std::stringstream ss;
+
+    auto x = 1.1_rq;
+    {
+        OA oa(ss);
+        oa << x;
+    }
+
+    x = 0;
+    {
+        IA ia(ss);
+        ia >> x;
+    }
+
+    REQUIRE(x == 1.1_rq);
+}
+
+TEST_CASE("real128 boost_s11n")
+{
+    test_s11n<boost::archive::text_oarchive, boost::archive::text_iarchive>();
+    test_s11n<boost::archive::binary_oarchive, boost::archive::binary_iarchive>();
 }
 
 #endif

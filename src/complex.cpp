@@ -23,6 +23,12 @@
 
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+
+#endif
+
 #include <mp++/complex.hpp>
 #include <mp++/detail/mpc.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -717,5 +723,27 @@ std::pair<real, real> complex::get_real_imag() const &
 {
     return std::make_pair(*re_cref{*this}, *im_cref{*this});
 }
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+void complex::load(boost::archive::binary_iarchive &ar, unsigned)
+{
+    // NOTE: for the binary archive, don't pass through the constructor,
+    // but assign directly the re/im members.
+    MPPP_MAYBE_TLS real re, im;
+
+    ar >> re;
+    ar >> im;
+
+    {
+        re_ref rr{*this};
+        im_ref ir{*this};
+
+        *rr = re;
+        *ir = im;
+    }
+}
+
+#endif
 
 } // namespace mppp

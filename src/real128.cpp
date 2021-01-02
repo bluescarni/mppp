@@ -19,6 +19,14 @@
 
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/binary_object.hpp>
+
+#endif
+
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
 #include <quadmath.h>
@@ -342,5 +350,24 @@ void sincos(const real128 &x, real128 *s, real128 *c)
 {
     ::sincosq(x.m_value, &s->m_value, &c->m_value);
 }
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Fast serialization implementations for Boost's binary archives.
+void real128::save(boost::archive::binary_oarchive &ar, unsigned) const
+{
+    ar << boost::serialization::make_binary_object(&m_value, sizeof(m_value));
+}
+
+void real128::load(boost::archive::binary_iarchive &ar, unsigned)
+{
+    // NOTE: init in order to avoid compiler warnings.
+    __float128 tmp{};
+    ar >> boost::serialization::make_binary_object(&tmp, sizeof(tmp));
+
+    m_value = tmp;
+}
+
+#endif
 
 } // namespace mppp

@@ -23,6 +23,15 @@
 
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
+#endif
+
 #include <mp++/complex128.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
@@ -843,3 +852,33 @@ TEST_CASE("down_assignment")
     REQUIRE_THROWS_AS((rr = complex128{4, 5}), std::domain_error);
 #endif
 }
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+template <typename OA, typename IA>
+void test_s11n()
+{
+    std::stringstream ss;
+
+    auto x = 1.1_rq + 1.3_icq;
+    {
+        OA oa(ss);
+        oa << x;
+    }
+
+    x = 0;
+    {
+        IA ia(ss);
+        ia >> x;
+    }
+
+    REQUIRE(x == 1.1_rq + 1.3_icq);
+}
+
+TEST_CASE("boost_s11n")
+{
+    test_s11n<boost::archive::text_oarchive, boost::archive::text_iarchive>();
+    test_s11n<boost::archive::binary_oarchive, boost::archive::binary_iarchive>();
+}
+
+#endif

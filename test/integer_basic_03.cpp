@@ -31,6 +31,15 @@
 #include <string_view>
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
+#endif
+
 #include <gmp.h>
 
 #include <mp++/detail/type_traits.hpp>
@@ -877,6 +886,46 @@ TEST_CASE("integer nts")
     REQUIRE(std::is_nothrow_swappable_v<integer<6>>);
     REQUIRE(std::is_nothrow_swappable_v<integer<10>>);
     REQUIRE(std::is_nothrow_swappable_v<integer<15>>);
+}
+
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+template <typename T, typename OA, typename IA>
+void test_s11n()
+{
+    std::stringstream ss;
+
+    auto x = T{-42};
+    {
+        OA oa(ss);
+        oa << x;
+    }
+
+    x = 0;
+    {
+        IA ia(ss);
+        ia >> x;
+    }
+
+    REQUIRE(x == -42);
+}
+
+struct boost_s11n_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+
+        test_s11n<integer, boost::archive::text_oarchive, boost::archive::text_iarchive>();
+        test_s11n<integer, boost::archive::binary_oarchive, boost::archive::binary_iarchive>();
+    }
+};
+
+TEST_CASE("boost_s11n")
+{
+    tuple_for_each(sizes{}, boost_s11n_tester{});
 }
 
 #endif

@@ -35,7 +35,7 @@ mp++ has the following dependencies:
   (typically, the quadmath library is part of GCC and it does not need to
   be installed separately);
 * the `Boost <https://www.boost.org/>`__ libraries, *optional*, currently used
-  only in the benchmarking suite;
+  for implementing (de)serialisation and in the benchmarking suite;
 * the `{fmt} <https://fmt.dev/latest/index.html>`__ library (at least version 6.2), *optional*, currently used
   only in the benchmarking suite.
 
@@ -66,6 +66,8 @@ path, etc.). The available configuration options are:
   (off by default, requires the ``MPPP_WITH_MPFR`` option to be active),
 * ``MPPP_WITH_QUADMATH``: enable features relying on the
   quadmath library (off by default),
+* ``MPPP_WITH_BOOST_S11N``: enable support for serialisation
+  via the Boost.serialization library (off by default),
 * ``MPPP_BUILD_TESTS``: build the test suite (off by default),
 * ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default),
 * ``MPPP_BUILD_STATIC_LIBRARY``: build mp++ as a static library, instead
@@ -91,6 +93,10 @@ path, etc.). The available configuration options are:
 .. versionadded:: 0.20
 
    The ``MPPP_WITH_MPC`` and ``MPPP_ENABLE_IPO`` build options.
+
+.. versionadded:: 0.22
+
+   The ``MPPP_WITH_BOOST_S11N`` build option.
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions), Clang
@@ -272,7 +278,8 @@ variables to signal with which optional dependencies mp++ was compiled:
 * ``mp++_WITH_MPFR`` if MPFR support was enabled,
 * ``mp++_WITH_MPC`` if MPC support was enabled,
 * ``mp++_WITH_ARB`` if Arb support was enabled,
-* ``mp++_WITH_QUADMATH`` if quadmath support was enabled.
+* ``mp++_WITH_QUADMATH`` if quadmath support was enabled,
+* ``mp++_WITH_BOOST_S11N`` if Boost.serialization support was enabled.
 
 .. _inst_plat_specific:
 

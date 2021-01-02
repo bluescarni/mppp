@@ -16,9 +16,9 @@
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
-static int ntries = 1000;
+static const int ntries = 1000;
 
-// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
 static inline void check_round_trip(const real128 &r)
