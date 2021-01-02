@@ -38,7 +38,7 @@ using fp_types = std::tuple<float, double, long double>;
 using int_t = integer<1>;
 using rat_t = rational<1>;
 
-// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
 static const int ntrials = 1000;

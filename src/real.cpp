@@ -6,6 +6,12 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#if defined(_MSC_VER)
+
+#define _SCL_SECURE_NO_WARNINGS
+
+#endif
+
 #include <mp++/config.hpp>
 
 #include <algorithm>
@@ -2302,4 +2308,313 @@ real &real_catalan(real &rop)
     return rop;
 }
 
+namespace detail
+{
+
+namespace
+{
+
+// std::size_t addition with overflow checking.
+std::size_t rbs_checked_add(std::size_t a, std::size_t b)
+{
+    // LCOV_EXCL_START
+    if (mppp_unlikely(a > std::numeric_limits<std::size_t>::max() - b)) {
+        throw std::overflow_error("Overflow detected in the computation of the binary size of a real");
+    }
+    // LCOV_EXCL_STOP
+
+    return a + b;
+}
+
+// Turn an MPFR precision into the number of limbs
+// necessary to represent the significand of
+// a number with that precision.
+std::size_t rbs_prec_to_nlimbs(::mpfr_prec_t p)
+{
+    // NOTE: currently both mpfr_prec_t and GMP_NUMB_BITS
+    // are signed.
+    using uprec_t = std::make_unsigned<::mpfr_prec_t>::type;
+    return safe_cast<std::size_t>(static_cast<uprec_t>(p / GMP_NUMB_BITS + static_cast<int>((p % GMP_NUMB_BITS) != 0)));
+}
+
+// Turn an MPFR precision into the number of bytes
+// necessary to represent the significand of
+// a number with that precision.
+std::size_t rbs_prec_to_size(::mpfr_prec_t p)
+{
+    const auto nlimbs = rbs_prec_to_nlimbs(p);
+
+    // LCOV_EXCL_START
+    if (mppp_unlikely(nlimbs > std::numeric_limits<std::uint32_t>::max() / sizeof(::mp_limb_t))) {
+        throw std::overflow_error("Overflow detected in the computation of the binary size of a real");
+    }
+    // LCOV_EXCL_STOP
+
+    return nlimbs * sizeof(::mp_limb_t);
+}
+
+// The base binary size of a real: accounts for the size of precision,
+// sign bit and exponent.
+std::size_t rbs_base_size()
+{
+    // Precision.
+    auto retval = sizeof(::mpfr_prec_t);
+    // Sign bit.
+    retval = rbs_checked_add(retval, sizeof(::mpfr_sign_t));
+    // Exponent.
+    return rbs_checked_add(retval, sizeof(::mpfr_exp_t));
+}
+
+// The minimum binary size of a real (a real must have at least 1 limb
+// of data).
+std::size_t rbs_min_size()
+{
+    return rbs_checked_add(rbs_base_size(), sizeof(::mp_limb_t));
+}
+
+// Load the serializaed precision value from a char buffer.
+::mpfr_prec_t rbs_read_prec(const char *src)
+{
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+    ::mpfr_prec_t p;
+    std::copy(src, src + sizeof(p), reinterpret_cast<char *>(&p));
+    return p;
+}
+
+} // namespace
+
+} // namespace detail
+
+// Size of the serialised binary representation: base size + limbs data.
+std::size_t real::binary_size() const
+{
+    return detail::rbs_checked_add(detail::rbs_base_size(), detail::rbs_prec_to_size(get_prec()));
+}
+
+std::size_t binary_size(const real &x)
+{
+    return x.binary_size();
+}
+
+// Save to a char buffer, given a binary size computed
+// via binary_size().
+void real::binary_save_impl(char *dest, std::size_t bs) const
+{
+    // Save the precision.
+    std::copy(reinterpret_cast<const char *>(&m_mpfr._mpfr_prec),
+              reinterpret_cast<const char *>(&m_mpfr._mpfr_prec) + sizeof(::mpfr_prec_t), dest);
+    dest += sizeof(::mpfr_prec_t);
+
+    // Save the sign bit.
+    std::copy(reinterpret_cast<const char *>(&m_mpfr._mpfr_sign),
+              reinterpret_cast<const char *>(&m_mpfr._mpfr_sign) + sizeof(::mpfr_sign_t), dest);
+    dest += sizeof(::mpfr_sign_t);
+
+    // Save the exponent.
+    std::copy(reinterpret_cast<const char *>(&m_mpfr._mpfr_exp),
+              reinterpret_cast<const char *>(&m_mpfr._mpfr_exp) + sizeof(::mpfr_exp_t), dest);
+    dest += sizeof(::mpfr_exp_t);
+
+    // Save the significand.
+    std::copy(reinterpret_cast<const char *>(m_mpfr._mpfr_d),
+              reinterpret_cast<const char *>(m_mpfr._mpfr_d) + (bs - detail::rbs_base_size()), dest);
+}
+
+// Save to a char buffer.
+std::size_t real::binary_save(char *dest) const
+{
+    const auto bs = binary_size();
+    binary_save_impl(dest, bs);
+    return bs;
+}
+
+// Save to a std::vector buffer.
+std::size_t real::binary_save(std::vector<char> &dest) const
+{
+    const auto bs = binary_size();
+    if (dest.size() < bs) {
+        dest.resize(detail::safe_cast<decltype(dest.size())>(bs));
+    }
+    binary_save_impl(dest.data(), bs);
+    return bs;
+}
+
+// Save to a stream.
+std::size_t real::binary_save(std::ostream &dest) const
+{
+    const auto bs = binary_size();
+    // NOTE: there does not seem to be a reliable way of detecting how many bytes
+    // are actually written via write(). See the question here and especially the comments:
+    // https://stackoverflow.com/questions/14238572/how-many-bytes-actually-written-by-ostreamwrite
+    // Seems almost like tellp() would work, but if an error occurs in the stream, then
+    // it returns unconditionally -1, so it is not very useful for our purposes.
+    // Thus, we will just return 0 on failure, and the full binary size otherwise.
+    //
+    // Write the raw data to stream.
+    dest.write(reinterpret_cast<const char *>(&m_mpfr._mpfr_prec),
+               detail::safe_cast<std::streamsize>(sizeof(::mpfr_prec_t)));
+    if (!dest.good()) {
+        // !dest.good() means that the last write operation failed. Bail out now.
+        return 0;
+    }
+
+    dest.write(reinterpret_cast<const char *>(&m_mpfr._mpfr_sign),
+               detail::safe_cast<std::streamsize>(sizeof(::mpfr_sign_t)));
+    if (!dest.good()) {
+        // LCOV_EXCL_START
+        return 0;
+        // LCOV_EXCL_STOP
+    }
+
+    dest.write(reinterpret_cast<const char *>(&m_mpfr._mpfr_exp),
+               detail::safe_cast<std::streamsize>(sizeof(::mpfr_exp_t)));
+    if (!dest.good()) {
+        // LCOV_EXCL_START
+        return 0;
+        // LCOV_EXCL_STOP
+    }
+
+    dest.write(reinterpret_cast<const char *>(m_mpfr._mpfr_d),
+               detail::safe_cast<std::streamsize>(bs - detail::rbs_base_size()));
+    return dest.good() ? bs : 0u;
+}
+
+// Load from a char buffer of unknown size.
+std::size_t real::binary_load_impl(const char *src)
+{
+    // Fetch the precision first.
+    const auto p = detail::rbs_read_prec(src);
+    src += sizeof(p);
+
+    // Fetch the sign bit.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+    ::mpfr_sign_t sb;
+    std::copy(src, src + sizeof(sb), reinterpret_cast<char *>(&sb));
+    src += sizeof(sb);
+
+    // Fetch the exponent.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+    ::mpfr_exp_t e;
+    std::copy(src, src + sizeof(e), reinterpret_cast<char *>(&e));
+    src += sizeof(e);
+
+    // Compute the size in bytes of the significand from the precision.
+    const auto sbs = detail::rbs_prec_to_size(p);
+
+    // Compute the return value.
+    auto retval = detail::rbs_checked_add(detail::rbs_base_size(), sbs);
+
+    // Set the precision of this.
+    set_prec(p);
+    // NOTE: from now on, everything is noexcept.
+    // Set the sign bit.
+    m_mpfr._mpfr_sign = sb;
+    // Set the exponent.
+    m_mpfr._mpfr_exp = e;
+    // Copy over the limbs.
+    std::copy(src, src + sbs, reinterpret_cast<char *>(m_mpfr._mpfr_d));
+
+    return retval;
+}
+
+// Load from a char buffer of size 'size' belonging to a container of type 'name'.
+std::size_t real::binary_load_impl(const char *src, std::size_t size, const char *name)
+{
+    if (mppp_unlikely(size < detail::rbs_min_size())) {
+        throw std::invalid_argument(std::string("Invalid size detected in the deserialisation of a real via a ") + name
+                                    + ": the " + name + " size must be at least "
+                                    + std::to_string(detail::rbs_min_size()) + " bytes, but it is only "
+                                    + std::to_string(size) + " bytes");
+    }
+
+    // Read the precision.
+    const auto p = detail::rbs_read_prec(src);
+
+    // Determine the binary size from the loaded precision.
+    const auto expected_size = detail::rbs_checked_add(detail::rbs_base_size(), detail::rbs_prec_to_size(p));
+
+    // Check that the buffer contains at least the expected amount of data.
+    if (mppp_unlikely(size < expected_size)) {
+        throw std::invalid_argument(std::string("Invalid size detected in the deserialisation of a real via a ") + name
+                                    + ": the " + name + " size must be at least " + std::to_string(expected_size)
+                                    + " bytes, but it is only " + std::to_string(size) + " bytes");
+    }
+
+    return binary_load_impl(src);
+}
+
+// Load from a char buffer of unknown size.
+std::size_t real::binary_load(const char *src)
+{
+    return binary_load_impl(src);
+}
+
+// Load from a std::vector.
+std::size_t real::binary_load(const std::vector<char> &v)
+{
+    return binary_load_impl(v.data(), detail::safe_cast<std::size_t>(v.size()), "std::vector");
+}
+
+// Load from an input stream.
+std::size_t real::binary_load(std::istream &src)
+{
+    // Let's try to read the precision first.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+    ::mpfr_prec_t p;
+    src.read(reinterpret_cast<char *>(&p), detail::safe_cast<std::streamsize>(sizeof(p)));
+    if (!src.good()) {
+        // Something went wrong with reading, return 0.
+        return 0;
+    }
+
+    // The sign bit.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+    ::mpfr_sign_t sb;
+    src.read(reinterpret_cast<char *>(&sb), detail::safe_cast<std::streamsize>(sizeof(sb)));
+    if (!src.good()) {
+        return 0;
+    }
+
+    // The exponent.
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+    ::mpfr_exp_t e;
+    src.read(reinterpret_cast<char *>(&e), detail::safe_cast<std::streamsize>(sizeof(e)));
+    if (!src.good()) {
+        return 0;
+    }
+
+    // Compute the size in bytes of the significand from the precision.
+    const auto sbs = detail::rbs_prec_to_size(p);
+
+    // Read the limb data into a local buffer.
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+    buffer.resize(detail::safe_cast<decltype(buffer.size())>(sbs));
+    src.read(buffer.data(), detail::safe_cast<std::streamsize>(sbs));
+    if (!src.good()) {
+        // Something went wrong with reading, return 0.
+        return 0;
+    }
+
+    // Compute the return value.
+    auto retval = detail::rbs_checked_add(detail::rbs_base_size(), sbs);
+
+    // Set the precision of this.
+    set_prec(p);
+    // NOTE: from now on, everything is noexcept.
+    // Set the sign bit.
+    m_mpfr._mpfr_sign = sb;
+    // Set the exponent.
+    m_mpfr._mpfr_exp = e;
+    // Copy over the limbs.
+    std::copy(buffer.begin(), buffer.end(), reinterpret_cast<char *>(m_mpfr._mpfr_d));
+
+    return retval;
+}
+
 } // namespace mppp
+
+#if defined(_MSC_VER)
+
+#undef _SCL_SECURE_NO_WARNINGS
+
+#endif

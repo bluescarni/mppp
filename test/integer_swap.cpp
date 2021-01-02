@@ -17,7 +17,7 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
-static int ntries = 1000;
+static const int ntries = 1000;
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -28,7 +28,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
 
-// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp)
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
 struct swap_tester {

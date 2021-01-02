@@ -56,6 +56,7 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   // NOTE: since mp_size_t is the size type used by mpn functions, it is expected that it cannot
                   // have smaller range than mpz_size_t, otherwise mpz_t would contain numbers too large to be
                   // used as arguments in the mpn functions.
+                  // NOLINTNEXTLINE(misc-redundant-expression)
                   nl_min<mpz_size_t>() >= nl_min<::mp_size_t>() && nl_max<mpz_size_t>() <= nl_max<::mp_size_t>(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
@@ -146,6 +147,7 @@ namespace
 // then the init of this thread_local variable will happen
 // before any dynamic initialisation:
 // https://en.cppreference.com/w/cpp/language/constant_initialization
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 MPPP_CONSTINIT thread_local mpz_alloc_cache mpz_alloc_cache_inst;
 
 // Implementation of the init of an mpz from cache.

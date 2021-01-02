@@ -31,7 +31,7 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
-static int ntries = 1000;
+static const int ntries = 1000;
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -67,6 +67,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 // A seed that will be used to init rngs in the multithreaded tests. Each time a batch of N threads
 // finishes, this value gets bumped up by N, so that the next time a multithreaded test which uses rng
 // is launched it will be inited with a different seed.
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937::result_type mt_rng_seed(0u);
 
 struct no_const {

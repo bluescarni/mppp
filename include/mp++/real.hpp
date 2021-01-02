@@ -14,6 +14,7 @@
 #if defined(MPPP_WITH_MPFR)
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <complex>
@@ -1212,6 +1213,39 @@ public:
 #endif
     real &trunc();
     real &frac();
+
+    // Size of the serialised binary representation.
+    MPPP_NODISCARD std::size_t binary_size() const;
+
+private:
+    void binary_save_impl(char *, std::size_t) const;
+
+    MPPP_DLL_LOCAL std::size_t binary_load_impl(const char *);
+    std::size_t binary_load_impl(const char *, std::size_t, const char *);
+
+public:
+    std::size_t binary_save(char *) const;
+    std::size_t binary_save(std::vector<char> &) const;
+    template <std::size_t S>
+    std::size_t binary_save(std::array<char, S> &dest) const
+    {
+        const auto bs = binary_size();
+        if (bs > S) {
+            return 0;
+        }
+        binary_save_impl(dest.data(), bs);
+        return bs;
+    }
+    std::size_t binary_save(std::ostream &) const;
+
+    std::size_t binary_load(const char *);
+    std::size_t binary_load(const std::vector<char> &);
+    template <std::size_t S>
+    std::size_t binary_load(const std::array<char, S> &src)
+    {
+        return binary_load_impl(src.data(), detail::safe_cast<std::size_t>(src.size()), "std::array");
+    }
+    std::size_t binary_load(std::istream &);
 
 private:
     mpfr_struct_t m_mpfr;
@@ -2441,6 +2475,23 @@ inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
+
+// Binary serialization.
+MPPP_DLL_PUBLIC std::size_t binary_size(const real &);
+
+// Save in binary format.
+template <typename T>
+inline auto binary_save(const real &x, T &&dest) -> decltype(x.binary_save(std::forward<T>(dest)))
+{
+    return x.binary_save(std::forward<T>(dest));
+}
+
+// Load in binary format.
+template <typename T>
+inline auto binary_load(real &x, T &&src) -> decltype(x.binary_load(std::forward<T>(src)))
+{
+    return x.binary_load(std::forward<T>(src));
+}
 
 // Constants.
 MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t);

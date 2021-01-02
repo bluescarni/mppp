@@ -449,6 +449,31 @@ object must contain a valid :cpp:type:`mpfr_t` object.
 Additionally, a variety of constructors, assignment operators and setters from
 :cpp:type:`mpfr_t` are also available.
 
+Serialisation
+-------------
+
+.. versionadded:: 0.22
+
+mp++ provides a simple :ref:`API for the (de)serialisation <real_s11n>` of :cpp:class:`~mppp::real` objects
+into/from memory buffers and C++ streams. Possible uses of the serialisation API include persistence (e.g.,
+saving/loading :cpp:class:`~mppp::real` values to/from a file), the transmission of :cpp:class:`~mppp::real` objects over
+the network (e.g., in distributed computing applications), inter-process communication, etc. The API consists of two main
+overloaded functions, :cpp:func:`mppp::real::binary_save()` and :cpp:func:`mppp::real::binary_load()` (plus their
+free-function counterparts).
+
+Because the API is identical, we refer to the tutorial section on
+:ref:`integer serialisation <tutorial_integer_s11n>` for usage examples.
+
+As already pointed out in the :ref:`integer serialisation section <tutorial_integer_s11n>`,
+the following points must be emphasised:
+
+* although mp++ does run some consistency checks during deserialisation, the API is not built to protect
+  against maliciously-crafted data. Users are thus advised not to load data from untrusted sources;
+* the current binary serialisation format is compiler, platform and architecture specific, it is not portable
+  and it might be subject to changes in future versions of mp++. Users are thus advised not to use
+  the binary serialisation format for long-term persistence or as a data exchange format: for such
+  purposes, it is better to use the string representation of :cpp:class:`~mppp::real` objects.
+
 User-defined literals
 ---------------------
 
