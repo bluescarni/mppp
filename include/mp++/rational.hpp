@@ -172,10 +172,15 @@ class rational
     }
     void load(boost::archive::binary_iarchive &ar, unsigned)
     {
-        // NOTE: for the binary archive, deserialize
-        // directly into the data members.
-        ar >> _get_num();
-        ar >> _get_den();
+        // NOTE: for the binary archive, avoid calling the constructor,
+        // but still do it in 2 stages for exception safety.
+        int_t num, den;
+
+        ar >> num;
+        ar >> den;
+
+        _get_num() = std::move(num);
+        _get_den() = std::move(den);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

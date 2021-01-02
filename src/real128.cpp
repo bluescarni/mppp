@@ -361,7 +361,11 @@ void real128::save(boost::archive::binary_oarchive &ar, unsigned) const
 
 void real128::load(boost::archive::binary_iarchive &ar, unsigned)
 {
-    ar >> boost::serialization::make_binary_object(&m_value, sizeof(m_value));
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+    __float128 tmp;
+    ar >> boost::serialization::make_binary_object(&tmp, sizeof(tmp));
+
+    m_value = tmp;
 }
 
 #endif
