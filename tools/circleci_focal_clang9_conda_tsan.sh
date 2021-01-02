@@ -26,7 +26,7 @@ mkdir build
 cd build
 
 # clang build.
-CC=clang CXX=clang++ cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=thread" -DMPPP_QUADMATH_INCLUDE_DIR=/usr/lib/gcc/x86_64-linux-gnu/9/include/ -DMPPP_QUADMATH_LIBRARY=/usr/lib/gcc/x86_64-linux-gnu/9/libquadmath.so -DMPPP_ENABLE_IPO=yes
+CC=clang CXX=clang++ cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=YES -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=thread" -DMPPP_QUADMATH_INCLUDE_DIR=/usr/lib/gcc/x86_64-linux-gnu/9/include/ -DMPPP_QUADMATH_LIBRARY=/usr/lib/gcc/x86_64-linux-gnu/9/libquadmath.so -DMPPP_ENABLE_IPO=yes
 make VERBOSE=1
 # Run the tests.
 ctest -V -j2
