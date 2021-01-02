@@ -1164,7 +1164,7 @@ template <std::size_t SSize>
 class integer
 {
 #if defined(MPPP_WITH_BOOST_S11N)
-    // Serialization support.
+    // Boost serialization support.
     friend class boost::serialization::access;
 
     template <typename Archive>

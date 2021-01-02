@@ -103,7 +103,7 @@ constexpr complex128 conj(const complex128 &);
 class MPPP_DLL_PUBLIC complex128
 {
 #if defined(MPPP_WITH_BOOST_S11N)
-    // Serialization support.
+    // Boost serialization support.
     friend class boost::serialization::access;
 
     template <typename Archive>

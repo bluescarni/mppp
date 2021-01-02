@@ -205,7 +205,7 @@ constexpr
 class MPPP_DLL_PUBLIC real128
 {
 #if defined(MPPP_WITH_BOOST_S11N)
-    // Serialization support.
+    // Boost serialization support.
     friend class boost::serialization::access;
 
     template <typename Archive>
