@@ -64,17 +64,17 @@ build_script:
 - cd build
 
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake .. -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_ENABLE_IPO=yes
-- if [%BUILD_TYPE%]==[MSVC15_64] cmake --build . --config Debug
+- if [%BUILD_TYPE%]==[MSVC15_64] cmake --build . --config Release
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake .. -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_TEST_PYBIND11=yes -DMPPP_ENABLE_IPO=yes
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake --build . --config Release --target pybind11_test_01
 
 # This build enables Unicode solutions.
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_MSVC_UNICODE=YES -DMPPP_ENABLE_IPO=yes
-- if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Debug
+- if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_TEST_PYBIND11=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_MSVC_UNICODE=YES -DMPPP_ENABLE_IPO=yes
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release --target pybind11_test_01
 
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_BUILD_STATIC_LIBRARY=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_ENABLE_IPO=yes
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_BUILD_STATIC_LIBRARY=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_ENABLE_IPO=yes
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . -- -v
 
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Os" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DMPPP_GMP_INCLUDE_DIR=C:/local/include -DMPPP_GMP_LIBRARY=C:/local/lib/libgmp.a -DMPPP_MPFR_INCLUDE_DIR=C:/local/include -DMPPP_MPFR_LIBRARY=C:/local/lib/libmpfr.a -DMPPP_TEST_NSPLIT=%TEST_NSPLIT% -DMPPP_TEST_SPLIT_NUM=%SPLIT_TEST_NUM% ..
@@ -86,14 +86,14 @@ test_script:
 # otherwise the tests will fail to run.
 
 - if [%BUILD_TYPE%]==[MSVC15_64] set OLD_PATH=%PATH%
-- if [%BUILD_TYPE%]==[MSVC15_64] set PATH=%PATH%;%CD%\Debug
-- if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Debug -E pybind11
+- if [%BUILD_TYPE%]==[MSVC15_64] set PATH=%PATH%;%CD%\Release
+- if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Release -E pybind11
 - if [%BUILD_TYPE%]==[MSVC15_64] set PATH=%OLD_PATH%;%CD%\Release
 - if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Release -R pybind11
 
 - if [%BUILD_TYPE%]==[MSVC17_64] set OLD_PATH=%PATH%
-- if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%PATH%;%CD%\Debug
-- if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Debug -E pybind11
+- if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%PATH%;%CD%\Release
+- if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -E pybind11
 - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%OLD_PATH%;%CD%\Release
 - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -R pybind11
 
