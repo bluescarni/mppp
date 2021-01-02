@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Input and output &#8212; mp++ 0.22 documentation</title>
+    <title>Boost.serialization support &#8212; mp++ 0.22 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
 
@@ -38,8 +38,8 @@
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="The numerical tower and type coercion" href="tutorial_numtower.html" />
-    <link rel="prev" title="Construction, conversion and assignment" href="tutorial_constr.html" />
+    <link rel="next" title="Extra: integration with pybind11" href="tutorial_pybind11.html" />
+    <link rel="prev" title="Multiprecision complex numbers tutorial" href="tutorial_complex.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -88,8 +88,8 @@
      Construction, conversion and assignment
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_io.html">
      Input and output
     </a>
    </li>
@@ -138,8 +138,8 @@
      Multiprecision complex numbers tutorial
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_boost_s11n.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      Boost.serialization support
     </a>
    </li>
@@ -280,7 +280,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/tutorial_io.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="_sources/tutorial_boost_s11n.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -312,33 +312,25 @@
         
               <div>
                 
-  <div class="section" id="input-and-output">
-<h1>Input and output<a class="headerlink" href="#input-and-output" title="Permalink to this headline">¶</a></h1>
-<p>All of mp++’s multiprecision classes support stream insertion:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>        <span class="c1">// &quot;42&quot;</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">-6</span><span class="o">/</span><span class="mi">7</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>      <span class="c1">// &quot;-6/7&quot;</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">real128</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>   <span class="c1">// &quot;1.10000000000000000000000000000000008e+00&quot;</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">real</span><span class="p">{</span><span class="s">&quot;1.3&quot;</span><span class="p">,</span> <span class="mi">150</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span> <span class="c1">// &quot;1.3000000000000000000000000000000000000000000006&quot;</span>
-</pre></div>
-</div>
-<p>Starting from mp++ 0.14, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
-honour the format flags in output streams:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iomanip&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;ios&gt;</span><span class="cp"></span>
-
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">showbase</span> <span class="o">&lt;&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span> <span class="c1">// &quot;0x2a&quot;</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">oct</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">showbase</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">showpos</span>
-          <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setw</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setfill</span><span class="p">(</span><span class="sc">&#39;*&#39;</span><span class="p">)</span>
-          <span class="o">&lt;&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>                              <span class="c1">// &quot;******+052&quot;</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">showbase</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">uppercase</span>
-          <span class="o">&lt;&lt;</span> <span class="n">rat_t</span><span class="p">{</span><span class="mf">227191947l</span><span class="n">l</span><span class="p">,</span> <span class="mi">13</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>                 <span class="c1">// &quot;0XD8AAC8B/0XD&quot;</span>
-</pre></div>
-</div>
-<p>In future versions of mp++, the floating-point classes will also honour the format flags in output streams.</p>
-<p>All of mp++’s multiprecision classes also provide <code class="docutils literal notranslate"><span class="pre">to_string()</span></code> member functions that convert the multiprecision
-values into string representations (see, e.g., <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer9to_stringEi" title="mppp::integer::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::to_string()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational9to_stringEi" title="mppp::rational::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::to_string()</span></code></a>,
-etc.). These member functions always return an “exact” string representation of the multiprecision value: feeding back
-the string representation to a constructor from string will initialise a value identical to the original one.</p>
+  <div class="section" id="boost-serialization-support">
+<span id="tutorial-boost-s11n"></span><h1>Boost.serialization support<a class="headerlink" href="#boost-serialization-support" title="Permalink to this headline">¶</a></h1>
+<p>Starting from version 0.22, all of mp++’s multiprecision classes support (de)serialisation
+via the <a class="reference external" href="https://www.boost.org/doc/libs/1_75_0/libs/serialization/doc/index.html">Boost.serialization</a>
+library, provided that mp++ was compiled with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_BOOST_S11N</span></code> option enabled
+(see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>). We refer to the documentation
+of Boost.serialization (particularly the
+<a class="reference external" href="https://www.boost.org/doc/libs/1_75_0/libs/serialization/doc/tutorial.html">tutorial</a>)
+for usage examples. Note that, as detailed in the previous sections,
+certain classes (such as <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and
+<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>) also provide a separate, low-level binary serialisation API
+which does not depend on Boost.serialization.</p>
+<p>There is an important <strong>caveat</strong> to keep in mind when using mp++’s Boost.serialization support.
+The serialisation to/from binary archives is optimised for speed, and no checks are performed
+on the validity of the data that is loaded from a binary archive. In other words, a
+maliciously-crafted binary archive could lead to the creation of an invalid mp++ object
+whose use could then lead to undefined and/or erratic runtime behaviour. Users are thus
+advised not to load data from untrusted binary archives. Non-binary archives do not suffer from
+these issues.</p>
 </div>
 
 
@@ -350,8 +342,8 @@ the string representation to a constructor from string will initialise a value i
     
     <div class='prev-next-bottom'>
         
-    <a class='left-prev' id="prev-link" href="tutorial_constr.html" title="previous page">Construction, conversion and assignment</a>
-    <a class='right-next' id="next-link" href="tutorial_numtower.html" title="next page">The numerical tower and type coercion</a>
+    <a class='left-prev' id="prev-link" href="tutorial_complex.html" title="previous page">Multiprecision complex numbers tutorial</a>
+    <a class='right-next' id="next-link" href="tutorial_pybind11.html" title="next page">Extra: integration with pybind11</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">

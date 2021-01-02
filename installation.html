@@ -139,6 +139,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="tutorial_boost_s11n.html">
+     Boost.serialization support
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
     </a>
@@ -391,7 +396,7 @@ in the implementation of the <a class="reference internal" href="real128.html#_C
 (typically, the quadmath library is part of GCC and it does not need to
 be installed separately);</p></li>
 <li><p>the <a class="reference external" href="https://www.boost.org/">Boost</a> libraries, <em>optional</em>, currently used
-only in the benchmarking suite;</p></li>
+for implementing (de)serialisation and in the benchmarking suite;</p></li>
 <li><p>the <a class="reference external" href="https://fmt.dev/latest/index.html">{fmt}</a> library (at least version 6.2), <em>optional</em>, currently used
 only in the benchmarking suite.</p></li>
 </ul>
@@ -423,6 +428,8 @@ option to be active),</p></li>
 (off by default, requires the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option to be active),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code>: enable features relying on the
 quadmath library (off by default),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_BOOST_S11N</span></code>: enable support for serialisation
+via the Boost.serialization library (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_TESTS</span></code>: build the test suite (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_BENCHMARKS</span></code>: build the benchmarking suite (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_STATIC_LIBRARY</span></code>: build mp++ as a static library, instead
@@ -444,6 +451,9 @@ off by default).</p></li>
 </div>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.20: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPC</span></code> and <code class="docutils literal notranslate"><span class="pre">MPPP_ENABLE_IPO</span></code> build options.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.22: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_BOOST_S11N</span></code> build option.</p>
 </div>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only
 using GCC (all the supported versions), Clang
@@ -599,7 +609,8 @@ variables to signal with which optional dependencies mp++ was compiled:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_MPFR</span></code> if MPFR support was enabled,</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_MPC</span></code> if MPC support was enabled,</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_ARB</span></code> if Arb support was enabled,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_QUADMATH</span></code> if quadmath support was enabled.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_QUADMATH</span></code> if quadmath support was enabled,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_BOOST_S11N</span></code> if Boost.serialization support was enabled.</p></li>
 </ul>
 </div>
 <div class="section" id="compiler-and-platform-specific-notes">
