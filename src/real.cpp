@@ -34,6 +34,14 @@
 #include <string_view>
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/binary_object.hpp>
+
+#endif
+
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/utils.hpp>
@@ -2610,6 +2618,35 @@ std::size_t real::binary_load(std::istream &src)
 
     return retval;
 }
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Fast serialization implementations for Boost's binary archives.
+void real::save(boost::archive::binary_oarchive &ar, unsigned) const
+{
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+    binary_save(buffer);
+
+    // Record the size and the raw data.
+    ar << buffer.size();
+    ar << boost::serialization::make_binary_object(buffer.data(), detail::safe_cast<std::size_t>(buffer.size()));
+}
+
+void real::load(boost::archive::binary_iarchive &ar, unsigned)
+{
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+
+    // Recover the size.
+    decltype(buffer.size()) s;
+    ar >> s;
+    buffer.resize(s);
+
+    ar >> boost::serialization::make_binary_object(buffer.data(), detail::safe_cast<std::size_t>(buffer.size()));
+
+    binary_load(buffer);
+}
+
+#endif
 
 } // namespace mppp
 

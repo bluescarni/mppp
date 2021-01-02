@@ -6,13 +6,23 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <array>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include <mp++/config.hpp>
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
+#endif
+
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/real.hpp>
@@ -378,3 +388,34 @@ TEST_CASE("real binary_save_load")
 #endif
     }
 }
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+template <typename OA, typename IA>
+void test_s11n()
+{
+    std::stringstream ss;
+
+    auto x = 1.1_r512;
+    {
+        OA oa(ss);
+        oa << x;
+    }
+
+    x = real{};
+    {
+        IA ia(ss);
+        ia >> x;
+    }
+
+    REQUIRE(x == 1.1_r512);
+    REQUIRE(x.get_prec() == 512);
+}
+
+TEST_CASE("boost_s11n")
+{
+    test_s11n<boost::archive::text_oarchive, boost::archive::text_iarchive>();
+    test_s11n<boost::archive::binary_oarchive, boost::archive::binary_iarchive>();
+}
+
+#endif

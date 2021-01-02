@@ -32,6 +32,17 @@
 #include <string_view>
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/tracking.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -244,6 +255,35 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 // Multiprecision floating-point class.
 class MPPP_DLL_PUBLIC real
 {
+#if defined(MPPP_WITH_BOOST_S11N)
+    friend class boost::serialization::access;
+
+    template <typename Archive>
+    void save(Archive &ar, unsigned) const
+    {
+        ar << get_prec();
+        ar << to_string();
+    }
+
+    template <typename Archive>
+    void load(Archive &ar, unsigned)
+    {
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+        ::mpfr_prec_t p;
+        ar >> p;
+        std::string tmp;
+        ar >> tmp;
+
+        *this = real{tmp, p};
+    }
+
+    // Overloads for binary archives.
+    void save(boost::archive::binary_oarchive &, unsigned) const;
+    void load(boost::archive::binary_iarchive &, unsigned);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif
+
     // Make friends, for accessing the non-checking prec setting funcs.
     template <bool, typename F, typename Arg0, typename... Args>
     // NOLINTNEXTLINE(readability-redundant-declaration)
@@ -4368,6 +4408,14 @@ inline rational<SSize> &rational<SSize>::operator=(const real &x)
 }
 
 } // namespace mppp
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+// Never track the address of real objects
+// during serialization.
+BOOST_CLASS_TRACKING(mppp::real, boost::serialization::track_never)
+
+#endif
 
 #include <mp++/detail/real_literals.hpp>
 
