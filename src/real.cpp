@@ -2555,7 +2555,7 @@ std::size_t real::binary_load(const std::vector<char> &v)
     return binary_load_impl(v.data(), detail::safe_cast<std::size_t>(v.size()), "std::vector");
 }
 
-// Load from a stringstream.
+// Load from an input stream.
 std::size_t real::binary_load(std::istream &src)
 {
     // Let's try to read the precision first.
