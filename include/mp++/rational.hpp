@@ -185,6 +185,7 @@ class rational
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif
+
 public:
     // Underlying integral type.
     using int_t = integer<SSize>;
