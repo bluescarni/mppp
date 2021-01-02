@@ -26,6 +26,15 @@
 #include <string_view>
 #endif
 
+#if defined(MPPP_WITH_BOOST_S11N)
+
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
+#endif
+
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
@@ -754,6 +763,46 @@ TEST_CASE("rational nts")
     REQUIRE(std::is_nothrow_swappable_v<rational<6>>);
     REQUIRE(std::is_nothrow_swappable_v<rational<10>>);
     REQUIRE(std::is_nothrow_swappable_v<rational<15>>);
+}
+
+#endif
+
+#if defined(MPPP_WITH_BOOST_S11N)
+
+template <typename T, typename OA, typename IA>
+void test_s11n()
+{
+    std::stringstream ss;
+
+    auto x = T{-42} / 13;
+    {
+        OA oa(ss);
+        oa << x;
+    }
+
+    x = 0;
+    {
+        IA ia(ss);
+        ia >> x;
+    }
+
+    REQUIRE(x == -42 / T{13});
+}
+
+struct boost_s11n_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+
+        test_s11n<rational, boost::archive::text_oarchive, boost::archive::text_iarchive>();
+        test_s11n<rational, boost::archive::binary_oarchive, boost::archive::binary_iarchive>();
+    }
+};
+
+TEST_CASE("boost_s11n")
+{
+    tuple_for_each(sizes{}, boost_s11n_tester{});
 }
 
 #endif
