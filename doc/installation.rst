@@ -217,7 +217,8 @@ system you can compile this example with the following command:
 
 Because parts of mp++ are implemented using templates,
 users of the library will have to explicitly link to GMP
-and (if enabled) MPFR and MPC. Explicit linking to the other optional
+and (if enabled) MPFR, MPC and Boost.serialization.
+Explicit linking to the other optional
 dependencies is not necessary, as their use is confined within
 the mp++ compiled library.
 

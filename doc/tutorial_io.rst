@@ -6,7 +6,7 @@ All of mp++'s multiprecision classes support stream insertion:
 .. code-block:: c++
 
    std::cout << int_t{42} << '\n';        // "42"
-   std::cout << rat_t{-6/7} << '\n';      // "-6/7"
+   std::cout << rat_t{-6, 7} << '\n';     // "-6/7"
    std::cout << real128{"1.1"} << '\n';   // "1.10000000000000000000000000000000008e+00"
    std::cout << real{"1.3", 150} << '\n'; // "1.3000000000000000000000000000000000000000000006"
 
