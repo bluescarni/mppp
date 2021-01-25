@@ -407,7 +407,7 @@ endif()
 set(_MPPP_MIN_BOOST_VERSION "1.60")
 if(MPPP_WITH_BOOST_S11N)
     find_package(Boost ${_MPPP_MIN_BOOST_VERSION} REQUIRED COMPONENTS serialization)
-    target_link_libraries(mp++ PUBLIC Boost::serialization)
+    target_link_libraries(mp++ PUBLIC Boost::serialization Boost::disable_autolinking)
 endif()
 
 # Mandatory dependency on GMP.
