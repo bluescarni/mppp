@@ -93,7 +93,7 @@ The real128 class
 
       :param x: the :cpp:type:`__float128` that will be assigned to the internal value.
 
-   .. cpp:function:: template <real128_interoperable T> constexpr explicit real128(const T &x)
+   .. cpp:function:: template <real128_interoperable T> constexpr real128(const T &x)
 
       Constructor from interoperable types.
 
@@ -106,7 +106,7 @@ The real128 class
 
       :exception std\:\:overflow_error: in case of (unlikely) overflow errors during initialisation.
 
-   .. cpp:function:: template <real128_cpp_complex T> constexpr explicit real128(const T &c)
+   .. cpp:function:: template <real128_cpp_complex T> constexpr real128(const T &c)
 
       .. note::
 

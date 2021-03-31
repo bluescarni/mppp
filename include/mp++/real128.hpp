@@ -381,7 +381,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
 #endif
-    constexpr explicit real128(const T &x) : m_value(cast_to_float128(x))
+    constexpr real128(const T &x) : m_value(cast_to_float128(x))
     {
     }
     // Constructor from std::complex.
@@ -390,7 +390,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
 #endif
-    MPPP_CONSTEXPR_14 explicit real128(const T &c)
+    MPPP_CONSTEXPR_14 real128(const T &c)
         : m_value(c.imag() == 0
                       ? c.real()
                       : throw std::domain_error(
