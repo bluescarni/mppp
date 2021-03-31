@@ -269,6 +269,10 @@ struct fp_ctor_tester {
             t3.join();
             REQUIRE(!fail.load());
             mt_rng_seed += 4u;
+
+            // Make sure integer is *not* implicitly ctible
+            // from the fp types.
+            REQUIRE(!std::is_convertible<Float, integer>::value);
         }
     };
     template <typename S>
@@ -345,10 +349,6 @@ struct complex_ctor_tester {
                        == "Cannot construct an integer from a complex C++ value with a non-zero imaginary part of "
                               + detail::to_string(Float(1));
             });
-
-            // Make sure integer is *not* implicitly ctible
-            // from the fp types.
-            REQUIRE(!std::is_convertible<Float, integer>::value);
         }
     };
     template <typename S>
