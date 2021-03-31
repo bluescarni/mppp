@@ -414,6 +414,7 @@ The real128 class
         NaN, an infinity, finite or normal, ``false`` otherwise.
 
    .. cpp:function:: constexpr real128 &abs()
+   .. cpp:function:: constexpr real128 &fabs()
 
       .. note::
 
@@ -427,6 +428,10 @@ The real128 class
       In-place absolute value.
 
       This member function will set ``this`` to its absolute value.
+
+      .. versionadded:: 0.23
+
+         The ``fabs()`` overload.
 
       :return: a reference to ``this``.
 
@@ -768,6 +773,7 @@ Arithmetic
    :return: :math:`\left(x \times y\right) + z`.
 
 .. cpp:function:: constexpr mppp::real128 mppp::abs(const mppp::real128 &x)
+.. cpp:function:: constexpr mppp::real128 mppp::fabs(const mppp::real128 &x)
 
    .. note::
 
@@ -775,6 +781,10 @@ Arithmetic
       is being used.
 
    Absolute value.
+
+   .. versionadded:: 0.23
+
+      The ``fabs()`` overload.
 
    :param x: the :cpp:class:`~mppp::real128` whose absolute value will be computed.
 

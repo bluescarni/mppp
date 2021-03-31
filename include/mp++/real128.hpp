@@ -792,6 +792,13 @@ public:
     {
         return *this = mppp::abs(*this);
     }
+#if !defined(__INTEL_COMPILER)
+    MPPP_CONSTEXPR_14
+#endif
+    real128 &fabs()
+    {
+        return this->abs();
+    }
 
     // In-place roots.
     real128 &sqrt();
@@ -885,6 +892,17 @@ constexpr
     return x.fpclassify() == FP_NAN
                ? x
                : (x.fpclassify() == FP_ZERO ? real128{} : (x.m_value < 0 ? real128{-x.m_value} : x));
+}
+
+#if defined(__INTEL_COMPILER)
+inline
+#else
+constexpr
+#endif
+    real128
+    fabs(const real128 &x)
+{
+    return mppp::abs(x);
 }
 
 // Multiply by power of 2.
