@@ -418,16 +418,16 @@ The real128 class
 
       .. note::
 
-        This function is ``constexpr`` only if at least C++14 is being used.
+        These functions are ``constexpr`` only if at least C++14 is being used.
 
       .. note::
 
-         This function is not ``constexpr`` if the Intel C++ compiler
+         These functions are not ``constexpr`` if the Intel C++ compiler
          is being used.
 
       In-place absolute value.
 
-      This member function will set ``this`` to its absolute value.
+      These member functions will set ``this`` to its absolute value.
 
       .. versionadded:: 0.23
 
@@ -777,7 +777,7 @@ Arithmetic
 
    .. note::
 
-      This function is not ``constexpr`` if the Intel C++ compiler
+      These functions are not ``constexpr`` if the Intel C++ compiler
       is being used.
 
    Absolute value.
