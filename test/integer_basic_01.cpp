@@ -127,9 +127,12 @@ struct int_ctor_tester {
         REQUIRE((std::is_constructible<integer, bool>::value));
         REQUIRE((lex_cast(integer{false}) == "0"));
         REQUIRE((lex_cast(integer{true}) == "1"));
+
         integer tmp = true;
         REQUIRE(std::is_convertible<bool, integer>::value);
         std::vector<integer> vec = {true, false};
+        REQUIRE(vec[0] == 1);
+        REQUIRE(vec[1] == 0);
 
         REQUIRE((!std::is_constructible<integer, no_const>::value));
         std::cout << "n static limbs: " << S::value << ", size: " << sizeof(integer) << '\n';

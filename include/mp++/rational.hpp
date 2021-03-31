@@ -274,12 +274,29 @@ private:
 public:
     // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <rational_cvr_interoperable<SSize> T>
+    template <typename T>
+    requires rational_cvr_interoperable<T, SSize> && !rational_integral_interoperable<T, SSize>
 #else
-    template <typename T, detail::enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int> = 0>
+    template <
+        typename T,
+        detail::enable_if_t<detail::conjunction<is_rational_cvr_interoperable<T, SSize>,
+                                                detail::negation<is_rational_integral_interoperable<T, SSize>>>::value,
+                            int> = 0>
+#endif
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+        explicit rational(T &&x) : rational(ptag{}, std::forward<T>(x))
+    {
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <typename T>
+    requires rational_cvr_interoperable<T, SSize> &&rational_integral_interoperable<T, SSize>
+#else
+    template <typename T, detail::enable_if_t<detail::conjunction<is_rational_cvr_interoperable<T, SSize>,
+                                                                  is_rational_integral_interoperable<T, SSize>>::value,
+                                              int> = 0>
 #endif
     // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-    explicit rational(T &&x) : rational(ptag{}, std::forward<T>(x))
+    rational(T &&x) : rational(ptag{}, std::forward<T>(x))
     {
     }
     // Constructor from numerator and denominator.
