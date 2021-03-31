@@ -1297,11 +1297,25 @@ public:
     explicit integer(integer_bitcnt_t nbits) : m_int(nbits) {}
     // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <integer_cpp_arithmetic T>
+    template <typename T>
+    requires integer_cpp_arithmetic<T> && !cpp_integral<T>
 #else
-    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
+    template <
+        typename T,
+        detail::enable_if_t<
+            detail::conjunction<is_integer_cpp_arithmetic<T>, detail::negation<is_cpp_integral<T>>>::value, int> = 0>
 #endif
     explicit integer(const T &x) : m_int(x)
+    {
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <typename T>
+    requires integer_cpp_arithmetic<T> &&cpp_integral<T>
+#else
+    template <typename T, detail::enable_if_t<
+                              detail::conjunction<is_integer_cpp_arithmetic<T>, is_cpp_integral<T>>::value, int> = 0>
+#endif
+    integer(const T &x) : m_int(x)
     {
     }
     // Generic constructor from a C++ complex type.
