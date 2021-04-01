@@ -641,11 +641,7 @@ TEST_CASE("real constructors")
                                    + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                    + detail::to_string(real_prec_min())));
 
-    // Implicit ctor.
-    {
-        real r00 = std::complex<double>{-42, 0};
-        REQUIRE(r00 == -42);
-    }
+    REQUIRE(!std::is_convertible<std::complex<double>, real>::value);
 }
 
 TEST_CASE("real kind constructors")

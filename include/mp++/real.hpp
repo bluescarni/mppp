@@ -447,7 +447,7 @@ public:
     template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
 #endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-    real(const T &c)
+    explicit real(const T &c)
         : real(c.imag() == 0 ? c.real()
                              : throw std::domain_error(
                                  "Cannot construct a real from a complex C++ value with a non-zero imaginary part of "

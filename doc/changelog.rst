@@ -11,7 +11,7 @@ Changelog
 Changes
 ~~~~~~~
 
-- Remove the ``explicit`` attribute from many generic
+- Remove the ``explicit`` attribute from several generic
   constructors in the multiprecision classes
   (`#269 <https://github.com/bluescarni/mppp/pull/269>`__).
 

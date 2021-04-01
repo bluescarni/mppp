@@ -411,8 +411,7 @@ TEST_CASE("real128 implicit generic ctor")
         REQUIRE(a == -12);
     }
     {
-        real128 a = std::complex<double>{-42, 0};
-        REQUIRE(a == -42);
+        REQUIRE(!std::is_convertible<std::complex<double>, real128>::value);
     }
     {
         std::vector<real128> vec = {1, 2, -3};
