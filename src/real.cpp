@@ -19,6 +19,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <ios>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -893,6 +894,7 @@ real &real::prec_round(::mpfr_prec_t p)
 std::string real::to_string(int base) const
 {
     std::ostringstream oss;
+    oss.exceptions(std::ios_base::failbit | std::ios_base::badbit);
     detail::mpfr_to_stream(&m_mpfr, oss, base);
     return oss.str();
 }

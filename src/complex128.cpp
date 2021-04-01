@@ -9,6 +9,7 @@
 #include <mp++/config.hpp>
 
 #include <cassert>
+#include <ios>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -49,6 +50,7 @@ complex128::complex128(const mppp::real &x) : m_value{cast_to_f128(x, std::true_
 std::string complex128::to_string() const
 {
     std::ostringstream oss;
+    oss.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
     // NOTE: use the same printing format as std::complex.
     oss << '(' << real().to_string() << ',' << imag().to_string() << ')';
