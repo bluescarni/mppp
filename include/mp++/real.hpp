@@ -426,7 +426,7 @@ public:
     template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
 #endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-    explicit real(const T &x) : real(ptag{}, detail::real_deduce_precision(x), true)
+    real(const T &x) : real(ptag{}, detail::real_deduce_precision(x), true)
     {
         dispatch_construction(x);
     }
@@ -447,7 +447,7 @@ public:
     template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
 #endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-    explicit real(const T &c)
+    real(const T &c)
         : real(c.imag() == 0 ? c.real()
                              : throw std::domain_error(
                                  "Cannot construct a real from a complex C++ value with a non-zero imaginary part of "

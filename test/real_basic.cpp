@@ -113,6 +113,10 @@ struct int_ctor_tester {
             REQUIRE(::mpfr_equal_p(real{n, detail::nl_digits<T>() + 100}.get_mpfr_t(),
                                    real{detail::to_string(n), 10, detail::nl_digits<T>()}.get_mpfr_t()));
         }
+
+        // Test for implicit construction.
+        real r = T(42);
+        REQUIRE(r == 42);
     }
 };
 
@@ -152,6 +156,11 @@ struct fp_ctor_tester {
         if (std::numeric_limits<T>::radix != 2 || (ppc_arch && std::is_same<T, long double>::value)) {
             return;
         }
+
+        // Test for implicit construction.
+        real r = T(-1.5);
+        REQUIRE(r == -1.5);
+
         std::uniform_real_distribution<T> dist(-T(100), T(100));
         for (int i = 0; i < ntrials; ++i) {
             auto x = dist(rng);
@@ -455,6 +464,16 @@ TEST_CASE("real constructors")
                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                       + detail::to_string(real_prec_min());
     });
+
+    // Implicit ctor from bool.
+    {
+        real r0 = true;
+        REQUIRE(r0 == 1);
+
+        real r1 = false;
+        REQUIRE(r1 == 0);
+    }
+
     // Construction from integer.
     REQUIRE(real{int_t{}}.zero_p());
     REQUIRE(real{int_t{}}.get_prec() == real_prec_min());
@@ -487,6 +506,12 @@ TEST_CASE("real constructors")
                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                       + detail::to_string(real_prec_min());
     });
+
+    // Implicit ctor.
+    {
+        real r0 = 123_z1;
+        REQUIRE(r0 == 123);
+    }
 
     // Construction from rational.
     REQUIRE(real{rat_t{}}.zero_p());
@@ -521,6 +546,12 @@ TEST_CASE("real constructors")
                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                       + detail::to_string(real_prec_min());
     });
+
+    // Implicit ctor.
+    {
+        real r0 = 123_q1;
+        REQUIRE(r0 == 123);
+    }
 
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE(real{real128{}}.zero_p());
@@ -567,6 +598,12 @@ TEST_CASE("real constructors")
                       + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                       + detail::to_string(real_prec_min());
     });
+
+    // Implicit ctor.
+    {
+        real r0 = -123_rq;
+        REQUIRE(r0 == -123);
+    }
 #endif
     // Constructor from mpfr_t.
     ::mpfr_t m;
@@ -603,6 +640,12 @@ TEST_CASE("real constructors")
                            Message("Cannot init a real with a precision of -1: the maximum allowed precision is "
                                    + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                    + detail::to_string(real_prec_min())));
+
+    // Implicit ctor.
+    {
+        real r0 = std::complex<double>{-42, 0};
+        REQUIRE(r0 == -42);
+    }
 }
 
 TEST_CASE("real kind constructors")
