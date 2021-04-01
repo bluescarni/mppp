@@ -119,8 +119,8 @@ The complex class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
+   .. cpp:function:: template <complex_interoperable T> complex(T &&x)
    .. cpp:function:: template <complex_interoperable T> explicit complex(T &&x, complex_prec_t p)
-   .. cpp:function:: template <complex_interoperable T> explicit complex(T &&x)
 
       Generic constructors.
 
