@@ -146,9 +146,9 @@ TEST_CASE("real128 abs")
     constexpr auto c4 = test_constexpr_fabs();
     REQUIRE(c4 == 5);
     constexpr auto c5 = test_constexpr_abs_ff();
-    REQUIRE(c3 == 5);
+    REQUIRE(c5 == 5);
     constexpr auto c6 = test_constexpr_fabs_ff();
-    REQUIRE(c4 == 5);
+    REQUIRE(c6 == 5);
 #endif
 }
 
