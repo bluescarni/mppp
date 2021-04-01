@@ -355,7 +355,10 @@ TEST_CASE("real128 constructors")
                == "Cannot assign a complex C++ value with a non-zero imaginary part of " + detail::to_string(1.)
                       + " to a real128";
     });
-#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    // NOTE: if MPC is available, std::complex<long double> will be
+    // implicitly converted to complex, for which an assignment operator
+    // is available.
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE) || defined(MPPP_WITH_MPC)
     ra = std::complex<long double>{-7, 0};
     REQUIRE(ra == -7);
 #else
