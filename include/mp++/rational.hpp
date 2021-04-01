@@ -275,7 +275,7 @@ public:
     // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-    requires rational_cvr_interoperable<T, SSize> && !rational_integral_interoperable<T, SSize>
+    requires rational_cvr_interoperable<T, SSize> && (!rational_integral_interoperable<T, SSize>)
 #else
     template <
         typename T,

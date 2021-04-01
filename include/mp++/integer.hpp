@@ -1298,7 +1298,7 @@ public:
     // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-    requires integer_cpp_arithmetic<T> && !cpp_integral<T>
+    requires integer_cpp_arithmetic<T> && (!cpp_integral<T>)
 #else
     template <
         typename T,
