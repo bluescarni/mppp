@@ -28,6 +28,8 @@ cmake -GNinja ../llvm \
 	-DCMAKE_CXX_COMPILER=clang++ \
 	-DLLVM_USE_SANITIZER=MemoryWithOrigins
 cmake --build . -- cxx cxxabi
+cd ..
+find . -iname "cxxabi.h"
 # Back to the MPPP build dir.
 cd $MPPP_BUILD_DIR
 
