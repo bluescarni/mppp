@@ -183,6 +183,50 @@ TEST_CASE("basic constructors")
 #endif
 }
 
+TEST_CASE("implicit generic ctor")
+{
+    {
+        complex128 a = 2;
+        REQUIRE(a == 2);
+    }
+    {
+        complex128 a = false;
+        REQUIRE(a == 0);
+    }
+    {
+        complex128 a = 1.5f;
+        REQUIRE(a == 1.5f);
+    }
+    {
+        complex128 a = 128_z1;
+        REQUIRE(a == 128);
+    }
+    {
+        complex128 a = -12_q1;
+        REQUIRE(a == -12);
+    }
+    {
+        complex128 a = -12_rq;
+        REQUIRE(a == -12);
+    }
+    {
+        complex128 a = std::complex<double>{-42, 0};
+        REQUIRE(a == -42);
+    }
+    {
+        std::vector<complex128> vec = {1, 2, -3};
+        REQUIRE(vec[0] == 1);
+        REQUIRE(vec[1] == 2);
+        REQUIRE(vec[2] == -3);
+    }
+
+#if defined(MPPP_WITH_MPFR)
+
+    REQUIRE(!std::is_convertible<real, complex128>::value);
+
+#endif
+}
+
 TEST_CASE("string constructors")
 {
     using Catch::Matchers::Message;

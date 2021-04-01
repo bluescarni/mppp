@@ -175,13 +175,27 @@ private:
 public:
     // Generic ctor.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <complex128_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
+    template <typename T>
+        requires complex128_interoperable<T>
+#if defined(MPPP_WITH_MPFR)
+        && (!std::is_same<T, real>::value)
 #endif
-    constexpr explicit complex128(const T &x) : m_value{cast_to_f128(x, detail::is_complex128_mppp_interoperable<T>{})}
+#else
+    template <typename T, detail::enable_if_t<detail::conjunction<is_complex128_interoperable<T>
+#if defined(MPPP_WITH_MPFR)
+                                                                  ,
+                                                                  detail::negation<std::is_same<T, real>>
+#endif
+                                                                  >::value,
+                                              int> = 0>
+#endif
+            constexpr complex128(const T &x)
+        : m_value{cast_to_f128(x, detail::is_complex128_mppp_interoperable<T>{})}
     {
     }
+#if defined(MPPP_WITH_MPFR)
+    explicit complex128(const mppp::real &);
+#endif
     // Binary generic ctors.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <complex128_interoperable T, complex128_interoperable U>
@@ -201,7 +215,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
 #endif
-    MPPP_CONSTEXPR_14 explicit complex128(const T &c)
+    MPPP_CONSTEXPR_14 complex128(const T &c)
         : m_value{static_cast<__float128>(c.real()), static_cast<__float128>(c.imag())}
     {
     }
