@@ -467,11 +467,11 @@ TEST_CASE("real constructors")
 
     // Implicit ctor from bool.
     {
-        real r0 = true;
-        REQUIRE(r0 == 1);
+        real r00 = true;
+        REQUIRE(r00 == 1);
 
-        real r1 = false;
-        REQUIRE(r1 == 0);
+        real r11 = false;
+        REQUIRE(r11 == 0);
     }
 
     // Construction from integer.
@@ -509,8 +509,8 @@ TEST_CASE("real constructors")
 
     // Implicit ctor.
     {
-        real r0 = 123_z1;
-        REQUIRE(r0 == 123);
+        real r00 = 123_z1;
+        REQUIRE(r00 == 123);
     }
 
     // Construction from rational.
@@ -549,8 +549,8 @@ TEST_CASE("real constructors")
 
     // Implicit ctor.
     {
-        real r0 = 123_q1;
-        REQUIRE(r0 == 123);
+        real r00 = 123_q1;
+        REQUIRE(r00 == 123);
     }
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -601,8 +601,8 @@ TEST_CASE("real constructors")
 
     // Implicit ctor.
     {
-        real r0 = -123_rq;
-        REQUIRE(r0 == -123);
+        real r00 = -123_rq;
+        REQUIRE(r00 == -123);
     }
 #endif
     // Constructor from mpfr_t.
@@ -643,8 +643,8 @@ TEST_CASE("real constructors")
 
     // Implicit ctor.
     {
-        real r0 = std::complex<double>{-42, 0};
-        REQUIRE(r0 == -42);
+        real r00 = std::complex<double>{-42, 0};
+        REQUIRE(r00 == -42);
     }
 }
 
