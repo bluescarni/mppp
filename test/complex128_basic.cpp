@@ -180,7 +180,6 @@ TEST_CASE("basic constructors")
     REQUIRE(c12.m_value == cplex128{1, 2});
 #else
     REQUIRE(!std::is_constructible<complex128, std::complex<long double>>::value);
-    complex128 foobar(std::complex<long double>{});
 #endif
 }
 

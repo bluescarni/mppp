@@ -13,7 +13,6 @@
 #include <ostream>
 #include <sstream>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
@@ -40,12 +39,6 @@ namespace mppp
 {
 
 static_assert(std::is_same<cplex128, __complex128>::value, "Mismatched __complex128 types.");
-
-#if defined(MPPP_WITH_MPFR)
-
-complex128::complex128(const mppp::real &x) : m_value{cast_to_f128(x, std::true_type{})} {}
-
-#endif
 
 std::string complex128::to_string() const
 {

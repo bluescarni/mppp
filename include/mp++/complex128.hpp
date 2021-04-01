@@ -194,7 +194,16 @@ public:
     {
     }
 #if defined(MPPP_WITH_MPFR)
-    explicit complex128(const mppp::real &);
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <typename T>
+    requires std::is_same<T, real>::value
+#else
+    template <typename T, detail::enable_if_t<std::is_same<T, real>::value, int> = 0>
+#endif
+        explicit complex128(const T &x)
+        : m_value{cast_to_f128(x, std::true_type{})}
+    {
+    }
 #endif
     // Binary generic ctors.
 #if defined(MPPP_HAVE_CONCEPTS)
