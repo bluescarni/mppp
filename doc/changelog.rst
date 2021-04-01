@@ -1,6 +1,26 @@
 Changelog
 =========
 
+0.23 (unreleased)
+-----------------
+
+- Add a new ``fabs()`` overload for the computation of the
+  absolute value of a :cpp:class:`~mppp::real128`
+  (`#269 <https://github.com/bluescarni/mppp/pull/269>`__).
+
+Changes
+~~~~~~~
+
+- Remove the ``explicit`` attribute from many generic
+  constructors in the multiprecision classes
+  (`#269 <https://github.com/bluescarni/mppp/pull/269>`__).
+
+Fix
+~~~
+
+- Disable Boost's autolinking feature in the build system
+  (`#267 <https://github.com/bluescarni/mppp/pull/267>`__).
+
 0.22 (2021-01-03)
 -----------------
 
