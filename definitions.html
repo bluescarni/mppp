@@ -26,7 +26,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.40e2e510f6b7d1648584402491bb10fe.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,8 +34,7 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx-book-theme.d31b09fe5c1d09cb49b26a786de4a05d.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Namespaces" href="namespaces.html" />
@@ -257,21 +256,21 @@
           
 <main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
     
-    <div class="row topbar fixed-top container-xl">
-    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
-    </div>
-    <div class="col pl-2 topbar-main">
-        
-        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
-            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
-            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
-            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
-            <i class="fas fa-bars"></i>
-            <i class="fas fa-arrow-left"></i>
-            <i class="fas fa-arrow-up"></i>
-        </button>
-        
-        
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
 <div class="dropdown-buttons-trigger">
     <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
             class="fas fa-download"></i></button>
@@ -289,22 +288,23 @@
     </div>
 </div>
 
-        <!-- Source interaction buttons -->
+            <!-- Source interaction buttons -->
 
 
-        <!-- Full screen (wrap in <a> to have style consistency -->
-        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
-                data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
-                title="Fullscreen mode"><i
-                    class="fas fa-expand"></i></button></a>
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
 
-        <!-- Launch buttons -->
+            <!-- Launch buttons -->
 
-    </div>
+        </div>
 
-    <!-- Table of contents -->
-    <div class="d-none d-md-block col-md-2 bd-toc show">
-        
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
     </div>
 </div>
     <div id="main-content" class="row">
@@ -320,35 +320,35 @@
 <p><em>#include &lt;mp++/config.hpp&gt;</em></p>
 <dl class="c macro">
 <dt id="c.MPPP_VERSION_STRING">
-<code class="sig-name descname">MPPP_VERSION_STRING</code><a class="headerlink" href="#c.MPPP_VERSION_STRING" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_VERSION_STRING</span></code><a class="headerlink" href="#c.MPPP_VERSION_STRING" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This definition expands to a string literal containing the full version of the mp++ library
 (e.g., for version 0.6 this macro expands to <code class="docutils literal notranslate"><span class="pre">&quot;0.6&quot;</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
 <dt id="c.MPPP_VERSION_MAJOR">
-<code class="sig-name descname">MPPP_VERSION_MAJOR</code><a class="headerlink" href="#c.MPPP_VERSION_MAJOR" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_VERSION_MAJOR</span></code><a class="headerlink" href="#c.MPPP_VERSION_MAJOR" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This definition expands to an integral literal corresponding to the major mp++ version (e.g.,
 for version 0.6, this macro expands to <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
 <dt id="c.MPPP_VERSION_MINOR">
-<code class="sig-name descname">MPPP_VERSION_MINOR</code><a class="headerlink" href="#c.MPPP_VERSION_MINOR" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_VERSION_MINOR</span></code><a class="headerlink" href="#c.MPPP_VERSION_MINOR" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This definition expands to an integral literal corresponding to the minor mp++ version (e.g.,
 for version 0.6, this macro expands to <code class="docutils literal notranslate"><span class="pre">6</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
 <dt id="c.MPPP_WITH_QUADMATH">
-<code class="sig-name descname">MPPP_WITH_QUADMATH</code><a class="headerlink" href="#c.MPPP_WITH_QUADMATH" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_WITH_QUADMATH</span></code><a class="headerlink" href="#c.MPPP_WITH_QUADMATH" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This name is defined if mp++ was configured with support for the quadmath library
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 </dd></dl>
 
 <dl class="c macro">
 <dt id="c.MPPP_WITH_BOOST_S11N">
-<code class="sig-name descname">MPPP_WITH_BOOST_S11N</code><a class="headerlink" href="#c.MPPP_WITH_BOOST_S11N" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_WITH_BOOST_S11N</span></code><a class="headerlink" href="#c.MPPP_WITH_BOOST_S11N" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.22.</span></p>
 </div>
@@ -358,7 +358,7 @@ for version 0.6, this macro expands to <code class="docutils literal notranslate
 
 <dl class="c macro">
 <dt id="c.MPPP_FLOAT128_WITH_LONG_DOUBLE">
-<code class="sig-name descname">MPPP_FLOAT128_WITH_LONG_DOUBLE</code><a class="headerlink" href="#c.MPPP_FLOAT128_WITH_LONG_DOUBLE" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_FLOAT128_WITH_LONG_DOUBLE</span></code><a class="headerlink" href="#c.MPPP_FLOAT128_WITH_LONG_DOUBLE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.22.</span></p>
 </div>
@@ -370,14 +370,14 @@ and the <code class="docutils literal notranslate"><span class="pre">__float128<
 
 <dl class="c macro">
 <dt id="c.MPPP_WITH_MPFR">
-<code class="sig-name descname">MPPP_WITH_MPFR</code><a class="headerlink" href="#c.MPPP_WITH_MPFR" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_WITH_MPFR</span></code><a class="headerlink" href="#c.MPPP_WITH_MPFR" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This name is defined if mp++ was configured with support for the MPFR library
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 </dd></dl>
 
 <dl class="c macro">
 <dt id="c.MPPP_WITH_MPC">
-<code class="sig-name descname">MPPP_WITH_MPC</code><a class="headerlink" href="#c.MPPP_WITH_MPC" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_WITH_MPC</span></code><a class="headerlink" href="#c.MPPP_WITH_MPC" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.20.</span></p>
 </div>
@@ -387,7 +387,7 @@ and the <code class="docutils literal notranslate"><span class="pre">__float128<
 
 <dl class="c macro">
 <dt id="c.MPPP_WITH_ARB">
-<code class="sig-name descname">MPPP_WITH_ARB</code><a class="headerlink" href="#c.MPPP_WITH_ARB" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_WITH_ARB</span></code><a class="headerlink" href="#c.MPPP_WITH_ARB" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
 </div>
@@ -397,14 +397,14 @@ and the <code class="docutils literal notranslate"><span class="pre">__float128<
 
 <dl class="c macro">
 <dt id="c.MPPP_HAVE_GCC_INT128">
-<code class="sig-name descname">MPPP_HAVE_GCC_INT128</code><a class="headerlink" href="#c.MPPP_HAVE_GCC_INT128" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_HAVE_GCC_INT128</span></code><a class="headerlink" href="#c.MPPP_HAVE_GCC_INT128" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This name is defined if mp++ detects the presence of the GCC-style 128-bit integers
 <code class="docutils literal notranslate"><span class="pre">__int128_t</span></code> and <code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code>, available on some compiler/platform combinations.</p>
 </dd></dl>
 
 <dl class="c macro">
 <dt id="c.MPPP_STATIC_BUILD">
-<code class="sig-name descname">MPPP_STATIC_BUILD</code><a class="headerlink" href="#c.MPPP_STATIC_BUILD" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_STATIC_BUILD</span></code><a class="headerlink" href="#c.MPPP_STATIC_BUILD" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.15.</span></p>
 </div>
@@ -414,7 +414,7 @@ library (see the <a class="reference internal" href="installation.html#installat
 
 <dl class="c macro">
 <dt id="c.MPPP_HAVE_STRING_VIEW">
-<code class="sig-name descname">MPPP_HAVE_STRING_VIEW</code><a class="headerlink" href="#c.MPPP_HAVE_STRING_VIEW" title="Permalink to this definition">¶</a><br /></dt>
+<code class="sig-name descname"><span class="pre">MPPP_HAVE_STRING_VIEW</span></code><a class="headerlink" href="#c.MPPP_HAVE_STRING_VIEW" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.17.</span></p>
 </div>
@@ -427,15 +427,15 @@ class (available since C++17).</p>
 
               </div>
               
-        </div>
-    </div>
-    
-    
-    <div class='prev-next-bottom'>
         
+        <div class='prev-next-bottom'>
+            
     <a class='left-prev' id="prev-link" href="reference.html" title="previous page">Reference</a>
     <a class='right-next' id="next-link" href="namespaces.html" title="next page">Namespaces</a>
 
+        </div>
+        
+        </div>
     </div>
     <footer class="footer mt-5 mt-md-0">
     <div class="container">

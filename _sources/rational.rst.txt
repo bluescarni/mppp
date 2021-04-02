@@ -81,6 +81,10 @@ The rational class
 
       Generic constructor.
 
+      .. note::
+
+         This constructor is not ``explicit`` if ``T`` satisfies :cpp:concept:`rational_integral_interoperable`.
+
       This constructor will initialize a rational with the value *x*. The construction will fail if either:
 
       * *x* is a non-finite floating-point value, or,
