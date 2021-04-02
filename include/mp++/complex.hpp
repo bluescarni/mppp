@@ -322,7 +322,7 @@ public:
     template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
 #endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-forwarding-reference-overload)
-    explicit complex(T &&x) : complex(gtag{}, is_rv_complex_interoperable<T>{}, std::forward<T>(x))
+    complex(T &&x) : complex(gtag{}, is_rv_complex_interoperable<T>{}, std::forward<T>(x))
     {
     }
     // Ctor from interoperable types + precision.

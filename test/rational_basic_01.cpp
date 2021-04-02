@@ -11,6 +11,7 @@
 #include <atomic>
 #include <complex>
 #include <cstddef>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <random>
@@ -110,6 +111,13 @@ struct int_ctor_tester {
             // Update the rng seed so that it does not generate the same sequence
             // for the next integral type.
             mt_rng_seed += 4u;
+
+            // Make sure rational is implicitly ctible
+            // from the integral types.
+            rational tmp = Int(5);
+            REQUIRE(std::is_convertible<Int, rational>::value);
+
+            std::vector<rational> vec = {Int(1), Int(2), Int(3)};
         }
     };
     template <typename S>
@@ -127,6 +135,13 @@ struct int_ctor_tester {
         REQUIRE((lex_cast(rational{false}) == "0"));
         REQUIRE((lex_cast(rational{true}) == "1"));
         REQUIRE((!std::is_constructible<rational, no_const>::value));
+
+        rational tmp = true;
+        REQUIRE(std::is_convertible<bool, rational>::value);
+        std::vector<rational> vec = {true, false};
+        REQUIRE(vec[0] == 1);
+        REQUIRE(vec[1] == 0);
+
         std::cout << "n static limbs: " << S::value << ", size: " << sizeof(rational) << '\n';
         // Testing for the ctor from int_t.
         using integer = typename rational::int_t;
@@ -138,6 +153,10 @@ struct int_ctor_tester {
         REQUIRE((lex_cast(rational{integer{-123}}) == "-123"));
         integer tmp_int{-123};
         REQUIRE((lex_cast(rational{tmp_int}) == "-123"));
+
+        REQUIRE(std::is_convertible<integer, rational>::value);
+        vec = std::vector<rational>{integer(0), integer(1)};
+
         // Testing for the ctor from num/den.
         REQUIRE((std::is_constructible<rational, integer, integer>::value));
         REQUIRE((std::is_constructible<rational, integer, int>::value));
@@ -268,6 +287,10 @@ struct fp_ctor_tester {
             t3.join();
             REQUIRE(!fail.load());
             mt_rng_seed += 4u;
+
+            // Make sure rational is *not* implicitly ctible
+            // from the fp types.
+            REQUIRE(!std::is_convertible<Float, rational>::value);
         }
     };
     template <typename S>
@@ -357,6 +380,10 @@ struct complex_ctor_tester {
                        == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
                               + detail::to_string(Float(1));
             });
+
+            // Make sure rational is *not* implicitly ctible
+            // from complex.
+            REQUIRE(!std::is_convertible<C, rational>::value);
         }
     };
     template <typename S>

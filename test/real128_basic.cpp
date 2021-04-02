@@ -17,6 +17,7 @@
 #include <ciso646>
 #include <complex>
 #include <cstdint>
+#include <initializer_list>
 #include <limits>
 #include <random>
 #include <sstream>
@@ -354,7 +355,10 @@ TEST_CASE("real128 constructors")
                == "Cannot assign a complex C++ value with a non-zero imaginary part of " + detail::to_string(1.)
                       + " to a real128";
     });
-#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    // NOTE: if MPC is available, std::complex<long double> will be
+    // implicitly converted to complex, for which an assignment operator
+    // is available.
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE) || defined(MPPP_WITH_MPC)
     ra = std::complex<long double>{-7, 0};
     REQUIRE(ra == -7);
 #else
@@ -385,6 +389,39 @@ TEST_CASE("real128 constructors")
     REQUIRE(isnan(ra));
     REQUIRE(std::is_same<decltype(ra = real{"nan", 100}), real128 &>::value);
 #endif
+}
+
+TEST_CASE("real128 implicit generic ctor")
+{
+    {
+        real128 a = 2;
+        REQUIRE(a == 2);
+    }
+    {
+        real128 a = false;
+        REQUIRE(a == 0);
+    }
+    {
+        real128 a = 1.5f;
+        REQUIRE(a == 1.5f);
+    }
+    {
+        real128 a = 128_z1;
+        REQUIRE(a == 128);
+    }
+    {
+        real128 a = -12_q1;
+        REQUIRE(a == -12);
+    }
+    {
+        REQUIRE(!std::is_convertible<std::complex<double>, real128>::value);
+    }
+    {
+        std::vector<real128> vec = {1, 2, -3};
+        REQUIRE(vec[0] == 1);
+        REQUIRE(vec[1] == 2);
+        REQUIRE(vec[2] == -3);
+    }
 }
 
 // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)

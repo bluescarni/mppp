@@ -43,6 +43,25 @@ static constexpr real128 test_constexpr_abs()
     return retval;
 }
 
+static constexpr real128 test_constexpr_abs_ff()
+{
+    real128 retval{-5};
+    return abs(retval);
+}
+
+static constexpr real128 test_constexpr_fabs()
+{
+    real128 retval{-5};
+    retval.fabs();
+    return retval;
+}
+
+static constexpr real128 test_constexpr_fabs_ff()
+{
+    real128 retval{-5};
+    return fabs(retval);
+}
+
 #endif
 
 #if defined(__INTEL_COMPILER)
@@ -58,6 +77,7 @@ TEST_CASE("real128 abs")
     REQUIRE((abs(r).m_value == 0));
     REQUIRE(!(abs(r).signbit()));
     REQUIRE((r.abs().m_value == 0));
+    REQUIRE((r.fabs().m_value == 0));
     REQUIRE((r.m_value == 0));
     REQUIRE(!r.signbit());
     r = -0.;
@@ -67,17 +87,36 @@ TEST_CASE("real128 abs")
     REQUIRE((r.abs().m_value == 0));
     REQUIRE((r.m_value == 0));
     REQUIRE(!r.signbit());
+    r = -0.;
+    REQUIRE(r.signbit());
+    REQUIRE((fabs(r).m_value == 0));
+    REQUIRE(!(fabs(r).signbit()));
+    REQUIRE((r.fabs().m_value == 0));
+    REQUIRE((r.m_value == 0));
+    REQUIRE(!r.signbit());
     r = -5;
     REQUIRE((abs(r).m_value == 5));
     REQUIRE((r.abs().m_value == 5));
+    REQUIRE((r.m_value == 5));
+    r = -5;
+    REQUIRE((fabs(r).m_value == 5));
+    REQUIRE((r.fabs().m_value == 5));
     REQUIRE((r.m_value == 5));
     r = 5;
     REQUIRE((abs(r).m_value == 5));
     REQUIRE((r.abs().m_value == 5));
     REQUIRE((r.m_value == 5));
+    r = 5;
+    REQUIRE((fabs(r).m_value == 5));
+    REQUIRE((r.fabs().m_value == 5));
+    REQUIRE((r.m_value == 5));
     r = -.00005;
     REQUIRE((abs(r).m_value == .00005));
     REQUIRE((r.abs().m_value == .00005));
+    REQUIRE((r.m_value == .00005));
+    r = -.00005;
+    REQUIRE((fabs(r).m_value == .00005));
+    REQUIRE((r.fabs().m_value == .00005));
     REQUIRE((r.m_value == .00005));
     r = .00005;
     REQUIRE((abs(r).m_value == .00005));
@@ -104,6 +143,12 @@ TEST_CASE("real128 abs")
 #if defined(MPPP_ENABLE_CONSTEXPR_TESTS) && !defined(__INTEL_COMPILER)
     constexpr auto c3 = test_constexpr_abs();
     REQUIRE(c3 == 5);
+    constexpr auto c4 = test_constexpr_fabs();
+    REQUIRE(c4 == 5);
+    constexpr auto c5 = test_constexpr_abs_ff();
+    REQUIRE(c5 == 5);
+    constexpr auto c6 = test_constexpr_fabs_ff();
+    REQUIRE(c6 == 5);
 #endif
 }
 

@@ -168,8 +168,8 @@ The real class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
+   .. cpp:function:: template <real_interoperable T> real(const T &x)
    .. cpp:function:: template <real_interoperable T> explicit real(const T &x, mpfr_prec_t p)
-   .. cpp:function:: template <real_interoperable T> explicit real(const T &x)
 
       Generic constructors.
 

@@ -8,6 +8,7 @@
 
 #include <mp++/config.hpp>
 
+#include <ios>
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
@@ -123,6 +124,7 @@ real128::real128(const char *begin, const char *end)
 std::string real128::to_string() const
 {
     std::ostringstream oss;
+    oss.exceptions(std::ios_base::failbit | std::ios_base::badbit);
     detail::float128_stream(oss, m_value);
     return oss.str();
 }

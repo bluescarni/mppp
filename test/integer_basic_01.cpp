@@ -10,6 +10,7 @@
 #include <cmath>
 #include <complex>
 #include <cstddef>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <random>
@@ -20,6 +21,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <gmp.h>
 
@@ -107,6 +109,13 @@ struct int_ctor_tester {
             // Update the rng seed so that it does not generate the same sequence
             // for the next integral type.
             mt_rng_seed += 4u;
+
+            // Make sure integer is implicitly ctible
+            // from the integral types.
+            integer tmp = Int(5);
+            REQUIRE(std::is_convertible<Int, integer>::value);
+
+            std::vector<integer> vec = {Int(1), Int(2), Int(3)};
         }
     };
     template <typename S>
@@ -118,6 +127,13 @@ struct int_ctor_tester {
         REQUIRE((std::is_constructible<integer, bool>::value));
         REQUIRE((lex_cast(integer{false}) == "0"));
         REQUIRE((lex_cast(integer{true}) == "1"));
+
+        integer tmp = true;
+        REQUIRE(std::is_convertible<bool, integer>::value);
+        std::vector<integer> vec = {true, false};
+        REQUIRE(vec[0] == 1);
+        REQUIRE(vec[1] == 0);
+
         REQUIRE((!std::is_constructible<integer, no_const>::value));
         std::cout << "n static limbs: " << S::value << ", size: " << sizeof(integer) << '\n';
     }
@@ -256,6 +272,10 @@ struct fp_ctor_tester {
             t3.join();
             REQUIRE(!fail.load());
             mt_rng_seed += 4u;
+
+            // Make sure integer is *not* implicitly ctible
+            // from the fp types.
+            REQUIRE(!std::is_convertible<Float, integer>::value);
         }
     };
     template <typename S>

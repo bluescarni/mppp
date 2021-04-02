@@ -533,6 +533,48 @@ TEST_CASE("basic and generic constructors")
                                        + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                                        + detail::to_string(real_prec_min())));
     }
+
+    // Implicit generic ctors
+    {
+        complex c1 = 42;
+        REQUIRE(c1 == 42);
+    }
+    {
+        complex c1 = true;
+        REQUIRE(c1 == 1);
+    }
+    {
+        complex c1 = 123.;
+        REQUIRE(c1 == 123);
+    }
+    {
+        complex c1 = -56_z1;
+        REQUIRE(c1 == -56);
+    }
+    {
+        complex c1 = -56_q1;
+        REQUIRE(c1 == -56);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex c1 = 123.5_rq;
+        REQUIRE(c1 == 123.5_rq);
+    }
+#endif
+    {
+        complex c1 = 1.1_r256;
+        REQUIRE(c1 == 1.1_r256);
+    }
+    {
+        complex c1 = std::complex<double>(1, 2);
+        REQUIRE(c1 == std::complex<double>(1, 2));
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        complex c1 = 1.1_rq - 2.1_icq;
+        REQUIRE(c1 == 1.1_rq - 2.1_icq);
+    }
+#endif
 }
 
 TEST_CASE("string constructors")

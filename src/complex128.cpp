@@ -9,6 +9,7 @@
 #include <mp++/config.hpp>
 
 #include <cassert>
+#include <ios>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -42,6 +43,7 @@ static_assert(std::is_same<cplex128, __complex128>::value, "Mismatched __complex
 std::string complex128::to_string() const
 {
     std::ostringstream oss;
+    oss.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
     // NOTE: use the same printing format as std::complex.
     oss << '(' << real().to_string() << ',' << imag().to_string() << ')';

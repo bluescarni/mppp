@@ -170,6 +170,10 @@ The integer class
 
       Generic constructor from arithmetic C++ types.
 
+      .. note::
+
+         This constructor is not ``explicit`` if ``T`` satisfies :cpp:concept:`cpp_integral`.
+
       This constructor will initialize an integer with the value of *x*.
       The initialisation is always successful if *x* is an integral value
       (construction from ``bool`` yields 1 for ``true``, 0 for ``false``).

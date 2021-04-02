@@ -95,9 +95,13 @@ The complex128 class
 
       :param c: the :cpp:type:`__complex128` that will be assigned to the internal value.
 
-   .. cpp:function:: template <complex128_interoperable T> constexpr explicit complex128(const T &x)
+   .. cpp:function:: template <complex128_interoperable T> constexpr complex128(const T &x)
 
       Constructor from real-valued interoperable types.
+
+      .. note::
+
+         This constructor is ``explicit`` if ``T`` is :cpp:class:`~mppp::real`.
 
       This constructor will initialise the internal value to *x*.
       Depending on the value and type of *x*, ``this`` may not be exactly equal
@@ -122,7 +126,7 @@ The complex128 class
 
       :exception unspecified: any exception raised by casting ``T`` to :cpp:class:`~mppp::real128`.
 
-   .. cpp:function:: template <real128_cpp_complex T> constexpr explicit complex128(const T &c)
+   .. cpp:function:: template <real128_cpp_complex T> constexpr complex128(const T &c)
 
       .. note::
 

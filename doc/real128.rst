@@ -93,7 +93,7 @@ The real128 class
 
       :param x: the :cpp:type:`__float128` that will be assigned to the internal value.
 
-   .. cpp:function:: template <real128_interoperable T> constexpr explicit real128(const T &x)
+   .. cpp:function:: template <real128_interoperable T> constexpr real128(const T &x)
 
       Constructor from interoperable types.
 
@@ -414,19 +414,24 @@ The real128 class
         NaN, an infinity, finite or normal, ``false`` otherwise.
 
    .. cpp:function:: constexpr real128 &abs()
+   .. cpp:function:: constexpr real128 &fabs()
 
       .. note::
 
-        This function is ``constexpr`` only if at least C++14 is being used.
+        These functions are ``constexpr`` only if at least C++14 is being used.
 
       .. note::
 
-         This function is not ``constexpr`` if the Intel C++ compiler
+         These functions are not ``constexpr`` if the Intel C++ compiler
          is being used.
 
       In-place absolute value.
 
-      This member function will set ``this`` to its absolute value.
+      These member functions will set ``this`` to its absolute value.
+
+      .. versionadded:: 0.23
+
+         The ``fabs()`` overload.
 
       :return: a reference to ``this``.
 
@@ -768,13 +773,18 @@ Arithmetic
    :return: :math:`\left(x \times y\right) + z`.
 
 .. cpp:function:: constexpr mppp::real128 mppp::abs(const mppp::real128 &x)
+.. cpp:function:: constexpr mppp::real128 mppp::fabs(const mppp::real128 &x)
 
    .. note::
 
-      This function is not ``constexpr`` if the Intel C++ compiler
+      These functions are not ``constexpr`` if the Intel C++ compiler
       is being used.
 
    Absolute value.
+
+   .. versionadded:: 0.23
+
+      The ``fabs()`` overload.
 
    :param x: the :cpp:class:`~mppp::real128` whose absolute value will be computed.
 
