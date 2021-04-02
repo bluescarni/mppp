@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.23 (unreleased)
+0.23 (2021-04-02)
 -----------------
 
 - Add a new ``fabs()`` overload for the computation of the
