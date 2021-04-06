@@ -69,6 +69,7 @@ at `this link <https://doi.org/10.5281/zenodo.1043579>`__.
 
    installation.rst
    tutorial.rst
+   interactive_notebooks.rst
    reference.rst
    benchmarks.rst
    changelog.rst
