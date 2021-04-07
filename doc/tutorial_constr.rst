@@ -26,17 +26,6 @@ on curly brackets. Using the same syntax, it is possible to:
 * initialise multiprecision objects from multiprecision objects of a different type,
 * initialise C++ numerical objects from multiprecision objects.
 
-.. note::
-
-   In mp++, most constructors and conversions are ``explicit``! This means that it is not possible
-   to use syntax such as
-
-   .. code-block:: c++
-
-      int_t n = 42;
-
-   or to pass an ``int_t`` to a function which expects an ``int`` parameter.
-
 Let's see a few examples:
 
 .. code-block:: c++
@@ -91,6 +80,16 @@ even if it does not preserve the exact value:
                                                  // of the original integer.
 
 The documentation of the multiprecision classes explains in detail the behaviour during construction and conversion.
+
+Note that, as a general rule, the constructors of mp++'s multiprecision classes are ``implicit``
+when constructing from numerical types lower in the :ref:`numerical hierarchy <tutorial_numtower>`, ``explicit`` otherwise.
+For instance, implicit construction of an :cpp:class:`~mppp::integer` from a C++ integral value is allowed, but implicit construction
+from a C++ floating-point value is not:
+
+.. code-block:: c++
+
+   int_t n1 = 5;   // Valid.
+   int_t n2 = 1.12 // Will NOT compile.
 
 All of mp++'s multiprecision classes can also be initialised from string-like entities (see the
 :cpp:concept:`~mppp::string_type` concept for a full list). By default, string input is interpreted as the base-10 representation
