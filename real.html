@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Multiprecision floats &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,8 +37,11 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Multiprecision complex numbers" href="complex.html" />
@@ -146,6 +152,40 @@
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -290,6 +330,22 @@
 </div>
 
             <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Freal.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
 
 
             <!-- Full screen (wrap in <a> to have style consistency -->
@@ -450,7 +506,7 @@
         
               <div>
                 
-  <div class="section" id="multiprecision-floats">
+  <section id="multiprecision-floats">
 <h1>Multiprecision floats<a class="headerlink" href="#multiprecision-floats" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -461,7 +517,7 @@ with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_
 <p><span class="versionmodified added">New in version 0.5.</span></p>
 </div>
 <p><em>#include &lt;mp++/real.hpp&gt;</em></p>
-<div class="section" id="the-real-class">
+<section id="the-real-class">
 <h2>The real class<a class="headerlink" href="#the-real-class" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4N4mppp4realE">
@@ -2136,8 +2192,8 @@ or <a class="reference internal" href="#_CPPv4N4mppp4real8set_precE11mpfr_prec_t
 
 </dd></dl>
 
-</div>
-<div class="section" id="types">
+</section>
+<section id="types">
 <h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp type">
 <dt id="_CPPv46mpfr_t">
@@ -2198,8 +2254,8 @@ one of the three special values NaN, infinity or zero.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types">https://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types</a></p>
 </div>
-</div>
-<div class="section" id="concepts">
+</section>
+<section id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp8cvr_realE">
@@ -2272,10 +2328,10 @@ involving <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::
 </ul>
 </dd></dl>
 
-</div>
-<div class="section" id="functions">
+</section>
+<section id="functions">
 <span id="real-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="precision-handling">
+<section id="precision-handling">
 <span id="real-prec"></span><h3>Precision handling<a class="headerlink" href="#precision-handling" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp8get_precERKN4mppp4realE">
@@ -2338,8 +2394,8 @@ the <code class="docutils literal notranslate"><span class="pre">MPFR_PREC_MAX</
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="assignment">
+</section>
+<section id="assignment">
 <span id="real-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_DpN4mppp13real_set_argsEEN4mppp3setERN4mppp4realERN4mppp4realEDpRK4Args">
@@ -2447,8 +2503,8 @@ bit is unspecified.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="conversion">
+</section>
+<section id="conversion">
 <span id="real-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp18real_interoperableEEN4mppp3getEbR1TRKN4mppp4realE">
@@ -2521,8 +2577,8 @@ value.</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="arithmetic">
+</section>
+<section id="arithmetic">
 <span id="real-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3addERN4mppp4realERN4mppp4realERR1TRR1U">
@@ -2866,8 +2922,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="comparison">
+</section>
+<section id="comparison">
 <span id="real-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp5nan_pERKN4mppp4realE">
@@ -3095,8 +3151,8 @@ regarding NaN values and moved-from objects, <code class="docutils literal notra
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="roots">
+</section>
+<section id="roots">
 <span id="real-roots"></span><h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4sqrtERN4mppp4realERN4mppp4realERR1T">
@@ -3348,8 +3404,8 @@ the same sign as <em>r</em> if <em>k</em> is odd, and positive if <em>k</em> is 
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="exponentiation">
+</section>
+<section id="exponentiation">
 <span id="real-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3powERN4mppp4realERN4mppp4realERR1TRR1U">
@@ -3390,8 +3446,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="trigonometry">
+</section>
+<section id="trigonometry">
 <span id="real-trig"></span><h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3sinERN4mppp4realERN4mppp4realERR1T">
@@ -3713,8 +3769,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="hyperbolic-functions">
+</section>
+<section id="hyperbolic-functions">
 <span id="real-hyper"></span><h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4sinhERN4mppp4realERN4mppp4realERR1T">
@@ -3881,8 +3937,8 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="logarithms-and-exponentials">
+</section>
+<section id="logarithms-and-exponentials">
 <span id="real-logexp"></span><h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3expERN4mppp4realERN4mppp4realERR1T">
@@ -4141,8 +4197,8 @@ fails because of (unlikely) overflow conditions.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="polylogarithms">
+</section>
+<section id="polylogarithms">
 <h3>Polylogarithms<a class="headerlink" href="#polylogarithms" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T">
@@ -4181,8 +4237,8 @@ If <span class="math notranslate nohighlight">\(x \geq 1\)</span>, NaN will be r
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="gamma-functions">
+</section>
+<section id="gamma-functions">
 <span id="real-gamma"></span><h3>Gamma functions<a class="headerlink" href="#gamma-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5gammaERN4mppp4realERN4mppp4realERR1T">
@@ -4316,8 +4372,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="bessel-functions">
+</section>
+<section id="bessel-functions">
 <span id="real-bessel"></span><h3>Bessel functions<a class="headerlink" href="#bessel-functions" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.17.</span></p>
@@ -4508,8 +4564,8 @@ fails because of (unlikely) overflow conditions.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="error-functions">
+</section>
+<section id="error-functions">
 <span id="real-err-func"></span><h3>Error functions<a class="headerlink" href="#error-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3erfERN4mppp4realERN4mppp4realERR1T">
@@ -4558,8 +4614,8 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="other-special-functions">
+</section>
+<section id="other-special-functions">
 <span id="real-other-specfunc"></span><h3>Other special functions<a class="headerlink" href="#other-special-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4eintERN4mppp4realERN4mppp4realERR1T">
@@ -4757,8 +4813,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="integer-and-remainder-related-functions">
+</section>
+<section id="integer-and-remainder-related-functions">
 <span id="real-intrem"></span><h3>Integer and remainder related functions<a class="headerlink" href="#integer-and-remainder-related-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4ceilERN4mppp4realERN4mppp4realERR1T">
@@ -5014,8 +5070,8 @@ with the sign of <em>x</em> divided by <em>y</em> (except if those low bits are 
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="input-output">
+</section>
+<section id="input-output">
 <span id="real-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppplsERNSt7ostreamERKN4mppp4realE">
@@ -5045,8 +5101,8 @@ library if precise and forward-compatible control on the printing format is need
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="serialisation">
+</section>
+<section id="serialisation">
 <span id="real-s11n"></span><h3>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.22.</span></p>
@@ -5133,9 +5189,9 @@ overload called on <em>x</em> with <em>src</em> as argument.</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="mathematical-operators">
+</section>
+</section>
+<section id="mathematical-operators">
 <span id="real-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mpppplEN4mppp4realERR1T">
@@ -5333,8 +5389,8 @@ specially are available.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="constants">
+</section>
+<section id="constants">
 <span id="real-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7real_piE11mpfr_prec_t">
@@ -5420,8 +5476,8 @@ functions.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="user-defined-literals">
+</section>
+<section id="user-defined-literals">
 <span id="real-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
@@ -5461,8 +5517,8 @@ a valid floating-point literal (as defined by the C++ standard).</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
               </div>

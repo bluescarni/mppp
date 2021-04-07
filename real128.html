@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Quadruple-precision floats &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,8 +37,11 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quadruple-precision complex numbers" href="complex128.html" />
@@ -146,6 +152,40 @@
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -290,6 +330,22 @@
 </div>
 
             <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Freal128.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
 
 
             <!-- Full screen (wrap in <a> to have style consistency -->
@@ -440,7 +496,7 @@
         
               <div>
                 
-  <div class="section" id="quadruple-precision-floats">
+  <section id="quadruple-precision-floats">
 <span id="real128-reference"></span><h1>Quadruple-precision floats<a class="headerlink" href="#quadruple-precision-floats" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -451,7 +507,7 @@ with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_
 <p><span class="versionmodified added">New in version 0.5.</span></p>
 </div>
 <p><em>#include &lt;mp++/real128.hpp&gt;</em></p>
-<div class="section" id="the-real128-class">
+<section id="the-real128-class">
 <h2>The real128 class<a class="headerlink" href="#the-real128-class" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4N4mppp7real128E">
@@ -1360,8 +1416,8 @@ possibly raising the <code class="docutils literal notranslate"><span class="pre
 
 </dd></dl>
 
-</div>
-<div class="section" id="types">
+</section>
+<section id="types">
 <h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp type">
 <dt id="_CPPv410__float128">
@@ -1375,8 +1431,8 @@ This is the type wrapped by the <a class="reference internal" href="#_CPPv4N4mpp
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="concepts">
+</section>
+<section id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp21real128_interoperableE">
@@ -1438,10 +1494,10 @@ involving <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mpp
 </ul>
 </dd></dl>
 
-</div>
-<div class="section" id="functions">
+</section>
+<section id="functions">
 <span id="real128-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="conversion">
+<section id="conversion">
 <span id="real128-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp21real128_interoperableEEN4mppp3getEbR1TRKN4mppp7real128E">
@@ -1526,8 +1582,8 @@ from GCC 6 onwards.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="arithmetic">
+</section>
+<section id="arithmetic">
 <span id="real128-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp3fmaERKN4mppp7real128ERKN4mppp7real128ERKN4mppp7real128E">
@@ -1631,8 +1687,8 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="comparison">
+</section>
+<section id="comparison">
 <span id="real128-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7signbitERKN4mppp7real128E">
@@ -1833,8 +1889,8 @@ standard library (e.g., <code class="docutils literal notranslate"><span class="
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="roots">
+</section>
+<section id="roots">
 <span id="real128-roots"></span><h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp4sqrtERKN4mppp7real128E">
@@ -1887,8 +1943,8 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="exponentiation">
+</section>
+<section id="exponentiation">
 <span id="real128-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp3powEN4mppp7real128ERK1TRK1U">
@@ -1910,8 +1966,8 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="trigonometry">
+</section>
+<section id="trigonometry">
 <span id="real128-trig"></span><h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp3sinERKN4mppp7real128E">
@@ -2005,8 +2061,8 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="hyperbolic-functions">
+</section>
+<section id="hyperbolic-functions">
 <span id="real128-hyper"></span><h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp4sinhERKN4mppp7real128E">
@@ -2056,8 +2112,8 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="logarithms-and-exponentials">
+</section>
+<section id="logarithms-and-exponentials">
 <span id="real128-logexp"></span><h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp3expERKN4mppp7real128E">
@@ -2121,8 +2177,8 @@ from GCC 9 onwards.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="gamma-functions">
+</section>
+<section id="gamma-functions">
 <span id="real128-gamma"></span><h3>Gamma functions<a class="headerlink" href="#gamma-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp6lgammaERKN4mppp7real128E">
@@ -2151,8 +2207,8 @@ from GCC 9 onwards.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="bessel-functions">
+</section>
+<section id="bessel-functions">
 <h3>Bessel functions<a class="headerlink" href="#bessel-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp2j0ERKN4mppp7real128E">
@@ -2208,8 +2264,8 @@ from GCC 9 onwards.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="other-special-functions">
+</section>
+<section id="other-special-functions">
 <span id="real128-miscfuncts"></span><h3>Other special functions<a class="headerlink" href="#other-special-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp3erfERKN4mppp7real128E">
@@ -2238,8 +2294,8 @@ from GCC 9 onwards.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="floating-point-manipulation">
+</section>
+<section id="floating-point-manipulation">
 <span id="real128-fpmanip"></span><h3>Floating-point manipulation<a class="headerlink" href="#floating-point-manipulation" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp9nextafterERKN4mppp7real128ERKN4mppp7real128E">
@@ -2286,8 +2342,8 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="integer-and-remainder-related-functions">
+</section>
+<section id="integer-and-remainder-related-functions">
 <h3>Integer and remainder-related functions<a class="headerlink" href="#integer-and-remainder-related-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp4ceilERKN4mppp7real128E">
@@ -2454,8 +2510,8 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="input-output">
+</section>
+<section id="input-output">
 <span id="real128-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppplsERNSt7ostreamERKN4mppp7real128E">
@@ -2486,8 +2542,8 @@ library if precise and forward-compatible control on the printing format is need
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="other">
+</section>
+<section id="other">
 <h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp4hashERKN4mppp7real128E">
@@ -2508,9 +2564,9 @@ guarantees that <code class="docutils literal notranslate"><span class="pre">x</
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="mathematical-operators">
+</section>
+</section>
+<section id="mathematical-operators">
 <span id="real128-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp function">
 <dt id="_CPPv4N4mpppplERKN4mppp7real128E">
@@ -2732,8 +2788,8 @@ from mp++ types.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="constants">
+</section>
+<section id="constants">
 <span id="real128-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h2>
 <p>A few mathematical constants are provided. The constants are available as inline variables
 (e.g., <a class="reference internal" href="#_CPPv4N4mppp6pi_128E" title="mppp::pi_128"><code class="xref cpp cpp-var docutils literal notranslate"><span class="pre">mppp::pi_128</span></code></a>, requires C++17 or later) and as constexpr functions (e.g., <a class="reference internal" href="#_CPPv4N4mppp10real128_piEv" title="mppp::real128_pi"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_pi()</span></code></a>,
@@ -2858,8 +2914,8 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dd><p>Quadruple-precision <span class="math notranslate nohighlight">\(\sqrt{2}\)</span> constant.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="standard-library-specialisations">
+</section>
+<section id="standard-library-specialisations">
 <span id="real128-std-specs"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4IENSt14numeric_limitsIN4mppp7real128EEE">
@@ -3072,8 +3128,8 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 
 </dd></dl>
 
-</div>
-<div class="section" id="user-defined-literals">
+</section>
+<section id="user-defined-literals">
 <span id="real128-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
@@ -3097,8 +3153,8 @@ a valid floating-point literal (as defined by the C++ standard).</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
               </div>

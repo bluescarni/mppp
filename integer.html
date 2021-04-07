@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Multiprecision integers &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,8 +37,11 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Multiprecision rationals" href="rational.html" />
@@ -146,6 +152,40 @@
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -291,6 +331,22 @@
 
             <!-- Source interaction buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Finteger.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
 
             <!-- Full screen (wrap in <a> to have style consistency -->
             <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
@@ -420,10 +476,10 @@
         
               <div>
                 
-  <div class="section" id="multiprecision-integers">
+  <section id="multiprecision-integers">
 <span id="integer-reference"></span><h1>Multiprecision integers<a class="headerlink" href="#multiprecision-integers" title="Permalink to this headline">¶</a></h1>
 <p><em>#include &lt;mp++/integer.hpp&gt;</em></p>
-<div class="section" id="the-integer-class">
+<section id="the-integer-class">
 <h2>The integer class<a class="headerlink" href="#the-integer-class" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp7integerE">
@@ -1479,8 +1535,8 @@ the public interface of <code class="docutils literal notranslate"><span class="
 
 </dd></dl>
 
-</div>
-<div class="section" id="types">
+</section>
+<section id="types">
 <h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp type">
 <dt id="_CPPv45mpz_t">
@@ -1523,8 +1579,8 @@ number.</p>
 from number of bits.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="concepts">
+</section>
+<section id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp22integer_cpp_arithmeticE">
@@ -1582,14 +1638,14 @@ if either:</p>
 </ul>
 </dd></dl>
 
-</div>
-<div class="section" id="functions">
+</section>
+<section id="functions">
 <span id="integer-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <p>Much of the functionality of the <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> class
 is exposed via plain functions. These functions
 mimic the <a class="reference external" href="https://gmplib.org/manual/Integer-Functions.html">GMP API</a> where appropriate, but a variety of
 convenience/generic overloads is provided as well.</p>
-<div class="section" id="assignment">
+<section id="assignment">
 <span id="integer-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp8set_zeroERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE">
@@ -1639,8 +1695,8 @@ convenience/generic overloads is provided as well.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="conversion">
+</section>
+<section id="conversion">
 <span id="integer-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp22integer_cpp_arithmeticE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE">
@@ -1688,8 +1744,8 @@ The conversion is always successful, and this function will always return <code 
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="arithmetic">
+</section>
+<section id="arithmetic">
 <span id="integer-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3addERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
@@ -1937,8 +1993,8 @@ if <em>y</em> fits in a single limb.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="division">
+</section>
+<section id="division">
 <span id="integer-division"></span><h3>Division<a class="headerlink" href="#division" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp7tdiv_qrEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
@@ -2063,8 +2119,8 @@ additionally requires <em>d</em> to be positive.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="comparison">
+</section>
+<section id="comparison">
 <span id="integer-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3cmpEiRKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
@@ -2142,8 +2198,8 @@ additionally requires <em>d</em> to be positive.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="logic-and-bit-fiddling">
+</section>
+<section id="logic-and-bit-fiddling">
 <span id="integer-logic"></span><h3>Logic and bit fiddling<a class="headerlink" href="#logic-and-bit-fiddling" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.6.</span></p>
@@ -2197,8 +2253,8 @@ Negative operands are treated as-if they were represented using two’s compleme
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="number-theoretic-functions">
+</section>
+<section id="number-theoretic-functions">
 <span id="integer-ntheory"></span><h3>Number theoretic functions<a class="headerlink" href="#number-theoretic-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3gcdERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
@@ -2395,8 +2451,8 @@ Note that for negative values of <em>n</em> this function always sets <em>rop</e
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="exponentiation">
+</section>
+<section id="exponentiation">
 <span id="integer-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm">
@@ -2463,8 +2519,8 @@ of <code class="docutils literal notranslate"><span class="pre">unsigned</span> 
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="roots">
+</section>
+<section id="roots">
 <span id="integer-roots"></span><h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
@@ -2643,8 +2699,8 @@ with <span class="math notranslate nohighlight">\(b&gt;1\)</span>, such that <em
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="input-output">
+</section>
+<section id="input-output">
 <span id="integer-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp7integerI5SSizeEE">
@@ -2670,8 +2726,8 @@ with <span class="math notranslate nohighlight">\(b&gt;1\)</span>, such that <em
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="serialisation">
+</section>
+<section id="serialisation">
 <span id="integer-s11n"></span><h3>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.7.</span></p>
@@ -2758,8 +2814,8 @@ overload called on <em>n</em> with <em>src</em> as argument.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="other">
+</section>
+<section id="other">
 <span id="integer-other"></span><h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp4hashENSt6size_tERKN4mppp7integerI5SSizeEE">
@@ -2792,9 +2848,9 @@ the program’s end or a thread’s exit. This function does exactly that.</p>
 <p>It is safe to call this function concurrently from different threads.</p>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="mathematical-operators">
+</section>
+</section>
+<section id="mathematical-operators">
 <span id="integer-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <p>Overloaded operators are provided for convenience.
 Their interface is generic, and their implementation
@@ -3178,8 +3234,8 @@ are treated as-if they were represented using two’s complement.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="standard-library-specialisations">
+</section>
+<section id="standard-library-specialisations">
 <span id="integer-std-specialisations"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4I_NSt6size_tEENSt4hashIN4mppp7integerI5SSizeEEEE">
@@ -3214,8 +3270,8 @@ are treated as-if they were represented using two’s complement.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="user-defined-literals">
+</section>
+<section id="user-defined-literals">
 <span id="integer-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.18.</span></p>
@@ -3250,8 +3306,8 @@ a valid integer literal (as defined by the C++ standard).</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
               </div>

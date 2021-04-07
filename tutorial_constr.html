@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Construction, conversion and assignment &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,6 +37,8 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -145,6 +150,40 @@
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -290,6 +329,22 @@
 
             <!-- Source interaction buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Ftutorial_constr.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
 
             <!-- Full screen (wrap in <a> to have style consistency -->
             <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
@@ -312,7 +367,7 @@
         
               <div>
                 
-  <div class="section" id="construction-conversion-and-assignment">
+  <section id="construction-conversion-and-assignment">
 <span id="tutorial-constr"></span><h1>Construction, conversion and assignment<a class="headerlink" href="#construction-conversion-and-assignment" title="Permalink to this headline">¶</a></h1>
 <p>All of mp++’s multiprecision classes default-construct to zero:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">;</span>
@@ -335,15 +390,6 @@ on curly brackets. Using the same syntax, it is possible to:</p>
 <li><p>initialise multiprecision objects from multiprecision objects of a different type,</p></li>
 <li><p>initialise C++ numerical objects from multiprecision objects.</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In mp++, most constructors and conversions are <code class="docutils literal notranslate"><span class="pre">explicit</span></code>! This means that it is not possible
-to use syntax such as</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
-</pre></div>
-</div>
-<p>or to pass an <code class="docutils literal notranslate"><span class="pre">int_t</span></code> to a function which expects an <code class="docutils literal notranslate"><span class="pre">int</span></code> parameter.</p>
-</div>
 <p>Let’s see a few examples:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
@@ -386,6 +432,14 @@ even if it does not preserve the exact value:</p>
 </pre></div>
 </div>
 <p>The documentation of the multiprecision classes explains in detail the behaviour during construction and conversion.</p>
+<p>Note that, as a general rule, the constructors of mp++’s multiprecision classes are <code class="docutils literal notranslate"><span class="pre">implicit</span></code>
+when constructing from numerical types lower in the <a class="reference internal" href="tutorial_numtower.html#tutorial-numtower"><span class="std std-ref">numerical hierarchy</span></a>, <code class="docutils literal notranslate"><span class="pre">explicit</span></code> otherwise.
+For instance, implicit construction of an <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> from a C++ integral value is allowed, but implicit construction
+from a C++ floating-point value is not:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>   <span class="c1">// Valid.</span>
+<span class="n">int_t</span> <span class="n">n2</span> <span class="o">=</span> <span class="mf">1.12</span> <span class="c1">// Will NOT compile.</span>
+</pre></div>
+</div>
 <p>All of mp++’s multiprecision classes can also be initialised from string-like entities (see the
 <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11string_typeE" title="mppp::string_type"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">string_type</span></code></a> concept for a full list). By default, string input is interpreted as the base-10 representation
 of the desired value, and parsing follows (hopefully) intuitive rules:</p>
@@ -449,7 +503,7 @@ Explicitly casting the multiprecision value before the assignment will however w
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
+</section>
 
 
               </div>

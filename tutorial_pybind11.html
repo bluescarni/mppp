@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Extra: integration with pybind11 &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,11 +37,14 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Reference" href="reference.html" />
+    <link rel="next" title="Interactive notebooks" href="interactive_notebooks.html" />
     <link rel="prev" title="Boost.serialization support" href="tutorial_boost_s11n.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -146,6 +152,40 @@
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -291,6 +331,22 @@
 
             <!-- Source interaction buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Ftutorial_pybind11.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
 
             <!-- Full screen (wrap in <a> to have style consistency -->
             <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
@@ -313,7 +369,7 @@
         
               <div>
                 
-  <div class="section" id="extra-integration-with-pybind11">
+  <section id="extra-integration-with-pybind11">
 <span id="tutorial-pybind11"></span><h1>Extra: integration with pybind11<a class="headerlink" href="#extra-integration-with-pybind11" title="Permalink to this headline">¶</a></h1>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -350,8 +406,8 @@ functions exposed from C++. The translation rules are the following:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects are converted to/from Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">integers</span></code></a>,</p></li>
 <li><p><a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects are converted to/from Python <a class="reference external" href="https://docs.python.org/3/library/fractions.html#fractions.Fraction" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">fractions</span></code></a>,</p></li>
-<li><p><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> objects are translated to/from <a class="reference external" href="http://mpmath.org/">mpmath’s mpf objects</a>,</p></li>
-<li><p><a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> objects are translated to/from <a class="reference external" href="http://mpmath.org/">mpmath’s mpc objects</a>.</p></li>
+<li><p><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> objects are translated to/from <a class="reference external" href="https://mpmath.org/">mpmath’s mpf objects</a>,</p></li>
+<li><p><a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> objects are translated to/from <a class="reference external" href="https://mpmath.org/">mpmath’s mpc objects</a>.</p></li>
 </ul>
 <p>If the mpmath library is not installed, the translations for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>, <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>,
 <a class="reference internal" href="complex128.html#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> and <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> will be disabled at runtime.</p>
@@ -418,7 +474,7 @@ functions exposed from C++. The translation rules are the following:</p>
 <p>Note that we have exposed functions which just return a copy of their input parameter.
 This will allow us to verify that the automatic translation between mp++ and Python objects
 works as intended. Now, assuming that we have built the code above into a Python extension
-called <code class="docutils literal notranslate"><span class="pre">pybind11_test_01</span></code> (see the <a class="reference external" href="https://pybind11.readthedocs.io/en/master/compiling.html">pybind11 documentation</a>
+called <code class="docutils literal notranslate"><span class="pre">pybind11_test_01</span></code> (see the <a class="reference external" href="https://pybind11.readthedocs.io/en/stable/compiling.html">pybind11 documentation</a>
 for details), we can try to call the exposed functions from Python:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pybind11_test_01</span> <span class="k">as</span> <span class="nn">p</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">Fraction</span> <span class="k">as</span> <span class="n">F</span>
@@ -536,7 +592,7 @@ exception is translated to Python’s <a class="reference external" href="https:
 <span class="gr">ZeroDivisionError</span>: <span class="n">Integer division by zero</span>
 </pre></div>
 </div>
-</div>
+</section>
 
 
               </div>
@@ -545,7 +601,7 @@ exception is translated to Python’s <a class="reference external" href="https:
         <div class='prev-next-bottom'>
             
     <a class='left-prev' id="prev-link" href="tutorial_boost_s11n.html" title="previous page">Boost.serialization support</a>
-    <a class='right-next' id="next-link" href="reference.html" title="next page">Reference</a>
+    <a class='right-next' id="next-link" href="interactive_notebooks.html" title="next page">Interactive notebooks</a>
 
         </div>
         

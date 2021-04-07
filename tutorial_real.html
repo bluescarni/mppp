@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Multiprecision float tutorial &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,8 +37,11 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Multiprecision complex numbers tutorial" href="tutorial_complex.html" />
@@ -146,6 +152,40 @@
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -291,6 +331,22 @@
 
             <!-- Source interaction buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Ftutorial_real.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
 
             <!-- Full screen (wrap in <a> to have style consistency -->
             <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
@@ -368,7 +424,7 @@
         
               <div>
                 
-  <div class="section" id="multiprecision-float-tutorial">
+  <section id="multiprecision-float-tutorial">
 <span id="tutorial-real"></span><h1>Multiprecision float tutorial<a class="headerlink" href="#multiprecision-float-tutorial" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is a floating-point
 class in which the number of digits of precision in the significand can
@@ -379,7 +435,7 @@ memory).</p>
 and it is designed to behave like a standard C++ floating-point type
 in which the precision is not a compile-time property of the class,
 but rather a runtime property of the class instances.</p>
-<div class="section" id="construction-and-precision-handling">
+<section id="construction-and-precision-handling">
 <h2>Construction and precision handling<a class="headerlink" href="#construction-and-precision-handling" title="Permalink to this headline">¶</a></h2>
 <p>The precision of a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is measured in the number
 of bits in the significand, and it can be set at
@@ -490,8 +546,8 @@ family of functions:</p>
                                <span class="c1">// 4*2**(-5).</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="precision-propagation">
+</section>
+<section id="precision-propagation">
 <h2>Precision propagation<a class="headerlink" href="#precision-propagation" title="Permalink to this headline">¶</a></h2>
 <p>In the C++ language, mixed-precision floating-point operations promote the lower-precision operand
 to the higher-precision type. For instance, in the following code snippet,</p>
@@ -551,8 +607,8 @@ of the generic constructor of <a class="reference internal" href="real.html#_CPP
 <span class="n">assert</span><span class="p">(</span><span class="n">x4</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span> <span class="o">==</span> <span class="mi">113</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="move-awareness">
+</section>
+<section id="move-awareness">
 <h2>Move awareness<a class="headerlink" href="#move-awareness" title="Permalink to this headline">¶</a></h2>
 <p>One of the major sources of inefficiency when working with <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects,
 especially at lower precisions, is the memory allocation overhead. The problem is
@@ -654,8 +710,8 @@ are very effective at detecting use-after-move occurrences in source code.</p>
 <p>It is important to emphasise how move-awareness in the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API is not
 limited to mathematical operators: all functions accepting one or more <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 objects as input arguments are move-aware.</p>
-</div>
-<div class="section" id="special-functions">
+</section>
+<section id="special-functions">
 <h2>Special functions<a class="headerlink" href="#special-functions" title="Permalink to this headline">¶</a></h2>
 <p>One of the design goals of the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class is to provide a
 comprehensive library of special functions. <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> currently
@@ -670,10 +726,10 @@ wraps all the special functions provided by the MPFR library, including:</p>
 <li><p>error functions,</p></li>
 </ul>
 <p>and many more. Additionally, <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> can also (optionally) use
-the <a class="reference external" href="http://arblib.org/">Arb</a> library to provide additional special functions
+the <a class="reference external" href="https://arblib.org/">Arb</a> library to provide additional special functions
 not available in MPFR.</p>
-</div>
-<div class="section" id="constants">
+</section>
+<section id="constants">
 <h2>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h2>
 <p>The MPFR API provides the ability to compute a handful of
 constants in arbitrary precision. This capability is
@@ -689,8 +745,8 @@ with the <span class="math notranslate nohighlight">\(\pi\)</span> constant:</p>
                               <span class="c1">// pi, that is, 3.1406.</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="comparisons">
+</section>
+<section id="comparisons">
 <h2>Comparisons<a class="headerlink" href="#comparisons" title="Permalink to this headline">¶</a></h2>
 <p>In addition to the <a class="reference internal" href="tutorial_commonops.html#tutorial-commonops"><span class="std std-ref">common comparison operators</span></a>
 available for all of mp++’s multiprecision classes,
@@ -733,8 +789,8 @@ and greater than non-NaN values:</p>
 <span class="n">assert</span><span class="p">(</span><span class="n">real_lt</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;inf&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">}));</span>       <span class="c1">// inf &lt; NaN.</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="interacting-with-the-mpfr-api">
+</section>
+<section id="interacting-with-the-mpfr-api">
 <h2>Interacting with the MPFR API<a class="headerlink" href="#interacting-with-the-mpfr-api" title="Permalink to this headline">¶</a></h2>
 <p>Because <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> wraps an <a class="reference internal" href="real.html#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a>
 instance, it is trivial to use a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> in the MPFR API.
@@ -752,8 +808,8 @@ must be in the bounds established by <a class="reference internal" href="real.ht
 object must contain a valid <a class="reference internal" href="real.html#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a> object.</p>
 <p>Additionally, a variety of constructors, assignment operators and setters from
 <a class="reference internal" href="real.html#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a> are also available.</p>
-</div>
-<div class="section" id="serialisation">
+</section>
+<section id="serialisation">
 <h2>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.22.</span></p>
@@ -776,8 +832,8 @@ and it might be subject to changes in future versions of mp++. Users are thus ad
 the binary serialisation format for long-term persistence or as a data exchange format: for such
 purposes, it is better to use the string representation of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects.</p></li>
 </ul>
-</div>
-<div class="section" id="user-defined-literals">
+</section>
+<section id="user-defined-literals">
 <h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <p>User-defined literals are available for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.
 The <a class="reference internal" href="real.html#real-literals"><span class="std std-ref">literals</span></a>
@@ -801,8 +857,8 @@ with 128, 256, 512 and 1024 bits of precision:</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/floating_literal">https://en.cppreference.com/w/cpp/language/floating_literal</a></p>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>

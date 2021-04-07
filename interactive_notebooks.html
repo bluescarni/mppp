@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
-    <title>Exceptions &#8212; mp++ 0.23 documentation</title>
+    <title>Interactive notebooks &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -42,8 +42,8 @@
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Common concepts" href="concepts.html" />
-    <link rel="prev" title="Namespaces" href="namespaces.html" />
+    <link rel="next" title="Integer basics" href="notebooks/integer_basics.html" />
+    <link rel="prev" title="Extra: integration with pybind11" href="tutorial_pybind11.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -156,8 +156,8 @@
   <i class="fas fa-chevron-down">
   </i>
  </li>
- <li class="toctree-l1 collapsible-parent">
-  <a class="reference internal" href="interactive_notebooks.html">
+ <li class="toctree-l1 current active collapsible-parent">
+  <a class="current reference internal" href="#">
    Interactive notebooks
   </a>
   <ul class="collapse-ul">
@@ -190,11 +190,11 @@
   <i class="fas fa-chevron-down">
   </i>
  </li>
- <li class="toctree-l1 current active collapsible-parent">
+ <li class="toctree-l1 collapsible-parent">
   <a class="reference internal" href="reference.html">
    Reference
   </a>
-  <ul class="current collapse-ul">
+  <ul class="collapse-ul">
    <li class="toctree-l2">
     <a class="reference internal" href="definitions.html">
      Macros and definitions
@@ -205,8 +205,8 @@
      Namespaces
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="exceptions.html">
      Exceptions
     </a>
    </li>
@@ -318,7 +318,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/exceptions.rst.txt"><button type="button"
+        <a class="dropdown-buttons" href="_sources/interactive_notebooks.rst.txt"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.rst</button></a>
         <!-- Download PDF via print -->
@@ -338,7 +338,7 @@
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Fexceptions.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Finteractive_notebooks.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -359,6 +359,21 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#integer">
+   Integer
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
         </div>
     </div>
 </div>
@@ -367,19 +382,27 @@
         
               <div>
                 
-  <section id="exceptions">
-<span id="id1"></span><h1>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h1>
-<p><em>#include &lt;mp++/exceptions.hpp&gt;</em></p>
-<dl class="cpp class">
-<dt id="_CPPv4N4mppp19zero_division_errorE">
-<span id="_CPPv3N4mppp19zero_division_errorE"></span><span id="_CPPv2N4mppp19zero_division_errorE"></span><span id="mppp::zero_division_error"></span><em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">zero_division_error</span></code> <em class="property"><span class="pre">final</span></em> <span class="pre">:</span> <em class="property"><span class="pre">public</span></em> <span class="pre">std</span><span class="pre">::</span><span class="pre">domain_error</span><a class="headerlink" href="#_CPPv4N4mppp19zero_division_errorE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Exception to signal division by zero.</p>
-<p>This exception inherits all members (including constructors) from
-<a class="reference external" href="https://en.cppreference.com/w/cpp/error/domain_error">std::domain_error</a>. It will be thrown
-when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
-represent infinities.</p>
-</dd></dl>
-
+  <section id="interactive-notebooks">
+<span id="id1"></span><h1>Interactive notebooks<a class="headerlink" href="#interactive-notebooks" title="Permalink to this headline">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>
+These tutorials can be launched as online interactive notebooks
+thanks to the infrastructure provided by <a href="https://mybinder.org/">binder</a>.
+Look for the rocket icon <i class="fas fa-rocket"></i> on top of each page!
+</p></div>
+<section id="integer">
+<h2>Integer<a class="headerlink" href="#integer" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/integer_basics.html">Integer basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/integer_formatted_output.html">Integer formatted output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/integer_arithmetic.html">Integer arithmetic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/integer_comparison.html">Integer comparison</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/integer_bit_fiddling.html">Integer logic and bit fiddling</a></li>
+</ul>
+</div>
+</section>
 </section>
 
 
@@ -388,8 +411,8 @@ represent infinities.</p>
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="namespaces.html" title="previous page">Namespaces</a>
-    <a class='right-next' id="next-link" href="concepts.html" title="next page">Common concepts</a>
+    <a class='left-prev' id="prev-link" href="tutorial_pybind11.html" title="previous page">Extra: integration with pybind11</a>
+    <a class='right-next' id="next-link" href="notebooks/integer_basics.html" title="next page">Integer basics</a>
 
         </div>
         

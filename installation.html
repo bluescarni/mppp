@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Installation &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,6 +37,8 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -145,6 +150,40 @@
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -290,6 +329,22 @@
 
             <!-- Source interaction buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Finstallation.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
 
             <!-- Full screen (wrap in <a> to have style consistency -->
             <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
@@ -364,9 +419,9 @@
         
               <div>
                 
-  <div class="section" id="installation">
+  <section id="installation">
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="introduction">
+<section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>mp++ is written in modern C++, and it requires a compiler able to understand
 at least C++11 (mp++ will also use features from C++14, C++17 and C++20,
@@ -388,7 +443,7 @@ for the <code class="docutils literal notranslate"><span class="pre">long</span>
 (MPFR 3 or a later version is required);</p></li>
 <li><p>the <a class="reference external" href="http://www.multiprecision.org/mpc/">GNU MPC</a> multiprecision complex library, <em>optional</em>, used in the implementation
 of the <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> class;</p></li>
-<li><p>the <a class="reference external" href="http://arblib.org/">Arb</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>,
+<li><p>the <a class="reference external" href="https://arblib.org/">Arb</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>,
 used in the implementation of additional special functions for the
 <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and <a class="reference internal" href="complex.html#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> classes, and in the benchmarking
 suite;</p></li>
@@ -410,8 +465,8 @@ installing from source (the minimum required version is 3.8).</p>
 integration setup.</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="installation-from-source">
+</section>
+<section id="installation-from-source">
 <h2>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h2>
 <p>Source releases of mp++ can be downloaded from
 <a class="reference external" href="https://github.com/bluescarni/mppp/releases">github</a>.
@@ -494,11 +549,11 @@ in order to execute the test or the benchmark suite you have to ensure that the
 <code class="docutils literal notranslate"><span class="pre">PATH</span></code> variable includes the directory that contains the mp++
 DLL (otherwise the tests will fail to run).</p>
 </div>
-</div>
-<div class="section" id="packages">
+</section>
+<section id="packages">
 <h2>Packages<a class="headerlink" href="#packages" title="Permalink to this headline">¶</a></h2>
 <p>mp++ is also available from a variety of package managers on various platforms.</p>
-<div class="section" id="conda">
+<section id="conda">
 <h3>Conda<a class="headerlink" href="#conda" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.2.</span></p>
@@ -515,17 +570,17 @@ to add <code class="docutils literal notranslate"><span class="pre">conda-forge<
 <p>(note that the <a class="reference external" href="https://anaconda.org/conda-forge/mppp">conda package</a> for mp++ is named <code class="docutils literal notranslate"><span class="pre">mppp</span></code> rather than <code class="docutils literal notranslate"><span class="pre">mp++</span></code>)</p>
 <p>Please refer to the <a class="reference external" href="https://conda.io/en/latest/">conda documentation</a> for instructions on how to setup and manage
 your conda installation.</p>
-</div>
-<div class="section" id="freebsd">
+</section>
+<section id="freebsd">
 <h3>FreeBSD<a class="headerlink" href="#freebsd" title="Permalink to this headline">¶</a></h3>
-<p>A FreeBSD port via <a class="reference external" href="https://www.freebsd.org/doc/handbook/pkgng-intro.html">pkg</a> has been created for
+<p>A FreeBSD port via <a class="reference external" href="https://www.freebsd.org/ports/">pkg</a> has been created for
 mp++. In order to install mp++ using pkg, execute the following command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pkg install mppp
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="checking-the-installation">
+</section>
+</section>
+<section id="checking-the-installation">
 <h2>Checking the installation<a class="headerlink" href="#checking-the-installation" title="Permalink to this headline">¶</a></h2>
 <p>You can test the installation of mp++ with the following
 simple <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code> program:</p>
@@ -566,8 +621,8 @@ than locating and linking manually the required dependencies
 internal debug checks at runtime which carry a large performance penalty. Users are advised
 to always define <code class="docutils literal notranslate"><span class="pre">NDEBUG</span></code> when compiling code using mp++ in <code class="docutils literal notranslate"><span class="pre">Release</span></code> builds.</p>
 </div>
-</div>
-<div class="section" id="including-mp-in-your-project-via-cmake">
+</section>
+<section id="including-mp-in-your-project-via-cmake">
 <h2>Including mp++ in your project via CMake<a class="headerlink" href="#including-mp-in-your-project-via-cmake" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.2.</span></p>
@@ -614,8 +669,8 @@ variables to signal with which optional dependencies mp++ was compiled:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_QUADMATH</span></code> if quadmath support was enabled,</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_BOOST_S11N</span></code> if Boost.serialization support was enabled.</p></li>
 </ul>
-</div>
-<div class="section" id="compiler-and-platform-specific-notes">
+</section>
+<section id="compiler-and-platform-specific-notes">
 <span id="inst-plat-specific"></span><h2>Compiler and platform specific notes<a class="headerlink" href="#compiler-and-platform-specific-notes" title="Permalink to this headline">¶</a></h2>
 <p>Visual Studio:</p>
 <ul class="simple">
@@ -681,8 +736,8 @@ test case from the mp++ test suite failing on FreeBSD <a class="footnote-referen
 <dd><p><a class="reference external" href="https://github.com/bluescarni/mppp/issues/132">https://github.com/bluescarni/mppp/issues/132</a></p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
               </div>

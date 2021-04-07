@@ -353,7 +353,7 @@ wraps all the special functions provided by the MPFR library, including:
 * error functions,
 
 and many more. Additionally, :cpp:class:`~mppp::real` can also (optionally) use
-the `Arb <http://arblib.org/>`__ library to provide additional special functions
+the `Arb <https://arblib.org/>`__ library to provide additional special functions
 not available in MPFR.
 
 Constants

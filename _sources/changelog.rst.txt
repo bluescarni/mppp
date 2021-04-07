@@ -233,7 +233,7 @@ New
 - Implement :cpp:class:`~mppp::real` primitives for exact
   multiplication/division by powers of 2
   (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
-- mp++ can now optionally use `Arb <http://arblib.org/>`__
+- mp++ can now optionally use `Arb <https://arblib.org/>`__
   to provide various additional special functions for
   :cpp:class:`~mppp::real`
   (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).

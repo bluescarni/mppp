@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Multiprecision rationals &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,8 +37,11 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quadruple-precision floats" href="real128.html" />
@@ -146,6 +152,40 @@
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -291,6 +331,22 @@
 
             <!-- Source interaction buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Frational.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
 
             <!-- Full screen (wrap in <a> to have style consistency -->
             <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
@@ -400,13 +456,13 @@
         
               <div>
                 
-  <div class="section" id="multiprecision-rationals">
+  <section id="multiprecision-rationals">
 <span id="rational-reference"></span><h1>Multiprecision rationals<a class="headerlink" href="#multiprecision-rationals" title="Permalink to this headline">¶</a></h1>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.3.</span></p>
 </div>
 <p><em>#include &lt;mp++/rational.hpp&gt;</em></p>
-<div class="section" id="the-rational-class">
+<section id="the-rational-class">
 <h2>The rational class<a class="headerlink" href="#the-rational-class" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp8rationalE">
@@ -1034,8 +1090,8 @@ values.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="types">
+</section>
+<section id="types">
 <h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp type">
 <dt id="_CPPv45mpq_t">
@@ -1048,8 +1104,8 @@ It is defined as an array of size 1 of an unspecified structure.</p>
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="concepts">
+</section>
+<section id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp concept">
 <dt id="_CPPv4I0_NSt6size_tEEN4mppp22rational_interoperableE">
@@ -1107,14 +1163,14 @@ type.</p></li>
 </ul>
 </dd></dl>
 
-</div>
-<div class="section" id="functions">
+</section>
+<section id="functions">
 <span id="rational-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <p>Much of the functionality of the <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class is exposed
 via plain functions. These functions
 mimic the <a class="reference external" href="https://gmplib.org/manual/Rational-Number-Functions.html">GMP API</a> where appropriate, but a variety of
 convenience/generic overloads is provided as well.</p>
-<div class="section" id="assignment">
+<section id="assignment">
 <span id="rational-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE">
@@ -1134,8 +1190,8 @@ convenience/generic overloads is provided as well.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="conversion">
+</section>
+<section id="conversion">
 <span id="rational-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tE_N4mppp22rational_interoperableI5SSizeEEEN4mppp3getEbR1TRKN4mppp8rationalI5SSizeEE">
@@ -1160,8 +1216,8 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="arithmetic">
+</section>
+<section id="arithmetic">
 <span id="rational-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE">
@@ -1286,8 +1342,8 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="comparison">
+</section>
+<section id="comparison">
 <span id="rational-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3cmpEiRKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE">
@@ -1357,8 +1413,8 @@ otherwise.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="number-theoretic-functions">
+</section>
+<section id="number-theoretic-functions">
 <span id="rational-ntheory"></span><h3>Number theoretic functions<a class="headerlink" href="#number-theoretic-functions" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.8.</span></p>
@@ -1388,8 +1444,8 @@ the binomial coefficient for <a class="reference internal" href="integer.html#_C
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="exponentiation">
+</section>
+<section id="exponentiation">
 <span id="rational-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mppp3powEDaRK1TRK1U">
@@ -1422,8 +1478,8 @@ in a handful of special cases).</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="input-output">
+</section>
+<section id="input-output">
 <span id="rational-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp8rationalI5SSizeEE">
@@ -1449,8 +1505,8 @@ in a handful of special cases).</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="other">
+</section>
+<section id="other">
 <span id="rational-other"></span><h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp12canonicaliseERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE">
@@ -1485,9 +1541,9 @@ that it is possible to use <a class="reference internal" href="#_CPPv4I_NSt6size
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="mathematical-operators">
+</section>
+</section>
+<section id="mathematical-operators">
 <span id="rational-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <p>Overloaded operators are provided for convenience. Their interface is generic,
 and their implementation
@@ -1687,8 +1743,8 @@ of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="standard-library-specialisations">
+</section>
+<section id="standard-library-specialisations">
 <span id="rational-std-specialisations"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4I_NSt6size_tEENSt4hashIN4mppp8rationalI5SSizeEEEE">
@@ -1723,8 +1779,8 @@ of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 
 </dd></dl>
 
-</div>
-<div class="section" id="user-defined-literals">
+</section>
+<section id="user-defined-literals">
 <span id="rational-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
@@ -1761,8 +1817,8 @@ a valid integer literal (as defined by the C++ standard).</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
               </div>

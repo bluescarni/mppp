@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Multiprecision complex numbers &#8212; mp++ 0.23 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
@@ -26,7 +27,9 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.c441f2ba0852f4cabcb80105e3a46ae6.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
   <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
 
@@ -34,8 +37,11 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Utility functions" href="utilities.html" />
@@ -146,6 +152,40 @@
    <li class="toctree-l2">
     <a class="reference internal" href="tutorial_pybind11.html">
      Extra: integration with pybind11
+    </a>
+   </li>
+  </ul>
+  <i class="fas fa-chevron-down">
+  </i>
+ </li>
+ <li class="toctree-l1 collapsible-parent">
+  <a class="reference internal" href="interactive_notebooks.html">
+   Interactive notebooks
+  </a>
+  <ul class="collapse-ul">
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_basics.html">
+     Integer basics
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_formatted_output.html">
+     Integer formatted output
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_arithmetic.html">
+     Integer arithmetic
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_comparison.html">
+     Integer comparison
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
+     Integer logic and bit fiddling
     </a>
    </li>
   </ul>
@@ -291,6 +331,22 @@
 
             <!-- Source interaction buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Fcomplex.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
 
             <!-- Full screen (wrap in <a> to have style consistency -->
             <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
@@ -420,7 +476,7 @@
         
               <div>
                 
-  <div class="section" id="multiprecision-complex-numbers">
+  <section id="multiprecision-complex-numbers">
 <h1>Multiprecision complex numbers<a class="headerlink" href="#multiprecision-complex-numbers" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -431,7 +487,7 @@ with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_
 <p><span class="versionmodified added">New in version 0.20.</span></p>
 </div>
 <p><em>#include &lt;mp++/complex.hpp&gt;</em></p>
-<div class="section" id="the-complex-class">
+<section id="the-complex-class">
 <h2>The complex class<a class="headerlink" href="#the-complex-class" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4N4mppp7complexE">
@@ -1500,8 +1556,8 @@ fails because of (unlikely) overflow conditions.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="types">
+</section>
+<section id="types">
 <h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp type">
 <dt id="_CPPv45mpc_t">
@@ -1525,8 +1581,8 @@ The MPC type <a class="reference internal" href="#_CPPv45mpc_t" title="mpc_t"><c
 <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> in order to avoid ambiguities during overload resolution.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="concepts">
+</section>
+<section id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp11cvr_complexE">
@@ -1624,10 +1680,10 @@ involving <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mpp
 of reference, is not const.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="functions">
+</section>
+<section id="functions">
 <span id="complex-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="components-access">
+<section id="components-access">
 <span id="complex-components-access"></span><h3>Components access<a class="headerlink" href="#components-access" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp13get_real_imagERKN4mppp7complexE">
@@ -1940,8 +1996,8 @@ imaginary part of <em>c</em>.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="precision-handling">
+</section>
+<section id="precision-handling">
 <h3>Precision handling<a class="headerlink" href="#precision-handling" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp8get_precERKN4mppp7complexE">
@@ -1984,8 +2040,8 @@ or <a class="reference internal" href="#_CPPv4N4mppp7complex10prec_roundE11mpfr_
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="assignment">
+</section>
+<section id="assignment">
 <h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_DpN4mppp16complex_set_argsEEN4mppp3setERN4mppp7complexERN4mppp7complexEDpRK4Args">
@@ -2060,8 +2116,8 @@ of <em>c</em> will not be altered.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="conversion">
+</section>
+<section id="conversion">
 <h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp19complex_convertibleEEN4mppp3getEbR1TRKN4mppp7complexE">
@@ -2086,8 +2142,8 @@ specified in the documentation of the conversion operator for <a class="referenc
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="arithmetic">
+</section>
+<section id="arithmetic">
 <h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3addERN4mppp7complexERN4mppp7complexERR1TRR1U">
@@ -2415,8 +2471,8 @@ multiplication/division by powers of 2.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="comparison">
+</section>
+<section id="comparison">
 <h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE">
@@ -2487,8 +2543,8 @@ numbers),</p></li>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="roots">
+</section>
+<section id="roots">
 <h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T">
@@ -2591,8 +2647,8 @@ fails because of (unlikely) overflow conditions.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="exponentiation">
+</section>
+<section id="exponentiation">
 <h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3powERN4mppp7complexERN4mppp7complexERR1TRR1U">
@@ -2633,8 +2689,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="trigonometry">
+</section>
+<section id="trigonometry">
 <h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp3sinERN4mppp7complexERN4mppp7complexERR1T">
@@ -2758,8 +2814,8 @@ precision of <em>op</em>.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="hyperbolic-functions">
+</section>
+<section id="hyperbolic-functions">
 <h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4sinhERN4mppp7complexERN4mppp7complexERR1T">
@@ -2862,8 +2918,8 @@ precision of <em>op</em>.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="logarithms-and-exponentials">
+</section>
+<section id="logarithms-and-exponentials">
 <h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp3expERN4mppp7complexERN4mppp7complexERR1T">
@@ -2930,8 +2986,8 @@ precision of <em>op</em>.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="arithmetic-geometric-mean">
+</section>
+<section id="arithmetic-geometric-mean">
 <h3>Arithmetic-geometric mean<a class="headerlink" href="#arithmetic-geometric-mean" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERN4mppp7complexERR1T">
@@ -3019,8 +3075,8 @@ fails because of (unlikely) overflow conditions.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="input-output">
+</section>
+<section id="input-output">
 <h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppplsERNSt7ostreamERKN4mppp7complexE">
@@ -3051,9 +3107,9 @@ library if precise and forward-compatible control on the printing format is need
 </dl>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="mathematical-operators">
+</section>
+</section>
+<section id="mathematical-operators">
 <span id="complex-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp11cvr_complexEEN4mpppplEN4mppp7complexERR1T">
@@ -3222,8 +3278,8 @@ standard.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="user-defined-literals">
+</section>
+<section id="user-defined-literals">
 <h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp function">
 <dt id="_CPPv4I_DpcEN4mppp8literalsli7_icr128EN4mppp7complexEv">
@@ -3261,8 +3317,8 @@ a valid floating-point literal (as defined by the C++ standard).</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
               </div>
