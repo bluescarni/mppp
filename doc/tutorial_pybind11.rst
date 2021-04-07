@@ -39,8 +39,8 @@ functions exposed from C++. The translation rules are the following:
 
 * :cpp:class:`~mppp::integer` objects are converted to/from Python :py:class:`integers <int>`,
 * :cpp:class:`~mppp::rational` objects are converted to/from Python :py:class:`fractions <fractions.Fraction>`,
-* :cpp:class:`~mppp::real` and :cpp:class:`~mppp::real128` objects are translated to/from `mpmath's mpf objects <http://mpmath.org/>`__,
-* :cpp:class:`~mppp::complex` and :cpp:class:`~mppp::complex128` objects are translated to/from `mpmath's mpc objects <http://mpmath.org/>`__.
+* :cpp:class:`~mppp::real` and :cpp:class:`~mppp::real128` objects are translated to/from `mpmath's mpf objects <https://mpmath.org/>`__,
+* :cpp:class:`~mppp::complex` and :cpp:class:`~mppp::complex128` objects are translated to/from `mpmath's mpc objects <https://mpmath.org/>`__.
 
 If the mpmath library is not installed, the translations for :cpp:class:`~mppp::real128`, :cpp:class:`~mppp::real`,
 :cpp:class:`~mppp::complex128` and :cpp:class:`~mppp::complex` will be disabled at runtime.
@@ -110,7 +110,7 @@ Let's take a look at an example of a pybind11 module enabling automatic translat
 Note that we have exposed functions which just return a copy of their input parameter.
 This will allow us to verify that the automatic translation between mp++ and Python objects
 works as intended. Now, assuming that we have built the code above into a Python extension
-called ``pybind11_test_01`` (see the `pybind11 documentation <https://pybind11.readthedocs.io/en/master/compiling.html>`__
+called ``pybind11_test_01`` (see the `pybind11 documentation <https://pybind11.readthedocs.io/en/stable/compiling.html>`__
 for details), we can try to call the exposed functions from Python:
 
 >>> import pybind11_test_01 as p

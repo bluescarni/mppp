@@ -43,7 +43,7 @@ substantial (see the :ref:`benchmarks <benchmarks>` section).
 Over time, mp++ has accrued many additional features, including
 multiprecision real and complex number types, and an expanding
 library of special functions (built in part on top of the excellent
-`Arb <http://arblib.org/>`__ library).
+`Arb <https://arblib.org/>`__ library).
 
 mp++ is a spinoff of the `Piranha <https://github.com/bluescarni/piranha>`__ library, released under the
 `MPL2 <https://www.mozilla.org/en-US/MPL/2.0/FAQ/>`__ license.
