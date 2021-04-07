@@ -33,9 +33,6 @@ make -j2 install
 cd ../doc
 export SPHINX_OUTPUT=`make html linkcheck 2>&1 >/dev/null`;
 
-# Debug.
-cat /home/circleci/project/doc/_build/html/reports/integer_arithmetic.log
-
 if [[ "${SPHINX_OUTPUT}" != "" ]]; then
     echo "Sphinx encountered some problem:";
     echo "${SPHINX_OUTPUT}";
