@@ -12,3 +12,5 @@ Integer
     notebooks/integer_basics
     notebooks/integer_formatted_output
     notebooks/integer_arithmetic
+    notebooks/integer_comparison
+    notebooks/integer_bit_fiddling
