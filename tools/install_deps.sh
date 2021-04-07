@@ -28,10 +28,6 @@ if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
 
     conda_pkgs="cmake gmp mpfr arb libflint mpc boost-cpp"
 
-    if [[ "${MPPP_BUILD}" == Documentation ]]; then
-        conda_pkgs="$conda_pkgs pip"
-    fi
-
     conda create -q -p $deps_dir -y $conda_pkgs
     source activate $deps_dir
 fi

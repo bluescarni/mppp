@@ -51,20 +51,6 @@ matrix:
           - g++-6
           - g++-6-multilib
           - cmake
-    - env: MPPP_BUILD="Documentation"
-      os: linux
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - gcc-5
-          - g++-5
-          - texlive
-          - texlive-latex-extra
-          - texlive-xetex
-          - lmodern
-          - latexmk
     - env: MPPP_BUILD="OSXDebug"
       os: osx
       osx_image: xcode6.4
