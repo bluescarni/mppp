@@ -26,7 +26,7 @@ mp++ has the following dependencies:
   (MPFR 3 or a later version is required);
 * the `GNU MPC <http://www.multiprecision.org/mpc/>`__ multiprecision complex library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::complex` class;
-* the `Arb <http://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
+* the `Arb <https://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
   used in the implementation of additional special functions for the
   :cpp:class:`~mppp::real` and :cpp:class:`~mppp::complex` classes, and in the benchmarking
   suite;
@@ -176,8 +176,7 @@ your conda installation.
 FreeBSD
 ^^^^^^^
 
-A FreeBSD port via `pkg
-<https://www.freebsd.org/doc/handbook/pkgng-intro.html>`__ has been created for
+A FreeBSD port via `pkg <https://www.freebsd.org/ports/>`__ has been created for
 mp++. In order to install mp++ using pkg, execute the following command:
 
 .. code-block:: console

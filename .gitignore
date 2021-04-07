@@ -3,6 +3,7 @@ build*
 
 # Documentation.
 doc/_build/
+doc/notebooks/.ipynb_checkpoints
 # This is auto-generated.
 doc/conf.py
 
