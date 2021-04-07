@@ -31,6 +31,10 @@ cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TY
 # Build the docs.
 cd ../doc
 export SPHINX_OUTPUT=`make html linkcheck 2>&1 >/dev/null`;
+
+# Debug.
+cat /home/circleci/project/doc/_build/html/reports/integer_arithmetic.log
+
 if [[ "${SPHINX_OUTPUT}" != "" ]]; then
     echo "Sphinx encountered some problem:";
     echo "${SPHINX_OUTPUT}";
@@ -74,7 +78,6 @@ do
         exit 1;
     fi
 done
-
 
 set +e
 set +x
