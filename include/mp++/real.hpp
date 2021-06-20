@@ -195,6 +195,9 @@ MPPP_DLL_PUBLIC void arb_sinc_pi(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void arb_hypgeom_bessel_j(::mpfr_t, const ::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void arb_hypgeom_bessel_y(::mpfr_t, const ::mpfr_t, const ::mpfr_t);
 
+MPPP_DLL_PUBLIC void arb_lambert_w0(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_lambert_wm1(::mpfr_t, const ::mpfr_t);
+
 #endif
 
 } // namespace detail
@@ -1243,6 +1246,11 @@ public:
     real &erfc();
     // In-place Airy function.
     real &ai();
+#if defined(MPPP_WITH_ARB)
+    // In-place Lambert W function.
+    real &lambert_w0();
+    real &lambert_wm1();
+#endif
 
     // In-place integer and remainder-related functions.
     real &ceil();
@@ -2198,7 +2206,7 @@ requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline real pow(T &&op1, U &&op2)
+inline real pow(T &&op1, U &&op2)
 {
     return detail::dispatch_real_pow(std::forward<T>(op1), std::forward<U>(op2));
 }
@@ -2422,6 +2430,13 @@ MPPP_REAL_MPFR_UNARY_IMPL(zeta, ::mpfr_zeta, true)
 MPPP_REAL_MPFR_UNARY_IMPL(erf, ::mpfr_erf, true)
 MPPP_REAL_MPFR_UNARY_IMPL(erfc, ::mpfr_erfc, true)
 MPPP_REAL_MPFR_UNARY_IMPL(ai, ::mpfr_ai, true)
+
+#if defined(MPPP_WITH_ARB)
+
+MPPP_REAL_MPFR_UNARY_IMPL(lambert_w0, detail::arb_lambert_w0, false)
+MPPP_REAL_MPFR_UNARY_IMPL(lambert_wm1, detail::arb_lambert_wm1, false)
+
+#endif
 
 #if defined(MPPP_MPFR_HAVE_MPFR_BETA)
 
@@ -2720,7 +2735,7 @@ requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline real operator+(T &&a, U &&b)
+inline real operator+(T &&a, U &&b)
 {
     return detail::dispatch_real_binary_add(std::forward<T>(a), std::forward<U>(b));
 }
@@ -2812,7 +2827,7 @@ requires real_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator+=(T &a, U &&b)
+inline T &operator+=(T &a, U &&b)
 {
     detail::dispatch_real_in_place_add(a, std::forward<U>(b));
     return a;
@@ -3038,7 +3053,7 @@ requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline real operator-(T &&a, U &&b)
+inline real operator-(T &&a, U &&b)
 {
     return detail::dispatch_real_binary_sub(std::forward<T>(a), std::forward<U>(b));
 }
@@ -3130,7 +3145,7 @@ requires real_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator-=(T &a, U &&b)
+inline T &operator-=(T &a, U &&b)
 {
     detail::dispatch_real_in_place_sub(a, std::forward<U>(b));
     return a;
@@ -3308,7 +3323,7 @@ requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline real operator*(T &&a, U &&b)
+inline real operator*(T &&a, U &&b)
 {
     return detail::dispatch_real_binary_mul(std::forward<T>(a), std::forward<U>(b));
 }
@@ -3400,7 +3415,7 @@ requires real_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator*=(T &a, U &&b)
+inline T &operator*=(T &a, U &&b)
 {
     detail::dispatch_real_in_place_mul(a, std::forward<U>(b));
     return a;
@@ -3684,7 +3699,7 @@ requires real_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator/=(T &a, U &&b)
+inline T &operator/=(T &a, U &&b)
 {
     detail::dispatch_real_in_place_div(a, std::forward<U>(b));
     return a;
@@ -3796,7 +3811,7 @@ requires real_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_eq_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator==(const T &a, const U &b)
+inline bool operator==(const T &a, const U &b)
 {
     return detail::dispatch_real_equality(a, b);
 }
@@ -3808,7 +3823,7 @@ requires real_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_eq_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator!=(const T &a, const U &b)
+inline bool operator!=(const T &a, const U &b)
 {
     return !(a == b);
 }
@@ -3952,7 +3967,7 @@ requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator>(const T &a, const U &b)
+inline bool operator>(const T &a, const U &b)
 {
     return detail::dispatch_real_gt(a, b);
 }
@@ -4096,7 +4111,7 @@ requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator>=(const T &a, const U &b)
+inline bool operator>=(const T &a, const U &b)
 {
     return detail::dispatch_real_gte(a, b);
 }
@@ -4240,7 +4255,7 @@ requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator<(const T &a, const U &b)
+inline bool operator<(const T &a, const U &b)
 {
     return detail::dispatch_real_lt(a, b);
 }
@@ -4384,7 +4399,7 @@ requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator<=(const T &a, const U &b)
+inline bool operator<=(const T &a, const U &b)
 {
     return detail::dispatch_real_lte(a, b);
 }

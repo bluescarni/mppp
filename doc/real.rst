@@ -979,6 +979,14 @@ The real class
    .. cpp:function:: real &erf()
    .. cpp:function:: real &erfc()
    .. cpp:function:: real &ai()
+   .. cpp:function:: real &lambert_w0()
+   .. cpp:function:: real &lambert_wm1()
+
+      .. note::
+
+         The :cpp:func:`~mppp::real::lambert_w0()` and :cpp:func:`~mppp::real::lambert_wm1()`
+         functions are available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
 
       Other special functions, in-place variants.
 
@@ -990,8 +998,14 @@ The real class
       * :math:`\operatorname{erf}\left( x \right)`,
       * :math:`\operatorname{erfc}\left( x \right)`,
       * :math:`\operatorname{Ai}\left( x \right)`,
+      * the Lambert W functions :math:`W_0\left( x \right)` and :math:`W_{-1}\left( x \right)`,
 
       where :math:`x` is the current value of ``this``.
+
+      .. versionadded:: 0.24
+
+         The :cpp:func:`~mppp::real::lambert_w0()` and :cpp:func:`~mppp::real::lambert_wm1()`
+         functions.
 
       :return: a reference to ``this``.
 
@@ -2672,6 +2686,13 @@ Other special functions
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::eint(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::zeta(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::ai(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::lambert_w0(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::lambert_wm1(mppp::real &rop, T &&op)
+
+   .. note::
+
+      The ``lambert_w0()`` and ``lambert_wm1()`` functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Other binary special functions.
 
@@ -2680,8 +2701,13 @@ Other special functions
    * the exponential integral,
    * the Riemann Zeta function,
    * the Airy function,
+   * the Lambert W functions :math:`W_0` and :math:`W_{-1}`,
 
    of *op*. The precision of the result will be equal to the precision of *op*.
+
+   .. versionadded:: 0.24
+
+      The ``lambert_w0()`` and ``lambert_wm1()`` functions.
 
    :param rop: the return value.
    :param op: the argument.
@@ -2691,6 +2717,13 @@ Other special functions
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::eint(T &&r)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::zeta(T &&r)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::ai(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::lambert_w0(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::lambert_wm1(T &&r)
+
+   .. note::
+
+      The ``lambert_w0()`` and ``lambert_wm1()`` functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Other unary special functions.
 
@@ -2699,12 +2732,17 @@ Other special functions
    * the exponential integral,
    * the Riemann Zeta function,
    * the Airy function,
+   * the Lambert W functions :math:`W_0` and :math:`W_{-1}`,
 
    of *r*. The precision of the result will be equal to the precision of *r*.
 
+   .. versionadded:: 0.24
+
+      The ``lambert_w0()`` and ``lambert_wm1()`` functions.
+
    :param r: the argument.
 
-   :return: the exponential integral, Riemann Zeta function or Airy function of *r*.
+   :return: the exponential integral, Riemann Zeta function, Airy function or Lambert W function of *r*.
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)
 

@@ -228,3 +228,35 @@ TEST_CASE("real agm")
     REQUIRE(agm(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
     REQUIRE(agm(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
+
+TEST_CASE("real lambert_w0")
+{
+    real r0{0};
+    r0.lambert_w0();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    real rop;
+    r0 = real{0};
+    REQUIRE(lambert_w0(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(lambert_w0(r0) == 0);
+    REQUIRE(lambert_w0(std::move(r0)) == 0);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+}
+
+TEST_CASE("real lambert_wm1")
+{
+    real r0{-.1};
+    r0.lambert_wm1();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(.1));
+    REQUIRE(abs(r0 - -3.577152) < 1E-5);
+    real rop;
+    r0 = real{-.1};
+    REQUIRE(abs(lambert_wm1(rop, r0) - -3.577152) < 1e-5);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(.1));
+    REQUIRE(abs(lambert_wm1(r0) - -3.577152) < 1e-5);
+    REQUIRE(abs(lambert_wm1(std::move(r0)) - -3.577152) < 1e-5);
+    // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+}

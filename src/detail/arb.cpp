@@ -313,6 +313,30 @@ void arb_hypgeom_bessel_y(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
     }
 }
 
+// NOTE: the Lambert W wrappers are needed because Arb has a single
+// function for both w0 and wm1.
+void arb_lambert_w0(::mpfr_t rop, const ::mpfr_t op)
+{
+    MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
+
+    mpfr_to_arb(arb_op.m_arb, op);
+
+    ::arb_lambertw(arb_rop.m_arb, arb_op.m_arb, 0, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+    arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+}
+
+void arb_lambert_wm1(::mpfr_t rop, const ::mpfr_t op)
+{
+    MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
+
+    mpfr_to_arb(arb_op.m_arb, op);
+
+    ::arb_lambertw(arb_rop.m_arb, arb_op.m_arb, 1, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+    arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+}
+
 #undef MPPP_UNARY_ARB_WRAPPER
 
 #if defined(MPPP_WITH_MPC)
@@ -471,6 +495,17 @@ real &real::sinc()
 real &real::sinc_pi()
 {
     return self_mpfr_unary_nornd(detail::arb_sinc_pi);
+}
+
+// In-place Lambert W functions.
+real &real::lambert_w0()
+{
+    return self_mpfr_unary_nornd(detail::arb_lambert_w0);
+}
+
+real &real::lambert_wm1()
+{
+    return self_mpfr_unary_nornd(detail::arb_lambert_wm1);
 }
 
 #if defined(MPPP_WITH_MPC)
