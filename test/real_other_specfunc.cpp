@@ -229,6 +229,8 @@ TEST_CASE("real agm")
     REQUIRE(agm(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
 
+#if defined(MPPP_WITH_ARB)
+
 TEST_CASE("real lambert_w0")
 {
     real r0{0};
@@ -260,3 +262,5 @@ TEST_CASE("real lambert_wm1")
     // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
+
+#endif
