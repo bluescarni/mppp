@@ -9,6 +9,8 @@ New
 
 - Add the Lambert W functions :math:`W_0` and :math:`W_{-1}`
   (`#271 <https://github.com/bluescarni/mppp/pull/271>`__).
+- Interactive notebooks are now available in the documentation
+  (`#270 <https://github.com/bluescarni/mppp/pull/270>`__).
 
 0.23 (2021-04-02)
 -----------------
