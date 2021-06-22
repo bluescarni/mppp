@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Quadruple-precision float tutorial &#8212; mp++ 0.23 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quadruple-precision float tutorial &#8212; mp++ 0.24 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -63,7 +62,7 @@
 <a class="navbar-brand text-wrap" href="index.html">
   
   
-  <h1 class="site-logo" id="site-title">mp++ 0.23 documentation</h1>
+  <h1 class="site-logo" id="site-title">mp++ 0.24 documentation</h1>
   
 </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -382,7 +381,7 @@
         
               <div>
                 
-  <section id="quadruple-precision-float-tutorial">
+  <div class="section" id="quadruple-precision-float-tutorial">
 <span id="tutorial-real128"></span><h1>Quadruple-precision float tutorial<a class="headerlink" href="#quadruple-precision-float-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>The <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class is a thin wrapper around
 the <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> type
@@ -483,7 +482,7 @@ in mp++, they are supposed to be found via ADL. Member function overloads for th
 </ul>
 <p>The <a class="reference internal" href="real128.html#real128-reference"><span class="std std-ref">real128 reference</span></a> contains the detailed description of all the features
 provided by <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
-<section id="user-defined-literal">
+<div class="section" id="user-defined-literal">
 <h2>User-defined literal<a class="headerlink" href="#user-defined-literal" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
@@ -494,7 +493,7 @@ The <a class="reference internal" href="real128.html#real128-literals"><span cla
 is defined within
 the inline namespace <code class="docutils literal notranslate"><span class="pre">mppp::literals</span></code>, and it supports
 decimal and hexadecimal representations:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 
 <span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="mf">123.456</span><span class="n">_rq</span><span class="p">;</span>   <span class="c1">// r1 contains the quadruple-precision</span>
                         <span class="c1">// approximation of 123.456 (that is,</span>
@@ -509,8 +508,8 @@ decimal and hexadecimal representations:</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/floating_literal">https://en.cppreference.com/w/cpp/language/floating_literal</a></p>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
               </div>

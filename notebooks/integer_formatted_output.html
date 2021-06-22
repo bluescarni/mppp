@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Integer formatted output &#8212; mp++ 0.23 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Integer formatted output &#8212; mp++ 0.24 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -63,7 +62,7 @@
 <a class="navbar-brand text-wrap" href="../index.html">
   
   
-  <h1 class="site-logo" id="site-title">mp++ 0.23 documentation</h1>
+  <h1 class="site-logo" id="site-title">mp++ 0.24 documentation</h1>
   
 </a>
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
@@ -409,9 +408,9 @@
         
               <div>
                 
-  <section id="integer-formatted-output">
+  <div class="section" id="integer-formatted-output">
 <h1>Integer formatted output<a class="headerlink" href="#integer-formatted-output" title="Permalink to this headline">¶</a></h1>
-<section id="preliminaries">
+<div class="section" id="preliminaries">
 <h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h2>
 <p>Let’s load the mp++ runtime, include the headers and import the user-defined literals:</p>
 <div class="cell docutils container">
@@ -423,7 +422,7 @@
 <span class="cp">#include</span> <span class="cpf">&lt;mp++/integer.hpp&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;mp++/exceptions.hpp&gt;</span><span class="cp"></span>
 
-<span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 <span class="k">using</span> <span class="n">int_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -440,8 +439,8 @@
 </div>
 </div>
 </div>
-</section>
-<section id="string-conversions">
+</div>
+<div class="section" id="string-conversions">
 <h2>String conversions<a class="headerlink" href="#string-conversions" title="Permalink to this headline">¶</a></h2>
 <p>Multiprecision integers can be converted to string via the <code class="docutils literal notranslate"><span class="pre">to_string()</span></code> member function. By default, a base-10 representation is produced:</p>
 <div class="cell docutils container">
@@ -542,8 +541,8 @@
 </div>
 </div>
 </div>
-</section>
-<section id="formatted-stream-output">
+</div>
+<div class="section" id="formatted-stream-output">
 <h2>Formatted stream output<a class="headerlink" href="#formatted-stream-output" title="Permalink to this headline">¶</a></h2>
 <p>Multiprecision integers will respect the format flags in output streams:</p>
 <div class="cell docutils container">
@@ -612,8 +611,8 @@ Internal alignment: **************123456
 </div>
 </div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
               </div>

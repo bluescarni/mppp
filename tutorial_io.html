@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Input and output &#8212; mp++ 0.23 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Input and output &#8212; mp++ 0.24 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -63,7 +62,7 @@
 <a class="navbar-brand text-wrap" href="index.html">
   
   
-  <h1 class="site-logo" id="site-title">mp++ 0.23 documentation</h1>
+  <h1 class="site-logo" id="site-title">mp++ 0.24 documentation</h1>
   
 </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -367,7 +366,7 @@
         
               <div>
                 
-  <section id="input-and-output">
+  <div class="section" id="input-and-output">
 <h1>Input and output<a class="headerlink" href="#input-and-output" title="Permalink to this headline">¶</a></h1>
 <p>All of mp++’s multiprecision classes support stream insertion:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>        <span class="c1">// &quot;42&quot;</span>
@@ -394,7 +393,7 @@ honour the format flags in output streams:</p>
 values into string representations (see, e.g., <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer9to_stringEi" title="mppp::integer::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::to_string()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational9to_stringEi" title="mppp::rational::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::to_string()</span></code></a>,
 etc.). These member functions always return an “exact” string representation of the multiprecision value: feeding back
 the string representation to a constructor from string will initialise a value identical to the original one.</p>
-</section>
+</div>
 
 
               </div>

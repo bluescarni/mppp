@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Construction, conversion and assignment &#8212; mp++ 0.23 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Construction, conversion and assignment &#8212; mp++ 0.24 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -63,7 +62,7 @@
 <a class="navbar-brand text-wrap" href="index.html">
   
   
-  <h1 class="site-logo" id="site-title">mp++ 0.23 documentation</h1>
+  <h1 class="site-logo" id="site-title">mp++ 0.24 documentation</h1>
   
 </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -367,7 +366,7 @@
         
               <div>
                 
-  <section id="construction-conversion-and-assignment">
+  <div class="section" id="construction-conversion-and-assignment">
 <span id="tutorial-constr"></span><h1>Construction, conversion and assignment<a class="headerlink" href="#construction-conversion-and-assignment" title="Permalink to this headline">¶</a></h1>
 <p>All of mp++’s multiprecision classes default-construct to zero:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">;</span>
@@ -461,7 +460,7 @@ which allow to specify a different base for the representation of the value:</p>
 classes support also initialisastion
 via user-defined literals, implemented in the
 <code class="docutils literal notranslate"><span class="pre">mppp::literals</span></code> inline namespace:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 
 <span class="k">auto</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">123</span><span class="n">_z1</span><span class="p">;</span>   <span class="c1">// n is an integer with 1 limb of static</span>
                    <span class="c1">// storage and initialised with the value 123.</span>
@@ -503,7 +502,7 @@ Explicitly casting the multiprecision value before the assignment will however w
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
 </pre></div>
 </div>
-</section>
+</div>
 
 
               </div>

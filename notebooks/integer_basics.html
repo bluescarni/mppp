@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Integer basics &#8212; mp++ 0.23 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Integer basics &#8212; mp++ 0.24 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -65,7 +64,7 @@
 <a class="navbar-brand text-wrap" href="../index.html">
   
   
-  <h1 class="site-logo" id="site-title">mp++ 0.23 documentation</h1>
+  <h1 class="site-logo" id="site-title">mp++ 0.24 documentation</h1>
   
 </a>
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
@@ -416,9 +415,9 @@
         
               <div>
                 
-  <section id="integer-basics">
+  <div class="section" id="integer-basics">
 <h1>Integer basics<a class="headerlink" href="#integer-basics" title="Permalink to this headline">¶</a></h1>
-<section id="preliminaries">
+<div class="section" id="preliminaries">
 <h2>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h2>
 <p>Let’s load the mp++ runtime, include the <code class="docutils literal notranslate"><span class="pre">integer.hpp</span></code> header and add a couple of <code class="docutils literal notranslate"><span class="pre">using</span></code> directives to reduce typing:</p>
 <div class="cell docutils container">
@@ -429,7 +428,7 @@
 
 <span class="cp">#include</span> <span class="cpf">&lt;mp++/integer.hpp&gt;</span><span class="cp"></span>
 
-<span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 <span class="c1">// We will be working with integers with 1</span>
 <span class="c1">// limb of static storage.</span>
 <span class="k">using</span> <span class="n">int_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
@@ -448,13 +447,13 @@
 <span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;string_view&gt;</span><span class="cp"></span>
 
-<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="nn">std</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 </pre></div>
 </div>
 </div>
 </div>
-</section>
-<section id="constructing-multiprecision-integers">
+</div>
+<div class="section" id="constructing-multiprecision-integers">
 <h2>Constructing multiprecision integers<a class="headerlink" href="#constructing-multiprecision-integers" title="Permalink to this headline">¶</a></h2>
 <p>There are many ways to construct multiprecision integers. Default-construction initialises to zero:</p>
 <div class="cell docutils container">
@@ -665,8 +664,8 @@ The storage type of n is: dynamic
 </div>
 </div>
 <p>On a 64-bit architecture, <span class="math notranslate nohighlight">\(n\)</span> is initialised with the value <span class="math notranslate nohighlight">\(123 + 456 \times 2^{64} + 789 \times 2^{128}\)</span>. On a 32-bit architecture, <span class="math notranslate nohighlight">\(n\)</span> is initialised with the value <span class="math notranslate nohighlight">\(123 + 456 \times 2^{32} + 789 \times 2^{64}\)</span>.</p>
-</section>
-<section id="assigning-multiprecision-integers">
+</div>
+<div class="section" id="assigning-multiprecision-integers">
 <h2>Assigning multiprecision integers<a class="headerlink" href="#assigning-multiprecision-integers" title="Permalink to this headline">¶</a></h2>
 <p>Assignment to multiprecision integers works as expected:</p>
 <div class="cell docutils container">
@@ -751,8 +750,8 @@ The storage type of n is: dynamic
 </div>
 </div>
 </div>
-</section>
-<section id="converting-multiprecision-integers">
+</div>
+<div class="section" id="converting-multiprecision-integers">
 <h2>Converting multiprecision integers<a class="headerlink" href="#converting-multiprecision-integers" title="Permalink to this headline">¶</a></h2>
 <p>We can convert multiprecision integers to other types:</p>
 <div class="cell docutils container">
@@ -881,8 +880,8 @@ The value of &#39;out&#39; is still 42
 </div>
 </div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
               </div>

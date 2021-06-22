@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Rational tutorial &#8212; mp++ 0.23 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rational tutorial &#8212; mp++ 0.24 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -63,7 +62,7 @@
 <a class="navbar-brand text-wrap" href="index.html">
   
   
-  <h1 class="site-logo" id="site-title">mp++ 0.23 documentation</h1>
+  <h1 class="site-logo" id="site-title">mp++ 0.24 documentation</h1>
   
 </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -387,7 +386,7 @@
         
               <div>
                 
-  <section id="rational-tutorial">
+  <div class="section" id="rational-tutorial">
 <span id="tutorial-rational"></span><h1>Rational tutorial<a class="headerlink" href="#rational-tutorial" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> is a class that builds upon <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> to provide
 an implementation of rational numbers represented as a numerator-denominator
@@ -454,7 +453,7 @@ of <code class="docutils literal notranslate"><span class="pre">std::hash</span>
 </ul>
 <p>Many of these features, which are documented in detail in the <a class="reference internal" href="rational.html#rational-reference"><span class="std std-ref">rational reference</span></a>, are available
 in multiple overloads, often both as free and member functions.</p>
-<section id="interacting-with-the-gmp-api">
+<div class="section" id="interacting-with-the-gmp-api">
 <h2>Interacting with the GMP API<a class="headerlink" href="#interacting-with-the-gmp-api" title="Permalink to this headline">¶</a></h2>
 <p>Like <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> provides facilities for interfacing
 with the <a class="reference external" href="https://gmplib.org/">GMP</a> library. Currently, the interoperability is limited to
@@ -485,8 +484,8 @@ and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></c
 <span class="n">mpq_clear</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>                <span class="c1">// Clear the mpq_t.</span>
 </pre></div>
 </div>
-</section>
-<section id="user-defined-literals">
+</div>
+<div class="section" id="user-defined-literals">
 <h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
@@ -497,7 +496,7 @@ limbs of static storage. The <a class="reference internal" href="rational.html#r
 are defined within
 the inline namespace <code class="docutils literal notranslate"><span class="pre">mppp::literals</span></code>, and they support
 binary, octal, decimal and hexadecimal representations:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 
 <span class="k">auto</span> <span class="n">q1</span> <span class="o">=</span> <span class="mi">123</span><span class="n">_q1</span><span class="p">;</span>      <span class="c1">// q1 has 1 limb of static storage,</span>
                        <span class="c1">// and it contains the value 123.</span>
@@ -521,8 +520,8 @@ can be constructed via these literals.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
               </div>

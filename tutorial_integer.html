@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Integer tutorial &#8212; mp++ 0.23 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Integer tutorial &#8212; mp++ 0.24 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -65,7 +64,7 @@
 <a class="navbar-brand text-wrap" href="index.html">
   
   
-  <h1 class="site-logo" id="site-title">mp++ 0.23 documentation</h1>
+  <h1 class="site-logo" id="site-title">mp++ 0.24 documentation</h1>
   
 </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -394,7 +393,7 @@
         
               <div>
                 
-  <section id="integer-tutorial">
+  <div class="section" id="integer-tutorial">
 <span id="tutorial-integer"></span><h1>Integer tutorial<a class="headerlink" href="#integer-tutorial" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> was the first class implemented in mp++, and as a result it is currently
 the most featureful and optimised among mp++’s multiprecision classes.</p>
@@ -439,7 +438,7 @@ integrals, …),</p></li>
 </ul>
 <p>Many of these features, which are documented in detail in the <a class="reference internal" href="integer.html#integer-reference"><span class="std std-ref">integer reference</span></a>, are available
 in multiple overloads, often both as free and member functions.</p>
-<section id="interacting-with-the-gmp-api">
+<div class="section" id="interacting-with-the-gmp-api">
 <h2>Interacting with the GMP API<a class="headerlink" href="#interacting-with-the-gmp-api" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> provides a variety of ways for interfacing with the <a class="reference external" href="https://gmplib.org/">GMP</a> library.
 There are a few reasons why one would want to use <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> in conjunction with the GMP API, such as:</p>
@@ -504,8 +503,8 @@ and verify that the creation of the read-only view did not trigger a promotion f
 <p>It must be noted that both <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a>
 have to be used carefully, as they return non-owning objects which can easily lead to dangling pointers or references, if misused.
 The documentation of the two functions explains in detail some of the potential pitfalls that users need to be aware of.</p>
-</section>
-<section id="serialisation">
+</div>
+<div class="section" id="serialisation">
 <span id="tutorial-integer-s11n"></span><h2>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.7.</span></p>
@@ -587,8 +586,8 @@ and it might be subject to changes in future versions of mp++. Users are thus ad
 the binary serialisation format for long-term persistence or as a data exchange format: for such
 purposes, it is better to use the string representation of <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects.</p></li>
 </ul>
-</section>
-<section id="user-defined-literals">
+</div>
+<div class="section" id="user-defined-literals">
 <h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.18.</span></p>
@@ -600,7 +599,7 @@ are defined within
 the inline namespace <code class="docutils literal notranslate"><span class="pre">mppp::literals</span></code>, and, like the builtin
 C++ integer literals, they support
 binary, octal, decimal and hexadecimal representations:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
 
 <span class="k">auto</span> <span class="n">n1</span> <span class="o">=</span> <span class="mi">123</span><span class="n">_z1</span><span class="p">;</span>      <span class="c1">// n1 has 1 limb of static storage,</span>
                        <span class="c1">// and it contains the value 123.</span>
@@ -622,8 +621,8 @@ binary, octal, decimal and hexadecimal representations:</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
               </div>

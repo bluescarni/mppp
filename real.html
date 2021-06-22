@@ -4,9 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Multiprecision floats &#8212; mp++ 0.23 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multiprecision floats &#8212; mp++ 0.24 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -65,7 +64,7 @@
 <a class="navbar-brand text-wrap" href="index.html">
   
   
-  <h1 class="site-logo" id="site-title">mp++ 0.23 documentation</h1>
+  <h1 class="site-logo" id="site-title">mp++ 0.24 documentation</h1>
   
 </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -506,7 +505,7 @@
         
               <div>
                 
-  <section id="multiprecision-floats">
+  <div class="section" id="multiprecision-floats">
 <h1>Multiprecision floats<a class="headerlink" href="#multiprecision-floats" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -517,7 +516,7 @@ with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_
 <p><span class="versionmodified added">New in version 0.5.</span></p>
 </div>
 <p><em>#include &lt;mp++/real.hpp&gt;</em></p>
-<section id="the-real-class">
+<div class="section" id="the-real-class">
 <h2>The real class<a class="headerlink" href="#the-real-class" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4N4mppp4realE">
@@ -1964,7 +1963,23 @@ fails because of (unlikely) overflow conditions.</p>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp4real2aiEv">
 <span id="_CPPv3N4mppp4real2aiEv"></span><span id="_CPPv2N4mppp4real2aiEv"></span><span id="mppp::real::ai"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-name descname"><span class="pre">ai</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real2aiEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Other special functions, in-place variants.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real10lambert_w0Ev">
+<span id="_CPPv3N4mppp4real10lambert_w0Ev"></span><span id="_CPPv2N4mppp4real10lambert_w0Ev"></span><span id="mppp::real::lambert_w0"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-name descname"><span class="pre">lambert_w0</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real10lambert_w0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N4mppp4real11lambert_wm1Ev">
+<span id="_CPPv3N4mppp4real11lambert_wm1Ev"></span><span id="_CPPv2N4mppp4real11lambert_wm1Ev"></span><span id="mppp::real::lambert_wm1"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-name descname"><span class="pre">lambert_wm1</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real11lambert_wm1Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="#_CPPv4N4mppp4real10lambert_w0Ev" title="mppp::real::lambert_w0"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">lambert_w0()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp4real11lambert_wm1Ev" title="mppp::real::lambert_wm1"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">lambert_wm1()</span></code></a>
+functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Other special functions, in-place variants.</p>
 <p>These member functions will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to, respectively:</p>
 <ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(\operatorname{Ei}\left( x \right)\)</span>,</p></li>
@@ -1973,11 +1988,20 @@ fails because of (unlikely) overflow conditions.</p>
 <li><p><span class="math notranslate nohighlight">\(\operatorname{erf}\left( x \right)\)</span>,</p></li>
 <li><p><span class="math notranslate nohighlight">\(\operatorname{erfc}\left( x \right)\)</span>,</p></li>
 <li><p><span class="math notranslate nohighlight">\(\operatorname{Ai}\left( x \right)\)</span>,</p></li>
+<li><p>the Lambert W functions <span class="math notranslate nohighlight">\(W_0\left( x \right)\)</span> and <span class="math notranslate nohighlight">\(W_{-1}\left( x \right)\)</span>,</p></li>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.24: </span>The <a class="reference internal" href="#_CPPv4N4mppp4real10lambert_w0Ev" title="mppp::real::lambert_w0"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">lambert_w0()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp4real11lambert_wm1Ev" title="mppp::real::lambert_wm1"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">lambert_wm1()</span></code></a>
+functions.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</dd>
+<dt class="field-even">Throws</dt>
+<dd class="field-even"><p><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2192,8 +2216,8 @@ or <a class="reference internal" href="#_CPPv4N4mppp4real8set_precE11mpfr_prec_t
 
 </dd></dl>
 
-</section>
-<section id="types">
+</div>
+<div class="section" id="types">
 <h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp type">
 <dt id="_CPPv46mpfr_t">
@@ -2254,8 +2278,8 @@ one of the three special values NaN, infinity or zero.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types">https://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types</a></p>
 </div>
-</section>
-<section id="concepts">
+</div>
+<div class="section" id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp concept">
 <dt id="_CPPv4I0EN4mppp8cvr_realE">
@@ -2328,10 +2352,10 @@ involving <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::
 </ul>
 </dd></dl>
 
-</section>
-<section id="functions">
+</div>
+<div class="section" id="functions">
 <span id="real-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<section id="precision-handling">
+<div class="section" id="precision-handling">
 <span id="real-prec"></span><h3>Precision handling<a class="headerlink" href="#precision-handling" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp8get_precERKN4mppp4realE">
@@ -2394,8 +2418,8 @@ the <code class="docutils literal notranslate"><span class="pre">MPFR_PREC_MAX</
 </dl>
 </dd></dl>
 
-</section>
-<section id="assignment">
+</div>
+<div class="section" id="assignment">
 <span id="real-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_DpN4mppp13real_set_argsEEN4mppp3setERN4mppp4realERN4mppp4realEDpRK4Args">
@@ -2503,8 +2527,8 @@ bit is unspecified.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="conversion">
+</div>
+<div class="section" id="conversion">
 <span id="real-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp18real_interoperableEEN4mppp3getEbR1TRKN4mppp4realE">
@@ -2577,8 +2601,8 @@ value.</p></li>
 </dl>
 </dd></dl>
 
-</section>
-<section id="arithmetic">
+</div>
+<div class="section" id="arithmetic">
 <span id="real-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3addERN4mppp4realERN4mppp4realERR1TRR1U">
@@ -2922,8 +2946,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</section>
-<section id="comparison">
+</div>
+<div class="section" id="comparison">
 <span id="real-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp5nan_pERKN4mppp4realE">
@@ -3151,8 +3175,8 @@ regarding NaN values and moved-from objects, <code class="docutils literal notra
 </dl>
 </dd></dl>
 
-</section>
-<section id="roots">
+</div>
+<div class="section" id="roots">
 <span id="real-roots"></span><h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4sqrtERN4mppp4realERN4mppp4realERR1T">
@@ -3404,8 +3428,8 @@ the same sign as <em>r</em> if <em>k</em> is odd, and positive if <em>k</em> is 
 </dl>
 </dd></dl>
 
-</section>
-<section id="exponentiation">
+</div>
+<div class="section" id="exponentiation">
 <span id="real-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp3powERN4mppp4realERN4mppp4realERR1TRR1U">
@@ -3446,8 +3470,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</section>
-<section id="trigonometry">
+</div>
+<div class="section" id="trigonometry">
 <span id="real-trig"></span><h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3sinERN4mppp4realERN4mppp4realERR1T">
@@ -3769,8 +3793,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</section>
-<section id="hyperbolic-functions">
+</div>
+<div class="section" id="hyperbolic-functions">
 <span id="real-hyper"></span><h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4sinhERN4mppp4realERN4mppp4realERR1T">
@@ -3937,8 +3961,8 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="logarithms-and-exponentials">
+</div>
+<div class="section" id="logarithms-and-exponentials">
 <span id="real-logexp"></span><h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3expERN4mppp4realERN4mppp4realERR1T">
@@ -4197,25 +4221,53 @@ fails because of (unlikely) overflow conditions.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="polylogarithms">
+</div>
+<div class="section" id="polylogarithms">
 <h3>Polylogarithms<a class="headerlink" href="#polylogarithms" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp8cvr_realEEN4mppp3li2ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp3li2ERN4mppp4realERR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">li2</span></code><span class="sig-paren">(</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><em><span class="pre">rop</span></em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T" title="mppp::li2::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary dilogarithm.</p>
-<p>This function will set <em>rop</em> to <span class="math notranslate nohighlight">\(\operatorname{Li}_2\left( x \right)\)</span>.
-The precision of the result will be equal to the precision of <em>x</em>.
-If <span class="math notranslate nohighlight">\(x \geq 1\)</span>, <em>rop</em> will be set to NaN.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp10polylog_siERN4mppp4realERN4mppp4realElRR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp10polylog_siERN4mppp4realElRR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp10polylog_siERN4mppp4realElRR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">polylog_si</span></code><span class="sig-paren">(</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><em><span class="pre">rop</span></em>, <span class="pre">long</span> <em><span class="pre">s</span></em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10polylog_siERN4mppp4realERN4mppp4realElRR1T" title="mppp::polylog_si::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10polylog_siERN4mppp4realERN4mppp4realElRR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7polylogERN4mppp4realERN4mppp4realERR1TRR1U">
+<span id="_CPPv3I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7polylogERN4mppp4realERR1TRR1U"></span><span id="_CPPv2I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7polylogERN4mppp4realERR1TRR1U"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">,</span> <span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">U</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">polylog</span></code><span class="sig-paren">(</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><em><span class="pre">rop</span></em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7polylogERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::polylog::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">s</span></em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7polylogERN4mppp4realERN4mppp4realERR1TRR1U" title="mppp::polylog::U"><span class="pre">U</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realE_N4mppp8cvr_realEEN4mppp7polylogERN4mppp4realERN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">polylog_si()</span></code> and <code class="docutils literal notranslate"><span class="pre">polylog()</span></code> functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Polylogarithms.</p>
+<p>These functions will set <em>rop</em> to, respectively:</p>
+<ul class="simple">
+<li><p>the dilogarithm <span class="math notranslate nohighlight">\(\operatorname{Li}_2\left( x \right)\)</span>,</p></li>
+<li><p>the polylogarithm of integer order <span class="math notranslate nohighlight">\(s\)</span> <span class="math notranslate nohighlight">\(\operatorname{Li}_s\left( x \right)\)</span>,</p></li>
+<li><p>the polylogarithm of real order <span class="math notranslate nohighlight">\(s\)</span> <span class="math notranslate nohighlight">\(\operatorname{Li}_s\left( x \right)\)</span>.</p></li>
+</ul>
+<p>The precision of the result will be equal to the precision of <em>x</em> (for <code class="docutils literal notranslate"><span class="pre">li2()</span></code> and <code class="docutils literal notranslate"><span class="pre">polylog_si()</span></code>) or
+to the largest precision among <em>s</em> and <em>x</em> (for <code class="docutils literal notranslate"><span class="pre">polylog()</span></code>).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.24: </span>The <code class="docutils literal notranslate"><span class="pre">polylog_si()</span></code> and <code class="docutils literal notranslate"><span class="pre">polylog()</span></code> functions.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
+<li><p><strong>s</strong> – the order of the polylogarithm.</p></li>
 <li><p><strong>x</strong> – the argument.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4223,22 +4275,52 @@ If <span class="math notranslate nohighlight">\(x \geq 1\)</span>, <em>rop</em> 
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3li2EN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp8cvr_realEEN4mppp3li2ERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp3li2ERR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">li2</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3li2EN4mppp4realERR1T" title="mppp::li2::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp3li2EN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Unary dilogarithm.</p>
-<p>This function will return <span class="math notranslate nohighlight">\(\operatorname{Li}_2\left( x \right)\)</span>.
-The precision of the result will be equal to the precision of <em>x</em>.
-If <span class="math notranslate nohighlight">\(x \geq 1\)</span>, NaN will be returned.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp10polylog_siEN4mppp4realElRR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp10polylog_siElRR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp10polylog_siElRR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">polylog_si</span></code><span class="sig-paren">(</span><span class="pre">long</span> <em><span class="pre">s</span></em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10polylog_siEN4mppp4realElRR1T" title="mppp::polylog_si::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10polylog_siEN4mppp4realElRR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp7polylogEN4mppp4realERR1TRR1U">
+<span id="_CPPv3I0_N4mppp13real_op_typesI1TEEEN4mppp7polylogERR1TRR1U"></span><span id="_CPPv2I0_N4mppp13real_op_typesI1TEEEN4mppp7polylogERR1TRR1U"></span><span class="pre">template&lt;</span><span class="pre">typename</span> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">,</span> <span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I00EN4mppp13real_op_typesE" title="mppp::real_op_types"><span class="pre">real_op_types</span></a><span class="pre">&lt;</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp7polylogEN4mppp4realERR1TRR1U" title="mppp::polylog::T"><span class="pre">T</span></a><span class="pre">&gt;</span> <code class="sig-name descname"><span class="pre">U</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">polylog</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp7polylogEN4mppp4realERR1TRR1U" title="mppp::polylog::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">s</span></em>, <a class="reference internal" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp7polylogEN4mppp4realERR1TRR1U" title="mppp::polylog::U"><span class="pre">U</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp13real_op_typesI1TEEEN4mppp7polylogEN4mppp4realERR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">polylog_si()</span></code> and <code class="docutils literal notranslate"><span class="pre">polylog()</span></code> functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Polylogarithms.</p>
+<p>These functions will return, respectively:</p>
+<ul class="simple">
+<li><p>the dilogarithm <span class="math notranslate nohighlight">\(\operatorname{Li}_2\left( x \right)\)</span>,</p></li>
+<li><p>the polylogarithm of integer order <span class="math notranslate nohighlight">\(s\)</span> <span class="math notranslate nohighlight">\(\operatorname{Li}_s\left( x \right)\)</span>,</p></li>
+<li><p>the polylogarithm of real order <span class="math notranslate nohighlight">\(s\)</span> <span class="math notranslate nohighlight">\(\operatorname{Li}_s\left( x \right)\)</span>.</p></li>
+</ul>
+<p>The precision of the result will be equal to the precision of <em>x</em> (for <code class="docutils literal notranslate"><span class="pre">li2()</span></code> and <code class="docutils literal notranslate"><span class="pre">polylog_si()</span></code>) or
+to the largest precision among <em>s</em> and <em>x</em> (for <code class="docutils literal notranslate"><span class="pre">polylog()</span></code>).</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.24: </span>The <code class="docutils literal notranslate"><span class="pre">polylog_si()</span></code> and <code class="docutils literal notranslate"><span class="pre">polylog()</span></code> functions.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> – the argument.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – the order of the polylogarithm.</p></li>
+<li><p><strong>x</strong> – the argument.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the dilogarithm of <em>x</em>.</p>
+<dd class="field-even"><p>the polylogarithm of <em>x</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
-<section id="gamma-functions">
+</div>
+<div class="section" id="gamma-functions">
 <span id="real-gamma"></span><h3>Gamma functions<a class="headerlink" href="#gamma-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp5gammaERN4mppp4realERN4mppp4realERR1T">
@@ -4372,8 +4454,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</section>
-<section id="bessel-functions">
+</div>
+<div class="section" id="bessel-functions">
 <span id="real-bessel"></span><h3>Bessel functions<a class="headerlink" href="#bessel-functions" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.17.</span></p>
@@ -4564,8 +4646,8 @@ fails because of (unlikely) overflow conditions.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="error-functions">
+</div>
+<div class="section" id="error-functions">
 <span id="real-err-func"></span><h3>Error functions<a class="headerlink" href="#error-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp3erfERN4mppp4realERN4mppp4realERR1T">
@@ -4614,8 +4696,8 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="other-special-functions">
+</div>
+<div class="section" id="other-special-functions">
 <span id="real-other-specfunc"></span><h3>Other special functions<a class="headerlink" href="#other-special-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4eintERN4mppp4realERN4mppp4realERR1T">
@@ -4630,14 +4712,33 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp2aiERN4mppp4realERN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp8cvr_realEEN4mppp2aiERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp2aiERN4mppp4realERR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">ai</span></code><span class="sig-paren">(</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><em><span class="pre">rop</span></em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp2aiERN4mppp4realERN4mppp4realERR1T" title="mppp::ai::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">op</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp2aiERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Other binary special functions.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp10lambert_w0ERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp10lambert_w0ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp10lambert_w0ERN4mppp4realERR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">lambert_w0</span></code><span class="sig-paren">(</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><em><span class="pre">rop</span></em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10lambert_w0ERN4mppp4realERN4mppp4realERR1T" title="mppp::lambert_w0::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">op</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10lambert_w0ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp11lambert_wm1ERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp11lambert_wm1ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp11lambert_wm1ERN4mppp4realERR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">lambert_wm1</span></code><span class="sig-paren">(</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><em><span class="pre">rop</span></em>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp11lambert_wm1ERN4mppp4realERN4mppp4realERR1T" title="mppp::lambert_wm1::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">op</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp11lambert_wm1ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">lambert_w0()</span></code> and <code class="docutils literal notranslate"><span class="pre">lambert_wm1()</span></code> functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Other binary special functions.</p>
 <p>These functions will set <em>rop</em> to, respectively,</p>
 <ul class="simple">
 <li><p>the exponential integral,</p></li>
 <li><p>the Riemann Zeta function,</p></li>
 <li><p>the Airy function,</p></li>
+<li><p>the Lambert W functions <span class="math notranslate nohighlight">\(W_0\)</span> and <span class="math notranslate nohighlight">\(W_{-1}\)</span>,</p></li>
 </ul>
 <p>of <em>op</em>. The precision of the result will be equal to the precision of <em>op</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.24: </span>The <code class="docutils literal notranslate"><span class="pre">lambert_w0()</span></code> and <code class="docutils literal notranslate"><span class="pre">lambert_wm1()</span></code> functions.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -4647,6 +4748,10 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4664,20 +4769,43 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp2aiEN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp8cvr_realEEN4mppp2aiERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp2aiERR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">ai</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp2aiEN4mppp4realERR1T" title="mppp::ai::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">r</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp2aiEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Other unary special functions.</p>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp10lambert_w0EN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp10lambert_w0ERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp10lambert_w0ERR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">lambert_w0</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10lambert_w0EN4mppp4realERR1T" title="mppp::lambert_w0::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">r</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10lambert_w0EN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp11lambert_wm1EN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp11lambert_wm1ERR1T"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp11lambert_wm1ERR1T"></span><span class="pre">template&lt;</span><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="pre">cvr_real</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">lambert_wm1</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp11lambert_wm1EN4mppp4realERR1T" title="mppp::lambert_wm1::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><span class="pre">&amp;</span><em><span class="pre">r</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp11lambert_wm1EN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">lambert_w0()</span></code> and <code class="docutils literal notranslate"><span class="pre">lambert_wm1()</span></code> functions are available only if mp++ was
+configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option enabled.</p>
+</div>
+<p>Other unary special functions.</p>
 <p>These functions will return, respectively,</p>
 <ul class="simple">
 <li><p>the exponential integral,</p></li>
 <li><p>the Riemann Zeta function,</p></li>
 <li><p>the Airy function,</p></li>
+<li><p>the Lambert W functions <span class="math notranslate nohighlight">\(W_0\)</span> and <span class="math notranslate nohighlight">\(W_{-1}\)</span>,</p></li>
 </ul>
 <p>of <em>r</em>. The precision of the result will be equal to the precision of <em>r</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.24: </span>The <code class="docutils literal notranslate"><span class="pre">lambert_w0()</span></code> and <code class="docutils literal notranslate"><span class="pre">lambert_wm1()</span></code> functions.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>r</strong> – the argument.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the exponential integral, Riemann Zeta function or Airy function of <em>r</em>.</p>
+<dd class="field-even"><p>the exponential integral, Riemann Zeta function, Airy function or Lambert W function of <em>r</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the conversion between Arb and MPFR types
+fails because of (unlikely) overflow conditions.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4813,8 +4941,8 @@ The precision of the result will be set to the largest precision among the opera
 </dl>
 </dd></dl>
 
-</section>
-<section id="integer-and-remainder-related-functions">
+</div>
+<div class="section" id="integer-and-remainder-related-functions">
 <span id="real-intrem"></span><h3>Integer and remainder related functions<a class="headerlink" href="#integer-and-remainder-related-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mppp4ceilERN4mppp4realERN4mppp4realERR1T">
@@ -5070,8 +5198,8 @@ with the sign of <em>x</em> divided by <em>y</em> (except if those low bits are 
 </dl>
 </dd></dl>
 
-</section>
-<section id="input-output">
+</div>
+<div class="section" id="input-output">
 <span id="real-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppplsERNSt7ostreamERKN4mppp4realE">
@@ -5101,8 +5229,8 @@ library if precise and forward-compatible control on the printing format is need
 </dl>
 </dd></dl>
 
-</section>
-<section id="serialisation">
+</div>
+<div class="section" id="serialisation">
 <span id="real-s11n"></span><h3>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.22.</span></p>
@@ -5189,9 +5317,9 @@ overload called on <em>x</em> with <em>src</em> as argument.</p>
 </dl>
 </dd></dl>
 
-</section>
-</section>
-<section id="mathematical-operators">
+</div>
+</div>
+<div class="section" id="mathematical-operators">
 <span id="real-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp function">
 <dt id="_CPPv4I_N4mppp8cvr_realEEN4mpppplEN4mppp4realERR1T">
@@ -5389,8 +5517,8 @@ specially are available.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="constants">
+</div>
+<div class="section" id="constants">
 <span id="real-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp function">
 <dt id="_CPPv4N4mppp7real_piE11mpfr_prec_t">
@@ -5476,8 +5604,8 @@ functions.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="user-defined-literals">
+</div>
+<div class="section" id="user-defined-literals">
 <span id="real-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
@@ -5517,8 +5645,8 @@ a valid floating-point literal (as defined by the C++ standard).</p>
 </dl>
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
               </div>
