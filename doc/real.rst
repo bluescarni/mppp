@@ -979,6 +979,14 @@ The real class
    .. cpp:function:: real &erf()
    .. cpp:function:: real &erfc()
    .. cpp:function:: real &ai()
+   .. cpp:function:: real &lambert_w0()
+   .. cpp:function:: real &lambert_wm1()
+
+      .. note::
+
+         The :cpp:func:`~mppp::real::lambert_w0()` and :cpp:func:`~mppp::real::lambert_wm1()`
+         functions are available only if mp++ was
+         configured with the ``MPPP_WITH_ARB`` option enabled.
 
       Other special functions, in-place variants.
 
@@ -990,10 +998,19 @@ The real class
       * :math:`\operatorname{erf}\left( x \right)`,
       * :math:`\operatorname{erfc}\left( x \right)`,
       * :math:`\operatorname{Ai}\left( x \right)`,
+      * the Lambert W functions :math:`W_0\left( x \right)` and :math:`W_{-1}\left( x \right)`,
 
       where :math:`x` is the current value of ``this``.
 
+      .. versionadded:: 0.24
+
+         The :cpp:func:`~mppp::real::lambert_w0()` and :cpp:func:`~mppp::real::lambert_wm1()`
+         functions.
+
       :return: a reference to ``this``.
+
+      :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+        fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: real &ceil()
    .. cpp:function:: real &floor()
@@ -2410,29 +2427,69 @@ Polylogarithms
 ~~~~~~~~~~~~~~
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::li2(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::polylog_si(mppp::real &rop, long s, T &&x)
+.. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::polylog(mppp::real &rop, T &&s, U &&x)
 
-   Binary dilogarithm.
+   .. note::
 
-   This function will set *rop* to :math:`\operatorname{Li}_2\left( x \right)`.
-   The precision of the result will be equal to the precision of *x*.
-   If :math:`x \geq 1`, *rop* will be set to NaN.
+      The ``polylog_si()`` and ``polylog()`` functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
+
+   Polylogarithms.
+
+   These functions will set *rop* to, respectively:
+
+   * the dilogarithm :math:`\operatorname{Li}_2\left( x \right)`,
+   * the polylogarithm of integer order :math:`s` :math:`\operatorname{Li}_s\left( x \right)`,
+   * the polylogarithm of real order :math:`s` :math:`\operatorname{Li}_s\left( x \right)`.
+
+   The precision of the result will be equal to the precision of *x* (for ``li2()`` and ``polylog_si()``) or
+   to the largest precision among *s* and *x* (for ``polylog()``).
+
+   .. versionadded:: 0.24
+
+      The ``polylog_si()`` and ``polylog()`` functions.
 
    :param rop: the return value.
+   :param s: the order of the polylogarithm.
    :param x: the argument.
 
    :return: a reference to *rop*.
 
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::li2(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::polylog_si(long s, T &&x)
+.. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::polylog(T &&s, U &&x)
 
-   Unary dilogarithm.
+   .. note::
 
-   This function will return :math:`\operatorname{Li}_2\left( x \right)`.
-   The precision of the result will be equal to the precision of *x*.
-   If :math:`x \geq 1`, NaN will be returned.
+      The ``polylog_si()`` and ``polylog()`` functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
+   Polylogarithms.
+
+   These functions will return, respectively:
+
+   * the dilogarithm :math:`\operatorname{Li}_2\left( x \right)`,
+   * the polylogarithm of integer order :math:`s` :math:`\operatorname{Li}_s\left( x \right)`,
+   * the polylogarithm of real order :math:`s` :math:`\operatorname{Li}_s\left( x \right)`.
+
+   The precision of the result will be equal to the precision of *x* (for ``li2()`` and ``polylog_si()``) or
+   to the largest precision among *s* and *x* (for ``polylog()``).
+
+   .. versionadded:: 0.24
+
+      The ``polylog_si()`` and ``polylog()`` functions.
+
+   :param s: the order of the polylogarithm.
    :param x: the argument.
 
-   :return: the dilogarithm of *x*.
+   :return: the polylogarithm of *x*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. _real_gamma:
 
@@ -2672,6 +2729,13 @@ Other special functions
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::eint(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::zeta(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::ai(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::lambert_w0(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::lambert_wm1(mppp::real &rop, T &&op)
+
+   .. note::
+
+      The ``lambert_w0()`` and ``lambert_wm1()`` functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Other binary special functions.
 
@@ -2680,17 +2744,32 @@ Other special functions
    * the exponential integral,
    * the Riemann Zeta function,
    * the Airy function,
+   * the Lambert W functions :math:`W_0` and :math:`W_{-1}`,
 
    of *op*. The precision of the result will be equal to the precision of *op*.
+
+   .. versionadded:: 0.24
+
+      The ``lambert_w0()`` and ``lambert_wm1()`` functions.
 
    :param rop: the return value.
    :param op: the argument.
 
    :return: a reference to *rop*.
 
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::eint(T &&r)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::zeta(T &&r)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::ai(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::lambert_w0(T &&r)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::lambert_wm1(T &&r)
+
+   .. note::
+
+      The ``lambert_w0()`` and ``lambert_wm1()`` functions are available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled.
 
    Other unary special functions.
 
@@ -2699,12 +2778,20 @@ Other special functions
    * the exponential integral,
    * the Riemann Zeta function,
    * the Airy function,
+   * the Lambert W functions :math:`W_0` and :math:`W_{-1}`,
 
    of *r*. The precision of the result will be equal to the precision of *r*.
 
+   .. versionadded:: 0.24
+
+      The ``lambert_w0()`` and ``lambert_wm1()`` functions.
+
    :param r: the argument.
 
-   :return: the exponential integral, Riemann Zeta function or Airy function of *r*.
+   :return: the exponential integral, Riemann Zeta function, Airy function or Lambert W function of *r*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)
 
