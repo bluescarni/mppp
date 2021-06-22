@@ -337,6 +337,31 @@ void arb_lambert_wm1(::mpfr_t rop, const ::mpfr_t op)
     arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
 }
 
+// NOTE: special handling for polylog with integral order.
+void arb_polylog_si(::mpfr_t rop, long n, const ::mpfr_t op)
+{
+    MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
+
+    mpfr_to_arb(arb_op.m_arb, op);
+
+    ::arb_polylog_si(arb_rop.m_arb, safe_cast<::slong>(n), arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+    arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+}
+
+// NOTE: we don't have a generic binary wrapper (yet).
+void arb_polylog(::mpfr_t rop, const ::mpfr_t op1, const ::mpfr_t op2)
+{
+    MPPP_MAYBE_TLS arb_raii arb_rop, arb_op1, arb_op2;
+
+    mpfr_to_arb(arb_op1.m_arb, op1);
+    mpfr_to_arb(arb_op2.m_arb, op2);
+
+    ::arb_polylog(arb_rop.m_arb, arb_op1.m_arb, arb_op2.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+    arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+}
+
 #undef MPPP_UNARY_ARB_WRAPPER
 
 #if defined(MPPP_WITH_MPC)

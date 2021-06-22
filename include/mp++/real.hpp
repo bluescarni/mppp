@@ -198,6 +198,9 @@ MPPP_DLL_PUBLIC void arb_hypgeom_bessel_y(::mpfr_t, const ::mpfr_t, const ::mpfr
 MPPP_DLL_PUBLIC void arb_lambert_w0(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void arb_lambert_wm1(::mpfr_t, const ::mpfr_t);
 
+MPPP_DLL_PUBLIC void arb_polylog_si(::mpfr_t, long, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_polylog(::mpfr_t, const ::mpfr_t, const ::mpfr_t);
+
 #endif
 
 } // namespace detail
@@ -2423,6 +2426,36 @@ MPPP_REAL_MPFR_BINARY_IMPL(yx, detail::arb_hypgeom_bessel_y, false)
 
 // Polylogarithms.
 MPPP_REAL_MPFR_UNARY_IMPL(li2, detail::real_li2_wrapper, true)
+
+#if defined(MPPP_WITH_ARB)
+
+// Polylogarithm, integer order.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &polylog_si(real &rop, long n, T &&op)
+{
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { detail::arb_polylog_si(r, n, o); };
+    return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real polylog_si(long n, T &&r)
+{
+    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { detail::arb_polylog_si(rop, n, op); };
+    return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
+}
+
+// Polylogarithm, real order.
+MPPP_REAL_MPFR_BINARY_IMPL(polylog, detail::arb_polylog, false)
+
+#endif
 
 // Other special functions.
 MPPP_REAL_MPFR_UNARY_IMPL(eint, ::mpfr_eint, true)
