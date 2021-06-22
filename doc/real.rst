@@ -2483,8 +2483,8 @@ Polylogarithms
 
       The ``polylog_si()`` and ``polylog()`` functions.
 
-   :param x: the argument.
    :param s: the order of the polylogarithm.
+   :param x: the argument.
 
    :return: the polylogarithm of *x*.
 
