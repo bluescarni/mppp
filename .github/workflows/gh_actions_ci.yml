@@ -7,6 +7,12 @@ on:
     branches:
       - master
 jobs:
+  osx_10_15:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: bash tools/gha_osx.sh
   binder_cache:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
