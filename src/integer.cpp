@@ -360,6 +360,7 @@ std::ostream &integer_stream_operator_impl(std::ostream &os, const mpz_struct_t 
         switch (fill) {
             case 1:
                 // Left fill: fill characters at the end.
+                // NOTE: minus 1 because of the terminator.
                 tmp.insert(tmp.end() - 1, fill_size, fill_char);
                 break;
             case 2:
@@ -382,6 +383,7 @@ std::ostream &integer_stream_operator_impl(std::ostream &os, const mpz_struct_t 
     }
 
     // Write out the unformatted data.
+    // NOTE: minus 1 because of the terminator.
     os.write(tmp.data(), safe_cast<std::streamsize>(tmp.size() - 1u));
 
     // Reset the stream width to zero, like the operator<<() does for builtin types.
