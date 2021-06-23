@@ -12,16 +12,23 @@
 
 #endif
 
+// NOTE: in order to use the MPFR formatted functions,
+// we must make sure that stdio.h is included before mpfr.h:
+// https://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
+#include <cstdio>
+
 #include <mp++/config.hpp>
 
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cerrno>
 #include <cmath>
 #include <cstddef>
 #include <ios>
 #include <iostream>
 #include <limits>
+#include <locale>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -2247,7 +2254,156 @@ bool real_gt(const real &a, const real &b)
 // Output stream operator.
 std::ostream &operator<<(std::ostream &os, const real &r)
 {
-    detail::mpfr_to_stream(r.get_mpfr_t(), os, 10);
+    // Get the stream width.
+    const auto width = os.width();
+
+    // Fetch the stream's flags.
+    const auto flags = os.flags();
+
+    // Check if we are using scientific, fixed or both.
+    const auto scientific = (flags & std::ios_base::scientific) != 0;
+    const auto fixed = (flags & std::ios_base::fixed) != 0;
+    const auto hexfloat = scientific && fixed;
+
+    // Force decimal point character?
+    const auto showpoint = (flags & std::ios_base::showpoint) != 0;
+
+    // Force the plus sign?
+    const bool with_plus = (flags & std::ios_base::showpos) != 0;
+
+    // Uppercase?
+    const bool uppercase = (flags & std::ios_base::uppercase) != 0;
+
+    // Fetch the precision too.
+    auto precision = os.precision();
+    // NOTE: if the precision is negative, reset it
+    // to the default value of 6.
+    if (precision < 0) {
+        precision = 6;
+    }
+
+    // Put together the format string.
+    std::ostringstream oss;
+    oss.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+    oss.imbue(std::locale::classic());
+
+    oss << '%';
+
+    if (showpoint) {
+        oss << '#';
+    }
+
+    if (with_plus) {
+        oss << '+';
+    }
+
+    if (hexfloat) {
+        // NOTE: in hexfloat mode, we want to ignore the precision
+        // setting in the stream object and print the exact representation:
+        // https://en.cppreference.com/w/cpp/locale/num_put/put
+        oss << 'R';
+    } else {
+        oss << '.' << precision << 'R';
+    }
+
+    if (hexfloat) {
+        oss << (uppercase ? 'A' : 'a');
+    } else if (scientific) {
+        oss << (uppercase ? 'E' : 'e');
+    } else if (fixed) {
+        // NOTE: in fixed format, the uppercase
+        // setting is ignored for floating-point types:
+        // https://en.cppreference.com/w/cpp/locale/num_put/put
+        oss << 'f';
+    } else {
+        oss << (uppercase ? 'G' : 'g');
+    }
+
+    const auto fmt_str = oss.str();
+
+    // Print out via the MPFR printf() function.
+    char *out_str = nullptr;
+    const auto ret = ::mpfr_asprintf(&out_str, fmt_str.c_str(), r.get_mpfr_t());
+    if (ret == -1) {
+        // LCOV_EXCL_START
+        // NOTE: the MPFR docs state that if printf() returns -1, the errno variable and erange
+        // flag are set. Let's clear them out before throwing.
+        errno = 0;
+        ::mpfr_clear_erangeflag();
+
+        throw std::invalid_argument("The mpfr_asprintf() function returned the error code " + std::to_string(ret));
+        // LCOV_EXCL_STOP
+    }
+
+    // printf() was successful, let's set up the RAII machinery to automatically
+    // clear out_str before anything else.
+    // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
+    struct out_str_cleaner {
+        ~out_str_cleaner()
+        {
+            ::mpfr_free_str(ptr);
+        }
+        char *ptr;
+    };
+
+    out_str_cleaner osc{out_str};
+
+    // NOTE: I am not sure if it is possible to get a string of size 0
+    // from a printf() function. Let's throw for the time being in such a case,
+    // as zero-length output complicates indexing below.
+    if (ret == 0) {
+        // LCOV_EXCL_START
+        throw std::invalid_argument("The mpfr_asprintf() function returned an empty string");
+        // LCOV_EXCL_STOP
+    }
+
+    // We are going to do the filling
+    // only if the stream width is larger
+    // than the total size of the number.
+    // NOTE: width > ret already implies width >= 0.
+    if (width > ret) {
+        // Create a std::string from the string outout
+        // of printf().
+        std::string tmp(out_str, out_str + ret);
+
+        // Determine the fill type.
+        const auto fill = detail::stream_flags_to_fill(flags);
+
+        // Compute how much fill we need.
+        const auto fill_size = detail::safe_cast<decltype(tmp.size())>(width - ret);
+
+        // Get the fill character.
+        const auto fill_char = os.fill();
+
+        switch (fill) {
+            case 1:
+                // Left fill: fill characters at the end.
+                tmp.insert(tmp.end(), fill_size, fill_char);
+                break;
+            case 2:
+                // Right fill: fill characters at the beginning.
+                tmp.insert(tmp.begin(), fill_size, fill_char);
+                break;
+            default: {
+                assert(fill == 3);
+
+                // Internal fill: the fill characters are always after the sign (if present).
+                const auto delta = static_cast<int>(tmp[0] == '+' || tmp[0] == '-');
+                tmp.insert(tmp.begin() + delta, fill_size, fill_char);
+                break;
+            }
+        }
+
+        os.write(tmp.data(), detail::safe_cast<std::streamsize>(tmp.size()));
+    } else {
+        os.write(out_str, detail::safe_cast<std::streamsize>(ret));
+    }
+
+    // Reset the stream width to zero, like the operator<<() does for builtin types.
+    // https://en.cppreference.com/w/cpp/io/manip/setw
+    // Do it here so we ensure we don't alter the state of the stream until the very end.
+    os.width(0);
+
     return os;
 }
 

@@ -8,6 +8,7 @@
 
 #include <mp++/config.hpp>
 
+#include <iomanip>
 #include <limits>
 #include <random>
 #include <sstream>
@@ -42,6 +43,259 @@ using rat_t = rational<1>;
 static std::mt19937 rng;
 
 static const int ntrials = 1000;
+
+TEST_CASE("real ostream")
+{
+    // Default setting.
+    {
+        std::ostringstream oss;
+        oss << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "1.1");
+    }
+
+    // Scientific format.
+    {
+        std::ostringstream oss;
+        oss << std::scientific << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "1.100000e+00");
+
+        oss.str("");
+
+        oss << std::uppercase << real{"1.1", 53};
+        REQUIRE(oss.str() == "1.100000E+00");
+
+        oss.str("");
+
+        oss << real{"inf", 53};
+        REQUIRE(oss.str() == "INF");
+    }
+
+    // Fixed format.
+    {
+        std::ostringstream oss;
+        oss << std::fixed << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "1.100000");
+
+        oss.str("");
+
+        oss << std::uppercase << real{"inf", 53};
+        REQUIRE(oss.str() == "inf");
+    }
+
+    // Hexfloat.
+    {
+        std::ostringstream oss;
+        oss << std::hexfloat << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "0x1.199999999999ap+0");
+
+        oss.str("");
+
+        oss << std::uppercase << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "0X1.199999999999AP+0");
+    }
+
+    // Test the showpoint bits.
+    {
+        std::ostringstream oss;
+        oss << std::showpoint << real{"42", 53};
+
+        REQUIRE(oss.str() == "42.0000");
+
+        oss.str("");
+
+        oss << std::scientific << real{"42", 53};
+
+        REQUIRE(oss.str() == "4.200000e+01");
+    }
+
+    // Test unconditional plus on front.
+    {
+        std::ostringstream oss;
+        oss << std::showpos << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "+1.1");
+
+        oss.str("");
+
+        oss << std::scientific << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "+1.100000e+00");
+
+        oss.str("");
+
+        oss << std::hexfloat << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "+0x1.199999999999ap+0");
+    }
+
+    // Test altering the precision.
+    {
+        std::ostringstream oss;
+        oss << std::showpoint << std::setprecision(10) << real{"42", 53};
+
+        REQUIRE(oss.str() == "42.00000000");
+
+        oss.str("");
+
+        oss << std::scientific << real{"42", 53};
+
+        REQUIRE(oss.str() == "4.2000000000e+01");
+
+        oss.str("");
+
+        oss << std::setprecision(20) << std::showpos << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "+1.10000000000000008882e+00");
+    }
+
+    // Test right fill.
+    {
+        std::ostringstream oss;
+        oss << std::setw(20) << std::setfill('*') << std::right << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "*****************1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::showpos << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "****************+1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "****************-1.1");
+    }
+
+    // Test left fill.
+    {
+        std::ostringstream oss;
+        oss << std::setw(20) << std::setfill('*') << std::left << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "1.1*****************");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::showpos << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "+1.1****************");
+
+        oss.str("");
+
+        oss << std::setw(20) << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-1.1****************");
+    }
+
+    // Test internal fill.
+    {
+        std::ostringstream oss;
+        oss << std::setw(20) << std::setfill('*') << std::internal << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "*****************1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::showpos << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "+****************1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-****************1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::fixed << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "+***********1.100000");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::scientific << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-*******1.100000e+00");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::hexfloat << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "+0x1.199999999999ap+0");
+
+        oss.str("");
+
+        oss << std::setw(30) << std::hexfloat << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-*********0x1.199999999999ap+0");
+
+        // Check the width is cleared out.
+        oss.str("");
+
+        oss << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-0x1.199999999999ap+0");
+    }
+
+    // Negative precision.
+    {
+        std::ostringstream oss;
+        oss << std::setprecision(-1) << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "1.1");
+
+        oss.str("");
+
+        oss << std::scientific << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-1.100000e+00");
+
+        oss.str("");
+
+        oss << std::fixed << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-1.100000");
+
+        oss.str("");
+
+        oss << std::hexfloat << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-0x1.199999999999ap+0");
+    }
+
+    // Zero precision.
+    {
+        std::ostringstream oss;
+        oss << std::setprecision(0) << real{"1.1", 53};
+
+        REQUIRE(oss.str() == "1");
+
+        oss.str("");
+
+        oss << std::scientific << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-1e+00");
+
+        oss.str("");
+
+        oss << std::fixed << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-1");
+
+        oss.str("");
+
+        oss << std::hexfloat << real{"-1.1", 53};
+
+        REQUIRE(oss.str() == "-0x1.199999999999ap+0");
+    }
+}
 
 struct int_io_tester {
     template <typename T>
