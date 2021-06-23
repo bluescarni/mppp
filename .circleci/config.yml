@@ -33,14 +33,6 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_focal_gcc9_conda_docs.sh
-  focal_clang9_conda_tsan:
-    docker:
-    - image: circleci/buildpack-deps:focal
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_focal_clang9_conda_tsan.sh
   focal_clang9_debuggmp_unstable:
     docker:
     - image: circleci/buildpack-deps:focal
@@ -57,22 +49,6 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_focal_clang9_debuggmp.sh
-  bionic_gcc7_conda_asan:
-    docker:
-    - image: circleci/buildpack-deps:bionic
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_bionic_gcc7_conda_asan.sh
-  bionic_gcc7_conda_ubsan:
-    docker:
-    - image: circleci/buildpack-deps:bionic
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_bionic_gcc7_conda_ubsan.sh
   focal_clang9_msan_00:
     docker:
     - image: circleci/buildpack-deps:focal
@@ -105,9 +81,6 @@ workflows:
     - bionic_gcc7_conda_coverage
     - bionic_gcc7_conda_release
     - focal_gcc9_conda_coverage
-    - focal_clang9_conda_tsan
     - focal_clang9_debuggmp_unstable
     - focal_clang9_debuggmp
-    - bionic_gcc7_conda_asan
-    - bionic_gcc7_conda_ubsan
     - focal_gcc9_conda_docs
