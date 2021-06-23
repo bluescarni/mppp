@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- :cpp:class:`~mppp::real` now respects the format
+  flags in output streams
+  (`#272 <https://github.com/bluescarni/mppp/pull/272>`__).
 - Add polylogarithms for :cpp:class:`~mppp::real`
   (`#271 <https://github.com/bluescarni/mppp/pull/271>`__).
 - Add the Lambert W functions :math:`W_0` and :math:`W_{-1}`
