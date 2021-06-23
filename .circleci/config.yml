@@ -1,76 +1,76 @@
 version: 2.1
 
 jobs:
-  # bionic_gcc7_conda_coverage:
-  #   docker:
-  #   - image: circleci/buildpack-deps:bionic
-  #   steps:
-  #   - checkout
-  #   - run:
-  #       name: Build and test
-  #       command: bash ./tools/circleci_bionic_gcc7_conda_coverage.sh
-  # bionic_gcc7_conda_release:
-  #   docker:
-  #   - image: circleci/buildpack-deps:bionic
-  #   steps:
-  #   - checkout
-  #   - run:
-  #       name: Build and test
-  #       command: bash ./tools/circleci_bionic_gcc7_conda_release.sh
-  # focal_gcc9_conda_coverage:
-  #   docker:
-  #   - image: circleci/buildpack-deps:focal
-  #   steps:
-  #   - checkout
-  #   - run:
-  #       name: Build and test
-  #       command: bash ./tools/circleci_focal_gcc9_conda_coverage.sh
-  # focal_gcc9_conda_docs:
-  #   docker:
-  #   - image: circleci/buildpack-deps:focal
-  #   steps:
-  #   - checkout
-  #   - run:
-  #       name: Build and test
-  #       command: bash ./tools/circleci_focal_gcc9_conda_docs.sh
-  # focal_clang9_debuggmp_unstable:
-  #   docker:
-  #   - image: circleci/buildpack-deps:focal
-  #   steps:
-  #   - checkout
-  #   - run:
-  #       name: Build and test
-  #       command: bash ./tools/circleci_focal_clang9_debuggmp_unstable.sh
-  # focal_clang9_debuggmp:
-  #   docker:
-  #   - image: circleci/buildpack-deps:focal
-  #   steps:
-  #   - checkout
-  #   - run:
-  #       name: Build and test
-  #       command: bash ./tools/circleci_focal_clang9_debuggmp.sh
-  # focal_clang9_msan_00:
-  #   docker:
-  #   - image: circleci/buildpack-deps:focal
-  #   steps:
-  #   - checkout
-  #   - run:
-  #       name: Build and test
-  #       command: bash ./tools/circleci_focal_clang9_msan.sh
-  #       environment:
-  #         TEST_NSPLIT: 2
-  #         SPLIT_TEST_NUM: 0
-  # focal_clang9_msan_01:
-  #   docker:
-  #   - image: circleci/buildpack-deps:focal
-  #   steps:
-  #   - checkout
-  #   - run:
-  #       name: Build and test
-  #       command: bash ./tools/circleci_focal_clang9_msan.sh
-  #       environment:
-  #         TEST_NSPLIT: 2
-  #         SPLIT_TEST_NUM: 1
+  bionic_gcc7_conda_coverage:
+    docker:
+    - image: circleci/buildpack-deps:bionic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_bionic_gcc7_conda_coverage.sh
+  bionic_gcc7_conda_release:
+    docker:
+    - image: circleci/buildpack-deps:bionic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_bionic_gcc7_conda_release.sh
+  focal_gcc9_conda_coverage:
+    docker:
+    - image: circleci/buildpack-deps:focal
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_focal_gcc9_conda_coverage.sh
+  focal_gcc9_conda_docs:
+    docker:
+    - image: circleci/buildpack-deps:focal
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_focal_gcc9_conda_docs.sh
+  focal_clang9_debuggmp_unstable:
+    docker:
+    - image: circleci/buildpack-deps:focal
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_focal_clang9_debuggmp_unstable.sh
+  focal_clang9_debuggmp:
+    docker:
+    - image: circleci/buildpack-deps:focal
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_focal_clang9_debuggmp.sh
+  focal_clang9_msan_00:
+    docker:
+    - image: circleci/buildpack-deps:focal
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_focal_clang9_msan.sh
+        environment:
+          TEST_NSPLIT: 2
+          SPLIT_TEST_NUM: 0
+  focal_clang9_msan_01:
+    docker:
+    - image: circleci/buildpack-deps:focal
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_focal_clang9_msan.sh
+        environment:
+          TEST_NSPLIT: 2
+          SPLIT_TEST_NUM: 1
   ubuntu_arm64:
     machine:
       image: ubuntu-2004:202101-01
@@ -85,12 +85,12 @@ workflows:
   version: 2.1
   all_builds:
     jobs:
-    # - focal_clang9_msan_00
-    # - focal_clang9_msan_01
-    # - bionic_gcc7_conda_coverage
-    # - bionic_gcc7_conda_release
-    # - focal_gcc9_conda_coverage
-    # - focal_clang9_debuggmp_unstable
-    # - focal_clang9_debuggmp
-    # - focal_gcc9_conda_docs
+    - focal_clang9_msan_00
+    - focal_clang9_msan_01
+    - bionic_gcc7_conda_coverage
+    - bionic_gcc7_conda_release
+    - focal_gcc9_conda_coverage
+    - focal_clang9_debuggmp_unstable
+    - focal_clang9_debuggmp
+    - focal_gcc9_conda_docs
     - ubuntu_arm64
