@@ -1,6 +1,6 @@
 # mp++
 [![Build Status](https://img.shields.io/circleci/project/github/bluescarni/mppp/master.svg?style=for-the-badge)](https://circleci.com/gh/bluescarni/mppp)
-[![Build Status](https://img.shields.io/travis/bluescarni/mppp/master.svg?logo=travis&style=for-the-badge)](https://travis-ci.org/bluescarni/mppp)
+[![Build Status](https://img.shields.io/github/workflow/status/bluescarni/mppp/GitHub%20CI?style=for-the-badge)](https://github.com/bluescarni/mppp/actions?query=workflow%3A%22GitHub+CI%22)
 [![Build Status](https://img.shields.io/appveyor/ci/bluescarni/mppp/master.svg?logo=appveyor&style=for-the-badge)](https://ci.appveyor.com/project/bluescarni/mppp)
 ![language](https://img.shields.io/badge/language-C%2B%2B11-red.svg?style=for-the-badge)
 [![Code Coverage](https://img.shields.io/codecov/c/github/bluescarni/mppp.svg?style=for-the-badge)](https://codecov.io/github/bluescarni/mppp?branch=master)
