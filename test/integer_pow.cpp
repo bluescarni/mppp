@@ -199,7 +199,8 @@ struct pow_tester {
         // invoked). This leads to inconsistencies in the two tests below,
         // so we just disable them in FreeBSD. See also:
         // https://github.com/bluescarni/mppp/issues/132
-#if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__)
+        // NOTE: the same problem seems to happen on aarch64.
+#if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__) && !defined(__aarch64__)
         REQUIRE(pow(integer{2}, 4.5l) == std::pow(2.l, 4.5l));
         REQUIRE(pow(4.5l, integer{-2}) == std::pow(4.5l, -2.l));
 #endif
