@@ -5205,14 +5205,7 @@ with the sign of <em>x</em> divided by <em>y</em> (except if those low bits are 
 <dt id="_CPPv4N4mppplsERNSt7ostreamERKN4mppp4realE">
 <span id="_CPPv3N4mppplsERNSt7ostreamERKN4mppp4realE"></span><span id="_CPPv2N4mppplsERNSt7ostreamERKN4mppp4realE"></span><span id="mppp::lshift-operator__osR.mppp::realCR"></span><span class="pre">std</span><span class="pre">::</span><span class="pre">ostream</span> <span class="pre">&amp;</span><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">operator&lt;&lt;</span></code><span class="sig-paren">(</span><span class="pre">std</span><span class="pre">::</span><span class="pre">ostream</span> <span class="pre">&amp;</span><em><span class="pre">os</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="pre">real</span></a> <span class="pre">&amp;</span><em><span class="pre">r</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppplsERNSt7ostreamERKN4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Output stream operator.</p>
-<p>This operator will insert into the stream <em>os</em> a string representation of <em>r</em>
-in base 10 (as returned by <a class="reference internal" href="#_CPPv4NK4mppp4real9to_stringEi" title="mppp::real::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::to_string()</span></code></a>).</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>In future versions of mp++, the behaviour of this operator will change to support the output stream’s formatting
-flags. For the time being, users are encouraged to use the <code class="docutils literal notranslate"><span class="pre">mpfr_get_str()</span></code> function from the MPFR
-library if precise and forward-compatible control on the printing format is needed.</p>
-</div>
+<p>This function will direct to the output stream <em>os</em> the input <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> <em>r</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -5224,7 +5217,11 @@ library if precise and forward-compatible control on the printing format is need
 <dd class="field-even"><p>a reference to <em>os</em>.</p>
 </dd>
 <dt class="field-odd">Throws</dt>
-<dd class="field-odd"><p><strong>unspecified</strong> – any exception thrown by <a class="reference internal" href="#_CPPv4NK4mppp4real9to_stringEi" title="mppp::real::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::to_string()</span></code></a>.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors.</p></li>
+<li><p><strong>std::invalid_argument</strong> – if the MPFR printing primitive <code class="docutils literal notranslate"><span class="pre">mpfr_asprintf()</span></code> returns an error code.</p></li>
+<li><p><strong>unspecified</strong> – any exception raised by the public interface of <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code> or by memory allocation errors.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
