@@ -7,6 +7,36 @@ on:
     branches:
       - master
 jobs:
+  osx_10_15:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: bash tools/gha_osx.sh
+  bionic_clang6:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: bash tools/gha_bionic_clang6.sh
+  bionic_gcc7_conda_asan:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: bash tools/gha_bionic_gcc7_conda_asan.sh
+  bionic_gcc7_conda_ubsan:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: bash tools/gha_bionic_gcc7_conda_ubsan.sh
+  focal_clang9_conda_tsan:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: bash tools/gha_focal_clang9_conda_tsan.sh
   binder_cache:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'

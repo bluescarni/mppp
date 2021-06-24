@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 jobs:
   bionic_gcc7_conda_coverage:
@@ -33,14 +33,6 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_focal_gcc9_conda_docs.sh
-  focal_clang9_conda_tsan:
-    docker:
-    - image: circleci/buildpack-deps:focal
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_focal_clang9_conda_tsan.sh
   focal_clang9_debuggmp_unstable:
     docker:
     - image: circleci/buildpack-deps:focal
@@ -57,30 +49,6 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_focal_clang9_debuggmp.sh
-  bionic_gcc7_conda_asan:
-    docker:
-    - image: circleci/buildpack-deps:bionic
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_bionic_gcc7_conda_asan.sh
-  bionic_gcc7_conda_ubsan:
-    docker:
-    - image: circleci/buildpack-deps:bionic
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_bionic_gcc7_conda_ubsan.sh
-  bionic_clang6:
-    docker:
-    - image: circleci/buildpack-deps:bionic
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_bionic_clang6.sh
   focal_clang9_msan_00:
     docker:
     - image: circleci/buildpack-deps:focal
@@ -103,20 +71,26 @@ jobs:
         environment:
           TEST_NSPLIT: 2
           SPLIT_TEST_NUM: 1
+  ubuntu_arm64:
+    machine:
+      image: ubuntu-2004:202101-01
+    resource_class: arm.medium
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_ubuntu_arm64.sh
 
 workflows:
-  version: 2
+  version: 2.1
   all_builds:
     jobs:
     - focal_clang9_msan_00
     - focal_clang9_msan_01
-    - bionic_clang6
     - bionic_gcc7_conda_coverage
     - bionic_gcc7_conda_release
     - focal_gcc9_conda_coverage
-    - focal_clang9_conda_tsan
     - focal_clang9_debuggmp_unstable
     - focal_clang9_debuggmp
-    - bionic_gcc7_conda_asan
-    - bionic_gcc7_conda_ubsan
     - focal_gcc9_conda_docs
+    - ubuntu_arm64

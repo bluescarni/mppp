@@ -73,9 +73,6 @@ std::ostream &rational_stream_operator_impl(std::ostream &os, const mpz_struct_t
     // Start by figuring out the base.
     const auto base = stream_flags_to_base(flags);
 
-    // Determine the fill type.
-    const auto fill = stream_flags_to_fill(flags);
-
     // Should we prefix the base? Do it only if:
     // - the number is nonzero,
     // - the showbase flag is set,
@@ -187,11 +184,14 @@ std::ostream &rational_stream_operator_impl(std::ostream &os, const mpz_struct_t
     // only if the stream width is larger
     // than the total size of the number.
     if (width >= 0 && make_unsigned(width) > final_size) {
+        // Determine the fill type.
+        const auto fill = stream_flags_to_fill(flags);
+
         // Compute how much fill we need.
         const auto fill_size = safe_cast<decltype(tmp_num.size())>(make_unsigned(width) - final_size);
         // Get the fill character.
         const auto fill_char = os.fill();
-        // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
+
         switch (fill) {
             case 1:
                 // Left fill: fill characters at the end.
@@ -208,7 +208,9 @@ std::ostream &rational_stream_operator_impl(std::ostream &os, const mpz_struct_t
                 // before the numerator starts).
                 tmp_num.insert(tmp_num.begin(), fill_size, fill_char);
                 break;
-            case 3: {
+            default: {
+                assert(fill == 3);
+
                 // Internal fill: the fill characters are always after the sign (if present).
                 // NOTE: contrary to integer, the internal fill does not take into account
                 // the base prefix, and it happens only if a sign is present.

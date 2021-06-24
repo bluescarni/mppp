@@ -3059,21 +3059,16 @@ Input/Output
 
    Output stream operator.
 
-   This operator will insert into the stream *os* a string representation of *r*
-   in base 10 (as returned by :cpp:func:`mppp::real::to_string()`).
-
-   .. warning::
-
-      In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
-      flags. For the time being, users are encouraged to use the ``mpfr_get_str()`` function from the MPFR
-      library if precise and forward-compatible control on the printing format is needed.
+   This function will direct to the output stream *os* the input :cpp:class:`~mppp::real` *r*.
 
    :param os: the target stream.
    :param r: the input argument.
 
    :return: a reference to *os*.
 
-   :exception unspecified: any exception thrown by :cpp:func:`mppp::real::to_string()`.
+   :exception std\:\:overflow_error: in case of (unlikely) overflow errors.
+   :exception std\:\:invalid_argument: if the MPFR printing primitive ``mpfr_asprintf()`` returns an error code.
+   :exception unspecified: any exception raised by the public interface of ``std::ostream`` or by memory allocation errors.
 
 .. _real_s11n:
 

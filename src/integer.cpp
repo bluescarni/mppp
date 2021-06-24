@@ -272,9 +272,6 @@ std::ostream &integer_stream_operator_impl(std::ostream &os, const mpz_struct_t 
     // Start by figuring out the base.
     const auto base = stream_flags_to_base(flags);
 
-    // Determine the fill type.
-    const auto fill = stream_flags_to_fill(flags);
-
     // Should we prefix the base? Do it only if:
     // - the number is nonzero,
     // - the showbase flag is set,
@@ -353,21 +350,26 @@ std::ostream &integer_stream_operator_impl(std::ostream &os, const mpz_struct_t 
     // only if the stream width is larger
     // than the total size of the number.
     if (width >= 0 && make_unsigned(width) > final_size) {
+        // Determine the fill type.
+        const auto fill = stream_flags_to_fill(flags);
         // Compute how much fill we need.
         const auto fill_size = safe_cast<decltype(tmp.size())>(make_unsigned(width) - final_size);
         // Get the fill character.
         const auto fill_char = os.fill();
-        // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
+
         switch (fill) {
             case 1:
                 // Left fill: fill characters at the end.
+                // NOTE: minus 1 because of the terminator.
                 tmp.insert(tmp.end() - 1, fill_size, fill_char);
                 break;
             case 2:
                 // Right fill: fill characters at the beginning.
                 tmp.insert(tmp.begin(), fill_size, fill_char);
                 break;
-            case 3: {
+            default: {
+                assert(fill == 3);
+
                 // Internal fill: the fill characters are always after the sign (if present)
                 // and the base prefix (if present).
                 auto delta = static_cast<int>(tmp[0] == '+' || tmp[0] == '-');
@@ -381,6 +383,7 @@ std::ostream &integer_stream_operator_impl(std::ostream &os, const mpz_struct_t 
     }
 
     // Write out the unformatted data.
+    // NOTE: minus 1 because of the terminator.
     os.write(tmp.data(), safe_cast<std::streamsize>(tmp.size() - 1u));
 
     // Reset the stream width to zero, like the operator<<() does for builtin types.
