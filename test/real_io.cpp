@@ -295,6 +295,14 @@ TEST_CASE("real ostream")
 
         REQUIRE(oss.str() == "-0x1.199999999999ap+0");
     }
+
+    // Print zero with zero precision.
+    {
+        std::ostringstream oss;
+        oss << std::setprecision(0) << real{"0", 53};
+
+        REQUIRE(oss.str() == "0");
+    }
 }
 
 struct int_io_tester {

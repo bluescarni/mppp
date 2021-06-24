@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- :cpp:class:`~mppp::real128` now respects the format
+  flags in output streams
+  (`#273 <https://github.com/bluescarni/mppp/pull/273>`__).
 - :cpp:class:`~mppp::real` now respects the format
   flags in output streams
   (`#272 <https://github.com/bluescarni/mppp/pull/272>`__).
