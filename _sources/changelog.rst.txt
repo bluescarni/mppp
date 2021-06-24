@@ -21,6 +21,12 @@ New
 - Interactive notebooks are now available in the documentation
   (`#270 <https://github.com/bluescarni/mppp/pull/270>`__).
 
+Fix
+~~~
+
+- Workaround for a failing test on 64-bit ARM in release mode
+  (`#274 <https://github.com/bluescarni/mppp/pull/274>`__).
+
 0.23 (2021-04-02)
 -----------------
 
