@@ -6,11 +6,20 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+// NOTE: in order to use the MPFR print functions,
+// we must make sure that stdio.h is included before mpfr.h:
+// https://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
+#include <cstdio>
+
 #include <mp++/config.hpp>
 
 #include <cassert>
+#include <cerrno>
 #include <cstddef>
+#include <ios>
+#include <locale>
 #include <ostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -34,6 +43,7 @@
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/parse_complex.hpp>
 #include <mp++/detail/utils.hpp>
+#include <mp++/integer.hpp>
 #include <mp++/real.hpp>
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -370,7 +380,155 @@ int cmpabs(const complex &c1, const complex &c2)
 
 std::ostream &operator<<(std::ostream &os, const complex &c)
 {
-    return os << c.to_string();
+    // Get the stream width.
+    const auto width = os.width();
+
+    // Fetch the stream's flags.
+    const auto flags = os.flags();
+
+    // Check if we are using scientific, fixed or both.
+    const auto scientific = (flags & std::ios_base::scientific) != 0;
+    const auto fixed = (flags & std::ios_base::fixed) != 0;
+    const auto hexfloat = scientific && fixed;
+
+    // Force decimal point character?
+    const auto showpoint = (flags & std::ios_base::showpoint) != 0;
+
+    // Force the plus sign?
+    const bool with_plus = (flags & std::ios_base::showpos) != 0;
+
+    // Uppercase?
+    const bool uppercase = (flags & std::ios_base::uppercase) != 0;
+
+    // Fetch the precision too.
+    auto precision = os.precision();
+    // NOTE: if the precision is negative, reset it
+    // to the default value of 6.
+    if (precision < 0) {
+        precision = 6;
+    }
+
+    // Put together the format string.
+    std::ostringstream oss;
+    oss.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+    oss.imbue(std::locale::classic());
+
+    oss << '%';
+
+    if (showpoint) {
+        oss << '#';
+    }
+
+    if (with_plus) {
+        oss << '+';
+    }
+
+    if (hexfloat) {
+        // NOTE: in hexfloat mode, we want to ignore the precision
+        // setting in the stream object and print the exact representation:
+        // https://en.cppreference.com/w/cpp/locale/num_put/put
+        oss << 'R';
+    } else {
+        oss << '.' << precision << 'R';
+    }
+
+    if (hexfloat) {
+        oss << (uppercase ? 'A' : 'a');
+    } else if (scientific) {
+        oss << (uppercase ? 'E' : 'e');
+    } else if (fixed) {
+        // NOTE: in fixed format, the uppercase
+        // setting is ignored for floating-point types:
+        // https://en.cppreference.com/w/cpp/locale/num_put/put
+        oss << 'f';
+    } else {
+        oss << (uppercase ? 'G' : 'g');
+    }
+
+    const auto fmt_str = oss.str();
+
+    // The RAII struct to clean out the string allocated by mpfr_asprintf().
+    // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
+    struct out_str_cleaner {
+        ~out_str_cleaner()
+        {
+            ::mpfr_free_str(ptr);
+        }
+        char *ptr;
+    };
+
+    // Init the tmp string.
+    std::string tmp = "(";
+
+    // Print the real and imaginary parts via mpfr_asprintf().
+    char *out_str = nullptr;
+    auto ret = ::mpfr_asprintf(&out_str, fmt_str.c_str(), mpc_realref(c.get_mpc_t()));
+    if (ret == -1) {
+        // LCOV_EXCL_START
+        // NOTE: the MPFR docs state that if printf() returns -1, the errno variable and erange
+        // flag are set. Let's clear them out before throwing.
+        errno = 0;
+        ::mpfr_clear_erangeflag();
+
+        throw std::invalid_argument("The mpfr_asprintf() function returned the error code -1");
+        // LCOV_EXCL_STOP
+    }
+    out_str_cleaner re_osc{out_str};
+
+    tmp += out_str;
+    tmp += ',';
+
+    ret = ::mpfr_asprintf(&out_str, fmt_str.c_str(), mpc_imagref(c.get_mpc_t()));
+    if (ret == -1) {
+        // LCOV_EXCL_START
+        // NOTE: the MPFR docs state that if printf() returns -1, the errno variable and erange
+        // flag are set. Let's clear them out before throwing.
+        errno = 0;
+        ::mpfr_clear_erangeflag();
+
+        throw std::invalid_argument("The mpfr_asprintf() function returned the error code -1");
+        // LCOV_EXCL_STOP
+    }
+    out_str_cleaner im_osc{out_str};
+
+    tmp += out_str;
+    tmp += ')';
+
+    // We are going to do the filling
+    // only if the stream width is larger
+    // than the total size of the string repr.
+    if (width >= 0 && detail::make_unsigned(width) > tmp.size()) {
+        // Determine the fill type.
+        const auto fill = detail::stream_flags_to_fill(flags);
+
+        // Compute how much fill we need.
+        const auto fill_size = detail::safe_cast<decltype(tmp.size())>(detail::make_unsigned(width) - tmp.size());
+
+        // Get the fill character.
+        const auto fill_char = os.fill();
+
+        switch (fill) {
+            case 1:
+                // Left fill: fill characters at the end.
+                tmp.insert(tmp.end(), fill_size, fill_char);
+                break;
+            default:
+                assert(fill == 2 || fill == 3);
+
+                // Right or internal fill: fill characters at the beginning.
+                tmp.insert(tmp.begin(), fill_size, fill_char);
+                break;
+        }
+    }
+
+    os.write(tmp.data(), detail::safe_cast<std::streamsize>(tmp.size()));
+
+    // Reset the stream width to zero, like the operator<<() does for builtin types.
+    // https://en.cppreference.com/w/cpp/io/manip/setw
+    // Do it here so we ensure we don't alter the state of the stream until the very end.
+    os.width(0);
+
+    return os;
 }
 
 complex &operator++(complex &c)
