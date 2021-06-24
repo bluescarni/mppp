@@ -507,17 +507,14 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
         // Get the fill character.
         const auto fill_char = os.fill();
 
-        switch (fill) {
-            case 1:
-                // Left fill: fill characters at the end.
-                tmp.insert(tmp.end(), fill_size, fill_char);
-                break;
-            default:
-                assert(fill == 2 || fill == 3);
+        if (fill == 1) {
+            // Left fill: fill characters at the end.
+            tmp.insert(tmp.end(), fill_size, fill_char);
+        } else {
+            assert(fill == 2 || fill == 3);
 
-                // Right or internal fill: fill characters at the beginning.
-                tmp.insert(tmp.begin(), fill_size, fill_char);
-                break;
+            // Right or internal fill: fill characters at the beginning.
+            tmp.insert(tmp.begin(), fill_size, fill_char);
         }
     }
 
