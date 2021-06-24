@@ -12,7 +12,7 @@
 
 #endif
 
-// NOTE: in order to use the MPFR formatted functions,
+// NOTE: in order to use the MPFR print functions,
 // we must make sure that stdio.h is included before mpfr.h:
 // https://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 #include <cstdio>
@@ -2331,7 +2331,7 @@ std::ostream &operator<<(std::ostream &os, const real &r)
         errno = 0;
         ::mpfr_clear_erangeflag();
 
-        throw std::invalid_argument("The mpfr_asprintf() function returned the error code " + std::to_string(ret));
+        throw std::invalid_argument("The mpfr_asprintf() function returned the error code -1");
         // LCOV_EXCL_STOP
     }
 
