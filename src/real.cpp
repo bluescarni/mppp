@@ -2359,7 +2359,7 @@ std::ostream &operator<<(std::ostream &os, const real &r)
 
     // We are going to do the filling
     // only if the stream width is larger
-    // than the total size of the number.
+    // than the total size of the string repr.
     // NOTE: width > ret already implies width >= 0.
     if (width > ret) {
         // Create a std::string from the string outout
