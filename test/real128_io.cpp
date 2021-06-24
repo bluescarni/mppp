@@ -6,6 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <iomanip>
+#include <limits>
 #include <random>
 #include <sstream>
 
@@ -21,14 +23,282 @@ static const int ntries = 1000;
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
+TEST_CASE("stream output")
+{
+    // Default setting.
+    {
+        std::ostringstream oss;
+        oss << real128{"1.1"};
+
+        REQUIRE(oss.str() == "1.1");
+    }
+
+    // Scientific format.
+    {
+        std::ostringstream oss;
+        oss << std::scientific << real128{"1.1"};
+
+        REQUIRE(oss.str() == "1.100000e+00");
+
+        oss.str("");
+
+        oss << std::uppercase << real128{"1.1"};
+        REQUIRE(oss.str() == "1.100000E+00");
+
+        oss.str("");
+
+        oss << real128{"inf"};
+        REQUIRE(oss.str() == "INF");
+    }
+
+    // Fixed format.
+    {
+        std::ostringstream oss;
+        oss << std::fixed << real128{"1.1"};
+
+        REQUIRE(oss.str() == "1.100000");
+
+        oss.str("");
+
+        oss << std::uppercase << real128{"inf"};
+        REQUIRE(oss.str() == "inf");
+    }
+
+    // Hexfloat.
+    {
+        std::ostringstream oss;
+        oss << std::hexfloat << real128{"1.1"};
+
+        REQUIRE(oss.str() == "0x1.199999999999999999999999999ap+0");
+
+        oss.str("");
+
+        oss << std::uppercase << real128{"1.1"};
+
+        REQUIRE(oss.str() == "0X1.199999999999999999999999999AP+0");
+    }
+
+    // Test the showpoint bits.
+    {
+        std::ostringstream oss;
+        oss << std::showpoint << real128{"42"};
+
+        REQUIRE(oss.str() == "42.0000");
+
+        oss.str("");
+
+        oss << std::scientific << real128{"42"};
+
+        REQUIRE(oss.str() == "4.200000e+01");
+    }
+
+    // Test unconditional plus on front.
+    {
+        std::ostringstream oss;
+        oss << std::showpos << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+1.1");
+
+        oss.str("");
+
+        oss << std::scientific << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+1.100000e+00");
+
+        oss.str("");
+
+        oss << std::hexfloat << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+0x1.199999999999999999999999999ap+0");
+    }
+
+    // Test altering the precision.
+    {
+        std::ostringstream oss;
+        oss << std::showpoint << std::setprecision(10) << real128{"42"};
+
+        REQUIRE(oss.str() == "42.00000000");
+
+        oss.str("");
+
+        oss << std::scientific << real128{"42"};
+
+        REQUIRE(oss.str() == "4.2000000000e+01");
+
+        oss.str("");
+
+        oss << std::setprecision(20) << std::showpos << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+1.10000000000000000000e+00");
+
+        oss.str("");
+
+        oss << std::setprecision(36) << std::showpos << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+1.100000000000000000000000000000000077e+00");
+    }
+
+    // Test right fill.
+    {
+        std::ostringstream oss;
+        oss << std::setw(20) << std::setfill('*') << std::right << real128{"1.1"};
+
+        REQUIRE(oss.str() == "*****************1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::showpos << real128{"1.1"};
+
+        REQUIRE(oss.str() == "****************+1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "****************-1.1");
+    }
+
+    // Test left fill.
+    {
+        std::ostringstream oss;
+        oss << std::setw(20) << std::setfill('*') << std::left << real128{"1.1"};
+
+        REQUIRE(oss.str() == "1.1*****************");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::showpos << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+1.1****************");
+
+        oss.str("");
+
+        oss << std::setw(20) << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-1.1****************");
+    }
+
+    // Test internal fill.
+    {
+        std::ostringstream oss;
+        oss << std::setw(20) << std::setfill('*') << std::internal << real128{"1.1"};
+
+        REQUIRE(oss.str() == "*****************1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::showpos << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+****************1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-****************1.1");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::fixed << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+***********1.100000");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::scientific << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-*******1.100000e+00");
+
+        oss.str("");
+
+        oss << std::setw(20) << std::hexfloat << real128{"1.1"};
+
+        REQUIRE(oss.str() == "+0x1.199999999999999999999999999ap+0");
+
+        oss.str("");
+
+        oss << std::setw(60) << std::hexfloat << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-************************0x1.199999999999999999999999999ap+0");
+
+        // Check the width is cleared out.
+        oss.str("");
+
+        oss << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-0x1.199999999999999999999999999ap+0");
+    }
+
+    // Negative precision.
+    {
+        std::ostringstream oss;
+        oss << std::setprecision(-1) << real128{"1.1"};
+
+        REQUIRE(oss.str() == "1.1");
+
+        oss.str("");
+
+        oss << std::scientific << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-1.100000e+00");
+
+        oss.str("");
+
+        oss << std::fixed << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-1.100000");
+
+        oss.str("");
+
+        oss << std::hexfloat << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-0x1.199999999999999999999999999ap+0");
+    }
+
+    // Zero precision.
+    {
+        std::ostringstream oss;
+        oss << std::setprecision(0) << real128{"1.1"};
+
+        REQUIRE(oss.str() == "1");
+
+        oss.str("");
+
+        oss << std::scientific << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-1e+00");
+
+        oss.str("");
+
+        oss << std::fixed << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-1");
+
+        oss.str("");
+
+        oss << std::hexfloat << real128{"-1.1"};
+
+        REQUIRE(oss.str() == "-0x1.199999999999999999999999999ap+0");
+    }
+
+    // Print zero with zero precision.
+    {
+        std::ostringstream oss;
+        oss << std::setprecision(0) << real128{"0"};
+
+        REQUIRE(oss.str() == "0");
+    }
+}
+
 static inline void check_round_trip(const real128 &r)
 {
     const auto tmp = r.to_string();
     real128 r2{tmp};
     REQUIRE(((r.m_value == r2.m_value) || (r.isnan() && r2.isnan() && r.signbit() == r2.signbit())));
     std::ostringstream oss;
-    oss << r;
+    oss << std::setprecision(std::numeric_limits<real128>::max_digits10) << r;
     REQUIRE(oss.str() == tmp);
+    REQUIRE(oss.str() == r.to_string());
 }
 
 TEST_CASE("real128 io")
