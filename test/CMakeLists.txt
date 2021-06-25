@@ -152,6 +152,7 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(complex128_pow)
   ADD_MPPP_TESTCASE(complex128_operators)
   ADD_MPPP_TESTCASE(complex128_literal)
+  ADD_MPPP_TESTCASE(complex128_io)
 endif()
 
 if(MPPP_WITH_MPFR)
