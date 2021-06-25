@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- The mp++ conda packages are now available for 64-bit
+  ARM and PowerPC architectures.
 - :cpp:class:`~mppp::complex128` now respects the format
   flags in output streams
   (`#276 <https://github.com/bluescarni/mppp/pull/276>`__).
