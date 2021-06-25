@@ -9,7 +9,6 @@
 #include <complex>
 #include <iomanip>
 #include <limits>
-#include <random>
 #include <sstream>
 
 #include <mp++/complex128.hpp>
@@ -18,11 +17,6 @@
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
-
-static const int ntries = 1000;
-
-// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
-static std::mt19937 rng;
 
 TEST_CASE("stream output")
 {
