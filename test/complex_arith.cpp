@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -19,7 +19,7 @@
 #if defined(_MSC_VER)
 
 template <typename... Args>
-auto fma_wrap(Args &&... args) -> decltype(mppp::fma(std::forward<Args>(args)...))
+auto fma_wrap(Args &&...args) -> decltype(mppp::fma(std::forward<Args>(args)...))
 {
     return mppp::fma(std::forward<Args>(args)...);
 }

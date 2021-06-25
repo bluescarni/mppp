@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -176,9 +176,9 @@ public:
     // Generic ctor.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-        requires complex128_interoperable<T>
+    requires complex128_interoperable<T>
 #if defined(MPPP_WITH_MPFR)
-        && (!std::is_same<T, real>::value)
+        &&(!std::is_same<T, real>::value)
 #endif
 #else
     template <typename T, detail::enable_if_t<detail::conjunction<is_complex128_interoperable<T>
@@ -619,7 +619,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    inline complex128 pow(const T &x, const U &y)
+inline complex128 pow(const T &x, const U &y)
 {
     return detail::complex128_pow_impl(x, y);
 }
@@ -718,7 +718,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr complex128 operator+(const T &x, const U &y)
+constexpr complex128 operator+(const T &x, const U &y)
 {
     return detail::complex128_binary_add_impl(x, y);
 }
@@ -779,7 +779,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    inline MPPP_CONSTEXPR_14 T &operator+=(T &x, const U &y)
+inline MPPP_CONSTEXPR_14 T &operator+=(T &x, const U &y)
 {
     detail::complex128_in_place_add_impl(x, y);
     return x;
@@ -873,7 +873,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr complex128 operator-(const T &x, const U &y)
+constexpr complex128 operator-(const T &x, const U &y)
 {
     return detail::complex128_binary_sub_impl(x, y);
 }
@@ -923,7 +923,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
+inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
 {
     detail::complex128_in_place_sub_impl(x, y);
     return x;
@@ -992,7 +992,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr complex128 operator*(const T &x, const U &y)
+constexpr complex128 operator*(const T &x, const U &y)
 {
     return detail::complex128_binary_mul_impl(x, y);
 }
@@ -1042,7 +1042,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    inline MPPP_CONSTEXPR_14 T &operator*=(T &x, const U &y)
+inline MPPP_CONSTEXPR_14 T &operator*=(T &x, const U &y)
 {
     detail::complex128_in_place_mul_impl(x, y);
     return x;
@@ -1111,7 +1111,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr complex128 operator/(const T &x, const U &y)
+constexpr complex128 operator/(const T &x, const U &y)
 {
     return detail::complex128_binary_div_impl(x, y);
 }
@@ -1161,7 +1161,7 @@ requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
-    inline MPPP_CONSTEXPR_14 T &operator/=(T &x, const U &y)
+inline MPPP_CONSTEXPR_14 T &operator/=(T &x, const U &y)
 {
     detail::complex128_in_place_div_impl(x, y);
     return x;
@@ -1249,7 +1249,7 @@ requires complex128_cmp_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr bool operator==(const T &x, const U &y)
+constexpr bool operator==(const T &x, const U &y)
 {
     return detail::complex128_eq_impl(x, y);
 }
@@ -1260,7 +1260,7 @@ requires complex128_cmp_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr bool operator!=(const T &x, const U &y)
+constexpr bool operator!=(const T &x, const U &y)
 {
     return !(x == y);
 }

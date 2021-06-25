@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -275,7 +275,7 @@ public:
     // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-    requires rational_cvr_interoperable<T, SSize> && (!rational_integral_interoperable<T, SSize>)
+    requires rational_cvr_interoperable<T, SSize> &&(!rational_integral_interoperable<T, SSize>)
 #else
     template <
         typename T,
@@ -284,12 +284,13 @@ public:
                             int> = 0>
 #endif
         // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-        explicit rational(T &&x) : rational(ptag{}, std::forward<T>(x))
+        explicit rational(T &&x)
+        : rational(ptag{}, std::forward<T>(x))
     {
     }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-    requires rational_cvr_interoperable<T, SSize> &&rational_integral_interoperable<T, SSize>
+    requires rational_cvr_interoperable<T, SSize> && rational_integral_interoperable<T, SSize>
 #else
     template <typename T, detail::enable_if_t<detail::conjunction<is_rational_cvr_interoperable<T, SSize>,
                                                                   is_rational_integral_interoperable<T, SSize>>::value,
@@ -1240,7 +1241,8 @@ inline T dispatch_binary_add(const T &x, const rational<SSize> &op2)
 // Binary addition operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires rational_op_types<T, U> inline auto
+requires rational_op_types<T, U>
+inline auto
 #else
 inline detail::rational_common_t<T, U>
 #endif
@@ -1297,7 +1299,7 @@ requires rational_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator+=(T &rop, const U &op)
+inline T &operator+=(T &rop, const U &op)
 {
     detail::dispatch_in_place_add(rop, op);
     return rop;
@@ -1394,7 +1396,8 @@ inline T dispatch_binary_sub(const T &x, const rational<SSize> &op2)
 // Binary subtraction operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires rational_op_types<T, U> inline auto
+requires rational_op_types<T, U>
+inline auto
 #else
 inline detail::rational_common_t<T, U>
 #endif
@@ -1451,7 +1454,7 @@ requires rational_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator-=(T &rop, const U &op)
+inline T &operator-=(T &rop, const U &op)
 {
     detail::dispatch_in_place_sub(rop, op);
     return rop;
@@ -1546,7 +1549,8 @@ inline T dispatch_binary_mul(const T &x, const rational<SSize> &op2)
 // Binary multiplication operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires rational_op_types<T, U> inline auto
+requires rational_op_types<T, U>
+inline auto
 #else
 inline detail::rational_common_t<T, U>
 #endif
@@ -1615,7 +1619,7 @@ requires rational_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator*=(T &rop, const U &op)
+inline T &operator*=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mul(rop, op);
     return rop;
@@ -1729,7 +1733,8 @@ inline T dispatch_binary_div(const T &x, const rational<SSize> &op2)
 // Binary division operator.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires rational_op_types<T, U> inline auto
+requires rational_op_types<T, U>
+inline auto
 #else
 inline detail::rational_common_t<T, U>
 #endif
@@ -1805,7 +1810,7 @@ requires rational_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator/=(T &rop, const U &op)
+inline T &operator/=(T &rop, const U &op)
 {
     detail::dispatch_in_place_div(rop, op);
     return rop;
@@ -1855,7 +1860,7 @@ requires rational_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator==(const T &op1, const U &op2)
+inline bool operator==(const T &op1, const U &op2)
 {
     return detail::dispatch_equality(op1, op2);
 }
@@ -1867,7 +1872,7 @@ requires rational_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator!=(const T &op1, const U &op2)
+inline bool operator!=(const T &op1, const U &op2)
 {
     return !(op1 == op2);
 }
@@ -1976,7 +1981,7 @@ requires rational_real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator<(const T &op1, const U &op2)
+inline bool operator<(const T &op1, const U &op2)
 {
     return detail::dispatch_less_than(op1, op2);
 }
@@ -1988,7 +1993,7 @@ requires rational_real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator<=(const T &op1, const U &op2)
+inline bool operator<=(const T &op1, const U &op2)
 {
     return !(op1 > op2);
 }
@@ -2000,7 +2005,7 @@ requires rational_real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator>(const T &op1, const U &op2)
+inline bool operator>(const T &op1, const U &op2)
 {
     return detail::dispatch_greater_than(op1, op2);
 }
@@ -2012,7 +2017,7 @@ requires rational_real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_rational_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator>=(const T &op1, const U &op2)
+inline bool operator>=(const T &op1, const U &op2)
 {
     return !(op1 < op2);
 }
@@ -2227,7 +2232,8 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
 // Binary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires rational_op_types<T, U> inline auto
+requires rational_op_types<T, U>
+inline auto
 #else
 template <typename T, typename U>
 inline detail::rational_common_t<T, U>
