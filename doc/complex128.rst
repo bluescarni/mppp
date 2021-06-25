@@ -726,21 +726,16 @@ Input/output
 
    Output stream operator.
 
-   This operator will print to the stream *os* the :cpp:class:`~mppp::complex128` *c*. The current implementation
-   ignores any formatting flag specified in *os*, and the print format will be the one
-   described in :cpp:func:`mppp::complex128::to_string()`.
-
-   .. warning::
-      In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
-      flags. For the time being, users are encouraged to use the ``quadmath_snprintf()`` function from the quadmath
-      library if precise and forward-compatible control on the printing format is needed.
+   This function will direct to the output stream *os* the input :cpp:class:`~mppp::complex128` *c*.
 
    :param os: the target stream.
    :param c: the input :cpp:class:`~mppp::complex128`.
 
    :return: a reference to *os*.
 
-   :exception unspecified: any exception thrown by :cpp:func:`mppp::complex128::to_string()`.
+   :exception std\:\:overflow_error: in case of (unlikely) overflow errors.
+   :exception std\:\:invalid_argument: if the quadmath printing primitive ``quadmath_snprintf()`` returns an error code.
+   :exception unspecified: any exception raised by the public interface of ``std::ostream`` or by memory allocation errors.
 
 .. _complex128_operators:
 

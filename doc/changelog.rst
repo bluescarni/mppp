@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- :cpp:class:`~mppp::complex128` now respects the format
+  flags in output streams
+  (`#276 <https://github.com/bluescarni/mppp/pull/276>`__).
 - :cpp:class:`~mppp::complex` now respects the format
   flags in output streams
   (`#275 <https://github.com/bluescarni/mppp/pull/275>`__).
