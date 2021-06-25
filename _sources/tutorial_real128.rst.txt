@@ -5,7 +5,7 @@ Quadruple-precision float tutorial
 
 The :cpp:class:`~mppp::real128` class is a thin wrapper around
 the :cpp:type:`__float128` type
-available on GCC, Clang and the Intel compiler.
+available on GCC, Clang and the Intel compiler on some platforms [#f1]_.
 
 :cpp:type:`__float128` is an implementation the
 `quadruple-precision IEEE 754 binary floating-point standard <https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>`__,
@@ -108,6 +108,12 @@ a few additional capabilities:
 
 The :ref:`real128 reference <real128_reference>` contains the detailed description of all the features
 provided by :cpp:class:`~mppp::real128`.
+
+.. rubric:: Footnotes
+
+.. [#f1] Note that on some platforms (e.g., Linux ARM64) a quadruple-precision floating-point type
+     is available as the standard C++ ``long double`` type. On such platforms, :cpp:type:`__float128`
+     is not available and neither is :cpp:class:`~mppp::real128`.
 
 User-defined literal
 --------------------

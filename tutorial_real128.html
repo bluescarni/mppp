@@ -385,7 +385,7 @@
 <span id="tutorial-real128"></span><h1>Quadruple-precision float tutorial<a class="headerlink" href="#quadruple-precision-float-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>The <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class is a thin wrapper around
 the <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> type
-available on GCC, Clang and the Intel compiler.</p>
+available on GCC, Clang and the Intel compiler on some platforms <a class="footnote-reference brackets" href="#f1" id="id1">1</a>.</p>
 <p><a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> is an implementation the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format">quadruple-precision IEEE 754 binary floating-point standard</a>,
 which provides up to 36 decimal digits of precision.
@@ -482,6 +482,14 @@ in mp++, they are supposed to be found via ADL. Member function overloads for th
 </ul>
 <p>The <a class="reference internal" href="real128.html#real128-reference"><span class="std std-ref">real128 reference</span></a> contains the detailed description of all the features
 provided by <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Note that on some platforms (e.g., Linux ARM64) a quadruple-precision floating-point type
+is available as the standard C++ <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> type. On such platforms, <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>
+is not available and neither is <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
+</dd>
+</dl>
 <div class="section" id="user-defined-literal">
 <h2>User-defined literal<a class="headerlink" href="#user-defined-literal" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">

@@ -1531,15 +1531,7 @@ if either:</p>
 <dt id="_CPPv4N4mppplsERNSt7ostreamERKN4mppp10complex128E">
 <span id="_CPPv3N4mppplsERNSt7ostreamERKN4mppp10complex128E"></span><span id="_CPPv2N4mppplsERNSt7ostreamERKN4mppp10complex128E"></span><span id="mppp::lshift-operator__osR.mppp::complex128CR"></span><span class="pre">std</span><span class="pre">::</span><span class="pre">ostream</span> <span class="pre">&amp;</span><code class="sig-prename descclassname"><span class="pre">mppp</span><code class="sig-prename descclassname"><span class="pre">::</span></code></code><code class="sig-name descname"><span class="pre">operator&lt;&lt;</span></code><span class="sig-paren">(</span><span class="pre">std</span><span class="pre">::</span><span class="pre">ostream</span> <span class="pre">&amp;</span><em><span class="pre">os</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">mppp</span><span class="pre">::</span><a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128"><span class="pre">complex128</span></a> <span class="pre">&amp;</span><em><span class="pre">c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppplsERNSt7ostreamERKN4mppp10complex128E" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Output stream operator.</p>
-<p>This operator will print to the stream <em>os</em> the <a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> <em>c</em>. The current implementation
-ignores any formatting flag specified in <em>os</em>, and the print format will be the one
-described in <a class="reference internal" href="#_CPPv4NK4mppp10complex1289to_stringEv" title="mppp::complex128::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex128::to_string()</span></code></a>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>In future versions of mp++, the behaviour of this operator will change to support the output stream’s formatting
-flags. For the time being, users are encouraged to use the <code class="docutils literal notranslate"><span class="pre">quadmath_snprintf()</span></code> function from the quadmath
-library if precise and forward-compatible control on the printing format is needed.</p>
-</div>
+<p>This function will direct to the output stream <em>os</em> the input <a class="reference internal" href="#_CPPv4N4mppp10complex128E" title="mppp::complex128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex128</span></code></a> <em>c</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1551,7 +1543,11 @@ library if precise and forward-compatible control on the printing format is need
 <dd class="field-even"><p>a reference to <em>os</em>.</p>
 </dd>
 <dt class="field-odd">Throws</dt>
-<dd class="field-odd"><p><strong>unspecified</strong> – any exception thrown by <a class="reference internal" href="#_CPPv4NK4mppp10complex1289to_stringEv" title="mppp::complex128::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex128::to_string()</span></code></a>.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors.</p></li>
+<li><p><strong>std::invalid_argument</strong> – if the quadmath printing primitive <code class="docutils literal notranslate"><span class="pre">quadmath_snprintf()</span></code> returns an error code.</p></li>
+<li><p><strong>unspecified</strong> – any exception raised by the public interface of <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code> or by memory allocation errors.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
