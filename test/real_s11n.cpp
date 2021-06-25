@@ -32,6 +32,7 @@
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real binary_save_load")
 {
     using Catch::Matchers::Contains;
