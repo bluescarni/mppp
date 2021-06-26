@@ -1,7 +1,7 @@
 channels:
   - conda-forge
 dependencies:
-  - mppp=0.23
+  - mppp=0.24
   - xeus-cling
   - jupyterlab
   - nlohmann_json
