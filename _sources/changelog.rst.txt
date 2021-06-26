@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.24 (unreleased)
+0.24 (2021-06-26)
 -----------------
 
 New
@@ -32,6 +32,8 @@ New
 Fix
 ~~~
 
+- Workaround for a failing test with GCC in C++20 mode
+  (`#277 <https://github.com/bluescarni/mppp/pull/277>`__).
 - Workaround for a failing test on 64-bit ARM in release mode
   (`#274 <https://github.com/bluescarni/mppp/pull/274>`__).
 
