@@ -26,3 +26,4 @@ Integer
     notebooks/integer_arithmetic
     notebooks/integer_comparison
     notebooks/integer_bit_fiddling
+    notebooks/integer_s11n
