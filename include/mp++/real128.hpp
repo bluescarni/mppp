@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -1180,7 +1180,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr real128 operator+(const T &x, const U &y)
+constexpr real128 operator+(const T &x, const U &y)
 {
     return detail::dispatch_add(x, y);
 }
@@ -1241,7 +1241,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    inline MPPP_CONSTEXPR_14 T &operator+=(T &x, const U &y)
+inline MPPP_CONSTEXPR_14 T &operator+=(T &x, const U &y)
 {
     detail::dispatch_in_place_add(x, y);
     return x;
@@ -1303,7 +1303,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr real128 operator-(const T &x, const U &y)
+constexpr real128 operator-(const T &x, const U &y)
 {
     return detail::dispatch_sub(x, y);
 }
@@ -1361,7 +1361,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
+inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
 {
     detail::dispatch_in_place_sub(x, y);
     return x;
@@ -1417,7 +1417,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr real128 operator*(const T &x, const U &y)
+constexpr real128 operator*(const T &x, const U &y)
 {
     return detail::dispatch_mul(x, y);
 }
@@ -1475,7 +1475,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    inline MPPP_CONSTEXPR_14 T &operator*=(T &x, const U &y)
+inline MPPP_CONSTEXPR_14 T &operator*=(T &x, const U &y)
 {
     detail::dispatch_in_place_mul(x, y);
     return x;
@@ -1516,7 +1516,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr real128 operator/(const T &x, const U &y)
+constexpr real128 operator/(const T &x, const U &y)
 {
     return detail::dispatch_div(x, y);
 }
@@ -1574,7 +1574,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    inline MPPP_CONSTEXPR_14 T &operator/=(T &x, const U &y)
+inline MPPP_CONSTEXPR_14 T &operator/=(T &x, const U &y)
 {
     detail::dispatch_in_place_div(x, y);
     return x;
@@ -1643,7 +1643,7 @@ requires real128_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr bool operator==(const T &x, const U &y)
+constexpr bool operator==(const T &x, const U &y)
 {
     return detail::dispatch_eq(x, y);
 }
@@ -1672,7 +1672,7 @@ requires real128_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr bool operator!=(const T &x, const U &y)
+constexpr bool operator!=(const T &x, const U &y)
 {
     return !(x == y);
 }
@@ -1712,7 +1712,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr bool operator<(const T &x, const U &y)
+constexpr bool operator<(const T &x, const U &y)
 {
     return detail::dispatch_lt(x, y);
 }
@@ -1764,7 +1764,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr bool operator<=(const T &x, const U &y)
+constexpr bool operator<=(const T &x, const U &y)
 {
     return detail::dispatch_lte(x, y);
 }
@@ -1816,7 +1816,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr bool operator>(const T &x, const U &y)
+constexpr bool operator>(const T &x, const U &y)
 {
     return detail::dispatch_gt(x, y);
 }
@@ -1868,7 +1868,7 @@ requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-    constexpr bool operator>=(const T &x, const U &y)
+constexpr bool operator>=(const T &x, const U &y)
 {
     return detail::dispatch_gte(x, y);
 }

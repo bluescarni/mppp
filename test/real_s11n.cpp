@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -32,6 +32,7 @@
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
+// NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real binary_save_load")
 {
     using Catch::Matchers::Contains;

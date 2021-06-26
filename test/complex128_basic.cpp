@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -821,7 +821,11 @@ TEST_CASE("get")
         REQUIRE(get(c, complex128{41, -1}));
         REQUIRE(c == std::complex<float>{41, -1});
 
-#if MPPP_CPLUSPLUS >= 202002L
+        // NOTE: there seems to be a constexpr bug currently
+        // on GCC which makes this test fail. Clang seems to do fine:
+        // https://godbolt.org/z/5jK5voPfK
+        // Let's disable this test on GCC for the time being.
+#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto tmp = test_constexpr_get3(complex128{44, -89});
         REQUIRE(tmp == std::complex<double>{44, -89});
 #endif

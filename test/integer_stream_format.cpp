@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -31,14 +31,14 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 static inline void runner_impl(std::ostringstream &) {}
 
 template <typename F, typename... Flags>
-static inline void runner_impl(std::ostringstream &oss, F &&f, Flags &&... flags)
+static inline void runner_impl(std::ostringstream &oss, F &&f, Flags &&...flags)
 {
     oss << std::forward<F>(f);
     runner_impl(oss, std::forward<Flags>(flags)...);
 }
 
 template <typename Int, typename... Flags>
-static inline std::string runner(const Int &n, Flags &&... flags)
+static inline std::string runner(const Int &n, Flags &&...flags)
 {
     std::ostringstream oss;
     runner_impl(oss, std::forward<Flags>(flags)...);

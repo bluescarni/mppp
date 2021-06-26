@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -1298,19 +1298,20 @@ public:
     // Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-    requires integer_cpp_arithmetic<T> && (!cpp_integral<T>)
+    requires integer_cpp_arithmetic<T> &&(!cpp_integral<T>)
 #else
     template <
         typename T,
         detail::enable_if_t<
             detail::conjunction<is_integer_cpp_arithmetic<T>, detail::negation<is_cpp_integral<T>>>::value, int> = 0>
 #endif
-    explicit integer(const T &x) : m_int(x)
+        explicit integer(const T &x)
+        : m_int(x)
     {
     }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-    requires integer_cpp_arithmetic<T> &&cpp_integral<T>
+    requires integer_cpp_arithmetic<T> && cpp_integral<T>
 #else
     template <typename T, detail::enable_if_t<
                               detail::conjunction<is_integer_cpp_arithmetic<T>, is_cpp_integral<T>>::value, int> = 0>
@@ -6545,7 +6546,8 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 // Generic binomial coefficient.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires integer_integral_op_types<T, U> inline auto
+requires integer_integral_op_types<T, U>
+inline auto
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 inline detail::integer_common_t<T, U>
@@ -6684,7 +6686,8 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
 // Generic binary exponentiation.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires integer_op_types<T, U> inline auto
+requires integer_op_types<T, U>
+inline auto
 #else
 inline detail::integer_common_t<T, U>
 #endif
@@ -7110,7 +7113,8 @@ inline integer<SSize> operator+(const integer<SSize> &n)
 // Binary addition.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires integer_op_types<T, U> inline auto
+requires integer_op_types<T, U>
+inline auto
 #else
 inline detail::integer_common_t<T, U>
 #endif
@@ -7126,7 +7130,7 @@ requires integer_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator+=(T &rop, const U &op)
+inline T &operator+=(T &rop, const U &op)
 {
     detail::dispatch_in_place_add(rop, op);
     return rop;
@@ -7246,7 +7250,8 @@ integer<SSize> operator-(const integer<SSize> &n)
 // Binary subtraction.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires integer_op_types<T, U> inline auto
+requires integer_op_types<T, U>
+inline auto
 #else
 inline detail::integer_common_t<T, U>
 #endif
@@ -7262,7 +7267,7 @@ requires integer_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator-=(T &rop, const U &op)
+inline T &operator-=(T &rop, const U &op)
 {
     detail::dispatch_in_place_sub(rop, op);
     return rop;
@@ -7360,7 +7365,8 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 // Binary multiplication.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires integer_op_types<T, U> inline auto
+requires integer_op_types<T, U>
+inline auto
 #else
 inline detail::integer_common_t<T, U>
 #endif
@@ -7376,7 +7382,7 @@ requires integer_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator*=(T &rop, const U &op)
+inline T &operator*=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mul(rop, op);
     return rop;
@@ -7501,7 +7507,8 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 // Binary division.
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-requires integer_op_types<T, U> inline auto
+requires integer_op_types<T, U>
+inline auto
 #else
 inline detail::integer_common_t<T, U>
 #endif
@@ -7517,7 +7524,7 @@ requires integer_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator/=(T &rop, const U &op)
+inline T &operator/=(T &rop, const U &op)
 {
     detail::dispatch_in_place_div(rop, op);
     return rop;
@@ -7526,7 +7533,8 @@ template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>
 // Binary modulo operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires integer_integral_op_types<T, U> inline auto
+requires integer_integral_op_types<T, U>
+inline auto
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 inline detail::integer_common_t<T, U>
@@ -7543,7 +7551,7 @@ requires integer_integral_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator%=(T &rop, const U &op)
+inline T &operator%=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mod(rop, op);
     return rop;
@@ -7834,7 +7842,7 @@ requires integer_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator==(const T &op1, const U &op2)
+inline bool operator==(const T &op1, const U &op2)
 {
     return detail::dispatch_equality(op1, op2);
 }
@@ -7846,7 +7854,7 @@ requires integer_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator!=(const T &op1, const U &op2)
+inline bool operator!=(const T &op1, const U &op2)
 {
     return !(op1 == op2);
 }
@@ -7858,7 +7866,7 @@ requires integer_real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator<(const T &op1, const U &op2)
+inline bool operator<(const T &op1, const U &op2)
 {
     return detail::dispatch_less_than(op1, op2);
 }
@@ -7870,7 +7878,7 @@ requires integer_real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator<=(const T &op1, const U &op2)
+inline bool operator<=(const T &op1, const U &op2)
 {
     return !(op1 > op2);
 }
@@ -7882,7 +7890,7 @@ requires integer_real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator>(const T &op1, const U &op2)
+inline bool operator>(const T &op1, const U &op2)
 {
     return detail::dispatch_greater_than(op1, op2);
 }
@@ -7894,7 +7902,7 @@ requires integer_real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator>=(const T &op1, const U &op2)
+inline bool operator>=(const T &op1, const U &op2)
 {
     return !(op1 < op2);
 }
@@ -7955,7 +7963,8 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
 // Binary bitwise OR operator
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires integer_integral_op_types<T, U> inline auto
+requires integer_integral_op_types<T, U>
+inline auto
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 inline detail::integer_common_t<T, U>
@@ -7972,7 +7981,7 @@ requires integer_integral_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator|=(T &rop, const U &op)
+inline T &operator|=(T &rop, const U &op)
 {
     detail::dispatch_in_place_or(rop, op);
     return rop;
@@ -8025,7 +8034,8 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
 // Binary bitwise AND operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires integer_integral_op_types<T, U> inline auto
+requires integer_integral_op_types<T, U>
+inline auto
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 inline detail::integer_common_t<T, U>
@@ -8042,7 +8052,7 @@ requires integer_integral_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator&=(T &rop, const U &op)
+inline T &operator&=(T &rop, const U &op)
 {
     detail::dispatch_in_place_and(rop, op);
     return rop;
@@ -8095,7 +8105,8 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
 // Binary bitwise XOR operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires integer_integral_op_types<T, U> inline auto
+requires integer_integral_op_types<T, U>
+inline auto
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 inline detail::integer_common_t<T, U>
@@ -8112,7 +8123,7 @@ requires integer_integral_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator^=(T &rop, const U &op)
+inline T &operator^=(T &rop, const U &op)
 {
     detail::dispatch_in_place_xor(rop, op);
     return rop;

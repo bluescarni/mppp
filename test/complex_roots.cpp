@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -195,8 +195,8 @@ TEST_CASE("rootn_ui")
     // Test the special cases.
     {
         auto tmp = rootn_ui(complex{1, 2, complex_prec_t(32)}, 0);
-        REQUIRE(complex::re_cref { tmp }->nan_p());
-        REQUIRE(complex::im_cref { tmp }->nan_p());
+        REQUIRE(complex::re_cref { tmp } -> nan_p());
+        REQUIRE(complex::im_cref { tmp } -> nan_p());
         REQUIRE(tmp.get_prec() == 32);
     }
     {

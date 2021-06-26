@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -9,6 +9,7 @@
 #include <complex>
 #include <iomanip>
 #include <limits>
+#include <random>
 #include <sstream>
 
 #include <mp++/complex.hpp>
@@ -18,6 +19,11 @@
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+
+// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
+static std::mt19937 rng;
+
+static const int ntrials = 1000;
 
 TEST_CASE("ostream test")
 {
@@ -236,4 +242,66 @@ TEST_CASE("ostream test")
 
         REQUIRE(oss.str() == "(0,0)");
     }
+
+    // NOTE: disable random testing on Windows as it seems in some cases
+    // the stream operator formatting is not fully standard-compliant.
+#if !defined(_WIN32)
+
+    // Random testing.
+    if (std::numeric_limits<double>::radix == 2) {
+        std::uniform_real_distribution<double> rdist(-100., 100.);
+        std::uniform_int_distribution<int> idist(0, 1), pdist(-1, std::numeric_limits<double>::max_digits10),
+            wdist(-1, 100);
+
+        for (auto i = 0; i < ntrials; ++i) {
+            std::ostringstream oss1, oss2;
+
+            if (idist(rng) == 0) {
+                oss1 << std::scientific;
+                oss2 << std::scientific;
+            }
+
+            if (idist(rng) == 0) {
+                oss1 << std::fixed;
+                oss2 << std::fixed;
+            }
+
+            if (idist(rng) == 0) {
+                oss1 << std::showpoint;
+                oss2 << std::showpoint;
+            }
+
+            if (idist(rng) == 0) {
+                oss1 << std::showpos;
+                oss2 << std::showpos;
+            }
+
+            if (idist(rng) == 0) {
+                oss1 << std::uppercase;
+                oss2 << std::uppercase;
+            }
+
+            const auto prec = pdist(rng);
+
+            oss1 << std::setprecision(prec);
+            oss2 << std::setprecision(prec);
+
+            const auto w = wdist(rng);
+
+            oss1 << std::setw(w);
+            oss2 << std::setw(w);
+
+            oss1 << std::setfill('*');
+            oss2 << std::setfill('*');
+
+            const auto x = rdist(rng), y = rdist(rng);
+
+            oss1 << std::complex<double>(x, y);
+            oss2 << complex{x, y};
+
+            REQUIRE(oss1.str() == oss2.str());
+        }
+    }
+
+#endif
 }

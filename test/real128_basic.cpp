@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -650,7 +650,11 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cf2, real128{1}));
         REQUIRE(cf2 == std::complex<float>{1, 0});
 
-#if MPPP_CPLUSPLUS >= 202002L
+        // NOTE: there seems to be a constexpr bug currently
+        // on GCC which makes this test fail. Clang seems to do fine:
+        // https://godbolt.org/z/5jK5voPfK
+        // Let's disable this test on GCC for the time being.
+#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cf3 = test_cexpr_complex_get1<float>(real128{7});
         REQUIRE(cf3 == std::complex<float>{7, 0});
         constexpr auto cf4 = test_cexpr_complex_get2<float>(real128{7});
@@ -667,7 +671,7 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cd2, real128{1}));
         REQUIRE(cd2 == std::complex<double>{1, 0});
 
-#if MPPP_CPLUSPLUS >= 202002L
+#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cd3 = test_cexpr_complex_get1<double>(real128{7});
         REQUIRE(cd3 == std::complex<double>{7, 0});
         constexpr auto cd4 = test_cexpr_complex_get2<double>(real128{7});
@@ -685,7 +689,7 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cld2, real128{1}));
         REQUIRE(cld2 == std::complex<long double>{1, 0});
 
-#if MPPP_CPLUSPLUS >= 202002L
+#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cld3 = test_cexpr_complex_get1<long double>(real128{7});
         REQUIRE(cld3 == std::complex<long double>{7, 0});
         constexpr auto cld4 = test_cexpr_complex_get2<long double>(real128{7});

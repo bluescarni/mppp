@@ -1,4 +1,4 @@
-// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -1882,7 +1882,7 @@ requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
-    inline complex pow(T &&a, U &&b)
+inline complex pow(T &&a, U &&b)
 {
     return detail::complex_pow_impl(std::forward<T>(a), std::forward<U>(b));
 }
@@ -2142,7 +2142,7 @@ requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
-    inline complex operator+(T &&a, U &&b)
+inline complex operator+(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_add(std::forward<T>(a), std::forward<U>(b));
 }
@@ -2241,7 +2241,7 @@ requires complex_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator+=(T &a, U &&b)
+inline T &operator+=(T &a, U &&b)
 {
     detail::dispatch_complex_in_place_add(a, std::forward<U>(b));
     return a;
@@ -2430,7 +2430,7 @@ requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
-    inline complex operator-(T &&a, U &&b)
+inline complex operator-(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_sub(std::forward<T>(a), std::forward<U>(b));
 }
@@ -2519,7 +2519,7 @@ requires complex_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator-=(T &a, U &&b)
+inline T &operator-=(T &a, U &&b)
 {
     detail::dispatch_complex_in_place_sub(a, std::forward<U>(b));
     return a;
@@ -2692,7 +2692,7 @@ requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
-    inline complex operator*(T &&a, U &&b)
+inline complex operator*(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_mul(std::forward<T>(a), std::forward<U>(b));
 }
@@ -2792,7 +2792,7 @@ requires complex_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator*=(T &a, U &&b)
+inline T &operator*=(T &a, U &&b)
 {
     detail::dispatch_complex_in_place_mul(a, std::forward<U>(b));
     return a;
@@ -2978,7 +2978,7 @@ requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
-    inline complex operator/(T &&a, U &&b)
+inline complex operator/(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_div(std::forward<T>(a), std::forward<U>(b));
 }
@@ -3066,7 +3066,7 @@ requires complex_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
 #endif
-    inline T &operator/=(T &a, U &&b)
+inline T &operator/=(T &a, U &&b)
 {
     detail::dispatch_complex_in_place_div(a, std::forward<U>(b));
     return a;
@@ -3116,7 +3116,7 @@ requires complex_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_eq_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator==(const T &x, const U &y)
+inline bool operator==(const T &x, const U &y)
 {
     return detail::dispatch_complex_equality(x, y);
 }
@@ -3128,7 +3128,7 @@ requires complex_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_eq_op_types<T, U>::value, int> = 0>
 #endif
-    inline bool operator!=(const T &x, const U &y)
+inline bool operator!=(const T &x, const U &y)
 {
     return !(x == y);
 }
