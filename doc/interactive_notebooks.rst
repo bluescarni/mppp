@@ -27,3 +27,11 @@ Integer
     notebooks/integer_comparison
     notebooks/integer_bit_fiddling
     notebooks/integer_s11n
+
+Real
+----
+
+.. toctree::
+    :maxdepth: 1
+
+    notebooks/real_basics
