@@ -623,6 +623,10 @@ struct int_convert_tester {
             t3.join();
             REQUIRE(!fail.load());
             mt_rng_seed += 4u;
+
+            // Check that integer cannot be implicitly converted
+            // to C++ ints.
+            REQUIRE(!std::is_convertible<integer, Int>::value);
         }
     };
     template <typename S>
@@ -709,6 +713,11 @@ struct fp_convert_tester {
             t3.join();
             REQUIRE(!fail.load());
             mt_rng_seed += 4u;
+
+            // Try implicit conversion.
+            Float tmp = integer{42};
+            REQUIRE(tmp == 42);
+            REQUIRE(std::is_convertible<integer, Float>::value);
         }
     };
     template <typename S>
@@ -757,6 +766,11 @@ struct complex_convert_tester {
             REQUIRE(C(integer{}) == C{0, 0});
             REQUIRE(C(integer{-37}) == C{-37, 0});
             REQUIRE(C(integer{42}) == C{42, 0});
+
+            // Try implicit conversions.
+            C tmp = integer{42};
+            REQUIRE(tmp == C{42, 0});
+            REQUIRE(std::is_convertible<integer, C>::value);
         }
     };
     template <typename S>
