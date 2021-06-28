@@ -6689,7 +6689,7 @@ template <typename T, std::size_t SSize,
           enable_if_t<disjunction<std::is_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T pow_impl(const integer<SSize> &base, const T &exp)
 {
-    return std::pow(static_cast<T>(base), exp);
+    return std::pow(base.operator T(), exp);
 }
 
 // FP/complex -- integer overload.
@@ -6697,7 +6697,7 @@ template <typename T, std::size_t SSize,
           enable_if_t<disjunction<std::is_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T pow_impl(const T &base, const integer<SSize> &exp)
 {
-    return std::pow(base, static_cast<T>(exp));
+    return std::pow(base, exp.operator T());
 }
 
 } // namespace detail
