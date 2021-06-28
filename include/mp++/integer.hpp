@@ -1953,7 +1953,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
 #endif
-    operator T() const
+    explicit operator T() const
     {
         return T(static_cast<typename T::value_type>(*this));
     }
