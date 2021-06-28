@@ -150,10 +150,8 @@ struct mppp_cpp_interop_tester {
             x1 = y1;
             REQUIRE(x1 == 43);
 
-#if !defined(__clang__)
             // Convert T to U.
             REQUIRE(static_cast<U>(x1) == U{43});
-#endif
 
             // Basic binary arithmetic.
             REQUIRE(x1 + U{4} == 47.);
@@ -215,12 +213,8 @@ struct cpp_mppp_interop_tester {
             // NOTE: here T is a C++ type,
             // U an mp++ type.
 
-#if defined(__clang__)
-            T x1{42};
-#else
             // Construct T from U.
             T x1{U{42}};
-#endif
             // NOLINTNEXTLINE(clang-diagnostic-implicit-int-float-conversion)
             REQUIRE(x1 == 42.);
 
