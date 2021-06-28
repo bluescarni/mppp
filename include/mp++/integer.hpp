@@ -1980,7 +1980,7 @@ public:
 #endif
     bool get(T &rop) const
     {
-        rop = static_cast<T>(*this);
+        rop = this->operator T();
         return true;
     }
     // Promote to dynamic storage.
@@ -7665,7 +7665,7 @@ template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(const integer<SSize> &a, const T &x)
 {
-    return static_cast<T>(a) == x;
+    return a.operator T() == x;
 }
 
 template <typename T, std::size_t SSize,

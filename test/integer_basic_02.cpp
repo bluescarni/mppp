@@ -747,9 +747,9 @@ struct complex_convert_tester {
             REQUIRE((is_convertible<C, integer>::value));
 
             // Casts to C.
-            REQUIRE(static_cast<C>(integer{0}) == C{0, 0});
-            REQUIRE(static_cast<C>(integer{1}) == C{1, 0});
-            REQUIRE(static_cast<C>(integer{-42}) == -C{42, 0});
+            REQUIRE(integer{0}.operator C() == C{0, 0});
+            REQUIRE(integer{1}.operator C() == C{1, 0});
+            REQUIRE(integer{-42}.operator C() == -C{42, 0});
             C rop{4, 5};
 
             // get() functions.
@@ -761,11 +761,6 @@ struct complex_convert_tester {
             REQUIRE(rop == C{-5, 0});
             REQUIRE(get(rop, integer{0}));
             REQUIRE(rop == C{0, 0});
-
-            // Functional cast form from integer to C.
-            REQUIRE(C(integer{}) == C{0, 0});
-            REQUIRE(C(integer{-37}) == C{-37, 0});
-            REQUIRE(C(integer{42}) == C{42, 0});
 
             // Try implicit conversions.
             C tmp = integer{42};
