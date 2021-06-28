@@ -7073,7 +7073,7 @@ template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_add(const integer<SSize> &op1, const T &x)
 {
-    return static_cast<T>(op1) + x;
+    return op1.operator T() + x;
 }
 
 template <std::size_t SSize, typename T,
@@ -7106,7 +7106,7 @@ template <std::size_t SSize, typename T,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 {
-    retval = static_cast<T>(retval) + x;
+    retval = retval.operator T() + x;
 }
 
 template <typename T, std::size_t SSize,
