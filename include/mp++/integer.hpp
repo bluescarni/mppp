@@ -7342,7 +7342,7 @@ template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_mul(const integer<SSize> &op1, const T &x)
 {
-    return op1.operator T() * x;
+    return static_cast<T>(op1) * x;
 }
 
 template <typename T, std::size_t SSize,
@@ -7369,7 +7369,7 @@ template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_mul(integer<SSize> &retval, const T &x)
 {
-    retval = retval.operator T() * x;
+    retval = static_cast<T>(retval) * x;
 }
 
 template <typename T, std::size_t SSize,
@@ -7439,14 +7439,14 @@ template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_div(const integer<SSize> &op1, const T &x)
 {
-    return op1.operator T() / x;
+    return static_cast<T>(op1) / x;
 }
 
 template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_div(const T &x, const integer<SSize> &op2)
 {
-    return x / op2.operator T();
+    return x / static_cast<T>(op2);
 }
 
 // Dispatching for in-place div.
@@ -7466,7 +7466,7 @@ template <typename T, std::size_t SSize,
           enable_if_t<disjunction<is_cpp_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_div(integer<SSize> &retval, const T &x)
 {
-    retval = retval.operator T() / x;
+    retval = static_cast<T>(retval) / x;
 }
 
 template <typename T, std::size_t SSize,
