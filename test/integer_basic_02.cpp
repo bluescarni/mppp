@@ -714,10 +714,12 @@ struct fp_convert_tester {
             REQUIRE(!fail.load());
             mt_rng_seed += 4u;
 
+#if MPPP_CPLUSPLUS >= 201703L
             // Try implicit conversion.
             Float tmp = integer{42};
             REQUIRE(tmp == 42);
             REQUIRE(std::is_convertible<integer, Float>::value);
+#endif
         }
     };
     template <typename S>
@@ -767,10 +769,12 @@ struct complex_convert_tester {
             REQUIRE(C(integer{-37}) == C{-37, 0});
             REQUIRE(C(integer{42}) == C{42, 0});
 
+#if MPPP_CPLUSPLUS >= 201703L
             // Try implicit conversions.
             C tmp = integer{42};
             REQUIRE(tmp == C{42, 0});
             REQUIRE(std::is_convertible<integer, C>::value);
+#endif
         }
     };
     template <typename S>

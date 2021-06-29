@@ -1943,7 +1943,10 @@ public:
               detail::enable_if_t<detail::conjunction<is_integer_cpp_arithmetic<T>, is_cpp_floating_point<T>>::value,
                                   int> = 0>
 #endif
-    operator T() const
+#if MPPP_CPLUSPLUS < 201703L
+        explicit
+#endif
+        operator T() const
     {
         return conv_operator_impl<T>();
     }
@@ -1952,6 +1955,9 @@ public:
     template <integer_cpp_complex T>
 #else
     template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
+#endif
+#if MPPP_CPLUSPLUS < 201703L
+    explicit
 #endif
     operator T() const
     {
