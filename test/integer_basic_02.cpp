@@ -766,6 +766,11 @@ struct complex_convert_tester {
             REQUIRE(C(integer{}) == C{0, 0});
             REQUIRE(C(integer{-37}) == C{-37, 0});
             REQUIRE(C(integer{42}) == C{42, 0});
+
+            // Try implicit conversions.
+            C tmp = integer{42};
+            REQUIRE(tmp == C{42, 0});
+            REQUIRE(std::is_convertible<integer, C>::value);
         }
     };
     template <typename S>
