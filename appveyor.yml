@@ -75,7 +75,7 @@ build_script:
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release --target pybind11_test_01
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_BUILD_STATIC_LIBRARY=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_ENABLE_IPO=yes
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . -- -v -j1
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . -- -v
 
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Os" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DMPPP_GMP_INCLUDE_DIR=C:/local/include -DMPPP_GMP_LIBRARY=C:/local/lib/libgmp.a -DMPPP_MPFR_INCLUDE_DIR=C:/local/include -DMPPP_MPFR_LIBRARY=C:/local/lib/libmpfr.a -DMPPP_TEST_NSPLIT=%TEST_NSPLIT% -DMPPP_TEST_SPLIT_NUM=%SPLIT_TEST_NUM% ..
 #- if [%COMPILER%]==[MinGW] cmake --build . --config %BUILD_TYPE% --target all
