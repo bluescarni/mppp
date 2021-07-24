@@ -31,14 +31,7 @@ make -j2 install
 
 # Build the docs.
 cd ../doc
-export SPHINX_OUTPUT=`make html linkcheck 2>&1 >/dev/null`;
-
-if [[ "${SPHINX_OUTPUT}" != "" ]]; then
-    echo "Sphinx encountered some problem:";
-    echo "${SPHINX_OUTPUT}";
-    exit 1;
-fi
-echo "Sphinx ran successfully";
+make html linkcheck
 
 if [[ ! -z "${CI_PULL_REQUEST}" ]]; then
     echo "Testing a pull request, the generated documentation will not be uploaded.";
