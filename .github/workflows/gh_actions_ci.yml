@@ -13,12 +13,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build
         run: bash tools/gha_osx.sh
-  bionic_clang6:
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        run: bash tools/gha_bionic_clang6.sh
   bionic_gcc7_conda_asan:
     runs-on: ubuntu-18.04
     steps:
