@@ -1912,9 +1912,14 @@ private:
         return mpz_float_conversion<T>(*static_cast<const detail::mpz_struct_t *>(get_mpz_view()));
     }
 
-    // Common implementation of the conversion operator.
-    template <typename T>
-    MPPP_NODISCARD T conv_operator_impl() const
+public:
+    // Generic conversion operator to a C++ fundamental type.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <integer_cpp_arithmetic T>
+#else
+    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
+#endif
+    explicit operator T() const
     {
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
@@ -1923,43 +1928,13 @@ private:
         }
         return std::move(retval.second);
     }
-
-public:
-    // Generic conversion operator to a C++ fundamental type.
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <cpp_integral T>
-#else
-    template <typename T, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
-    explicit operator T() const
-    {
-        return conv_operator_impl<T>();
-    }
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <typename T>
-    requires(integer_cpp_arithmetic<T> &&cpp_floating_point<T>)
-#else
-    template <typename T,
-              detail::enable_if_t<detail::conjunction<is_integer_cpp_arithmetic<T>, is_cpp_floating_point<T>>::value,
-                                  int> = 0>
-#endif
-#if MPPP_CPLUSPLUS < 201703L
-        explicit
-#endif
-        operator T() const
-    {
-        return conv_operator_impl<T>();
-    }
     // Generic conversion operator to a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
 #else
     template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
 #endif
-#if MPPP_CPLUSPLUS < 201703L
-    explicit
-#endif
-    operator T() const
+    explicit operator T() const
     {
         return T(static_cast<typename T::value_type>(*this));
     }

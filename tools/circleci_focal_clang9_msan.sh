@@ -46,7 +46,7 @@ make install
 cd ..
 MPPP_MSAN_FLAGS="-fsanitize=memory -stdlib=libc++ -nostdinc++ -isystem ${LLVM_BUILD_DIR}/include/c++/v1/include/c++/v1/ -isystem ${LLVM_BUILD_DIR}/include/c++/v1 -L${LLVM_BUILD_DIR}/lib -Wl,-rpath,${LLVM_BUILD_DIR}/lib -Wno-unused-command-line-argument"
 CC=clang CXX=clang++ cmake ../ -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="${MPPP_MSAN_FLAGS}" -DCMAKE_C_FLAGS="${MPPP_MSAN_FLAGS}" -DCMAKE_PREFIX_PATH=/home/circleci/.local -DCMAKE_CXX_STANDARD=17 -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM}
-make -j1 VERBOSE=1
+make -j2 VERBOSE=1
 ctest -j4 -V
 
 set +e
