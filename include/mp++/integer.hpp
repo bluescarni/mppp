@@ -1913,6 +1913,19 @@ private:
     }
 
 public:
+    // NOTE: in C++17 and later it is possible to implement implicit conversion
+    // towards C++ types higher in the hierarchy (e.g., double). This works in C++17
+    // because of mandatory copy elision, which allows to skip a step in the conversion
+    // sequence which, in C++14, makes things ambiguous. See the discussion here:
+    // https://cpplang.slack.com/archives/C21PKDHSL/p1624893578046400
+    // And the code snippet here:
+    // https://godbolt.org/z/snK19f5Wf
+    // Unfortunately, for some reason clang goes ballistic if we make the conversion
+    // operator conditionally explicit, taking huge amounts of time/memory
+    // to compile the tests. We can probably revisit this behaviour in the future,
+    // perhaps even using C++20's conditionally-explicit syntax rather than
+    // SFINAE dispatching.
+
     // Generic conversion operator to a C++ fundamental type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_arithmetic T>
