@@ -1265,6 +1265,11 @@ public:
     real &trunc();
     real &frac();
 
+#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
+    // Get the number of significant digits required for a round-tripping representation.
+    MPPP_NODISCARD std::size_t get_str_ndigits(int = 10) const;
+#endif
+
     // Size of the serialised binary representation.
     MPPP_NODISCARD std::size_t binary_size() const;
 
@@ -2563,6 +2568,13 @@ inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
+
+#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
+
+// Get the number of significant digits required for a round-tripping representation.
+MPPP_DLL_PUBLIC std::size_t get_str_ndigits(const real &, int = 10);
+
+#endif
 
 // Binary serialization.
 MPPP_DLL_PUBLIC std::size_t binary_size(const real &);

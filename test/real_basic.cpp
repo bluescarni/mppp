@@ -1725,3 +1725,34 @@ TEST_CASE("real nts")
 }
 
 #endif
+
+#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
+
+TEST_CASE("real str_ndigits")
+{
+    using Catch::Matchers::Message;
+
+    real r0{"1.1", 53};
+
+    REQUIRE(r0.get_str_ndigits() == 17u);
+    REQUIRE(r0.get_str_ndigits(10) == 17u);
+
+    r0 = real{"1.1", 24};
+
+    REQUIRE(get_str_ndigits(r0) == 9u);
+    REQUIRE(get_str_ndigits(r0, 10) == 9u);
+
+    REQUIRE_THROWS_MATCHES(
+        r0.get_str_ndigits(1), std::invalid_argument,
+        Message("Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is 1 instead"));
+    REQUIRE_THROWS_MATCHES(
+        get_str_ndigits(r0, -100), std::invalid_argument,
+        Message(
+            "Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is -100 instead"));
+    REQUIRE_THROWS_MATCHES(
+        get_str_ndigits(r0, 63), std::invalid_argument,
+        Message(
+            "Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is 63 instead"));
+}
+
+#endif

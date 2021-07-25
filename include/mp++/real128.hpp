@@ -197,8 +197,6 @@ constexpr
 // - the constructor from integer *may* be implemented in a faster way by reading directly the hi/lo parts
 //   and writing them to the ieee union (instead right now we are using __float128 arithmetics and quadmath
 //   functions). Make sure to benchmark first though...
-// - initial code for stream formatting at 687b86d9380a534048f62aac3815c31b094e52d2. The problem to be
-//   solved is the segfault in MinGW.
 // - should we change the cast operator to C++ types to check the result of the conversion?
 
 // Quadruple-precision floating-point class.

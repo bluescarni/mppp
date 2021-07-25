@@ -91,6 +91,11 @@ from a C++ floating-point value is not:
    int_t n1 = 5;   // Valid.
    int_t n2 = 1.12 // Will NOT compile.
 
+On the other hand, all the conversion operators in mp++'s multiprecision classes are currently ``explicit``. In particular,
+converting an mp++ multiprecision object to a fundamental C++ type always requires an explicit cast. This behaviour may be
+changed in the future so that conversions to fundamental C++ types higher in the hierarchy are ``implicit`` (e.g.,
+:cpp:class:`~mppp::integer` to ``double`` conversions).
+
 All of mp++'s multiprecision classes can also be initialised from string-like entities (see the
 :cpp:concept:`~mppp::string_type` concept for a full list). By default, string input is interpreted as the base-10 representation
 of the desired value, and parsing follows (hopefully) intuitive rules:
@@ -153,13 +158,3 @@ of the assignment operators mirrors the behaviour of the corresponding construct
    q = "-5/6";
    assert((q == rat_t{-5, 6}));
    q = std::numeric_limits<double>::infinity();  // Raises std::domain_error.
-
-Note however that, due to language limitations, it is **not** possible to assign a multiprecision value to a C++ numerical object.
-Explicitly casting the multiprecision value before the assignment will however work:
-
-.. code-block:: c++
-
-   int n = 5;
-   n = int_t{42};                   // This will NOT compile.
-   n = static_cast<int>(int_t{42}); // This will compile.
-   assert(n == 42);

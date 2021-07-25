@@ -1774,3 +1774,34 @@ TEST_CASE("boost_s11n")
 }
 
 #endif
+
+#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
+
+TEST_CASE("real str_ndigits")
+{
+    using Catch::Matchers::Message;
+
+    complex c0{"(1.1,1.3)", complex_prec_t(53)};
+
+    REQUIRE(c0.get_str_ndigits() == 17u);
+    REQUIRE(c0.get_str_ndigits(10) == 17u);
+
+    c0 = complex{"(1.1,1.3)", complex_prec_t(24)};
+
+    REQUIRE(get_str_ndigits(c0) == 9u);
+    REQUIRE(get_str_ndigits(c0, 10) == 9u);
+
+    REQUIRE_THROWS_MATCHES(
+        c0.get_str_ndigits(1), std::invalid_argument,
+        Message("Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is 1 instead"));
+    REQUIRE_THROWS_MATCHES(
+        get_str_ndigits(c0, -100), std::invalid_argument,
+        Message(
+            "Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is -100 instead"));
+    REQUIRE_THROWS_MATCHES(
+        get_str_ndigits(c0, 63), std::invalid_argument,
+        Message(
+            "Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is 63 instead"));
+}
+
+#endif

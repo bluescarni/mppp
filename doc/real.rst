@@ -755,6 +755,27 @@ The real class
       :exception std\:\:invalid_argument: if *base* is not in the :math:`\left[ 2,62 \right]` range.
       :exception std\:\:runtime_error: if the call to the ``mpfr_get_str()`` function of the MPFR API fails.
 
+   .. cpp:function:: std::size_t get_str_ndigits(int base = 10) const
+
+      .. versionadded:: 0.25
+
+      .. note::
+
+         This function is available from MPFR 4.1 onwards.
+
+      Minimum number of digits necessary for round-tripping.
+
+      This member function will return the minimum number of digits
+      necessary to ensure that the current value of ``this``
+      can be recovered exactly from
+      a string representation in the given *base*.
+
+      :param base: the base to be used for the string representation.
+
+      :return: the minimum number of digits necessary for round-tripping.
+
+      :exception std\:\:invalid_argument: if *base* is not in the :math:`\left[ 2,62 \right]` range.
+
    .. cpp:function:: real &neg()
    .. cpp:function:: real &abs()
 
@@ -1423,6 +1444,28 @@ Conversion
    :exception std\:\:domain_error: if *r* is not finite.
    :exception std\:\:overflow_error: if the output exponent is larger than an implementation-defined
      value.
+
+.. cpp:function:: std::size_t mppp::get_str_ndigits(const mppp::real &r, int base = 10)
+
+   .. versionadded:: 0.25
+
+   .. note::
+
+      This function is available from MPFR 4.1 onwards.
+
+   Minimum number of digits necessary for round-tripping.
+
+   This member function will return the minimum number of digits
+   necessary to ensure that the current value of *r*
+   can be recovered exactly from
+   a string representation in the given *base*.
+
+   :param r: the input value.
+   :param base: the base to be used for the string representation.
+
+   :return: the minimum number of digits necessary for round-tripping.
+
+   :exception std\:\:invalid_argument: if *base* is not in the :math:`\left[ 2,62 \right]` range.
 
 .. _real_arithmetic:
 

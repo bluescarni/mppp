@@ -2551,6 +2551,27 @@ std::size_t rbs_min_size()
 
 } // namespace detail
 
+#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
+
+// Get the number of significant digits required for a round-tripping representation.
+std::size_t real::get_str_ndigits(int base) const
+{
+    if (mppp_unlikely(base < 2 || base > 62)) {
+        throw std::invalid_argument(
+            "Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is "
+            + std::to_string(base) + " instead");
+    }
+
+    return ::mpfr_get_str_ndigits(base, get_prec());
+}
+
+std::size_t get_str_ndigits(const real &r, int base)
+{
+    return r.get_str_ndigits(base);
+}
+
+#endif
+
 // Size of the serialised binary representation: base size + limbs data.
 std::size_t real::binary_size() const
 {
