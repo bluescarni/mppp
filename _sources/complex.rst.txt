@@ -589,6 +589,27 @@ The complex class
 
       :exception unspecified: any exception thrown by :cpp:func:`mppp::real::to_string()`.
 
+   .. cpp:function:: std::size_t get_str_ndigits(int base = 10) const
+
+      .. versionadded:: 0.25
+
+      .. note::
+
+         This function is available from MPFR 4.1 onwards.
+
+      Minimum number of digits necessary for round-tripping.
+
+      This member function will return the minimum number of digits
+      necessary to ensure that the current value of ``this``
+      can be recovered exactly from
+      a string representation in the given *base*.
+
+      :param base: the base to be used for the string representation.
+
+      :return: the minimum number of digits necessary for round-tripping.
+
+      :exception std\:\:invalid_argument: if *base* is not in the :math:`\left[ 2,62 \right]` range.
+
    .. cpp:function:: std::pair<real, real> get_real_imag() const &
    .. cpp:function:: std::pair<real, real> get_real_imag() &&
 
@@ -1214,6 +1235,28 @@ Conversion
 
    :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
       specified in the documentation of the conversion operator for :cpp:class:`~mppp::complex`.
+
+.. cpp:function:: std::size_t mppp::get_str_ndigits(const mppp::complex &c, int base = 10)
+
+   .. versionadded:: 0.25
+
+   .. note::
+
+      This function is available from MPFR 4.1 onwards.
+
+   Minimum number of digits necessary for round-tripping.
+
+   This member function will return the minimum number of digits
+   necessary to ensure that the current value of *c*
+   can be recovered exactly from
+   a string representation in the given *base*.
+
+   :param c: the input value.
+   :param base: the base to be used for the string representation.
+
+   :return: the minimum number of digits necessary for round-tripping.
+
+   :exception std\:\:invalid_argument: if *base* is not in the :math:`\left[ 2,62 \right]` range.
 
 Arithmetic
 ~~~~~~~~~~

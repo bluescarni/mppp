@@ -1,6 +1,21 @@
 Changelog
 =========
 
+0.25 (unreleased)
+-----------------
+
+New
+~~~
+
+- Add functions to compute the number of digits necessary
+  for round-tripping for :cpp:class:`~mppp::real` and
+  :cpp:class:`~mppp::complex`
+  (`#280 <https://github.com/bluescarni/mppp/pull/280>`__).
+  Requires MPFR>=4.1.
+- Add new interactive notebooks for :cpp:class:`~mppp::real`
+  and :cpp:class:`~mppp::integer`
+  (`#280 <https://github.com/bluescarni/mppp/pull/280>`__).
+
 0.24 (2021-06-26)
 -----------------
 
