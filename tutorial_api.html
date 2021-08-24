@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -402,14 +402,14 @@ on top of which mp++ is built,</p></li>
 API, consider the simple task of adding two multiprecision integers <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>. This can be accomplished
 either via the overloaded binary operator for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (as seen in the previous section), or via the
 lower-level <code class="docutils literal notranslate"><span class="pre">add()</span></code> primitive (which is documented in the <a class="reference internal" href="integer.html#integer-arithmetic"><span class="std std-ref">integer reference</span></a>):</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">2</span><span class="p">},</span> <span class="n">b</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span><span class="w"> </span><span class="n">a</span><span class="p">{</span><span class="mi">2</span><span class="p">},</span><span class="w"> </span><span class="n">b</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span><span class="w"></span>
 
-<span class="k">auto</span> <span class="n">c1</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span> <span class="c1">// Binary operator.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">c1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"> </span><span class="c1">// Binary operator.</span>
 
-<span class="n">int_t</span> <span class="n">c2</span><span class="p">;</span>
-<span class="n">add</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>   <span class="c1">// Low-level add() primitive.</span>
+<span class="n">int_t</span><span class="w"> </span><span class="n">c2</span><span class="p">;</span><span class="w"></span>
+<span class="n">add</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w">   </span><span class="c1">// Low-level add() primitive.</span>
 
-<span class="n">assert</span><span class="p">(</span><span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">c1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">c2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Similarly to the <code class="docutils literal notranslate"><span class="pre">mpz_add()</span></code> function from the GMP API, mp++’s <code class="docutils literal notranslate"><span class="pre">add()</span></code> is a ternary function taking as first
@@ -418,19 +418,19 @@ there is a fundamental difference in terms of the number of operations performed
 operator returns a new value, which is then used to move-initialise <code class="docutils literal notranslate"><span class="pre">c1</span></code> <a class="footnote-reference brackets" href="#f1" id="id1">1</a>, while the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function writes
 the result of the addition <em>directly</em> into an existing value. While, in practice, the difference might not
 matter in the simple example above, it will start to matter in less trivial cases:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int_t</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{...};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...};</span><span class="w"></span>
 
-<span class="n">int_t</span> <span class="n">sum1</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">sum1</span> <span class="o">=</span> <span class="n">sum1</span> <span class="o">+</span> <span class="n">n</span><span class="p">;</span>    <span class="c1">// Binary operator.</span>
-<span class="p">}</span>
+<span class="n">int_t</span><span class="w"> </span><span class="n">sum1</span><span class="p">;</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">sum1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w">    </span><span class="c1">// Binary operator.</span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">int_t</span> <span class="n">sum2</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">add</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="n">sum2</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span> <span class="c1">// Low-level add() function.</span>
-<span class="p">}</span>
+<span class="n">int_t</span><span class="w"> </span><span class="n">sum2</span><span class="p">;</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">add</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span><span class="w"> </span><span class="n">sum2</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w"> </span><span class="c1">// Low-level add() function.</span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">assert</span><span class="p">(</span><span class="n">sum1</span> <span class="o">==</span> <span class="n">sum2</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">sum1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">sum2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>In this example, we are computing the sum of the integral values held in a vector <code class="docutils literal notranslate"><span class="pre">v</span></code>. When using the binary operator,
@@ -440,26 +440,26 @@ avoided altogether as the result of the addition is written directly into the ac
 of the loop will necessarily be less efficient than the second one. Note that, in this specific case, we can recover optimal
 performance while maintaining a nice syntax by replacing the binary operator with an in-place operator (which will avoid the
 creation of unnecessary temporaries):</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">sum1</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">sum1</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span> <span class="c1">// In-place addition operator.</span>
-<span class="p">}</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span><span class="w"> </span><span class="n">sum1</span><span class="p">;</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">sum1</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="c1">// In-place addition operator.</span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Let’s see another example:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int_t</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{...};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{...};</span><span class="w"></span>
 
-<span class="n">int_t</span> <span class="n">gcd1</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">gcd1</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">gcd1</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span> <span class="c1">// Binary gcd() function.</span>
-<span class="p">}</span>
+<span class="n">int_t</span><span class="w"> </span><span class="n">gcd1</span><span class="p">;</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">gcd1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gcd</span><span class="p">(</span><span class="n">gcd1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w"> </span><span class="c1">// Binary gcd() function.</span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">int_t</span> <span class="n">gcd2</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">gcd</span><span class="p">(</span><span class="n">gcd2</span><span class="p">,</span> <span class="n">gcd2</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>  <span class="c1">// Ternary gcd() function.</span>
-<span class="p">}</span>
+<span class="n">int_t</span><span class="w"> </span><span class="n">gcd2</span><span class="p">;</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">gcd</span><span class="p">(</span><span class="n">gcd2</span><span class="p">,</span><span class="w"> </span><span class="n">gcd2</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">);</span><span class="w">  </span><span class="c1">// Ternary gcd() function.</span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">assert</span><span class="p">(</span><span class="n">gcd1</span> <span class="o">==</span> <span class="n">gcd2</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">gcd1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">gcd2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Here we are computing the GCD of the integers stored in the vector <code class="docutils literal notranslate"><span class="pre">v</span></code>. mp++ provides two overloads for the <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3gcdERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::gcd"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">gcd()</span></code></a> function:</p>
@@ -480,17 +480,17 @@ following set of overloads:</p>
 <li><p>a GMP-style binary function.</p></li>
 </ul>
 <p>As a concrete example, let’s take a look at different ways of computing the absolute value of an integer:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="mi">-5</span><span class="p">};</span>
-<span class="n">n1</span><span class="p">.</span><span class="n">abs</span><span class="p">();</span>              <span class="c1">// In-place nullary member function.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span><span class="w"> </span><span class="n">n1</span><span class="p">{</span><span class="mi">-5</span><span class="p">};</span><span class="w"></span>
+<span class="n">n1</span><span class="p">.</span><span class="n">abs</span><span class="p">();</span><span class="w">              </span><span class="c1">// In-place nullary member function.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
 
-<span class="n">int_t</span> <span class="n">n2</span><span class="p">{</span><span class="mi">-5</span><span class="p">};</span>
-<span class="k">auto</span> <span class="n">n2_abs</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">n2</span><span class="p">);</span> <span class="c1">// Unary function.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n2_abs</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
+<span class="n">int_t</span><span class="w"> </span><span class="n">n2</span><span class="p">{</span><span class="mi">-5</span><span class="p">};</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">n2_abs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">n2</span><span class="p">);</span><span class="w"> </span><span class="c1">// Unary function.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n2_abs</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
 
-<span class="n">int_t</span> <span class="n">n3</span><span class="p">{</span><span class="mi">-5</span><span class="p">},</span> <span class="n">n3_abs</span><span class="p">;</span>
-<span class="n">abs</span><span class="p">(</span><span class="n">n3_abs</span><span class="p">,</span> <span class="n">n3</span><span class="p">);</span>       <span class="c1">// GMP-style binary function.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n3_abs</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
+<span class="n">int_t</span><span class="w"> </span><span class="n">n3</span><span class="p">{</span><span class="mi">-5</span><span class="p">},</span><span class="w"> </span><span class="n">n3_abs</span><span class="p">;</span><span class="w"></span>
+<span class="n">abs</span><span class="p">(</span><span class="n">n3_abs</span><span class="p">,</span><span class="w"> </span><span class="n">n3</span><span class="p">);</span><span class="w">       </span><span class="c1">// GMP-style binary function.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n3_abs</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer3absEv" title="mppp::integer::abs"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::abs()</span></code></a> member function computes and stores the absolute value directly into the calling object.
@@ -499,9 +499,9 @@ binary <code class="docutils literal notranslate"><span class="pre">abs()</span>
 <p>The nullary member function overload is provided to cater to the common use case in which a value is mutated in-place
 through a unary operation (e.g., <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">abs(n)</span></code>). Since the nullary member function overloads return a reference
 to the calling object, they can be chained to perform a sequence of in-place operations on the same value:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="mi">-16</span><span class="p">};</span>
-<span class="n">n1</span><span class="p">.</span><span class="n">abs</span><span class="p">().</span><span class="n">sqrt</span><span class="p">().</span><span class="n">neg</span><span class="p">();</span> <span class="c1">// Equivalent to: n1 = neg(sqrt(abs(n1)))</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="mi">-4</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span><span class="w"> </span><span class="n">n1</span><span class="p">{</span><span class="mi">-16</span><span class="p">};</span><span class="w"></span>
+<span class="n">n1</span><span class="p">.</span><span class="n">abs</span><span class="p">().</span><span class="n">sqrt</span><span class="p">().</span><span class="n">neg</span><span class="p">();</span><span class="w"> </span><span class="c1">// Equivalent to: n1 = neg(sqrt(abs(n1)))</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-4</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p class="rubric">Footnotes</p>

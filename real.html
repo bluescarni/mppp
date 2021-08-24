@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -552,7 +552,7 @@ is that in operations involving <a class="reference internal" href="#_CPPv4N4mpp
 by the precision of the operands, whereas in MPFR the precision of the operation is determined by the precision
 of the return value (which is always passed as the first function parameter in the MPFR API). For instance,
 in the following code,</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">real</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="mi">200</span><span class="p">}</span> <span class="o">+</span> <span class="n">real</span><span class="p">{</span><span class="mi">6</span><span class="p">,</span> <span class="mi">150</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">}</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">150</span><span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
@@ -569,11 +569,11 @@ the desired precision value.</p>
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#real-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding MPFR functions minus the leading <code class="docutils literal notranslate"><span class="pre">mpfr_</span></code>
 prefix. For instance, the MPFR call</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpfr_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">MPFR_RNDN</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpfr_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">MPFR_RNDN</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>that writes the result of <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code>, rounded to nearest, into <code class="docutils literal notranslate"><span class="pre">rop</span></code>, becomes simply</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function is resolved via argument-dependent lookup. Function calls with overlapping arguments
@@ -2353,7 +2353,7 @@ Specifically, this concept will be <code class="docutils literal notranslate"><s
 <dd><p>This concept is satisfied if the types in the parameter pack <code class="docutils literal notranslate"><span class="pre">Args</span></code>
 can be used as argument types in one of the <a class="reference internal" href="#_CPPv4N4mppp4real3setERK4real" title="mppp::real::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::set()</span></code></a> member function overloads.
 In other words, this concept is satisfied if the expression</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">r</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="p">...);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">r</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>is valid (where <code class="docutils literal notranslate"><span class="pre">r</span></code> is a non-const <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code>, etc. are const
@@ -2474,7 +2474,7 @@ the <code class="docutils literal notranslate"><span class="pre">MPFR_PREC_MAX</
 <p>This function will use the arguments <em>args</em> to set the value of the <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> <em>r</em>,
 using one of the available <a class="reference internal" href="#_CPPv4N4mppp4real3setERK4real" title="mppp::real::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::set()</span></code></a> overloads. That is,
 the body of this function is equivalent to</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">r</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">args</span><span class="p">...);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">args</span><span class="p">...);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The input arguments must satisfy the <a class="reference internal" href="#_CPPv4IDpEN4mppp13real_set_argsE" title="mppp::real_set_args"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::real_set_args</span></code></a> concept.</p>
@@ -5335,7 +5335,7 @@ with the sign of <em>x</em> divided by <em>y</em> (except if those low bits are 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This function participates in overload resolution only if the expression</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">x</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">dest</span><span class="p">));</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">dest</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>is well-formed.</p>
@@ -5366,7 +5366,7 @@ overload called on <em>x</em> with <em>dest</em> as argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This function participates in overload resolution only if the expression</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">x</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">src</span><span class="p">));</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">src</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>is well-formed.</p>
@@ -5468,17 +5468,17 @@ overload called on <em>x</em> with <em>src</em> as argument.</p>
 <dd><p>In-place arithmetic operators.</p>
 <p>If <em>a</em> is a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>, then these operators are equivalent, respectively,
 to the expressions:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">;</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">;</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Otherwise, these operators are equivalent to the expressions:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">);</span>
-<span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">);</span>
-<span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">);</span>
-<span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">

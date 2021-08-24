@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -525,7 +525,7 @@ is that in operations involving <a class="reference internal" href="#_CPPv4N4mpp
 by the precision of the operands, whereas in MPC the precision of the operation is determined by the precision
 of the return value (which is always passed as the first function parameter in the MPC API). For instance,
 in the following code,</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">c</span> <span class="o">=</span> <span class="n">complex</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span> <span class="n">complex_prec_t</span><span class="p">(</span><span class="mi">200</span><span class="p">)}</span> <span class="o">+</span> <span class="n">real</span><span class="p">{</span><span class="mi">6</span><span class="p">,</span> <span class="n">complex_prec_t</span><span class="p">(</span><span class="mi">150</span><span class="p">)};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">complex</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">complex_prec_t</span><span class="p">(</span><span class="mi">200</span><span class="p">)}</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">complex_prec_t</span><span class="p">(</span><span class="mi">150</span><span class="p">)};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
@@ -543,11 +543,11 @@ the desired precision value.</p>
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#complex-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding MPC functions minus the leading <code class="docutils literal notranslate"><span class="pre">mpc_</span></code>
 prefix. For instance, the MPC call</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpc_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">MPC_RNDNN</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpc_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">MPC_RNDNN</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>that writes the result of <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code>, rounded to nearest, into <code class="docutils literal notranslate"><span class="pre">rop</span></code>, becomes simply</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function is resolved via argument-dependent lookup. Function calls with overlapping arguments
@@ -1681,7 +1681,7 @@ or cv qualified.</p>
 <dd><p>This concept is satisfied if the types in the parameter pack <code class="docutils literal notranslate"><span class="pre">Args</span></code>
 can be used as argument types in one of the <a class="reference internal" href="#_CPPv4N4mppp7complex3setERK7complex" title="mppp::complex::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex::set()</span></code></a> member function overloads.
 In other words, this concept is satisfied if the expression</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="p">...);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>is valid (where <code class="docutils literal notranslate"><span class="pre">c</span></code> is a non-const <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code>, etc. are const
@@ -1763,18 +1763,18 @@ an instance of this class can be used to perform read-only operations
 on the real part of the <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> number
 via the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API.</p>
 <p>Here’s a typical usage pattern:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex</span> <span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex</span><span class="w"> </span><span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span><span class="w"></span>
 
-<span class="p">{</span>
-   <span class="c1">// Place the re_cref object in a new scope</span>
-   <span class="c1">// in order to minimise its lifetime.</span>
-   <span class="n">complex</span><span class="o">::</span><span class="n">re_cref</span> <span class="n">re</span><span class="p">{</span><span class="n">c</span><span class="p">};</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="c1">// Place the re_cref object in a new scope</span>
+<span class="w">   </span><span class="c1">// in order to minimise its lifetime.</span>
+<span class="w">   </span><span class="n">complex</span><span class="o">::</span><span class="n">re_cref</span><span class="w"> </span><span class="n">re</span><span class="p">{</span><span class="n">c</span><span class="p">};</span><span class="w"></span>
 
-   <span class="c1">// We can use &#39;re&#39; as-if it was a pointer</span>
-   <span class="c1">// to an mppp::real.</span>
-   <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;The real part of c is &quot;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">re</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
-   <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Is the real part of c one? &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">re</span><span class="o">-&gt;</span><span class="n">is_one</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="w">   </span><span class="c1">// We can use &#39;re&#39; as-if it was a pointer</span>
+<span class="w">   </span><span class="c1">// to an mppp::real.</span>
+<span class="w">   </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;The real part of c is &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">re</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="w">   </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Is the real part of c one? &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">re</span><span class="o">-&gt;</span><span class="n">is_one</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Because <a class="reference internal" href="#_CPPv4N4mppp7complex7re_crefE" title="mppp::complex::re_cref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">re_cref</span></code></a> shares data
@@ -1874,19 +1874,19 @@ an instance of this class can be used to perform non-<code class="docutils liter
 on the real part of the <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> number
 via the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API.</p>
 <p>Here’s a typical usage pattern:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex</span> <span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex</span><span class="w"> </span><span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span><span class="w"></span>
 
-<span class="p">{</span>
-   <span class="c1">// Place the re_ref object in a new scope</span>
-   <span class="c1">// in order to minimise its lifetime.</span>
-   <span class="n">complex</span><span class="o">::</span><span class="n">re_ref</span> <span class="n">re</span><span class="p">{</span><span class="n">c</span><span class="p">};</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="c1">// Place the re_ref object in a new scope</span>
+<span class="w">   </span><span class="c1">// in order to minimise its lifetime.</span>
+<span class="w">   </span><span class="n">complex</span><span class="o">::</span><span class="n">re_ref</span><span class="w"> </span><span class="n">re</span><span class="p">{</span><span class="n">c</span><span class="p">};</span><span class="w"></span>
 
-   <span class="c1">// We can use &#39;re&#39; as-if it was a pointer</span>
-   <span class="c1">// to an mppp::real.</span>
-   <span class="o">*</span><span class="n">re</span> <span class="o">+=</span> <span class="mi">5</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="w">   </span><span class="c1">// We can use &#39;re&#39; as-if it was a pointer</span>
+<span class="w">   </span><span class="c1">// to an mppp::real.</span>
+<span class="w">   </span><span class="o">*</span><span class="n">re</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;c is now: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">c</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span> <span class="c1">// Will print &#39;(6.000..., 2.000...)&#39;.</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;c is now: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Will print &#39;(6.000..., 2.000...)&#39;.</span>
 </pre></div>
 </div>
 <p>On construction, <a class="reference internal" href="#_CPPv4N4mppp7complex6re_refE" title="mppp::complex::re_ref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">re_ref</span></code></a> takes ownership of the real
@@ -2095,7 +2095,7 @@ or <a class="reference internal" href="#_CPPv4N4mppp7complex10prec_roundE11mpfr_
 <p>This function will use the arguments <em>args</em> to set the value of the <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> <em>c</em>,
 using one of the available <a class="reference internal" href="#_CPPv4N4mppp7complex3setERK7complex" title="mppp::complex::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex::set()</span></code></a> overloads. That is,
 the body of this function is equivalent to</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">args</span><span class="p">...);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">args</span><span class="p">...);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The input arguments must satisfy the <a class="reference internal" href="#_CPPv4IDpEN4mppp16complex_set_argsE" title="mppp::complex_set_args"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::complex_set_args</span></code></a> concept.</p>
@@ -3256,17 +3256,17 @@ fails because of (unlikely) overflow conditions.</p>
 <dd><p>In-place arithmetic operators.</p>
 <p>If <em>a</em> is a <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>, then these operators are equivalent, respectively,
 to the expressions:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">;</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">;</span>
-<span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Otherwise, these operators are equivalent to the expressions:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">);</span>
-<span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">);</span>
-<span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">);</span>
-<span class="n">a</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">

@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -391,15 +391,15 @@
   <div class="section" id="preliminaries">
 <h1>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial, we will assume that the global mp++ header has been included:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;mp++/mp++.hpp&gt;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;mp++/mp++.hpp&gt;</span><span class="cp"></span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">mp++.hpp</span></code> header will pull in the public mp++ API in its entirety.
 It is also possible to include individual mp++ headers instead of <code class="docutils literal notranslate"><span class="pre">mp++.hpp</span></code>, e.g.:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;mp++/integer.hpp&gt;</span><span class="c1">  // For the integer multiprecision class</span><span class="cp"></span>
-                             <span class="c1">// and associated functions.</span>
-<span class="cp">#include</span> <span class="cpf">&lt;mp++/rational.hpp&gt;</span><span class="c1"> // For the rational multiprecision class</span><span class="cp"></span>
-                             <span class="c1">// and associated functions.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;mp++/integer.hpp&gt;</span><span class="c1">  // For the integer multiprecision class</span><span class="cp"></span>
+<span class="w">                             </span><span class="c1">// and associated functions.</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;mp++/rational.hpp&gt;</span><span class="c1"> // For the rational multiprecision class</span><span class="cp"></span>
+<span class="w">                             </span><span class="c1">// and associated functions.</span>
 </pre></div>
 </div>
 <p>Including individual headers rather than the global <code class="docutils literal notranslate"><span class="pre">mp++.hpp</span></code> header is in general a good idea
@@ -412,8 +412,8 @@ implementation details which may change from version to version in incompatible 
 <p>We will also assume, for convenience, that mp++’s multiprecision classes have been lifted into the root namespace,
 and we will introduce a couple of handy aliases for the <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
 classes:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="n">int_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="k">using</span> <span class="n">rat_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">int_t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">rat_t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> are class templates parametrised over a positive

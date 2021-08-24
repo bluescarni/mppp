@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -495,11 +495,11 @@ Rational numbers are represented in the usual canonical form:</p>
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#rational-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding GMP functions minus the leading <code class="docutils literal notranslate"><span class="pre">mpq_</span></code>
 prefix. For instance, the GMP call</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpq_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpq_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>that writes the result of <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> into <code class="docutils literal notranslate"><span class="pre">rop</span></code> becomes simply</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function is resolved via argument-dependent lookup. Function calls with overlapping arguments
@@ -811,7 +811,7 @@ to <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 <span id="_CPPv3I_11string_typeEN4mppp8rationalaSERK1T"></span><span id="_CPPv2I_11string_typeEN4mppp8rationalaSERK1T"></span><span class="pre">template&lt;</span><a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11string_typeE" title="mppp::string_type"><span class="pre">string_type</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="pre">rational</span></a> <span class="pre">&amp;</span><code class="sig-name descname"><span class="pre">operator=</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv4I_11string_typeEN4mppp8rationalaSER8rationalRK1T" title="mppp::rational::operator=::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><em><span class="pre">s</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_11string_typeEN4mppp8rationalaSER8rationalRK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from string.</p>
 <p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>That is, a temporary rational is constructed from <em>s</em> and it is then

@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -504,13 +504,13 @@ default-initialised to zero rather than to indefinite values, conversions must b
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#complex128-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding quadmath functions minus the
 leading <code class="docutils literal notranslate"><span class="pre">c</span></code> prefix and the trailing <code class="docutils literal notranslate"><span class="pre">q</span></code> suffix. For instance, the quadmath code</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">__complex128</span> <span class="n">a</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
-<span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="o">::</span><span class="n">csinq</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">__complex128</span><span class="w"> </span><span class="n">a</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">::</span><span class="n">csinq</span><span class="p">(</span><span class="n">a</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>that computes the sine of <span class="math notranslate nohighlight">\(1+2\imath\)</span> in quadruple precision, storing the result in <code class="docutils literal notranslate"><span class="pre">b</span></code>, becomes in mp++</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex128</span> <span class="n">a</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
-<span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex128</span><span class="w"> </span><span class="n">a</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">sin()</span></code> function is resolved via argument-dependent lookup.</p>

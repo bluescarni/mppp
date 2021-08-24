@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -451,20 +451,20 @@ reference.</p>
 a few additional capabilities:</p>
 <ul>
 <li><p>construction/conversion from/to <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="n">__float128</span><span class="p">(</span><span class="mi">42</span><span class="p">)};</span>                <span class="c1">// Construction from a __float128.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
-<span class="n">assert</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">__float128</span><span class="o">&gt;</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span> <span class="c1">// Conversion to __float128.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span><span class="w"> </span><span class="n">r</span><span class="p">{</span><span class="n">__float128</span><span class="p">(</span><span class="mi">42</span><span class="p">)};</span><span class="w">                </span><span class="c1">// Construction from a __float128.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">42</span><span class="p">);</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">__float128</span><span class="o">&gt;</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">42</span><span class="p">);</span><span class="w"> </span><span class="c1">// Conversion to __float128.</span>
 </pre></div>
 </div>
 </li>
 <li><p>direct access to the internal <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> instance (via the public <a class="reference internal" href="real128.html#_CPPv4N4mppp7real1287m_valueE" title="mppp::real128::m_value"><code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">m_value</span></code></a>
 data member):</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
-<span class="n">r</span><span class="p">.</span><span class="n">m_value</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>                 <span class="c1">// Modify directly the internal __float128 member.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="mi">2</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span><span class="w"> </span><span class="n">r</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span><span class="w"></span>
+<span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">                 </span><span class="c1">// Modify directly the internal __float128 member.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 
-<span class="n">r</span><span class="p">.</span><span class="n">m_value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="n">assert</span><span class="p">(</span><span class="o">::</span><span class="n">cosq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// Call a libquadmath function directly on the internal member.</span>
+<span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="o">::</span><span class="n">cosq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// Call a libquadmath function directly on the internal member.</span>
 </pre></div>
 </div>
 </li>
@@ -472,25 +472,25 @@ data member):</p>
 <a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/Math-Library-Routines.html#Math-Library-Routines">libquadmath library routines</a>.
 Note that the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> function names drop the suffix <code class="docutils literal notranslate"><span class="pre">q</span></code> appearing in the names of the libquadmath routines, and, as usual
 in mp++, they are supposed to be found via ADL. Member function overloads for the unary functions are also available:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span><span class="w"> </span><span class="n">r</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span><span class="w"></span>
 
 <span class="c1">// Trigonometry.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">cosq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">sinq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">::</span><span class="n">cosq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">::</span><span class="n">sinq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span><span class="w"></span>
 
 <span class="c1">// Logarithms and exponentials.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">expq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">log10q</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">::</span><span class="n">expq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">::</span><span class="n">log10q</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span><span class="w"></span>
 
 <span class="c1">// Etc.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">lgamma</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">lgammaq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">erf</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">erfq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">lgamma</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">::</span><span class="n">lgammaq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">erf</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">::</span><span class="n">erfq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span><span class="w"></span>
 
 <span class="c1">// Member function overloads.</span>
-<span class="k">auto</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">r</span><span class="p">);</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">cos</span><span class="p">()</span> <span class="o">==</span> <span class="n">tmp</span><span class="p">);</span> <span class="c1">// NOTE: r.cos() will set r to its cosine.</span>
-<span class="n">tmp</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">r</span><span class="p">);</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">sin</span><span class="p">()</span> <span class="o">==</span> <span class="n">tmp</span><span class="p">);</span> <span class="c1">// NOTE: r.sin() will set r to its sine.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">tmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">r</span><span class="p">);</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">cos</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">tmp</span><span class="p">);</span><span class="w"> </span><span class="c1">// NOTE: r.cos() will set r to its cosine.</span>
+<span class="n">tmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">r</span><span class="p">);</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">sin</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">tmp</span><span class="p">);</span><span class="w"> </span><span class="c1">// NOTE: r.sin() will set r to its sine.</span>
 </pre></div>
 </div>
 </li>
@@ -519,15 +519,15 @@ The <a class="reference internal" href="real128.html#real128-literals"><span cla
 is defined within
 the inline namespace <code class="docutils literal notranslate"><span class="pre">mppp::literals</span></code>, and it supports
 decimal and hexadecimal representations:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span><span class="w"></span>
 
-<span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="mf">123.456</span><span class="n">_rq</span><span class="p">;</span>   <span class="c1">// r1 contains the quadruple-precision</span>
-                        <span class="c1">// approximation of 123.456 (that is,</span>
-                        <span class="c1">// 123.455999999999999999999999999999998).</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">r1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">123.456</span><span class="n">_rq</span><span class="p">;</span><span class="w">   </span><span class="c1">// r1 contains the quadruple-precision</span>
+<span class="w">                        </span><span class="c1">// approximation of 123.456 (that is,</span>
+<span class="w">                        </span><span class="c1">// 123.455999999999999999999999999999998).</span>
 
-<span class="k">auto</span> <span class="n">r2</span> <span class="o">=</span> <span class="mf">4.2e1</span><span class="n">_rq</span><span class="p">;</span>     <span class="c1">// Scientific notation can be used.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">r2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.2e1</span><span class="n">_rq</span><span class="p">;</span><span class="w">     </span><span class="c1">// Scientific notation can be used.</span>
 
-<span class="k">auto</span> <span class="n">r3</span> <span class="o">=</span> <span class="mf">0x1.12p-1</span><span class="n">_rq</span><span class="p">;</span> <span class="c1">// Hexadecimal floats are supported too.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">r3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0x1.12p-1</span><span class="n">_rq</span><span class="p">;</span><span class="w"> </span><span class="c1">// Hexadecimal floats are supported too.</span>
 </pre></div>
 </div>
 <div class="admonition seealso">

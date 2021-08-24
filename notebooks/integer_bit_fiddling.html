@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     
@@ -432,9 +432,9 @@
 <span class="cpf">#pragma cling add_library_path(&quot;</span><span class="c1">$CONDA_PREFIX/lib&quot;)</span><span class="cp"></span>
 <span class="cp">#pragma cling load(&quot;mp++&quot;)</span>
 
-<span class="cp">#include</span> <span class="cpf">&lt;mp++/integer.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;mp++/integer.hpp&gt;</span><span class="cp"></span>
 
-<span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -442,7 +442,7 @@
 <p>Let us also include a few useful bits from the standard library:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 </pre></div>
 </div>
 </div>
@@ -453,7 +453,7 @@
 <p>Multiprecision integers support the standard bitwise operators, such as the bitwise NOT operator:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="p">(</span><span class="mi">0</span><span class="n">_z1</span><span class="p">)</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="p">(</span><span class="mi">0</span><span class="n">_z1</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -465,7 +465,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="p">(</span><span class="mi">123</span><span class="n">_z1</span><span class="p">)</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="p">(</span><span class="mi">123</span><span class="n">_z1</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -478,7 +478,7 @@
 <p>Negative integers are treated as-if they were represented using two’s complement:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="p">(</span><span class="mi">-1</span><span class="n">_z1</span><span class="p">)</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="p">(</span><span class="mi">-1</span><span class="n">_z1</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -490,7 +490,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="p">(</span><span class="mi">-124</span><span class="n">_z1</span><span class="p">)</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="o">~</span><span class="p">(</span><span class="mi">-124</span><span class="n">_z1</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -503,7 +503,7 @@
 <p>The bitwise OR, AND and XOR operators:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mb">0b01001010</span><span class="n">_z1</span> <span class="o">|</span> <span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="mb">0b01001010</span><span class="n">_z1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -515,7 +515,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mb">0b11001010</span><span class="n">_z1</span> <span class="o">&amp;</span> <span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="mb">0b11001010</span><span class="n">_z1</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -527,7 +527,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mb">0b11001010</span><span class="n">_z1</span> <span class="o">^</span> <span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="mb">0b11001010</span><span class="n">_z1</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -540,7 +540,7 @@
 <p>Multiprecision integer arguments can be mixed with C++ integral arguments:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mb">0b01001010</span><span class="n">_z1</span> <span class="o">|</span> <span class="mi">45</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="mb">0b01001010</span><span class="n">_z1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="mi">45</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -552,7 +552,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">-123ll</span> <span class="o">&amp;</span> <span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="mi">-123ll</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -564,7 +564,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">255u</span> <span class="o">^</span> <span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="mi">255u</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mb">0b10010100</span><span class="n">_z1</span><span class="p">).</span><span class="n">to_string</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -577,11 +577,11 @@
 <p>The in-place variants are supported as well:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="k">auto</span> <span class="n">n</span> <span class="o">=</span> <span class="mb">0b001</span><span class="n">_z1</span><span class="p">;</span>
-    <span class="n">n</span> <span class="o">|=</span> <span class="mb">0b111</span><span class="n">_z1</span><span class="p">;</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">0b001</span><span class="n">_z1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mb">0b111</span><span class="n">_z1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -593,11 +593,11 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mb">-0b101010</span><span class="p">;</span>
-    <span class="n">n</span> <span class="o">&amp;=</span> <span class="mb">0b111</span><span class="n">_z1</span><span class="p">;</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">-0b101010</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="mb">0b111</span><span class="n">_z1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -609,11 +609,11 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="k">auto</span> <span class="n">n</span> <span class="o">=</span> <span class="mb">0b001</span><span class="n">_z1</span><span class="p">;</span>
-    <span class="n">n</span> <span class="o">^=</span> <span class="mb">0b111</span><span class="n">_z1</span><span class="p">;</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">0b001</span><span class="n">_z1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="mb">0b111</span><span class="n">_z1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 </div>

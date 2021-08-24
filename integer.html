@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -519,11 +519,11 @@ dynamic, the usual <code class="docutils literal notranslate"><span class="pre">
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#integer-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding GMP functions minus the leading <code class="docutils literal notranslate"><span class="pre">mpz_</span></code>
 prefix. For instance, the GMP call</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>that writes the result of <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> into <code class="docutils literal notranslate"><span class="pre">rop</span></code> becomes simply</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function is resolved via argument-dependent lookup. Function calls with overlapping arguments
@@ -540,11 +540,11 @@ method, which allows to use <a class="reference internal" href="#_CPPv4I_NSt6siz
 </ul>
 <p>The <a class="reference internal" href="#_CPPv4N4mppp7integer8mpz_viewE" title="mppp::integer::mpz_view"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mpz_view</span></code></a> class represent a read-only view of an integer object which is implicitly convertible to the type
 <code class="docutils literal notranslate"><span class="pre">const</span></code> <a class="reference internal" href="#_CPPv45mpz_t" title="mpz_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpz_t</span></code></a> and which is thus usable as an argument to GMP functions. For example:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
-<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// Create an mpz_t with the value 1.</span>
-<span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">n</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span> <span class="c1">// Initialize an integer with the value 1.</span>
-<span class="n">mpz_add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">.</span><span class="n">get_mpz_view</span><span class="p">());</span> <span class="c1">// Compute the result of n + m and store</span>
-                               <span class="c1">// it in m using the GMP API.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span><span class="w"> </span><span class="n">m</span><span class="p">;</span><span class="w"></span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// Create an mpz_t with the value 1.</span>
+<span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="w"> </span><span class="n">n</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span><span class="w"> </span><span class="c1">// Initialize an integer with the value 1.</span>
+<span class="n">mpz_add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">.</span><span class="n">get_mpz_view</span><span class="p">());</span><span class="w"> </span><span class="c1">// Compute the result of n + m and store</span>
+<span class="w">                               </span><span class="c1">// it in m using the GMP API.</span>
 </pre></div>
 </div>
 <p>See the documentation of <a class="reference internal" href="#_CPPv4NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a> for more details about the <a class="reference internal" href="#_CPPv4N4mppp7integer8mpz_viewE" title="mppp::integer::mpz_view"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mpz_view</span></code></a> class.
@@ -603,8 +603,8 @@ sized <em>size</em> starting at <em>p</em>. The array is expected to contain
 the limbs of the desired value for <code class="docutils literal notranslate"><span class="pre">this</span></code>, ordered from the least significant
 to the most significant.</p>
 <p>For instance, the following code:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mp_limb_t</span> <span class="n">arr</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">};</span>
-<span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">n</span><span class="p">{</span><span class="n">arr</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mp_limb_t</span><span class="w"> </span><span class="n">arr</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">};</span><span class="w"></span>
+<span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="w"> </span><span class="n">n</span><span class="p">{</span><span class="n">arr</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>will initialise <code class="docutils literal notranslate"><span class="pre">n</span></code> to the value <span class="math notranslate nohighlight">\(5 + 6 \times 2^{N} + 7 \times 2^{2N}\)</span>,
@@ -648,7 +648,7 @@ or if at least one element of the <em>p</em> array is greater than <code class="
 <p>This constructor will initialise <code class="docutils literal notranslate"><span class="pre">this</span></code> to zero, allocating enough memory
 to represent a value with a magnitude of <em>nbits</em> binary digits. The storage type
 will be static if <em>nbits</em> is small enough, dynamic otherwise. For instance, the code</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">integer</span> <span class="n">n</span><span class="p">{</span><span class="n">integer_bitcnt_t</span><span class="p">(</span><span class="mi">64</span><span class="p">)};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">integer</span><span class="w"> </span><span class="n">n</span><span class="p">{</span><span class="n">integer_bitcnt_t</span><span class="p">(</span><span class="mi">64</span><span class="p">)};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>will initialise an integer <code class="docutils literal notranslate"><span class="pre">n</span></code> with value zero and enough storage for a 64-bit value.</p>
@@ -945,7 +945,7 @@ to <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" tit
 <span id="_CPPv3I_11string_typeEN4mppp7integeraSERK1T"></span><span id="_CPPv2I_11string_typeEN4mppp7integeraSERK1T"></span><span class="pre">template&lt;</span><a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11string_typeE" title="mppp::string_type"><span class="pre">string_type</span></a> <code class="sig-name descname"><span class="pre">T</span></code><span class="pre">&gt;</span><br /><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><span class="pre">integer</span></a> <span class="pre">&amp;</span><code class="sig-name descname"><span class="pre">operator=</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv4I_11string_typeEN4mppp7integeraSER7integerRK1T" title="mppp::integer::operator=::T"><span class="pre">T</span></a> <span class="pre">&amp;</span><em><span class="pre">s</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_11string_typeEN4mppp7integeraSER7integerRK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from string.</p>
 <p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">integer</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">integer</span><span class="p">{</span><span class="n">s</span><span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>That is, a temporary integer is constructed from
@@ -2775,7 +2775,7 @@ with <span class="math notranslate nohighlight">\(b&gt;1\)</span>, such that <em
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This function participates in overload resolution only if the expression</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">n</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">dest</span><span class="p">));</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">dest</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>is well-formed.</p>
@@ -2806,7 +2806,7 @@ overload called on <em>n</em> with <em>dest</em> as argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This function participates in overload resolution only if the expression</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">n</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">src</span><span class="p">));</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">src</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>is well-formed.</p>

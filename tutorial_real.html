@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -467,100 +467,100 @@ The copy constructor and the copy assignment operator of
 so that the result of the operation is an exact copy of the source
 operand.</p>
 <p>Let’s see a few examples:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x0</span><span class="p">;</span>                <span class="c1">// x0 is inited to zero with minimum precision.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="n">x0</span><span class="p">;</span><span class="w">                </span><span class="c1">// x0 is inited to zero with minimum precision.</span>
 
-<span class="n">real</span> <span class="n">x1</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>            <span class="c1">// x1 is inited to 42, the precision is set to</span>
-                        <span class="c1">// the bit width of the &#39;int&#39; type</span>
-                        <span class="c1">// (typically 32).</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x1</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span><span class="w">            </span><span class="c1">// x1 is inited to 42, the precision is set to</span>
+<span class="w">                        </span><span class="c1">// the bit width of the &#39;int&#39; type</span>
+<span class="w">                        </span><span class="c1">// (typically 32).</span>
 
-<span class="n">real</span> <span class="n">x2</span><span class="p">{</span><span class="mi">42</span><span class="p">,</span> <span class="mi">128</span><span class="p">};</span>       <span class="c1">// x2 is inited to 42, the precision is set</span>
-                        <span class="c1">// explicitly to 128 bits.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x2</span><span class="p">{</span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">};</span><span class="w">       </span><span class="c1">// x2 is inited to 42, the precision is set</span>
+<span class="w">                        </span><span class="c1">// explicitly to 128 bits.</span>
 
-<span class="n">real</span> <span class="n">x3</span><span class="p">{</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="n">_q1</span><span class="p">};</span>      <span class="c1">// x3 is inited from the rational value</span>
-                        <span class="c1">// &#39;1/3&#39;. The precision is set to the sum</span>
-                        <span class="c1">// of the bit widths of numerator and</span>
-                        <span class="c1">// denominator (which will total 128 bits</span>
-                        <span class="c1">// on most platforms). Because &#39;1/3&#39;</span>
-                        <span class="c1">// cannot be represented exactly in a binary</span>
-                        <span class="c1">// floating-point format, x3 will contain</span>
-                        <span class="c1">// the 128-bit approximation of &#39;1/3&#39;.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x3</span><span class="p">{</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span><span class="n">_q1</span><span class="p">};</span><span class="w">      </span><span class="c1">// x3 is inited from the rational value</span>
+<span class="w">                        </span><span class="c1">// &#39;1/3&#39;. The precision is set to the sum</span>
+<span class="w">                        </span><span class="c1">// of the bit widths of numerator and</span>
+<span class="w">                        </span><span class="c1">// denominator (which will total 128 bits</span>
+<span class="w">                        </span><span class="c1">// on most platforms). Because &#39;1/3&#39;</span>
+<span class="w">                        </span><span class="c1">// cannot be represented exactly in a binary</span>
+<span class="w">                        </span><span class="c1">// floating-point format, x3 will contain</span>
+<span class="w">                        </span><span class="c1">// the 128-bit approximation of &#39;1/3&#39;.</span>
 
-<span class="n">real</span> <span class="n">x4</span><span class="p">{</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="n">_q1</span><span class="p">,</span> <span class="mi">256</span><span class="p">};</span> <span class="c1">// x4 is inited to the 256-bit</span>
-                        <span class="c1">// approximation of the rational</span>
-                        <span class="c1">// value &#39;1/3&#39;.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x4</span><span class="p">{</span><span class="mi">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span><span class="n">_q1</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">};</span><span class="w"> </span><span class="c1">// x4 is inited to the 256-bit</span>
+<span class="w">                        </span><span class="c1">// approximation of the rational</span>
+<span class="w">                        </span><span class="c1">// value &#39;1/3&#39;.</span>
 
-<span class="n">real</span> <span class="n">x5</span><span class="p">{</span><span class="n">x4</span><span class="p">};</span>            <span class="c1">// x5 is an exact copy (i.e., both</span>
-                        <span class="c1">// value and precision) of x4.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x5</span><span class="p">{</span><span class="n">x4</span><span class="p">};</span><span class="w">            </span><span class="c1">// x5 is an exact copy (i.e., both</span>
+<span class="w">                        </span><span class="c1">// value and precision) of x4.</span>
 
-<span class="n">x5</span> <span class="o">=</span> <span class="n">x2</span><span class="p">;</span>                <span class="c1">// x5 is now an exact copy of x2.</span>
+<span class="n">x5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x2</span><span class="p">;</span><span class="w">                </span><span class="c1">// x5 is now an exact copy of x2.</span>
 
-<span class="n">x5</span> <span class="o">=</span> <span class="mf">1.25</span><span class="p">;</span>              <span class="c1">// x5 now contains the value &#39;1.25&#39;,</span>
-                        <span class="c1">// and its precision is set to the number</span>
-                        <span class="c1">// of binary digits in the significand of</span>
-                        <span class="c1">// the C++ &#39;double&#39; type (typically 53).</span>
+<span class="n">x5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.25</span><span class="p">;</span><span class="w">              </span><span class="c1">// x5 now contains the value &#39;1.25&#39;,</span>
+<span class="w">                        </span><span class="c1">// and its precision is set to the number</span>
+<span class="w">                        </span><span class="c1">// of binary digits in the significand of</span>
+<span class="w">                        </span><span class="c1">// the C++ &#39;double&#39; type (typically 53).</span>
 
 <span class="c1">// Fetch and print the precision of x2 (i.e., 128).</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">x2</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">x2</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
 
 <span class="c1">// Reduce the precision of x2 to 4 bits, while</span>
 <span class="c1">// rounding to nearest the original value. I.e.,</span>
 <span class="c1">// x2 will end up containing the 4-bit approximation</span>
 <span class="c1">// of the value &#39;42&#39;.</span>
-<span class="n">x2</span><span class="p">.</span><span class="n">prec_round</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">x2</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span> <span class="o">==</span> <span class="mi">4</span><span class="p">);</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">x2</span> <span class="o">==</span> <span class="n">real</span><span class="p">{</span><span class="mi">42</span><span class="p">,</span> <span class="mi">4</span><span class="p">});</span>
+<span class="n">x2</span><span class="p">.</span><span class="n">prec_round</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x2</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x2</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">});</span><span class="w"></span>
 
 <span class="c1">// Destructively extend the precision of x2</span>
 <span class="c1">// to 1024 bits. The value will be set to NaN.</span>
-<span class="n">x2</span><span class="p">.</span><span class="n">set_prec</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">x2</span><span class="p">.</span><span class="n">nan_p</span><span class="p">());</span>
+<span class="n">x2</span><span class="p">.</span><span class="n">set_prec</span><span class="p">(</span><span class="mi">1024</span><span class="p">);</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x2</span><span class="p">.</span><span class="n">nan_p</span><span class="p">());</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The constructors from string currently always require the
 precision to be passed explicitly (this restriction may
 be lifted in the future):</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x0</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">,</span> <span class="mi">512</span><span class="p">};</span>          <span class="c1">// x0 is set to the 512-bit approximation</span>
-                              <span class="c1">// of &#39;1.1&#39;.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="n">x0</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">512</span><span class="p">};</span><span class="w">          </span><span class="c1">// x0 is set to the 512-bit approximation</span>
+<span class="w">                              </span><span class="c1">// of &#39;1.1&#39;.</span>
 
-<span class="n">real</span> <span class="n">x1</span><span class="p">{</span><span class="s">&quot;0x1.5p-1&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">512</span><span class="p">};</span> <span class="c1">// Construction from other bases is also</span>
-                              <span class="c1">// possible (here base 16 is used).</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x1</span><span class="p">{</span><span class="s">&quot;0x1.5p-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="mi">512</span><span class="p">};</span><span class="w"> </span><span class="c1">// Construction from other bases is also</span>
+<span class="w">                              </span><span class="c1">// possible (here base 16 is used).</span>
 </pre></div>
 </div>
 <p>In additions to the <a class="reference internal" href="tutorial_constr.html#tutorial-constr"><span class="std std-ref">constructors</span></a> common to
 all of mp++’s classes, <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> features additional
 specialised constructors:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">inf</span><span class="p">,</span> <span class="mi">-1</span><span class="p">,</span> <span class="mi">64</span><span class="p">};</span> <span class="c1">// x0 is set to -infinity with 64</span>
-                                 <span class="c1">// bits of precision.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">inf</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">};</span><span class="w"> </span><span class="c1">// x0 is set to -infinity with 64</span>
+<span class="w">                                 </span><span class="c1">// bits of precision.</span>
 
-<span class="n">real</span> <span class="n">x1</span><span class="p">{</span><span class="mi">-4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">112</span><span class="p">};</span>             <span class="c1">// x1 is set to -4*2**8 with 112</span>
-                                 <span class="c1">// bits of precision.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x1</span><span class="p">{</span><span class="mi">-4</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">112</span><span class="p">};</span><span class="w">             </span><span class="c1">// x1 is set to -4*2**8 with 112</span>
+<span class="w">                                 </span><span class="c1">// bits of precision.</span>
 </pre></div>
 </div>
 <p>Sometimes it is useful to be able to set a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 to a specific value <em>without</em> changing its precision. For this
 purpose, <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> provides the <a class="reference internal" href="real.html#_CPPv4N4mppp4real3setERK4real" title="mppp::real::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">set()</span></code></a>
 family of functions:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">zero</span><span class="p">,</span> <span class="mi">112</span><span class="p">};</span> <span class="c1">// Create a positive zero with 112 bits of precision.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">zero</span><span class="p">,</span><span class="w"> </span><span class="mi">112</span><span class="p">};</span><span class="w"> </span><span class="c1">// Create a positive zero with 112 bits of precision.</span>
 
-<span class="n">real</span> <span class="n">x1</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">,</span> <span class="mi">256</span><span class="p">};</span>           <span class="c1">// x1 is the 256-bit approximation of &#39;1.1&#39;.</span>
-<span class="n">x0</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">x1</span><span class="p">);</span>                    <span class="c1">// x0 will be set to x1 rounded to nearest</span>
-                               <span class="c1">// to 112 bits.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x1</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">};</span><span class="w">           </span><span class="c1">// x1 is the 256-bit approximation of &#39;1.1&#39;.</span>
+<span class="n">x0</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">x1</span><span class="p">);</span><span class="w">                    </span><span class="c1">// x0 will be set to x1 rounded to nearest</span>
+<span class="w">                               </span><span class="c1">// to 112 bits.</span>
 
-<span class="n">x0</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="n">_q1</span><span class="p">);</span>              <span class="c1">// x0 will be set to the 112-bit approximation</span>
-                               <span class="c1">// of the fraction &#39;2/3&#39;.</span>
+<span class="n">x0</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span><span class="n">_q1</span><span class="p">);</span><span class="w">              </span><span class="c1">// x0 will be set to the 112-bit approximation</span>
+<span class="w">                               </span><span class="c1">// of the fraction &#39;2/3&#39;.</span>
 
-<span class="n">x0</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;2.1&quot;</span><span class="p">);</span>                 <span class="c1">// x0 will be set to the 112-bit approximation</span>
-                               <span class="c1">// of the value &#39;2.1&#39;.</span>
+<span class="n">x0</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;2.1&quot;</span><span class="p">);</span><span class="w">                 </span><span class="c1">// x0 will be set to the 112-bit approximation</span>
+<span class="w">                               </span><span class="c1">// of the value &#39;2.1&#39;.</span>
 </pre></div>
 </div>
 <p>Specialised setter functions are also available:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">zero</span><span class="p">,</span> <span class="mi">112</span><span class="p">};</span> <span class="c1">// Create a positive zero with 112 bits of precision.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="n">x0</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">zero</span><span class="p">,</span><span class="w"> </span><span class="mi">112</span><span class="p">};</span><span class="w"> </span><span class="c1">// Create a positive zero with 112 bits of precision.</span>
 
-<span class="n">x0</span><span class="p">.</span><span class="n">set_inf</span><span class="p">();</span>                  <span class="c1">// Set x0 to +infinity, precision is not altered.</span>
-<span class="n">x0</span><span class="p">.</span><span class="n">set_inf</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span>                <span class="c1">// Set x0 to -infinity, precision is not altered.</span>
+<span class="n">x0</span><span class="p">.</span><span class="n">set_inf</span><span class="p">();</span><span class="w">                  </span><span class="c1">// Set x0 to +infinity, precision is not altered.</span>
+<span class="n">x0</span><span class="p">.</span><span class="n">set_inf</span><span class="p">(</span><span class="mi">-1</span><span class="p">);</span><span class="w">                </span><span class="c1">// Set x0 to -infinity, precision is not altered.</span>
 
-<span class="n">set_ui_2exp</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">-5</span><span class="p">);</span>        <span class="c1">// Set x0 to the 112-bit approximation of</span>
-                               <span class="c1">// 4*2**(-5).</span>
+<span class="n">set_ui_2exp</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">-5</span><span class="p">);</span><span class="w">        </span><span class="c1">// Set x0 to the 112-bit approximation of</span>
+<span class="w">                               </span><span class="c1">// 4*2**(-5).</span>
 </pre></div>
 </div>
 </div>
@@ -568,10 +568,10 @@ family of functions:</p>
 <h2>Precision propagation<a class="headerlink" href="#precision-propagation" title="Permalink to this headline">¶</a></h2>
 <p>In the C++ language, mixed-precision floating-point operations promote the lower-precision operand
 to the higher-precision type. For instance, in the following code snippet,</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="n">x1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="kt">double</span> <span class="n">x2</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="kt">double</span><span class="w"> </span><span class="n">x2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
 
-<span class="k">auto</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x2</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>the addition is computed in <code class="docutils literal notranslate"><span class="pre">double</span></code> precision, and the result <code class="docutils literal notranslate"><span class="pre">ret</span></code>
@@ -581,19 +581,19 @@ overloaded operators) accepting two or more <a class="reference internal" href="
 in input, the precision at which the operation is performed (and the precision of the result)
 is the maximum precision among the operands.</p>
 <p>Let’s see a couple of examples:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x1</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">,</span> <span class="mi">128</span><span class="p">};</span>          <span class="c1">// 128-bit approximation of &#39;1.1&#39;.</span>
-<span class="n">real</span> <span class="n">x2</span><span class="p">{</span><span class="mi">42</span><span class="p">,</span> <span class="mi">10</span><span class="p">};</span>              <span class="c1">// x2 contains the value 42, represented exactly</span>
-                              <span class="c1">// by a 10-bit significand.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="n">x1</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">};</span><span class="w">          </span><span class="c1">// 128-bit approximation of &#39;1.1&#39;.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x2</span><span class="p">{</span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">};</span><span class="w">              </span><span class="c1">// x2 contains the value 42, represented exactly</span>
+<span class="w">                              </span><span class="c1">// by a 10-bit significand.</span>
 
-<span class="k">auto</span> <span class="n">x3</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span><span class="p">;</span>            <span class="c1">// x3 is the result of the addition of</span>
-                              <span class="c1">// x1 and x2, computed at 128 bits of precision.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">x3</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span> <span class="o">==</span> <span class="mi">128</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">x3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x2</span><span class="p">;</span><span class="w">            </span><span class="c1">// x3 is the result of the addition of</span>
+<span class="w">                              </span><span class="c1">// x1 and x2, computed at 128 bits of precision.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x3</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">128</span><span class="p">);</span><span class="w"></span>
 
-<span class="n">real</span> <span class="n">x4</span><span class="p">{</span><span class="s">&quot;2.3&quot;</span><span class="p">,</span> <span class="mi">256</span><span class="p">};</span>          <span class="c1">// 256-bit approximation of &#39;2.3&#39;.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">x4</span><span class="p">{</span><span class="s">&quot;2.3&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">};</span><span class="w">          </span><span class="c1">// 256-bit approximation of &#39;2.3&#39;.</span>
 
-<span class="k">auto</span> <span class="n">x5</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">);</span>        <span class="c1">// x5 is the result of x3 raised to the</span>
-                              <span class="c1">// power of x4, computed at 256 bits of precision.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">x5</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span> <span class="o">==</span> <span class="mi">256</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">x5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="w"> </span><span class="n">x4</span><span class="p">);</span><span class="w">        </span><span class="c1">// x5 is the result of x3 raised to the</span>
+<span class="w">                              </span><span class="c1">// power of x4, computed at 256 bits of precision.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x5</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">256</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The same idea extends to operations mixing <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> and
@@ -602,26 +602,26 @@ non-<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mpp
 is determined following a set of heuristics detailed in the documentation
 of the generic constructor of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
 <p>Let’s see a few concrete examples:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">x1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>                   <span class="c1">// 4-bit representation of the value &#39;1&#39;.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="n">x1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span><span class="w">                   </span><span class="c1">// 4-bit representation of the value &#39;1&#39;.</span>
 
-<span class="k">auto</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="mi">41</span><span class="p">;</span>               <span class="c1">// The deduced precision of the literal &#39;41&#39; is the</span>
-                                 <span class="c1">// bit width of the &#39;int&#39; type (typically 32). Hence,</span>
-                                 <span class="c1">// the addition will be performed with 32 bits of</span>
-                                 <span class="c1">// precision (because 32 &gt; 4).</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">x2</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span> <span class="o">==</span> <span class="mi">32</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">x2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">41</span><span class="p">;</span><span class="w">               </span><span class="c1">// The deduced precision of the literal &#39;41&#39; is the</span>
+<span class="w">                                 </span><span class="c1">// bit width of the &#39;int&#39; type (typically 32). Hence,</span>
+<span class="w">                                 </span><span class="c1">// the addition will be performed with 32 bits of</span>
+<span class="w">                                 </span><span class="c1">// precision (because 32 &gt; 4).</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x2</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">32</span><span class="p">);</span><span class="w"></span>
 
-<span class="k">auto</span> <span class="n">x3</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">);</span>          <span class="c1">// The deduced precision of the literal &#39;0.5&#39; is the</span>
-                                 <span class="c1">// bit width of the significand of the &#39;double&#39; type</span>
-                                 <span class="c1">// (typically 53). Hence, the exponentiation will be</span>
-                                 <span class="c1">// performed with 53 bits of precision (because 53 &gt; 32).</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">x3</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span> <span class="o">==</span> <span class="mi">53</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">x3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span><span class="w">          </span><span class="c1">// The deduced precision of the literal &#39;0.5&#39; is the</span>
+<span class="w">                                 </span><span class="c1">// bit width of the significand of the &#39;double&#39; type</span>
+<span class="w">                                 </span><span class="c1">// (typically 53). Hence, the exponentiation will be</span>
+<span class="w">                                 </span><span class="c1">// performed with 53 bits of precision (because 53 &gt; 32).</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x3</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">53</span><span class="p">);</span><span class="w"></span>
 
-<span class="k">auto</span> <span class="n">x4</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">real128</span><span class="p">{</span><span class="mi">2</span><span class="p">},</span> <span class="n">x3</span><span class="p">);</span> <span class="c1">// The deduced precision of a real128</span>
-                                 <span class="c1">// is 113 (i.e., the number of bits in the</span>
-                                 <span class="c1">// significand). Hence, the inverse tangent</span>
-                                 <span class="c1">// will be computed with 113 bits of</span>
-                                 <span class="c1">// precision (because 113 &gt; 53).</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">x4</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span> <span class="o">==</span> <span class="mi">113</span><span class="p">);</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">x4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atan2</span><span class="p">(</span><span class="n">real128</span><span class="p">{</span><span class="mi">2</span><span class="p">},</span><span class="w"> </span><span class="n">x3</span><span class="p">);</span><span class="w"> </span><span class="c1">// The deduced precision of a real128</span>
+<span class="w">                                 </span><span class="c1">// is 113 (i.e., the number of bits in the</span>
+<span class="w">                                 </span><span class="c1">// significand). Hence, the inverse tangent</span>
+<span class="w">                                 </span><span class="c1">// will be computed with 113 bits of</span>
+<span class="w">                                 </span><span class="c1">// precision (because 113 &gt; 53).</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x4</span><span class="p">.</span><span class="n">get_prec</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">113</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -632,12 +632,12 @@ especially at lower precisions, is the memory allocation overhead. The problem i
 particularly evident when creating complex mathematical expressions involving
 <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects.</p>
 <p>Consider the following example:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="nf">horner_6</span><span class="p">(</span><span class="k">const</span> <span class="n">real</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">)</span>
-<span class="p">{</span>
-   <span class="n">real</span> <span class="n">a</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">real</span><span class="p">{</span><span class="mf">1.</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mf">2.</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mf">3.</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mf">4.</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mf">5.</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mf">6.</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mf">7.</span><span class="p">}};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="nf">horner_6</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">real</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="n">real</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">real</span><span class="p">{</span><span class="mf">1.</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mf">2.</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mf">3.</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mf">4.</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mf">5.</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mf">6.</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mf">7.</span><span class="p">}};</span><span class="w"></span>
 
-   <span class="k">return</span> <span class="p">(((((</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="p">}</span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="p">(((((</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>This is the evaluation of the polynomial of degree 6</p>
@@ -647,16 +647,16 @@ particularly evident when creating complex mathematical expressions involving
 <a class="reference external" href="https://en.wikipedia.org/wiki/Horner%27s_method">Horner’s method</a>.
 The polynomial coefficients are stored in the array <code class="docutils literal notranslate"><span class="pre">a</span></code>.
 Let’s focus on the expression in the return statement:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">(((((</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">(((((</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Due to the way operators are parsed in the C++ language,
 this expression is decomposed in multiple subexpressions,
 which are then formally chained together in the following fashion:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">tmp0</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span>
-<span class="k">auto</span> <span class="n">tmp1</span> <span class="o">=</span> <span class="n">tmp0</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
-<span class="k">auto</span> <span class="n">tmp2</span> <span class="o">=</span> <span class="n">tmp1</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span>
-<span class="k">auto</span> <span class="n">tmp3</span> <span class="o">=</span> <span class="n">tmp2</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">tmp0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">tmp1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">tmp2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">tmp3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tmp2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span><span class="w"></span>
 <span class="c1">// ... and so on.</span>
 </pre></div>
 </div>
@@ -667,14 +667,14 @@ necessary if one, instead of using overloaded binary operators,
 employs either the ternary mathematical primitives provided by
 <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>, or, equivalently, in-place operators:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">// Create the return value.</span>
-<span class="n">real</span> <span class="n">ret</span><span class="p">{</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]};</span>
+<span class="n">real</span><span class="w"> </span><span class="n">ret</span><span class="p">{</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]};</span><span class="w"></span>
 
 <span class="c1">// Accumulate the result into</span>
 <span class="c1">// ret step-by-step.</span>
-<span class="n">mul</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>    <span class="c1">// or: ret *= x;</span>
-<span class="n">add</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">]);</span> <span class="c1">// or: ret += a[5];</span>
-<span class="n">mul</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>    <span class="c1">// or: ret *= x;</span>
-<span class="n">add</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">]);</span> <span class="c1">// or: ret += a[4];</span>
+<span class="n">mul</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span><span class="w">    </span><span class="c1">// or: ret *= x;</span>
+<span class="n">add</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">]);</span><span class="w"> </span><span class="c1">// or: ret += a[5];</span>
+<span class="n">mul</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span><span class="w">    </span><span class="c1">// or: ret *= x;</span>
+<span class="n">add</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">]);</span><span class="w"> </span><span class="c1">// or: ret += a[4];</span>
 <span class="c1">// ... and so on.</span>
 </pre></div>
 </div>
@@ -687,7 +687,7 @@ when a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="
 an <em>rvalue</em>) and it is able to re-use the memory provided by such
 a temporary to construct the result of the operation.</p>
 <p>For instance, consider the subexpression:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Here the multiplication <code class="docutils literal notranslate"><span class="pre">a[6]</span> <span class="pre">*</span> <span class="pre">x</span></code> produces a new <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>, which
@@ -696,20 +696,20 @@ recognises that the first argument is an rvalue, and accordingly it will use the
 memory provided by the result of <code class="docutils literal notranslate"><span class="pre">a[6]</span> <span class="pre">*</span> <span class="pre">x</span></code> to create the result of the full
 subexpression, thus avoiding an unnecessary memory allocation.</p>
 <p>The end result is that in the expression</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">(((((</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="p">(((((</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"></span>
 </pre></div>
 </div>
 <p>only a <strong>single</strong> memory allocation is performed, instead of 12.</p>
 <p>Moreover, it turns out that in this specific case it is even possible to elide that
 last memory allocation. Observe that in the expression above, the only memory
 allocation originates from the first subexpression encountered by the compiler, that is:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"></span>
 </pre></div>
 </div>
 <p>In this subexpression there are no rvalues whose memory can be pilfered. However, we can notice how the variable
 <code class="docutils literal notranslate"><span class="pre">a[6]</span></code> from the coefficient array is never used again in the rest of the <code class="docutils literal notranslate"><span class="pre">horner_6()</span></code>
 function. We can then “cast” <code class="docutils literal notranslate"><span class="pre">a[6]</span></code> to an rvalue via the <code class="docutils literal notranslate"><span class="pre">std::move()</span></code> utility function:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Now the memory necessary to represent the result of the multiplication will be “stolen” from
@@ -753,13 +753,13 @@ constants in arbitrary precision. This capability is
 <a class="reference internal" href="real.html#real-constants"><span class="std std-ref">exposed</span></a>
 in the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API. Here’s an example
 with the <span class="math notranslate nohighlight">\(\pi\)</span> constant:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">r0</span> <span class="o">=</span> <span class="n">real_pi</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>        <span class="c1">// r0 is the 42-bit approximation of pi,</span>
-                              <span class="c1">// that is, 3.14159265359012.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real</span><span class="w"> </span><span class="n">r0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">real_pi</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span><span class="w">        </span><span class="c1">// r0 is the 42-bit approximation of pi,</span>
+<span class="w">                              </span><span class="c1">// that is, 3.14159265359012.</span>
 
-<span class="n">real</span> <span class="n">r1</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">zero</span><span class="p">,</span> <span class="mi">10</span><span class="p">};</span> <span class="c1">// Init a real zero with 10 bits of precision.</span>
+<span class="n">real</span><span class="w"> </span><span class="n">r1</span><span class="p">{</span><span class="n">real_kind</span><span class="o">::</span><span class="n">zero</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">};</span><span class="w"> </span><span class="c1">// Init a real zero with 10 bits of precision.</span>
 
-<span class="n">real_pi</span><span class="p">(</span><span class="n">r1</span><span class="p">);</span>                  <span class="c1">// r1 is now set to the 10-bit approximation of</span>
-                              <span class="c1">// pi, that is, 3.1406.</span>
+<span class="n">real_pi</span><span class="p">(</span><span class="n">r1</span><span class="p">);</span><span class="w">                  </span><span class="c1">// r1 is now set to the 10-bit approximation of</span>
+<span class="w">                              </span><span class="c1">// pi, that is, 3.1406.</span>
 </pre></div>
 </div>
 </div>
@@ -771,39 +771,39 @@ available for all of mp++’s multiprecision classes,
 <p>For instance, it is possible to detect special <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> values:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">// Check that default construction</span>
 <span class="c1">// initialises to zero.</span>
-<span class="n">real</span> <span class="n">r0</span><span class="p">;</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r0</span><span class="p">.</span><span class="n">zero_p</span><span class="p">());</span>
+<span class="n">real</span><span class="w"> </span><span class="n">r0</span><span class="p">;</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r0</span><span class="p">.</span><span class="n">zero_p</span><span class="p">());</span><span class="w"></span>
 
 <span class="c1">// Detection of non-finite values.</span>
-<span class="n">real</span> <span class="n">r1</span><span class="p">{</span><span class="s">&quot;inf&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">};</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r1</span><span class="p">.</span><span class="n">inf_p</span><span class="p">());</span>
-<span class="n">real</span> <span class="n">r2</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">};</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r2</span><span class="p">.</span><span class="n">nan_p</span><span class="p">());</span>
+<span class="n">real</span><span class="w"> </span><span class="n">r1</span><span class="p">{</span><span class="s">&quot;inf&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">42</span><span class="p">};</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r1</span><span class="p">.</span><span class="n">inf_p</span><span class="p">());</span><span class="w"></span>
+<span class="n">real</span><span class="w"> </span><span class="n">r2</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">42</span><span class="p">};</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r2</span><span class="p">.</span><span class="n">nan_p</span><span class="p">());</span><span class="w"></span>
 
 <span class="c1">// Check if a real is an exact</span>
 <span class="c1">// integral value.</span>
-<span class="n">real</span> <span class="n">r3</span><span class="p">{</span><span class="mi">3</span><span class="p">};</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">r3</span><span class="p">.</span><span class="n">integer_p</span><span class="p">());</span>
+<span class="n">real</span><span class="w"> </span><span class="n">r3</span><span class="p">{</span><span class="mi">3</span><span class="p">};</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r3</span><span class="p">.</span><span class="n">integer_p</span><span class="p">());</span><span class="w"></span>
 </pre></div>
 </div>
 <p><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> values can be compared by absolute value:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">1</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mi">-1</span><span class="p">})</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// |1| == |-1|.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">-2</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mi">1</span><span class="p">})</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>  <span class="c1">// |-2| &gt; |1|.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">0</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mi">-1</span><span class="p">})</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">);</span>  <span class="c1">// |0| &lt; |-1|.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">-1</span><span class="p">})</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">// |1| == |-1|.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">-2</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">1</span><span class="p">})</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="c1">// |-2| &gt; |1|.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">cmpabs</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">-1</span><span class="p">})</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="c1">// |0| &lt; |-1|.</span>
 </pre></div>
 </div>
 <p>And they can also be compared efficiently to integral multiples
 of powers of 2:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">cmp_ui_2exp</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">50</span><span class="p">},</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// 50 &gt; 3*2**4.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">cmp_ui_2exp</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="mi">50</span><span class="p">},</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">// 50 &gt; 3*2**4.</span>
 </pre></div>
 </div>
 <p>The <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API also provides comparison
 functions that handle NaN values in a special way. Specifically,
 these functions consider all NaN values equal to each other
 and greater than non-NaN values:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">real_equal_to</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">}));</span> <span class="c1">// NaN == NaN.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">real_gt</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="mi">100</span><span class="p">}));</span>             <span class="c1">// NaN &gt; 100.</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">real_lt</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;inf&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">},</span> <span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">}));</span>       <span class="c1">// inf &lt; NaN.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">real_equal_to</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">}));</span><span class="w"> </span><span class="c1">// NaN == NaN.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">real_gt</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">100</span><span class="p">}));</span><span class="w">             </span><span class="c1">// NaN &gt; 100.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">real_lt</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;inf&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">},</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="s">&quot;nan&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">}));</span><span class="w">       </span><span class="c1">// inf &lt; NaN.</span>
 </pre></div>
 </div>
 </div>
@@ -859,15 +859,15 @@ the inline namespace <code class="docutils literal notranslate"><span class="pre
 decimal and hexadecimal representations, and they currently
 allow to construct <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> instances
 with 128, 256, 512 and 1024 bits of precision:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">mppp</span><span class="o">::</span><span class="nn">literals</span><span class="p">;</span><span class="w"></span>
 
-<span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="mf">123.456</span><span class="n">_r128</span><span class="p">;</span>   <span class="c1">// r1 contains the 128-bit</span>
-                          <span class="c1">// approximation of 123.456 (that is,</span>
-                          <span class="c1">// 123.45599999999999999999999999999999999988).</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">r1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">123.456</span><span class="n">_r128</span><span class="p">;</span><span class="w">   </span><span class="c1">// r1 contains the 128-bit</span>
+<span class="w">                          </span><span class="c1">// approximation of 123.456 (that is,</span>
+<span class="w">                          </span><span class="c1">// 123.45599999999999999999999999999999999988).</span>
 
-<span class="k">auto</span> <span class="n">r2</span> <span class="o">=</span> <span class="mf">4.2e1</span><span class="n">_r256</span><span class="p">;</span>     <span class="c1">// Scientific notation can be used.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">r2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.2e1</span><span class="n">_r256</span><span class="p">;</span><span class="w">     </span><span class="c1">// Scientific notation can be used.</span>
 
-<span class="k">auto</span> <span class="n">r3</span> <span class="o">=</span> <span class="mf">0x1.12p-1</span><span class="n">_r512</span><span class="p">;</span> <span class="c1">// Hexadecimal floats are supported too.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">r3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0x1.12p-1</span><span class="n">_r512</span><span class="p">;</span><span class="w"> </span><span class="c1">// Hexadecimal floats are supported too.</span>
 </pre></div>
 </div>
 <div class="admonition seealso">

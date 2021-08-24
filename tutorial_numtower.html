@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.5f77b4aec8189eecf79907ce328c390d.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
@@ -397,9 +397,9 @@ in an arithmetic operation, all operands are converted (or <em>coerced</em>) int
 common type determined from the types of the operands. The converted operands
 are then used in place of the original operands to perform the operation,
 and the type of the result will be the common type. For instance:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="mf">5l</span><span class="p">;</span>   <span class="c1">// &#39;4&#39; is int, &#39;5l&#39; is long: a will be long.</span>
-<span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">4.f</span> <span class="o">+</span> <span class="mf">5l</span><span class="p">;</span> <span class="c1">// &#39;4.f&#39; is float, &#39;5l&#39; is long: b will be float.</span>
-<span class="k">auto</span> <span class="n">c</span> <span class="o">=</span> <span class="mf">4.f</span> <span class="o">+</span> <span class="mf">5.</span><span class="p">;</span> <span class="c1">// &#39;4.f&#39; is float, &#39;5.&#39; is double: c will be double.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">5l</span><span class="p">;</span><span class="w">   </span><span class="c1">// &#39;4&#39; is int, &#39;5l&#39; is long: a will be long.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">5l</span><span class="p">;</span><span class="w"> </span><span class="c1">// &#39;4.f&#39; is float, &#39;5l&#39; is long: b will be float.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">5.</span><span class="p">;</span><span class="w"> </span><span class="c1">// &#39;4.f&#39; is float, &#39;5.&#39; is double: c will be double.</span>
 </pre></div>
 </div>
 <p>In order to determine the common type, C++ assigns a rank to each fundamental type.
@@ -436,23 +436,23 @@ objects with a precision lower than <a class="reference internal" href="real128.
 when it comes to type coercion, <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is always assigned a rank higher than any other type.</p>
 <p>For complex-valued types, the type hierarchy is easily extended. In a binary operation involving
 two different complex-valued types, the real-valued coercion rules can be directly applied:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">complex</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">c1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span> <span class="c1">// The complex counterpart of double.</span>
-<span class="n">complex128</span> <span class="n">c2</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>           <span class="c1">// The complex counterpart of real128.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">complex</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">c1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span><span class="w"> </span><span class="c1">// The complex counterpart of double.</span>
+<span class="n">complex128</span><span class="w"> </span><span class="n">c2</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span><span class="w">           </span><span class="c1">// The complex counterpart of real128.</span>
 
-<span class="k">auto</span> <span class="n">res</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">+</span> <span class="n">c2</span><span class="p">;</span>            <span class="c1">// &#39;res&#39; will be complex128, because</span>
-                               <span class="c1">// in the type hierarchy real128 &gt; double.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c2</span><span class="p">;</span><span class="w">            </span><span class="c1">// &#39;res&#39; will be complex128, because</span>
+<span class="w">                               </span><span class="c1">// in the type hierarchy real128 &gt; double.</span>
 </pre></div>
 </div>
 <p>If one of the operands is complex-valued and the other one is real-valued, then
 first the real-valued type is formally promoted to its complex counterpart, and
 then the real-valued coercion rules can be applied again:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">complex</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
-<span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">complex</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span><span class="w"></span>
+<span class="n">real128</span><span class="w"> </span><span class="n">r</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span><span class="w"></span>
 
-<span class="k">auto</span> <span class="n">res</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="n">r</span><span class="p">;</span> <span class="c1">// &#39;res&#39; will be complex128: r is first</span>
-                  <span class="c1">// promoted to its complex counterpart,</span>
-                  <span class="c1">// complex128, and the rules from the</span>
-                  <span class="c1">// previous example are then applied.</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">r</span><span class="p">;</span><span class="w"> </span><span class="c1">// &#39;res&#39; will be complex128: r is first</span>
+<span class="w">                  </span><span class="c1">// promoted to its complex counterpart,</span>
+<span class="w">                  </span><span class="c1">// complex128, and the rules from the</span>
+<span class="w">                  </span><span class="c1">// previous example are then applied.</span>
 </pre></div>
 </div>
 <p>mp++’s type coercion rules extend beyond arithmetic operators (e.g., they also apply to binary
