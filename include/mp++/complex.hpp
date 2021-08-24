@@ -2364,8 +2364,7 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_sub(const T &n, U &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
-            = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+        auto wrapper = [n](::mpc_t c, const ::mpc_t o) { mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<U>(a));
     } else {
@@ -2377,7 +2376,7 @@ inline complex dispatch_complex_binary_sub(const T &n, U &&a)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_sub(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
