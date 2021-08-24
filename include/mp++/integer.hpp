@@ -288,7 +288,7 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
 #else
     // Implementation via GMP.
     // NOTE: assuming GMP knows how to deal with nails, so not masking.
-    return static_cast<unsigned>(::mpn_sizeinbase(&l, 1, 2));
+    return static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2));
 #endif
 }
 
@@ -2752,11 +2752,11 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             if (asize2 == 1) {
                 // NOTE: we are not masking data2[0] with GMP_NUMB_MASK, I am assuming the mpn function
                 // is able to deal with a limb with a nail.
-                cy = ::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+                cy = mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
             } else if (asize1 == asize2) {
-                cy = ::mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+                cy = mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
             } else {
-                cy = ::mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+                cy = mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
             }
             if (cy) {
                 assert(asize1 < static_int<SSize>::s_size);
@@ -2772,9 +2772,9 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t cy;
             if (asize1 == 1) {
-                cy = ::mpn_add_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+                cy = mpn_add_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
             } else {
-                cy = ::mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+                cy = mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
             }
             if (cy) {
                 assert(asize2 < static_int<SSize>::s_size);
@@ -2785,16 +2785,16 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             }
         }
     } else {
-        if (asize1 > asize2 || (asize1 == asize2 && ::mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
+        if (asize1 > asize2 || (asize1 == asize2 && mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
             // abs(op1) >= abs(op2).
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t br;
             if (asize2 == 1) {
-                br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+                br = mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
             } else if (asize1 == asize2) {
-                br = ::mpn_sub_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+                br = mpn_sub_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
             } else {
-                br = ::mpn_sub(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+                br = mpn_sub(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
             }
             assert(!br);
             rop._mp_size = integer_sub_compute_size(rdata, asize1);
@@ -2806,9 +2806,9 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t br;
             if (asize1 == 1) {
-                br = ::mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+                br = mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
             } else {
-                br = ::mpn_sub(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+                br = mpn_sub(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
             }
             assert(!br);
             rop._mp_size = integer_sub_compute_size(rdata, asize2);
@@ -3040,7 +3040,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
     }
     if (sign1 == sign2) {
         // op1 and op2 have the same sign. Implement as a true addition.
-        if (::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2)) {
+        if (mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2)) {
             assert(asize1 < static_int<SSize>::s_size);
             // New size is old size + 1 if old size was positive, old size - 1 otherwise.
             rop._mp_size = size1 + sign2;
@@ -3054,7 +3054,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
         // op1 and op2 have different signs. Implement as a subtraction.
         if (asize1 > 1 || (asize1 == 1 && (data1[0] & GMP_NUMB_MASK) >= l2)) {
             // abs(op1) >= abs(op2).
-            const auto br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
+            const auto br = mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
             ignore(br);
             assert(!br);
             // The asize can be the original one or original - 1 (we subtracted a limb). If size1 was positive,
@@ -3063,7 +3063,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
             rop._mp_size = size1 + sign2 * !(rdata[asize1 - 1] & GMP_NUMB_MASK);
         } else {
             // abs(op2) > abs(op1).
-            const auto br = ::mpn_sub_1(rdata, &l2, 1, data1[0]);
+            const auto br = mpn_sub_1(rdata, &l2, 1, data1[0]);
             ignore(br);
             assert(!br);
             // The size must be +-1, as abs(op2) == abs(op1) is handled above.
@@ -3417,18 +3417,18 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
     ::mp_limb_t hi;
     if (asize2 == 1) {
         // NOTE: the 1-limb versions do not write the hi limb, we have to write it ourselves.
-        hi = ::mpn_mul_1(res_data, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        hi = mpn_mul_1(res_data, data1, static_cast<::mp_size_t>(asize1), data2[0]);
         res_data[asize1] = hi;
     } else if (asize1 == 1) {
-        hi = ::mpn_mul_1(res_data, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+        hi = mpn_mul_1(res_data, data2, static_cast<::mp_size_t>(asize2), data1[0]);
         res_data[asize2] = hi;
     } else if (asize1 == asize2) {
-        ::mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
+        mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
         hi = res_data[2 * asize1 - 1];
     } else if (asize1 >= asize2) {
-        hi = ::mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+        hi = mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
     } else {
-        hi = ::mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+        hi = mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
     }
     // The actual size.
     const std::size_t asize = max_asize - unsigned(hi == 0u);
@@ -3875,8 +3875,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
         if (rs) {
             // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
             // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() + ls >= n.m_limbs.data().
-            ret = ::mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize),
-                               unsigned(rs));
+            ret = mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs));
             // Write bits spilling out.
             rop.m_limbs[new_asize] = ret;
         } else {
@@ -3899,7 +3898,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
             // In this case the operation may fail, so we need to write to temporary storage.
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, SSize> tmp;
-            if (::mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
+            if (mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
                 return SSize + 1u;
             }
             // The shift was successful without spill over, copy the content from the tmp
@@ -4083,7 +4082,7 @@ inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSiz
     const auto res_data = res.data();
 
     // Run the mpn function.
-    ::mpn_sqr(res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    mpn_sqr(res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
 
     // Compute the actual size of the result: it could be asize * 2
     // or 1 less, depending on whether the most significant limb of the
@@ -4257,7 +4256,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     const auto sqr_res_data = sqr_res.data();
 
     // Run the squaring function.
-    ::mpn_sqr(sqr_res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    mpn_sqr(sqr_res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
     // Compute the actual size of the result of the squaring: it could be asize * 2
     // or 1 less, depending on whether the most significant limb of the
     // result is zero.
@@ -4289,15 +4288,14 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     mpz_size_t ret_size;
     if (mod_asize == 1u) {
         // Optimization when the divisor has 1 limb.
-        r_res[0]
-            = ::mpn_divrem_1(q_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize), mod.m_limbs[0]);
+        r_res[0] = mpn_divrem_1(q_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize), mod.m_limbs[0]);
         // The size can be 1 or zero, depending on the value
         // of the only limb in r_res.
         ret_size = static_cast<mpz_size_t>((r_res[0] & GMP_NUMB_MASK) != 0u);
     } else {
         // The general case.
-        ::mpn_tdiv_qr(q_res.data(), r_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize),
-                      mod.m_limbs.data(), static_cast<::mp_size_t>(mod_asize));
+        mpn_tdiv_qr(q_res.data(), r_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize),
+                    mod.m_limbs.data(), static_cast<::mp_size_t>(mod_asize));
         // Determine the size of the output, which will
         // be in the [0, mod_asize] range.
         ret_size = static_cast<mpz_size_t>(mod_asize);
@@ -4492,11 +4490,11 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
         r.m_limbs[0]
-            = ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+            = mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
         // General implementation.
-        ::mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1),
-                      data2, static_cast<::mp_size_t>(asize2));
+        mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
+                    static_cast<::mp_size_t>(asize2));
     }
     // Complete the quotient: compute size and sign.
     q._mp_size = asize1 - asize2 + 1;
@@ -4725,13 +4723,13 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
-        ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> r_unused;
         // General implementation.
-        ::mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
-                      static_cast<::mp_size_t>(asize2));
+        mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
+                    static_cast<::mp_size_t>(asize2));
     }
     // Complete the quotient: compute size and sign.
     q._mp_size = asize1 - asize2 + 1;
@@ -4844,7 +4842,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     if (asize2 == 1) {
         // Optimisation in case the dividend has only 1 limb.
         // NOTE: overlapping arguments are fine here.
-        ::mpn_divexact_1(q.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
+        mpn_divexact_1(q.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
         // Complete the quotient: compute size and sign.
         q._mp_size = asize1 - asize2 + 1;
         while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
@@ -5043,7 +5041,7 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
     if (rs) {
         // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
         // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() <= n.m_limbs.data() + ls.
-        ::mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
+        mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
     } else {
         // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
         // NOTE: std::move requires that the destination iterator is not within the input range.
@@ -5162,7 +5160,7 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2)
         // NOTE: reduce the value of the comparison to the [-1, 1] range, so that
         // if we need to negate it below we ensure not to run into overflows.
         const int cmp_abs
-            = integral_sign(::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize)));
+            = integral_sign(mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize)));
         // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
         return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
     }
@@ -5328,7 +5326,7 @@ inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op,
         }
         if (sign) {
             const auto cy
-                = static_cast<mpz_size_t>(::mpn_add_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1));
+                = static_cast<mpz_size_t>(mpn_add_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1));
             if (cy) {
                 // If there's a carry, we'll need to write into the upper limb.
                 assert(asize < static_cast<mpz_size_t>(SSize));
@@ -5342,7 +5340,7 @@ inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op,
         }
         return true;
     }
-    ::mpn_sub_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1);
+    mpn_sub_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1);
     // Size will be the original asize minus possibly 1, if the original topmost limb
     // has become zero.
     rop._mp_size
@@ -5510,7 +5508,7 @@ inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
     // Create a copy so we can compare to the original value later.
     auto size = n;
     // Flip the bits.
-    ::mpn_com(rop, sp, static_cast<::mp_size_t>(size));
+    mpn_com(rop, sp, static_cast<::mp_size_t>(size));
     // Compute the new size.
     if ((rop[size - 1] & GMP_NUMB_MASK) == 0u) {
         --size;
@@ -5521,7 +5519,7 @@ inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
     if (size != 0) {
         // If rop is nonzero, use the mpn_add_1() primitive, storing the carry
         // and updating the size if necessary.
-        if (::mpn_add_1(rop, rop, size, 1) != 0u) {
+        if (mpn_add_1(rop, rop, size, 1) != 0u) {
             // This needs to hold as sp is nonzero: 2sc can never
             // overflow the highest limb.
             assert(size < n);
@@ -5569,7 +5567,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         // Set the size.
         rop._mp_size = asize1;
         // Compute the ior.
-        ::mpn_ior_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
+        mpn_ior_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
         // Copy extra limbs from data1.
         copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
         return;
@@ -5585,7 +5583,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOTE: in all 3 cases, the mpn_ior_n() is done with the minimum size among the operands
             // (asize2). In this case, due to the twosc, the first most significant limbs in tmp1 might
             // be zero, but according to the mpn docs this is not a problem.
-            ::mpn_ior_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
+            mpn_ior_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
             // Copy over the remaining limbs from the largest operand.
             copy_limbs(tmp1.data() + asize2, tmp1.data() + asize1, rop.m_limbs.data() + asize2);
             // The final twosc. This will return the effective abs size, which we need to negate.
@@ -5597,13 +5595,13 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOTE: after the twosc, the limbs in tmp2 from asize2 to asize1 should be set
             // to all 1s. We don't need to actually do that: ORing op1 with these high all-1 limbs
             // produces all-1 limbs in the result, and the final twosc will flip them back to zero.
-            ::mpn_ior_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_ior_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
             rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize2);
             break;
         case 3u:
             twosc(tmp1.data(), data1, asize1);
             twosc(tmp2.data(), data2, asize2);
-            ::mpn_ior_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_ior_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
             rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize2);
             break;
     }
@@ -5804,7 +5802,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     if (sign1 > 0 && sign2 > 0) {
         // The easy case: both are nonnegative.
         // Compute the and.
-        ::mpn_and_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
+        mpn_and_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
         // The asize will be at most asize2. Upper limbs could be zero due to the ANDing.
         rop._mp_size = compute_static_int_asize(rop, asize2);
         return true;
@@ -5820,7 +5818,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOTE: in all 3 cases, the mpn_and_n() is done with the minimum size among the operands
             // (asize2). In this case, due to the twosc, the first most significant limbs in tmp1 might
             // be zero, but according to the mpn docs this is not a problem.
-            ::mpn_and_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
+            mpn_and_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
             // NOTE: size cannot be larger than asize2, as all the limbs above that limit from op1
             // will be set to zero by the ANDing.
             rop._mp_size = compute_static_int_asize(rop, asize2);
@@ -5829,7 +5827,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // op1 nonnegative, op2 negative.
             twosc(tmp2.data(), data2, asize2);
             // Do the AND.
-            ::mpn_and_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_and_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
             // Copy over the upper limbs of op1 to rop: the limbs in tmp2 from asize2 to asize1
             // are (virtually) set to all 1s by the twosc, so ANDing with the corresponding limbs
             // in op1 means simply copying op1 over.
@@ -5842,7 +5840,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             twosc(tmp2.data(), data2, asize2);
             // Write in temp storage, as we might overflow and we don't want to spoil
             // rop in that case.
-            ::mpn_and_n(tmpr.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_and_n(tmpr.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
             // Copy over the upper limbs of op1 to rop (same as above). Non overlapping,
             // as we are only using local storage.
             copy_limbs_no(tmp1.data() + asize2, tmp1.data() + asize1, tmpr.data() + asize2);
@@ -6055,7 +6053,7 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     if (sign1 > 0 && sign2 > 0) {
         // The easy case: both are nonnegative.
         // Compute the xor.
-        ::mpn_xor_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
+        mpn_xor_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
         // Limbs from asize2 to asize1 in op1 get copied as-is, as they are XORed with
         // zeroes from op2.
         copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
@@ -6075,7 +6073,7 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOTE: in all 3 cases, the mpn_xor_n() is done with the minimum size among the operands
             // (asize2). In this case, due to the twosc, the first most significant limbs in tmp1 might
             // be zero, but according to the mpn docs this is not a problem.
-            ::mpn_xor_n(tmpr.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
+            mpn_xor_n(tmpr.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
             // Copy over the limbs in tmp1 from asize2 to asize1.
             copy_limbs_no(tmp1.data() + asize2, tmp1.data() + asize1, tmpr.data() + asize2);
             // Check for zero.
@@ -6089,12 +6087,12 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // op1 nonnegative, op2 negative.
             twosc(tmp2.data(), data2, asize2);
             // Do the XOR.
-            ::mpn_xor_n(tmpr.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_xor_n(tmpr.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
             // The limbs in tmp2 from asize2 to asize1 have all been set to 1: XORing them
             // with the corresponding limbs in op1 means bit-flipping the limbs in op1.
             if (asize2 != asize1) {
                 // NOTE: mpn functions require nonzero operands, so we need to branch here.
-                ::mpn_com(tmpr.data() + asize2, data1 + asize2, asize1 - asize2);
+                mpn_com(tmpr.data() + asize2, data1 + asize2, asize1 - asize2);
             }
             // Check for zero.
             if (mppp_unlikely(std::all_of(tmpr.data(), tmpr.data() + asize1,
@@ -6106,11 +6104,11 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         case 3u:
             twosc(tmp1.data(), data1, asize1);
             twosc(tmp2.data(), data2, asize2);
-            ::mpn_xor_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_xor_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
             // Same as above, regarding the all-1 limbs in tmp2.
             if (asize2 != asize1) {
                 // NOTE: mpn functions require nonzero operands, so we need to branch here.
-                ::mpn_com(rop.m_limbs.data() + asize2, tmp1.data() + asize2, asize1 - asize2);
+                mpn_com(rop.m_limbs.data() + asize2, tmp1.data() + asize2, asize1 - asize2);
             }
             rop._mp_size = compute_static_int_asize(rop, asize1);
             return true;
@@ -6192,12 +6190,12 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // Special casing if an operand has asize 1.
     if (asize1 == 1) {
         rop._mp_size = 1;
-        rop.m_limbs[0] = ::mpn_gcd_1(op2.m_limbs.data(), static_cast<::mp_size_t>(asize2), op1.m_limbs[0]);
+        rop.m_limbs[0] = mpn_gcd_1(op2.m_limbs.data(), static_cast<::mp_size_t>(asize2), op1.m_limbs[0]);
         return;
     }
     if (asize2 == 1) {
         rop._mp_size = 1;
-        rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
+        rop.m_limbs[0] = mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
         return;
     }
     // General case, via mpz.
@@ -6256,7 +6254,7 @@ inline void static_gcd_impl(static_int<1> &rop, const static_int<1> &op1, const 
     // We need to benchmark again when the next GMP version comes out. If the binary GCD
     // is still faster, we should consider using it instead of mpn_gcd_1(), as even on Intel
     // processors the binary GCD is only marginally slower than mpn_gcd_1().
-    rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(1), op2.m_limbs[0]);
+    rop.m_limbs[0] = mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(1), op2.m_limbs[0]);
 }
 
 template <std::size_t SSize>
@@ -6737,7 +6735,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
             std::array<::mp_limb_t, SSize> tmp;
             const bool overlap = (&rs == &ns);
             const auto rs_data = rs.m_limbs.data(), out_ptr = overlap ? tmp.data() : rs_data;
-            ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+            mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
             // Compute the size of the output (which is ceil(size / 2)).
             const auto new_size = size / 2u + size % 2u;
             assert(!new_size || (out_ptr[new_size - 1u] & GMP_NUMB_MASK));
@@ -6801,7 +6799,7 @@ inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, con
         const auto rops_data = rops.m_limbs.data(), out_ptr = overlap ? tmp.data() : rops_data,
                    rems_data = rems.m_limbs.data();
         // Do the computation. The function will return the size of the remainder.
-        const auto rem_size = ::mpn_sqrtrem(out_ptr, rems_data, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+        const auto rem_size = mpn_sqrtrem(out_ptr, rems_data, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
         // Compute the size of the output (which is ceil(size / 2)).
         const auto rop_size = size / 2u + size % 2u;
         assert(!rop_size || (out_ptr[rop_size - 1u] & GMP_NUMB_MASK));
@@ -6876,7 +6874,7 @@ inline bool perfect_square_p(const integer<SSize> &n)
         }
         // NOTE: as usual, we assume that we can freely cast any valid mpz_size_t to
         // mp_size_t when calling mpn functions.
-        return ::mpn_perfect_square_p(ptr, static_cast<::mp_size_t>(size)) != 0;
+        return mpn_perfect_square_p(ptr, static_cast<::mp_size_t>(size)) != 0;
     } else {
         // n is zero or negative. It is a perfect square
         // only if zero.
@@ -7719,7 +7717,7 @@ inline bool static_less_than(const static_int<SSize> &n1, const static_int<SSize
 
     // The two sizes are equal, compare the absolute values.
     if (size1) {
-        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
+        const int cmp_abs = mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
         return (size1 >= 0 && cmp_abs < 0) || (size1 < 0 && cmp_abs > 0);
     }
     // Both operands are zero.
@@ -7793,7 +7791,7 @@ inline bool static_greater_than(const static_int<SSize> &n1, const static_int<SS
     }
 
     if (size1) {
-        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
+        const int cmp_abs = mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
         return (size1 >= 0 && cmp_abs > 0) || (size1 < 0 && cmp_abs < 0);
     }
     return false;

@@ -542,29 +542,29 @@ struct mpq_move_ctor_tester {
     {
         using rational = rational<S::value>;
         ::mpq_t q0;
-        ::mpq_init(q0);
+        mpq_init(q0);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == 0);
-        ::mpq_init(q0);
+        mpq_init(q0);
         mpz_set_si(mpq_numref(q0), 1234);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == 1234);
-        ::mpq_init(q0);
+        mpq_init(q0);
         mpz_set_si(mpq_numref(q0), -1234);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == -1234);
-        ::mpq_init(q0);
+        mpq_init(q0);
         mpz_set_si(mpq_numref(q0), 4);
         mpz_set_si(mpq_denref(q0), -3);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(rational{std::move(q0)}) == "4/-3");
-        ::mpq_init(q0);
+        mpq_init(q0);
         mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         mpz_set_si(mpq_denref(q0), -3);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(rational{std::move(q0)})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237/-3");
-        ::mpq_init(q0);
+        mpq_init(q0);
         mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         mpz_set_str(mpq_denref(q0), "-3218372891372987328917389127389217398271983712987398127398172389712937819237",
                     10);

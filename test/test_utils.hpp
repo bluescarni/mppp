@@ -183,7 +183,7 @@ inline void random_integer(mppp::detail::mpz_raii &m, unsigned n, std::mt19937 &
 inline void random_rational(mppp::detail::mpq_raii &m, unsigned n, std::mt19937 &rng)
 {
     if (n == 0u) {
-        ::mpq_set_ui(&m.m_mpq, 0, 1);
+        mpq_set_ui(&m.m_mpq, 0, 1);
         return;
     }
     MPPP_MAYBE_TLS mppp::detail::mpz_raii tmp;
@@ -203,7 +203,7 @@ inline void random_rational(mppp::detail::mpq_raii &m, unsigned n, std::mt19937 
     if (mpz_sgn(mpq_denref(&m.m_mpq)) == 0) {
         mpz_set_ui(mpq_denref(&m.m_mpq), 1);
     }
-    ::mpq_canonicalize(&m.m_mpq);
+    mpq_canonicalize(&m.m_mpq);
 }
 
 // Set mpz to the max value with n limbs.

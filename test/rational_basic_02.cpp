@@ -157,16 +157,16 @@ struct mpq_copy_ass_tester {
         detail::mpq_raii m;
         q = &m.m_mpq;
         REQUIRE(lex_cast(q) == "0");
-        ::mpq_set_si(&m.m_mpq, 1234, 1);
+        mpq_set_si(&m.m_mpq, 1234, 1);
         q = &m.m_mpq;
         REQUIRE(lex_cast(q) == "1234");
-        ::mpq_set_si(&m.m_mpq, -1234, 1);
+        mpq_set_si(&m.m_mpq, -1234, 1);
         q = &m.m_mpq;
         REQUIRE(lex_cast(q) == "-1234");
-        ::mpq_set_str(&m.m_mpq, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpq_set_str(&m.m_mpq, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         q = &m.m_mpq;
         REQUIRE(lex_cast(q) == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
-        ::mpq_set_str(&m.m_mpq, "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2", 10);
+        mpq_set_str(&m.m_mpq, "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2", 10);
         q = &m.m_mpq;
         REQUIRE(lex_cast(q) == "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2");
     }
@@ -188,27 +188,27 @@ struct mpq_move_ass_tester {
         REQUIRE((!std::is_assignable<const rational &, ::mpq_t &&>::value));
         rational q;
         ::mpq_t q0;
-        ::mpq_init(q0);
+        mpq_init(q0);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "0");
-        ::mpq_init(q0);
-        ::mpq_set_si(q0, 1234, 1);
+        mpq_init(q0);
+        mpq_set_si(q0, 1234, 1);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "1234");
-        ::mpq_init(q0);
-        ::mpq_set_si(q0, -1234, 1);
+        mpq_init(q0);
+        mpq_set_si(q0, -1234, 1);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "-1234");
-        ::mpq_init(q0);
-        ::mpq_set_str(q0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpq_init(q0);
+        mpq_set_str(q0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
-        ::mpq_init(q0);
-        ::mpq_set_str(q0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2", 10);
+        mpq_init(q0);
+        mpq_set_str(q0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2", 10);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         q = std::move(q0);
         REQUIRE(lex_cast(q) == "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2");

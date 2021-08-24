@@ -64,7 +64,7 @@ struct mpq_raii {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     mpq_raii()
     {
-        ::mpq_init(&m_mpq);
+        mpq_init(&m_mpq);
     }
     mpq_raii(const mpq_raii &) = delete;
     mpq_raii(mpq_raii &&) = delete;
@@ -72,7 +72,7 @@ struct mpq_raii {
     mpq_raii &operator=(mpq_raii &&) = delete;
     ~mpq_raii()
     {
-        ::mpq_clear(&m_mpq);
+        mpq_clear(&m_mpq);
     }
     mpq_struct_t m_mpq;
 };

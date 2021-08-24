@@ -70,7 +70,7 @@ struct hash_tester {
                 if (mpz_sgn(mpq_denref(&tmp.m_mpq)) == 0) {
                     mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
                 }
-                ::mpq_canonicalize(&tmp.m_mpq);
+                mpq_canonicalize(&tmp.m_mpq);
                 n1 = &tmp.m_mpq;
                 REQUIRE((hash(n1) == hash(n1.get_num()) + hash(n1.get_den())));
                 REQUIRE((hasher(n1) == hash(n1)));

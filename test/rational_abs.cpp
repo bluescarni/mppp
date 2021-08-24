@@ -69,11 +69,11 @@ struct abs_tester {
                 if (mpz_sgn(mpq_denref(&tmp.m_mpq)) == 0) {
                     mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
                 }
-                ::mpq_canonicalize(&tmp.m_mpq);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_canonicalize(&tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {

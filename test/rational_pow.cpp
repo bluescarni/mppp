@@ -95,10 +95,10 @@ struct pow_tester {
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 random_rational(tmp, x, rng);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {

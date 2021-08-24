@@ -51,17 +51,17 @@ struct cmp_tester {
         // Start with all zeroes.
         detail::mpq_raii m1, m2;
         rational n1, n2;
-        REQUIRE(check_cmp(cmp(n1, n2), ::mpq_cmp(&m1.m_mpq, &m2.m_mpq)));
+        REQUIRE(check_cmp(cmp(n1, n2), mpq_cmp(&m1.m_mpq, &m2.m_mpq)));
         detail::mpq_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 random_rational(tmp, x, rng);
-                ::mpq_set(&m1.m_mpq, &tmp.m_mpq);
+                mpq_set(&m1.m_mpq, &tmp.m_mpq);
                 n1 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m1.m_mpq, &m1.m_mpq);
+                    mpq_neg(&m1.m_mpq, &m1.m_mpq);
                     n1.neg();
                 }
                 if (n1.get_num().is_static() && sdist(rng)) {
@@ -73,10 +73,10 @@ struct cmp_tester {
                     n1._get_den().promote();
                 }
                 random_rational(tmp, y, rng);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {
@@ -87,24 +87,24 @@ struct cmp_tester {
                     // Promote sometimes, if possible.
                     n2._get_den().promote();
                 }
-                REQUIRE(check_cmp(cmp(n1, n2), ::mpq_cmp(&m1.m_mpq, &m2.m_mpq)));
-                REQUIRE(check_cmp(cmp(n1, n1), ::mpq_cmp(&m1.m_mpq, &m1.m_mpq)));
-                REQUIRE(check_cmp(cmp(n2, n2), ::mpq_cmp(&m2.m_mpq, &m2.m_mpq)));
+                REQUIRE(check_cmp(cmp(n1, n2), mpq_cmp(&m1.m_mpq, &m2.m_mpq)));
+                REQUIRE(check_cmp(cmp(n1, n1), mpq_cmp(&m1.m_mpq, &m1.m_mpq)));
+                REQUIRE(check_cmp(cmp(n2, n2), mpq_cmp(&m2.m_mpq, &m2.m_mpq)));
                 REQUIRE((n1 == n1));
                 REQUIRE((n2 == n2));
-                if (::mpq_cmp(&m1.m_mpq, &m2.m_mpq)) {
+                if (mpq_cmp(&m1.m_mpq, &m2.m_mpq)) {
                     REQUIRE((n1 != n2));
                 } else {
                     REQUIRE((n1 == n2));
                 }
                 // Test the integer versions as well.
-                REQUIRE(check_cmp(cmp(n1, n2.get_num()), ::mpq_cmp_z(&m1.m_mpq, mpq_numref(&m2.m_mpq))));
-                REQUIRE(check_cmp(cmp(n2.get_num(), n1), -::mpq_cmp_z(&m1.m_mpq, mpq_numref(&m2.m_mpq))));
+                REQUIRE(check_cmp(cmp(n1, n2.get_num()), mpq_cmp_z(&m1.m_mpq, mpq_numref(&m2.m_mpq))));
+                REQUIRE(check_cmp(cmp(n2.get_num(), n1), -mpq_cmp_z(&m1.m_mpq, mpq_numref(&m2.m_mpq))));
                 n2._get_den() = 1;
                 REQUIRE(cmp(n2, n2.get_num()) == 0);
                 REQUIRE(cmp(n2.get_num(), n2) == 0);
                 n2 = n1;
-                ::mpq_set(&m2.m_mpq, &m1.m_mpq);
+                mpq_set(&m2.m_mpq, &m1.m_mpq);
                 if (n2.get_num().is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2._get_num().promote();
@@ -113,9 +113,9 @@ struct cmp_tester {
                     // Promote sometimes, if possible.
                     n2._get_den().promote();
                 }
-                REQUIRE(check_cmp(cmp(n1, n2), ::mpq_cmp(&m1.m_mpq, &m2.m_mpq)));
+                REQUIRE(check_cmp(cmp(n1, n2), mpq_cmp(&m1.m_mpq, &m2.m_mpq)));
                 // Overlap.
-                REQUIRE(check_cmp(cmp(n1, n1), ::mpq_cmp(&m1.m_mpq, &m1.m_mpq)));
+                REQUIRE(check_cmp(cmp(n1, n1), mpq_cmp(&m1.m_mpq, &m1.m_mpq)));
             }
         };
 
