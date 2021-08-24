@@ -124,7 +124,7 @@ void real_li2_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd)
     // rop to nan.
     // NOTE: check for nan before checking for >= 1, otherwise
     // the comparison function will set the erange flag.
-    if (!mpfr_nan_p(op) && ::mpfr_cmp_ui(op, 1u) >= 0) {
+    if (!mpfr_nan_p(op) && mpfr_cmp_ui(op, 1u) >= 0) {
         ::mpfr_set_nan(rop);
     } else {
         ::mpfr_li2(rop, op, rnd);
@@ -139,7 +139,7 @@ void real_ceil_wrapper(::mpfr_t rop, const ::mpfr_t op)
         throw std::domain_error("Cannot compute the ceiling of a NaN value");
     }
 
-    ::mpfr_ceil(rop, op);
+    mpfr_ceil(rop, op);
 }
 
 void real_floor_wrapper(::mpfr_t rop, const ::mpfr_t op)
@@ -148,7 +148,7 @@ void real_floor_wrapper(::mpfr_t rop, const ::mpfr_t op)
         throw std::domain_error("Cannot compute the floor of a NaN value");
     }
 
-    ::mpfr_floor(rop, op);
+    mpfr_floor(rop, op);
 }
 
 void real_round_wrapper(::mpfr_t rop, const ::mpfr_t op)
@@ -157,7 +157,7 @@ void real_round_wrapper(::mpfr_t rop, const ::mpfr_t op)
         throw std::domain_error("Cannot round a NaN value");
     }
 
-    ::mpfr_round(rop, op);
+    mpfr_round(rop, op);
 }
 
 #if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
@@ -179,7 +179,7 @@ void real_trunc_wrapper(::mpfr_t rop, const ::mpfr_t op)
         throw std::domain_error("Cannot truncate a NaN value");
     }
 
-    ::mpfr_trunc(rop, op);
+    mpfr_trunc(rop, op);
 }
 
 void real_frac_wrapper(::mpfr_t rop, const ::mpfr_t op)
@@ -309,7 +309,7 @@ real::real(const real &other, ::mpfr_prec_t p)
 {
     // Init with custom precision, and then set.
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
-    ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
+    mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
 }
 
 // Move constructor with custom precision.
@@ -354,7 +354,7 @@ void real::dispatch_construction(const long double &x)
 // constructor from unsigned.
 void real::dispatch_construction(const bool &b)
 {
-    ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
+    mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
 }
 
 void real::dispatch_mpz_construction(const ::mpz_t n)
@@ -473,7 +473,7 @@ real::real(const ::mpfr_t x)
 {
     // Init with the same precision as other, and then set.
     ::mpfr_init2(&m_mpfr, mpfr_get_prec(x));
-    ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+    mpfr_set(&m_mpfr, x, MPFR_RNDN);
 }
 
 // Copy assignment operator.
@@ -490,7 +490,7 @@ real &real::operator=(const real &other)
             ::mpfr_init2(&m_mpfr, other.get_prec());
         }
         // Perform the actual copy from other.
-        ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
+        mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
     }
     return *this;
 }
@@ -529,7 +529,7 @@ real &real::operator=(const ::mpfr_t x)
     // Set the precision, assuming the prec of x is valid.
     set_prec_impl<false>(mpfr_get_prec(x));
     // Set the value.
-    ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+    mpfr_set(&m_mpfr, x, MPFR_RNDN);
     return *this;
 }
 
@@ -584,7 +584,7 @@ real &real::set(const char *begin, const char *end, int base)
 // Set to an mpfr_t.
 real &real::set(const ::mpfr_t x)
 {
-    ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+    mpfr_set(&m_mpfr, x, MPFR_RNDN);
     return *this;
 }
 
@@ -615,7 +615,7 @@ bool real::is_one() const
     // NOTE: preempt calling the comparison function, if this is NaN
     // (in such case, the range flag will be touched and we do not
     // want to bother with that).
-    return !nan_p() && (::mpfr_cmp_ui(&m_mpfr, 1u) == 0);
+    return !nan_p() && (mpfr_cmp_ui(&m_mpfr, 1u) == 0);
 }
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -662,7 +662,7 @@ void real::assign_real128(const real128 &x)
         const auto p4 = std::get<3>(t) % (1ull << 32);
         // Build the significand, from most to least significant.
         // NOTE: unsigned long is guaranteed to be at least 32 bit.
-        ::mpfr_set_ui(&this->m_mpfr, static_cast<unsigned long>(p1), MPFR_RNDN);
+        mpfr_set_ui(&this->m_mpfr, static_cast<unsigned long>(p1), MPFR_RNDN);
         ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
         ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p2), MPFR_RNDN);
         ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
@@ -1364,7 +1364,7 @@ void dispatch_real_in_place_mul_integer_impl(real &a, const ::mpz_t n, ::mpfr_pr
 
 void dispatch_real_in_place_mul(real &a, bool n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
@@ -1452,7 +1452,7 @@ void dispatch_real_in_place_div_integer_impl(real &a, const ::mpz_t n, ::mpfr_pr
 
 void dispatch_real_in_place_div(real &a, bool n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
@@ -1547,7 +1547,7 @@ bool dispatch_real_equality(const real &r, bool b)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) == 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) == 0;
     }
 }
 
@@ -1635,7 +1635,7 @@ bool dispatch_real_gt(const real &r, bool b)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) > 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) > 0;
     }
 }
 
@@ -1644,7 +1644,7 @@ bool dispatch_real_gt(bool b, const real &r)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) < 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) < 0;
     }
 }
 
@@ -1776,7 +1776,7 @@ bool dispatch_real_gte(const real &r, bool b)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) >= 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) >= 0;
     }
 }
 
@@ -1785,7 +1785,7 @@ bool dispatch_real_gte(bool b, const real &r)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) <= 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) <= 0;
     }
 }
 
@@ -1917,7 +1917,7 @@ bool dispatch_real_lt(const real &r, bool b)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) < 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) < 0;
     }
 }
 
@@ -1926,7 +1926,7 @@ bool dispatch_real_lt(bool b, const real &r)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) > 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) > 0;
     }
 }
 
@@ -2058,7 +2058,7 @@ bool dispatch_real_lte(const real &r, bool b)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) <= 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) <= 0;
     }
 }
 
@@ -2067,7 +2067,7 @@ bool dispatch_real_lte(bool b, const real &r)
     if (r.nan_p()) {
         return false;
     } else {
-        return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) >= 0;
+        return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(b)) >= 0;
     }
 }
 
@@ -2171,7 +2171,7 @@ bool dispatch_real_lte(const real128 &r1, const real &r2)
 int cmp(const real &a, const real &b)
 {
     ::mpfr_clear_erangeflag();
-    auto retval = ::mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
+    auto retval = mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
         throw std::domain_error("Cannot compare two reals if at least one of them is NaN");

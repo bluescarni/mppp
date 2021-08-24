@@ -380,7 +380,7 @@ private:
     void dispatch_construction(const T &n)
     {
         if (n <= detail::nl_max<unsigned long>()) {
-            ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
+            mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
             // NOTE: here and elsewhere let's use a 2-limb integer, in the hope
             // of avoiding dynamic memory allocation.
@@ -392,7 +392,7 @@ private:
     void dispatch_construction(const T &n)
     {
         if (n <= detail::nl_max<long>() && n >= detail::nl_min<long>()) {
-            ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
+            mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
@@ -577,7 +577,7 @@ private:
     void dispatch_assignment(const bool &b)
     {
         dispatch_integral_ass_prec<SetPrec>(b);
-        ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
+        mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
     template <bool SetPrec, typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>>::value, int> = 0>
@@ -585,7 +585,7 @@ private:
     {
         dispatch_integral_ass_prec<SetPrec>(n);
         if (n <= detail::nl_max<unsigned long>()) {
-            ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
+            mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
@@ -596,7 +596,7 @@ private:
     {
         dispatch_integral_ass_prec<SetPrec>(n);
         if (n <= detail::nl_max<long>() && n >= detail::nl_min<long>()) {
-            ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
+            mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
@@ -3237,7 +3237,7 @@ inline real dispatch_real_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
         auto wrapper
-            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+            = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3251,7 +3251,7 @@ inline real dispatch_real_binary_mul(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3267,7 +3267,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3398,7 +3398,7 @@ inline void dispatch_real_in_place_mul(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
         auto wrapper
-            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+            = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3416,7 +3416,7 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_mul(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3514,7 +3514,7 @@ inline real dispatch_real_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
         auto wrapper
-            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+            = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3542,7 +3542,7 @@ inline real dispatch_real_binary_div(const U &n, T &&a)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_div(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3559,7 +3559,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3682,7 +3682,7 @@ inline void dispatch_real_in_place_div(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
         auto wrapper
-            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+            = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3700,7 +3700,7 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_div(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3785,7 +3785,7 @@ inline bool dispatch_real_equality(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) == 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) == 0;
         }
     } else {
         return dispatch_real_equality(r, integer<2>{n});
@@ -3803,7 +3803,7 @@ inline bool dispatch_real_equality(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) == 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) == 0;
         }
     } else {
         return dispatch_real_equality(r, integer<2>{n});
@@ -3905,7 +3905,7 @@ inline bool dispatch_real_gt(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) > 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) > 0;
         }
     } else {
         return dispatch_real_gt(r, integer<2>{n});
@@ -3920,7 +3920,7 @@ inline bool dispatch_real_gt(const T &n, const real &r)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) < 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) < 0;
         }
     } else {
         return dispatch_real_gt(integer<2>{n}, r);
@@ -3939,7 +3939,7 @@ inline bool dispatch_real_gt(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) > 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) > 0;
         }
     } else {
         return dispatch_real_gt(r, integer<2>{n});
@@ -3954,7 +3954,7 @@ inline bool dispatch_real_gt(const T &n, const real &r)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) < 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) < 0;
         }
     } else {
         return dispatch_real_gt(integer<2>{n}, r);
@@ -4049,7 +4049,7 @@ inline bool dispatch_real_gte(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) >= 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) >= 0;
         }
     } else {
         return dispatch_real_gte(r, integer<2>{n});
@@ -4064,7 +4064,7 @@ inline bool dispatch_real_gte(const T &n, const real &r)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) <= 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) <= 0;
         }
     } else {
         return dispatch_real_gte(integer<2>{n}, r);
@@ -4083,7 +4083,7 @@ inline bool dispatch_real_gte(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) >= 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) >= 0;
         }
     } else {
         return dispatch_real_gte(r, integer<2>{n});
@@ -4098,7 +4098,7 @@ inline bool dispatch_real_gte(const T &n, const real &r)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) <= 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) <= 0;
         }
     } else {
         return dispatch_real_gte(integer<2>{n}, r);
@@ -4193,7 +4193,7 @@ inline bool dispatch_real_lt(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) < 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) < 0;
         }
     } else {
         return dispatch_real_lt(r, integer<2>{n});
@@ -4208,7 +4208,7 @@ inline bool dispatch_real_lt(const T &n, const real &r)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) > 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) > 0;
         }
     } else {
         return dispatch_real_lt(integer<2>{n}, r);
@@ -4227,7 +4227,7 @@ inline bool dispatch_real_lt(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) < 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) < 0;
         }
     } else {
         return dispatch_real_lt(r, integer<2>{n});
@@ -4242,7 +4242,7 @@ inline bool dispatch_real_lt(const T &n, const real &r)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) > 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) > 0;
         }
     } else {
         return dispatch_real_lt(integer<2>{n}, r);
@@ -4337,7 +4337,7 @@ inline bool dispatch_real_lte(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) <= 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) <= 0;
         }
     } else {
         return dispatch_real_lte(r, integer<2>{n});
@@ -4352,7 +4352,7 @@ inline bool dispatch_real_lte(const T &n, const real &r)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) >= 0;
+            return mpfr_cmp_ui(r.get_mpfr_t(), static_cast<unsigned long>(n)) >= 0;
         }
     } else {
         return dispatch_real_lte(integer<2>{n}, r);
@@ -4371,7 +4371,7 @@ inline bool dispatch_real_lte(const real &r, const T &n)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) <= 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) <= 0;
         }
     } else {
         return dispatch_real_lte(r, integer<2>{n});
@@ -4386,7 +4386,7 @@ inline bool dispatch_real_lte(const T &n, const real &r)
         if (r.nan_p()) {
             return false;
         } else {
-            return ::mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) >= 0;
+            return mpfr_cmp_si(r.get_mpfr_t(), static_cast<long>(n)) >= 0;
         }
     } else {
         return dispatch_real_lte(integer<2>{n}, r);

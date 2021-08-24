@@ -676,7 +676,7 @@ complex &complex::abs()
     tmp.set_prec(get_prec());
     ::mpc_abs(tmp._get_mpfr_t(), &m_mpc, MPFR_RNDN);
 
-    ::mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
+    mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
     ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
 
     return *this;
@@ -690,7 +690,7 @@ complex &complex::norm()
     tmp.set_prec(get_prec());
     ::mpc_norm(tmp._get_mpfr_t(), &m_mpc, MPFR_RNDN);
 
-    ::mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
+    mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
     ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
 
     return *this;
@@ -704,7 +704,7 @@ complex &complex::arg()
     tmp.set_prec(get_prec());
     ::mpc_arg(tmp._get_mpfr_t(), &m_mpc, MPFR_RNDN);
 
-    ::mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
+    mpfr_set(mpc_realref(&m_mpc), tmp.get_mpfr_t(), MPFR_RNDN);
     ::mpfr_set_zero(mpc_imagref(&m_mpc), 1);
 
     return *this;

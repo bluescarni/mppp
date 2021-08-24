@@ -43,9 +43,9 @@ TEST_CASE("real identity")
     REQUIRE((+r0).get_prec() == real_prec_min());
     REQUIRE((+real{}).get_prec() == real_prec_min());
     r0 = 123;
-    REQUIRE(::mpfr_cmp_ui((+r0).get_mpfr_t(), 123ul) == 0);
+    REQUIRE(mpfr_cmp_ui((+r0).get_mpfr_t(), 123ul) == 0);
     REQUIRE((+r0).get_prec() == detail::nl_digits<int>() + 1);
-    REQUIRE(::mpfr_cmp_ui((+std::move(r0)).get_mpfr_t(), 123ul) == 0);
+    REQUIRE(mpfr_cmp_ui((+std::move(r0)).get_mpfr_t(), 123ul) == 0);
     // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
@@ -461,9 +461,9 @@ TEST_CASE("real neg copy")
     REQUIRE((-r0).get_prec() == real_prec_min());
     REQUIRE((-real{}).get_prec() == real_prec_min());
     r0 = 123;
-    REQUIRE(::mpfr_cmp_si((-r0).get_mpfr_t(), -123l) == 0);
+    REQUIRE(mpfr_cmp_si((-r0).get_mpfr_t(), -123l) == 0);
     REQUIRE((-r0).get_prec() == detail::nl_digits<int>() + 1);
-    REQUIRE(::mpfr_cmp_si((-std::move(r0)).get_mpfr_t(), -123l) == 0);
+    REQUIRE(mpfr_cmp_si((-std::move(r0)).get_mpfr_t(), -123l) == 0);
     // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
