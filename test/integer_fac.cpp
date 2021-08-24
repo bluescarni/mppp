@@ -42,32 +42,32 @@ struct fac_tester {
         // Start with all zeroes.
         detail::mpz_raii m1;
         integer n1;
-        ::mpz_fac_ui(&m1.m_mpz, 0);
+        mpz_fac_ui(&m1.m_mpz, 0);
         fac_ui(n1, 0);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Try one.
-        ::mpz_fac_ui(&m1.m_mpz, 1);
+        mpz_fac_ui(&m1.m_mpz, 1);
         REQUIRE(&fac_ui(n1, 1) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Try two.
-        ::mpz_fac_ui(&m1.m_mpz, 2);
+        mpz_fac_ui(&m1.m_mpz, 2);
         fac_ui(n1, 2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Try 4.
-        ::mpz_fac_ui(&m1.m_mpz, 4);
+        mpz_fac_ui(&m1.m_mpz, 4);
         fac_ui(n1, 4);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Try 10.
-        ::mpz_fac_ui(&m1.m_mpz, 10);
+        mpz_fac_ui(&m1.m_mpz, 10);
         fac_ui(n1, 10);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Try the limit.
-        ::mpz_fac_ui(&m1.m_mpz, 1000000ul);
+        mpz_fac_ui(&m1.m_mpz, 1000000ul);
         fac_ui(n1, 1000000ul);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         // Error testing.
@@ -90,7 +90,7 @@ struct fac_tester {
                 n1.promote();
             }
             const auto x = udist(rng);
-            ::mpz_fac_ui(&m1.m_mpz, x);
+            mpz_fac_ui(&m1.m_mpz, x);
             fac_ui(n1, x);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
         }

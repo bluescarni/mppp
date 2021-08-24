@@ -42,26 +42,26 @@ struct tdiv_q_tester {
         // A few simple tests to start.
         n3 = integer(12);
         n4 = integer(5);
-        ::mpz_set_ui(&m3.m_mpz, 12);
-        ::mpz_set_ui(&m4.m_mpz, 5);
+        mpz_set_ui(&m3.m_mpz, 12);
+        mpz_set_ui(&m4.m_mpz, 5);
         tdiv_q(n1, n3, n4);
         REQUIRE(std::is_same<integer &, decltype(tdiv_q(n1, n3, n4))>::value);
-        ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
+        mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         n3 = integer(-12);
-        ::mpz_set_si(&m3.m_mpz, -12);
+        mpz_set_si(&m3.m_mpz, -12);
         tdiv_q(n1, n3, n4);
-        ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
+        mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         n4 = integer(-5);
-        ::mpz_set_si(&m4.m_mpz, -5);
+        mpz_set_si(&m4.m_mpz, -5);
         tdiv_q(n1, n3, n4);
-        ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
+        mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         n3 = integer(12);
-        ::mpz_set_ui(&m3.m_mpz, 12);
+        mpz_set_ui(&m3.m_mpz, 12);
         tdiv_q(n1, n3, n4);
-        ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
+        mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         // Random testing.
         detail::mpz_raii tmp;
@@ -71,10 +71,10 @@ struct tdiv_q_tester {
                 // Helper to generate randomly dividend and divisor.
                 auto random_34 = [&]() {
                     random_integer(tmp, x, rng);
-                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                    mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
-                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                        mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
                     }
                     if (n3.is_static() && sdist(rng)) {
@@ -84,10 +84,10 @@ struct tdiv_q_tester {
                     // Make sure divisor is not zero.
                     do {
                         random_integer(tmp, y, rng);
-                        ::mpz_set(&m4.m_mpz, &tmp.m_mpz);
+                        mpz_set(&m4.m_mpz, &tmp.m_mpz);
                         n4 = &tmp.m_mpz;
                         if (sdist(rng)) {
-                            ::mpz_neg(&m4.m_mpz, &m4.m_mpz);
+                            mpz_neg(&m4.m_mpz, &m4.m_mpz);
                             n4.neg();
                         }
                         if (n4.is_static() && sdist(rng)) {
@@ -101,31 +101,31 @@ struct tdiv_q_tester {
                 // NOLINTNEXTLINE(misc-redundant-expression)
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
-                    ::mpz_set_ui(&m1.m_mpz, 0);
+                    mpz_set_ui(&m1.m_mpz, 0);
                 }
                 tdiv_q(n1, n3, n4);
-                ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
+                mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 // In-place variations.
                 random_34();
                 tdiv_q(n1, n3, n4);
-                ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
+                mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 random_34();
                 tdiv_q(n1, n3, n4);
-                ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
+                mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 random_34();
                 tdiv_q(n1, n4, n4);
-                ::mpz_tdiv_q(&m1.m_mpz, &m4.m_mpz, &m4.m_mpz);
+                mpz_tdiv_q(&m1.m_mpz, &m4.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 random_34();
                 tdiv_q(n1, n4, n4);
-                ::mpz_tdiv_q(&m1.m_mpz, &m4.m_mpz, &m4.m_mpz);
+                mpz_tdiv_q(&m1.m_mpz, &m4.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 random_34();
                 tdiv_q(n4, n4, n4);
-                ::mpz_tdiv_q(&m4.m_mpz, &m4.m_mpz, &m4.m_mpz);
+                mpz_tdiv_q(&m4.m_mpz, &m4.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n4) == lex_cast(m4)));
             }
             // Error handling.

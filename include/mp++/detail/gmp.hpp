@@ -38,7 +38,7 @@ struct mpz_raii {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     mpz_raii()
     {
-        ::mpz_init(&m_mpz);
+        mpz_init(&m_mpz);
         assert(m_mpz._mp_alloc >= 0);
     }
     mpz_raii(const mpz_raii &) = delete;
@@ -51,7 +51,7 @@ struct mpz_raii {
         // it seems like the pointer always points to something:
         // https://gmplib.org/repo/gmp/file/835f8974ff6e/mpz/init.c
         assert(m_mpz._mp_d != nullptr);
-        ::mpz_clear(&m_mpz);
+        mpz_clear(&m_mpz);
     }
     mpz_struct_t m_mpz;
 };

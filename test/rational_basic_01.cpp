@@ -510,19 +510,19 @@ struct mpq_copy_ctor_tester {
         detail::mpq_raii m;
         REQUIRE((std::is_constructible<rational, const ::mpq_t>::value));
         REQUIRE(lex_cast(rational{&m.m_mpq}) == "0");
-        ::mpz_set_si(mpq_numref(&m.m_mpq), 1234);
+        mpz_set_si(mpq_numref(&m.m_mpq), 1234);
         REQUIRE(lex_cast(rational{&m.m_mpq}) == "1234");
-        ::mpz_set_si(mpq_numref(&m.m_mpq), -1234);
+        mpz_set_si(mpq_numref(&m.m_mpq), -1234);
         REQUIRE(lex_cast(rational{&m.m_mpq}) == "-1234");
-        ::mpz_set_si(mpq_numref(&m.m_mpq), 4);
-        ::mpz_set_si(mpq_denref(&m.m_mpq), -3);
+        mpz_set_si(mpq_numref(&m.m_mpq), 4);
+        mpz_set_si(mpq_denref(&m.m_mpq), -3);
         REQUIRE(lex_cast(rational{&m.m_mpq}) == "4/-3");
-        ::mpz_set_str(mpq_numref(&m.m_mpq),
-                      "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(mpq_numref(&m.m_mpq),
+                    "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         REQUIRE(lex_cast(rational{&m.m_mpq})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237/-3");
-        ::mpz_set_str(mpq_denref(&m.m_mpq),
-                      "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(mpq_denref(&m.m_mpq),
+                    "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         REQUIRE(lex_cast(rational{&m.m_mpq})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237/"
                    "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
@@ -546,30 +546,28 @@ struct mpq_move_ctor_tester {
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == 0);
         ::mpq_init(q0);
-        ::mpz_set_si(mpq_numref(q0), 1234);
+        mpz_set_si(mpq_numref(q0), 1234);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == 1234);
         ::mpq_init(q0);
-        ::mpz_set_si(mpq_numref(q0), -1234);
+        mpz_set_si(mpq_numref(q0), -1234);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(rational{std::move(q0)} == -1234);
         ::mpq_init(q0);
-        ::mpz_set_si(mpq_numref(q0), 4);
-        ::mpz_set_si(mpq_denref(q0), -3);
+        mpz_set_si(mpq_numref(q0), 4);
+        mpz_set_si(mpq_denref(q0), -3);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(rational{std::move(q0)}) == "4/-3");
         ::mpq_init(q0);
-        ::mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237",
-                      10);
-        ::mpz_set_si(mpq_denref(q0), -3);
+        mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_si(mpq_denref(q0), -3);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(rational{std::move(q0)})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237/-3");
         ::mpq_init(q0);
-        ::mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237",
-                      10);
-        ::mpz_set_str(mpq_denref(q0), "-3218372891372987328917389127389217398271983712987398127398172389712937819237",
-                      10);
+        mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(mpq_denref(q0), "-3218372891372987328917389127389217398271983712987398127398172389712937819237",
+                    10);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(rational{std::move(q0)})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237/"
@@ -596,22 +594,22 @@ struct mpz_ctor_tester {
         REQUIRE(rational{&m.m_mpz}.get_num().is_static());
         REQUIRE(rational{&m.m_mpz}.get_den().is_one());
         REQUIRE(rational{&m.m_mpz}.get_den().is_static());
-        ::mpz_set_si(&m.m_mpz, 1234);
+        mpz_set_si(&m.m_mpz, 1234);
         REQUIRE(rational{&m.m_mpz}.get_num() == 1234);
         REQUIRE(rational{&m.m_mpz}.get_num().is_static());
         REQUIRE(rational{&m.m_mpz}.get_den().is_one());
         REQUIRE(rational{&m.m_mpz}.get_den().is_static());
-        ::mpz_set_si(&m.m_mpz, -1234);
+        mpz_set_si(&m.m_mpz, -1234);
         REQUIRE(rational{&m.m_mpz}.get_num() == -1234);
         REQUIRE(rational{&m.m_mpz}.get_num().is_static());
         REQUIRE(rational{&m.m_mpz}.get_den().is_one());
         REQUIRE(rational{&m.m_mpz}.get_den().is_static());
-        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         REQUIRE(rational{&m.m_mpz}.get_num()
                 == integer{"3218372891372987328917389127389217398271983712987398127398172389712937819237"});
         REQUIRE(rational{&m.m_mpz}.get_den().is_one());
         REQUIRE(rational{&m.m_mpz}.get_den().is_static());
-        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         REQUIRE(rational{&m.m_mpz}.get_num()
                 == -integer{"3218372891372987328917389127389217398271983712987398127398172389712937819237"});
         REQUIRE(rational{&m.m_mpz}.get_den().is_one());

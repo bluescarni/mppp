@@ -165,17 +165,17 @@ inline std::string lex_cast(__int128_t n)
 inline void random_integer(mppp::detail::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
 {
     if (n == 0u) {
-        ::mpz_set_ui(&m.m_mpz, 0);
+        mpz_set_ui(&m.m_mpz, 0);
         return;
     }
     MPPP_MAYBE_TLS mppp::detail::mpz_raii tmp;
     std::uniform_int_distribution<::mp_limb_t> dist(0u, std::numeric_limits<::mp_limb_t>::max());
     // Set the first limb.
-    ::mpz_set_str(&m.m_mpz, lex_cast((dist(rng) & GMP_NUMB_MASK) / div).c_str(), 10);
+    mpz_set_str(&m.m_mpz, lex_cast((dist(rng) & GMP_NUMB_MASK) / div).c_str(), 10);
     for (unsigned i = 1u; i < n; ++i) {
-        ::mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
-        ::mpz_mul_2exp(&m.m_mpz, &m.m_mpz, GMP_NUMB_BITS);
-        ::mpz_add(&m.m_mpz, &m.m_mpz, &tmp.m_mpz);
+        mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+        mpz_mul_2exp(&m.m_mpz, &m.m_mpz, GMP_NUMB_BITS);
+        mpz_add(&m.m_mpz, &m.m_mpz, &tmp.m_mpz);
     }
 }
 
@@ -189,19 +189,19 @@ inline void random_rational(mppp::detail::mpq_raii &m, unsigned n, std::mt19937 
     MPPP_MAYBE_TLS mppp::detail::mpz_raii tmp;
     std::uniform_int_distribution<::mp_limb_t> dist(0u, std::numeric_limits<::mp_limb_t>::max());
     // Set the first limb.
-    ::mpz_set_str(mpq_numref(&m.m_mpq), lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
-    ::mpz_set_str(mpq_denref(&m.m_mpq), lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+    mpz_set_str(mpq_numref(&m.m_mpq), lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+    mpz_set_str(mpq_denref(&m.m_mpq), lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
     for (unsigned i = 1u; i < n; ++i) {
-        ::mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
-        ::mpz_mul_2exp(mpq_numref(&m.m_mpq), mpq_numref(&m.m_mpq), GMP_NUMB_BITS);
-        ::mpz_add(mpq_numref(&m.m_mpq), mpq_numref(&m.m_mpq), &tmp.m_mpz);
-        ::mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
-        ::mpz_mul_2exp(mpq_denref(&m.m_mpq), mpq_denref(&m.m_mpq), GMP_NUMB_BITS);
-        ::mpz_add(mpq_denref(&m.m_mpq), mpq_denref(&m.m_mpq), &tmp.m_mpz);
+        mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+        mpz_mul_2exp(mpq_numref(&m.m_mpq), mpq_numref(&m.m_mpq), GMP_NUMB_BITS);
+        mpz_add(mpq_numref(&m.m_mpq), mpq_numref(&m.m_mpq), &tmp.m_mpz);
+        mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+        mpz_mul_2exp(mpq_denref(&m.m_mpq), mpq_denref(&m.m_mpq), GMP_NUMB_BITS);
+        mpz_add(mpq_denref(&m.m_mpq), mpq_denref(&m.m_mpq), &tmp.m_mpz);
     }
     // Take care of zero den.
     if (mpz_sgn(mpq_denref(&m.m_mpq)) == 0) {
-        ::mpz_set_ui(mpq_denref(&m.m_mpq), 1);
+        mpz_set_ui(mpq_denref(&m.m_mpq), 1);
     }
     ::mpq_canonicalize(&m.m_mpq);
 }
@@ -210,16 +210,16 @@ inline void random_rational(mppp::detail::mpq_raii &m, unsigned n, std::mt19937 
 inline void max_integer(mppp::detail::mpz_raii &m, unsigned n)
 {
     if (n == 0u) {
-        ::mpz_set_ui(&m.m_mpz, 0);
+        mpz_set_ui(&m.m_mpz, 0);
         return;
     }
     MPPP_MAYBE_TLS mppp::detail::mpz_raii tmp;
     // Set the first limb.
-    ::mpz_set_str(&m.m_mpz, lex_cast(GMP_NUMB_MAX).c_str(), 10);
+    mpz_set_str(&m.m_mpz, lex_cast(GMP_NUMB_MAX).c_str(), 10);
     for (unsigned i = 1u; i < n; ++i) {
-        ::mpz_set_str(&tmp.m_mpz, lex_cast(GMP_NUMB_MAX).c_str(), 10);
-        ::mpz_mul_2exp(&m.m_mpz, &m.m_mpz, GMP_NUMB_BITS);
-        ::mpz_add(&m.m_mpz, &m.m_mpz, &tmp.m_mpz);
+        mpz_set_str(&tmp.m_mpz, lex_cast(GMP_NUMB_MAX).c_str(), 10);
+        mpz_mul_2exp(&m.m_mpz, &m.m_mpz, GMP_NUMB_BITS);
+        mpz_add(&m.m_mpz, &m.m_mpz, &tmp.m_mpz);
     }
 }
 

@@ -159,7 +159,7 @@ int main()
         mppp_benchmark::simple_timer st;
 
         for (auto i = 0ul; i < size; ++i) {
-            ::mpz_addmul(ret.backend().data(), p.first[i].backend().data(), p.second[i].backend().data());
+            mpz_addmul(ret.backend().data(), p.first[i].backend().data(), p.second[i].backend().data());
         }
 
         const auto runtime = st.elapsed();

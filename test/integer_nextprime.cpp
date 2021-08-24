@@ -40,16 +40,16 @@ struct nextprime_tester {
         // Start with all zeroes.
         detail::mpz_raii m1, m2;
         integer n1, n2;
-        ::mpz_nextprime(&m1.m_mpz, &m2.m_mpz);
+        mpz_nextprime(&m1.m_mpz, &m2.m_mpz);
         REQUIRE(&nextprime(n1, n2) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Test the other variants.
         n1.nextprime();
-        ::mpz_nextprime(&m1.m_mpz, &m1.m_mpz);
+        mpz_nextprime(&m1.m_mpz, &m1.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
-        ::mpz_nextprime(&m1.m_mpz, &m1.m_mpz);
+        mpz_nextprime(&m1.m_mpz, &m1.m_mpz);
         REQUIRE((lex_cast(nextprime(n1)) == lex_cast(m1)));
         detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
@@ -62,17 +62,17 @@ struct nextprime_tester {
                     n1 = integer{};
                 }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
                 }
-                ::mpz_nextprime(&m1.m_mpz, &m2.m_mpz);
+                mpz_nextprime(&m1.m_mpz, &m2.m_mpz);
                 nextprime(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1) == lex_cast(nextprime(n2))));

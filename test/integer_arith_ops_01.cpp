@@ -258,25 +258,25 @@ struct add_tester {
         // Couple of tests at the boundaries
         detail::mpz_raii tmp;
         retval = integer{GMP_NUMB_MAX};
-        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        mpz_set(&tmp.m_mpz, retval.get_mpz_view());
         ++retval;
-        ::mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
         REQUIRE((lex_cast(retval) == lex_cast(tmp)));
         retval = integer{GMP_NUMB_MAX};
         mul_2exp(retval, retval, GMP_NUMB_BITS);
         add(retval, retval, integer{GMP_NUMB_MAX});
-        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        mpz_set(&tmp.m_mpz, retval.get_mpz_view());
         retval++;
-        ::mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
         REQUIRE((lex_cast(retval) == lex_cast(tmp)));
         retval = integer{GMP_NUMB_MAX};
         mul_2exp(retval, retval, GMP_NUMB_BITS);
         add(retval, retval, integer{GMP_NUMB_MAX});
         mul_2exp(retval, retval, GMP_NUMB_BITS);
         add(retval, retval, integer{GMP_NUMB_MAX});
-        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        mpz_set(&tmp.m_mpz, retval.get_mpz_view());
         retval++;
-        ::mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
         REQUIRE((lex_cast(retval) == lex_cast(tmp)));
         // Type traits.
         REQUIRE((!is_addable<integer, std::string>::value));
@@ -512,17 +512,17 @@ struct sub_tester {
         detail::mpz_raii tmp;
         retval = integer{GMP_NUMB_MAX};
         retval.neg();
-        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        mpz_set(&tmp.m_mpz, retval.get_mpz_view());
         --retval;
-        ::mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
         REQUIRE((lex_cast(retval) == lex_cast(tmp)));
         retval = integer{GMP_NUMB_MAX};
         mul_2exp(retval, retval, GMP_NUMB_BITS);
         add(retval, retval, integer{GMP_NUMB_MAX});
         retval.neg();
-        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        mpz_set(&tmp.m_mpz, retval.get_mpz_view());
         retval--;
-        ::mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
         REQUIRE((lex_cast(retval) == lex_cast(tmp)));
         retval = integer{GMP_NUMB_MAX};
         mul_2exp(retval, retval, GMP_NUMB_BITS);
@@ -530,9 +530,9 @@ struct sub_tester {
         mul_2exp(retval, retval, GMP_NUMB_BITS);
         add(retval, retval, integer{GMP_NUMB_MAX});
         retval.neg();
-        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        mpz_set(&tmp.m_mpz, retval.get_mpz_view());
         retval--;
-        ::mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
         REQUIRE((lex_cast(retval) == lex_cast(tmp)));
         // Type traits.
         REQUIRE((!is_subtractable<integer, std::string>::value));

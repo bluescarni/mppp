@@ -191,7 +191,7 @@ MPPP_DLL_PUBLIC void mpz_clear_wrap(mpz_struct_t &);
 inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
     mpz_init_nlimbs(m0, get_mpz_size(&m1));
-    ::mpz_set(&m0, &m1);
+    mpz_set(&m0, &m1);
 }
 
 // Convert an mpz to a string in a specific base, to be written into out.
@@ -692,7 +692,7 @@ union integer_union {
                                     + to_string(x));
         }
         MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
+        mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
         dispatch_mpz_ctor(&tmp.m_mpz);
     }
 #if defined(MPPP_WITH_MPFR)
@@ -728,7 +728,7 @@ union integer_union {
                 + " was specified, but the only valid values are 0 and any value in the [2,62] range");
         }
         MPPP_MAYBE_TLS mpz_raii mpz;
-        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
+        if (mppp_unlikely(mpz_set_str(&mpz.m_mpz, s, base))) {
             if (base != 0) {
                 throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
                                             + to_string(base));
@@ -884,7 +884,7 @@ union integer_union {
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
             // Self assignment is fine, mpz_set() can have aliasing arguments.
-            ::mpz_set(&g_dy(), &other.g_dy());
+            mpz_set(&g_dy(), &other.g_dy());
         }
         return *this;
     }
@@ -911,7 +911,7 @@ union integer_union {
         } else {
             // Swap with other. Self-assignment is fine, mpz_swap() can have
             // aliasing arguments.
-            ::mpz_swap(&g_dy(), &other.g_dy());
+            mpz_swap(&g_dy(), &other.g_dy());
         }
         return *this;
     }
@@ -977,7 +977,7 @@ union integer_union {
             // Otherwise, we preallocate nlimbs and then set tmp_mpz
             // to the value of this.
             mpz_init_nlimbs(tmp_mpz, nlimbs);
-            ::mpz_set(&tmp_mpz, &v);
+            mpz_set(&tmp_mpz, &v);
         }
         // Destroy static.
         g_st().~s_storage();
@@ -1012,7 +1012,7 @@ union integer_union {
         if (is_static()) {
             g_st()._mp_size = -g_st()._mp_size;
         } else {
-            ::mpz_neg(&g_dy(), &g_dy());
+            mpz_neg(&g_dy(), &g_dy());
         }
     }
     // NOTE: keep these public as we need them below.
@@ -1490,7 +1490,7 @@ private:
                                     + " to an integer");
         }
         MPPP_MAYBE_TLS detail::mpz_raii tmp;
-        ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
+        mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
         *this = &tmp.m_mpz;
     }
 #if defined(MPPP_WITH_MPFR)
@@ -1577,7 +1577,7 @@ public:
             m_int.g_st().zero_upper_limbs(asize);
         } else if (!s && asize > SSize) {
             // Dynamic to dynamic.
-            ::mpz_set(&m_int.m_dy, n);
+            mpz_set(&m_int.m_dy, n);
         } else if (s && asize > SSize) {
             // this is static, n is too big. Promote and assign.
             // Destroy static.
@@ -1862,7 +1862,7 @@ private:
               detail::enable_if_t<detail::disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const detail::mpz_struct_t &m)
     {
-        return std::make_pair(true, static_cast<T>(::mpz_get_d(&m)));
+        return std::make_pair(true, static_cast<T>(mpz_get_d(&m)));
     }
 #if defined(MPPP_WITH_MPFR)
     template <typename T, detail::enable_if_t<std::is_same<T, long double>::value, int> = 0>
@@ -2047,7 +2047,7 @@ public:
                 m_int.g_st()._mp_size = -m_int.g_st()._mp_size;
             }
         } else {
-            ::mpz_abs(&m_int.g_dy(), &m_int.g_dy());
+            mpz_abs(&m_int.g_dy(), &m_int.g_dy());
         }
         return *this;
     }
@@ -2067,7 +2067,7 @@ public:
         if (mppp_unlikely(sgn() < 0)) {
             throw std::invalid_argument("Cannot run primality tests on the negative number " + to_string());
         }
-        return ::mpz_probab_prime_p(get_mpz_view(), reps);
+        return mpz_probab_prime_p(get_mpz_view(), reps);
     }
     // Integer square root (in-place version).
     integer &sqrt()
@@ -2537,7 +2537,7 @@ inline void swap(integer<SSize> &n1, integer<SSize> &n2) noexcept
     } else {
         // Swap with other. Self swap is fine, mpz_swap() can have
         // aliasing arguments.
-        ::mpz_swap(&u1.g_dy(), &u2.g_dy());
+        mpz_swap(&u1.g_dy(), &u2.g_dy());
     }
 }
 
@@ -2993,7 +2993,7 @@ inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
-    ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3209,7 +3209,7 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
     //   the GMP API expects.
     if (op2 <= std::numeric_limits<unsigned long>::max()) {
         // op2 actually fits in unsigned long, let's just invoke the mpz_add_ui() function directly.
-        ::mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
+        mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
     } else {
         // LCOV_EXCL_START
         // op2 overflows unsigned long, but still fits in a limb. We will create a fake mpz struct
@@ -3222,7 +3222,7 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
         // as op2 is unsigned, fits in an mp_limbt_t and it is not zero (otherwise we would've taken
         // the other branch).
         const detail::mpz_struct_t tmp_mpz{1, 1, op2_copy};
-        ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
+        mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
     return rop;
@@ -3282,7 +3282,7 @@ inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
-    ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3314,12 +3314,12 @@ inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op
         rop._get_union().promote(SSize + 1u);
     }
     if (op2 <= std::numeric_limits<unsigned long>::max()) {
-        ::mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
+        mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
     } else {
         // LCOV_EXCL_START
         ::mp_limb_t op2_copy[1] = {static_cast<::mp_limb_t>(op2)};
         const detail::mpz_struct_t tmp_mpz{1, 1, op2_copy};
-        ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
+        mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
     return rop;
@@ -3594,7 +3594,7 @@ inline integer<SSize> &mul(integer<SSize> &rop, const integer<SSize> &op1, const
         // revisit this.
         rop._get_union().promote(size_hint);
     }
-    ::mpz_mul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_mul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3812,7 +3812,7 @@ inline integer<SSize> &addmul(integer<SSize> &rop, const integer<SSize> &op1, co
     if (sr) {
         rop._get_union().promote(size_hint);
     }
-    ::mpz_addmul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_addmul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3832,7 +3832,7 @@ inline integer<SSize> &submul(integer<SSize> &rop, const integer<SSize> &op1, co
     if (sr) {
         rop._get_union().promote(size_hint);
     }
-    ::mpz_submul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_submul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -4040,7 +4040,7 @@ inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::
     if (sr) {
         rop._get_union().promote(size_hint);
     }
-    ::mpz_mul_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+    mpz_mul_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
     return rop;
 }
 
@@ -4188,7 +4188,7 @@ inline integer<SSize> &sqr(integer<SSize> &rop, const integer<SSize> &n)
     if (sr) {
         rop._get_union().promote(size_hint);
     }
-    ::mpz_mul(&rop._get_union().g_dy(), n.get_mpz_view(), n.get_mpz_view());
+    mpz_mul(&rop._get_union().g_dy(), n.get_mpz_view(), n.get_mpz_view());
     return rop;
 }
 
@@ -4390,8 +4390,8 @@ inline integer<SSize> &sqrm(integer<SSize> &rop, const integer<SSize> &op, const
     // NOTE: use temp storage to avoid issues with overlapping
     // arguments.
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    ::mpz_mul(&tmp.m_mpz, op.get_mpz_view(), op.get_mpz_view());
-    ::mpz_tdiv_r(&rop._get_union().g_dy(), &tmp.m_mpz, mod.get_mpz_view());
+    mpz_mul(&tmp.m_mpz, op.get_mpz_view(), op.get_mpz_view());
+    mpz_tdiv_r(&rop._get_union().g_dy(), &tmp.m_mpz, mod.get_mpz_view());
 
     return rop;
 }
@@ -4681,7 +4681,7 @@ inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &
     if (sr) {
         r._get_union().promote();
     }
-    ::mpz_tdiv_qr(&q._get_union().g_dy(), &r._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    mpz_tdiv_qr(&q._get_union().g_dy(), &r._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
 }
 
 namespace detail
@@ -4820,7 +4820,7 @@ inline integer<SSize> &tdiv_q(integer<SSize> &q, const integer<SSize> &n, const 
     if (sq) {
         q._get_union().promote();
     }
-    ::mpz_tdiv_q(&q._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    mpz_tdiv_q(&q._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
     return q;
 }
 
@@ -4863,7 +4863,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     MPPP_MAYBE_TLS mpz_raii tmp;
     const auto v1 = op1.get_mpz_view();
     const auto v2 = op2.get_mpz_view();
-    ::mpz_divexact(&tmp.m_mpz, &v1, &v2);
+    mpz_divexact(&tmp.m_mpz, &v1, &v2);
     // Copy over from the tmp struct into q.
     q._mp_size = tmp.m_mpz._mp_size;
     copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + (q._mp_size >= 0 ? q._mp_size : -q._mp_size), q.m_limbs.data());
@@ -4941,7 +4941,7 @@ inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, co
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
     return rop;
 }
 
@@ -4996,7 +4996,7 @@ inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n
     }
     // NOTE: there's no public mpz_divexact_gcd() function in GMP, just use
     // mpz_divexact() directly.
-    ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
     return rop;
 }
 
@@ -5139,7 +5139,7 @@ inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n,
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_tdiv_q_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+    mpz_tdiv_q_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
     return rop;
 }
 
@@ -5220,7 +5220,7 @@ inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
     if (mppp_likely(s1 && s2)) {
         return static_cmp(op1._get_union().g_st(), op2._get_union().g_st());
     }
-    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
+    return mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
 }
 
 // Sign function.
@@ -5383,7 +5383,7 @@ inline integer<SSize> &bitwise_not(integer<SSize> &rop, const integer<SSize> &op
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_com(&rop._get_union().g_dy(), op.get_mpz_view());
+    mpz_com(&rop._get_union().g_dy(), op.get_mpz_view());
     return rop;
 }
 
@@ -5644,7 +5644,7 @@ inline integer<SSize> &bitwise_ior(integer<SSize> &rop, const integer<SSize> &op
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_ior(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_ior(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -5897,7 +5897,7 @@ inline integer<SSize> &bitwise_and(integer<SSize> &rop, const integer<SSize> &op
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_and(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_and(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -6158,7 +6158,7 @@ inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_xor(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_xor(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -6212,7 +6212,7 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     MPPP_MAYBE_TLS mpz_raii tmp;
     const auto v1 = op1.get_mpz_view();
     const auto v2 = op2.get_mpz_view();
-    ::mpz_gcd(&tmp.m_mpz, &v1, &v2);
+    mpz_gcd(&tmp.m_mpz, &v1, &v2);
     // Copy over.
     rop._mp_size = tmp.m_mpz._mp_size;
     assert(rop._mp_size > 0);
@@ -6288,7 +6288,7 @@ inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_gcd(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_gcd(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -6455,7 +6455,7 @@ inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
     // NOTE: let's get through a static temporary and then assign it to the rop,
     // so that rop will be static/dynamic according to the size of tmp.
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    ::mpz_fac_ui(&tmp.m_mpz, n);
+    mpz_fac_ui(&tmp.m_mpz, n);
     return rop = &tmp.m_mpz;
 }
 
@@ -6464,7 +6464,7 @@ template <std::size_t SSize>
 inline integer<SSize> &bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
 {
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
+    mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
     return rop = &tmp.m_mpz;
 }
 
@@ -6577,7 +6577,7 @@ template <std::size_t SSize>
 inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
 {
     MPPP_MAYBE_TLS mpz_raii tmp;
-    ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
+    mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
     rop = &tmp.m_mpz;
 }
 } // namespace detail
@@ -6612,7 +6612,7 @@ template <std::size_t SSize>
 inline integer<SSize> &pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned long exp)
 {
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
+    mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
     return rop = &tmp.m_mpz;
 }
 
@@ -6757,7 +6757,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         if (sr) {
             rop.promote();
         }
-        ::mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
+        mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
     }
 }
 } // namespace detail
@@ -6853,7 +6853,7 @@ inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
         if (srem) {
             rem._get_union().promote();
         }
-        ::mpz_sqrtrem(&rop._get_union().g_dy(), &rem._get_union().g_dy(), n.get_mpz_view());
+        mpz_sqrtrem(&rop._get_union().g_dy(), &rem._get_union().g_dy(), n.get_mpz_view());
     }
 }
 
@@ -6896,7 +6896,7 @@ inline bool root(integer<SSize> &rop, const integer<SSize> &n, unsigned long m)
                                 + " of the negative number " + n.to_string());
     }
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    const auto ret = ::mpz_root(&tmp.m_mpz, n.get_mpz_view(), m);
+    const auto ret = mpz_root(&tmp.m_mpz, n.get_mpz_view(), m);
     rop = &tmp.m_mpz;
     return ret != 0;
 }
@@ -6923,7 +6923,7 @@ inline void rootrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
     }
     MPPP_MAYBE_TLS detail::mpz_raii tmp_rop;
     MPPP_MAYBE_TLS detail::mpz_raii tmp_rem;
-    ::mpz_rootrem(&tmp_rop.m_mpz, &tmp_rem.m_mpz, n.get_mpz_view(), m);
+    mpz_rootrem(&tmp_rop.m_mpz, &tmp_rem.m_mpz, n.get_mpz_view(), m);
     rop = &tmp_rop.m_mpz;
     rem = &tmp_rem.m_mpz;
 }
@@ -6932,7 +6932,7 @@ inline void rootrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
 template <std::size_t SSize>
 inline bool perfect_power_p(const integer<SSize> &n)
 {
-    return ::mpz_perfect_power_p(n.get_mpz_view()) != 0;
+    return mpz_perfect_power_p(n.get_mpz_view()) != 0;
 }
 
 namespace detail
@@ -7736,7 +7736,7 @@ inline bool dispatch_less_than(const integer<SSize> &op1, const integer<SSize> &
         return static_less_than(op1._get_union().g_st(), op2._get_union().g_st());
     }
 
-    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) < 0;
+    return mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) < 0;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
@@ -7807,7 +7807,7 @@ inline bool dispatch_greater_than(const integer<SSize> &op1, const integer<SSize
         return static_greater_than(op1._get_union().g_st(), op2._get_union().g_st());
     }
 
-    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) > 0;
+    return mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) > 0;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>

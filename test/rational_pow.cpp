@@ -48,14 +48,14 @@ using has_pow = detail::is_detected<pow_t, T, U>;
 static inline void mpq_pow(::mpq_t rop, const ::mpq_t base, long exp)
 {
     if (exp >= 0) {
-        ::mpz_pow_ui(mpq_numref(rop), mpq_numref(base), static_cast<unsigned long>(exp));
-        ::mpz_pow_ui(mpq_denref(rop), mpq_denref(base), static_cast<unsigned long>(exp));
+        mpz_pow_ui(mpq_numref(rop), mpq_numref(base), static_cast<unsigned long>(exp));
+        mpz_pow_ui(mpq_denref(rop), mpq_denref(base), static_cast<unsigned long>(exp));
     } else {
-        ::mpz_pow_ui(mpq_numref(rop), mpq_denref(base), static_cast<unsigned long>(-exp));
-        ::mpz_pow_ui(mpq_denref(rop), mpq_numref(base), static_cast<unsigned long>(-exp));
+        mpz_pow_ui(mpq_numref(rop), mpq_denref(base), static_cast<unsigned long>(-exp));
+        mpz_pow_ui(mpq_denref(rop), mpq_numref(base), static_cast<unsigned long>(-exp));
         if (mpz_sgn(mpq_denref(rop)) < 0) {
-            ::mpz_neg(mpq_numref(rop), mpq_numref(rop));
-            ::mpz_neg(mpq_denref(rop), mpq_denref(rop));
+            mpz_neg(mpq_numref(rop), mpq_numref(rop));
+            mpz_neg(mpq_denref(rop), mpq_denref(rop));
         }
     }
 }

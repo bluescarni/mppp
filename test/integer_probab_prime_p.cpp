@@ -35,16 +35,16 @@ struct probab_prime_p_tester {
         using integer = integer<S::value>;
         detail::mpz_raii m1;
         integer n1;
-        REQUIRE((probab_prime_p(n1) == ::mpz_probab_prime_p(&m1.m_mpz, 25)));
-        REQUIRE((n1.probab_prime_p() == ::mpz_probab_prime_p(&m1.m_mpz, 25)));
-        ::mpz_set_ui(&m1.m_mpz, 1u);
+        REQUIRE((probab_prime_p(n1) == mpz_probab_prime_p(&m1.m_mpz, 25)));
+        REQUIRE((n1.probab_prime_p() == mpz_probab_prime_p(&m1.m_mpz, 25)));
+        mpz_set_ui(&m1.m_mpz, 1u);
         n1 = integer(1);
-        REQUIRE((probab_prime_p(n1, 12) == ::mpz_probab_prime_p(&m1.m_mpz, 25)));
-        REQUIRE((n1.probab_prime_p(12) == ::mpz_probab_prime_p(&m1.m_mpz, 25)));
-        ::mpz_set_ui(&m1.m_mpz, 123u);
+        REQUIRE((probab_prime_p(n1, 12) == mpz_probab_prime_p(&m1.m_mpz, 25)));
+        REQUIRE((n1.probab_prime_p(12) == mpz_probab_prime_p(&m1.m_mpz, 25)));
+        mpz_set_ui(&m1.m_mpz, 123u);
         n1 = integer(123);
-        REQUIRE((probab_prime_p(n1) == ::mpz_probab_prime_p(&m1.m_mpz, 25)));
-        REQUIRE((n1.probab_prime_p() == ::mpz_probab_prime_p(&m1.m_mpz, 25)));
+        REQUIRE((probab_prime_p(n1) == mpz_probab_prime_p(&m1.m_mpz, 25)));
+        REQUIRE((n1.probab_prime_p() == mpz_probab_prime_p(&m1.m_mpz, 25)));
         // Couple of sanity checks.
         REQUIRE((probab_prime_p(integer{17}) != 0));
         REQUIRE((probab_prime_p(integer{49979687ll}) != 0));

@@ -387,7 +387,7 @@ struct sizes_tester {
                     n.promote();
                 }
                 const auto res1 = n.nbits();
-                const auto res2 = n.sgn() ? ::mpz_sizeinbase(&tmp.m_mpz, 2) : 0u;
+                const auto res2 = n.sgn() ? mpz_sizeinbase(&tmp.m_mpz, 2) : 0u;
                 REQUIRE(res1 == res2);
             }
         };

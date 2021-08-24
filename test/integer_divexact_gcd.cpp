@@ -40,48 +40,48 @@ struct divexact_gcd_tester {
         // Start with zeroes.
         detail::mpz_raii m1, m2, m3;
         integer n1, n2, n3;
-        ::mpz_set_si(&m3.m_mpz, 1);
+        mpz_set_si(&m3.m_mpz, 1);
         n3 = integer(1);
-        ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         REQUIRE(&divexact_gcd(n1, n2, n3) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(divexact_gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m3.m_mpz, 2);
+        mpz_set_si(&m3.m_mpz, 2);
         n3 = integer(2);
-        ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         divexact_gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(divexact_gcd(n2, n3)) == lex_cast(m1)));
         // Simple tests.
-        ::mpz_set_si(&m2.m_mpz, 8);
+        mpz_set_si(&m2.m_mpz, 8);
         n2 = integer(8);
-        ::mpz_set_si(&m3.m_mpz, 2);
+        mpz_set_si(&m3.m_mpz, 2);
         n3 = integer(2);
-        ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         divexact_gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(divexact_gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, 16);
+        mpz_set_si(&m2.m_mpz, 16);
         n2 = integer(16);
-        ::mpz_set_si(&m3.m_mpz, 2);
+        mpz_set_si(&m3.m_mpz, 2);
         n3 = integer(2);
-        ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         divexact_gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(divexact_gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, -32);
+        mpz_set_si(&m2.m_mpz, -32);
         n2 = integer(-32);
-        ::mpz_set_si(&m3.m_mpz, 4);
+        mpz_set_si(&m3.m_mpz, 4);
         n3 = integer(4);
-        ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         divexact_gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(divexact_gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, -32);
+        mpz_set_si(&m2.m_mpz, -32);
         n2 = integer(-32);
-        ::mpz_set_si(&m3.m_mpz, 2);
+        mpz_set_si(&m3.m_mpz, 2);
         n3 = integer(2);
-        ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         divexact_gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(divexact_gcd(n2, n3)) == lex_cast(m1)));
@@ -96,7 +96,7 @@ struct divexact_gcd_tester {
                     n1 = integer{};
                 }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (n3.sgn() == 0) {
                     continue;
@@ -106,12 +106,12 @@ struct divexact_gcd_tester {
                     n3.promote();
                 }
                 n2 = n3;
-                ::mpz_set(&m2.m_mpz, &m3.m_mpz);
+                mpz_set(&m2.m_mpz, &m3.m_mpz);
                 const auto mult = mdist(rng);
                 mul(n2, n2, integer(mult));
-                ::mpz_mul_si(&m2.m_mpz, &m2.m_mpz, mult);
+                mpz_mul_si(&m2.m_mpz, &m2.m_mpz, mult);
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
                 if (n2.is_static() && sdist(rng)) {
@@ -119,17 +119,17 @@ struct divexact_gcd_tester {
                     n2.promote();
                 }
                 divexact_gcd(n1, n2, n3);
-                ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(divexact_gcd(n2, n3)) == lex_cast(m1)));
                 if (n2.sgn() > 0) {
                     // Overlapping.
                     divexact_gcd(n1, n2, n2);
-                    ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                    mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m2.m_mpz);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(divexact_gcd(n2, n2)) == lex_cast(m1)));
                     divexact_gcd(n2, n2, n2);
-                    ::mpz_divexact(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                    mpz_divexact(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
                     REQUIRE((lex_cast(n2) == lex_cast(m2)));
                     REQUIRE((lex_cast(divexact_gcd(n2, n2)) == lex_cast(m2)));
                 }

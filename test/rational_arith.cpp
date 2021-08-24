@@ -119,7 +119,7 @@ struct add_tester {
                 ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
                 ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
                 add(n1, n2_copy, n3_copy);
                 ::mpq_add(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -130,7 +130,7 @@ struct add_tester {
                 REQUIRE((lex_cast(n3_copy + n2_copy) == lex_cast(m1)));
                 REQUIRE((lex_cast(n3_copy + n2_copy.get_num()) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 add(n1, n2_copy, n3_copy);
                 ::mpq_add(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -292,7 +292,7 @@ struct sub_tester {
                 ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
                 ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
                 sub(n1, n2_copy, n3_copy);
                 ::mpq_sub(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -304,7 +304,7 @@ struct sub_tester {
                 REQUIRE((lex_cast(-(n3_copy - n2_copy)) == lex_cast(m1)));
                 REQUIRE((lex_cast(-(n3_copy - n2_copy.get_num())) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 sub(n1, n2_copy, n3_copy);
                 ::mpq_sub(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -468,7 +468,7 @@ struct mul_tester {
                 ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
                 ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
                 mul(n1, n2_copy, n3_copy);
                 ::mpq_mul(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -479,7 +479,7 @@ struct mul_tester {
                 REQUIRE((lex_cast(n3_copy * n2_copy) == lex_cast(m1)));
                 REQUIRE((lex_cast(n3_copy * n2.get_num()) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 mul(n1, n2_copy, n3_copy);
                 ::mpq_mul(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -649,7 +649,7 @@ struct div_tester {
                 ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
                 ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
                 if (n3_copy.sgn() != 0) {
                     div(n1, n2_copy, n3_copy);
                     ::mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
@@ -663,7 +663,7 @@ struct div_tester {
                     REQUIRE((lex_cast(n3_copy / n2_copy.get_num()) == lex_cast(m1)));
                 }
                 n3_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 if (n3_copy.sgn() != 0) {
                     div(n1, n2_copy, n3_copy);
                     ::mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);

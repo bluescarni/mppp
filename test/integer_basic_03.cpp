@@ -415,14 +415,14 @@ struct mpz_copy_ctor_tester {
         using integer = integer<S::value>;
         detail::mpz_raii m;
         REQUIRE(lex_cast(integer{&m.m_mpz}) == "0");
-        ::mpz_set_si(&m.m_mpz, 1234);
+        mpz_set_si(&m.m_mpz, 1234);
         REQUIRE(lex_cast(integer{&m.m_mpz}) == "1234");
-        ::mpz_set_si(&m.m_mpz, -1234);
+        mpz_set_si(&m.m_mpz, -1234);
         REQUIRE(lex_cast(integer{&m.m_mpz}) == "-1234");
-        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         REQUIRE(lex_cast(integer{&m.m_mpz})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
-        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         REQUIRE(lex_cast(integer{&m.m_mpz})
                 == "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
         // Random testing.
@@ -433,7 +433,7 @@ struct mpz_copy_ctor_tester {
             for (auto i = 0; i < ntries; ++i) {
                 detail::mpz_raii mpz;
                 auto tmp = dist(eng);
-                ::mpz_set_si(&mpz.m_mpz, tmp);
+                mpz_set_si(&mpz.m_mpz, tmp);
                 if (lex_cast(integer{&mpz.m_mpz}) != lex_cast(tmp)) {
                     fail.store(false);
                 }
@@ -462,24 +462,24 @@ struct mpz_move_ctor_tester {
     {
         using integer = integer<S::value>;
         ::mpz_t m0;
-        ::mpz_init(m0);
+        mpz_init(m0);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "0");
-        ::mpz_init(m0);
-        ::mpz_set_si(m0, 1234);
+        mpz_init(m0);
+        mpz_set_si(m0, 1234);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "1234");
-        ::mpz_init(m0);
-        ::mpz_set_si(m0, -1234);
+        mpz_init(m0);
+        mpz_set_si(m0, -1234);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "-1234");
-        ::mpz_init(m0);
-        ::mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_init(m0);
+        mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
-        ::mpz_init(m0);
-        ::mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_init(m0);
+        mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         REQUIRE(lex_cast(integer{std::move(m0)})
                 == "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
@@ -490,9 +490,9 @@ struct mpz_move_ctor_tester {
             std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
             for (auto i = 0; i < ntries; ++i) {
                 ::mpz_t m1;
-                ::mpz_init(m1);
+                mpz_init(m1);
                 auto tmp = dist(eng);
-                ::mpz_set_si(m1, tmp);
+                mpz_set_si(m1, tmp);
                 // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
                 if (lex_cast(integer{std::move(m1)}) != lex_cast(tmp)) {
                     fail.store(false);

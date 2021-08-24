@@ -232,14 +232,14 @@ struct mpz_ass_tester {
         REQUIRE((!std::is_assignable<const rational &, ::mpz_t>::value));
         rational q{6, 5};
         detail::mpz_raii m;
-        ::mpz_set_si(&m.m_mpz, 1234);
+        mpz_set_si(&m.m_mpz, 1234);
         q = &m.m_mpz;
         REQUIRE(q.get_num() == 1234);
         REQUIRE(q.get_num().is_static());
         REQUIRE(q.get_den() == 1);
         REQUIRE(q.get_den().is_static());
         q = "-7/3";
-        ::mpz_set_si(&m.m_mpz, -1234);
+        mpz_set_si(&m.m_mpz, -1234);
         q = &m.m_mpz;
         REQUIRE(q.get_num() == -1234);
         REQUIRE(q.get_num().is_static());
@@ -259,12 +259,12 @@ struct mpz_ass_tester {
         REQUIRE(q.get_num().is_static());
         REQUIRE(q.get_den() == 1);
         REQUIRE(q.get_den().is_static());
-        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         q = &m.m_mpz;
         REQUIRE(q.get_num() == integer{"3218372891372987328917389127389217398271983712987398127398172389712937819237"});
         REQUIRE(q.get_den() == 1);
         REQUIRE(q.get_den().is_static());
-        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         q = &m.m_mpz;
         REQUIRE(q.get_num()
                 == -integer{"3218372891372987328917389127389217398271983712987398127398172389712937819237"});

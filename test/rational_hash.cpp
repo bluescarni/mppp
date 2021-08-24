@@ -65,10 +65,10 @@ struct hash_tester {
                 }
                 random_integer(num, x, rng);
                 random_integer(den, x, rng);
-                ::mpz_set(mpq_numref(&tmp.m_mpq), &num.m_mpz);
-                ::mpz_set(mpq_denref(&tmp.m_mpq), &den.m_mpz);
+                mpz_set(mpq_numref(&tmp.m_mpq), &num.m_mpz);
+                mpz_set(mpq_denref(&tmp.m_mpq), &den.m_mpz);
                 if (mpz_sgn(mpq_denref(&tmp.m_mpq)) == 0) {
-                    ::mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
+                    mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
                 }
                 ::mpq_canonicalize(&tmp.m_mpq);
                 n1 = &tmp.m_mpq;
