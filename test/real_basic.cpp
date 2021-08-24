@@ -452,11 +452,11 @@ TEST_CASE("real constructors")
     // Special handling of bool.
     REQUIRE(real{false}.zero_p());
     REQUIRE(real{false}.get_prec() == detail::c_max(::mpfr_prec_t(detail::nl_digits<bool>()), real_prec_min()));
-    REQUIRE(::mpfr_cmp_ui(real{true}.get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_ui(real{true}.get_mpfr_t(), 1ul) == 0);
     REQUIRE(real{true}.get_prec() == detail::c_max(::mpfr_prec_t(detail::nl_digits<bool>()), real_prec_min()));
     REQUIRE((real{false, ::mpfr_prec_t(128)}.zero_p()));
     REQUIRE((real{false, ::mpfr_prec_t(128)}.get_prec() == 128));
-    REQUIRE(::mpfr_cmp_ui((real{true, ::mpfr_prec_t(128)}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_ui((real{true, ::mpfr_prec_t(128)}).get_mpfr_t(), 1ul) == 0);
     REQUIRE((real{true, ::mpfr_prec_t(128)}.get_prec() == 128));
     REQUIRE_THROWS_PREDICATE((real{false, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
@@ -477,13 +477,13 @@ TEST_CASE("real constructors")
     // Construction from integer.
     REQUIRE(real{int_t{}}.zero_p());
     REQUIRE(real{int_t{}}.get_prec() == real_prec_min());
-    REQUIRE(::mpfr_cmp_ui((real{int_t{1}}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_ui((real{int_t{1}}).get_mpfr_t(), 1ul) == 0);
     REQUIRE(real{int_t{1}}.get_prec() == GMP_NUMB_BITS);
-    REQUIRE(::mpfr_cmp_ui((real{int_t{42}}).get_mpfr_t(), 42ul) == 0);
+    REQUIRE(mpfr_cmp_ui((real{int_t{42}}).get_mpfr_t(), 42ul) == 0);
     REQUIRE(real{int_t{42}}.get_prec() == GMP_NUMB_BITS);
-    REQUIRE(::mpfr_cmp_si((real{-int_t{1}}).get_mpfr_t(), -1l) == 0);
+    REQUIRE(mpfr_cmp_si((real{-int_t{1}}).get_mpfr_t(), -1l) == 0);
     REQUIRE(real{int_t{-1}}.get_prec() == GMP_NUMB_BITS);
-    REQUIRE(::mpfr_cmp_si((real{-int_t{42}}).get_mpfr_t(), -42l) == 0);
+    REQUIRE(mpfr_cmp_si((real{-int_t{42}}).get_mpfr_t(), -42l) == 0);
     REQUIRE(real{int_t{-42}}.get_prec() == GMP_NUMB_BITS);
     real r0{int_t{42} << GMP_NUMB_BITS};
     REQUIRE(r0.get_prec() == 2 * GMP_NUMB_BITS);
@@ -516,13 +516,13 @@ TEST_CASE("real constructors")
     // Construction from rational.
     REQUIRE(real{rat_t{}}.zero_p());
     REQUIRE(real{rat_t{}}.get_prec() == GMP_NUMB_BITS);
-    REQUIRE(::mpfr_cmp_ui((real{rat_t{1}}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_ui((real{rat_t{1}}).get_mpfr_t(), 1ul) == 0);
     REQUIRE(real{rat_t{1}}.get_prec() == GMP_NUMB_BITS * 2);
-    REQUIRE(::mpfr_cmp_ui((real{rat_t{42}}).get_mpfr_t(), 42ul) == 0);
+    REQUIRE(mpfr_cmp_ui((real{rat_t{42}}).get_mpfr_t(), 42ul) == 0);
     REQUIRE(real{rat_t{42}}.get_prec() == GMP_NUMB_BITS * 2);
-    REQUIRE(::mpfr_cmp_si((real{-rat_t{1}}).get_mpfr_t(), -1l) == 0);
+    REQUIRE(mpfr_cmp_si((real{-rat_t{1}}).get_mpfr_t(), -1l) == 0);
     REQUIRE(real{rat_t{-1}}.get_prec() == GMP_NUMB_BITS * 2);
-    REQUIRE(::mpfr_cmp_si((real{-rat_t{42}}).get_mpfr_t(), -42l) == 0);
+    REQUIRE(mpfr_cmp_si((real{-rat_t{42}}).get_mpfr_t(), -42l) == 0);
     REQUIRE(real{rat_t{-42}}.get_prec() == GMP_NUMB_BITS * 2);
     REQUIRE((::mpfr_equal_p((real{rat_t{5, 2}}).get_mpfr_t(), (real{"2.5", 10, 64}).get_mpfr_t())));
     REQUIRE((real{rat_t{5, 2}}.get_prec()) == GMP_NUMB_BITS * 2);
@@ -531,7 +531,7 @@ TEST_CASE("real constructors")
     tmp = real{42, GMP_NUMB_BITS * 3};
     r0 = real{rat_t{int_t{42} << GMP_NUMB_BITS, 5}};
     ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
-    ::mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
+    mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
     REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 3);
     REQUIRE_THROWS_PREDICATE((real{rat_t{}, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -561,10 +561,10 @@ TEST_CASE("real constructors")
     REQUIRE(real{real128{}}.get_prec() == 113);
     REQUIRE(real{real128{-1}}.get_prec() == 113);
     REQUIRE(real{real128{1}}.get_prec() == 113);
-    REQUIRE(::mpfr_cmp_ui((real{real128{1}}).get_mpfr_t(), 1ul) == 0);
-    REQUIRE(::mpfr_cmp_si((real{real128{-1}}).get_mpfr_t(), -1l) == 0);
-    REQUIRE(::mpfr_cmp_ui((real{real128{1123}}).get_mpfr_t(), 1123ul) == 0);
-    REQUIRE(::mpfr_cmp_si((real{real128{-1123}}).get_mpfr_t(), -1123l) == 0);
+    REQUIRE(mpfr_cmp_ui((real{real128{1}}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_si((real{real128{-1}}).get_mpfr_t(), -1l) == 0);
+    REQUIRE(mpfr_cmp_ui((real{real128{1123}}).get_mpfr_t(), 1123ul) == 0);
+    REQUIRE(mpfr_cmp_si((real{real128{-1123}}).get_mpfr_t(), -1123l) == 0);
     REQUIRE(real{real128_inf()}.inf_p());
     REQUIRE(real{real128_inf()}.sgn() > 0);
     REQUIRE(real{-real128_inf()}.inf_p());
@@ -608,18 +608,18 @@ TEST_CASE("real constructors")
     // Constructor from mpfr_t.
     ::mpfr_t m;
     ::mpfr_init2(m, 123);
-    ::mpfr_set_ui(m, 42ul, MPFR_RNDN);
+    mpfr_set_ui(m, 42ul, MPFR_RNDN);
     real rtmp{m};
     REQUIRE(rtmp.get_prec() == 123);
-    REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
-    ::mpfr_set_si(m, -63l, MPFR_RNDN);
+    REQUIRE(mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
+    mpfr_set_si(m, -63l, MPFR_RNDN);
 #if defined(_MSC_VER) && !defined(__clang__)
     ::mpfr_clear(m);
 #else
     // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
     real rtmp2{std::move(m)};
     REQUIRE(rtmp2.get_prec() == 123);
-    REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
+    REQUIRE(mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
 #endif
 
     using Catch::Matchers::Message;
@@ -871,7 +871,7 @@ TEST_CASE("real assignment")
     REQUIRE(r7.zero_p());
     REQUIRE(r7.get_prec() == detail::c_max(::mpfr_prec_t(detail::nl_digits<bool>()), real_prec_min()));
     r7 = true;
-    REQUIRE(::mpfr_cmp_ui(r7.get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_ui(r7.get_mpfr_t(), 1ul) == 0);
     REQUIRE(r7.get_prec() == detail::c_max(::mpfr_prec_t(detail::nl_digits<bool>()), real_prec_min()));
     // Assignment from integer.
     real r8;
@@ -879,16 +879,16 @@ TEST_CASE("real assignment")
     REQUIRE(r8.zero_p());
     REQUIRE(r8.get_prec() == real_prec_min());
     r8 = int_t{1};
-    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
     r8 = int_t{42};
-    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 42ul) == 0);
+    REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 42ul) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
     r8 = -int_t{1};
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
     r8 = -int_t{42};
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
     r8 = int_t{42} << GMP_NUMB_BITS;
     REQUIRE(r8.get_prec() == 2 * GMP_NUMB_BITS);
@@ -904,16 +904,16 @@ TEST_CASE("real assignment")
     REQUIRE(r8.zero_p());
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
     r8 = rat_t{1};
-    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 2);
     r8 = rat_t{42};
-    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 42ul) == 0);
+    REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 42ul) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 2);
     r8 = -rat_t{1};
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 2);
     r8 = rat_t{-42};
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 2);
     r8 = rat_t{5, 2};
     REQUIRE((::mpfr_equal_p((r8).get_mpfr_t(), (real{"2.5", 10, 64}).get_mpfr_t())));
@@ -924,7 +924,7 @@ TEST_CASE("real assignment")
     tmp = real{42, GMP_NUMB_BITS * 3};
     r8 = rat_t{int_t{42} << GMP_NUMB_BITS, 5};
     ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
-    ::mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
+    mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r8.get_mpfr_t())));
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 3);
 #if defined(MPPP_WITH_QUADMATH)
@@ -939,13 +939,13 @@ TEST_CASE("real assignment")
     REQUIRE(r8.get_prec() == 113);
     r8 = real128{1};
     REQUIRE(r8.get_prec() == 113);
-    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
     r8 = real128{-1};
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
     r8 = real128{1123};
-    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1123ul) == 0);
+    REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 1123ul) == 0);
     r8 = real128{-1123};
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1123l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -1123l) == 0);
     r8 = real128_inf();
     REQUIRE(r8.inf_p());
     REQUIRE(r8.sgn() > 0);
@@ -969,53 +969,53 @@ TEST_CASE("real assignment")
     r8.set_prec(212);
     r8.set(real{1234, 55});
     REQUIRE(r8.get_prec() == 212);
-    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1234ul) == 0);
+    REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 1234ul) == 0);
     r8.set_prec(115);
     r8.set(12u);
     REQUIRE(r8.get_prec() == 115);
-    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 12ul) == 0);
+    REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 12ul) == 0);
     r8.set_prec(116);
     r8.set(short(-42));
     REQUIRE(r8.get_prec() == 116);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
     r8.set_prec(26);
     r8.set(false);
     REQUIRE(r8.get_prec() == 26);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 0l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 0l) == 0);
     r8.set_prec(126);
     r8.set(-123.);
     REQUIRE(r8.get_prec() == 126);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -123l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -123l) == 0);
     r8.set_prec(125);
     r8.set(123.f);
     REQUIRE(r8.get_prec() == 125);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 123l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 123l) == 0);
     r8.set_prec(136);
     r8.set(int_t{-12345l});
     REQUIRE(r8.get_prec() == 136);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -12345l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -12345l) == 0);
     r8.set_prec(135);
     r8.set(rat_t{-9, 3});
     REQUIRE(r8.get_prec() == 135);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -3l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -3l) == 0);
 #if defined(MPPP_WITH_QUADMATH)
     r8.set_prec(185);
     r8.set(real128{-456});
     REQUIRE(r8.get_prec() == 185);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -456l) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -456l) == 0);
 #endif
     // Setter from string.
     r8.set_prec(123);
     r8.set("-4.321e3");
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
     r8.set("4.321e3", 0);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
     r8.set("0b10011010010", 0);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
     r8.set("0b10011010011", 2);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     r8.set("0b1.0011010011e10", 2);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(r8.set("4.321e3", -1), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == std::string{"Cannot assign a real from a string in base -1: the base must either be zero or in the "
@@ -1026,7 +1026,7 @@ TEST_CASE("real assignment")
                == std::string{"Cannot assign a real from a string in base 65: the base must either be zero or in the "
                               "[2,62] range"};
     });
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(r8.set("hell-o"), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
@@ -1042,15 +1042,15 @@ TEST_CASE("real assignment")
     });
     REQUIRE(r8.nan_p());
     r8.set(std::string{"-4.321e3"});
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
     r8.set(std::string{"4.321e3"}, 0);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
     r8.set(std::string{"0b10011010010"}, 0);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
     r8.set(std::string{"0b10011010011"}, 2);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     r8.set(std::string{"0b1.0011010011e10"}, 2);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(
         r8.set(std::string{"4.321e3"}, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
@@ -1065,7 +1065,7 @@ TEST_CASE("real assignment")
                        "Cannot assign a real from a string in base 65: the base must either be zero or in the "
                        "[2,62] range"};
         });
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(r8.set(std::string{"hell-o"}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
@@ -1087,13 +1087,13 @@ TEST_CASE("real assignment")
     r8.set_prec(123);
     const std::vector<char> vc = {',', '-', '1', '2', '3', '4'};
     r8.set(vc.data() + 1, vc.data() + 5);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -123) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -123) == 0);
     REQUIRE(r8.get_prec() == 123);
     r8.set(vc.data() + 1, vc.data() + 6, 0);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1234) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -1234) == 0);
     REQUIRE(r8.get_prec() == 123);
     r8.set(vc.data() + 1, vc.data() + 4, 4);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -6) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -6) == 0);
     REQUIRE(r8.get_prec() == 123);
     REQUIRE_THROWS_PREDICATE(
         r8.set(vc.data() + 1, vc.data() + 5, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -1126,15 +1126,15 @@ TEST_CASE("real assignment")
         });
 #if defined(MPPP_HAVE_STRING_VIEW)
     r8.set(std::string_view{"-4.321e3"});
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
     r8.set(std::string_view{"4.321e3"}, 0);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
     r8.set(std::string_view{"0b10011010010"}, 0);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
     r8.set(std::string_view{"0b10011010011"}, 2);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     r8.set(std::string_view{"0b1.0011010011e10"}, 2);
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(
         r8.set(std::string_view{"4.321e3"}, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
@@ -1149,7 +1149,7 @@ TEST_CASE("real assignment")
                        "Cannot assign a real from a string in base 65: the base must either be zero or in the "
                        "[2,62] range"};
         });
-    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(
         r8.set(std::string_view{"hell-o"}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
@@ -1173,12 +1173,12 @@ TEST_CASE("real assignment")
         // Assignment from mpfr_t.
         ::mpfr_t m;
         ::mpfr_init2(m, 123);
-        ::mpfr_set_ui(m, 42ul, MPFR_RNDN);
+        mpfr_set_ui(m, 42ul, MPFR_RNDN);
         real rtmp;
         rtmp = m;
         REQUIRE(rtmp.get_prec() == 123);
-        REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
-        ::mpfr_set_si(m, -63l, MPFR_RNDN);
+        REQUIRE(mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
+        mpfr_set_si(m, -63l, MPFR_RNDN);
 #if defined(_MSC_VER) && !defined(__clang__)
         ::mpfr_clear(m);
 #else
@@ -1186,33 +1186,33 @@ TEST_CASE("real assignment")
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         rtmp2 = std::move(m);
         REQUIRE(rtmp2.get_prec() == 123);
-        REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
+        REQUIRE(mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
 #endif
     }
     {
         // Setter from mpfr_t.
         ::mpfr_t m;
         ::mpfr_init2(m, 123);
-        ::mpfr_set_ui(m, 42ul, MPFR_RNDN);
+        mpfr_set_ui(m, 42ul, MPFR_RNDN);
         real rtmp{12, 12};
         rtmp.set(m);
         REQUIRE(rtmp.get_prec() == 12);
-        REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
+        REQUIRE(mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
         ::mpfr_clear(m);
     }
     // The setter free function.
     r8.set_prec(154);
     set(r8, 12);
-    REQUIRE(::mpfr_cmp_ui(r8.get_mpfr_t(), 12ul) == 0);
+    REQUIRE(mpfr_cmp_ui(r8.get_mpfr_t(), 12ul) == 0);
     REQUIRE(r8.get_prec() == 154);
     r8.set_prec(254);
     set(r8, "123", 7);
-    REQUIRE(::mpfr_cmp_ui(r8.get_mpfr_t(), 66ul) == 0);
+    REQUIRE(mpfr_cmp_ui(r8.get_mpfr_t(), 66ul) == 0);
     REQUIRE(r8.get_prec() == 254);
     REQUIRE((std::is_same<real &, decltype(set(r8, "123", 7))>::value));
     r8.set_prec(253);
     set(r8, rat_t{45, 5});
-    REQUIRE(::mpfr_cmp_ui(r8.get_mpfr_t(), 9ul) == 0);
+    REQUIRE(mpfr_cmp_ui(r8.get_mpfr_t(), 9ul) == 0);
     REQUIRE(r8.get_prec() == 253);
     // Special values setters.
     r8.set_nan();

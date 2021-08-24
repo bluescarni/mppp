@@ -1307,11 +1307,11 @@ TEST_CASE("set_nan")
 TEST_CASE("mpc_t getters")
 {
     complex c{1, 2};
-    REQUIRE(::mpfr_cmp_ui(mpc_realref(c.get_mpc_t()), 1u) == 0);
-    REQUIRE(::mpfr_cmp_ui(mpc_imagref(c.get_mpc_t()), 2u) == 0);
+    REQUIRE(mpfr_cmp_ui(mpc_realref(c.get_mpc_t()), 1u) == 0);
+    REQUIRE(mpfr_cmp_ui(mpc_imagref(c.get_mpc_t()), 2u) == 0);
     ::mpc_add_ui(c._get_mpc_t(), c.get_mpc_t(), 3u, MPC_RNDNN);
-    REQUIRE(::mpfr_cmp_ui(mpc_realref(c.get_mpc_t()), 4u) == 0);
-    REQUIRE(::mpfr_cmp_ui(mpc_imagref(c.get_mpc_t()), 2u) == 0);
+    REQUIRE(mpfr_cmp_ui(mpc_realref(c.get_mpc_t()), 4u) == 0);
+    REQUIRE(mpfr_cmp_ui(mpc_imagref(c.get_mpc_t()), 2u) == 0);
 }
 
 TEST_CASE("special values")
