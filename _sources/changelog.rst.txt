@@ -16,6 +16,15 @@ New
   and :cpp:class:`~mppp::integer`
   (`#280 <https://github.com/bluescarni/mppp/pull/280>`__).
 
+Fix
+~~~
+
+- Don't prepend ``::`` when invoking GMP/MPFR/MPC
+  macros. This fixes build failures observed on some
+  platforms
+  (`#283 <https://github.com/bluescarni/mppp/pull/283>`__,
+  `#282 <https://github.com/bluescarni/mppp/pull/282>`__).
+
 0.24 (2021-06-26)
 -----------------
 
