@@ -28,7 +28,7 @@ install:
 - if [%BUILD_TYPE%]==[MSVC15_64] conda update -n base conda
 - if [%BUILD_TYPE%]==[MSVC15_64] conda config --add channels conda-forge
 - if [%BUILD_TYPE%]==[MSVC15_64] conda config --set channel_priority strict
-- if [%BUILD_TYPE%]==[MSVC15_64] conda create --name mppp cmake mpir mpfr mpc arb pybind11 mpmath python=3.6 boost-cpp
+- if [%BUILD_TYPE%]==[MSVC15_64] conda create --name mppp cmake mpir mpfr "<4.1" mpc arb pybind11 mpmath python=3.6 boost-cpp
 - if [%BUILD_TYPE%]==[MSVC15_64] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC17_64] call "C:\\Miniconda36-x64\\Scripts\\activate.bat"
@@ -36,7 +36,7 @@ install:
 - if [%BUILD_TYPE%]==[MSVC17_64] conda update -n base conda
 - if [%BUILD_TYPE%]==[MSVC17_64] conda config --add channels conda-forge
 - if [%BUILD_TYPE%]==[MSVC17_64] conda config --set channel_priority strict
-- if [%BUILD_TYPE%]==[MSVC17_64] conda create --name mppp cmake mpir mpfr mpc arb pybind11 mpmath python=3.6 boost-cpp
+- if [%BUILD_TYPE%]==[MSVC17_64] conda create --name mppp cmake mpir mpfr "<4.1" mpc arb pybind11 mpmath python=3.6 boost-cpp
 - if [%BUILD_TYPE%]==[MSVC17_64] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\\Miniconda36-x64\\Scripts\\activate.bat"
@@ -44,7 +44,7 @@ install:
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] conda update -n base conda
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --add channels conda-forge
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --set channel_priority strict
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create --name mppp cmake ninja mpir mpfr mpc arb clang clangxx
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create --name mppp cmake ninja mpir mpfr "<4.1" mpc arb clang clangxx
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call activate mppp
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] clang-cl -v
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
