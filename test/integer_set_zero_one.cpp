@@ -63,10 +63,10 @@ struct set_zero_tester {
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
+                mpz_set(&m1.m_mpz, &tmp.m_mpz);
                 n1 = integer(&tmp.m_mpz);
                 if (sdist(rng)) {
-                    ::mpz_neg(&m1.m_mpz, &m1.m_mpz);
+                    mpz_neg(&m1.m_mpz, &m1.m_mpz);
                     n1.neg();
                 }
                 if (n1.is_static() && sdist(rng)) {
@@ -133,10 +133,10 @@ struct set_one_tester {
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
+                mpz_set(&m1.m_mpz, &tmp.m_mpz);
                 n1 = integer(&tmp.m_mpz);
                 if (sdist(rng)) {
-                    ::mpz_neg(&m1.m_mpz, &m1.m_mpz);
+                    mpz_neg(&m1.m_mpz, &m1.m_mpz);
                     n1.neg();
                 }
                 if (n1.is_static() && sdist(rng)) {

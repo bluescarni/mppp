@@ -229,7 +229,7 @@ private:
                                     + detail::to_string(x));
         }
         MPPP_MAYBE_TLS detail::mpq_raii q;
-        ::mpq_set_d(&q.m_mpq, static_cast<double>(x));
+        mpq_set_d(&q.m_mpq, static_cast<double>(x));
         m_num = mpq_numref(&q.m_mpq);
         m_den = mpq_denref(&q.m_mpq);
     }
@@ -251,7 +251,7 @@ private:
         // https://lists.gforge.inria.fr/pipermail/mpfr-commits/2017-June/011186.html
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
         ::mpfr_get_f(&mpf.m_mpf, &mpfr.m_mpfr, MPFR_RNDN);
-        ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
+        mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
         m_num = mpq_numref(&mpq.m_mpq);
         m_den = mpq_denref(&mpq.m_mpq);
     }
@@ -514,7 +514,7 @@ private:
     MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         const auto v = detail::get_mpq_view(*this);
-        return std::make_pair(true, static_cast<T>(::mpq_get_d(&v)));
+        return std::make_pair(true, static_cast<T>(mpq_get_d(&v)));
     }
 #if defined(MPPP_WITH_MPFR)
     // Conversion to long double.
@@ -2029,7 +2029,7 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
     // NOTE: here we have potential for 2 views referring to the same underlying
     // object. The same potential issues as described in the mpz_view class may arise.
     // Keep an eye on it.
-    // NOTE: this can probably be improved by implementing the same strategy as in ::mpq_cmp()
+    // NOTE: this can probably be improved by implementing the same strategy as in mpq_cmp()
     // but based on our primitives:
     // - if op1 and op2 are integers, compare the nums,
     // - try to see if the limb/bit sizes of nums and dens can tell use immediately which
@@ -2037,7 +2037,7 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
     // - otherwise, do the two multiplications and compare.
     const auto v1 = detail::get_mpq_view(op1);
     const auto v2 = detail::get_mpq_view(op2);
-    return ::mpq_cmp(&v1, &v2);
+    return mpq_cmp(&v1, &v2);
 }
 
 // Comparison function for rational/integer arguments.

@@ -50,9 +50,9 @@ struct inv_tester {
             return std::string(ex.what()) == "Cannot invert a zero rational";
         });
         n2 = "3/-4";
-        ::mpq_set_si(&m2.m_mpq, -3, 4);
+        mpq_set_si(&m2.m_mpq, -3, 4);
         REQUIRE(&inv(n1, n2) == &n1);
-        ::mpq_inv(&m1.m_mpq, &m2.m_mpq);
+        mpq_inv(&m1.m_mpq, &m2.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(inv(n2)) == lex_cast(m1)));
         n2.inv();
@@ -71,19 +71,19 @@ struct inv_tester {
                 }
                 random_integer(num, x, rng);
                 random_integer(den, x, rng);
-                ::mpz_set(mpq_numref(&tmp.m_mpq), &num.m_mpz);
-                ::mpz_set(mpq_denref(&tmp.m_mpq), &den.m_mpz);
+                mpz_set(mpq_numref(&tmp.m_mpq), &num.m_mpz);
+                mpz_set(mpq_denref(&tmp.m_mpq), &den.m_mpz);
                 if (mpz_sgn(mpq_denref(&tmp.m_mpq)) == 0) {
-                    ::mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
+                    mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
                 }
                 if (mpz_sgn(mpq_numref(&tmp.m_mpq)) == 0) {
                     continue;
                 }
-                ::mpq_canonicalize(&tmp.m_mpq);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_canonicalize(&tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {
@@ -94,7 +94,7 @@ struct inv_tester {
                     // Promote sometimes, if possible.
                     n2._get_den().promote();
                 }
-                ::mpq_inv(&m1.m_mpq, &m2.m_mpq);
+                mpq_inv(&m1.m_mpq, &m2.m_mpq);
                 inv(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1) == lex_cast(inv(n2))));

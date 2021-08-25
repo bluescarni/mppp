@@ -40,7 +40,7 @@ struct neg_tester {
         // Start with all zeroes.
         detail::mpq_raii m1, m2;
         rational n1, n2;
-        ::mpq_neg(&m1.m_mpq, &m2.m_mpq);
+        mpq_neg(&m1.m_mpq, &m2.m_mpq);
         REQUIRE(&neg(n1, n2) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         // Test the other variants.
@@ -58,10 +58,10 @@ struct neg_tester {
                     n1 = rational{};
                 }
                 random_rational(tmp, x, rng);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {
@@ -72,7 +72,7 @@ struct neg_tester {
                     // Promote sometimes, if possible.
                     n2._get_den().promote();
                 }
-                ::mpq_neg(&m1.m_mpq, &m2.m_mpq);
+                mpq_neg(&m1.m_mpq, &m2.m_mpq);
                 neg(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1) == lex_cast(neg(n2))));

@@ -43,56 +43,56 @@ struct gcd_tester {
         REQUIRE(std::is_same<integer, decltype(gcd(n2, n3))>::value);
         REQUIRE(gcd(n1, n2, n3) == 0);
         REQUIRE(std::is_same<integer &, decltype(gcd(n1, n2, n3))>::value);
-        ::mpz_set_si(&m3.m_mpz, 1);
+        mpz_set_si(&m3.m_mpz, 1);
         n3 = integer(1);
-        ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         REQUIRE(&gcd(n1, n2, n3) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m3.m_mpz, -2);
+        mpz_set_si(&m3.m_mpz, -2);
         n3 = integer(-2);
-        ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
         // Simple tests.
-        ::mpz_set_si(&m2.m_mpz, 8);
+        mpz_set_si(&m2.m_mpz, 8);
         n2 = integer(8);
-        ::mpz_set_si(&m3.m_mpz, 2);
+        mpz_set_si(&m3.m_mpz, 2);
         n3 = integer(2);
-        ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, 8);
+        mpz_set_si(&m2.m_mpz, 8);
         n2 = integer(8);
-        ::mpz_set_si(&m3.m_mpz, 0);
+        mpz_set_si(&m3.m_mpz, 0);
         n3 = integer(0);
-        ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, 16);
+        mpz_set_si(&m2.m_mpz, 16);
         n2 = integer(16);
-        ::mpz_set_si(&m3.m_mpz, -2);
+        mpz_set_si(&m3.m_mpz, -2);
         n3 = integer(-2);
-        ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, -32);
+        mpz_set_si(&m2.m_mpz, -32);
         n2 = integer(-32);
-        ::mpz_set_si(&m3.m_mpz, 4);
+        mpz_set_si(&m3.m_mpz, 4);
         n3 = integer(4);
-        ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, -32);
+        mpz_set_si(&m2.m_mpz, -32);
         n2 = integer(-32);
-        ::mpz_set_si(&m3.m_mpz, -4);
+        mpz_set_si(&m3.m_mpz, -4);
         n3 = integer(-4);
-        ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
@@ -107,10 +107,10 @@ struct gcd_tester {
                     n1 = integer{};
                 }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
                 if (n2.is_static() && sdist(rng)) {
@@ -118,10 +118,10 @@ struct gcd_tester {
                     n2.promote();
                 }
                 random_integer(tmp, y, rng);
-                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
                 }
                 if (n3.is_static() && sdist(rng)) {
@@ -129,19 +129,19 @@ struct gcd_tester {
                     n3.promote();
                 }
                 gcd(n1, n2, n3);
-                ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
                 gcd(n1, n3, n2);
-                ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(gcd(n3, n2)) == lex_cast(m1)));
                 // Overlapping.
                 gcd(n1, n2, n2);
-                ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 gcd(n2, n2, n2);
-                ::mpz_gcd(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                mpz_gcd(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
             }
         };
@@ -193,56 +193,56 @@ struct lcm_tester {
         REQUIRE(std::is_same<integer, decltype(lcm(n2, n3))>::value);
         REQUIRE(lcm(n1, n2, n3) == 0);
         REQUIRE(std::is_same<integer &, decltype(lcm(n1, n2, n3))>::value);
-        ::mpz_set_si(&m3.m_mpz, 1);
+        mpz_set_si(&m3.m_mpz, 1);
         n3 = integer(1);
-        ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         REQUIRE(&lcm(n1, n2, n3) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(lcm(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m3.m_mpz, -2);
+        mpz_set_si(&m3.m_mpz, -2);
         n3 = integer(-2);
-        ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         lcm(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(lcm(n2, n3)) == lex_cast(m1)));
         // Simple tests.
-        ::mpz_set_si(&m2.m_mpz, 8);
+        mpz_set_si(&m2.m_mpz, 8);
         n2 = integer(8);
-        ::mpz_set_si(&m3.m_mpz, 2);
+        mpz_set_si(&m3.m_mpz, 2);
         n3 = integer(2);
-        ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         lcm(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(lcm(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, 8);
+        mpz_set_si(&m2.m_mpz, 8);
         n2 = integer(8);
-        ::mpz_set_si(&m3.m_mpz, 0);
+        mpz_set_si(&m3.m_mpz, 0);
         n3 = integer(0);
-        ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         lcm(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(lcm(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, 16);
+        mpz_set_si(&m2.m_mpz, 16);
         n2 = integer(16);
-        ::mpz_set_si(&m3.m_mpz, -2);
+        mpz_set_si(&m3.m_mpz, -2);
         n3 = integer(-2);
-        ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         lcm(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(lcm(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, -32);
+        mpz_set_si(&m2.m_mpz, -32);
         n2 = integer(-32);
-        ::mpz_set_si(&m3.m_mpz, 4);
+        mpz_set_si(&m3.m_mpz, 4);
         n3 = integer(4);
-        ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         lcm(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(lcm(n2, n3)) == lex_cast(m1)));
-        ::mpz_set_si(&m2.m_mpz, -32);
+        mpz_set_si(&m2.m_mpz, -32);
         n2 = integer(-32);
-        ::mpz_set_si(&m3.m_mpz, -4);
+        mpz_set_si(&m3.m_mpz, -4);
         n3 = integer(-4);
-        ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         lcm(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(lcm(n2, n3)) == lex_cast(m1)));
@@ -257,10 +257,10 @@ struct lcm_tester {
                     n1 = integer{};
                 }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
                 if (n2.is_static() && sdist(rng)) {
@@ -268,10 +268,10 @@ struct lcm_tester {
                     n2.promote();
                 }
                 random_integer(tmp, y, rng);
-                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
                 }
                 if (n3.is_static() && sdist(rng)) {
@@ -279,19 +279,19 @@ struct lcm_tester {
                     n3.promote();
                 }
                 lcm(n1, n2, n3);
-                ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(lcm(n2, n3)) == lex_cast(m1)));
                 lcm(n1, n3, n2);
-                ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(lcm(n3, n2)) == lex_cast(m1)));
                 // Overlapping.
                 lcm(n1, n2, n2);
-                ::mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                mpz_lcm(&m1.m_mpz, &m2.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 lcm(n2, n2, n2);
-                ::mpz_lcm(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                mpz_lcm(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
             }
         };
@@ -338,7 +338,7 @@ TEST_CASE("lcm")
     int_t m1{n1}, m2{n2}, m3;
 
     lcm(n3, n1, n2);
-    ::mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
+    mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
 
     REQUIRE(n3 == m3);
     REQUIRE(lcm(n1, n2) == n3);
@@ -347,7 +347,7 @@ TEST_CASE("lcm")
     m1.neg();
 
     lcm(n3, n1, n2);
-    ::mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
+    mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
 
     REQUIRE(n3 == m3);
     REQUIRE(lcm(n1, n2) == n3);
@@ -356,7 +356,7 @@ TEST_CASE("lcm")
     m2.neg();
 
     lcm(n3, n1, n2);
-    ::mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
+    mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
 
     REQUIRE(n3 == m3);
     REQUIRE(lcm(n1, n2) == n3);
@@ -365,7 +365,7 @@ TEST_CASE("lcm")
     m1.neg();
 
     lcm(n3, n1, n2);
-    ::mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
+    mpz_lcm(m3.get_mpz_t(), m1.get_mpz_view(), m2.get_mpz_view());
 
     REQUIRE(n3 == m3);
     REQUIRE(lcm(n1, n2) == n3);

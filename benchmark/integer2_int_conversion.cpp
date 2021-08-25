@@ -118,7 +118,7 @@ int main()
         mppp_benchmark::simple_timer st;
 
         std::transform(v.begin(), v.end(), c_out.begin(),
-                       [](const mpz_int &n) { return static_cast<int>(::mpz_get_si(n.backend().data())); });
+                       [](const mpz_int &n) { return static_cast<int>(mpz_get_si(n.backend().data())); });
 
         const auto runtime = st.elapsed();
         bdata.emplace_back(name, runtime);

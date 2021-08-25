@@ -198,16 +198,16 @@ struct mpz_copy_ass_tester {
         detail::mpz_raii m;
         n = &m.m_mpz;
         REQUIRE(lex_cast(n) == "0");
-        ::mpz_set_si(&m.m_mpz, 1234);
+        mpz_set_si(&m.m_mpz, 1234);
         n = &m.m_mpz;
         REQUIRE(n == 1234);
-        ::mpz_set_si(&m.m_mpz, -1234);
+        mpz_set_si(&m.m_mpz, -1234);
         n = &m.m_mpz;
         REQUIRE(n == -1234);
-        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         n = &m.m_mpz;
         REQUIRE(n == integer("3218372891372987328917389127389217398271983712987398127398172389712937819237"));
-        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         n = &m.m_mpz;
         REQUIRE(n == integer("-3218372891372987328917389127389217398271983712987398127398172389712937819237"));
         // Random testing.
@@ -219,7 +219,7 @@ struct mpz_copy_ass_tester {
             for (auto i = 0; i < ntries; ++i) {
                 detail::mpz_raii mpz;
                 auto tmp = dist(eng);
-                ::mpz_set_si(&mpz.m_mpz, tmp);
+                mpz_set_si(&mpz.m_mpz, tmp);
                 integer z;
                 if (sdist(eng)) {
                     z.promote();
@@ -254,27 +254,27 @@ struct mpz_move_ass_tester {
         using integer = integer<S::value>;
         integer n;
         ::mpz_t m0;
-        ::mpz_init(m0);
+        mpz_init(m0);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(lex_cast(n) == "0");
-        ::mpz_init(m0);
-        ::mpz_set_si(m0, 1234);
+        mpz_init(m0);
+        mpz_set_si(m0, 1234);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(n == 1234);
-        ::mpz_init(m0);
-        ::mpz_set_si(m0, -1234);
+        mpz_init(m0);
+        mpz_set_si(m0, -1234);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(n == -1234);
-        ::mpz_init(m0);
-        ::mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_init(m0);
+        mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(n == integer("3218372891372987328917389127389217398271983712987398127398172389712937819237"));
-        ::mpz_init(m0);
-        ::mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        mpz_init(m0);
+        mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
         // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
         n = std::move(m0);
         REQUIRE(n == integer("-3218372891372987328917389127389217398271983712987398127398172389712937819237"));
@@ -286,9 +286,9 @@ struct mpz_move_ass_tester {
             std::mt19937 eng(static_cast<std::mt19937::result_type>(u + mt_rng_seed));
             for (auto i = 0; i < ntries; ++i) {
                 ::mpz_t m1;
-                ::mpz_init(m1);
+                mpz_init(m1);
                 auto tmp = dist(eng);
-                ::mpz_set_si(m1, tmp);
+                mpz_set_si(m1, tmp);
                 integer z;
                 if (sdist(eng)) {
                     z.promote();

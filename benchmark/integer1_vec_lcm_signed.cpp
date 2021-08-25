@@ -159,9 +159,9 @@ int main()
         mppp_benchmark::simple_timer st;
 
         for (auto i = 0ul; i < size; ++i) {
-            ::mpz_lcm(std::get<2>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
-                      std::get<1>(p)[i].backend().data());
-            ::mpz_add(ret.backend().data(), ret.backend().data(), std::get<2>(p)[i].backend().data());
+            mpz_lcm(std::get<2>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
+                    std::get<1>(p)[i].backend().data());
+            mpz_add(ret.backend().data(), ret.backend().data(), std::get<2>(p)[i].backend().data());
         }
 
         const auto runtime = st.elapsed();

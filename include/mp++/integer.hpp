@@ -191,7 +191,7 @@ MPPP_DLL_PUBLIC void mpz_clear_wrap(mpz_struct_t &);
 inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
     mpz_init_nlimbs(m0, get_mpz_size(&m1));
-    ::mpz_set(&m0, &m1);
+    mpz_set(&m0, &m1);
 }
 
 // Convert an mpz to a string in a specific base, to be written into out.
@@ -288,7 +288,7 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
 #else
     // Implementation via GMP.
     // NOTE: assuming GMP knows how to deal with nails, so not masking.
-    return static_cast<unsigned>(::mpn_sizeinbase(&l, 1, 2));
+    return static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2));
 #endif
 }
 
@@ -692,7 +692,7 @@ union integer_union {
                                     + to_string(x));
         }
         MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
+        mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
         dispatch_mpz_ctor(&tmp.m_mpz);
     }
 #if defined(MPPP_WITH_MPFR)
@@ -728,7 +728,7 @@ union integer_union {
                 + " was specified, but the only valid values are 0 and any value in the [2,62] range");
         }
         MPPP_MAYBE_TLS mpz_raii mpz;
-        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
+        if (mppp_unlikely(mpz_set_str(&mpz.m_mpz, s, base))) {
             if (base != 0) {
                 throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
                                             + to_string(base));
@@ -884,7 +884,7 @@ union integer_union {
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
             // Self assignment is fine, mpz_set() can have aliasing arguments.
-            ::mpz_set(&g_dy(), &other.g_dy());
+            mpz_set(&g_dy(), &other.g_dy());
         }
         return *this;
     }
@@ -911,7 +911,7 @@ union integer_union {
         } else {
             // Swap with other. Self-assignment is fine, mpz_swap() can have
             // aliasing arguments.
-            ::mpz_swap(&g_dy(), &other.g_dy());
+            mpz_swap(&g_dy(), &other.g_dy());
         }
         return *this;
     }
@@ -977,7 +977,7 @@ union integer_union {
             // Otherwise, we preallocate nlimbs and then set tmp_mpz
             // to the value of this.
             mpz_init_nlimbs(tmp_mpz, nlimbs);
-            ::mpz_set(&tmp_mpz, &v);
+            mpz_set(&tmp_mpz, &v);
         }
         // Destroy static.
         g_st().~s_storage();
@@ -1012,7 +1012,7 @@ union integer_union {
         if (is_static()) {
             g_st()._mp_size = -g_st()._mp_size;
         } else {
-            ::mpz_neg(&g_dy(), &g_dy());
+            mpz_neg(&g_dy(), &g_dy());
         }
     }
     // NOTE: keep these public as we need them below.
@@ -1490,7 +1490,7 @@ private:
                                     + " to an integer");
         }
         MPPP_MAYBE_TLS detail::mpz_raii tmp;
-        ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
+        mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
         *this = &tmp.m_mpz;
     }
 #if defined(MPPP_WITH_MPFR)
@@ -1577,7 +1577,7 @@ public:
             m_int.g_st().zero_upper_limbs(asize);
         } else if (!s && asize > SSize) {
             // Dynamic to dynamic.
-            ::mpz_set(&m_int.m_dy, n);
+            mpz_set(&m_int.m_dy, n);
         } else if (s && asize > SSize) {
             // this is static, n is too big. Promote and assign.
             // Destroy static.
@@ -1862,7 +1862,7 @@ private:
               detail::enable_if_t<detail::disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const detail::mpz_struct_t &m)
     {
-        return std::make_pair(true, static_cast<T>(::mpz_get_d(&m)));
+        return std::make_pair(true, static_cast<T>(mpz_get_d(&m)));
     }
 #if defined(MPPP_WITH_MPFR)
     template <typename T, detail::enable_if_t<std::is_same<T, long double>::value, int> = 0>
@@ -2047,7 +2047,7 @@ public:
                 m_int.g_st()._mp_size = -m_int.g_st()._mp_size;
             }
         } else {
-            ::mpz_abs(&m_int.g_dy(), &m_int.g_dy());
+            mpz_abs(&m_int.g_dy(), &m_int.g_dy());
         }
         return *this;
     }
@@ -2067,7 +2067,7 @@ public:
         if (mppp_unlikely(sgn() < 0)) {
             throw std::invalid_argument("Cannot run primality tests on the negative number " + to_string());
         }
-        return ::mpz_probab_prime_p(get_mpz_view(), reps);
+        return mpz_probab_prime_p(get_mpz_view(), reps);
     }
     // Integer square root (in-place version).
     integer &sqrt()
@@ -2537,7 +2537,7 @@ inline void swap(integer<SSize> &n1, integer<SSize> &n2) noexcept
     } else {
         // Swap with other. Self swap is fine, mpz_swap() can have
         // aliasing arguments.
-        ::mpz_swap(&u1.g_dy(), &u2.g_dy());
+        mpz_swap(&u1.g_dy(), &u2.g_dy());
     }
 }
 
@@ -2752,11 +2752,11 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             if (asize2 == 1) {
                 // NOTE: we are not masking data2[0] with GMP_NUMB_MASK, I am assuming the mpn function
                 // is able to deal with a limb with a nail.
-                cy = ::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+                cy = mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
             } else if (asize1 == asize2) {
-                cy = ::mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+                cy = mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
             } else {
-                cy = ::mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+                cy = mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
             }
             if (cy) {
                 assert(asize1 < static_int<SSize>::s_size);
@@ -2772,9 +2772,9 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t cy;
             if (asize1 == 1) {
-                cy = ::mpn_add_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+                cy = mpn_add_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
             } else {
-                cy = ::mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+                cy = mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
             }
             if (cy) {
                 assert(asize2 < static_int<SSize>::s_size);
@@ -2785,16 +2785,16 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             }
         }
     } else {
-        if (asize1 > asize2 || (asize1 == asize2 && ::mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
+        if (asize1 > asize2 || (asize1 == asize2 && mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
             // abs(op1) >= abs(op2).
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t br;
             if (asize2 == 1) {
-                br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+                br = mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
             } else if (asize1 == asize2) {
-                br = ::mpn_sub_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+                br = mpn_sub_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
             } else {
-                br = ::mpn_sub(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+                br = mpn_sub(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
             }
             assert(!br);
             rop._mp_size = integer_sub_compute_size(rdata, asize1);
@@ -2806,9 +2806,9 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             ::mp_limb_t br;
             if (asize1 == 1) {
-                br = ::mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+                br = mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
             } else {
-                br = ::mpn_sub(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+                br = mpn_sub(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
             }
             assert(!br);
             rop._mp_size = integer_sub_compute_size(rdata, asize2);
@@ -2993,7 +2993,7 @@ inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
-    ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3040,7 +3040,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
     }
     if (sign1 == sign2) {
         // op1 and op2 have the same sign. Implement as a true addition.
-        if (::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2)) {
+        if (mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2)) {
             assert(asize1 < static_int<SSize>::s_size);
             // New size is old size + 1 if old size was positive, old size - 1 otherwise.
             rop._mp_size = size1 + sign2;
@@ -3054,7 +3054,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
         // op1 and op2 have different signs. Implement as a subtraction.
         if (asize1 > 1 || (asize1 == 1 && (data1[0] & GMP_NUMB_MASK) >= l2)) {
             // abs(op1) >= abs(op2).
-            const auto br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
+            const auto br = mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
             ignore(br);
             assert(!br);
             // The asize can be the original one or original - 1 (we subtracted a limb). If size1 was positive,
@@ -3063,7 +3063,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
             rop._mp_size = size1 + sign2 * !(rdata[asize1 - 1] & GMP_NUMB_MASK);
         } else {
             // abs(op2) > abs(op1).
-            const auto br = ::mpn_sub_1(rdata, &l2, 1, data1[0]);
+            const auto br = mpn_sub_1(rdata, &l2, 1, data1[0]);
             ignore(br);
             assert(!br);
             // The size must be +-1, as abs(op2) == abs(op1) is handled above.
@@ -3209,7 +3209,7 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
     //   the GMP API expects.
     if (op2 <= std::numeric_limits<unsigned long>::max()) {
         // op2 actually fits in unsigned long, let's just invoke the mpz_add_ui() function directly.
-        ::mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
+        mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
     } else {
         // LCOV_EXCL_START
         // op2 overflows unsigned long, but still fits in a limb. We will create a fake mpz struct
@@ -3222,7 +3222,7 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
         // as op2 is unsigned, fits in an mp_limbt_t and it is not zero (otherwise we would've taken
         // the other branch).
         const detail::mpz_struct_t tmp_mpz{1, 1, op2_copy};
-        ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
+        mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
     return rop;
@@ -3282,7 +3282,7 @@ inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
-    ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3314,12 +3314,12 @@ inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op
         rop._get_union().promote(SSize + 1u);
     }
     if (op2 <= std::numeric_limits<unsigned long>::max()) {
-        ::mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
+        mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
     } else {
         // LCOV_EXCL_START
         ::mp_limb_t op2_copy[1] = {static_cast<::mp_limb_t>(op2)};
         const detail::mpz_struct_t tmp_mpz{1, 1, op2_copy};
-        ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
+        mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
     return rop;
@@ -3417,18 +3417,18 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
     ::mp_limb_t hi;
     if (asize2 == 1) {
         // NOTE: the 1-limb versions do not write the hi limb, we have to write it ourselves.
-        hi = ::mpn_mul_1(res_data, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        hi = mpn_mul_1(res_data, data1, static_cast<::mp_size_t>(asize1), data2[0]);
         res_data[asize1] = hi;
     } else if (asize1 == 1) {
-        hi = ::mpn_mul_1(res_data, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+        hi = mpn_mul_1(res_data, data2, static_cast<::mp_size_t>(asize2), data1[0]);
         res_data[asize2] = hi;
     } else if (asize1 == asize2) {
-        ::mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
+        mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
         hi = res_data[2 * asize1 - 1];
     } else if (asize1 >= asize2) {
-        hi = ::mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+        hi = mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
     } else {
-        hi = ::mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+        hi = mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
     }
     // The actual size.
     const std::size_t asize = max_asize - unsigned(hi == 0u);
@@ -3594,7 +3594,7 @@ inline integer<SSize> &mul(integer<SSize> &rop, const integer<SSize> &op1, const
         // revisit this.
         rop._get_union().promote(size_hint);
     }
-    ::mpz_mul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_mul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3812,7 +3812,7 @@ inline integer<SSize> &addmul(integer<SSize> &rop, const integer<SSize> &op1, co
     if (sr) {
         rop._get_union().promote(size_hint);
     }
-    ::mpz_addmul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_addmul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3832,7 +3832,7 @@ inline integer<SSize> &submul(integer<SSize> &rop, const integer<SSize> &op1, co
     if (sr) {
         rop._get_union().promote(size_hint);
     }
-    ::mpz_submul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_submul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -3875,8 +3875,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
         if (rs) {
             // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
             // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() + ls >= n.m_limbs.data().
-            ret = ::mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize),
-                               unsigned(rs));
+            ret = mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs));
             // Write bits spilling out.
             rop.m_limbs[new_asize] = ret;
         } else {
@@ -3899,7 +3898,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
             // In this case the operation may fail, so we need to write to temporary storage.
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, SSize> tmp;
-            if (::mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
+            if (mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
                 return SSize + 1u;
             }
             // The shift was successful without spill over, copy the content from the tmp
@@ -4040,7 +4039,7 @@ inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::
     if (sr) {
         rop._get_union().promote(size_hint);
     }
-    ::mpz_mul_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+    mpz_mul_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
     return rop;
 }
 
@@ -4083,7 +4082,7 @@ inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSiz
     const auto res_data = res.data();
 
     // Run the mpn function.
-    ::mpn_sqr(res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    mpn_sqr(res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
 
     // Compute the actual size of the result: it could be asize * 2
     // or 1 less, depending on whether the most significant limb of the
@@ -4188,7 +4187,7 @@ inline integer<SSize> &sqr(integer<SSize> &rop, const integer<SSize> &n)
     if (sr) {
         rop._get_union().promote(size_hint);
     }
-    ::mpz_mul(&rop._get_union().g_dy(), n.get_mpz_view(), n.get_mpz_view());
+    mpz_mul(&rop._get_union().g_dy(), n.get_mpz_view(), n.get_mpz_view());
     return rop;
 }
 
@@ -4257,7 +4256,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     const auto sqr_res_data = sqr_res.data();
 
     // Run the squaring function.
-    ::mpn_sqr(sqr_res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    mpn_sqr(sqr_res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
     // Compute the actual size of the result of the squaring: it could be asize * 2
     // or 1 less, depending on whether the most significant limb of the
     // result is zero.
@@ -4289,15 +4288,14 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     mpz_size_t ret_size;
     if (mod_asize == 1u) {
         // Optimization when the divisor has 1 limb.
-        r_res[0]
-            = ::mpn_divrem_1(q_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize), mod.m_limbs[0]);
+        r_res[0] = mpn_divrem_1(q_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize), mod.m_limbs[0]);
         // The size can be 1 or zero, depending on the value
         // of the only limb in r_res.
         ret_size = static_cast<mpz_size_t>((r_res[0] & GMP_NUMB_MASK) != 0u);
     } else {
         // The general case.
-        ::mpn_tdiv_qr(q_res.data(), r_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize),
-                      mod.m_limbs.data(), static_cast<::mp_size_t>(mod_asize));
+        mpn_tdiv_qr(q_res.data(), r_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize),
+                    mod.m_limbs.data(), static_cast<::mp_size_t>(mod_asize));
         // Determine the size of the output, which will
         // be in the [0, mod_asize] range.
         ret_size = static_cast<mpz_size_t>(mod_asize);
@@ -4390,8 +4388,8 @@ inline integer<SSize> &sqrm(integer<SSize> &rop, const integer<SSize> &op, const
     // NOTE: use temp storage to avoid issues with overlapping
     // arguments.
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    ::mpz_mul(&tmp.m_mpz, op.get_mpz_view(), op.get_mpz_view());
-    ::mpz_tdiv_r(&rop._get_union().g_dy(), &tmp.m_mpz, mod.get_mpz_view());
+    mpz_mul(&tmp.m_mpz, op.get_mpz_view(), op.get_mpz_view());
+    mpz_tdiv_r(&rop._get_union().g_dy(), &tmp.m_mpz, mod.get_mpz_view());
 
     return rop;
 }
@@ -4492,11 +4490,11 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
         r.m_limbs[0]
-            = ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+            = mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
         // General implementation.
-        ::mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1),
-                      data2, static_cast<::mp_size_t>(asize2));
+        mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
+                    static_cast<::mp_size_t>(asize2));
     }
     // Complete the quotient: compute size and sign.
     q._mp_size = asize1 - asize2 + 1;
@@ -4681,7 +4679,7 @@ inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &
     if (sr) {
         r._get_union().promote();
     }
-    ::mpz_tdiv_qr(&q._get_union().g_dy(), &r._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    mpz_tdiv_qr(&q._get_union().g_dy(), &r._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
 }
 
 namespace detail
@@ -4725,13 +4723,13 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
-        ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> r_unused;
         // General implementation.
-        ::mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
-                      static_cast<::mp_size_t>(asize2));
+        mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
+                    static_cast<::mp_size_t>(asize2));
     }
     // Complete the quotient: compute size and sign.
     q._mp_size = asize1 - asize2 + 1;
@@ -4820,7 +4818,7 @@ inline integer<SSize> &tdiv_q(integer<SSize> &q, const integer<SSize> &n, const 
     if (sq) {
         q._get_union().promote();
     }
-    ::mpz_tdiv_q(&q._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    mpz_tdiv_q(&q._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
     return q;
 }
 
@@ -4844,7 +4842,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     if (asize2 == 1) {
         // Optimisation in case the dividend has only 1 limb.
         // NOTE: overlapping arguments are fine here.
-        ::mpn_divexact_1(q.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
+        mpn_divexact_1(q.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
         // Complete the quotient: compute size and sign.
         q._mp_size = asize1 - asize2 + 1;
         while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
@@ -4863,7 +4861,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     MPPP_MAYBE_TLS mpz_raii tmp;
     const auto v1 = op1.get_mpz_view();
     const auto v2 = op2.get_mpz_view();
-    ::mpz_divexact(&tmp.m_mpz, &v1, &v2);
+    mpz_divexact(&tmp.m_mpz, &v1, &v2);
     // Copy over from the tmp struct into q.
     q._mp_size = tmp.m_mpz._mp_size;
     copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + (q._mp_size >= 0 ? q._mp_size : -q._mp_size), q.m_limbs.data());
@@ -4941,7 +4939,7 @@ inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, co
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
     return rop;
 }
 
@@ -4996,7 +4994,7 @@ inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n
     }
     // NOTE: there's no public mpz_divexact_gcd() function in GMP, just use
     // mpz_divexact() directly.
-    ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
     return rop;
 }
 
@@ -5043,7 +5041,7 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
     if (rs) {
         // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
         // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() <= n.m_limbs.data() + ls.
-        ::mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
+        mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
     } else {
         // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
         // NOTE: std::move requires that the destination iterator is not within the input range.
@@ -5139,7 +5137,7 @@ inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n,
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_tdiv_q_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+    mpz_tdiv_q_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
     return rop;
 }
 
@@ -5162,7 +5160,7 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2)
         // NOTE: reduce the value of the comparison to the [-1, 1] range, so that
         // if we need to negate it below we ensure not to run into overflows.
         const int cmp_abs
-            = integral_sign(::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize)));
+            = integral_sign(mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize)));
         // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
         return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
     }
@@ -5220,7 +5218,7 @@ inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
     if (mppp_likely(s1 && s2)) {
         return static_cmp(op1._get_union().g_st(), op2._get_union().g_st());
     }
-    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
+    return mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
 }
 
 // Sign function.
@@ -5328,7 +5326,7 @@ inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op,
         }
         if (sign) {
             const auto cy
-                = static_cast<mpz_size_t>(::mpn_add_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1));
+                = static_cast<mpz_size_t>(mpn_add_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1));
             if (cy) {
                 // If there's a carry, we'll need to write into the upper limb.
                 assert(asize < static_cast<mpz_size_t>(SSize));
@@ -5342,7 +5340,7 @@ inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op,
         }
         return true;
     }
-    ::mpn_sub_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1);
+    mpn_sub_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1);
     // Size will be the original asize minus possibly 1, if the original topmost limb
     // has become zero.
     rop._mp_size
@@ -5383,7 +5381,7 @@ inline integer<SSize> &bitwise_not(integer<SSize> &rop, const integer<SSize> &op
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_com(&rop._get_union().g_dy(), op.get_mpz_view());
+    mpz_com(&rop._get_union().g_dy(), op.get_mpz_view());
     return rop;
 }
 
@@ -5510,7 +5508,7 @@ inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
     // Create a copy so we can compare to the original value later.
     auto size = n;
     // Flip the bits.
-    ::mpn_com(rop, sp, static_cast<::mp_size_t>(size));
+    mpn_com(rop, sp, static_cast<::mp_size_t>(size));
     // Compute the new size.
     if ((rop[size - 1] & GMP_NUMB_MASK) == 0u) {
         --size;
@@ -5521,7 +5519,7 @@ inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
     if (size != 0) {
         // If rop is nonzero, use the mpn_add_1() primitive, storing the carry
         // and updating the size if necessary.
-        if (::mpn_add_1(rop, rop, size, 1) != 0u) {
+        if (mpn_add_1(rop, rop, size, 1) != 0u) {
             // This needs to hold as sp is nonzero: 2sc can never
             // overflow the highest limb.
             assert(size < n);
@@ -5569,7 +5567,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         // Set the size.
         rop._mp_size = asize1;
         // Compute the ior.
-        ::mpn_ior_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
+        mpn_ior_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
         // Copy extra limbs from data1.
         copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
         return;
@@ -5585,7 +5583,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOTE: in all 3 cases, the mpn_ior_n() is done with the minimum size among the operands
             // (asize2). In this case, due to the twosc, the first most significant limbs in tmp1 might
             // be zero, but according to the mpn docs this is not a problem.
-            ::mpn_ior_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
+            mpn_ior_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
             // Copy over the remaining limbs from the largest operand.
             copy_limbs(tmp1.data() + asize2, tmp1.data() + asize1, rop.m_limbs.data() + asize2);
             // The final twosc. This will return the effective abs size, which we need to negate.
@@ -5597,13 +5595,13 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOTE: after the twosc, the limbs in tmp2 from asize2 to asize1 should be set
             // to all 1s. We don't need to actually do that: ORing op1 with these high all-1 limbs
             // produces all-1 limbs in the result, and the final twosc will flip them back to zero.
-            ::mpn_ior_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_ior_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
             rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize2);
             break;
         case 3u:
             twosc(tmp1.data(), data1, asize1);
             twosc(tmp2.data(), data2, asize2);
-            ::mpn_ior_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_ior_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
             rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize2);
             break;
     }
@@ -5644,7 +5642,7 @@ inline integer<SSize> &bitwise_ior(integer<SSize> &rop, const integer<SSize> &op
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_ior(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_ior(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -5804,7 +5802,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     if (sign1 > 0 && sign2 > 0) {
         // The easy case: both are nonnegative.
         // Compute the and.
-        ::mpn_and_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
+        mpn_and_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
         // The asize will be at most asize2. Upper limbs could be zero due to the ANDing.
         rop._mp_size = compute_static_int_asize(rop, asize2);
         return true;
@@ -5820,7 +5818,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOTE: in all 3 cases, the mpn_and_n() is done with the minimum size among the operands
             // (asize2). In this case, due to the twosc, the first most significant limbs in tmp1 might
             // be zero, but according to the mpn docs this is not a problem.
-            ::mpn_and_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
+            mpn_and_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
             // NOTE: size cannot be larger than asize2, as all the limbs above that limit from op1
             // will be set to zero by the ANDing.
             rop._mp_size = compute_static_int_asize(rop, asize2);
@@ -5829,7 +5827,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // op1 nonnegative, op2 negative.
             twosc(tmp2.data(), data2, asize2);
             // Do the AND.
-            ::mpn_and_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_and_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
             // Copy over the upper limbs of op1 to rop: the limbs in tmp2 from asize2 to asize1
             // are (virtually) set to all 1s by the twosc, so ANDing with the corresponding limbs
             // in op1 means simply copying op1 over.
@@ -5842,7 +5840,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             twosc(tmp2.data(), data2, asize2);
             // Write in temp storage, as we might overflow and we don't want to spoil
             // rop in that case.
-            ::mpn_and_n(tmpr.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_and_n(tmpr.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
             // Copy over the upper limbs of op1 to rop (same as above). Non overlapping,
             // as we are only using local storage.
             copy_limbs_no(tmp1.data() + asize2, tmp1.data() + asize1, tmpr.data() + asize2);
@@ -5897,7 +5895,7 @@ inline integer<SSize> &bitwise_and(integer<SSize> &rop, const integer<SSize> &op
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_and(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_and(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -6055,7 +6053,7 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     if (sign1 > 0 && sign2 > 0) {
         // The easy case: both are nonnegative.
         // Compute the xor.
-        ::mpn_xor_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
+        mpn_xor_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
         // Limbs from asize2 to asize1 in op1 get copied as-is, as they are XORed with
         // zeroes from op2.
         copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
@@ -6075,7 +6073,7 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // NOTE: in all 3 cases, the mpn_xor_n() is done with the minimum size among the operands
             // (asize2). In this case, due to the twosc, the first most significant limbs in tmp1 might
             // be zero, but according to the mpn docs this is not a problem.
-            ::mpn_xor_n(tmpr.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
+            mpn_xor_n(tmpr.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
             // Copy over the limbs in tmp1 from asize2 to asize1.
             copy_limbs_no(tmp1.data() + asize2, tmp1.data() + asize1, tmpr.data() + asize2);
             // Check for zero.
@@ -6089,12 +6087,12 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // op1 nonnegative, op2 negative.
             twosc(tmp2.data(), data2, asize2);
             // Do the XOR.
-            ::mpn_xor_n(tmpr.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_xor_n(tmpr.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
             // The limbs in tmp2 from asize2 to asize1 have all been set to 1: XORing them
             // with the corresponding limbs in op1 means bit-flipping the limbs in op1.
             if (asize2 != asize1) {
                 // NOTE: mpn functions require nonzero operands, so we need to branch here.
-                ::mpn_com(tmpr.data() + asize2, data1 + asize2, asize1 - asize2);
+                mpn_com(tmpr.data() + asize2, data1 + asize2, asize1 - asize2);
             }
             // Check for zero.
             if (mppp_unlikely(std::all_of(tmpr.data(), tmpr.data() + asize1,
@@ -6106,11 +6104,11 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         case 3u:
             twosc(tmp1.data(), data1, asize1);
             twosc(tmp2.data(), data2, asize2);
-            ::mpn_xor_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
+            mpn_xor_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
             // Same as above, regarding the all-1 limbs in tmp2.
             if (asize2 != asize1) {
                 // NOTE: mpn functions require nonzero operands, so we need to branch here.
-                ::mpn_com(rop.m_limbs.data() + asize2, tmp1.data() + asize2, asize1 - asize2);
+                mpn_com(rop.m_limbs.data() + asize2, tmp1.data() + asize2, asize1 - asize2);
             }
             rop._mp_size = compute_static_int_asize(rop, asize1);
             return true;
@@ -6158,7 +6156,7 @@ inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_xor(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_xor(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -6192,12 +6190,12 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // Special casing if an operand has asize 1.
     if (asize1 == 1) {
         rop._mp_size = 1;
-        rop.m_limbs[0] = ::mpn_gcd_1(op2.m_limbs.data(), static_cast<::mp_size_t>(asize2), op1.m_limbs[0]);
+        rop.m_limbs[0] = mpn_gcd_1(op2.m_limbs.data(), static_cast<::mp_size_t>(asize2), op1.m_limbs[0]);
         return;
     }
     if (asize2 == 1) {
         rop._mp_size = 1;
-        rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
+        rop.m_limbs[0] = mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
         return;
     }
     // General case, via mpz.
@@ -6212,7 +6210,7 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     MPPP_MAYBE_TLS mpz_raii tmp;
     const auto v1 = op1.get_mpz_view();
     const auto v2 = op2.get_mpz_view();
-    ::mpz_gcd(&tmp.m_mpz, &v1, &v2);
+    mpz_gcd(&tmp.m_mpz, &v1, &v2);
     // Copy over.
     rop._mp_size = tmp.m_mpz._mp_size;
     assert(rop._mp_size > 0);
@@ -6256,7 +6254,7 @@ inline void static_gcd_impl(static_int<1> &rop, const static_int<1> &op1, const 
     // We need to benchmark again when the next GMP version comes out. If the binary GCD
     // is still faster, we should consider using it instead of mpn_gcd_1(), as even on Intel
     // processors the binary GCD is only marginally slower than mpn_gcd_1().
-    rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(1), op2.m_limbs[0]);
+    rop.m_limbs[0] = mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(1), op2.m_limbs[0]);
 }
 
 template <std::size_t SSize>
@@ -6288,7 +6286,7 @@ inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const
     if (sr) {
         rop._get_union().promote();
     }
-    ::mpz_gcd(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    mpz_gcd(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
 }
 
@@ -6455,7 +6453,7 @@ inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
     // NOTE: let's get through a static temporary and then assign it to the rop,
     // so that rop will be static/dynamic according to the size of tmp.
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    ::mpz_fac_ui(&tmp.m_mpz, n);
+    mpz_fac_ui(&tmp.m_mpz, n);
     return rop = &tmp.m_mpz;
 }
 
@@ -6464,7 +6462,7 @@ template <std::size_t SSize>
 inline integer<SSize> &bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
 {
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
+    mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
     return rop = &tmp.m_mpz;
 }
 
@@ -6577,7 +6575,7 @@ template <std::size_t SSize>
 inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
 {
     MPPP_MAYBE_TLS mpz_raii tmp;
-    ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
+    mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
     rop = &tmp.m_mpz;
 }
 } // namespace detail
@@ -6612,7 +6610,7 @@ template <std::size_t SSize>
 inline integer<SSize> &pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned long exp)
 {
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
+    mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
     return rop = &tmp.m_mpz;
 }
 
@@ -6737,7 +6735,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
             std::array<::mp_limb_t, SSize> tmp;
             const bool overlap = (&rs == &ns);
             const auto rs_data = rs.m_limbs.data(), out_ptr = overlap ? tmp.data() : rs_data;
-            ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+            mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
             // Compute the size of the output (which is ceil(size / 2)).
             const auto new_size = size / 2u + size % 2u;
             assert(!new_size || (out_ptr[new_size - 1u] & GMP_NUMB_MASK));
@@ -6757,7 +6755,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         if (sr) {
             rop.promote();
         }
-        ::mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
+        mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
     }
 }
 } // namespace detail
@@ -6801,7 +6799,7 @@ inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, con
         const auto rops_data = rops.m_limbs.data(), out_ptr = overlap ? tmp.data() : rops_data,
                    rems_data = rems.m_limbs.data();
         // Do the computation. The function will return the size of the remainder.
-        const auto rem_size = ::mpn_sqrtrem(out_ptr, rems_data, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+        const auto rem_size = mpn_sqrtrem(out_ptr, rems_data, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
         // Compute the size of the output (which is ceil(size / 2)).
         const auto rop_size = size / 2u + size % 2u;
         assert(!rop_size || (out_ptr[rop_size - 1u] & GMP_NUMB_MASK));
@@ -6853,7 +6851,7 @@ inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
         if (srem) {
             rem._get_union().promote();
         }
-        ::mpz_sqrtrem(&rop._get_union().g_dy(), &rem._get_union().g_dy(), n.get_mpz_view());
+        mpz_sqrtrem(&rop._get_union().g_dy(), &rem._get_union().g_dy(), n.get_mpz_view());
     }
 }
 
@@ -6876,7 +6874,7 @@ inline bool perfect_square_p(const integer<SSize> &n)
         }
         // NOTE: as usual, we assume that we can freely cast any valid mpz_size_t to
         // mp_size_t when calling mpn functions.
-        return ::mpn_perfect_square_p(ptr, static_cast<::mp_size_t>(size)) != 0;
+        return mpn_perfect_square_p(ptr, static_cast<::mp_size_t>(size)) != 0;
     } else {
         // n is zero or negative. It is a perfect square
         // only if zero.
@@ -6896,7 +6894,7 @@ inline bool root(integer<SSize> &rop, const integer<SSize> &n, unsigned long m)
                                 + " of the negative number " + n.to_string());
     }
     MPPP_MAYBE_TLS detail::mpz_raii tmp;
-    const auto ret = ::mpz_root(&tmp.m_mpz, n.get_mpz_view(), m);
+    const auto ret = mpz_root(&tmp.m_mpz, n.get_mpz_view(), m);
     rop = &tmp.m_mpz;
     return ret != 0;
 }
@@ -6923,7 +6921,7 @@ inline void rootrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
     }
     MPPP_MAYBE_TLS detail::mpz_raii tmp_rop;
     MPPP_MAYBE_TLS detail::mpz_raii tmp_rem;
-    ::mpz_rootrem(&tmp_rop.m_mpz, &tmp_rem.m_mpz, n.get_mpz_view(), m);
+    mpz_rootrem(&tmp_rop.m_mpz, &tmp_rem.m_mpz, n.get_mpz_view(), m);
     rop = &tmp_rop.m_mpz;
     rem = &tmp_rem.m_mpz;
 }
@@ -6932,7 +6930,7 @@ inline void rootrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
 template <std::size_t SSize>
 inline bool perfect_power_p(const integer<SSize> &n)
 {
-    return ::mpz_perfect_power_p(n.get_mpz_view()) != 0;
+    return mpz_perfect_power_p(n.get_mpz_view()) != 0;
 }
 
 namespace detail
@@ -7719,7 +7717,7 @@ inline bool static_less_than(const static_int<SSize> &n1, const static_int<SSize
 
     // The two sizes are equal, compare the absolute values.
     if (size1) {
-        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
+        const int cmp_abs = mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
         return (size1 >= 0 && cmp_abs < 0) || (size1 < 0 && cmp_abs > 0);
     }
     // Both operands are zero.
@@ -7736,7 +7734,7 @@ inline bool dispatch_less_than(const integer<SSize> &op1, const integer<SSize> &
         return static_less_than(op1._get_union().g_st(), op2._get_union().g_st());
     }
 
-    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) < 0;
+    return mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) < 0;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>
@@ -7793,7 +7791,7 @@ inline bool static_greater_than(const static_int<SSize> &n1, const static_int<SS
     }
 
     if (size1) {
-        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
+        const int cmp_abs = mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
         return (size1 >= 0 && cmp_abs > 0) || (size1 < 0 && cmp_abs < 0);
     }
     return false;
@@ -7807,7 +7805,7 @@ inline bool dispatch_greater_than(const integer<SSize> &op1, const integer<SSize
         return static_greater_than(op1._get_union().g_st(), op2._get_union().g_st());
     }
 
-    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) > 0;
+    return mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) > 0;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral<T>::value, int> = 0>

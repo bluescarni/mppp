@@ -43,7 +43,7 @@ struct bin_tester {
         // Start with all zeroes.
         detail::mpz_raii m1, m2;
         integer n1, n2;
-        ::mpz_bin_ui(&m1.m_mpz, &m2.m_mpz, 0u);
+        mpz_bin_ui(&m1.m_mpz, &m2.m_mpz, 0u);
         REQUIRE(&bin_ui(n1, n2, 0) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(bin_ui(n2, 0)) == lex_cast(m1)));
@@ -59,7 +59,7 @@ struct bin_tester {
             }
             const auto n = ndist(rng);
             const auto k = kdist(rng);
-            ::mpz_set_si(&m2.m_mpz, n);
+            mpz_set_si(&m2.m_mpz, n);
             n2 = integer(n);
             if (n1.is_static() && sdist(rng)) {
                 // Promote sometimes, if possible.
@@ -69,7 +69,7 @@ struct bin_tester {
                 // Promote sometimes, if possible.
                 n2.promote();
             }
-            ::mpz_bin_ui(&m1.m_mpz, &m2.m_mpz, k);
+            mpz_bin_ui(&m1.m_mpz, &m2.m_mpz, k);
             bin_ui(n1, n2, k);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE((lex_cast(bin_ui(n2, k)) == lex_cast(m1)));
@@ -132,8 +132,8 @@ struct binomial_tester {
                 CHECK_NOTHROW(binomial(n, tmp2));
                 continue;
             }
-            ::mpz_set_si(&m.m_mpz, static_cast<long>(tmp1));
-            ::mpz_bin_ui(&m.m_mpz, &m.m_mpz, static_cast<unsigned long>(tmp2));
+            mpz_set_si(&m.m_mpz, static_cast<long>(tmp1));
+            mpz_bin_ui(&m.m_mpz, &m.m_mpz, static_cast<unsigned long>(tmp2));
             REQUIRE(binomial(n, tmp2).to_string() == lex_cast(m));
         }
         REQUIRE_THROWS_AS(binomial(n, std::numeric_limits<unsigned long>::max() + int_type(1)), std::overflow_error);

@@ -42,7 +42,7 @@ struct sqrt_tester {
         // Start with all zeroes.
         detail::mpz_raii m1, m2;
         integer n1, n2;
-        ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
+        mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         REQUIRE(&sqrt(n1, n2) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -53,8 +53,8 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Try one.
         n2 = integer{1};
-        ::mpz_set_ui(&m2.m_mpz, 1u);
-        ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
+        mpz_set_ui(&m2.m_mpz, 1u);
+        mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         sqrt(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -65,8 +65,8 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Two.
         n2 = integer{2};
-        ::mpz_set_ui(&m2.m_mpz, 2u);
-        ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
+        mpz_set_ui(&m2.m_mpz, 2u);
+        mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         sqrt(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -77,8 +77,8 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Four.
         n2 = integer{4};
-        ::mpz_set_ui(&m2.m_mpz, 4u);
-        ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
+        mpz_set_ui(&m2.m_mpz, 4u);
+        mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         sqrt(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -89,8 +89,8 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Ten.
         n2 = integer{10};
-        ::mpz_set_ui(&m2.m_mpz, 10u);
-        ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
+        mpz_set_ui(&m2.m_mpz, 10u);
+        mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         sqrt(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -122,13 +122,13 @@ struct sqrt_tester {
                     n1 = integer{};
                 }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
                 }
-                ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
+                mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
                 sqrt(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(sqrt(n2)) == lex_cast(m1)));
@@ -136,7 +136,7 @@ struct sqrt_tester {
                 REQUIRE((lex_cast(n2) == lex_cast(m1)));
                 // Overlap.
                 n2 = integer(detail::mpz_to_str(&m2.m_mpz));
-                ::mpz_sqrt(&m2.m_mpz, &m2.m_mpz);
+                mpz_sqrt(&m2.m_mpz, &m2.m_mpz);
                 sqrt(n2, n2);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
             }
@@ -183,7 +183,7 @@ struct sqrtrem_tester {
         // Start with all zeroes.
         detail::mpz_raii m1, m2, m3;
         integer n1, n2, n3;
-        ::mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         sqrtrem(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
@@ -191,8 +191,8 @@ struct sqrtrem_tester {
         REQUIRE(n2.is_static());
         // Try one.
         n3 = 1;
-        ::mpz_set_ui(&m3.m_mpz, 1u);
-        ::mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_set_ui(&m3.m_mpz, 1u);
+        mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         sqrtrem(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
@@ -200,8 +200,8 @@ struct sqrtrem_tester {
         REQUIRE(n2.is_static());
         // Two.
         n3 = 2;
-        ::mpz_set_ui(&m3.m_mpz, 2u);
-        ::mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_set_ui(&m3.m_mpz, 2u);
+        mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         sqrtrem(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
@@ -209,8 +209,8 @@ struct sqrtrem_tester {
         REQUIRE(n2.is_static());
         // Four.
         n3 = 4;
-        ::mpz_set_ui(&m3.m_mpz, 4u);
-        ::mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_set_ui(&m3.m_mpz, 4u);
+        mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         sqrtrem(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
@@ -218,8 +218,8 @@ struct sqrtrem_tester {
         REQUIRE(n2.is_static());
         // Ten.
         n3 = 10;
-        ::mpz_set_ui(&m3.m_mpz, 10u);
-        ::mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        mpz_set_ui(&m3.m_mpz, 10u);
+        mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         sqrtrem(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
@@ -256,25 +256,25 @@ struct sqrtrem_tester {
                     n2 = integer{};
                 }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (n3.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n3.promote();
                 }
-                ::mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 sqrtrem(n1, n2, n3);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // Argument overlaps with rop.
-                ::mpz_sqrtrem(&m3.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                mpz_sqrtrem(&m3.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 sqrtrem(n3, n2, n3);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 REQUIRE((lex_cast(n3) == lex_cast(m3)));
                 // Argument overlaps with rem.
-                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
-                ::mpz_sqrtrem(&m1.m_mpz, &m3.m_mpz, &m3.m_mpz);
+                mpz_sqrtrem(&m1.m_mpz, &m3.m_mpz, &m3.m_mpz);
                 sqrtrem(n1, n3, n3);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n3) == lex_cast(m3)));
@@ -357,7 +357,7 @@ struct perfect_square_p_tester {
                     // Promote sometimes, if possible.
                     n.promote();
                 }
-                REQUIRE((::mpz_perfect_square_p(&tmp.m_mpz) != 0) == perfect_square_p(n));
+                REQUIRE((mpz_perfect_square_p(&tmp.m_mpz) != 0) == perfect_square_p(n));
             }
         };
 

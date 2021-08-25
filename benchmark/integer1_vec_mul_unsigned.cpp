@@ -162,12 +162,12 @@ int main()
         mppp_benchmark::simple_timer st;
 
         for (auto i = 0ul; i < size; ++i) {
-            ::mpz_mul(std::get<3>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
-                      std::get<1>(p)[i].backend().data());
+            mpz_mul(std::get<3>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
+                    std::get<1>(p)[i].backend().data());
         }
         for (auto i = 0ul; i < size; ++i) {
-            ::mpz_add(std::get<3>(p)[i].backend().data(), std::get<2>(p)[i].backend().data(),
-                      std::get<3>(p)[i].backend().data());
+            mpz_add(std::get<3>(p)[i].backend().data(), std::get<2>(p)[i].backend().data(),
+                    std::get<3>(p)[i].backend().data());
         }
 
         const auto runtime = st.elapsed();

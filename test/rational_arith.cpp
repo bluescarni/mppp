@@ -42,7 +42,7 @@ struct add_tester {
         detail::mpq_raii m1, m2, m3;
         rational n1, n2, n3;
         REQUIRE(&add(n1, n2, n3) == &n1);
-        ::mpq_add(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+        mpq_add(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2 + n3) == lex_cast(m1)));
         REQUIRE(n1.get_num().is_static());
@@ -57,10 +57,10 @@ struct add_tester {
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 random_rational(tmp, x, rng);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {
@@ -72,10 +72,10 @@ struct add_tester {
                     n2._get_den().promote();
                 }
                 random_rational(tmp, y, rng);
-                ::mpq_set(&m3.m_mpq, &tmp.m_mpq);
+                mpq_set(&m3.m_mpq, &tmp.m_mpq);
                 n3 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m3.m_mpq, &m3.m_mpq);
+                    mpq_neg(&m3.m_mpq, &m3.m_mpq);
                     n3.neg();
                 }
                 if (n3.get_num().is_static() && sdist(rng)) {
@@ -92,36 +92,36 @@ struct add_tester {
                     n1 = rational{};
                 }
                 add(n1, n2, n3);
-                ::mpq_add(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+                mpq_add(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2 + n3) == lex_cast(m1)));
                 // Various variations of in-place.
                 auto n1_old(n1);
                 auto n2_old(n2);
                 add(n1, n1, n2);
-                ::mpq_add(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                mpq_add(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1_old + n2) == lex_cast(m1)));
                 add(n2, n1, n2);
-                ::mpq_add(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                mpq_add(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 REQUIRE((lex_cast(n1 + n2_old) == lex_cast(m2)));
                 n1_old = n1;
                 add(n1, n1, n1);
-                ::mpq_add(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
+                mpq_add(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1_old + n1_old) == lex_cast(m1)));
                 // Tests with integral arguments.
                 auto n2_copy(n2);
                 auto n3_copy(n3);
                 detail::mpq_raii m2_copy, m3_copy;
-                ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
-                ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
+                mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
+                mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
                 add(n1, n2_copy, n3_copy);
-                ::mpq_add(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                mpq_add(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy + n3_copy) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy.get_num() + n3_copy) == lex_cast(m1)));
@@ -130,9 +130,9 @@ struct add_tester {
                 REQUIRE((lex_cast(n3_copy + n2_copy) == lex_cast(m1)));
                 REQUIRE((lex_cast(n3_copy + n2_copy.get_num()) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 add(n1, n2_copy, n3_copy);
-                ::mpq_add(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                mpq_add(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n3_copy + n2_copy) == lex_cast(m1)));
                 // Tests with equal dens. This checks that
@@ -149,21 +149,21 @@ struct add_tester {
                 // Test subtraction of equal numbers.
                 if (x == y) {
                     random_rational(tmp, x, rng);
-                    ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                    mpq_set(&m2.m_mpq, &tmp.m_mpq);
                     n2 = rational(&tmp.m_mpq);
                     const bool neg = sdist(rng) == 1;
                     if (neg) {
-                        ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                        mpq_neg(&m2.m_mpq, &m2.m_mpq);
                         n2.neg();
                     }
-                    ::mpq_set(&m3.m_mpq, &tmp.m_mpq);
+                    mpq_set(&m3.m_mpq, &tmp.m_mpq);
                     n3 = rational(&tmp.m_mpq);
                     if (!neg) {
-                        ::mpq_neg(&m3.m_mpq, &m3.m_mpq);
+                        mpq_neg(&m3.m_mpq, &m3.m_mpq);
                         n3.neg();
                     }
                     add(n1, n2, n3);
-                    ::mpq_add(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+                    mpq_add(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n2 + n3) == lex_cast(m1)));
                     REQUIRE((lex_cast(n1) == "0"));
@@ -215,7 +215,7 @@ struct sub_tester {
         detail::mpq_raii m1, m2, m3;
         rational n1, n2, n3;
         REQUIRE(&sub(n1, n2, n3) == &n1);
-        ::mpq_sub(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+        mpq_sub(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2 - n3) == lex_cast(m1)));
         REQUIRE(n1.get_num().is_static());
@@ -230,10 +230,10 @@ struct sub_tester {
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 random_rational(tmp, x, rng);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {
@@ -245,10 +245,10 @@ struct sub_tester {
                     n2._get_den().promote();
                 }
                 random_rational(tmp, y, rng);
-                ::mpq_set(&m3.m_mpq, &tmp.m_mpq);
+                mpq_set(&m3.m_mpq, &tmp.m_mpq);
                 n3 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m3.m_mpq, &m3.m_mpq);
+                    mpq_neg(&m3.m_mpq, &m3.m_mpq);
                     n3.neg();
                 }
                 if (n3.get_num().is_static() && sdist(rng)) {
@@ -265,36 +265,36 @@ struct sub_tester {
                     n1 = rational{};
                 }
                 sub(n1, n2, n3);
-                ::mpq_sub(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+                mpq_sub(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2 - n3) == lex_cast(m1)));
                 // Various variations of in-place.
                 auto old_n1(n1);
                 auto old_n2(n2);
                 sub(n1, n1, n2);
-                ::mpq_sub(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                mpq_sub(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(old_n1 - n2) == lex_cast(m1)));
                 sub(n2, n1, n2);
-                ::mpq_sub(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                mpq_sub(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 REQUIRE((lex_cast(n1 - old_n2) == lex_cast(m2)));
                 old_n1 = n1;
                 sub(n1, n1, n1);
-                ::mpq_sub(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
+                mpq_sub(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(old_n1 - old_n1) == lex_cast(m1)));
                 // Tests with integral arguments.
                 auto n2_copy(n2);
                 auto n3_copy(n3);
                 detail::mpq_raii m2_copy, m3_copy;
-                ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
-                ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
+                mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
+                mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
                 sub(n1, n2_copy, n3_copy);
-                ::mpq_sub(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                mpq_sub(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy - n3_copy) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy.get_num() - n3_copy) == lex_cast(m1)));
@@ -304,9 +304,9 @@ struct sub_tester {
                 REQUIRE((lex_cast(-(n3_copy - n2_copy)) == lex_cast(m1)));
                 REQUIRE((lex_cast(-(n3_copy - n2_copy.get_num())) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 sub(n1, n2_copy, n3_copy);
-                ::mpq_sub(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                mpq_sub(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy - n3_copy) == lex_cast(m1)));
                 // Tests with equal dens. This checks that
@@ -323,23 +323,23 @@ struct sub_tester {
                 // Test subtraction of equal numbers.
                 if (x == y) {
                     random_rational(tmp, x, rng);
-                    ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
-                    ::mpq_neg(&m2.m_mpq, &tmp.m_mpq);
+                    mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                    mpq_neg(&m2.m_mpq, &tmp.m_mpq);
                     n2 = rational(&tmp.m_mpq);
                     n2.neg();
                     const bool neg = sdist(rng) == 1;
                     if (neg) {
-                        ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                        mpq_neg(&m2.m_mpq, &m2.m_mpq);
                         n2.neg();
                     }
-                    ::mpq_set(&m3.m_mpq, &tmp.m_mpq);
+                    mpq_set(&m3.m_mpq, &tmp.m_mpq);
                     n3 = rational(&tmp.m_mpq);
                     if (!neg) {
-                        ::mpq_neg(&m3.m_mpq, &m3.m_mpq);
+                        mpq_neg(&m3.m_mpq, &m3.m_mpq);
                         n3.neg();
                     }
                     sub(n1, n2, n3);
-                    ::mpq_sub(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+                    mpq_sub(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
                     REQUIRE((lex_cast(n2 - n3) == lex_cast(m1)));
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n1) == "0"));
@@ -391,7 +391,7 @@ struct mul_tester {
         detail::mpq_raii m1, m2, m3;
         rational n1, n2, n3;
         REQUIRE(&mul(n1, n2, n3) == &n1);
-        ::mpq_mul(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+        mpq_mul(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2 * n3) == lex_cast(m1)));
         REQUIRE(n1.get_num().is_static());
@@ -406,10 +406,10 @@ struct mul_tester {
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 random_rational(tmp, x, rng);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {
@@ -421,10 +421,10 @@ struct mul_tester {
                     n2._get_den().promote();
                 }
                 random_rational(tmp, y, rng);
-                ::mpq_set(&m3.m_mpq, &tmp.m_mpq);
+                mpq_set(&m3.m_mpq, &tmp.m_mpq);
                 n3 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m3.m_mpq, &m3.m_mpq);
+                    mpq_neg(&m3.m_mpq, &m3.m_mpq);
                     n3.neg();
                 }
                 if (n3.get_num().is_static() && sdist(rng)) {
@@ -441,36 +441,36 @@ struct mul_tester {
                     n1 = rational{};
                 }
                 mul(n1, n2, n3);
-                ::mpq_mul(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+                mpq_mul(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2 * n3) == lex_cast(m1)));
                 // Various variations of in-place.
                 auto n1_old(n1);
                 auto n2_old(n2);
                 mul(n1, n1, n2);
-                ::mpq_mul(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                mpq_mul(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1_old * n2) == lex_cast(m1)));
                 mul(n2, n1, n2);
-                ::mpq_mul(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                mpq_mul(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 REQUIRE((lex_cast(n2_old * n1) == lex_cast(m2)));
                 n1_old = n1;
                 mul(n1, n1, n1);
-                ::mpq_mul(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
+                mpq_mul(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1_old * n1_old) == lex_cast(m1)));
                 // Tests with integral arguments.
                 auto n2_copy(n2);
                 auto n3_copy(n3);
                 detail::mpq_raii m2_copy, m3_copy;
-                ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
-                ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
+                mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
+                mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
                 mul(n1, n2_copy, n3_copy);
-                ::mpq_mul(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                mpq_mul(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy * n3_copy) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy.get_num() * n3_copy) == lex_cast(m1)));
@@ -479,9 +479,9 @@ struct mul_tester {
                 REQUIRE((lex_cast(n3_copy * n2_copy) == lex_cast(m1)));
                 REQUIRE((lex_cast(n3_copy * n2.get_num()) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 mul(n1, n2_copy, n3_copy);
-                ::mpq_mul(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                mpq_mul(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy * n3_copy) == lex_cast(m1)));
                 // Tests with equal dens. This checks that
@@ -556,9 +556,9 @@ struct div_tester {
         });
         n2 = 0;
         n3 = -10;
-        ::mpq_set_si(&m3.m_mpq, -10, 1);
+        mpq_set_si(&m3.m_mpq, -10, 1);
         REQUIRE(&div(n1, n2, n3) == &n1);
-        ::mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+        mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2 / n3) == lex_cast(m1)));
         REQUIRE(n1.get_num().is_static());
@@ -573,10 +573,10 @@ struct div_tester {
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 random_rational(tmp, x, rng);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {
@@ -588,10 +588,10 @@ struct div_tester {
                     n2._get_den().promote();
                 }
                 random_rational(tmp, y, rng);
-                ::mpq_set(&m3.m_mpq, &tmp.m_mpq);
+                mpq_set(&m3.m_mpq, &tmp.m_mpq);
                 n3 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m3.m_mpq, &m3.m_mpq);
+                    mpq_neg(&m3.m_mpq, &m3.m_mpq);
                     n3.neg();
                 }
                 if (n3.get_num().is_static() && sdist(rng)) {
@@ -618,7 +618,7 @@ struct div_tester {
                     continue;
                 }
                 div(n1, n2, n3);
-                ::mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+                mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2 / n3) == lex_cast(m1)));
                 // Various variations of in-place.
@@ -626,11 +626,11 @@ struct div_tester {
                 auto n2_old(n2);
                 if (n2.sgn() != 0) {
                     div(n1, n1, n2);
-                    ::mpq_div(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                    mpq_div(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n1_old / n2) == lex_cast(m1)));
                     div(n2, n1, n2);
-                    ::mpq_div(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                    mpq_div(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n2) == lex_cast(m2)));
                     REQUIRE((lex_cast(n1 / n2_old) == lex_cast(m2)));
@@ -638,7 +638,7 @@ struct div_tester {
                 n1_old = n1;
                 if (n1.sgn() != 0) {
                     div(n1, n1, n1);
-                    ::mpq_div(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
+                    mpq_div(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n1 / n1) == lex_cast(m1)));
                 }
@@ -646,27 +646,27 @@ struct div_tester {
                 auto n2_copy(n2);
                 auto n3_copy(n3);
                 detail::mpq_raii m2_copy, m3_copy;
-                ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
-                ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
+                mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
+                mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
                 if (n3_copy.sgn() != 0) {
                     div(n1, n2_copy, n3_copy);
-                    ::mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                    mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n2_copy.get_num() / n3_copy) == lex_cast(m1)));
                 }
                 if (n2_copy.sgn() != 0) {
                     div(n1, n3_copy, n2_copy);
-                    ::mpq_div(&m1.m_mpq, &m3_copy.m_mpq, &m2_copy.m_mpq);
+                    mpq_div(&m1.m_mpq, &m3_copy.m_mpq, &m2_copy.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n3_copy / n2_copy.get_num()) == lex_cast(m1)));
                 }
                 n3_copy._get_den() = 1;
-                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 if (n3_copy.sgn() != 0) {
                     div(n1, n2_copy, n3_copy);
-                    ::mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                    mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n2_copy / n3_copy.get_num()) == lex_cast(m1)));
                     REQUIRE((lex_cast(n2_copy.get_num() / n3_copy) == lex_cast(m1)));

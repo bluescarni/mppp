@@ -64,16 +64,16 @@ struct abs_tester {
                 }
                 random_integer(num, x, rng);
                 random_integer(den, x, rng);
-                ::mpz_set(mpq_numref(&tmp.m_mpq), &num.m_mpz);
-                ::mpz_set(mpq_denref(&tmp.m_mpq), &den.m_mpz);
+                mpz_set(mpq_numref(&tmp.m_mpq), &num.m_mpz);
+                mpz_set(mpq_denref(&tmp.m_mpq), &den.m_mpz);
                 if (mpz_sgn(mpq_denref(&tmp.m_mpq)) == 0) {
-                    ::mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
+                    mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
                 }
-                ::mpq_canonicalize(&tmp.m_mpq);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_canonicalize(&tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {

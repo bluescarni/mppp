@@ -45,7 +45,7 @@ struct pow_tester {
         // Start with all zeroes.
         detail::mpz_raii m1, m2;
         integer n1, n2;
-        ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, 0u);
+        mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, 0u);
         REQUIRE(&pow_ui(n1, n2, 0) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(pow_ui(n2, 0)) == lex_cast(m1)));
@@ -62,10 +62,10 @@ struct pow_tester {
                     n1 = integer{};
                 }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
                 if (n2.is_static() && sdist(rng)) {
@@ -73,12 +73,12 @@ struct pow_tester {
                     n2.promote();
                 }
                 const unsigned ex = edist(rng);
-                ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, ex);
+                mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, ex);
                 pow_ui(n1, n2, ex);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(pow_ui(n2, ex)) == lex_cast(m1)));
                 // Overlap.
-                ::mpz_pow_ui(&m2.m_mpz, &m2.m_mpz, ex);
+                mpz_pow_ui(&m2.m_mpz, &m2.m_mpz, ex);
                 pow_ui(n2, n2, ex);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
             }

@@ -48,14 +48,14 @@ using has_pow = detail::is_detected<pow_t, T, U>;
 static inline void mpq_pow(::mpq_t rop, const ::mpq_t base, long exp)
 {
     if (exp >= 0) {
-        ::mpz_pow_ui(mpq_numref(rop), mpq_numref(base), static_cast<unsigned long>(exp));
-        ::mpz_pow_ui(mpq_denref(rop), mpq_denref(base), static_cast<unsigned long>(exp));
+        mpz_pow_ui(mpq_numref(rop), mpq_numref(base), static_cast<unsigned long>(exp));
+        mpz_pow_ui(mpq_denref(rop), mpq_denref(base), static_cast<unsigned long>(exp));
     } else {
-        ::mpz_pow_ui(mpq_numref(rop), mpq_denref(base), static_cast<unsigned long>(-exp));
-        ::mpz_pow_ui(mpq_denref(rop), mpq_numref(base), static_cast<unsigned long>(-exp));
+        mpz_pow_ui(mpq_numref(rop), mpq_denref(base), static_cast<unsigned long>(-exp));
+        mpz_pow_ui(mpq_denref(rop), mpq_numref(base), static_cast<unsigned long>(-exp));
         if (mpz_sgn(mpq_denref(rop)) < 0) {
-            ::mpz_neg(mpq_numref(rop), mpq_numref(rop));
-            ::mpz_neg(mpq_denref(rop), mpq_denref(rop));
+            mpz_neg(mpq_numref(rop), mpq_numref(rop));
+            mpz_neg(mpq_denref(rop), mpq_denref(rop));
         }
     }
 }
@@ -95,10 +95,10 @@ struct pow_tester {
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 random_rational(tmp, x, rng);
-                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                mpq_set(&m2.m_mpq, &tmp.m_mpq);
                 n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
                 if (n2.get_num().is_static() && sdist(rng)) {

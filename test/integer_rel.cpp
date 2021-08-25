@@ -66,7 +66,7 @@ struct cmp_tester {
         // Start with all zeroes.
         detail::mpz_raii m1, m2;
         integer n1, n2;
-        REQUIRE(check_cmp(n1, n2, ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+        REQUIRE(check_cmp(n1, n2, mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
         REQUIRE(n1.is_static());
         REQUIRE(n2.is_static());
         detail::mpz_raii tmp;
@@ -75,10 +75,10 @@ struct cmp_tester {
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
+                mpz_set(&m1.m_mpz, &tmp.m_mpz);
                 n1 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m1.m_mpz, &m1.m_mpz);
+                    mpz_neg(&m1.m_mpz, &m1.m_mpz);
                     n1.neg();
                 }
                 if (n1.is_static() && sdist(rng)) {
@@ -86,34 +86,34 @@ struct cmp_tester {
                     n1.promote();
                 }
                 random_integer(tmp, y, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
                 }
-                REQUIRE(check_cmp(n1, n2, ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
-                REQUIRE(check_cmp(n1, n1, ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
-                REQUIRE(check_cmp(n2, n2, ::mpz_cmp(&m2.m_mpz, &m2.m_mpz)));
+                REQUIRE(check_cmp(n1, n2, mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+                REQUIRE(check_cmp(n1, n1, mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
+                REQUIRE(check_cmp(n2, n2, mpz_cmp(&m2.m_mpz, &m2.m_mpz)));
                 REQUIRE((n1 == n1));
                 REQUIRE((n2 == n2));
-                if (::mpz_cmp(&m1.m_mpz, &m2.m_mpz)) {
+                if (mpz_cmp(&m1.m_mpz, &m2.m_mpz)) {
                     REQUIRE((n1 != n2));
                 } else {
                     REQUIRE((n1 == n2));
                 }
                 n2 = n1;
-                ::mpz_set(&m2.m_mpz, &m1.m_mpz);
+                mpz_set(&m2.m_mpz, &m1.m_mpz);
                 if (sdist(rng) && n2.is_static()) {
                     n2.promote();
                 }
-                REQUIRE(check_cmp(n1, n2, ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+                REQUIRE(check_cmp(n1, n2, mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
                 // Overlap.
-                REQUIRE(check_cmp(n1, n1, ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
+                REQUIRE(check_cmp(n1, n1, mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
             }
         };
 

@@ -199,7 +199,7 @@ void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
         }
         // LCOV_EXCL_STOP
         // NOTE: nbits == 0 is allowed.
-        ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
+        mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
         assert(make_unsigned_t<mpz_alloc_t>(rop._mp_alloc) >= nlimbs);
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     }
@@ -215,7 +215,7 @@ void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits, std::size_t nlimbs)
 #endif
         ignore(nlimbs);
         // NOTE: nbits == 0 is allowed.
-        ::mpz_init2(&rop, nbits);
+        mpz_init2(&rop, nbits);
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     }
 #endif
@@ -232,7 +232,7 @@ void mpz_clear_wrap(mpz_struct_t &m)
         ++mpzc.sizes[idx];
     } else {
 #endif
-        ::mpz_clear(&m);
+        mpz_clear(&m);
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     }
 #endif
@@ -241,7 +241,7 @@ void mpz_clear_wrap(mpz_struct_t &m)
 void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base)
 {
     assert(base >= 2 && base <= 62);
-    const auto size_base = ::mpz_sizeinbase(mpz, base);
+    const auto size_base = mpz_sizeinbase(mpz, base);
     // LCOV_EXCL_START
     if (mppp_unlikely(size_base > nl_max<std::size_t>() - 2u)) {
         throw std::overflow_error("Too many digits in the conversion of mpz_t to string");
@@ -258,7 +258,7 @@ void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base)
     }
     // LCOV_EXCL_STOP
     out.resize(static_cast<std::vector<char>::size_type>(total_size));
-    ::mpz_get_str(out.data(), base, mpz);
+    mpz_get_str(out.data(), base, mpz);
 }
 
 std::ostream &integer_stream_operator_impl(std::ostream &os, const mpz_struct_t *n, int n_sgn)

@@ -59,32 +59,32 @@ struct add_ui_tester {
             detail::mpz_raii m1, m2;
             integer n1, n2;
             REQUIRE(&add_ui(n1, n2, Int(0u)) == &n1);
-            ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             // Ones and zeroes.
             add_ui(n1, n2, Int(1u));
-            ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
+            mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             n2 = integer{1};
-            ::mpz_set_si(&m2.m_mpz, 1);
+            mpz_set_si(&m2.m_mpz, 1);
             add_ui(n1, n2, Int(0u));
-            ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             n2 = integer{-1};
-            ::mpz_set_si(&m2.m_mpz, -1);
+            mpz_set_si(&m2.m_mpz, -1);
             add_ui(n1, n2, Int(0u));
-            ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             add_ui(n1, n2, Int(1u));
-            ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
+            mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             add_ui(n1, n2, Int(123u));
-            ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
+            mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             detail::mpz_raii tmp;
@@ -99,10 +99,10 @@ struct add_ui_tester {
                         n1 = integer{};
                     }
                     random_integer(tmp, x, rng);
-                    ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                    mpz_set(&m2.m_mpz, &tmp.m_mpz);
                     n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
-                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                        mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
                     }
                     if (n2.is_static() && sdist(rng)) {
@@ -110,19 +110,19 @@ struct add_ui_tester {
                         n2.promote();
                     }
                     add_ui(n1, n2, Int(0u));
-                    ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                    mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     const auto rul = uldist(rng);
                     add_ui(n1, integer{}, rul);
                     detail::mpz_raii empty;
-                    ::mpz_add(&m1.m_mpz, &empty.m_mpz, integer{rul}.get_mpz_view());
+                    mpz_add(&m1.m_mpz, &empty.m_mpz, integer{rul}.get_mpz_view());
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     add_ui(n1, n2, rul);
-                    ::mpz_add(&m1.m_mpz, &m2.m_mpz, integer{rul}.get_mpz_view());
+                    mpz_add(&m1.m_mpz, &m2.m_mpz, integer{rul}.get_mpz_view());
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     // Overlap.
                     add_ui(n2, n2, rul);
-                    ::mpz_add(&m2.m_mpz, &m2.m_mpz, integer{rul}.get_mpz_view());
+                    mpz_add(&m2.m_mpz, &m2.m_mpz, integer{rul}.get_mpz_view());
                     REQUIRE((lex_cast(n2) == lex_cast(m2)));
                     REQUIRE((lex_cast(n2) == lex_cast(n1)));
                 }
@@ -137,21 +137,21 @@ struct add_ui_tester {
             if (S::value == 1) {
                 // Tests specific for 1-limb optimisation.
                 n2 = integer{GMP_NUMB_MAX};
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 add_ui(n1, n2, Int(0u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 add_ui(n1, n2, Int(1u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 add_ui(n1, n2, Int(123u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 add_ui(n2, n2, Int(1u));
-                ::mpz_add_ui(&m2.m_mpz, &m2.m_mpz, 1);
+                mpz_add_ui(&m2.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 n1 = integer{};
             }
@@ -161,21 +161,21 @@ struct add_ui_tester {
                 n2 = integer{GMP_NUMB_MAX};
                 mul_2exp(n2, n2, GMP_NUMB_BITS);
                 add(n2, n2, integer{GMP_NUMB_MAX});
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 add_ui(n1, n2, Int(0u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 add_ui(n1, n2, Int(1u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 add_ui(n1, n2, Int(123u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 add_ui(n2, n2, Int(1u));
-                ::mpz_add_ui(&m2.m_mpz, &m2.m_mpz, 1);
+                mpz_add_ui(&m2.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 n1 = integer{};
             }
@@ -187,41 +187,41 @@ struct add_ui_tester {
                     mul_2exp(n2, n2, GMP_NUMB_BITS);
                     add(n2, n2, integer{GMP_NUMB_MAX});
                 }
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 add_ui(n1, n2, Int(0u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 add_ui(n1, n2, Int(1u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 n2 = integer{};
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 add_ui(n1, n2, static_cast<Int>(-1));
-                ::mpz_add(&m1.m_mpz, &m2.m_mpz, integer{static_cast<Int>(-1)}.get_mpz_view());
+                mpz_add(&m1.m_mpz, &m2.m_mpz, integer{static_cast<Int>(-1)}.get_mpz_view());
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n2 = integer{GMP_NUMB_MAX};
                 mul_2exp(n2, n2, GMP_NUMB_BITS);
                 add(n2, n2, integer{GMP_NUMB_MAX});
                 n2.neg();
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 add_ui(n1, n2, Int(123u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 n2 = integer{GMP_NUMB_MAX};
                 n2.neg();
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 add_ui(n1, n2, Int(123u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 n2 = integer{1};
                 n2.neg();
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 add_ui(n1, n2, Int(123u));
-                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
             }
@@ -257,32 +257,32 @@ struct sub_ui_tester {
             detail::mpz_raii m1, m2;
             integer n1, n2;
             REQUIRE(&sub_ui(n1, n2, Int(0u)) == &n1);
-            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             // Ones and zeroes.
             sub_ui(n1, n2, Int(1u));
-            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+            mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             n2 = integer{1};
-            ::mpz_set_si(&m2.m_mpz, 1);
+            mpz_set_si(&m2.m_mpz, 1);
             sub_ui(n1, n2, Int(0u));
-            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             n2 = integer{-1};
-            ::mpz_set_si(&m2.m_mpz, -1);
+            mpz_set_si(&m2.m_mpz, -1);
             sub_ui(n1, n2, Int(0u));
-            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             sub_ui(n1, n2, Int(1u));
-            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+            mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             sub_ui(n1, n2, Int(123u));
-            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+            mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
             detail::mpz_raii tmp;
@@ -297,10 +297,10 @@ struct sub_ui_tester {
                         n1 = integer{};
                     }
                     random_integer(tmp, x, rng);
-                    ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                    mpz_set(&m2.m_mpz, &tmp.m_mpz);
                     n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
-                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                        mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
                     }
                     if (n2.is_static() && sdist(rng)) {
@@ -308,19 +308,19 @@ struct sub_ui_tester {
                         n2.promote();
                     }
                     sub_ui(n1, n2, Int(0u));
-                    ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                    mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     const auto rul = uldist(rng);
                     sub_ui(n1, integer{}, rul);
                     detail::mpz_raii empty;
-                    ::mpz_sub(&m1.m_mpz, &empty.m_mpz, integer{rul}.get_mpz_view());
+                    mpz_sub(&m1.m_mpz, &empty.m_mpz, integer{rul}.get_mpz_view());
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     sub_ui(n1, n2, rul);
-                    ::mpz_sub(&m1.m_mpz, &m2.m_mpz, integer{rul}.get_mpz_view());
+                    mpz_sub(&m1.m_mpz, &m2.m_mpz, integer{rul}.get_mpz_view());
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     // Overlap.
                     sub_ui(n2, n2, rul);
-                    ::mpz_sub(&m2.m_mpz, &m2.m_mpz, integer{rul}.get_mpz_view());
+                    mpz_sub(&m2.m_mpz, &m2.m_mpz, integer{rul}.get_mpz_view());
                     REQUIRE((lex_cast(n2) == lex_cast(m2)));
                     REQUIRE((lex_cast(n2) == lex_cast(n1)));
                 }
@@ -335,21 +335,21 @@ struct sub_ui_tester {
             if (S::value == 1) {
                 // Tests specific for 1-limb optimisation.
                 n2 = integer{GMP_NUMB_MAX};
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 sub_ui(n1, n2, Int(0u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 sub_ui(n1, n2, Int(1u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 sub_ui(n1, n2, Int(123u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 sub_ui(n2, n2, Int(1u));
-                ::mpz_sub_ui(&m2.m_mpz, &m2.m_mpz, 1);
+                mpz_sub_ui(&m2.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 n1 = integer{};
             }
@@ -359,21 +359,21 @@ struct sub_ui_tester {
                 n2 = integer{GMP_NUMB_MAX};
                 mul_2exp(n2, n2, GMP_NUMB_BITS);
                 add(n2, n2, integer{GMP_NUMB_MAX});
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 sub_ui(n1, n2, Int(0u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 sub_ui(n1, n2, Int(1u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 sub_ui(n1, n2, Int(123u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 sub_ui(n2, n2, Int(1u));
-                ::mpz_sub_ui(&m2.m_mpz, &m2.m_mpz, 1);
+                mpz_sub_ui(&m2.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 n1 = integer{};
             }
@@ -385,41 +385,41 @@ struct sub_ui_tester {
                     mul_2exp(n2, n2, GMP_NUMB_BITS);
                     add(n2, n2, integer{GMP_NUMB_MAX});
                 }
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 sub_ui(n1, n2, Int(0u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 sub_ui(n1, n2, Int(1u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 n2 = integer{};
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 sub_ui(n1, n2, static_cast<Int>(-1));
-                ::mpz_sub(&m1.m_mpz, &m2.m_mpz, integer{static_cast<Int>(-1)}.get_mpz_view());
+                mpz_sub(&m1.m_mpz, &m2.m_mpz, integer{static_cast<Int>(-1)}.get_mpz_view());
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n2 = integer{GMP_NUMB_MAX};
                 mul_2exp(n2, n2, GMP_NUMB_BITS);
                 add(n2, n2, integer{GMP_NUMB_MAX});
                 n2.neg();
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 sub_ui(n1, n2, Int(123u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 n2 = integer{GMP_NUMB_MAX};
                 n2.neg();
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 sub_ui(n1, n2, Int(123u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
                 n2 = integer{1};
                 n2.neg();
-                ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                mpz_set(&m2.m_mpz, n2.get_mpz_view());
                 sub_ui(n1, n2, Int(123u));
-                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 n1 = integer{};
             }
