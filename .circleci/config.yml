@@ -90,7 +90,7 @@ workflows:
     - bionic_gcc7_conda_coverage
     - bionic_gcc7_conda_release
     - focal_gcc9_conda_coverage
-    - focal_clang9_debuggmp_unstable
+    # - focal_clang9_debuggmp_unstable
     - focal_clang9_debuggmp
     - focal_gcc9_conda_docs
     - ubuntu_arm64
