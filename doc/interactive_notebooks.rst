@@ -35,3 +35,4 @@ Real
     :maxdepth: 1
 
     notebooks/real_basics
+    notebooks/real_prec_propagate
