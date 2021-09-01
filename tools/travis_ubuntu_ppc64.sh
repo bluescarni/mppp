@@ -15,7 +15,7 @@ wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge
 export deps_dir=$HOME/local
 export PATH="$HOME/miniconda/bin:$PATH"
 bash miniconda.sh -b -p $HOME/miniconda
-conda create -y -q -p $deps_dir cmake gmp mpfr libflint arb python=3.8 pybind11 mpc boost-cpp c-compiler cxx-compiler
+conda create -y -q -p $deps_dir cmake gmp mpfr libflint arb python=3.8 pybind11 mpc boost-cpp c-compiler cxx-compiler make
 source activate $deps_dir
 
 # Create the build dir and cd into it.
