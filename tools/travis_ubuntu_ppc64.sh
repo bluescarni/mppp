@@ -19,6 +19,7 @@ conda create -y -q -p $deps_dir cmake gmp mpfr libflint arb python=3.8 pybind11 
 source activate $deps_dir
 
 # Create the build dir and cd into it.
+cd /mppp
 mkdir build
 cd build
 
