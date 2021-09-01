@@ -7,7 +7,8 @@ set -x
 set -e
 
 # Core deps.
-sudo apt-get install wget
+#sudo apt-get install wget
+sudo apt-get purge build-essential
 
 # Install conda+deps.
 wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-ppc64le.sh -O miniconda.sh
