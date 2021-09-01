@@ -6,6 +6,9 @@ set -x
 # Exit on error.
 set -e
 
+# Install wget.
+apt-get install wget
+
 # Install conda+deps.
 wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-ppc64le.sh -O miniconda.sh
 export deps_dir=$HOME/local
