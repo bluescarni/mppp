@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.26 (unreleased)
+-----------------
+
+Fix
+~~~
+
+- :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`
+  are now correctly supported on PPC64, if ``__float128`` is available
+  (`#286 <https://github.com/bluescarni/mppp/pull/286>`__).
+
 0.25 (2021-08-31)
 -----------------
 
