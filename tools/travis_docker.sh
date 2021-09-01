@@ -7,7 +7,7 @@ set -x
 set -e
 
 docker pull ubuntu:hirsute
-docker run --rm -e TRAVIS_TAG -v `pwd`:/mppp ubuntu:focal bash /mppp/tools/travis_ubuntu_ppc64.sh
+docker run --rm -e TRAVIS_TAG -v `pwd`:/mppp ubuntu:hirsute bash /mppp/tools/travis_ubuntu_ppc64.sh
 
 set +e
 set +x
