@@ -240,8 +240,14 @@
 #else
 
 // On non-clang, let's always assume that __float128
-// can interact with long double.
+// can interact with long double, *unless* we are on
+// PowerPC. On such a setup, GCC disables interaction
+// between __float128 and long double.
+#if !defined(__PPC__)
+
 #define MPPP_FLOAT128_WITH_LONG_DOUBLE
+
+#endif
 
 #endif
 

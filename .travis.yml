@@ -11,7 +11,7 @@ matrix:
       arch: ppc64le
       dist: focal
 script:
-    - tools/travis_ubuntu_ppc64.sh
+    - tools/travis_docker.sh
 
 notifications:
   email: false
