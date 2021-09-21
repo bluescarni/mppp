@@ -191,7 +191,10 @@ void real_frac_wrapper(::mpfr_t rop, const ::mpfr_t op)
     ::mpfr_frac(rop, op, MPFR_RNDN);
 }
 
-void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
+namespace
+{
+
+void mpfr_to_string(const ::mpfr_t r, std::ostream &os, int base)
 {
     // All chars potentially used by MPFR for representing the digits up to base 62, sorted.
     constexpr char all_chars[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -278,6 +281,8 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
         os << z_exp;
     }
 }
+
+} // namespace
 
 } // namespace detail
 
@@ -902,7 +907,7 @@ std::string real::to_string(int base) const
 {
     std::ostringstream oss;
     oss.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-    detail::mpfr_to_stream(&m_mpfr, oss, base);
+    detail::mpfr_to_string(&m_mpfr, oss, base);
     return oss.str();
 }
 

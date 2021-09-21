@@ -99,6 +99,7 @@ static_assert(real_prec_check(static_cast<::mpfr_prec_t>(std::numeric_limits<lon
               "The precision required to represent long double is outside the MPFR min/max precision bounds.");
 
 } // namespace detail
+
 } // namespace mppp
 
 #endif
