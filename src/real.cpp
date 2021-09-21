@@ -52,6 +52,7 @@
 
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/real_common.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
@@ -2256,8 +2257,10 @@ bool real_gt(const real &a, const real &b)
     return (!a.nan_p() && !b_nan) ? (::mpfr_greater_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : !b_nan;
 }
 
-// Output stream operator.
-std::ostream &operator<<(std::ostream &os, const real &r)
+namespace detail
+{
+
+std::ostream &mpfr_t_to_stream(std::ostream &os, const ::mpfr_t r)
 {
     // Get the stream width.
     const auto width = os.width();
@@ -2328,7 +2331,7 @@ std::ostream &operator<<(std::ostream &os, const real &r)
 
     // Print out via the MPFR printf() function.
     char *out_str = nullptr;
-    const auto ret = ::mpfr_asprintf(&out_str, fmt_str.c_str(), r.get_mpfr_t());
+    const auto ret = ::mpfr_asprintf(&out_str, fmt_str.c_str(), r);
     if (ret == -1) {
         // LCOV_EXCL_START
         // NOTE: the MPFR docs state that if printf() returns -1, the errno variable and erange
@@ -2410,6 +2413,14 @@ std::ostream &operator<<(std::ostream &os, const real &r)
     os.width(0);
 
     return os;
+}
+
+} // namespace detail
+
+// Output stream operator.
+std::ostream &operator<<(std::ostream &os, const real &r)
+{
+    return detail::mpfr_t_to_stream(os, r.get_mpfr_t());
 }
 
 namespace detail

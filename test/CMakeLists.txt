@@ -207,3 +207,5 @@ endif()
 ADD_MPPP_TESTCASE(type_name)
 ADD_MPPP_TESTCASE(utils)
 ADD_MPPP_TESTCASE(type_traits)
+
+ADD_MPPP_TESTCASE(static_real_basic)

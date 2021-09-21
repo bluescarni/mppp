@@ -17,6 +17,7 @@
 
 #if defined(MPPP_WITH_MPFR)
 #include <mp++/real.hpp>
+#include <mp++/static_real.hpp>
 #endif
 
 #if defined(MPPP_WITH_MPC)
