@@ -71,9 +71,6 @@ constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
     return real_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
 }
 
-// Helper function to print an mpfr to stream in a given base.
-MPPP_DLL_PUBLIC void mpfr_to_stream(const ::mpfr_t, std::ostream &, int);
-
 // Helpers to deduce the precision when constructing/assigning a real via another type.
 // NOTE: it is important that these helpers return a valid (i.e., clamped) precision
 // value, because they are used in contexts in which the output precision
