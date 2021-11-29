@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.27 (unreleased)
+-----------------
+
+Fix
+~~~
+
+- Fix an MSVC build issue in C++20 mode
+  (`#292 <https://github.com/bluescarni/mppp/pull/292>`__).
+
 0.26 (2021-09-02)
 -----------------
 
