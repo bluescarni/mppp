@@ -41,14 +41,6 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_focal_clang9_debuggmp_unstable.sh
-  focal_clang9_debuggmp:
-    docker:
-    - image: circleci/buildpack-deps:focal
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_focal_clang9_debuggmp.sh
   focal_clang9_msan_00:
     docker:
     - image: circleci/buildpack-deps:focal
@@ -91,6 +83,5 @@ workflows:
     - bionic_gcc7_conda_release
     - focal_gcc9_conda_coverage
     # - focal_clang9_debuggmp_unstable
-    - focal_clang9_debuggmp
     - focal_gcc9_conda_docs
     - ubuntu_arm64
