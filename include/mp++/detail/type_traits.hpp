@@ -163,7 +163,7 @@ using is_unsigned = disjunction<std::is_unsigned<T>
 #endif
                                 >;
 
-// make_unsigned machinery,
+// make_unsigned machinery.
 template <typename T, typename = void>
 struct make_unsigned_impl {
     using type = typename std::make_unsigned<T>::type;

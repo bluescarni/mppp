@@ -2827,6 +2827,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
                             const std::integral_constant<int, 1> &)
 {
     ignore(asize1, asize2);
+
+    // Cache the output pointer.
     auto rdata = rop.m_limbs.data();
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
     // NOTE: both asizes have to be 0 or 1 here.
@@ -2860,7 +2862,6 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     return true;
 }
 
-// Optimization for two-limbs statics with no nails.
 // Small helper to compare two statics of equal asize 1 or 2.
 inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *data2, mpz_size_t asize)
 {
@@ -2885,6 +2886,7 @@ inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *
     return 0;
 }
 
+// Optimization for two-limbs statics with no nails.
 template <std::size_t SSize>
 inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,

@@ -92,7 +92,7 @@ MPPP_DLL_PUBLIC std::string to_string(__int128_t);
 // NOTE: here we are using cast to unsigned + unary minus to extract the abs value of a signed negative
 // integral. See:
 // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
-// This technique is not 100% portable: it requires an implementation
+// This technique is not 100% portable in C++ < 20: it requires an implementation
 // of signed integers such that the absolute value of the minimum (negative) value is not greater than
 // the maximum value of the unsigned counterpart. This is guaranteed on all computer architectures in use today,
 // but in theory there could be architectures where the assumption is not respected. See for instance the
@@ -101,11 +101,13 @@ MPPP_DLL_PUBLIC std::string to_string(__int128_t);
 // Note that in any case we never run into UB, the only consequence is that for very large negative values
 // we could init the integer with the wrong value, and we should be able to detect this in the unit tests.
 // Let's keep this in mind in the remote case this ever becomes a problem.
+// Since C++20, integers are guaranteed to be represented via two's complement, and thus
+// this function is portable.
 template <typename T>
 constexpr make_unsigned_t<T> nint_abs(T n) noexcept
 {
-    // NOTE: we should assert about negative n, but this is guaranteed to work properly only
-    // from C++17:
+    // NOTE: we should assert about negative n, but this is guaranteed to work properly in
+    // constexpr functions only from C++17:
     // https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
 #if MPPP_CPLUSPLUS >= 201703L
     // LCOV_EXCL_START
