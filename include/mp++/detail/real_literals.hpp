@@ -48,13 +48,6 @@ inline real real_literal_impl(::mpfr_prec_t prec)
 inline namespace literals
 {
 
-#if defined(__clang__)
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-
-#endif
-
 #define MPPP_DECLARE_REAL_UDL(prec)                                                                                    \
     template <char... Chars>                                                                                           \
     inline real operator"" _r##prec()                                                                                  \
@@ -68,12 +61,6 @@ MPPP_DECLARE_REAL_UDL(512)
 MPPP_DECLARE_REAL_UDL(1024)
 
 #undef MPPP_DECLARE_REAL_UDL
-
-#if defined(__clang__)
-
-#pragma clang diagnostic pop
-
-#endif
 
 } // namespace literals
 

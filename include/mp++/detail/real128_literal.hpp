@@ -17,13 +17,6 @@ namespace mppp
 inline namespace literals
 {
 
-#if defined(__clang__)
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-
-#endif
-
 template <char... Chars>
 inline real128 operator"" _rq()
 {
@@ -39,12 +32,6 @@ inline real128 operator"" _rq()
 
     return real128(arr);
 }
-
-#if defined(__clang__)
-
-#pragma clang diagnostic pop
-
-#endif
 
 } // namespace literals
 

@@ -1268,24 +1268,11 @@ constexpr bool operator!=(const T &x, const U &y)
 inline namespace literals
 {
 
-#if defined(__clang__)
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-
-#endif
-
 template <char... Chars>
 inline complex128 operator"" _icq()
 {
     return complex128{0, operator"" _rq<Chars...>()};
 }
-
-#if defined(__clang__)
-
-#pragma clang diagnostic pop
-
-#endif
 
 } // namespace literals
 
