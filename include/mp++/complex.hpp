@@ -3147,6 +3147,13 @@ inline bool operator!=(const T &x, const U &y)
 inline namespace literals
 {
 
+#if defined(__clang__)
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+
+#endif
+
 #define MPPP_DECLARE_COMPLEX_UDL(prec)                                                                                 \
     template <char... Chars>                                                                                           \
     inline complex operator"" _icr##prec()                                                                             \
@@ -3160,6 +3167,12 @@ MPPP_DECLARE_COMPLEX_UDL(512)
 MPPP_DECLARE_COMPLEX_UDL(1024)
 
 #undef MPPP_DECLARE_COMPLEX_UDL
+
+#if defined(__clang__)
+
+#pragma clang diagnostic pop
+
+#endif
 
 } // namespace literals
 

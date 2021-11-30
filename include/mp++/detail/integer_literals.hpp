@@ -401,6 +401,13 @@ inline integer<SSize> integer_literal_impl()
 inline namespace literals
 {
 
+#if defined(__clang__)
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+
+#endif
+
 #define MPPP_DECLARE_INTEGRAL_UDL(n)                                                                                   \
     template <char... Chars>                                                                                           \
     inline integer<n> operator"" _z##n()                                                                               \
@@ -413,6 +420,12 @@ MPPP_DECLARE_INTEGRAL_UDL(2)
 MPPP_DECLARE_INTEGRAL_UDL(3)
 
 #undef MPPP_DECLARE_INTEGRAL_UDL
+
+#if defined(__clang__)
+
+#pragma clang diagnostic pop
+
+#endif
 
 } // namespace literals
 

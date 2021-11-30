@@ -17,6 +17,13 @@ namespace mppp
 inline namespace literals
 {
 
+#if defined(__clang__)
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+
+#endif
+
 #define MPPP_DECLARE_RATIONAL_UDL(n)                                                                                   \
     template <char... Chars>                                                                                           \
     inline rational<n> operator"" _q##n()                                                                              \
@@ -29,6 +36,12 @@ MPPP_DECLARE_RATIONAL_UDL(2)
 MPPP_DECLARE_RATIONAL_UDL(3)
 
 #undef MPPP_DECLARE_RATIONAL_UDL
+
+#if defined(__clang__)
+
+#pragma clang diagnostic pop
+
+#endif
 
 } // namespace literals
 
