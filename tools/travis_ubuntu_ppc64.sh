@@ -6,12 +6,9 @@ set -x
 # Exit on error.
 set -e
 
-# Install wget.
-apt-get update
-apt-get -y install wget
 
 # Install conda+deps.
-wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-ppc64le.sh -O miniconda.sh
+curl -L -o miniconda.sh https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-ppc64le.sh
 export deps_dir=$HOME/local
 export PATH="$HOME/miniconda/bin:$PATH"
 bash miniconda.sh -b -p $HOME/miniconda
@@ -19,7 +16,6 @@ conda create -y -q -p $deps_dir cmake gmp mpfr libflint arb python=3.8 pybind11 
 source activate $deps_dir
 
 # Create the build dir and cd into it.
-cd /mppp
 mkdir build
 cd build
 
