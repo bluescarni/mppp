@@ -7,6 +7,8 @@ Changelog
 Fix
 ~~~
 
+- Fix compilation in debug mode on recent versions of Clang
+  (`#293 <https://github.com/bluescarni/mppp/pull/293>`__).
 - Fix an MSVC build issue in C++20 mode
   (`#292 <https://github.com/bluescarni/mppp/pull/292>`__).
 
