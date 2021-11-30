@@ -205,6 +205,29 @@ struct make_unsigned_impl<T, enable_if_t<disjunction<std::is_same<remove_cv_t<T>
 template <typename T>
 using make_unsigned_t = typename make_unsigned_impl<T>::type;
 
+// make_signed machinery.
+// NOTE: we don't use this with char types, don't apply
+// the workarounds explained above for make_unsigned.
+template <typename T, typename = void>
+struct make_signed_impl {
+    using type = typename std::make_signed<T>::type;
+};
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+// NOTE: make_signed is supposed to preserve cv qualifiers, hence the non-trivial implementation.
+template <typename T>
+struct make_signed_impl<T, enable_if_t<disjunction<std::is_same<remove_cv_t<T>, __uint128_t>,
+                                                   std::is_same<remove_cv_t<T>, __int128_t>>::value>> {
+    using tmp_type = typename std::conditional<std::is_const<T>::value, const __int128_t, __int128_t>::type;
+    using type = typename std::conditional<std::is_volatile<T>::value, volatile tmp_type, tmp_type>::type;
+};
+
+#endif
+
+template <typename T>
+using make_signed_t = typename make_signed_impl<T>::type;
+
 // Various numeric_limits utils.
 template <typename T>
 constexpr int nl_digits() noexcept

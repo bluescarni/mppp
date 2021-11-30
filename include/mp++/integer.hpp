@@ -2849,15 +2849,38 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 
     // Cache the output pointer.
     auto rdata = rop.m_limbs.data();
-    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
+
+    // Cache the input limbs.
+    const auto l1 = op1.m_limbs[0], l2 = op2.m_limbs[0];
+
     // NOTE: both asizes have to be 0 or 1 here.
-    assert((asize1 == 1 && data1[0] != 0u) || (asize1 == 0 && data1[0] == 0u));
-    assert((asize2 == 1 && data2[0] != 0u) || (asize2 == 0 && data2[0] == 0u));
+    assert((asize1 == 1 && l1 != 0u) || (asize1 == 0 && l1 == 0u));
+    assert((asize2 == 1 && l2 != 0u) || (asize2 == 0 && l2 == 0u));
+
+    // Optimise the case in which the addition can be performed
+    // via the signed counterpart of mp_limb_t.
+    if (mppp_likely(l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)))) {
+        const auto x = make_signed(l1, sign1);
+        const auto y = make_signed(l2, sign2);
+
+        const auto ret = x + y;
+        rop._mp_size = integral_sign(ret);
+
+        // NOTE: the absolute
+        // value is guaranteed to be representable
+        // as a signed integer because of the magnitude
+        // checks above, assuming two's complement as usual.
+        rdata[0] = static_cast<::mp_limb_t>(std::abs(ret));
+
+        return true;
+    }
+
     // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t tmp;
+
     if (sign1 == sign2) {
         // When the signs are identical, we can implement addition as a true addition.
-        if (mppp_unlikely(limb_add_overflow(data1[0], data2[0], &tmp))) {
+        if (mppp_unlikely(limb_add_overflow(l1, l2, &tmp))) {
             return false;
         }
         // Assign the output. asize can be zero (sign1 == sign2 == 0) or 1.
@@ -2866,16 +2889,16 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     } else {
         // When the signs differ, we need to implement addition as a subtraction.
         // NOTE: this also includes the case in which only one of the operands is zero.
-        if (data1[0] >= data2[0]) {
+        if (l1 >= l2) {
             // op1 is not smaller than op2.
-            tmp = data1[0] - data2[0];
+            tmp = l1 - l2;
             // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
-            rop._mp_size = sign1 * (data1[0] != data2[0]);
+            rop._mp_size = sign1 * (l1 != l2);
             rdata[0] = tmp;
         } else {
-            // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
+            // NOTE: this has to be one, as l2 and l1 cannot be equal.
             rop._mp_size = sign2;
-            rdata[0] = data2[0] - data1[0];
+            rdata[0] = l2 - l1;
         }
     }
     return true;
@@ -3100,7 +3123,30 @@ template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
                                  ::mp_limb_t l2, const std::integral_constant<int, 1> &)
 {
+    // Cache the output pointer.
+    auto rdata = rop.m_limbs.data();
+
+    // Cache the input limb from op1.
     const auto l1 = op1.m_limbs[0];
+
+    // Optimise the case in which the add/sub can be performed
+    // via the signed counterpart of mp_limb_t.
+    if (mppp_likely(l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)))) {
+        const auto x = make_signed(l1, sign1);
+        const auto y = static_cast<make_signed_t<::mp_limb_t>>(l2);
+
+        const auto ret = AddOrSub ? (x + y) : (x - y);
+        rop._mp_size = integral_sign(ret);
+
+        // NOTE: the absolute
+        // value is guaranteed to be representable
+        // as a signed integer because of the magnitude
+        // checks above, assuming two's complement as usual.
+        rdata[0] = static_cast<::mp_limb_t>(std::abs(ret));
+
+        return true;
+    }
+
     // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t tmp;
     if ((sign1 >= 0 && AddOrSub) || (sign1 <= 0 && !AddOrSub)) {
@@ -3112,7 +3158,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
         // The size is 1 for addition, -1 for subtraction, unless
         // the result is zero.
         rop._mp_size = (AddOrSub ? 1 : -1) * (tmp != 0u);
-        rop.m_limbs[0] = tmp;
+        rdata[0] = tmp;
     } else {
         // op1 negative and addition, or op1 positive and subtraction. Implement
         // as a subtraction.
@@ -3121,12 +3167,12 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
             tmp = l1 - l2;
             // asize is 1 or 0, 0 iff l1 == l2. Sign is negative for add, positive for sub.
             rop._mp_size = (AddOrSub ? -1 : 1) * (tmp != 0u);
-            rop.m_limbs[0] = tmp;
+            rdata[0] = tmp;
         } else {
             // op1 has smaller abs. The result will be positive for add, negative
             // for sub (cannot be zero as it is handled above).
             rop._mp_size = AddOrSub ? 1 : -1;
-            rop.m_limbs[0] = l2 - l1;
+            rdata[0] = l2 - l1;
         }
     }
     return true;
@@ -3191,7 +3237,7 @@ inline bool static_addsub_1(static_int<SSize> &rop, const static_int<SSize> &op1
     if (integer_static_addsub_1_algo<static_int<SSize>>::value == 0 && retval) {
         // If we used the mpn functions and we actually wrote into rop, then
         // make sure we zero out the unused limbs.
-        // NOTE: same as above, we may have used mpn function when SSize <= opt_size.
+        // NOTE: same as above, we may have used mpn functions when SSize <= opt_size.
         rop.zero_unused_limbs();
     }
     return retval;
@@ -3652,12 +3698,36 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     if (mppp_unlikely(tmp)) {
         return 3u;
     }
+
     // Determine the sign of the product: 0, 1 or -1.
     const int sign_prod = sign1 * sign2;
-    // Now add/sub.
+
+    // Cache the original value in rop.
+    const auto rlimb = rop.m_limbs[0];
+
+    // Now add.
+
+    // Optimise the case in which the addition can be performed
+    // via the signed counterpart of mp_limb_t.
+    if (rlimb < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && prod < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2))) {
+        const auto x = make_signed(rlimb, signr);
+        const auto y = make_signed(prod, sign_prod);
+
+        const auto ret = x + y;
+        rop._mp_size = integral_sign(ret);
+
+        // NOTE: the absolute
+        // value is guaranteed to be representable
+        // as a signed integer because of the magnitude
+        // checks above, assuming two's complement as usual.
+        rop.m_limbs[0] = static_cast<::mp_limb_t>(std::abs(ret));
+
+        return 0u;
+    }
+
     if (signr == sign_prod) {
         // Same sign, do addition with overflow check.
-        if (mppp_unlikely(limb_add_overflow(rop.m_limbs[0], prod, &tmp))) {
+        if (mppp_unlikely(limb_add_overflow(rlimb, prod, &tmp))) {
             return 2u;
         }
         // Assign the output.
@@ -3665,16 +3735,16 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         rop.m_limbs[0] = tmp;
     } else {
         // When the signs differ, we need to implement addition as a subtraction.
-        if (rop.m_limbs[0] >= prod) {
+        if (rlimb >= prod) {
             // abs(rop) >= abs(prod).
-            tmp = rop.m_limbs[0] - prod;
+            tmp = rlimb - prod;
             // asize is either 1 or 0 (0 iff rop == prod).
             rop._mp_size = signr * static_cast<int>(tmp != 0u);
             rop.m_limbs[0] = tmp;
         } else {
             // NOTE: this cannot be zero, as rop and prod cannot be equal.
             rop._mp_size = sign_prod;
-            rop.m_limbs[0] = prod - rop.m_limbs[0];
+            rop.m_limbs[0] = prod - rlimb;
         }
     }
     return 0u;
