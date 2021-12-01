@@ -4,6 +4,13 @@ Changelog
 0.27 (unreleased)
 -----------------
 
+Changes
+~~~~~~~
+
+- Performance improvements in the single-limb addition
+  primitives for signed integrals
+  (`#293 <https://github.com/bluescarni/mppp/pull/293>`__).
+
 Fix
 ~~~
 
