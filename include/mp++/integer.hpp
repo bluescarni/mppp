@@ -4777,7 +4777,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // division.
     const ::mp_limb_t n = op1.m_limbs[0] & GMP_NUMB_MASK, d = op2.m_limbs[0] & GMP_NUMB_MASK, q_ = n / d;
     // Write q.
-    q._mp_size = sign1 * sign2 * (n >= d);
+    q._mp_size = (n >= d) ? (sign1 * sign2) : 0;
     // NOTE: there should be no need here to mask.
     q.m_limbs[0] = q_;
 }
