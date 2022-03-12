@@ -199,7 +199,9 @@
 #endif
 
 // C++20 constinit.
-#if defined(__cpp_constinit)
+// NOTE: this seems to be buggy currently on MSVC:
+// https://github.com/bluescarni/mppp/issues/291
+#if defined(__cpp_constinit) && (!defined(_MSC_VER) || defined(__clang__))
 
 #define MPPP_CONSTINIT constinit
 
