@@ -138,11 +138,6 @@ if(NOT _YACMACompilerLinkerSettingsRun)
         # This is useful when the compiler decides the template backtrace is too verbose.
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-ftemplate-backtrace-limit=0)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-fstack-protector-all)
-        # A few suggestion flags.
-        _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-attribute=pure)
-        _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-attribute=const)
-        _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-attribute=noreturn)
-        _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-attribute=format)
         # From GCC 5.
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wodr)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-final-types)
