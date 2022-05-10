@@ -23,26 +23,6 @@
 namespace mppp
 {
 
-namespace detail
-{
-
-// Compile-time function to determine if a static_real with precision
-// Prec is higher in the numerical hierarchy than the type T.
-template <typename T, mpfr_prec_t Prec>
-constexpr bool sr_higher_than()
-{
-    if constexpr (is_cpp_floating_point<T>::value) {
-        static_assert(std::numeric_limits<T>::radix == 2,
-                      "C++ floating-point types in bases other than 2 are not supported.");
-
-        return Prec > std::numeric_limits<T>::digits;
-    } else if constexpr (is_cpp_integral<T>::value) {
-        return true;
-    }
-}
-
-} // namespace detail
-
 template <mpfr_prec_t Prec>
 class static_real
 {
@@ -58,24 +38,27 @@ class static_real
 public:
     static constexpr mpfr_prec_t prec = Prec;
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     static_real()
     {
         mpfr_custom_init(m_storage, Prec);
         mpfr_custom_init_set(&m_mpfr, MPFR_ZERO_KIND, 0, Prec, m_storage);
     }
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     static_real(const static_real &o)
     {
         mpfr_custom_init(m_storage, Prec);
 
         const auto o_kind = mpfr_custom_get_kind(&o.m_mpfr);
         const auto o_exp = mpfr_custom_get_exp(&o.m_mpfr);
-        const auto o_sig = static_cast<const unsigned char *>(mpfr_custom_get_significand(&o.m_mpfr));
+        const auto *const o_sig = static_cast<const unsigned char *>(mpfr_custom_get_significand(&o.m_mpfr));
 
         std::copy(o_sig, o_sig + sig_size, m_storage);
 
         mpfr_custom_init_set(&m_mpfr, o_kind, o_exp, Prec, m_storage);
     }
     // NOTE: move equivalent to copy.
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     static_real(static_real &&o) noexcept : static_real(o) {}
     static_real &operator=(const static_real &o)
     {
@@ -85,9 +68,12 @@ public:
 
         return *this;
     }
+    ~static_real() = default;
+
     // NOTE: move equivalent to copy.
     static_real &operator=(static_real &&o) noexcept
     {
+        // NOLINTNEXTLINE(misc-unconventional-assign-operator)
         return *this = o;
     }
 
