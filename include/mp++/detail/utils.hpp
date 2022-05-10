@@ -92,7 +92,7 @@ MPPP_DLL_PUBLIC std::string to_string(__int128_t);
 // NOTE: here we are using cast to unsigned + unary minus to extract the abs value of a signed negative
 // integral. See:
 // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
-// This technique is not 100% portable: it requires an implementation
+// This technique is not 100% portable in C++ < 20: it requires an implementation
 // of signed integers such that the absolute value of the minimum (negative) value is not greater than
 // the maximum value of the unsigned counterpart. This is guaranteed on all computer architectures in use today,
 // but in theory there could be architectures where the assumption is not respected. See for instance the
@@ -101,11 +101,13 @@ MPPP_DLL_PUBLIC std::string to_string(__int128_t);
 // Note that in any case we never run into UB, the only consequence is that for very large negative values
 // we could init the integer with the wrong value, and we should be able to detect this in the unit tests.
 // Let's keep this in mind in the remote case this ever becomes a problem.
+// Since C++20, integers are guaranteed to be represented via two's complement, and thus
+// this function is portable.
 template <typename T>
 constexpr make_unsigned_t<T> nint_abs(T n) noexcept
 {
-    // NOTE: we should assert about negative n, but this is guaranteed to work properly only
-    // from C++17:
+    // NOTE: we should assert about negative n, but this is guaranteed to work properly in
+    // constexpr functions only from C++17:
     // https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
 #if MPPP_CPLUSPLUS >= 201703L
     // LCOV_EXCL_START
@@ -262,6 +264,38 @@ template <typename... Args>
 constexpr int ignore(Args &&...)
 {
     return 0;
+}
+
+// Given an input unsigned integer n, this function will return
+// a signed integer whose absolute value is n and whose sign is
+// s (following the usual convention: s = 0 means zero,
+// s = 1 means positive, s = -1 means negative).
+// No overflow check is performed: if the value of the result
+// does not fit in the return type, the behaviour will be undefined.
+template <typename T>
+inline make_signed_t<T> make_signed(const T &n, int s)
+{
+    static_assert(is_unsigned<T>::value, "make_signed() can be invoked only on unsigned integral types.");
+    // NOTE: avoid integral promotion bullshit.
+    static_assert(std::is_same<T, decltype(n + n)>::value, "make_signed() cannot be used with short integral types.");
+
+    // Consistency checks: s must be one of [0, -1, 1], and, if s is zero,
+    // then n must also be zero.
+    assert(s == 0 || s == -1 || s == 1);
+    assert(s != 0 || n == 0u);
+
+    // NOTE: s_ex will be:
+    // - 0 if s is 0 or 1,
+    // - the max value representable by T if s is -1 (this is because the
+    //   right shift produces the int -1, which is then converted to the
+    //   unsigned T).
+    // NOTE: the right shift behaviour for signed operands is standardised
+    // only since C++20, but in practice it should work everywhere.
+    const auto s_ex = static_cast<T>(s >> (std::numeric_limits<int>::digits - 1));
+
+    // (n ^ s_ex) - s_ex returns n if s_ex is 0, -n (still represented
+    // as an unsigned) otherwise.
+    return static_cast<make_signed_t<T>>((n ^ s_ex) - s_ex);
 }
 
 #if defined(_MSC_VER)

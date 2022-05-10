@@ -904,6 +904,16 @@ struct addmul_tester {
                     mpz_set_si(&m3.m_mpz, i3);
                     mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
+
+                    // Corner case: product succeeds, addition cannot
+                    // be optimised with the sign extension approach,
+                    // n2 and n3 have different signs and they are larger
+                    // in magnitude than new_n1.
+                    n2 = -integer(::mp_limb_t(1) << (GMP_NUMB_BITS / 2 - 1));
+                    n3 = integer(::mp_limb_t(1) << (GMP_NUMB_BITS / 2 - 1));
+                    integer new_n1 = idist(rng), new_n1_copy(new_n1);
+                    addmul(new_n1, n2, n3);
+                    REQUIRE(new_n1 == new_n1_copy + (n2 * n3));
                 }
                 // Make sure we test 2 x 1 when it succeeds.
                 if (S::value == 2u && x == 1u && y == 2u) {

@@ -111,6 +111,25 @@ enum class integer_bitcnt_t : ::mp_bitcnt_t {};
 namespace detail
 {
 
+// Check if a double-limb unsigned numeric type is available.
+// If it exists, it will be a type guaranteed
+// to have *at least* twice the number of bits of mp_limb_t.
+// NOTE: in case of nail bits, in order to avoid complications,
+// we never define MPPP_HAVE_DLIMB_T.
+#if defined(MPPP_HAVE_GCC_INT128) && GMP_NUMB_BITS == 64 && !GMP_NAIL_BITS
+
+#define MPPP_HAVE_DLIMB_T
+
+using dlimb_t = __uint128_t;
+
+#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
+
+#define MPPP_HAVE_DLIMB_T
+
+using dlimb_t = std::uint_least64_t;
+
+#endif
+
 // Small helper to get the size in limbs from an mpz_t. Will return zero if n is zero.
 inline std::size_t get_mpz_size(const ::mpz_t n)
 {
@@ -2827,16 +2846,41 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
                             const std::integral_constant<int, 1> &)
 {
     ignore(asize1, asize2);
+
+    // Cache the output pointer.
     auto rdata = rop.m_limbs.data();
-    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
+
+    // Cache the input limbs.
+    const auto l1 = op1.m_limbs[0], l2 = op2.m_limbs[0];
+
     // NOTE: both asizes have to be 0 or 1 here.
-    assert((asize1 == 1 && data1[0] != 0u) || (asize1 == 0 && data1[0] == 0u));
-    assert((asize2 == 1 && data2[0] != 0u) || (asize2 == 0 && data2[0] == 0u));
+    assert((asize1 == 1 && l1 != 0u) || (asize1 == 0 && l1 == 0u));
+    assert((asize2 == 1 && l2 != 0u) || (asize2 == 0 && l2 == 0u));
+
+    // Optimise the case in which the addition can be performed
+    // via the signed counterpart of mp_limb_t.
+    if (mppp_likely(l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)))) {
+        const auto x = make_signed(l1, sign1);
+        const auto y = make_signed(l2, sign2);
+
+        const auto ret = x + y;
+        rop._mp_size = integral_sign(ret);
+
+        // NOTE: the absolute
+        // value is guaranteed to be representable
+        // as a signed integer because of the magnitude
+        // checks above, assuming two's complement as usual.
+        rdata[0] = static_cast<::mp_limb_t>(std::abs(ret));
+
+        return true;
+    }
+
     // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t tmp;
+
     if (sign1 == sign2) {
         // When the signs are identical, we can implement addition as a true addition.
-        if (mppp_unlikely(limb_add_overflow(data1[0], data2[0], &tmp))) {
+        if (mppp_unlikely(limb_add_overflow(l1, l2, &tmp))) {
             return false;
         }
         // Assign the output. asize can be zero (sign1 == sign2 == 0) or 1.
@@ -2845,22 +2889,21 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     } else {
         // When the signs differ, we need to implement addition as a subtraction.
         // NOTE: this also includes the case in which only one of the operands is zero.
-        if (data1[0] >= data2[0]) {
+        if (l1 >= l2) {
             // op1 is not smaller than op2.
-            tmp = data1[0] - data2[0];
+            tmp = l1 - l2;
             // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
-            rop._mp_size = sign1 * (data1[0] != data2[0]);
+            rop._mp_size = sign1 * (l1 != l2);
             rdata[0] = tmp;
         } else {
-            // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
+            // NOTE: this has to be one, as l2 and l1 cannot be equal.
             rop._mp_size = sign2;
-            rdata[0] = data2[0] - data1[0];
+            rdata[0] = l2 - l1;
         }
     }
     return true;
 }
 
-// Optimization for two-limbs statics with no nails.
 // Small helper to compare two statics of equal asize 1 or 2.
 inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *data2, mpz_size_t asize)
 {
@@ -2885,6 +2928,7 @@ inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *
     return 0;
 }
 
+// Optimization for two-limbs statics with no nails.
 template <std::size_t SSize>
 inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
@@ -3079,7 +3123,30 @@ template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
                                  ::mp_limb_t l2, const std::integral_constant<int, 1> &)
 {
+    // Cache the output pointer.
+    auto rdata = rop.m_limbs.data();
+
+    // Cache the input limb from op1.
     const auto l1 = op1.m_limbs[0];
+
+    // Optimise the case in which the add/sub can be performed
+    // via the signed counterpart of mp_limb_t.
+    if (mppp_likely(l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)))) {
+        const auto x = make_signed(l1, sign1);
+        const auto y = static_cast<make_signed_t<::mp_limb_t>>(l2);
+
+        const auto ret = AddOrSub ? (x + y) : (x - y);
+        rop._mp_size = integral_sign(ret);
+
+        // NOTE: the absolute
+        // value is guaranteed to be representable
+        // as a signed integer because of the magnitude
+        // checks above, assuming two's complement as usual.
+        rdata[0] = static_cast<::mp_limb_t>(std::abs(ret));
+
+        return true;
+    }
+
     // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     ::mp_limb_t tmp;
     if ((sign1 >= 0 && AddOrSub) || (sign1 <= 0 && !AddOrSub)) {
@@ -3091,7 +3158,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
         // The size is 1 for addition, -1 for subtraction, unless
         // the result is zero.
         rop._mp_size = (AddOrSub ? 1 : -1) * (tmp != 0u);
-        rop.m_limbs[0] = tmp;
+        rdata[0] = tmp;
     } else {
         // op1 negative and addition, or op1 positive and subtraction. Implement
         // as a subtraction.
@@ -3100,12 +3167,12 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
             tmp = l1 - l2;
             // asize is 1 or 0, 0 iff l1 == l2. Sign is negative for add, positive for sub.
             rop._mp_size = (AddOrSub ? -1 : 1) * (tmp != 0u);
-            rop.m_limbs[0] = tmp;
+            rdata[0] = tmp;
         } else {
             // op1 has smaller abs. The result will be positive for add, negative
             // for sub (cannot be zero as it is handled above).
             rop._mp_size = AddOrSub ? 1 : -1;
-            rop.m_limbs[0] = l2 - l1;
+            rdata[0] = l2 - l1;
         }
     }
     return true;
@@ -3170,7 +3237,7 @@ inline bool static_addsub_1(static_int<SSize> &rop, const static_int<SSize> &op1
     if (integer_static_addsub_1_algo<static_int<SSize>>::value == 0 && retval) {
         // If we used the mpn functions and we actually wrote into rop, then
         // make sure we zero out the unused limbs.
-        // NOTE: same as above, we may have used mpn function when SSize <= opt_size.
+        // NOTE: same as above, we may have used mpn functions when SSize <= opt_size.
         rop.zero_unused_limbs();
     }
     return retval;
@@ -3364,19 +3431,11 @@ namespace detail
 {
 
 // The double limb multiplication optimization is available in the following cases:
-// - no nails, we are on a 64bit MSVC build, the limb type has exactly 64 bits and GMP_NUMB_BITS is 64,
-// - no nails, we have a 128bit unsigned available, the limb type has exactly 64 bits and GMP_NUMB_BITS is 64,
-// - no nails, the smallest 64 bit unsigned type has exactly 64 bits, the limb type has exactly 32 bits and
-//   GMP_NUMB_BITS is 32.
-// NOTE: here we are checking that GMP_NUMB_BITS is the same as the limits ::digits property, which is probably
-// rather redundant on any conceivable architecture.
+// - no nails, we are on a 64bit MSVC build and GMP_NUMB_BITS is 64,
+// - we have a double limb numeric type.
 using integer_have_dlimb_mul = std::integral_constant<bool,
-#if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64))                                                    \
-    || (defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64))
-                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
-#elif GMP_NUMB_BITS == 32
-                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
-                                                          && nl_digits<::mp_limb_t>() == 32
+#if (defined(_MSC_VER) && defined(_WIN64) && GMP_NUMB_BITS == 64 && !GMP_NAIL_BITS) || defined(MPPP_HAVE_DLIMB_T)
+                                                      true
 #else
                                                       false
 #endif
@@ -3462,23 +3521,12 @@ inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
     return ::UnsignedMultiply128(op1, op2, hi);
 }
 
-#elif defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+#elif defined(MPPP_HAVE_DLIMB_T)
 
 inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 {
-    using dlimb_t = __uint128_t;
     const dlimb_t res = dlimb_t(op1) * op2;
-    *hi = static_cast<::mp_limb_t>(res >> 64);
-    return static_cast<::mp_limb_t>(res);
-}
-
-#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
-
-inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
-{
-    using dlimb_t = std::uint_least64_t;
-    const dlimb_t res = dlimb_t(op1) * op2;
-    *hi = static_cast<::mp_limb_t>(res >> 32);
+    *hi = static_cast<::mp_limb_t>(res >> GMP_NUMB_BITS);
     return static_cast<::mp_limb_t>(res);
 }
 
@@ -3650,12 +3698,36 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     if (mppp_unlikely(tmp)) {
         return 3u;
     }
+
     // Determine the sign of the product: 0, 1 or -1.
     const int sign_prod = sign1 * sign2;
-    // Now add/sub.
+
+    // Cache the original value in rop.
+    const auto rlimb = rop.m_limbs[0];
+
+    // Now add.
+
+    // Optimise the case in which the addition can be performed
+    // via the signed counterpart of mp_limb_t.
+    if (rlimb < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && prod < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2))) {
+        const auto x = make_signed(rlimb, signr);
+        const auto y = make_signed(prod, sign_prod);
+
+        const auto ret = x + y;
+        rop._mp_size = integral_sign(ret);
+
+        // NOTE: the absolute
+        // value is guaranteed to be representable
+        // as a signed integer because of the magnitude
+        // checks above, assuming two's complement as usual.
+        rop.m_limbs[0] = static_cast<::mp_limb_t>(std::abs(ret));
+
+        return 0u;
+    }
+
     if (signr == sign_prod) {
         // Same sign, do addition with overflow check.
-        if (mppp_unlikely(limb_add_overflow(rop.m_limbs[0], prod, &tmp))) {
+        if (mppp_unlikely(limb_add_overflow(rlimb, prod, &tmp))) {
             return 2u;
         }
         // Assign the output.
@@ -3663,16 +3735,16 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         rop.m_limbs[0] = tmp;
     } else {
         // When the signs differ, we need to implement addition as a subtraction.
-        if (rop.m_limbs[0] >= prod) {
+        if (rlimb >= prod) {
             // abs(rop) >= abs(prod).
-            tmp = rop.m_limbs[0] - prod;
+            tmp = rlimb - prod;
             // asize is either 1 or 0 (0 iff rop == prod).
             rop._mp_size = signr * static_cast<int>(tmp != 0u);
             rop.m_limbs[0] = tmp;
         } else {
             // NOTE: this cannot be zero, as rop and prod cannot be equal.
             rop._mp_size = sign_prod;
-            rop.m_limbs[0] = prod - rop.m_limbs[0];
+            rop.m_limbs[0] = prod - rlimb;
         }
     }
     return 0u;
@@ -4203,18 +4275,14 @@ inline integer<SSize> sqr(const integer<SSize> &n)
 namespace detail
 {
 
-// Detect the presence of dual-limb division/remainder. This is currently possible only if:
-// - we are on a 32bit build (with the usual constraints that the types have exactly 32/64 bits and no nails),
-// - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
+// Detect the presence of dual-limb division/remainder. This is currently possible only if we
+// have a double limb type available.
 // NOTE: starting from MSVC 2019, there are some 128bit division intrinsics
 // available:
 // https://docs.microsoft.com/en-us/cpp/intrinsics/udiv128
 using integer_have_dlimb_div = std::integral_constant<bool,
-#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64)
-                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
-#elif GMP_NUMB_BITS == 32
-                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
-                                                          && nl_digits<::mp_limb_t>() == 32
+#if defined(MPPP_HAVE_DLIMB_T)
+                                                      true
 #else
                                                       false
 #endif
@@ -4309,19 +4377,10 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     copy_limbs_no(r_res.data(), r_res.data() + ret_size, rop.m_limbs.data());
 }
 
-#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+#if defined(MPPP_HAVE_DLIMB_T)
 
 inline ::mp_limb_t static_sqrm_impl_1(::mp_limb_t op, ::mp_limb_t mod)
 {
-    using dlimb_t = __uint128_t;
-    return static_cast<::mp_limb_t>((dlimb_t(op) * op) % mod);
-}
-
-#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
-
-inline ::mp_limb_t static_sqrm_impl_1(::mp_limb_t op, ::mp_limb_t mod)
-{
-    using dlimb_t = std::uint_least64_t;
     return static_cast<::mp_limb_t>((dlimb_t(op) * op) % mod);
 }
 
@@ -4536,67 +4595,33 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     r.m_limbs[0] = r_;
 }
 
-// Implementation of the 2-limb division/remainder primitives,
-// parametrised on the double limb type and limb bit width.
-// These assume that there are no nail bits and that
-// the bit width of DLimb is exactly twice the bit
-// width of the limb type.
+// Implementation of the 2-limb division/remainder primitives.
+
+#if defined(MPPP_HAVE_DLIMB_T)
 
 // Quotient+remainder.
-template <typename DLimb, int NBits>
-inline void dlimb_tdiv_qr_impl(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                               ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2,
-                               ::mp_limb_t *MPPP_RESTRICT r1, ::mp_limb_t *MPPP_RESTRICT r2)
+inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
+                          ::mp_limb_t *MPPP_RESTRICT r2)
 {
-    const auto op1 = op11 + (DLimb(op12) << NBits);
-    const auto op2 = op21 + (DLimb(op22) << NBits);
+    const auto op1 = op11 + (dlimb_t(op12) << GMP_NUMB_BITS);
+    const auto op2 = op21 + (dlimb_t(op22) << GMP_NUMB_BITS);
     const auto q = op1 / op2, r = op1 % op2;
     *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> NBits);
+    *q2 = static_cast<::mp_limb_t>(q >> GMP_NUMB_BITS);
     *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
-    *r2 = static_cast<::mp_limb_t>(r >> NBits);
+    *r2 = static_cast<::mp_limb_t>(r >> GMP_NUMB_BITS);
 }
 
 // Quotient only.
-template <typename DLimb, int NBits>
-inline void dlimb_tdiv_q_impl(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                              ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                         ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    const auto op1 = op11 + (DLimb(op12) << NBits);
-    const auto op2 = op21 + (DLimb(op22) << NBits);
+    const auto op1 = op11 + (dlimb_t(op12) << GMP_NUMB_BITS);
+    const auto op2 = op21 + (dlimb_t(op22) << GMP_NUMB_BITS);
     const auto q = op1 / op2;
     *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> NBits);
-}
-
-#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
-
-inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
-                          ::mp_limb_t *MPPP_RESTRICT r2)
-{
-    dlimb_tdiv_qr_impl<__uint128_t, 64>(op11, op12, op21, op22, q1, q2, r1, r2);
-}
-
-inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                         ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
-{
-    dlimb_tdiv_q_impl<__uint128_t, 64>(op11, op12, op21, op22, q1, q2);
-}
-
-#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
-
-inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
-                          ::mp_limb_t *MPPP_RESTRICT r2)
-{
-    dlimb_tdiv_qr_impl<std::uint_least64_t, 32>(op11, op12, op21, op22, q1, q2, r1, r2);
-}
-
-inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                         ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
-{
-    dlimb_tdiv_q_impl<std::uint_least64_t, 32>(op11, op12, op21, op22, q1, q2);
+    *q2 = static_cast<::mp_limb_t>(q >> GMP_NUMB_BITS);
 }
 
 #endif
@@ -4752,7 +4777,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // division.
     const ::mp_limb_t n = op1.m_limbs[0] & GMP_NUMB_MASK, d = op2.m_limbs[0] & GMP_NUMB_MASK, q_ = n / d;
     // Write q.
-    q._mp_size = sign1 * sign2 * (n >= d);
+    q._mp_size = (n >= d) ? (sign1 * sign2) : 0;
     // NOTE: there should be no need here to mask.
     q.m_limbs[0] = q_;
 }
