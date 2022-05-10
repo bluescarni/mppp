@@ -87,6 +87,10 @@ static_assert(disjunction<std::is_same<::mp_limb_t, unsigned long>, std::is_same
                           std::is_same<::mp_limb_t, unsigned>>::value,
               "Invalid type for mp_limb_t.");
 
+// Paranoia check.
+static_assert(nl_digits<::mp_limb_t>() == GMP_LIMB_BITS,
+              "Inconsistent bit width between std::numeric_limits and GMP_LIMB_BITS.");
+
 } // namespace
 
 void mpz_alloc_cache::clear() noexcept
