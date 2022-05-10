@@ -4,11 +4,13 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Macros and definitions &#8212; mp++ 0.26 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Macros and definitions &#8212; mp++ 0.27 documentation</title>
     
-  <link href="_static/css/theme.css" rel="stylesheet" />
-  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,33 +20,50 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinx-book-theme.e8f53015daec13862f6db5e763c41738.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js"></script>
-    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Namespaces" href="namespaces.html" />
     <link rel="prev" title="Reference" href="reference.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
     
     <div class="container-fluid" id="banner"></div>
 
@@ -53,13 +72,15 @@
     <div class="container-xl">
       <div class="row">
           
-<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
-    
-        <div class="navbar-brand-box">
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
     <a class="navbar-brand text-wrap" href="index.html">
       
       
-      <h1 class="site-logo" id="site-title">mp++ 0.26 documentation</h1>
+      
+      <h1 class="site-logo" id="site-title">mp++ 0.27 documentation</h1>
       
     </a>
 </div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
@@ -299,12 +320,17 @@
 </ul>
 
     </div>
-</nav> <!-- To handle the deprecated key -->
-
-<div class="navbar_extra_footer">
-  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-</div>
-
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
 </div>
 
 
@@ -312,117 +338,201 @@
 
 
           
-<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
     
-    <div class="topbar container-xl fixed-top">
-    <div class="topbar-contents row">
-        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
-        <div class="col pl-md-4 topbar-main">
-            
-            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
-                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
-                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
-                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
-                <i class="fas fa-bars"></i>
-                <i class="fas fa-arrow-left"></i>
-                <i class="fas fa-arrow-up"></i>
-            </button>
-            
-            
-<div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
-            class="fas fa-download"></i></button>
-
-    <div class="dropdown-buttons">
-        <!-- ipynb file if we had a myst markdown file -->
+    <div class="header-article row sticky-top noprint">
         
-        <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/definitions.rst.txt"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
-                data-placement="left">.rst</button></a>
-        <!-- Download PDF via print -->
-        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/bluescarni/mppp"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Fdefinitions.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/definitions.rst.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.rst</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
     </div>
 </div>
 
-            <!-- Source interaction buttons -->
-
-<div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
-        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
-    <div class="dropdown-buttons sourcebuttons">
-        <a class="repository-button"
-            href="https://github.com/bluescarni/mppp"><button type="button" class="btn btn-secondary topbarbtn"
-                data-toggle="tooltip" data-placement="left" title="Source repository"><i
-                    class="fab fa-github"></i>repository</button></a>
-        <a class="issues-button"
-            href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Fdefinitions.html&body=Your%20issue%20content%20here."><button
-                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
-                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
-        
-    </div>
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
 </div>
-
-            <!-- Full screen (wrap in <a> to have style consistency -->
-
-<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
-        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
-        title="Fullscreen mode"><i
-            class="fas fa-expand"></i></button></a>
-
-            <!-- Launch buttons -->
-
-        </div>
-
-        <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
-            
-        </div>
     </div>
-</div>
-    <div id="main-content" class="row">
-        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Macros and definitions</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
               <div>
                 
-  <div class="section" id="macros-and-definitions">
-<h1>Macros and definitions<a class="headerlink" href="#macros-and-definitions" title="Permalink to this headline">¶</a></h1>
+  <section id="macros-and-definitions">
+<h1>Macros and definitions<a class="headerlink" href="#macros-and-definitions" title="Permalink to this headline">#</a></h1>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.6.</span></p>
 </div>
 <p><em>#include &lt;mp++/config.hpp&gt;</em></p>
 <dl class="c macro">
-<dt id="c.MPPP_VERSION_STRING">
-<code class="sig-name descname"><span class="pre">MPPP_VERSION_STRING</span></code><a class="headerlink" href="#c.MPPP_VERSION_STRING" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_VERSION_STRING">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_VERSION_STRING</span></span></span><a class="headerlink" href="#c.MPPP_VERSION_STRING" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This definition expands to a string literal containing the full version of the mp++ library
 (e.g., for version 0.6 this macro expands to <code class="docutils literal notranslate"><span class="pre">&quot;0.6&quot;</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_VERSION_MAJOR">
-<code class="sig-name descname"><span class="pre">MPPP_VERSION_MAJOR</span></code><a class="headerlink" href="#c.MPPP_VERSION_MAJOR" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_VERSION_MAJOR">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_VERSION_MAJOR</span></span></span><a class="headerlink" href="#c.MPPP_VERSION_MAJOR" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This definition expands to an integral literal corresponding to the major mp++ version (e.g.,
 for version 0.6, this macro expands to <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_VERSION_MINOR">
-<code class="sig-name descname"><span class="pre">MPPP_VERSION_MINOR</span></code><a class="headerlink" href="#c.MPPP_VERSION_MINOR" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_VERSION_MINOR">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_VERSION_MINOR</span></span></span><a class="headerlink" href="#c.MPPP_VERSION_MINOR" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This definition expands to an integral literal corresponding to the minor mp++ version (e.g.,
 for version 0.6, this macro expands to <code class="docutils literal notranslate"><span class="pre">6</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_WITH_QUADMATH">
-<code class="sig-name descname"><span class="pre">MPPP_WITH_QUADMATH</span></code><a class="headerlink" href="#c.MPPP_WITH_QUADMATH" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_WITH_QUADMATH">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_WITH_QUADMATH</span></span></span><a class="headerlink" href="#c.MPPP_WITH_QUADMATH" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This name is defined if mp++ was configured with support for the quadmath library
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_WITH_BOOST_S11N">
-<code class="sig-name descname"><span class="pre">MPPP_WITH_BOOST_S11N</span></code><a class="headerlink" href="#c.MPPP_WITH_BOOST_S11N" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_WITH_BOOST_S11N">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_WITH_BOOST_S11N</span></span></span><a class="headerlink" href="#c.MPPP_WITH_BOOST_S11N" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.22.</span></p>
 </div>
@@ -431,8 +541,8 @@ for version 0.6, this macro expands to <code class="docutils literal notranslate
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_FLOAT128_WITH_LONG_DOUBLE">
-<code class="sig-name descname"><span class="pre">MPPP_FLOAT128_WITH_LONG_DOUBLE</span></code><a class="headerlink" href="#c.MPPP_FLOAT128_WITH_LONG_DOUBLE" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_FLOAT128_WITH_LONG_DOUBLE">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_FLOAT128_WITH_LONG_DOUBLE</span></span></span><a class="headerlink" href="#c.MPPP_FLOAT128_WITH_LONG_DOUBLE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.22.</span></p>
 </div>
@@ -443,15 +553,15 @@ and the <code class="docutils literal notranslate"><span class="pre">__float128<
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_WITH_MPFR">
-<code class="sig-name descname"><span class="pre">MPPP_WITH_MPFR</span></code><a class="headerlink" href="#c.MPPP_WITH_MPFR" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_WITH_MPFR">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_WITH_MPFR</span></span></span><a class="headerlink" href="#c.MPPP_WITH_MPFR" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This name is defined if mp++ was configured with support for the MPFR library
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_WITH_MPC">
-<code class="sig-name descname"><span class="pre">MPPP_WITH_MPC</span></code><a class="headerlink" href="#c.MPPP_WITH_MPC" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_WITH_MPC">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_WITH_MPC</span></span></span><a class="headerlink" href="#c.MPPP_WITH_MPC" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.20.</span></p>
 </div>
@@ -460,8 +570,8 @@ and the <code class="docutils literal notranslate"><span class="pre">__float128<
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_WITH_ARB">
-<code class="sig-name descname"><span class="pre">MPPP_WITH_ARB</span></code><a class="headerlink" href="#c.MPPP_WITH_ARB" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_WITH_ARB">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_WITH_ARB</span></span></span><a class="headerlink" href="#c.MPPP_WITH_ARB" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
 </div>
@@ -470,15 +580,15 @@ and the <code class="docutils literal notranslate"><span class="pre">__float128<
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_HAVE_GCC_INT128">
-<code class="sig-name descname"><span class="pre">MPPP_HAVE_GCC_INT128</span></code><a class="headerlink" href="#c.MPPP_HAVE_GCC_INT128" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_HAVE_GCC_INT128">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_HAVE_GCC_INT128</span></span></span><a class="headerlink" href="#c.MPPP_HAVE_GCC_INT128" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This name is defined if mp++ detects the presence of the GCC-style 128-bit integers
 <code class="docutils literal notranslate"><span class="pre">__int128_t</span></code> and <code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code>, available on some compiler/platform combinations.</p>
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_STATIC_BUILD">
-<code class="sig-name descname"><span class="pre">MPPP_STATIC_BUILD</span></code><a class="headerlink" href="#c.MPPP_STATIC_BUILD" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_STATIC_BUILD">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_STATIC_BUILD</span></span></span><a class="headerlink" href="#c.MPPP_STATIC_BUILD" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.15.</span></p>
 </div>
@@ -487,8 +597,8 @@ library (see the <a class="reference internal" href="installation.html#installat
 </dd></dl>
 
 <dl class="c macro">
-<dt id="c.MPPP_HAVE_STRING_VIEW">
-<code class="sig-name descname"><span class="pre">MPPP_HAVE_STRING_VIEW</span></code><a class="headerlink" href="#c.MPPP_HAVE_STRING_VIEW" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object c" id="c.MPPP_HAVE_STRING_VIEW">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_HAVE_STRING_VIEW</span></span></span><a class="headerlink" href="#c.MPPP_HAVE_STRING_VIEW" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.17.</span></p>
 </div>
@@ -496,59 +606,53 @@ library (see the <a class="reference internal" href="installation.html#installat
 class (available since C++17).</p>
 </dd></dl>
 
-</div>
+</section>
 
 
               </div>
               
-        
-            
-
-
-
-<div class='prev-next-bottom'>
-    
-    <div id="prev">
-        <a class="left-prev" href="reference.html" title="previous page">
-            <i class="prevnext-label fas fa-angle-left"></i>
-            <div class="prevnext-info">
-                <p class="prevnext-label">previous</p>
-                <p class="prevnext-title">Reference</p>
-            </div>
-        </a>
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="reference.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Reference</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="namespaces.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Namespaces</p>
     </div>
-     <div id="next">
-        <a class="right-next" href="namespaces.html" title="next page">
-            <div class="prevnext-info">
-                <p class="prevnext-label">next</p>
-                <p class="prevnext-title">Namespaces</p>
-            </div>
-            <i class="prevnext-label fas fa-angle-right"></i>
-        </a>
-     </div>
-
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
-        
+            </footer>
         </div>
     </div>
-    <footer class="footer mt-5 mt-md-0">
-    <div class="container">
-      <p>
-        
-          By Francesco Biscani<br/>
-        
-            &copy; Copyright 2016-2021, Francesco Biscani.<br/>
-      </p>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Francesco Biscani<br/>
+  
+      &copy; Copyright 2016-2021, Francesco Biscani.<br/>
+</p>
+        </footer>
     </div>
-  </footer>
-</main>
+    
+</div>
 
 
       </div>
     </div>
   
-  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
-  
+
   </body>
 </html>
