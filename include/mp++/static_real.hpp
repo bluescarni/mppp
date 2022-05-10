@@ -9,6 +9,8 @@
 #ifndef MPPP_STATIC_REAL_HPP
 #define MPPP_STATIC_REAL_HPP
 
+#include <algorithm>
+#include <cstddef>
 #include <limits>
 #include <ostream>
 
@@ -47,8 +49,11 @@ class static_real
     static_assert(Prec >= real_prec_min() && Prec <= real_prec_max(),
                   "The precision selected for a static_real is outside the valid range.");
 
+    // Significand's size in bytes.
+    static constexpr std::size_t sig_size = mpfr_custom_get_size(Prec);
+
     mpfr_struct_t m_mpfr;
-    alignas(mp_limb_t) unsigned char m_storage[mpfr_custom_get_size(Prec)];
+    alignas(mp_limb_t) unsigned char m_storage[sig_size];
 
 public:
     static constexpr mpfr_prec_t prec = Prec;
@@ -58,20 +63,26 @@ public:
         mpfr_custom_init(m_storage, Prec);
         mpfr_custom_init_set(&m_mpfr, MPFR_ZERO_KIND, 0, Prec, m_storage);
     }
-    static_real(const static_real &o) : static_real()
+    static_real(const static_real &o)
     {
-        // NOTE: it might be possible to pass the value of o directly to
-        // mpfr_custom_init_set, but the logic looks a bit complicated.
-        // It might also be possible to do a straight bit copy of o
-        // and then adjust the pointer in m_mpfr, but let's keep it simple
-        // for now.
-        mpfr_set(&m_mpfr, &o.m_mpfr, MPFR_RNDN);
+        mpfr_custom_init(m_storage, Prec);
+
+        const auto o_kind = mpfr_custom_get_kind(&o.m_mpfr);
+        const auto o_exp = mpfr_custom_get_exp(&o.m_mpfr);
+        const auto o_sig = static_cast<const unsigned char *>(mpfr_custom_get_significand(&o.m_mpfr));
+
+        std::copy(o_sig, o_sig + sig_size, m_storage);
+
+        mpfr_custom_init_set(&m_mpfr, o_kind, o_exp, Prec, m_storage);
     }
     // NOTE: move equivalent to copy.
     static_real(static_real &&o) noexcept : static_real(o) {}
     static_real &operator=(const static_real &o)
     {
-        mpfr_set(&m_mpfr, &o.m_mpfr, MPFR_RNDN);
+        if (mppp_likely(this != &o)) {
+            mpfr_set(&m_mpfr, &o.m_mpfr, MPFR_RNDN);
+        }
+
         return *this;
     }
     // NOTE: move equivalent to copy.

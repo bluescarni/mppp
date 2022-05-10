@@ -52,4 +52,6 @@ using namespace mppp;
 TEST_CASE("static_real constructors")
 {
     static_real<128> r, r2(r);
+    std::cout << r << '\n';
+    std::cout << r2 << '\n';
 }
