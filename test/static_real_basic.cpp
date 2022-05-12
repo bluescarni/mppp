@@ -28,6 +28,8 @@
 // #include <string_view>
 // #endif
 
+#include <iostream>
+
 // #include <mp++/detail/gmp.hpp>
 // #include <mp++/detail/mpfr.hpp>
 // #include <mp++/detail/type_traits.hpp>
@@ -54,4 +56,6 @@ TEST_CASE("static_real constructors")
     static_real<128> r, r2(r);
     std::cout << r << '\n';
     std::cout << r2 << '\n';
+    std::cout << sizeof(static_real<128>) << '\n';
+    std::cout << sizeof(static_real<256>) << '\n';
 }

@@ -33,7 +33,9 @@ class static_real
     // Significand size in number of mp_limb_t.
     static constexpr std::size_t sig_size_limbs
         = sig_size_bytes / sizeof(::mp_limb_t) + static_cast<std::size_t>(sig_size_bytes % sizeof(::mp_limb_t) != 0u);
+    static_assert(sig_size_limbs > 0u, "Invalid size for a static real.");
 
+    // The MPFR struct.
     mpfr_struct_t m_mpfr;
     // The significand.
     ::mp_limb_t m_sig[sig_size_limbs];
@@ -51,6 +53,8 @@ public:
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     static_real(const static_real &o)
     {
+        assert(o.m_mpfr._mpfr_prec == prec);
+
         // Init the significand.
         mpfr_custom_init(m_sig, Prec);
 
@@ -71,8 +75,21 @@ public:
     static_real(static_real &&o) noexcept : static_real(o) {}
     static_real &operator=(const static_real &o)
     {
+        assert(m_mpfr._mpfr_prec == o.m_mpfr._mpfr_prec);
+        assert(m_mpfr._mpfr_prec == prec);
+
         if (mppp_likely(this != &o)) {
-            mpfr_set(&m_mpfr, &o.m_mpfr, MPFR_RNDN);
+            // NOTE: here we take advantage of the internals
+            // of mpfr_struct_t.
+            // NOTE: no need to copy over the precision or to alter
+            // the pointer to the significand.
+            m_mpfr._mpfr_sign = o.m_mpfr._mpfr_sign;
+            m_mpfr._mpfr_exp = o.m_mpfr._mpfr_exp;
+            const auto *const o_sig = static_cast<const ::mp_limb_t *>(mpfr_custom_get_significand(&o.m_mpfr));
+            assert(o_sig == o.m_sig);
+
+            // Copy over the significand.
+            std::copy(o_sig, o_sig + sig_size_limbs, m_sig);
         }
 
         return *this;
