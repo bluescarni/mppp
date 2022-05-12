@@ -383,6 +383,7 @@ void real::dispatch_construction(const real128 &x)
 #endif
 
 // Various helpers and constructors from string-like entities.
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
 {
     if (mppp_unlikely(base && (base < 2 || base > 62))) {
@@ -427,7 +428,7 @@ real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
 real::real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
 
 // Constructor from a special value, sign and precision.
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-easily-swappable-parameters)
 real::real(real_kind k, int sign, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
@@ -459,14 +460,14 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
 real::real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
 
 // Constructors from n*2**e.
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-easily-swappable-parameters)
 real::real(unsigned long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
     set_ui_2exp(*this, n, e);
 }
 
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-easily-swappable-parameters)
 real::real(long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));

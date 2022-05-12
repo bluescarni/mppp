@@ -178,13 +178,13 @@ complex::complex(const stag &, const char *s, int base, ::mpfr_prec_t p)
 }
 
 complex::complex(const stag &, const std::string &s, int base, ::mpfr_prec_t p)
-    : complex(s.c_str(), base, complex_prec_t(p))
+    : complex(s.c_str(), base, static_cast<complex_prec_t>(p))
 {
 }
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 complex::complex(const stag &, const std::string_view &s, int base, ::mpfr_prec_t p)
-    : complex(s.data(), s.data() + s.size(), base, complex_prec_t(p))
+    : complex(s.data(), s.data() + s.size(), base, static_cast<complex_prec_t>(p))
 {
 }
 #endif
