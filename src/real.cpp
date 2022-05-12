@@ -53,6 +53,7 @@
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/real_common.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
@@ -69,6 +70,22 @@ namespace detail
 
 namespace
 {
+
+// Paranoia checks.
+static_assert(real_prec_min() <= real_prec_max(), "The minimum real precision is larger than the maximum precision.");
+
+// Zero precision has a special meaning, depending on the context. Thus, the minimum precision must be nonzero.
+static_assert(real_prec_min() > 0, "The minimum real precision must be positive.");
+
+// A couple of sanity checks when constructing temporary mpfrs/mpfs from long double.
+static_assert(std::numeric_limits<long double>::max_digits10 < nl_max<int>() / 4, "Overflow error.");
+// NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
+static_assert(std::numeric_limits<long double>::max_digits10 * 4 < nl_max<::mpfr_prec_t>(), "Overflow error.");
+// NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
+static_assert(std::numeric_limits<long double>::max_digits10 * 4 < nl_max<::mp_bitcnt_t>(), "Overflow error.");
+// NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
+static_assert(real_prec_check(static_cast<::mpfr_prec_t>(std::numeric_limits<long double>::max_digits10 * 4)),
+              "The precision required to represent long double is outside the MPFR min/max precision bounds.");
 
 // Some misc tests to check that the mpfr struct conforms to our expectations.
 struct expected_mpfr_struct_t {

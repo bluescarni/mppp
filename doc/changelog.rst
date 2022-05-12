@@ -1,6 +1,24 @@
 Changelog
 =========
 
+0.27 (unreleased)
+-----------------
+
+Changes
+~~~~~~~
+
+- Performance improvements in the single-limb addition
+  primitives for signed integrals
+  (`#293 <https://github.com/bluescarni/mppp/pull/293>`__).
+
+Fix
+~~~
+
+- Fix compilation in debug mode on recent versions of Clang
+  (`#293 <https://github.com/bluescarni/mppp/pull/293>`__).
+- Fix an MSVC build issue in C++20 mode
+  (`#292 <https://github.com/bluescarni/mppp/pull/292>`__).
+
 0.26 (2021-09-02)
 -----------------
 

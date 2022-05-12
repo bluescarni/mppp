@@ -62,11 +62,23 @@ struct hash_tester {
         detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
-        auto random_xy = [&](unsigned x) {
+        //
+        // NOTE: capture n1/n2 by value because there seems to be
+        // a strict aliasing bug in GCC, perhaps related to the union
+        // with common initial sequence used to implement integer.
+        // Essentially, what seems to happen is that the compiler ignores
+        // the negation of n1 via n1.neg(), and the subsequent assignment
+        // n2 = n1 will result in n1 and n2 having the same absolute
+        // value but different sign. It seems like the "if (sdist(rng)) {"
+        // is skipped altogether - adding a print statement in it is enough
+        // to avoid the issue. Compiling with -fno-strict-aliasing also seems
+        // to hide the bug, as well as capturing only n2 by reference.
+        auto random_xy = [&, n1, n2](unsigned x) mutable {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 n1 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
+                    // std::cout << "Negated!\n";
                     n1.neg();
                 }
                 n2 = n1;

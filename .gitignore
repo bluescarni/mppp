@@ -13,3 +13,7 @@ doc/conf.py
 
 # .orig files from patch.
 *.orig
+
+# Editor bits.
+.cache/
+
