@@ -321,12 +321,12 @@ real::real(const real &other, ::mpfr_prec_t p)
 // Move constructor with custom precision.
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 real::real(real &&other, ::mpfr_prec_t p)
+    : // Shallow copy other.
+      m_mpfr(other.m_mpfr)
 {
     // Check the precision first of all.
     check_init_prec(p);
 
-    // Shallow copy other.
-    m_mpfr = other.m_mpfr;
     // Mark the other as moved-from.
     other.m_mpfr._mpfr_d = nullptr;
 

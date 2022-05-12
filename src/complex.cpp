@@ -130,14 +130,14 @@ complex::complex(const complex &other, complex_prec_t p)
 
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
 complex::complex(complex &&other, complex_prec_t p_)
+    : // Shallow copy other.
+      m_mpc(other.m_mpc)
 {
     const auto p = static_cast<::mpfr_prec_t>(p_);
 
     // Check the precision first of all.
     check_init_prec(p);
 
-    // Shallow copy other.
-    m_mpc = other.m_mpc;
     // Mark the other as moved-from.
     other.m_mpc.re->_mpfr_d = nullptr;
 
