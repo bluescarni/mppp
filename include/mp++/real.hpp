@@ -1382,7 +1382,7 @@ MPPP_DLL_PUBLIC real &set_si_2exp(real &, long, ::mpfr_exp_t);
 // Implementation of the constructor from n*2**e, integer overload.
 // Place it here so that set_z_2exp() is visible.
 template <std::size_t SSize>
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-easily-swappable-parameters)
 inline real::real(const integer<SSize> &n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
