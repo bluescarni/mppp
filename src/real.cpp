@@ -2533,7 +2533,7 @@ std::size_t rbs_prec_to_size(::mpfr_prec_t p)
     const auto nlimbs = rbs_prec_to_nlimbs(p);
 
     // LCOV_EXCL_START
-    if (mppp_unlikely(nlimbs > std::numeric_limits<std::uint32_t>::max() / sizeof(::mp_limb_t))) {
+    if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / sizeof(::mp_limb_t))) {
         throw std::overflow_error("Overflow detected in the computation of the binary size of a real");
     }
     // LCOV_EXCL_STOP
