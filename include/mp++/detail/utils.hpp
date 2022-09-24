@@ -10,6 +10,8 @@
 #define MPPP_DETAIL_UTILS_HPP
 
 #include <cassert>
+#include <cstddef>
+#include <functional>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -296,6 +298,14 @@ inline make_signed_t<T> make_signed(const T &n, int s)
     // (n ^ s_ex) - s_ex returns n if s_ex is 0, -n (still represented
     // as an unsigned) otherwise.
     return static_cast<make_signed_t<T>>((n ^ s_ex) - s_ex);
+}
+
+// The hash combiner. This is lifted directly from Boost. See also:
+// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
+template <typename T>
+inline void hash_combine(std::size_t &seed, const T &val)
+{
+    seed ^= std::hash<T>{}(val) + static_cast<std::size_t>(0x9e3779b9ull) + (seed << 6) + (seed >> 2);
 }
 
 #if defined(_MSC_VER)
