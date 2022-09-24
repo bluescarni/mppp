@@ -17,6 +17,7 @@
 #include <cmath>
 #include <complex>
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <ostream>
 #include <stdexcept>
@@ -2037,13 +2038,12 @@ inline constexpr real128 sqrt2_128 = real128_sqrt2();
 // Hash.
 inline std::size_t hash(const real128 &x)
 {
-    // NOTE: in order to detect if x is zero/nan, resort to reading directly into the ieee fields.
-    // This avoids calling the fpclassify() function, which internally invokes a compiler library function.
+    // NOTE: in order to detect if x is zero, resort to reading directly into the ieee fields.
+    // This avoids calling a compiler library function.
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     detail::ieee_float128 ief;
     ief.value = x.m_value;
     const auto is_zero = ief.i_eee.exponent == 0u && ief.i_eee.mant_low == 0u && ief.i_eee.mant_high == 0u;
-    const auto is_nan = ief.i_eee.exponent == 32767ul && (ief.i_eee.mant_low != 0u || ief.i_eee.mant_high != 0u);
     // Read the bit-level representation of x and mix it up using a hash combiner.
     struct float128_split_t {
         // NOTE: unsigned long long is guaranteed to be at least 64-bit wide.
@@ -2057,17 +2057,15 @@ inline std::size_t hash(const real128 &x)
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     float128_split fs;
     fs.value = x.m_value;
-    auto retval = fs.split.part1;
-    // The hash combiner. This is lifted directly from Boost. See also:
-    // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
-    retval ^= fs.split.part2 + 0x9e3779b9ull + (retval << 6) + (retval >> 2);
-    // This last step will set retval to zero if x is zero, and to -1 if x is NaN. We need this because:
-    // - +0.0 and -0.0 have a different bit-level representation, but they are mathematically equal
-    //   and they are equal according to operator==();
-    // - we want to ensure that all NaN values produce the same hash.
-    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    retval = (retval & static_cast<unsigned long long>(-!is_zero)) | static_cast<unsigned long long>(-is_nan);
-    return static_cast<std::size_t>(retval);
+    // Init the retval with the hash of the first part.
+    auto retval = std::hash<unsigned long long>{}(fs.split.part1);
+    // Combine with the second part.
+    detail::hash_combine(retval, fs.split.part2);
+    // This last step will set retval to zero if x is zero. We need this because
+    // +0.0 and -0.0 have a different bit-level representation, but they are mathematically equal
+    // and they are equal according to operator==().
+    retval &= static_cast<std::size_t>(-static_cast<int>(!is_zero));
+    return retval;
 }
 
 // NOTE: put these definitions here, as we need the comparison operators to be available.
@@ -2216,6 +2214,23 @@ public:
     static constexpr bool traps = false;
     static constexpr bool tinyness_before = false;
     static constexpr float_round_style round_style = round_to_nearest;
+};
+
+// Specialisation of std::hash for real128.
+template <>
+struct hash<mppp::real128> {
+    // NOTE: these typedefs have been deprecated in C++17.
+#if MPPP_CPLUSPLUS < 201703L
+    // The argument type.
+    using argument_type = mppp::real128;
+    // The result type.
+    using result_type = size_t;
+#endif
+    // Call operator.
+    size_t operator()(const mppp::real128 &x) const
+    {
+        return mppp::hash(x);
+    }
 };
 
 } // namespace std

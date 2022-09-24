@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
+#include <functional>
 
 #include <mp++/real128.hpp>
 
@@ -17,13 +18,12 @@ using namespace mppp;
 
 TEST_CASE("real128 hash")
 {
-    REQUIRE(hash(real128{"nan"}) == std::size_t(-1));
-    REQUIRE(hash(real128{"-nan"}) == std::size_t(-1));
     REQUIRE(hash(real128{0}) == 0u);
     REQUIRE(hash(real128{0.}) == hash(real128{-0.}));
     REQUIRE(hash(real128{42}) != 0u);
     REQUIRE(hash(real128{42}) != std::size_t(-1));
     REQUIRE(hash(real128{-42}) != 0u);
+    REQUIRE(hash(real128{-42}) == std::hash<real128>{}(real128{-42}));
     REQUIRE(hash(real128{-42}) != std::size_t(-1));
     REQUIRE(hash(real128{"inf"}) != 0u);
     REQUIRE(hash(real128{"inf"}) != std::size_t(-1));

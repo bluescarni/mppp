@@ -1379,8 +1379,7 @@ Other
 
    Hash function for :cpp:class:`~mppp::real128`.
 
-   All NaN values produce the same hash value. For non-NaN arguments, this function
-   guarantees that ``x == y`` implies ``hash(x) == hash(y)``.
+   This function guarantees that ``x == y`` implies ``hash(x) == hash(y)``.
 
    :param x: the argument.
 
@@ -1646,6 +1645,27 @@ Standard library specialisations
    .. cpp:function:: public static constexpr mppp::real128 denorm_min()
 
      :return: the output of :cpp:func:`mppp::real128_denorm_min()`.
+
+.. cpp:class:: template <> std::hash<mppp::real128>
+
+   .. versionadded:: 0.27
+
+   Specialisation of ``std::hash`` for :cpp:class:`mppp::real128`.
+
+   The hash is computed via :cpp:func:`std::size_t mppp::hash(const mppp::real128 &)`.
+
+   .. cpp:type:: public argument_type = mppp::real128
+   .. cpp:type:: public result_type = std::size_t
+
+   .. note::
+
+      The :cpp:type:`argument_type` and :cpp:type:`result_type` type aliases are defined only until C++14.
+
+   .. cpp:function:: public std::size_t operator()(const mppp::real128 &x) const
+
+      :param x: the input :cpp:class:`mppp::real128`.
+
+      :return: a hash value for *x*.
 
 .. _real128_literals:
 
