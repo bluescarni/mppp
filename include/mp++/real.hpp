@@ -1864,14 +1864,29 @@ inline bool nan_p(const real &r)
     return r.nan_p();
 }
 
+inline bool isnan(const real &r)
+{
+    return r.nan_p();
+}
+
 // Detect inf.
 inline bool inf_p(const real &r)
 {
     return r.inf_p();
 }
 
+inline bool isinf(const real &r)
+{
+    return r.inf_p();
+}
+
 // Detect finite.
 inline bool number_p(const real &r)
+{
+    return r.number_p();
+}
+
+inline bool isfinite(const real &r)
 {
     return r.number_p();
 }
@@ -2032,6 +2047,7 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
 // Neg and abs.
 MPPP_REAL_MPFR_UNARY_IMPL(neg, ::mpfr_neg, true)
 MPPP_REAL_MPFR_UNARY_IMPL(abs, ::mpfr_abs, true)
+MPPP_REAL_MPFR_UNARY_IMPL(fabs, ::mpfr_abs, true)
 
 // Positive difference.
 MPPP_REAL_MPFR_BINARY_IMPL(dim, ::mpfr_dim, true)

@@ -1555,11 +1555,16 @@ Arithmetic
    :return: :math:`-x`.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::abs(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::fabs(mppp::real &rop, T &&x)
 
    Binary :cpp:class:`~mppp::real` absolute value.
 
-   This function will set *rop* to :math:`\left| x \right|`. The precision of the result will be
+   These functions will set *rop* to :math:`\left| x \right|`. The precision of the result will be
    equal to the precision of *x*.
+
+   .. versionadded:: 0.27
+
+      The ``fabs()`` overload.
 
    :param rop: the return value.
    :param x: the operand.
@@ -1567,11 +1572,16 @@ Arithmetic
    :return: a reference to *rop*.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::abs(T &&x)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::fabs(T &&x)
 
    Unary :cpp:class:`~mppp::real` absolute value.
 
-   This function will return :math:`\left| x \right|`. The precision of the result will be
+   These functions will return :math:`\left| x \right|`. The precision of the result will be
    equal to the precision of *x*.
+
+   .. versionadded:: 0.27
+
+      The ``fabs()`` overload.
 
    :param x: the operand.
 
@@ -1685,8 +1695,11 @@ Comparison
 ~~~~~~~~~~
 
 .. cpp:function:: bool mppp::nan_p(const mppp::real &r)
+.. cpp:function:: bool mppp::isnan(const mppp::real &r)
 .. cpp:function:: bool mppp::inf_p(const mppp::real &r)
+.. cpp:function:: bool mppp::isinf(const mppp::real &r)
 .. cpp:function:: bool mppp::number_p(const mppp::real &r)
+.. cpp:function:: bool mppp::isfinite(const mppp::real &r)
 .. cpp:function:: bool mppp::zero_p(const mppp::real &r)
 .. cpp:function:: bool mppp::regular_p(const mppp::real &r)
 .. cpp:function:: bool mppp::integer_p(const mppp::real &r)
@@ -1696,15 +1709,19 @@ Comparison
 
    These functions will return ``true`` if *r* is, respectively:
 
-   * NaN,
-   * an infinity,
-   * a finite number,
-   * zero,
-   * a regular number (i.e., not NaN, infinity or zero),
-   * an integral value,
-   * one,
+   * NaN (``nan_p()`` and ``isnan()``),
+   * an infinity (``inf_p()`` and ``isinf()``),
+   * a finite number (``number_p()`` and ``isfinite()``),
+   * zero (``zero_p()``),
+   * a regular number (i.e., not NaN, infinity or zero) (``regular_p()``),
+   * an integral value (``integer_p()``),
+   * one (``is_one()``),
 
    ``false`` otherwise.
+
+   .. versionadded:: 0.27
+
+      The ``isnan()``, ``isinf()`` and ``isfinite()`` overloads.
 
    :param r: the input argument.
 

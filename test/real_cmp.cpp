@@ -26,10 +26,17 @@ TEST_CASE("real naninf")
 {
     REQUIRE(!real{12}.nan_p());
     REQUIRE(!nan_p(real{12}));
+    REQUIRE(!isnan(real{12}));
+    REQUIRE(isnan(real{"nan", 15}));
     REQUIRE(!real{12}.inf_p());
     REQUIRE(!inf_p(real{12}));
+    REQUIRE(!isinf(real{12}));
+    REQUIRE(isinf(real{"-inf", 20}));
     REQUIRE(real{12}.number_p());
     REQUIRE(number_p(real{12}));
+    REQUIRE(isfinite(real{12}));
+    REQUIRE(!isfinite(real{"inf", 20}));
+    REQUIRE(!isfinite(real{"nan", 20}));
     REQUIRE(!real{12}.zero_p());
     REQUIRE(!zero_p(real{12}));
     REQUIRE(real{12}.regular_p());
