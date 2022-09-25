@@ -3184,6 +3184,21 @@ Serialisation
 
    :exception unspecified: any exception thrown by the invoked :cpp:func:`mppp::real::binary_load()` overload.
 
+Other
+~~~~~
+
+.. cpp:function:: std::size_t mppp::hash(const mppp::real &x)
+
+   .. versionadded:: 0.27
+
+   Hash function for :cpp:class:`~mppp::real`.
+
+   This function guarantees that ``x == y`` implies ``hash(x) == hash(y)``.
+
+   :param x: the argument.
+
+   :return: a hash value for *x*.
+
 .. _real_operators:
 
 Mathematical operators
@@ -3347,6 +3362,30 @@ Constants
    :param rop: the return value.
 
    :return: a reference to *rop*.
+
+Standard library specialisations
+--------------------------------
+
+.. cpp:class:: template <> std::hash<mppp::real>
+
+   .. versionadded:: 0.27
+
+   Specialisation of ``std::hash`` for :cpp:class:`mppp::real`.
+
+   The hash is computed via :cpp:func:`std::size_t mppp::hash(const mppp::real &)`.
+
+   .. cpp:type:: public argument_type = mppp::real
+   .. cpp:type:: public result_type = std::size_t
+
+   .. note::
+
+      The :cpp:type:`argument_type` and :cpp:type:`result_type` type aliases are defined only until C++14.
+
+   .. cpp:function:: public std::size_t operator()(const mppp::real &x) const
+
+      :param x: the input :cpp:class:`mppp::real`.
+
+      :return: a hash value for *x*.
 
 .. _real_literals:
 

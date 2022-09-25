@@ -20,6 +20,7 @@
 #include <complex>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -4464,6 +4465,9 @@ inline rational<SSize> &rational<SSize>::operator=(const real &x)
     return *this = static_cast<rational<SSize>>(x);
 }
 
+// Hashing.
+MPPP_DLL_PUBLIC std::size_t hash(const real &);
+
 } // namespace mppp
 
 #if defined(MPPP_WITH_BOOST_S11N)
@@ -4473,6 +4477,28 @@ inline rational<SSize> &rational<SSize>::operator=(const real &x)
 BOOST_CLASS_TRACKING(mppp::real, boost::serialization::track_never)
 
 #endif
+
+namespace std
+{
+
+// Specialisation of std::hash for real.
+template <>
+struct hash<mppp::real> {
+    // NOTE: these typedefs have been deprecated in C++17.
+#if MPPP_CPLUSPLUS < 201703L
+    // The argument type.
+    using argument_type = mppp::real;
+    // The result type.
+    using result_type = size_t;
+#endif
+    // Call operator.
+    size_t operator()(const mppp::real &x) const
+    {
+        return mppp::hash(x);
+    }
+};
+
+} // namespace std
 
 #include <mp++/detail/real_literals.hpp>
 

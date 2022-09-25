@@ -25,6 +25,7 @@
 #include <cerrno>
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <ios>
 #include <iostream>
 #include <limits>
@@ -399,6 +400,7 @@ void real::dispatch_construction(const real128 &x)
 #endif
 
 // Various helpers and constructors from string-like entities.
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
 {
     if (mppp_unlikely(base && (base < 2 || base > 62))) {
@@ -443,7 +445,7 @@ real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
 real::real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
 
 // Constructor from a special value, sign and precision.
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-easily-swappable-parameters)
 real::real(real_kind k, int sign, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
@@ -475,14 +477,14 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
 real::real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
 
 // Constructors from n*2**e.
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-easily-swappable-parameters)
 real::real(unsigned long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
     set_ui_2exp(*this, n, e);
 }
 
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-easily-swappable-parameters)
 real::real(long n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
@@ -2849,6 +2851,63 @@ void real::load(boost::archive::binary_iarchive &ar, unsigned)
 }
 
 #endif
+
+std::size_t hash(const real &r)
+{
+    // Handle special cases first.
+
+    if (r.nan_p()) {
+        // Give all NaNs the same hash, regardless of sign,
+        // significand, etc.
+        return 42;
+    }
+
+    if (r.zero_p()) {
+        // Give zero of any sign the same hash. All zeroes
+        // are mathematically equal, thus all zeroes must
+        // produce the same hash value.
+        return 0;
+    }
+
+    // Init the retval with the hash of the sign.
+    auto retval = std::hash<::mpfr_sign_t>{}(r.get_mpfr_t()->_mpfr_sign);
+
+    if (r.inf_p()) {
+        // For infinities, mix in a constant value, so that all +infs hash to the same
+        // value and all -infs hash to another value.
+        detail::hash_combine(retval, 42);
+        return retval;
+    }
+
+    // Normal number. Let's start by mixing in the exponent,
+    detail::hash_combine(retval, r.get_mpfr_t()->_mpfr_exp);
+
+    // Next, we will mix in all the limbs, starting from the least significant (index 0).
+    // We will skip the initial sequence of zero limbs, and we will start
+    // mixing only once we encounter the first nonzero limb. This ensures that
+    // the same number represented in different precisions will hash to the
+    // same value. See:
+    // https://www.mpfr.org/mpfr-current/mpfr.html#Internals
+    auto found_first_nz = false;
+
+    const auto nlimbs = detail::rbs_prec_to_nlimbs(r.get_prec());
+
+    for (std::size_t i = 0; i < nlimbs; ++i) {
+        if (found_first_nz || r.get_mpfr_t()->_mpfr_d[i] != 0u) {
+            detail::hash_combine(retval, r.get_mpfr_t()->_mpfr_d[i]);
+            found_first_nz = true;
+        }
+    }
+
+    // We must have run into a nonzero limb at some point:
+    // """
+    // Non-singular (i.e., different from NaN, Infinity or zero) values always have
+    // the most significant bit of the most significant limb set to 1.
+    // """
+    assert(found_first_nz);
+
+    return retval;
+}
 
 } // namespace mppp
 
