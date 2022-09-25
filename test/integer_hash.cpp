@@ -39,14 +39,7 @@ struct hash_tester {
     {
         using integer = integer<S::value>;
         const std::hash<integer> hasher{};
-        integer n1, n2;
-        REQUIRE((hash(n1) == 0u));
-        REQUIRE((hasher(n1) == 0u));
-        n1.promote();
-        REQUIRE((hash(n1) == 0u));
-        REQUIRE((hasher(n1) == 0u));
-        n1 = integer{12};
-        n2 = n1;
+        auto n1 = integer{12}, n2 = n1;
         REQUIRE(n2.is_static());
         n1.promote();
         REQUIRE(n1.is_dynamic());
