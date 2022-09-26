@@ -47,14 +47,24 @@ TEST_CASE("real abs")
     r0 = -1;
     REQUIRE(r0.abs() == real{1});
     REQUIRE(abs(real{-42}) == real{42});
+    REQUIRE(fabs(real{-42}) == real{42});
     r0 = -53;
     REQUIRE(abs(r0) == real{53});
+    REQUIRE(fabs(r0) == real{53});
     abs(r0, real{-53, 8});
     REQUIRE(std::is_same<real &, decltype(abs(r0, real{-53, 8}))>::value);
     REQUIRE(r0 == real{53});
     REQUIRE(r0.get_prec() == 8);
+    fabs(r0, real{-53, 8});
+    REQUIRE(std::is_same<real &, decltype(fabs(r0, real{-53, 8}))>::value);
+    REQUIRE(r0 == real{53});
+    REQUIRE(r0.get_prec() == 8);
     real r1{-123};
     abs(r0, r1);
+    REQUIRE(r0 == real{123});
+    REQUIRE(r0.get_prec() == detail::nl_digits<int>() + 1);
+    r1 = real{-123};
+    fabs(r0, r1);
     REQUIRE(r0 == real{123});
     REQUIRE(r0.get_prec() == detail::nl_digits<int>() + 1);
 }

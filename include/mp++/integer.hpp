@@ -7037,13 +7037,12 @@ inline std::size_t hash(const integer<SSize> &n)
         = size >= 0 ? static_cast<std::size_t>(size) : static_cast<std::size_t>(detail::nint_abs(size));
     const ::mp_limb_t *ptr
         = n._get_union().is_static() ? n._get_union().g_st().m_limbs.data() : n._get_union().g_dy()._mp_d;
-    // Init the retval as the signed size.
-    auto retval = static_cast<std::size_t>(size);
+    // Init the retval as the hash of the signed size.
+    auto retval = std::hash<detail::mpz_size_t>{}(size);
     // Combine the limbs.
     for (std::size_t i = 0; i < asize; ++i) {
-        // The hash combiner. This is lifted directly from Boost. See also:
-        // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
-        retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9ul) + (retval << 6) + (retval >> 2);
+        // Combine the hashes of the limbs.
+        detail::hash_combine(retval, ptr[i] & GMP_NUMB_MASK);
     }
     return retval;
 }
@@ -8200,7 +8199,7 @@ namespace std
 // Specialisation of std::hash for mppp::integer.
 template <size_t SSize>
 struct hash<mppp::integer<SSize>> {
-// NOTE: these typedefs have been deprecated in C++17.
+    // NOTE: these typedefs have been deprecated in C++17.
 #if MPPP_CPLUSPLUS < 201703L
     // The argument type.
     using argument_type = mppp::integer<SSize>;

@@ -4,6 +4,16 @@ Changelog
 0.27 (unreleased)
 -----------------
 
+New
+~~~
+
+- Add several ``std`` math overloads for :cpp:class:`~mppp::real`
+  (`#295 <https://github.com/bluescarni/mppp/pull/295>`__).
+- Add hashing capabilities to :cpp:class:`~mppp::real`
+  (`#295 <https://github.com/bluescarni/mppp/pull/295>`__).
+- Add a ``std::hash`` specialisation for :cpp:class:`~mppp::real128`
+  (`#295 <https://github.com/bluescarni/mppp/pull/295>`__).
+
 Changes
 ~~~~~~~
 

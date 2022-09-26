@@ -6,9 +6,6 @@ set -x
 # Exit on error.
 set -e
 
-# Core deps.
-sudo apt-get install build-essential
-
 # Install conda+deps.
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 export deps_dir=$HOME/local
@@ -16,10 +13,8 @@ export PATH="$HOME/miniconda/bin:$PATH"
 bash miniconda.sh -b -p $HOME/miniconda
 conda config --add channels conda-forge
 conda config --set channel_priority strict
-conda_pkgs="cmake gmp mpfr libflint arb python=3.7 pybind11 mpc boost-cpp sphinx sphinx-book-theme myst-nb xeus-cling"
-conda create -q -p $deps_dir -y
+conda create -y -q -p $deps_dir cmake gmp mpfr libflint arb 'python=3.10' pybind11 mpc boost-cpp sphinx sphinx-book-theme myst-nb xeus-cling c-compiler cxx-compiler make
 source activate $deps_dir
-conda install $conda_pkgs -y
 
 # Create the build dir and cd into it.
 mkdir build

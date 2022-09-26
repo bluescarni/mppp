@@ -20,6 +20,7 @@
 #include <complex>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -1382,7 +1383,7 @@ MPPP_DLL_PUBLIC real &set_si_2exp(real &, long, ::mpfr_exp_t);
 // Implementation of the constructor from n*2**e, integer overload.
 // Place it here so that set_z_2exp() is visible.
 template <std::size_t SSize>
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-easily-swappable-parameters)
 inline real::real(const integer<SSize> &n, ::mpfr_exp_t e, ::mpfr_prec_t p)
 {
     ::mpfr_init2(&m_mpfr, check_init_prec(p));
@@ -1863,14 +1864,29 @@ inline bool nan_p(const real &r)
     return r.nan_p();
 }
 
+inline bool isnan(const real &r)
+{
+    return r.nan_p();
+}
+
 // Detect inf.
 inline bool inf_p(const real &r)
 {
     return r.inf_p();
 }
 
+inline bool isinf(const real &r)
+{
+    return r.inf_p();
+}
+
 // Detect finite.
 inline bool number_p(const real &r)
+{
+    return r.number_p();
+}
+
+inline bool isfinite(const real &r)
 {
     return r.number_p();
 }
@@ -2031,6 +2047,7 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
 // Neg and abs.
 MPPP_REAL_MPFR_UNARY_IMPL(neg, ::mpfr_neg, true)
 MPPP_REAL_MPFR_UNARY_IMPL(abs, ::mpfr_abs, true)
+MPPP_REAL_MPFR_UNARY_IMPL(fabs, ::mpfr_abs, true)
 
 // Positive difference.
 MPPP_REAL_MPFR_BINARY_IMPL(dim, ::mpfr_dim, true)
@@ -4464,6 +4481,9 @@ inline rational<SSize> &rational<SSize>::operator=(const real &x)
     return *this = static_cast<rational<SSize>>(x);
 }
 
+// Hashing.
+MPPP_DLL_PUBLIC std::size_t hash(const real &);
+
 } // namespace mppp
 
 #if defined(MPPP_WITH_BOOST_S11N)
@@ -4473,6 +4493,28 @@ inline rational<SSize> &rational<SSize>::operator=(const real &x)
 BOOST_CLASS_TRACKING(mppp::real, boost::serialization::track_never)
 
 #endif
+
+namespace std
+{
+
+// Specialisation of std::hash for real.
+template <>
+struct hash<mppp::real> {
+    // NOTE: these typedefs have been deprecated in C++17.
+#if MPPP_CPLUSPLUS < 201703L
+    // The argument type.
+    using argument_type = mppp::real;
+    // The result type.
+    using result_type = size_t;
+#endif
+    // Call operator.
+    size_t operator()(const mppp::real &x) const
+    {
+        return mppp::hash(x);
+    }
+};
+
+} // namespace std
 
 #include <mp++/detail/real_literals.hpp>
 
