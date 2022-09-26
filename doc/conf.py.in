@@ -136,7 +136,15 @@ html_theme_options = {
     },
 }
 
-nb_execution_mode = "force"
+nb_execution_mode = "off"
+
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "html_image",
+]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
