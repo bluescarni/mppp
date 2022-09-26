@@ -32,7 +32,7 @@ make -j2 VERBOSE=1
 ctest -j2 -V
 
 # Run the benchmarks as well.
-make -j2 VERBOSE=1 benchmark
+# make -j2 VERBOSE=1 benchmark
 
 set +e
 set +x
