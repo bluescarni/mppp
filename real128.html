@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
@@ -21,9 +21,9 @@
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
@@ -36,7 +36,7 @@
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -45,7 +45,7 @@
     <link rel="next" title="Quadruple-precision complex numbers" href="complex128.html" />
     <link rel="prev" title="Multiprecision rationals" href="rational.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -2811,8 +2811,7 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 <p><span class="versionmodified added">New in version 0.12.</span></p>
 </div>
 <p>Hash function for <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
-<p>All NaN values produce the same hash value. For non-NaN arguments, this function
-guarantees that <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">y</span></code> implies <code class="docutils literal notranslate"><span class="pre">hash(x)</span> <span class="pre">==</span> <span class="pre">hash(y)</span></code>.</p>
+<p>This function guarantees that <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">y</span></code> implies <code class="docutils literal notranslate"><span class="pre">hash(x)</span> <span class="pre">==</span> <span class="pre">hash(y)</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>x</strong> – the argument.</p>
@@ -3381,6 +3380,43 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>the output of <a class="reference internal" href="#_CPPv4N4mppp18real128_denorm_minEv" title="mppp::real128_denorm_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_denorm_min()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IENSt4hashIN4mppp7real128EEE">
+<span id="_CPPv3IENSt4hashIN4mppp7real128EEE"></span><span id="_CPPv2IENSt4hashIN4mppp7real128EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IENSt4hashIN4mppp7real128EEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.27.</span></p>
+</div>
+<p>Specialisation of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code> for <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::real128</span></code></a>.</p>
+<p>The hash is computed via <a class="reference internal" href="#_CPPv4N4mppp4hashERKN4mppp7real128E" title="std::size_t mppp::hash(const mppp::real128&amp;)"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">std::size_t</span> <span class="pre">mppp::hash(const</span> <span class="pre">mppp::real128</span> <span class="pre">&amp;)</span></code></a>.</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4NSt4hashIN4mppp7real128EE13argument_typeE">
+<span id="_CPPv3NSt4hashIN4mppp7real128EE13argument_typeE"></span><span id="_CPPv2NSt4hashIN4mppp7real128EE13argument_typeE"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">argument_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><a class="headerlink" href="#_CPPv4NSt4hashIN4mppp7real128EE13argument_typeE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4NSt4hashIN4mppp7real128EE11result_typeE">
+<span id="_CPPv3NSt4hashIN4mppp7real128EE11result_typeE"></span><span id="_CPPv2NSt4hashIN4mppp7real128EE11result_typeE"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">result_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4NSt4hashIN4mppp7real128EE11result_typeE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="#_CPPv4NSt4hashIN4mppp7real128EE13argument_typeE" title="std::hash&lt;mppp::real128&gt;::argument_type"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">argument_type</span></code></a> and <a class="reference internal" href="#_CPPv4NSt4hashIN4mppp7real128EE11result_typeE" title="std::hash&lt;mppp::real128&gt;::result_type"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">result_type</span></code></a> type aliases are defined only until C++14.</p>
+</div>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NKSt4hashIN4mppp7real128EEclERKN4mppp7real128E">
+<span id="_CPPv3NKSt4hashIN4mppp7real128EEclERKN4mppp7real128E"></span><span id="_CPPv2NKSt4hashIN4mppp7real128EEclERKN4mppp7real128E"></span><span id="std::hash:mppp::real128:::call-operator__mppp::real128CRC"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NKSt4hashIN4mppp7real128EEclERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::real128</span></code></a>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a hash value for <em>x</em>.</p>
 </dd>
 </dl>
 </dd></dl>
