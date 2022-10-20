@@ -13,7 +13,7 @@ export PATH="$HOME/miniconda/bin:$PATH"
 bash miniconda.sh -b -p $HOME/miniconda
 conda config --add channels conda-forge
 conda config --set channel_priority strict
-conda create -y -q -p $deps_dir cmake gmp mpfr libflint arb 'python=3.10' pybind11 mpc boost-cpp sphinx sphinx-book-theme myst-nb xeus-cling c-compiler cxx-compiler make
+conda create -y -q -p $deps_dir cmake gmp mpfr libflint arb 'python=3.10' pybind11 mpc boost-cpp sphinx sphinx-book-theme myst-nb xeus-cling c-compiler cxx-compiler make fmt
 source activate $deps_dir
 
 # Create the build dir and cd into it.
@@ -21,7 +21,7 @@ mkdir build
 cd build
 
 # Build and install
-cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DMPPP_ENABLE_IPO=yes
+cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DMPPP_ENABLE_IPO=yes
 make -j2 install
 
 # Build the docs.
