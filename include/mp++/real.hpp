@@ -802,6 +802,9 @@ public:
         return mpfr_get_prec(&m_mpfr);
     }
 
+    // Get the number of limbs necessary to represent this.
+    MPPP_NODISCARD std::size_t get_nlimbs() const;
+
 private:
     // Utility function to check precision in set_prec().
     static ::mpfr_prec_t check_set_prec(::mpfr_prec_t p)
@@ -1343,6 +1346,14 @@ inline mpfr_prec_t get_prec(const real &r)
 {
     return r.get_prec();
 }
+
+// Get the number of limbs necessary to represent r.
+inline std::size_t get_nlimbs(const real &r)
+{
+    return r.get_nlimbs();
+}
+
+MPPP_DLL_PUBLIC std::size_t prec_to_nlimbs(mpfr_prec_t);
 
 namespace detail
 {
@@ -2575,6 +2586,72 @@ inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 }
 
 #endif
+
+// NOTE: nexttoward()/nextafter() have different semantics with respect
+// to the usual MPFR functions. The basic gist is that the second argument
+// (y) is there only to represent a direction, thus its precision must not
+// influence the result, whose precision will be the same as x's. As a consequence,
+// these are basically unary functions with an ancillary read-only argument.
+// Additionally, mpfr_nexttoward() uses the first argument as *both*
+// input and output, which is also unlike the other MPFR functions.
+// Hence, the custom implementations below.
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &nexttoward(real &rop, T &&x, const real &y)
+{
+    // NOTE: we need to make a copy of y because we don't
+    // want to risk changing its value in case it overlaps
+    // with rop or x.
+    MPPP_MAYBE_TLS real y_copy;
+    y_copy = y;
+
+    rop = std::forward<T>(x);
+
+    ::mpfr_nexttoward(rop._get_mpfr_t(), y_copy.get_mpfr_t());
+
+    return rop;
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real nexttoward(T &&x, const real &y)
+{
+    MPPP_MAYBE_TLS real y_copy;
+    y_copy = y;
+
+    real retval{std::forward<T>(x)};
+
+    ::mpfr_nexttoward(retval._get_mpfr_t(), y_copy.get_mpfr_t());
+
+    return retval;
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &nextafter(real &rop, T &&x, const real &y)
+{
+    return nexttoward(rop, std::forward<T>(x), y);
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real nextafter(T &&x, const real &y)
+{
+    return nexttoward(std::forward<T>(x), y);
+}
 
 #undef MPPP_REAL_MPFR_UNARY_HEADER
 #undef MPPP_REAL_MPFR_UNARY_IMPL

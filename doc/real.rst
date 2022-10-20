@@ -676,6 +676,14 @@ The real class
       :exception std\:\:invalid_argument: if *p* is outside the range established by
         :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
+   .. cpp:function:: std::size_t get_nlimbs() const
+
+      .. versionadded:: 0.27
+
+      Get the number of limbs.
+
+      :return: the number of multiprecision limbs (of type :cpp:type:`mp_limb_t`) necessary to represent the significand of ``this``.
+
    .. cpp:function:: template <real_interoperable T> explicit operator T() const
 
       Generic conversion operator.
@@ -1323,6 +1331,30 @@ Precision handling
    the ``MPFR_PREC_MAX`` MPFR constant.
 
    :return: the minimum/maximum valid precisions for a :cpp:class:`~mppp::real`.
+
+.. cpp:function:: std::size_t mppp::get_nlimbs(const mppp::real &r)
+
+   .. versionadded:: 0.27
+
+   Get the number of limbs of a  :cpp:class:`~mppp::real`.
+
+   :param r: the input argument.
+
+   :return: the number of multiprecision limbs (of type :cpp:type:`mp_limb_t`) necessary to represent the significand of *r*.
+
+.. cpp:function:: std::size_t mppp::prec_to_nlimbs(mpfr_prec_t p)
+
+   .. versionadded:: 0.27
+
+   Convert a precision value into a number of limbs.
+
+   :param p: the input precision value.
+
+   :return: the number of multiprecision limbs (of type :cpp:type:`mp_limb_t`) necessary to represent
+      the significand of a :cpp:class:`~mppp::real` with *p* bits of precision.
+
+   :exception std\:\:invalid_argument: if *p* is outside the range established by
+      :cpp:func:`mppp::real_prec_min()` and :cpp:func:`mppp::real_prec_max()`.
 
 .. _real_assignment:
 
@@ -3109,6 +3141,45 @@ Integer and remainder related functions
    :param y: the denominator.
 
    :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::nexttoward(mppp::real &rop, T &&x, const mppp::real &y)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::nextafter(mppp::real &rop, T &&x, const mppp::real &y)
+
+   .. versionadded:: 0.27
+
+   Returns the next representable value of *x* in the direction of *y* (ternary version).
+
+   These functions will set *rop* to the next representable value of *x* in the direction of *y*.
+   Note that in these functions the precision of *y* is ignored, and the precision of *rop*
+   will always be set to the precision of *x*. If *x* equals *y*, *rop* will be set to *x*.
+   If any operand is NaN, *rop* will also be set to NaN.
+
+   :param rop: the return value.
+   :param x: the source value.
+   :param y: the direction value.
+
+   :return: a reference to *rop*.
+
+   :exception unspecified: any exception raised by the copy assignment operator of :cpp:class:`~mppp::real`.
+
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::nexttoward(T &&x, const mppp::real &y)
+.. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::nextafter(T &&x, const mppp::real &y)
+
+   .. versionadded:: 0.27
+
+   Returns the next representable value of *x* in the direction of *y* (binary version).
+
+   These functions will return the next representable value of *x* in the direction of *y*.
+   Note that in these functions the precision of *y* is ignored, and the precision of the result
+   will always be set to the precision of *x*. If *x* equals *y*, *x* will be returned.
+   If any operand is NaN, the return value will also be NaN.
+
+   :param x: the source value.
+   :param y: the direction value.
+
+   :return: the next representable value of *x* in the direction of *y*.
+
+   :exception unspecified: any exception raised by the copy assignment operator or the copy constructor of :cpp:class:`~mppp::real`.
 
 .. _real_io:
 
