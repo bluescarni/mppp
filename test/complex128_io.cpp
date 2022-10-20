@@ -6,11 +6,20 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <complex>
 #include <iomanip>
 #include <limits>
 #include <random>
 #include <sstream>
+#include <stdexcept>
+
+#if defined(MPPP_WITH_FMT)
+
+#include <fmt/core.h>
+
+#endif
 
 #include <mp++/complex128.hpp>
 
@@ -299,3 +308,18 @@ TEST_CASE("stream output")
         }
     }
 }
+
+#if defined(MPPP_WITH_FMT)
+
+TEST_CASE("fmt test")
+{
+    using Catch::Matchers::Message;
+
+    REQUIRE(fmt::format("{}", 0_icq) == (0_icq).to_string());
+    REQUIRE(fmt::format("{}", -1.1_rq + 2.1_icq) == (-1.1_rq + 2.1_icq).to_string());
+
+    REQUIRE_THROWS_MATCHES(fmt::format("{:<30}", -1.1_icq), std::invalid_argument,
+                           Message("No format strings are currently supported for mp++'s classes"));
+}
+
+#endif

@@ -34,6 +34,14 @@
 
 #endif
 
+#if defined(MPPP_WITH_FMT)
+
+#include <fmt/core.h>
+
+#include <mp++/detail/fmt.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/mpc.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -361,7 +369,8 @@ public:
 #else
     template <typename T, typename U,
               detail::enable_if_t<
-                  detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
+                  detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int>
+              = 0>
 #endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(T &&re, U &&im)
@@ -377,7 +386,8 @@ public:
 #else
     template <typename T, typename U,
               detail::enable_if_t<
-                  detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int> = 0>
+                  detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int>
+              = 0>
 #endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(T &&re, U &&im, complex_prec_t p)
@@ -1798,7 +1808,8 @@ template <typename T, typename U,
                                                                  std::is_same<U, real128>
 #endif
                                                                  >>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline complex complex_pow_impl(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -1883,7 +1894,7 @@ inline complex complex_pow_impl(const T &c, const real &x)
 // Binary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_op_types<T, U>
+    requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
@@ -2012,7 +2023,8 @@ inline complex dispatch_complex_binary_add(const real &x, T &&a)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline complex dispatch_complex_binary_add(T &&a, const U &x)
 {
     // NOTE: another way of implementing this is via the conversion
@@ -2050,7 +2062,8 @@ inline complex dispatch_complex_binary_add(T &&a, const U &x)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline complex dispatch_complex_binary_add(const U &x, T &&a)
 {
     return dispatch_complex_binary_add(std::forward<T>(a), x);
@@ -2143,7 +2156,7 @@ inline complex dispatch_complex_binary_add(const T &c, U &&x)
 // Binary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_op_types<T, U>
+    requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
@@ -2166,9 +2179,9 @@ inline void dispatch_complex_in_place_add(complex &a, T &&b)
 MPPP_DLL_PUBLIC void dispatch_complex_in_place_add(complex &, const real &);
 
 // complex-(anything real-valued other than unsigned integral or real).
-template <
-    typename T,
-    enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int> = 0>
+template <typename T,
+          enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int>
+          = 0>
 inline void dispatch_complex_in_place_add(complex &a, const T &x)
 {
     const auto orig_p = a.get_prec();
@@ -2231,7 +2244,8 @@ template <typename T, typename U,
           enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
                                   conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
                                   conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline void dispatch_complex_in_place_add(T &x, U &&a)
 {
     x = static_cast<T>(x + std::forward<U>(a));
@@ -2242,7 +2256,7 @@ inline void dispatch_complex_in_place_add(T &x, U &&a)
 // In-place addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_in_place_op_types<T, U>
+    requires complex_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
 #endif
@@ -2302,7 +2316,8 @@ inline complex dispatch_complex_binary_sub(const real &x, T &&a)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline complex dispatch_complex_binary_sub(T &&a, const U &x)
 {
     const auto a_prec = a.get_prec();
@@ -2326,7 +2341,8 @@ inline complex dispatch_complex_binary_sub(T &&a, const U &x)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline complex dispatch_complex_binary_sub(const U &x, T &&a)
 {
     return -dispatch_complex_binary_sub(std::forward<T>(a), x);
@@ -2430,7 +2446,7 @@ inline complex dispatch_complex_binary_sub(const T &c, U &&x)
 // Binary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_op_types<T, U>
+    requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
@@ -2453,9 +2469,9 @@ inline void dispatch_complex_in_place_sub(complex &a, T &&b)
 MPPP_DLL_PUBLIC void dispatch_complex_in_place_sub(complex &, const real &);
 
 // complex-(anything real-valued other than unsigned integral or real).
-template <
-    typename T,
-    enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int> = 0>
+template <typename T,
+          enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int>
+          = 0>
 inline void dispatch_complex_in_place_sub(complex &a, const T &x)
 {
     const auto orig_p = a.get_prec();
@@ -2508,7 +2524,8 @@ template <typename T, typename U,
           enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
                                   conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
                                   conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline void dispatch_complex_in_place_sub(T &x, U &&a)
 {
     x = static_cast<T>(x - std::forward<U>(a));
@@ -2519,7 +2536,7 @@ inline void dispatch_complex_in_place_sub(T &x, U &&a)
 // In-place subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_in_place_op_types<T, U>
+    requires complex_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
 #endif
@@ -2556,10 +2573,10 @@ inline complex dispatch_complex_binary_mul(const real &x, T &&a)
 }
 
 // complex-(anything real-valued other than integral or real).
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>, negation<is_cpp_integral<U>>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<
+              conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>, negation<is_cpp_integral<U>>>::value, int>
+          = 0>
 inline complex dispatch_complex_binary_mul(T &&a, const U &x)
 {
     const auto a_prec = a.get_prec();
@@ -2582,10 +2599,10 @@ inline complex dispatch_complex_binary_mul(T &&a, const U &x)
 }
 
 // (anything real-valued other than integral or real)-complex.
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>, negation<is_cpp_integral<U>>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<
+              conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>, negation<is_cpp_integral<U>>>::value, int>
+          = 0>
 inline complex dispatch_complex_binary_mul(const U &x, T &&a)
 {
     return dispatch_complex_binary_mul(std::forward<T>(a), x);
@@ -2692,7 +2709,7 @@ inline complex dispatch_complex_binary_mul(const T &c, U &&x)
 // Binary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_op_types<T, U>
+    requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
@@ -2781,7 +2798,8 @@ template <typename T, typename U,
           enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
                                   conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
                                   conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline void dispatch_complex_in_place_mul(T &x, U &&a)
 {
     x = static_cast<T>(x * std::forward<U>(a));
@@ -2792,7 +2810,7 @@ inline void dispatch_complex_in_place_mul(T &x, U &&a)
 // In-place multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_in_place_op_types<T, U>
+    requires complex_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
 #endif
@@ -2834,7 +2852,8 @@ inline complex dispatch_complex_binary_div(const real &x, T &&a)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline complex dispatch_complex_binary_div(T &&a, const U &x)
 {
     const auto a_prec = a.get_prec();
@@ -2860,7 +2879,8 @@ inline complex dispatch_complex_binary_div(T &&a, const U &x)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline complex dispatch_complex_binary_div(const U &x, T &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -2978,7 +2998,7 @@ inline complex dispatch_complex_binary_div(const T &c, U &&x)
 // Binary division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_op_types<T, U>
+    requires complex_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
 #endif
@@ -3001,9 +3021,9 @@ inline void dispatch_complex_in_place_div(complex &a, T &&b)
 MPPP_DLL_PUBLIC void dispatch_complex_in_place_div(complex &, const real &);
 
 // complex-(anything real-valued other than unsigned integral or real).
-template <
-    typename T,
-    enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int> = 0>
+template <typename T,
+          enable_if_t<conjunction<is_rv_complex_interoperable<T>, negation<is_cpp_unsigned_integral<T>>>::value, int>
+          = 0>
 inline void dispatch_complex_in_place_div(complex &a, const T &x)
 {
     complex::re_ref re{a};
@@ -3055,7 +3075,8 @@ template <typename T, typename U,
           enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
                                   conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
                                   conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline void dispatch_complex_in_place_div(T &x, U &&a)
 {
     x = static_cast<T>(x / std::forward<U>(a));
@@ -3066,7 +3087,7 @@ inline void dispatch_complex_in_place_div(T &x, U &&a)
 // In-place division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_in_place_op_types<T, U>
+    requires complex_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
 #endif
@@ -3123,7 +3144,7 @@ inline bool dispatch_complex_equality(const T &x, const complex &c)
 // Equality.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_eq_op_types<T, U>
+    requires complex_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_eq_op_types<T, U>::value, int> = 0>
 #endif
@@ -3135,7 +3156,7 @@ inline bool operator==(const T &x, const U &y)
 // Inequality.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex_eq_op_types<T, U>
+    requires complex_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex_eq_op_types<T, U>::value, int> = 0>
 #endif
@@ -3185,6 +3206,19 @@ inline rational<SSize> &rational<SSize>::operator=(const complex &c)
 // Never track the address of complex objects
 // during serialization.
 BOOST_CLASS_TRACKING(mppp::complex, boost::serialization::track_never)
+
+#endif
+
+#if defined(MPPP_WITH_FMT)
+
+namespace fmt
+{
+
+template <>
+struct formatter<mppp::complex> : mppp::detail::to_string_formatter {
+};
+
+} // namespace fmt
 
 #endif
 

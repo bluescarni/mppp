@@ -48,6 +48,13 @@ Macros and definitions
    This name is defined if mp++ was configured with support for the Boost.serialization library
    (see the :ref:`installation instructions <installation>`).
 
+.. c:macro:: MPPP_WITH_FMT
+
+   .. versionadded:: 0.27
+
+   This name is defined if mp++ was configured with support for the fmt library
+   (see the :ref:`installation instructions <installation>`).
+
 .. c:macro:: MPPP_FLOAT128_WITH_LONG_DOUBLE
 
    .. versionadded:: 0.22

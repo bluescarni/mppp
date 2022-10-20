@@ -44,6 +44,14 @@
 
 #endif
 
+#if defined(MPPP_WITH_FMT)
+
+#include <fmt/core.h>
+
+#include <mp++/detail/fmt.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -4612,6 +4620,19 @@ struct hash<mppp::real> {
 } // namespace std
 
 #include <mp++/detail/real_literals.hpp>
+
+#if defined(MPPP_WITH_FMT)
+
+namespace fmt
+{
+
+template <>
+struct formatter<mppp::real> : mppp::detail::to_string_formatter {
+};
+
+} // namespace fmt
+
+#endif
 
 // Support for pretty printing in xeus-cling.
 #if defined(__CLING__)

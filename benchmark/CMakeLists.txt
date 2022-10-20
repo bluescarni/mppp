@@ -14,9 +14,7 @@ if(NOT TARGET Boost::boost)
 endif()
 
 # fmt is always required.
-# NOTE: need at least version 6.2
-# to print 128-bit integers.
-find_package(fmt 6.2 REQUIRED)
+find_package(fmt ${_MPPP_MIN_FMT_VERSION} REQUIRED CONFIG)
 
 if(MPPP_BENCHMARK_FLINT)
   find_package(mp++_FLINT REQUIRED)

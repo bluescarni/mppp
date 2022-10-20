@@ -31,6 +31,7 @@
 #cmakedefine MPPP_QUADMATH_HAVE_LOGBQ
 @MPPP_STATIC_BUILD@
 #cmakedefine MPPP_WITH_BOOST_S11N
+#cmakedefine MPPP_WITH_FMT
 // clang-format on
 // End of defines instantiated by CMake.
 

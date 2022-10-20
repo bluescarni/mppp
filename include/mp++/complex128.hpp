@@ -33,6 +33,14 @@
 
 #endif
 
+#if defined(MPPP_WITH_FMT)
+
+#include <fmt/core.h>
+
+#include <mp++/detail/fmt.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/visibility.hpp>
@@ -176,9 +184,9 @@ public:
     // Generic ctor.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-    requires complex128_interoperable<T>
+        requires complex128_interoperable<T>
 #if defined(MPPP_WITH_MPFR)
-        &&(!std::is_same<T, real>::value)
+                 && (!std::is_same<T, real>::value)
 #endif
 #else
     template <typename T, detail::enable_if_t<detail::conjunction<is_complex128_interoperable<T>
@@ -187,21 +195,20 @@ public:
                                                                   detail::negation<std::is_same<T, real>>
 #endif
                                                                   >::value,
-                                              int> = 0>
+                                              int>
+                          = 0>
 #endif
-            constexpr complex128(const T &x)
-        : m_value{cast_to_f128(x, detail::is_complex128_mppp_interoperable<T>{})}
+    constexpr complex128(const T &x) : m_value{cast_to_f128(x, detail::is_complex128_mppp_interoperable<T>{})}
     {
     }
 #if defined(MPPP_WITH_MPFR)
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
-    requires std::is_same<T, real>::value
+        requires std::is_same<T, real>::value
 #else
     template <typename T, detail::enable_if_t<std::is_same<T, real>::value, int> = 0>
 #endif
-        explicit complex128(const T &x)
-        : m_value{cast_to_f128(x, std::true_type{})}
+    explicit complex128(const T &x) : m_value{cast_to_f128(x, std::true_type{})}
     {
     }
 #endif
@@ -211,7 +218,8 @@ public:
 #else
     template <typename T, typename U,
               detail::enable_if_t<
-                  detail::conjunction<is_complex128_interoperable<T>, is_complex128_interoperable<U>>::value, int> = 0>
+                  detail::conjunction<is_complex128_interoperable<T>, is_complex128_interoperable<U>>::value, int>
+              = 0>
 #endif
     constexpr explicit complex128(const T &re, const U &im)
         : m_value{cast_to_f128(re, detail::is_complex128_mppp_interoperable<T>{}),
@@ -615,7 +623,7 @@ inline complex128 complex128_pow_impl(const std::complex<T> &x, const real128 &y
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -714,7 +722,7 @@ inline MPPP_CONSTEXPR_14 complex128 complex128_binary_add_impl(const std::comple
 // Binary plus.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -775,7 +783,7 @@ inline MPPP_CONSTEXPR_20 void complex128_in_place_add_impl(std::complex<T> &c, c
 // In-place plus.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -869,7 +877,7 @@ inline MPPP_CONSTEXPR_14 complex128 complex128_binary_sub_impl(const std::comple
 // Binary minus.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -919,7 +927,7 @@ inline MPPP_CONSTEXPR_20 void complex128_in_place_sub_impl(std::complex<T> &c, c
 // In-place minus.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -988,7 +996,7 @@ inline MPPP_CONSTEXPR_14 complex128 complex128_binary_mul_impl(const std::comple
 // Binary mul.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1038,7 +1046,7 @@ inline MPPP_CONSTEXPR_20 void complex128_in_place_mul_impl(std::complex<T> &c, c
 // In-place mul.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1107,7 +1115,7 @@ inline MPPP_CONSTEXPR_14 complex128 complex128_binary_div_impl(const std::comple
 // Binary div.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1157,7 +1165,7 @@ inline MPPP_CONSTEXPR_20 void complex128_in_place_div_impl(std::complex<T> &c, c
 // In-place div.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_op_types<T, U>
+    requires complex128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1245,7 +1253,7 @@ inline MPPP_CONSTEXPR_14 bool complex128_eq_impl(const std::complex<T> &c2, cons
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_cmp_op_types<T, U>
+    requires complex128_cmp_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
 #endif
@@ -1256,7 +1264,7 @@ constexpr bool operator==(const T &x, const U &y)
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires complex128_cmp_op_types<T, U>
+    requires complex128_cmp_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
 #endif
@@ -1309,6 +1317,19 @@ inline MPPP_CONSTEXPR_14 real128 &real128::operator=(const complex128 &x)
 // Never track the address of complex128 objects
 // during serialization.
 BOOST_CLASS_TRACKING(mppp::complex128, boost::serialization::track_never)
+
+#endif
+
+#if defined(MPPP_WITH_FMT)
+
+namespace fmt
+{
+
+template <>
+struct formatter<mppp::complex128> : mppp::detail::to_string_formatter {
+};
+
+} // namespace fmt
 
 #endif
 
