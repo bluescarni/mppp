@@ -355,7 +355,8 @@ The real128 class
       .. note::
 
          The ``logb()`` function is available when using ``libquadmath``
-         from GCC 6 onwards.
+         from GCC 6 onwards. See also the :c:macro:`MPPP_QUADMATH_HAVE_LOGBQ`
+         definition.
 
       .. versionadded:: 0.21
 
@@ -524,7 +525,8 @@ The real128 class
       .. note::
 
          The ``exp2()`` function is available when using ``libquadmath``
-         from GCC 9 onwards.
+         from GCC 9 onwards. See also the :c:macro:`MPPP_QUADMATH_HAVE_EXP2Q`
+         definition.
 
       In-place logarithms and exponentials.
 
@@ -744,7 +746,8 @@ Conversion
    .. note::
 
       The ``logb()`` function is available when using ``libquadmath``
-      from GCC 6 onwards.
+      from GCC 6 onwards. See also the :c:macro:`MPPP_QUADMATH_HAVE_LOGBQ`
+      definition.
 
    .. versionadded:: 0.21
 
@@ -1120,7 +1123,8 @@ Logarithms and exponentials
    .. note::
 
       The ``exp2()`` function is available when using ``libquadmath``
-      from GCC 9 onwards.
+      from GCC 9 onwards. See also the :c:macro:`MPPP_QUADMATH_HAVE_EXP2Q`
+      definition.
 
    Logarithms and exponentials.
 
