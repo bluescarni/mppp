@@ -36,7 +36,7 @@ install:
 - if [%BUILD_TYPE%]==[MSVC17_64] conda update -n base conda
 - if [%BUILD_TYPE%]==[MSVC17_64] conda config --add channels conda-forge
 - if [%BUILD_TYPE%]==[MSVC17_64] conda config --set channel_priority strict
-- if [%BUILD_TYPE%]==[MSVC17_64] conda create --name mppp cmake mpir mpfr mpc arb pybind11 mpmath python=3.10 boost-cpp fmt
+- if [%BUILD_TYPE%]==[MSVC17_64] conda create --name mppp cmake mpir mpfr mpc arb boost-cpp fmt
 - if [%BUILD_TYPE%]==[MSVC17_64] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\\Miniconda37-x64\\Scripts\\activate.bat"
@@ -69,8 +69,6 @@ build_script:
 # This build enables Unicode solutions.
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_MSVC_UNICODE=YES -DMPPP_ENABLE_IPO=yes
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release
-- if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=ON -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_TEST_PYBIND11=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_MSVC_UNICODE=YES -DMPPP_ENABLE_IPO=yes
-- if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release --target pybind11_test_01
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_BUILD_STATIC_LIBRARY=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_ENABLE_IPO=yes
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . -- -v
@@ -89,9 +87,7 @@ test_script:
 
 - if [%BUILD_TYPE%]==[MSVC17_64] set OLD_PATH=%PATH%
 - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%PATH%;%CD%\Release
-- if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -E pybind11
-- if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%OLD_PATH%;%CD%\Release
-- if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -R pybind11
+- if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release
 
 # NOTE: no need to alter the PATH, static library build.
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] ctest -V
