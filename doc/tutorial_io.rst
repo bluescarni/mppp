@@ -37,6 +37,17 @@ format flags in output streams:
    std::cout << std::hexfloat << std::uppercase << complex{1.1, 1.3} << '\n';    // "(0X1.199999999999AP+0,0X1.4CCCCCCCCCCCDP+0)"
    std::cout << std::fixed << std::showpoint << std::showpos << 42_rq << '\n';   // "+42.000000"
 
+Starting from mp++ 0.27, all of mp++'s multiprecision classes support formatting via the
+`{fmt} <https://fmt.dev/latest/index.html>`__ library, provided that mp++ has been built with
+the ``MPPP_WITH_FMT`` option enabled (see the :ref:`installation instructions <installation>`):
+
+.. code-block:: c++
+
+   #include <iostream>
+
+   #include <fmt/core.h>
+
+   std::cout << fmt::format("The answer is {}", int_t{42}); // "The answer is 42"
 
 All of mp++'s multiprecision classes also provide ``to_string()`` member functions that convert the multiprecision
 values into string representations (see, e.g., :cpp:func:`mppp::integer::to_string()`, :cpp:func:`mppp::rational::to_string()`,
