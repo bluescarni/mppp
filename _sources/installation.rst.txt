@@ -36,8 +36,8 @@ mp++ has the following dependencies:
   be installed separately);
 * the `Boost <https://www.boost.org/>`__ libraries, *optional*, currently used
   for implementing (de)serialisation and in the benchmarking suite;
-* the `{fmt} <https://fmt.dev/latest/index.html>`__ library (at least version 6.2), *optional*, currently used
-  only in the benchmarking suite.
+* the `{fmt} <https://fmt.dev/latest/index.html>`__ library (at least version 6.2), *optional*, used
+  to provide formatting capabilities to the multiprecision classes and in the benchmarking suite.
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
 installing from source (the minimum required version is 3.8).
@@ -68,6 +68,8 @@ path, etc.). The available configuration options are:
   quadmath library (off by default),
 * ``MPPP_WITH_BOOST_S11N``: enable support for serialisation
   via the Boost.serialization library (off by default),
+* ``MPPP_WITH_FMT``: enable support for formatting
+  via the fmt library (off by default),
 * ``MPPP_BUILD_TESTS``: build the test suite (off by default),
 * ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default),
 * ``MPPP_BUILD_STATIC_LIBRARY``: build mp++ as a static library, instead
@@ -97,6 +99,10 @@ path, etc.). The available configuration options are:
 .. versionadded:: 0.22
 
    The ``MPPP_WITH_BOOST_S11N`` build option.
+
+.. versionadded:: 0.27
+
+   The ``MPPP_WITH_FMT`` build option.
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions), Clang
@@ -279,7 +285,8 @@ variables to signal with which optional dependencies mp++ was compiled:
 * ``mp++_WITH_MPC`` if MPC support was enabled,
 * ``mp++_WITH_ARB`` if Arb support was enabled,
 * ``mp++_WITH_QUADMATH`` if quadmath support was enabled,
-* ``mp++_WITH_BOOST_S11N`` if Boost.serialization support was enabled.
+* ``mp++_WITH_BOOST_S11N`` if Boost.serialization support was enabled,
+* ``mp++_WITH_FMT`` if fmt support was enabled.
 
 .. _inst_plat_specific:
 

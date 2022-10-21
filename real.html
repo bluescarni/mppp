@@ -22,8 +22,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
-    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
@@ -32,12 +31,7 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script>let toggleHintShow = 'Click to show';</script>
-    <script>let toggleHintHide = 'Click to hide';</script>
-    <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="_static/togglebutton.js"></script>
     <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
-    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -1711,6 +1705,20 @@ otherwise the current value will be preserved exactly.</p>
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK4mppp4real10get_nlimbsEv">
+<span id="_CPPv3NK4mppp4real10get_nlimbsEv"></span><span id="_CPPv2NK4mppp4real10get_nlimbsEv"></span><span id="mppp::real::get_nlimbsC"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_nlimbs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4mppp4real10get_nlimbsEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.27.</span></p>
+</div>
+<p>Get the number of limbs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the number of multiprecision limbs (of type <a class="reference internal" href="integer.html#_CPPv49mp_limb_t" title="mp_limb_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mp_limb_t</span></code></a>) necessary to represent the significand of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_18real_interoperableENK4mppp4realcv1TEv">
 <span id="_CPPv3I_18real_interoperableENK4mppp4realcv1TEv"></span><span id="_CPPv2I_18real_interoperableENK4mppp4realcv1TEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp18real_interoperableE" title="mppp::real_interoperable"><span class="n"><span class="pre">real_interoperable</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_18real_interoperableENK4mppp4realcv1TEv" title="mppp::real::operator T::T"><span class="n"><span class="pre">T</span></span></a></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I_18real_interoperableENK4mppp4realcv1TEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Generic conversion operator.</p>
@@ -2736,6 +2744,45 @@ the <code class="docutils literal notranslate"><span class="pre">MPFR_PREC_MAX</
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>the minimum/maximum valid precisions for a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4mppp10get_nlimbsERKN4mppp4realE">
+<span id="_CPPv3N4mppp10get_nlimbsERKN4mppp4realE"></span><span id="_CPPv2N4mppp10get_nlimbsERKN4mppp4realE"></span><span id="mppp::get_nlimbs__mppp::realCR"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_nlimbs</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp10get_nlimbsERKN4mppp4realE" title="Permalink to this definition">#</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.27.</span></p>
+</div>
+<p>Get the number of limbs of a  <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>r</strong> – the input argument.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the number of multiprecision limbs (of type <a class="reference internal" href="integer.html#_CPPv49mp_limb_t" title="mp_limb_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mp_limb_t</span></code></a>) necessary to represent the significand of <em>r</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N4mppp14prec_to_nlimbsE11mpfr_prec_t">
+<span id="_CPPv3N4mppp14prec_to_nlimbsE11mpfr_prec_t"></span><span id="_CPPv2N4mppp14prec_to_nlimbsE11mpfr_prec_t"></span><span id="mppp::prec_to_nlimbs__mpfr_prec_t"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">prec_to_nlimbs</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t"><span class="n"><span class="pre">mpfr_prec_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">p</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp14prec_to_nlimbsE11mpfr_prec_t" title="Permalink to this definition">#</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.27.</span></p>
+</div>
+<p>Convert a precision value into a number of limbs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> – the input precision value.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the number of multiprecision limbs (of type <a class="reference internal" href="integer.html#_CPPv49mp_limb_t" title="mp_limb_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mp_limb_t</span></code></a>) necessary to represent
+the significand of a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> with <em>p</em> bits of precision.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>p</em> is outside the range established by
+<a class="reference internal" href="#_CPPv4N4mppp13real_prec_minEv" title="mppp::real_prec_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_min()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp13real_prec_maxEv" title="mppp::real_prec_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_max()</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -5581,6 +5628,71 @@ with the sign of <em>x</em> divided by <em>y</em> (except if those low bits are 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_N4mppp8cvr_realEEN4mppp10nexttowardERN4mppp4realERN4mppp4realERR1TRKN4mppp4realE">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp10nexttowardERN4mppp4realERR1TRKN4mppp4realE"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp10nexttowardERN4mppp4realERR1TRKN4mppp4realE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="n"><span class="pre">cvr_real</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">nexttoward</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10nexttowardERN4mppp4realERN4mppp4realERR1TRKN4mppp4realE" title="mppp::nexttoward::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10nexttowardERN4mppp4realERN4mppp4realERR1TRKN4mppp4realE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_N4mppp8cvr_realEEN4mppp9nextafterERN4mppp4realERN4mppp4realERR1TRKN4mppp4realE">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp9nextafterERN4mppp4realERR1TRKN4mppp4realE"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp9nextafterERN4mppp4realERR1TRKN4mppp4realE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="n"><span class="pre">cvr_real</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">nextafter</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp9nextafterERN4mppp4realERN4mppp4realERR1TRKN4mppp4realE" title="mppp::nextafter::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp9nextafterERN4mppp4realERN4mppp4realERR1TRKN4mppp4realE" title="Permalink to this definition">#</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.27.</span></p>
+</div>
+<p>Returns the next representable value of <em>x</em> in the direction of <em>y</em> (ternary version).</p>
+<p>These functions will set <em>rop</em> to the next representable value of <em>x</em> in the direction of <em>y</em>.
+Note that in these functions the precision of <em>y</em> is ignored, and the precision of <em>rop</em>
+will always be set to the precision of <em>x</em>. If <em>x</em> equals <em>y</em>, <em>rop</em> will be set to <em>x</em>.
+If any operand is NaN, <em>rop</em> will also be set to NaN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rop</strong> – the return value.</p></li>
+<li><p><strong>x</strong> – the source value.</p></li>
+<li><p><strong>y</strong> – the direction value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception raised by the copy assignment operator of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_N4mppp8cvr_realEEN4mppp10nexttowardEN4mppp4realERR1TRKN4mppp4realE">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp10nexttowardERR1TRKN4mppp4realE"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp10nexttowardERR1TRKN4mppp4realE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="n"><span class="pre">cvr_real</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">nexttoward</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10nexttowardEN4mppp4realERR1TRKN4mppp4realE" title="mppp::nexttoward::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp10nexttowardEN4mppp4realERR1TRKN4mppp4realE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_N4mppp8cvr_realEEN4mppp9nextafterEN4mppp4realERR1TRKN4mppp4realE">
+<span id="_CPPv3I_N4mppp8cvr_realEEN4mppp9nextafterERR1TRKN4mppp4realE"></span><span id="_CPPv2I_N4mppp8cvr_realEEN4mppp9nextafterERR1TRKN4mppp4realE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp8cvr_realE" title="mppp::cvr_real"><span class="n"><span class="pre">cvr_real</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">nextafter</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp9nextafterEN4mppp4realERR1TRKN4mppp4realE" title="mppp::nextafter::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp8cvr_realEEN4mppp9nextafterEN4mppp4realERR1TRKN4mppp4realE" title="Permalink to this definition">#</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.27.</span></p>
+</div>
+<p>Returns the next representable value of <em>x</em> in the direction of <em>y</em> (binary version).</p>
+<p>These functions will return the next representable value of <em>x</em> in the direction of <em>y</em>.
+Note that in these functions the precision of <em>y</em> is ignored, and the precision of the result
+will always be set to the precision of <em>x</em>. If <em>x</em> equals <em>y</em>, <em>x</em> will be returned.
+If any operand is NaN, the return value will also be NaN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – the source value.</p></li>
+<li><p><strong>y</strong> – the direction value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the next representable value of <em>x</em> in the direction of <em>y</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception raised by the copy assignment operator or the copy constructor of <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>

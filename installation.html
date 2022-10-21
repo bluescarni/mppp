@@ -22,8 +22,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
-    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
@@ -32,12 +31,7 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script>let toggleHintShow = 'Click to show';</script>
-    <script>let toggleHintHide = 'Click to hide';</script>
-    <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="_static/togglebutton.js"></script>
     <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
-    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Tutorial" href="tutorial.html" />
@@ -641,8 +635,8 @@ in the implementation of the <a class="reference internal" href="real128.html#_C
 be installed separately);</p></li>
 <li><p>the <a class="reference external" href="https://www.boost.org/">Boost</a> libraries, <em>optional</em>, currently used
 for implementing (de)serialisation and in the benchmarking suite;</p></li>
-<li><p>the <a class="reference external" href="https://fmt.dev/latest/index.html">{fmt}</a> library (at least version 6.2), <em>optional</em>, currently used
-only in the benchmarking suite.</p></li>
+<li><p>the <a class="reference external" href="https://fmt.dev/latest/index.html">{fmt}</a> library (at least version 6.2), <em>optional</em>, used
+to provide formatting capabilities to the multiprecision classes and in the benchmarking suite.</p></li>
 </ul>
 <p>Additionally, <a class="reference external" href="https://cmake.org/">CMake</a> is the build system used by mp++ and it must also be available when
 installing from source (the minimum required version is 3.8).</p>
@@ -674,6 +668,8 @@ option to be active),</p></li>
 quadmath library (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_BOOST_S11N</span></code>: enable support for serialisation
 via the Boost.serialization library (off by default),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_FMT</span></code>: enable support for formatting
+via the fmt library (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_TESTS</span></code>: build the test suite (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_BENCHMARKS</span></code>: build the benchmarking suite (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_STATIC_LIBRARY</span></code>: build mp++ as a static library, instead
@@ -698,6 +694,9 @@ off by default).</p></li>
 </div>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.22: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_BOOST_S11N</span></code> build option.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.27: </span>The <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_FMT</span></code> build option.</p>
 </div>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only
 using GCC (all the supported versions), Clang
@@ -855,7 +854,8 @@ variables to signal with which optional dependencies mp++ was compiled:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_MPC</span></code> if MPC support was enabled,</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_ARB</span></code> if Arb support was enabled,</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_QUADMATH</span></code> if quadmath support was enabled,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_BOOST_S11N</span></code> if Boost.serialization support was enabled.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_BOOST_S11N</span></code> if Boost.serialization support was enabled,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mp++_WITH_FMT</span></code> if fmt support was enabled.</p></li>
 </ul>
 </section>
 <section id="compiler-and-platform-specific-notes">

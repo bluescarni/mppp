@@ -25,11 +25,34 @@ Macros and definitions
    This name is defined if mp++ was configured with support for the quadmath library
    (see the :ref:`installation instructions <installation>`).
 
+.. c:macro:: MPPP_QUADMATH_HAVE_EXP2Q
+
+   .. versionadded:: 0.27
+
+   This name is defined if mp++ was configured with support for a quadmath library version
+   providing the ``exp2q()`` function
+   (see the :ref:`installation instructions <installation>`).
+
+.. c:macro:: MPPP_QUADMATH_HAVE_LOGBQ
+
+   .. versionadded:: 0.27
+
+   This name is defined if mp++ was configured with support for a quadmath library version
+   providing the ``logbq()`` function
+   (see the :ref:`installation instructions <installation>`).
+
 .. c:macro:: MPPP_WITH_BOOST_S11N
 
    .. versionadded:: 0.22
 
    This name is defined if mp++ was configured with support for the Boost.serialization library
+   (see the :ref:`installation instructions <installation>`).
+
+.. c:macro:: MPPP_WITH_FMT
+
+   .. versionadded:: 0.27
+
+   This name is defined if mp++ was configured with support for the fmt library
    (see the :ref:`installation instructions <installation>`).
 
 .. c:macro:: MPPP_FLOAT128_WITH_LONG_DOUBLE
