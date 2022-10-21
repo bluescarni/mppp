@@ -43,6 +43,14 @@
 
 #endif
 
+#if defined(MPPP_WITH_FMT)
+
+#include <fmt/core.h>
+
+#include <mp++/detail/fmt.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>
@@ -1018,7 +1026,7 @@ MPPP_DLL_PUBLIC real128 cbrt(const real128 &);
 #if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_REAL128_BINARY_OP_HEADER                                                                                  \
     template <typename T, typename U>                                                                                  \
-    requires real128_op_types<T, U>
+        requires real128_op_types<T, U>
 #else
 #define MPPP_REAL128_BINARY_OP_HEADER                                                                                  \
     template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
@@ -1175,7 +1183,7 @@ real128 dispatch_add(const T &, const real128 &);
 // Binary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1236,7 +1244,7 @@ inline void dispatch_in_place_add(T &x, const real128 &y)
 // In-place addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1298,7 +1306,7 @@ real128 dispatch_sub(const T &, const real128 &);
 // Binary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1356,7 +1364,7 @@ inline void dispatch_in_place_sub(T &x, const real128 &y)
 // In-place subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1412,7 +1420,7 @@ real128 dispatch_mul(const T &, const real128 &);
 // Binary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1470,7 +1478,7 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
 // In-place multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1511,7 +1519,7 @@ real128 dispatch_div(const T &, const real128 &);
 // Binary division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1569,7 +1577,7 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
 // In-place division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1638,7 +1646,7 @@ bool dispatch_eq(const T &, const real128 &);
 // Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_eq_op_types<T, U>
+    requires real128_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
 #endif
@@ -1667,7 +1675,7 @@ inline bool dispatch_eq(const T &x, const real128 &y)
 // Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_eq_op_types<T, U>
+    requires real128_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
 #endif
@@ -1707,7 +1715,7 @@ bool dispatch_lt(const T &, const real128 &);
 // Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1759,7 +1767,7 @@ bool dispatch_lte(const T &, const real128 &);
 // Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1811,7 +1819,7 @@ bool dispatch_gt(const T &, const real128 &);
 // Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -1863,7 +1871,7 @@ bool dispatch_gte(const T &, const real128 &);
 // Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real128_op_types<T, U>
+    requires real128_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
@@ -2236,6 +2244,19 @@ struct hash<mppp::real128> {
 } // namespace std
 
 #include <mp++/detail/real128_literal.hpp>
+
+#if defined(MPPP_WITH_FMT)
+
+namespace fmt
+{
+
+template <>
+struct formatter<mppp::real128> : mppp::detail::to_string_formatter {
+};
+
+} // namespace fmt
+
+#endif
 
 // Support for pretty printing in xeus-cling.
 #if defined(__CLING__)

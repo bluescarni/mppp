@@ -2909,6 +2909,21 @@ std::size_t hash(const real &r)
     return retval;
 }
 
+std::size_t real::get_nlimbs() const
+{
+    return detail::rbs_prec_to_nlimbs(get_prec());
+}
+
+std::size_t prec_to_nlimbs(mpfr_prec_t p)
+{
+    if (mppp_unlikely(p < real_prec_min() || p > real_prec_max())) {
+        throw std::invalid_argument("An invalid input precision of " + detail::to_string(p)
+                                    + " was passed to prec_to_nlimbs()");
+    }
+
+    return detail::rbs_prec_to_nlimbs(p);
+}
+
 } // namespace mppp
 
 #if defined(_MSC_VER)

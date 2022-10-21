@@ -44,6 +44,14 @@
 
 #endif
 
+#if defined(MPPP_WITH_FMT)
+
+#include <fmt/core.h>
+
+#include <mp++/detail/fmt.hpp>
+
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -802,6 +810,9 @@ public:
         return mpfr_get_prec(&m_mpfr);
     }
 
+    // Get the number of limbs necessary to represent this.
+    MPPP_NODISCARD std::size_t get_nlimbs() const;
+
 private:
     // Utility function to check precision in set_prec().
     static ::mpfr_prec_t check_set_prec(::mpfr_prec_t p)
@@ -950,7 +961,8 @@ private:
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::negation<std::is_same<bool, T>>, detail::is_integral<T>,
                                                       detail::is_unsigned<T>>::value,
-                                  int> = 0>
+                                  int>
+              = 0>
     MPPP_NODISCARD T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
@@ -1342,6 +1354,14 @@ inline mpfr_prec_t get_prec(const real &r)
 {
     return r.get_prec();
 }
+
+// Get the number of limbs necessary to represent r.
+inline std::size_t get_nlimbs(const real &r)
+{
+    return r.get_nlimbs();
+}
+
+MPPP_DLL_PUBLIC std::size_t prec_to_nlimbs(mpfr_prec_t);
 
 namespace detail
 {
@@ -2172,7 +2192,8 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline real dispatch_real_pow(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -2182,10 +2203,10 @@ inline real dispatch_real_pow(T &&a, const U &x)
 }
 
 // (everything but unsigned integral)-real.
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_real_interoperable<T>, negation<is_cpp_unsigned_integral<T>>, is_cvr_real<U>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<
+              conjunction<is_real_interoperable<T>, negation<is_cpp_unsigned_integral<T>>, is_cvr_real<U>>::value, int>
+          = 0>
 inline real dispatch_real_pow(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -2195,9 +2216,9 @@ inline real dispatch_real_pow(const T &x, U &&a)
 }
 
 // unsigned integral-real.
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_real_interoperable<T>, is_cpp_unsigned_integral<T>, is_cvr_real<U>>::value, int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, is_cpp_unsigned_integral<T>, is_cvr_real<U>>::value, int>
+          = 0>
 inline real dispatch_real_pow(const T &n, U &&a)
 {
     if (n <= nl_max<unsigned long>()) {
@@ -2224,7 +2245,7 @@ inline real dispatch_real_pow(const bool &n, T &&a)
 // Binary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+    requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
@@ -2574,6 +2595,72 @@ inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 
 #endif
 
+// NOTE: nexttoward()/nextafter() have different semantics with respect
+// to the usual MPFR functions. The basic gist is that the second argument
+// (y) is there only to represent a direction, thus its precision must not
+// influence the result, whose precision will be the same as x's. As a consequence,
+// these are basically unary functions with an ancillary read-only argument.
+// Additionally, mpfr_nexttoward() uses the first argument as *both*
+// input and output, which is also unlike the other MPFR functions.
+// Hence, the custom implementations below.
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &nexttoward(real &rop, T &&x, const real &y)
+{
+    // NOTE: we need to make a copy of y because we don't
+    // want to risk changing its value in case it overlaps
+    // with rop or x.
+    MPPP_MAYBE_TLS real y_copy;
+    y_copy = y;
+
+    rop = std::forward<T>(x);
+
+    ::mpfr_nexttoward(rop._get_mpfr_t(), y_copy.get_mpfr_t());
+
+    return rop;
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real nexttoward(T &&x, const real &y)
+{
+    MPPP_MAYBE_TLS real y_copy;
+    y_copy = y;
+
+    real retval{std::forward<T>(x)};
+
+    ::mpfr_nexttoward(retval._get_mpfr_t(), y_copy.get_mpfr_t());
+
+    return retval;
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &nextafter(real &rop, T &&x, const real &y)
+{
+    return nexttoward(rop, std::forward<T>(x), y);
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <cvr_real T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real nextafter(T &&x, const real &y)
+{
+    return nexttoward(std::forward<T>(x), y);
+}
+
 #undef MPPP_REAL_MPFR_UNARY_HEADER
 #undef MPPP_REAL_MPFR_UNARY_IMPL
 #undef MPPP_REAL_MPFR_BINARY_HEADER1
@@ -2727,9 +2814,10 @@ inline real dispatch_real_binary_add(const rational<SSize> &q, T &&a)
 }
 
 // real-(float, double).
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
+    = 0>
 inline real dispatch_real_binary_add(T &&a, const U &x)
 {
     // NOTE: the MPFR docs state that mpfr_add_d() assumes that
@@ -2745,9 +2833,10 @@ inline real dispatch_real_binary_add(T &&a, const U &x)
 }
 
 // (float, double)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value, int>
+    = 0>
 inline real dispatch_real_binary_add(const T &x, U &&a)
 {
     return dispatch_real_binary_add(std::forward<U>(a), x);
@@ -2761,7 +2850,8 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline real dispatch_real_binary_add(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -2779,7 +2869,8 @@ template <typename T, typename U,
 #endif
                                               >,
                                   is_cvr_real<U>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline real dispatch_real_binary_add(const T &x, U &&a)
 {
     return dispatch_real_binary_add(std::forward<U>(a), x);
@@ -2790,7 +2881,7 @@ inline real dispatch_real_binary_add(const T &x, U &&a)
 // Binary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+    requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
@@ -2882,7 +2973,7 @@ inline void dispatch_real_in_place_add(T &x, U &&a)
 // In-place addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_in_place_op_types<T, U>
+    requires real_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
@@ -3034,9 +3125,10 @@ inline real dispatch_real_binary_sub(const rational<SSize> &q, T &&a)
 }
 
 // real-(float, double).
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
+    = 0>
 inline real dispatch_real_binary_sub(T &&a, const U &x)
 {
     // NOTE: the MPFR docs state that mpfr_sub_d() assumes that
@@ -3052,9 +3144,10 @@ inline real dispatch_real_binary_sub(T &&a, const U &x)
 }
 
 // (float, double)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
+    = 0>
 inline real dispatch_real_binary_sub(const U &x, T &&a)
 {
     // NOTE: the MPFR docs state that mpfr_d_sub() assumes that
@@ -3077,7 +3170,8 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline real dispatch_real_binary_sub(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3094,7 +3188,8 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline real dispatch_real_binary_sub(const U &x, T &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3108,7 +3203,7 @@ inline real dispatch_real_binary_sub(const U &x, T &&a)
 // Binary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+    requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
@@ -3200,7 +3295,7 @@ inline void dispatch_real_in_place_sub(T &x, U &&a)
 // In-place subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_in_place_op_types<T, U>
+    requires real_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
@@ -3315,9 +3410,10 @@ inline real dispatch_real_binary_mul(const rational<SSize> &q, T &&a)
 }
 
 // real-(float, double).
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
+    = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &x)
 {
     // NOTE: the MPFR docs state that mpfr_mul_d() assumes that
@@ -3333,9 +3429,10 @@ inline real dispatch_real_binary_mul(T &&a, const U &x)
 }
 
 // (float, double)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value, int>
+    = 0>
 inline real dispatch_real_binary_mul(const T &x, U &&a)
 {
     return dispatch_real_binary_mul(std::forward<U>(a), x);
@@ -3349,7 +3446,8 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3367,7 +3465,8 @@ template <typename T, typename U,
 #endif
                                               >,
                                   is_cvr_real<U>>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline real dispatch_real_binary_mul(const T &x, U &&a)
 {
     return dispatch_real_binary_mul(std::forward<U>(a), x);
@@ -3378,7 +3477,7 @@ inline real dispatch_real_binary_mul(const T &x, U &&a)
 // Binary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+    requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
@@ -3470,7 +3569,7 @@ inline void dispatch_real_in_place_mul(T &x, U &&a)
 // In-place multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_in_place_op_types<T, U>
+    requires real_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
@@ -3501,7 +3600,8 @@ template <
                                                         std::is_same<U, real128>
 #endif
                                                         >>::value,
-                int> = 0>
+                int>
+    = 0>
 inline real dispatch_real_binary_div(const U &x, T &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3606,9 +3706,10 @@ inline real dispatch_real_binary_div(T &&a, const rational<SSize> &q)
 }
 
 // real-(float, double).
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
+    = 0>
 inline real dispatch_real_binary_div(T &&a, const U &x)
 {
     // NOTE: the MPFR docs state that mpfr_div_d() assumes that
@@ -3624,9 +3725,10 @@ inline real dispatch_real_binary_div(T &&a, const U &x)
 }
 
 // (float, double)-real.
-template <typename T, typename U,
-          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
+    = 0>
 inline real dispatch_real_binary_div(const U &x, T &&a)
 {
     // NOTE: the MPFR docs state that mpfr_d_div() assumes that
@@ -3649,7 +3751,8 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int> = 0>
+                      int>
+          = 0>
 inline real dispatch_real_binary_div(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3754,7 +3857,7 @@ inline void dispatch_real_in_place_div(T &x, U &&a)
 // In-place division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_in_place_op_types<T, U>
+    requires real_in_place_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
 #endif
@@ -3866,7 +3969,7 @@ inline bool dispatch_real_equality(const T &x, const real &r)
 // Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_eq_op_types<T, U>
+    requires real_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_eq_op_types<T, U>::value, int> = 0>
 #endif
@@ -3878,7 +3981,7 @@ inline bool operator==(const T &a, const U &b)
 // Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_eq_op_types<T, U>
+    requires real_eq_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_eq_op_types<T, U>::value, int> = 0>
 #endif
@@ -4022,7 +4125,7 @@ MPPP_DLL_PUBLIC bool dispatch_real_gt(const real128 &, const real &);
 // Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+    requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
@@ -4166,7 +4269,7 @@ MPPP_DLL_PUBLIC bool dispatch_real_gte(const real128 &, const real &);
 // Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+    requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
@@ -4310,7 +4413,7 @@ MPPP_DLL_PUBLIC bool dispatch_real_lt(const real128 &, const real &);
 // Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+    requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
@@ -4454,7 +4557,7 @@ MPPP_DLL_PUBLIC bool dispatch_real_lte(const real128 &, const real &);
 // Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires real_op_types<T, U>
+    requires real_op_types<T, U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
 #endif
@@ -4517,6 +4620,19 @@ struct hash<mppp::real> {
 } // namespace std
 
 #include <mp++/detail/real_literals.hpp>
+
+#if defined(MPPP_WITH_FMT)
+
+namespace fmt
+{
+
+template <>
+struct formatter<mppp::real> : mppp::detail::to_string_formatter {
+};
+
+} // namespace fmt
+
+#endif
 
 // Support for pretty printing in xeus-cling.
 #if defined(__CLING__)

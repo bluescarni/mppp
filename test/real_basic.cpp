@@ -31,6 +31,7 @@
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
@@ -184,11 +185,17 @@ TEST_CASE("real constructors")
     REQUIRE(r1.get_prec() == real_prec_min());
     REQUIRE(r1.zero_p());
     REQUIRE(!r1.signbit());
+    REQUIRE(r1.get_nlimbs() > 0u);
+    REQUIRE(get_nlimbs(r1) > 0u);
+    REQUIRE(get_nlimbs(r1) == r1.get_nlimbs());
     // Copy ctor.
     real r3{real{4}};
     REQUIRE(r3.is_valid());
     REQUIRE(::mpfr_equal_p(r3.get_mpfr_t(), real{4}.get_mpfr_t()));
     REQUIRE(r3.get_prec() == real{4}.get_prec());
+    REQUIRE(get_nlimbs(r3) > 0u);
+    REQUIRE(get_nlimbs(r3) == r3.get_nlimbs());
+    REQUIRE(prec_to_nlimbs(r3.get_prec()) == r3.get_nlimbs());
     real r4{real{4, 123}};
     REQUIRE(::mpfr_equal_p(r4.get_mpfr_t(), real{4, 123}.get_mpfr_t()));
     REQUIRE(r4.get_prec() == 123);
@@ -1756,3 +1763,18 @@ TEST_CASE("real str_ndigits")
 }
 
 #endif
+
+TEST_CASE("prec_to_nlimbs failure")
+{
+    using Catch::Matchers::Message;
+
+    // NOTE: the current constraints on real_prec_min/max ensure
+    // we can compute +-1 safely.
+    REQUIRE_THROWS_MATCHES(prec_to_nlimbs(real_prec_min() - 1), std::invalid_argument,
+                           Message("An invalid input precision of " + detail::to_string(real_prec_min() - 1)
+                                   + " was passed to prec_to_nlimbs()"));
+
+    REQUIRE_THROWS_MATCHES(prec_to_nlimbs(real_prec_max() + 1), std::invalid_argument,
+                           Message("An invalid input precision of " + detail::to_string(real_prec_max() + 1)
+                                   + " was passed to prec_to_nlimbs()"));
+}

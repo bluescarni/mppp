@@ -17,6 +17,12 @@
 #include <tuple>
 #include <type_traits>
 
+#if defined(MPPP_WITH_FMT)
+
+#include <fmt/core.h>
+
+#endif
+
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
@@ -448,3 +454,18 @@ TEST_CASE("real io")
         REQUIRE(::mpfr_equal_p(real{123, 100}.get_mpfr_t(), real{oss.str(), 100}.get_mpfr_t()));
     }
 }
+
+#if defined(MPPP_WITH_FMT)
+
+TEST_CASE("fmt test")
+{
+    using Catch::Matchers::Message;
+
+    REQUIRE(fmt::format("{}", 0_r256) == (0_r256).to_string());
+    REQUIRE(fmt::format("{}", -1.1_r512) == (-1.1_r512).to_string());
+
+    REQUIRE_THROWS_MATCHES(fmt::format("{:<30}", -1.1_r512), std::invalid_argument,
+                           Message("No format strings are currently supported for mp++'s classes"));
+}
+
+#endif

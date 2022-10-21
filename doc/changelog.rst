@@ -7,6 +7,11 @@ Changelog
 New
 ~~~
 
+- Add initial optional support for formatting via the fmt library
+  (`#296 <https://github.com/bluescarni/mppp/pull/296>`__).
+- Add helpers to determine the number of limbs in the significand
+  of a :cpp:class:`~mppp::real` number
+  (`#296 <https://github.com/bluescarni/mppp/pull/296>`__).
 - Add several ``std`` math overloads for :cpp:class:`~mppp::real`
   (`#295 <https://github.com/bluescarni/mppp/pull/295>`__).
 - Add hashing capabilities to :cpp:class:`~mppp::real`

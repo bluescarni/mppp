@@ -179,6 +179,7 @@ if(MPPP_WITH_MPFR)
   ADD_MPPP_TESTCASE(real_polylogs)
   ADD_MPPP_TESTCASE(real_s11n)
   ADD_MPPP_TESTCASE(real_hash)
+  ADD_MPPP_TESTCASE(real_nextafter)
 endif()
 
 if(MPPP_WITH_MPC)
