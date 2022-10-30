@@ -77,6 +77,14 @@ static_assert(real_prec_min() <= real_prec_max(), "The minimum real precision is
 // Zero precision has a special meaning, depending on the context. Thus, the minimum precision must be nonzero.
 static_assert(real_prec_min() > 0, "The minimum real precision must be positive.");
 
+// Double-check that mpfr_prec_t is signed.
+static_assert(std::is_signed<::mpfr_prec_t>::value, "mpfr_prec_t is not signed.");
+
+// Ensure no funny business with integral promotions.
+static_assert(std::is_same<detail::uncvref_t<decltype(std::declval<::mpfr_prec_t>() + std::declval<::mpfr_prec_t>())>,
+                           ::mpfr_prec_t>::value,
+              "mpfr_prec_t is a short integer type.");
+
 // A couple of sanity checks when constructing temporary mpfrs/mpfs from long double.
 static_assert(std::numeric_limits<long double>::max_digits10 < nl_max<int>() / 4, "Overflow error.");
 // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
@@ -2907,6 +2915,32 @@ std::size_t hash(const real &r)
     assert(found_first_nz);
 
     return retval;
+}
+
+real real::eps() const
+{
+    // NOTE: for consistency with the epsilons returned for C++
+    // types, we return here 2**-(prec - 1). See:
+    // https://en.wikipedia.org/wiki/Machine_epsilon
+    // NOTE: computing prec - 1 never returns a negative value, as we enforce that real_prec_min() > 0.
+    // Negation is also safe (we remove a few bits from the MPFR defined max prec
+    // value and in any case two's complement would save us even if get_prec()
+    // returned the max value).
+    return real{1ul, detail::safe_cast<::mpfr_exp_t>(-(get_prec() - 1)), get_prec()};
+}
+
+real eps(const real &r)
+{
+    return r.eps();
+}
+
+real eps(::mpfr_prec_t p)
+{
+    if (mppp_unlikely(p < real_prec_min() || p > real_prec_max())) {
+        throw std::invalid_argument("An invalid input precision of " + detail::to_string(p) + " was passed to eps()");
+    }
+
+    return real{1ul, detail::safe_cast<::mpfr_exp_t>(-(p - 1)), p};
 }
 
 std::size_t real::get_nlimbs() const
