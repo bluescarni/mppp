@@ -238,34 +238,34 @@ TEST_CASE("real eps")
     if (std::numeric_limits<double>::is_iec559 && std::numeric_limits<double>::radix == 2) {
         REQUIRE(real{0.}.eps() == std::numeric_limits<double>::epsilon());
         REQUIRE(eps(real{0.}) == std::numeric_limits<double>::epsilon());
-        REQUIRE(eps(std::numeric_limits<double>::digits) == std::numeric_limits<double>::epsilon());
+        REQUIRE(prec_to_eps(std::numeric_limits<double>::digits) == std::numeric_limits<double>::epsilon());
     }
 
     if (std::numeric_limits<float>::is_iec559 && std::numeric_limits<float>::radix == 2) {
         REQUIRE(real{0.f}.eps() == std::numeric_limits<float>::epsilon());
         REQUIRE(eps(real{0.f}) == std::numeric_limits<float>::epsilon());
-        REQUIRE(eps(std::numeric_limits<float>::digits) == std::numeric_limits<float>::epsilon());
+        REQUIRE(prec_to_eps(std::numeric_limits<float>::digits) == std::numeric_limits<float>::epsilon());
     }
 
     if (std::numeric_limits<long double>::is_iec559 && std::numeric_limits<long double>::radix == 2) {
         REQUIRE(real{0.l}.eps() == std::numeric_limits<long double>::epsilon());
         REQUIRE(eps(real{0.l}) == std::numeric_limits<long double>::epsilon());
-        REQUIRE(eps(std::numeric_limits<long double>::digits) == std::numeric_limits<long double>::epsilon());
+        REQUIRE(prec_to_eps(std::numeric_limits<long double>::digits) == std::numeric_limits<long double>::epsilon());
     }
 
 #if defined(MPPP_WITH_QUADMATH)
 
     REQUIRE(real{mppp::real128(0)}.eps() == std::numeric_limits<mppp::real128>::epsilon());
     REQUIRE(eps(real{mppp::real128(0)}) == std::numeric_limits<mppp::real128>::epsilon());
-    REQUIRE(eps(std::numeric_limits<mppp::real128>::digits) == std::numeric_limits<mppp::real128>::epsilon());
+    REQUIRE(prec_to_eps(std::numeric_limits<mppp::real128>::digits) == std::numeric_limits<mppp::real128>::epsilon());
 
 #endif
 
     using Catch::Matchers::Message;
 
-    REQUIRE_THROWS_MATCHES(eps(0), std::invalid_argument,
-                           Message("An invalid input precision of 0 was passed to eps()"));
-    REQUIRE_THROWS_MATCHES(
-        eps(real_prec_max() + 1), std::invalid_argument,
-        Message("An invalid input precision of " + detail::to_string(real_prec_max() + 1) + " was passed to eps()"));
+    REQUIRE_THROWS_MATCHES(prec_to_eps(0), std::invalid_argument,
+                           Message("An invalid input precision of 0 was passed to prec_to_eps()"));
+    REQUIRE_THROWS_MATCHES(prec_to_eps(real_prec_max() + 1), std::invalid_argument,
+                           Message("An invalid input precision of " + detail::to_string(real_prec_max() + 1)
+                                   + " was passed to prec_to_eps()"));
 }

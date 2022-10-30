@@ -2934,10 +2934,11 @@ real eps(const real &r)
     return r.eps();
 }
 
-real eps(::mpfr_prec_t p)
+real prec_to_eps(::mpfr_prec_t p)
 {
     if (mppp_unlikely(p < real_prec_min() || p > real_prec_max())) {
-        throw std::invalid_argument("An invalid input precision of " + detail::to_string(p) + " was passed to eps()");
+        throw std::invalid_argument("An invalid input precision of " + detail::to_string(p)
+                                    + " was passed to prec_to_eps()");
     }
 
     return real{1ul, detail::safe_cast<::mpfr_exp_t>(-(p - 1)), p};

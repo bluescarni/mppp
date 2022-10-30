@@ -280,7 +280,8 @@ class MPPP_DLL_PUBLIC real
     template <typename Archive>
     void load(Archive &ar, unsigned)
     {
-        ::mpfr_prec_t p{};
+        // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+        ::mpfr_prec_t p;
         ar >> p;
         std::string tmp;
         ar >> tmp;
@@ -1953,7 +1954,7 @@ inline bool signbit(const real &r)
 MPPP_DLL_PUBLIC real eps(const real &);
 
 // Return the epsilon corresponding to the input precision value.
-MPPP_DLL_PUBLIC real eps(::mpfr_prec_t);
+MPPP_DLL_PUBLIC real prec_to_eps(::mpfr_prec_t);
 
 // Comparison.
 MPPP_DLL_PUBLIC int cmp(const real &, const real &);
