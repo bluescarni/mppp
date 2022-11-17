@@ -188,14 +188,16 @@
 
 #endif
 
-// Wrapper for the C++17 [[nodiscard]] attribute.
+// Wrapper for the C++17 [[nodiscard]], [[maybe_unused]] attributes.
 #if MPPP_CPLUSPLUS >= 201703L
 
 #define MPPP_NODISCARD [[nodiscard]]
+#define MPPP_MAYBE_UNUSED [[maybe_unused]]
 
 #else
 
 #define MPPP_NODISCARD
+#define MPPP_MAYBE_UNUSED
 
 #endif
 
