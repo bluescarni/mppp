@@ -2818,7 +2818,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         if (asize1 > asize2 || (asize1 == asize2 && mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
             // abs(op1) >= abs(op2).
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
-            ::mp_limb_t br;
+            MPPP_MAYBE_UNUSED ::mp_limb_t br;
             if (asize2 == 1) {
                 br = mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
             } else if (asize1 == asize2) {
@@ -2834,7 +2834,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         } else {
             // abs(op2) > abs(op1).
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
-            ::mp_limb_t br;
+            MPPP_MAYBE_UNUSED ::mp_limb_t br;
             if (asize1 == 1) {
                 br = mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
             } else {
