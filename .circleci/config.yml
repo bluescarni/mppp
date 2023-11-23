@@ -1,14 +1,15 @@
 version: 2.1
 
 jobs:
-  bionic_gcc7_conda_coverage:
+  conda_coverage:
     docker:
-    - image: circleci/buildpack-deps:bionic
+    - image: cimg/base:current
+    resource_class: large
     steps:
     - checkout
     - run:
         name: Build and test
-        command: bash ./tools/circleci_bionic_gcc7_conda_coverage.sh
+        command: bash ./tools/circleci_conda_coverage.sh
   bionic_gcc7_conda_release:
     docker:
     - image: circleci/buildpack-deps:bionic
@@ -79,7 +80,7 @@ workflows:
     jobs:
     # - focal_clang9_msan_00
     # - focal_clang9_msan_01
-    - bionic_gcc7_conda_coverage
+    - conda_coverage
     - bionic_gcc7_conda_release
     - focal_gcc9_conda_coverage
     # - focal_clang9_debuggmp_unstable
