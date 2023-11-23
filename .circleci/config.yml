@@ -19,14 +19,15 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_conda_release.sh
-  focal_gcc9_conda_docs:
+  conda_docs:
     docker:
-    - image: circleci/buildpack-deps:focal
+    - image: cimg/base:current
+    resource_class: large
     steps:
     - checkout
     - run:
         name: Build and test
-        command: bash ./tools/circleci_focal_gcc9_conda_docs.sh
+        command: bash ./tools/circleci_conda_docs.sh
   focal_clang9_debuggmp_unstable:
     docker:
     - image: circleci/buildpack-deps:focal
@@ -76,5 +77,5 @@ workflows:
     - conda_coverage
     - conda_release
     # - focal_clang9_debuggmp_unstable
-    - focal_gcc9_conda_docs
+    - conda_docs
     - conda_arm64
