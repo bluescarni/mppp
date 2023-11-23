@@ -22,7 +22,9 @@ mkdir build
 cd build
 
 # GCC build.
-cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_CXX_STANDARD=17 \
+cmake ../ -G Ninja \
+    -DCMAKE_PREFIX_PATH=$deps_dir \
+    -DCMAKE_CXX_STANDARD=17 \
     -DCMAKE_BUILD_TYPE=Debug \
     -DMPPP_BUILD_TESTS=yes \
     -DMPPP_WITH_MPFR=yes \
@@ -31,7 +33,7 @@ cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_CXX_STANDARD=17 \
     -DMPPP_WITH_QUADMATH=yes \
     -DMPPP_WITH_BOOST_S11N=yes \
     -DCMAKE_CXX_FLAGS="--coverage"
-make -j4 VERBOSE=1
+ninja -v -j4
 # Run the tests.
 ctest -V -j4
 
