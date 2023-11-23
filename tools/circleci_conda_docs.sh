@@ -14,7 +14,7 @@ wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge
 export deps_dir=$HOME/local
 export PATH="$HOME/mambaforge/bin:$PATH"
 bash mambaforge.sh -b -p $HOME/mambaforge
-mamba create -y -p $deps_dir c-compiler cxx-compiler ninja cmake gmp mpfr 'libflint<3' arb mpc fmt libboost-devel 'sphinx=6.*' 'sphinx-book-theme=1.*' xeus-cling
+mamba create -y -p $deps_dir c-compiler cxx-compiler ninja cmake gmp mpfr 'libflint<3' arb mpc fmt libboost-devel 'sphinx=6.*' 'sphinx-book-theme=1.*' myst-nb xeus-cling
 source activate $deps_dir
 
 # Create the build dir and cd into it.
