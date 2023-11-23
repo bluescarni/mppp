@@ -1,686 +1,418 @@
 
+
 <!DOCTYPE html>
 
-<html lang="en">
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Multiprecision rationals &#8212; mp++ 0.27 documentation</title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'rational';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quadruple-precision floats" href="real128.html" />
     <link rel="prev" title="Multiprecision integers" href="integer.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
     
-    <div class="container-fluid" id="banner"></div>
-
     
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
 
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="index.html">
-      
-      
-      
-      <h1 class="site-logo" id="site-title">mp++ 0.27 documentation</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mp++ 0.27 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="installation.html">
-   Installation
-  </a>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="tutorial.html">
-   Tutorial
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_prelim.html">
-     Preliminaries
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_constr.html">
-     Construction, conversion and assignment
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_io.html">
-     Input and output
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_numtower.html">
-     The numerical tower and type coercion
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_commonops.html">
-     Common operators
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_api.html">
-     API overview
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_integer.html">
-     Integer tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_rational.html">
-     Rational tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_real128.html">
-     Quadruple-precision float tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_complex128.html">
-     Quadruple-precision complex numbers tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_real.html">
-     Multiprecision float tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_complex.html">
-     Multiprecision complex numbers tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_boost_s11n.html">
-     Boost.serialization support
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_pybind11.html">
-     Extra: integration with pybind11
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="interactive_notebooks.html">
-   Interactive notebooks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_basics.html">
-     Integer basics
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_formatted_output.html">
-     Integer formatted output
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_arithmetic.html">
-     Integer arithmetic
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_comparison.html">
-     Integer comparison
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
-     Integer logic and bit fiddling
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_s11n.html">
-     Integer serialisation
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/real_basics.html">
-     Real basics
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="reference.html">
-   Reference
-  </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="current">
-   <li class="toctree-l2">
-    <a class="reference internal" href="definitions.html">
-     Macros and definitions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="namespaces.html">
-     Namespaces
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="exceptions.html">
-     Exceptions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="concepts.html">
-     Common concepts
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="integer.html">
-     Multiprecision integers
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     Multiprecision rationals
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="real128.html">
-     Quadruple-precision floats
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="complex128.html">
-     Quadruple-precision complex numbers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="real.html">
-     Multiprecision floats
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="complex.html">
-     Multiprecision complex numbers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="utilities.html">
-     Utility functions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="fwd_decl.html">
-     Forward declarations
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="benchmarks.html">
-   Benchmarks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="integer_benchmarks.html">
-     Integer benchmarks
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="changelog.html">
-   Changelog
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_constr.html">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex128.html">Quadruple-precision complex numbers tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex.html">Multiprecision complex numbers tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_boost_s11n.html">Boost.serialization support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="interactive_notebooks.html">Interactive notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_basics.html">Integer basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_formatted_output.html">Integer formatted output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_arithmetic.html">Integer arithmetic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_comparison.html">Integer comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_bit_fiddling.html">Integer logic and bit fiddling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_s11n.html">Integer serialisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/real_basics.html">Real basics</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="reference.html">Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex128.html">Quadruple-precision complex numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex.html">Multiprecision complex numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fwd_decl.html">Forward declarations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="benchmarks.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="integer_benchmarks.html">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/bluescarni/mppp" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Frational.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
 </div>
 
 
-          
-
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
-<div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
 
 
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/rational.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
   </span>
-
-</label>
-
-        
-    </div>
-    <div class="header-article__right">
-<button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
   <i class="fas fa-expand"></i>
   </span>
 
 </button>
 
-<div class="menu-dropdown menu-dropdown-repository-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Source repositories">
-      <i class="fab fa-github"></i>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://github.com/bluescarni/mppp"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Source repository"
->
-  
+`);
+</script>
 
-<span class="headerbtn__icon-container">
-  <i class="fab fa-github"></i>
-  </span>
-<span class="headerbtn__text-container">repository</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Frational.html&body=Your%20issue%20content%20here."
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Open an issue"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-lightbulb"></i>
-  </span>
-<span class="headerbtn__text-container">open issue</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="_sources/rational.rst.txt"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="headerbtn__text-container">.rst</span>
-</a>
-
-      </li>
-      
-      <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="headerbtn__text-container">.pdf</span>
-</button>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
-
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-rational-class">
-   The rational class
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types">
-   Types
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#concepts">
-   Concepts
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#functions">
-   Functions
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#assignment">
-     Assignment
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#conversion">
-     Conversion
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#arithmetic">
-     Arithmetic
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#comparison">
-     Comparison
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#number-theoretic-functions">
-     Number theoretic functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#exponentiation">
-     Exponentiation
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-output">
-     Input/Output
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#other">
-     Other
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#mathematical-operators">
-   Mathematical operators
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#standard-library-specialisations">
-   Standard library specialisations
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#user-defined-literals">
-   User-defined literals
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Multiprecision rationals</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-rational-class">
-   The rational class
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types">
-   Types
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#concepts">
-   Concepts
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#functions">
-   Functions
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#assignment">
-     Assignment
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#conversion">
-     Conversion
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#arithmetic">
-     Arithmetic
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#comparison">
-     Comparison
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#number-theoretic-functions">
-     Number theoretic functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#exponentiation">
-     Exponentiation
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-output">
-     Input/Output
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#other">
-     Other
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#mathematical-operators">
-   Mathematical operators
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#standard-library-specialisations">
-   Standard library specialisations
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#user-defined-literals">
-   User-defined literals
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Multiprecision rationals</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rational-class">The rational class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types">Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concepts">Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#assignment">Assignment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion">Conversion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic">Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">Comparison</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#number-theoretic-functions">Number theoretic functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponentiation">Exponentiation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-output">Input/Output</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-operators">Mathematical operators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-library-specialisations">Standard library specialisations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-defined-literals">User-defined literals</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section id="multiprecision-rationals">
-<span id="rational-reference"></span><h1>Multiprecision rationals<a class="headerlink" href="#multiprecision-rationals" title="Permalink to this headline">#</a></h1>
+<span id="rational-reference"></span><h1>Multiprecision rationals<a class="headerlink" href="#multiprecision-rationals" title="Permalink to this heading">#</a></h1>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.3.</span></p>
 </div>
 <p><em>#include &lt;mp++/rational.hpp&gt;</em></p>
 <section id="the-rational-class">
-<h2>The rational class<a class="headerlink" href="#the-rational-class" title="Permalink to this headline">#</a></h2>
+<h2>The rational class<a class="headerlink" href="#the-rational-class" title="Permalink to this heading">#</a></h2>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tEEN4mppp8rationalE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp8rationalE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp8rationalE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">rational</span></span></span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="Permalink to this definition">#</a><br /></dt>
@@ -695,11 +427,11 @@ Rational numbers are represented in the usual canonical form:</p>
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#rational-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding GMP functions minus the leading <code class="docutils literal notranslate"><span class="pre">mpq_</span></code>
 prefix. For instance, the GMP call</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpq_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpq_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>that writes the result of <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> into <code class="docutils literal notranslate"><span class="pre">rop</span></code> becomes simply</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function is resolved via argument-dependent lookup. Function calls with overlapping arguments
@@ -747,7 +479,7 @@ denominator.</p>
 <p>The copy constructor will perform a copy of numerator
 and denominator. The move constructor will leave <em>other</em> in an unspecified but valid state.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> – the construction argument.</p>
 </dd>
 </dl>
@@ -768,10 +500,10 @@ and denominator. The move constructor will leave <em>other</em> in an unspecifie
 or whose real part is not finite.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the value that will be used to initialize <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">domain_error</span></span></span> – if <em>x</em> is a non-finite floating-point value, or
 a complex value with non-zero imaginary part or non-finite real part.</p>
 </dd>
@@ -793,7 +525,7 @@ to ensure that <code class="docutils literal notranslate"><span class="pre">this
 so will result in undefined behaviour.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – the numerator.</p></li>
 <li><p><strong>d</strong> – the denominator.</p></li>
@@ -801,7 +533,7 @@ so will result in undefined behaviour.</p>
 of numerator and denominator.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><span class="n">zero_division_error</span></a></span></span> – if the denominator is zero.</p>
 </dd>
 </dl>
@@ -817,13 +549,13 @@ by the division operator <code class="docutils literal notranslate"><span class=
 The format for numerator and denominator is described in the documentation of the constructor from string
 of <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>s</strong> – the input string.</p></li>
 <li><p><strong>base</strong> – the base used in the string representation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><span class="n">zero_division_error</span></a></span></span> – if the denominator is zero.</p></li>
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the string constructor of <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, or by
@@ -842,14 +574,14 @@ which is interpreted as the string representation of a rational in base <em>base
 <p>Internally, the constructor will copy the content of the range to a local buffer, add a
 string terminator, and invoke the constructor from string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>begin</strong> – the begin of the input range.</p></li>
 <li><p><strong>end</strong> – the end of the input range.</p></li>
 <li><p><strong>base</strong> – the base used in the string representation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the constructor from string, or by
 memory errors in standard containers.</p>
 </dd>
@@ -868,7 +600,7 @@ the input GMP integer <em>n</em>, and the denominator to 1.</p>
 with an uninitialized <em>n</em> results in undefined behaviour.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n</strong> – the input GMP integer.</p>
 </dd>
 </dl>
@@ -888,7 +620,7 @@ with an uninitialized <em>q</em> results in undefined behaviour.</p>
 canonicalise <code class="docutils literal notranslate"><span class="pre">this</span></code>: numerator and denominator are constructed as-is from <em>q</em>.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input GMP rational.</p>
 </dd>
 </dl>
@@ -914,7 +646,7 @@ will take care of releasing them when the destructor is called.</p>
 <p>Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input GMP rational.</p>
 </dd>
 </dl>
@@ -931,10 +663,10 @@ will take care of releasing them when the destructor is called.</p>
 <dd><p>Copy and move assignment.</p>
 <p>After move-assignment, <em>other</em> is left in an unspecified but valid state.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -946,13 +678,13 @@ will take care of releasing them when the destructor is called.</p>
 <dd><p>Generic assignment operator.</p>
 <p>This operator will assign <em>x</em> to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the generic constructor.</p>
 </dd>
 </dl>
@@ -993,13 +725,13 @@ is available only if mp++ was configured with the <code class="docutils literal 
 <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> and then move-assigning the result
 to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception raised by the conversion of <em>x</em>
 to <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>.</p>
 </dd>
@@ -1011,19 +743,19 @@ to <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 <span id="_CPPv3I_11string_typeEN4mppp8rationalaSERK1T"></span><span id="_CPPv2I_11string_typeEN4mppp8rationalaSERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11string_typeE" title="mppp::string_type"><span class="n"><span class="pre">string_type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_11string_typeEN4mppp8rationalaSER8rationalRK1T" title="mppp::rational::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_11string_typeEN4mppp8rationalaSER8rationalRK1T" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Assignment from string.</p>
 <p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
 </pre></div>
 </div>
 <p>That is, a temporary rational is constructed from <em>s</em> and it is then
 move-assigned to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>s</strong> – the string that will be used for the assignment.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the constructor from string.</p>
 </dd>
 </dl>
@@ -1043,10 +775,10 @@ with an uninitialized <em>n</em> results in undefined behaviour.</p>
 the data in <em>n</em> must be completely distinct from the data in <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n</strong> – the input GMP integer.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1067,10 +799,10 @@ the assigned value: numerator and denominator are assigned as-is from <em>q</em>
 the data in <em>q</em> must be completely distinct from the data in <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input GMP rational.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1098,10 +830,10 @@ will take care of releasing them when the destructor is called.</p>
 <p>Due to a compiler bug, this operator is not available on Microsoft Visual Studio.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input GMP rational.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1116,13 +848,13 @@ The string format consists of the numerator, followed by the division operator <
 denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be
 represented in the returned string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>base</strong> – the desired base for the string representation.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a string representation for <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer9to_stringEi" title="mppp::integer::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::to_string()</span></code></a>.</p>
 </dd>
 </dl>
@@ -1138,10 +870,10 @@ Conversion to <code class="docutils literal notranslate"><span class="pre">bool<
 yields the result of the truncated division of the numerator by the denominator, if representable by the target
 type. Conversion to floating-point and complex types might yield inexact values and infinities.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to the target type.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">overflow_error</span></span></span> – if the target type is an integral type and the
 value of <code class="docutils literal notranslate"><span class="pre">this</span></code> overflows its range.</p>
 </dd>
@@ -1158,10 +890,10 @@ from the conversion operator, this member function does not raise any exception:
 the member function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the member function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion
 fails, <em>rop</em> will not be altered.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rop</strong> – the variable which will store the result of the conversion.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code> is
 an integral C++ type which cannot represent the truncated value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
@@ -1193,7 +925,7 @@ an integral C++ type which cannot represent the truncated value of <code class="
 or denominator via one of the mutable getters, the rational is kept in canonical form.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a (const) reference to the numerator or denominator.</p>
 </dd>
 </dl>
@@ -1216,7 +948,7 @@ form. Calling this member function, however, might be necessary if the numerator
 are modified manually, or when constructing/assigning from non-canonical <a class="reference internal" href="#_CPPv45mpq_t" title="mpq_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpq_t</span></code></a>
 values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1227,7 +959,7 @@ values.</p>
 <span id="_CPPv3NK4mppp8rational12is_canonicalEv"></span><span id="_CPPv2NK4mppp8rational12is_canonicalEv"></span><span id="mppp::rational::is_canonicalC"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_canonical</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4mppp8rational12is_canonicalEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Check canonical form.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is the canonical form for rational numbers, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
 </dl>
@@ -1238,7 +970,7 @@ values.</p>
 <span id="_CPPv3NK4mppp8rational3sgnEv"></span><span id="_CPPv2NK4mppp8rational3sgnEv"></span><span id="mppp::rational::sgnC"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sgn</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4mppp8rational3sgnEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Sign function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>0 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero, 1 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is positive, -1 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is negation.</p>
 </dd>
 </dl>
@@ -1250,7 +982,7 @@ values.</p>
 <dd><p>Negate in-place.</p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its negative.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1262,7 +994,7 @@ values.</p>
 <dd><p>In-place absolute value.</p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its absolute value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1274,10 +1006,10 @@ values.</p>
 <dd><p>Invert in-place.</p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its inverse.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><span class="n">zero_division_error</span></a></span></span> – if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero.</p>
 </dd>
 </dl>
@@ -1298,7 +1030,7 @@ values.</p>
 <span id="_CPPv3NK4mppp8rational15is_negative_oneEv"></span><span id="_CPPv2NK4mppp8rational15is_negative_oneEv"></span><span id="mppp::rational::is_negative_oneC"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_negative_one</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4mppp8rational15is_negative_oneEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Test for special values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is, respectively, <span class="math notranslate nohighlight">\(0\)</span>, <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(-1\)</span>,
 <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
@@ -1309,7 +1041,7 @@ values.</p>
 
 </section>
 <section id="types">
-<h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">#</a></h2>
+<h2>Types<a class="headerlink" href="#types" title="Permalink to this heading">#</a></h2>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv45mpq_t">
 <span id="_CPPv35mpq_t"></span><span id="_CPPv25mpq_t"></span><span id="mpq_t"></span><span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mpq_t</span></span></span><a class="headerlink" href="#_CPPv45mpq_t" title="Permalink to this definition">#</a><br /></dt>
@@ -1323,7 +1055,7 @@ It is defined as an array of size 1 of an unspecified structure.</p>
 
 </section>
 <section id="concepts">
-<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">#</a></h2>
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this heading">#</a></h2>
 <dl class="cpp concept">
 <dt class="sig sig-object cpp" id="_CPPv4I0_NSt6size_tEEN4mppp22rational_interoperableE">
 <span id="_CPPv3I0_NSt6size_tEEN4mppp22rational_interoperableE"></span><span id="_CPPv2I0_NSt6size_tEEN4mppp22rational_interoperableE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">concept</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">rational_interoperable</span></span></span><a class="headerlink" href="#_CPPv4I0_NSt6size_tEEN4mppp22rational_interoperableE" title="Permalink to this definition">#</a><br /></dt>
@@ -1382,13 +1114,13 @@ type.</p></li>
 
 </section>
 <section id="functions">
-<span id="rational-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">#</a></h2>
+<span id="rational-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h2>
 <p>Much of the functionality of the <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class is exposed
 via plain functions. These functions
 mimic the <a class="reference external" href="https://gmplib.org/manual/Rational-Number-Functions.html">GMP API</a> where appropriate, but a variety of
 convenience/generic overloads is provided as well.</p>
 <section id="assignment">
-<span id="rational-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">#</a></h3>
+<span id="rational-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp4swapERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp4swapERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">swap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="mppp::swap::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q1</span></span>, <span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="mppp::swap::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q2</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
@@ -1398,7 +1130,7 @@ convenience/generic overloads is provided as well.</p>
 <p>Swap.</p>
 <p>This function will efficiently swap the values of <em>q1</em> and <em>q2</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>q1</strong> – the first argument.</p></li>
 <li><p><strong>q2</strong> – the second argument.</p></li>
@@ -1409,7 +1141,7 @@ convenience/generic overloads is provided as well.</p>
 
 </section>
 <section id="conversion">
-<span id="rational-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">#</a></h3>
+<span id="rational-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tE_N4mppp22rational_interoperableI5SSizeEEEN4mppp3getEbR1TRKN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3I_NSt6size_tE_N4mppp22rational_interoperableI5SSizeEEEN4mppp3getER1TRKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tE_N4mppp22rational_interoperableI5SSizeEEEN4mppp3getER1TRKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp22rational_interoperableE" title="mppp::rational_interoperable"><span class="n"><span class="pre">rational_interoperable</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp22rational_interoperableI5SSizeEEEN4mppp3getEbR1TRKN4mppp8rationalI5SSizeEE" title="mppp::get::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp22rational_interoperableI5SSizeEEEN4mppp3getEbR1TRKN4mppp8rationalI5SSizeEE" title="mppp::get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tE_N4mppp22rational_interoperableI5SSizeEEEN4mppp3getEbR1TRKN4mppp8rationalI5SSizeEE" title="mppp::get::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tE_N4mppp22rational_interoperableI5SSizeEEEN4mppp3getEbR1TRKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
@@ -1420,13 +1152,13 @@ If the conversion is successful, the function
 will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <em>rop</em> will
 not be altered.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the variable which will store the result of the conversion.</p></li>
 <li><p><strong>q</strong> – the input argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">T</span></code> is
 an integral C++ type which cannot represent the truncated value of <em>q</em>.</p>
 </dd>
@@ -1435,7 +1167,7 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 
 </section>
 <section id="arithmetic">
-<span id="rational-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">#</a></h3>
+<span id="rational-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::add::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">add</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::add::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::add::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::add::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3addERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
@@ -1463,17 +1195,17 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 <li><p><span class="math notranslate nohighlight">\(\frac{x}{y}\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">mppp</span><span class="p">::</span><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><span class="n">zero_division_error</span></a></span></span> – if, in a division operation, <em>y</em> is zero.</p>
 </dd>
 </dl>
@@ -1490,13 +1222,13 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 <dd><p>Binary negation and absolute value.</p>
 <p>These functions will set <em>rop</em> to, respectively, <span class="math notranslate nohighlight">\(-x\)</span> and <span class="math notranslate nohighlight">\(\left| x \right|\)</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>x</strong> – the input value.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -1512,10 +1244,10 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 <span id="_CPPv3I_NSt6size_tEEN4mppp3absERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3absERKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3absEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::abs::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">abs</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3absEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::abs::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3absEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Unary negation and absolute value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(-x\)</span> and <span class="math notranslate nohighlight">\(\left| x \right|\)</span> respectively.</p>
 </dd>
 </dl>
@@ -1527,16 +1259,16 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 <dd><p>Binary inversion.</p>
 <p>This function will set <em>rop</em> to <span class="math notranslate nohighlight">\(x^{-1}\)</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>x</strong> – the input value.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by <a class="reference internal" href="#_CPPv4N4mppp8rational3invEv" title="mppp::rational::inv"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::inv()</span></code></a>.</p>
 </dd>
 </dl>
@@ -1547,13 +1279,13 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 <span id="_CPPv3I_NSt6size_tEEN4mppp3invERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3invERKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3invEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::inv::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">inv</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3invEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::inv::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3invEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Unary inversion.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(x^{-1}\)</span>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by <a class="reference internal" href="#_CPPv4N4mppp8rational3invEv" title="mppp::rational::inv"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::inv()</span></code></a>.</p>
 </dd>
 </dl>
@@ -1561,7 +1293,7 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 
 </section>
 <section id="comparison">
-<span id="rational-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">#</a></h3>
+<span id="rational-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tEEN4mppp3cmpEiRKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3cmpERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3cmpERKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">cmp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::cmp::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::cmp::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRKN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
@@ -1579,13 +1311,13 @@ an integral C++ type which cannot represent the truncated value of <em>q</em>.</
 <p>These functions will return 0 if <span class="math notranslate nohighlight">\(x=y\)</span>, a negative value if <span class="math notranslate nohighlight">\(x&lt;y\)</span>
 and a positive value if <span class="math notranslate nohighlight">\(x&gt;y\)</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the comparison.</p>
 </dd>
 </dl>
@@ -1596,10 +1328,10 @@ and a positive value if <span class="math notranslate nohighlight">\(x&gt;y\)</s
 <span id="_CPPv3I_NSt6size_tEEN4mppp3sgnERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3sgnERKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">sgn</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3sgnEiRKN4mppp8rationalI5SSizeEE" title="mppp::sgn::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3sgnEiRKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Sign function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>0 if <em>q</em> is zero, 1 if <em>q</em> is positive, -1 if <em>q</em> is negative.</p>
 </dd>
 </dl>
@@ -1620,10 +1352,10 @@ and a positive value if <span class="math notranslate nohighlight">\(x&gt;y\)</s
 <span id="_CPPv3I_NSt6size_tEEN4mppp15is_negative_oneERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp15is_negative_oneERKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">is_negative_one</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp15is_negative_oneEbRKN4mppp8rationalI5SSizeEE" title="mppp::is_negative_one::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp15is_negative_oneEbRKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Test for special values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if, respectively, <span class="math notranslate nohighlight">\(q=0\)</span>, <span class="math notranslate nohighlight">\(q=1\)</span> or <span class="math notranslate nohighlight">\(q=-1\)</span>, <code class="docutils literal notranslate"><span class="pre">false</span></code>
 otherwise.</p>
 </dd>
@@ -1632,7 +1364,7 @@ otherwise.</p>
 
 </section>
 <section id="number-theoretic-functions">
-<span id="rational-ntheory"></span><h3>Number theoretic functions<a class="headerlink" href="#number-theoretic-functions" title="Permalink to this headline">#</a></h3>
+<span id="rational-ntheory"></span><h3>Number theoretic functions<a class="headerlink" href="#number-theoretic-functions" title="Permalink to this heading">#</a></h3>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.8.</span></p>
 </div>
@@ -1645,16 +1377,16 @@ represents an integral value, the calculation is forwarded to the implementation
 the binomial coefficient for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>. Otherwise, an implementation
 based on the falling factorial is employed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the top value.</p></li>
 <li><p><strong>y</strong> – the bottom value.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\({x \choose y}\)</span>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the implementation of
 the binomial coefficient for <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</p>
 </dd>
@@ -1663,7 +1395,7 @@ the binomial coefficient for <a class="reference internal" href="integer.html#_C
 
 </section>
 <section id="exponentiation">
-<span id="rational-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">#</a></h3>
+<span id="rational-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mppp3powEDaRK1TRK1U">
 <span id="_CPPv3I0_N4mppp17rational_op_typesI1TEEEN4mppp3powERK1TRK1U"></span><span id="_CPPv2I0_N4mppp17rational_op_typesI1TEEEN4mppp3powERK1TRK1U"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I00EN4mppp17rational_op_typesE" title="mppp::rational_op_types"><span class="n"><span class="pre">rational_op_types</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mppp3powEDaRK1TRK1U" title="mppp::pow::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">pow</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mppp3powEDaRK1TRK1U" title="mppp::pow::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mppp3powEDaRK1TRK1U" title="mppp::pow::U"><span class="n"><span class="pre">U</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mppp3powEDaRK1TRK1U" title="Permalink to this definition">#</a><br /></dt>
@@ -1675,16 +1407,16 @@ floating-point or complex value. Otherwise, the result will be a <a class="refer
 of numerator and denominator. Thus, if <em>y</em> is a rational value, the exponentiation will be successful
 only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the base.</p></li>
 <li><p><strong>y</strong> – the exponent.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(x^y\)</span>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">mppp</span><span class="p">::</span><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><span class="n">zero_division_error</span></a></span></span> – if floating-point or complex types are not involved, and
 <em>x</em> is zero and <em>y</em> negative.</p></li>
@@ -1697,23 +1429,23 @@ in a handful of special cases).</p></li>
 
 </section>
 <section id="input-output">
-<span id="rational-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">#</a></h3>
+<span id="rational-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3I_NSt6size_tEEN4mppplsERNSt7ostreamERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppplsERNSt7ostreamERKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;&lt;</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp8rationalI5SSizeEE" title="mppp::operator&lt;&lt;::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Stream insertion operator.</p>
 <p>This function will direct to the output stream <em>os</em> the input <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> <em>q</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>os</strong> – the output stream.</p></li>
 <li><p><strong>q</strong> – the input <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>os</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">overflow_error</span></span></span> – in case of (unlikely) overflow errors.</p></li>
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception raised by the public interface of <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code> or by memory allocation errors.</p></li>
@@ -1724,7 +1456,7 @@ in a handful of special cases).</p></li>
 
 </section>
 <section id="other">
-<span id="rational-other"></span><h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">#</a></h3>
+<span id="rational-other"></span><h3>Other<a class="headerlink" href="#other" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tEEN4mppp12canonicaliseERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp12canonicaliseERN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp12canonicaliseERN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp12canonicaliseERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="mppp::canonicalise::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">canonicalise</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp12canonicaliseERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="mppp::canonicalise::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp12canonicaliseERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
@@ -1732,10 +1464,10 @@ in a handful of special cases).</p></li>
 <p>This function will put <em>rop</em> in canonical form. Internally, this function will employ
 <a class="reference internal" href="#_CPPv4N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::canonicalise()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rop</strong> – the rational that will be canonicalised.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -1749,10 +1481,10 @@ in a handful of special cases).</p></li>
 <p>A <a class="reference internal" href="#rational-std-specialisations"><span class="std std-ref">specialisation</span></a> of the standard <code class="docutils literal notranslate"><span class="pre">std::hash</span></code> functor is also provided, so
 that it is possible to use <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> in standard unordered associative containers out of the box.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the rational whose hash value will be computed.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a hash value for <em>q</em>.</p>
 </dd>
 </dl>
@@ -1761,7 +1493,7 @@ that it is possible to use <a class="reference internal" href="#_CPPv4I_NSt6size
 </section>
 </section>
 <section id="mathematical-operators">
-<span id="rational-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">#</a></h2>
+<span id="rational-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this heading">#</a></h2>
 <p>Overloaded operators are provided for convenience. Their interface is generic,
 and their implementation
 is typically built on top of basic <a class="reference internal" href="#rational-functions"><span class="std std-ref">functions</span></a>.</p>
@@ -1775,10 +1507,10 @@ is typically built on top of basic <a class="reference internal" href="#rational
 <span id="_CPPv3I_NSt6size_tEEN4mpppmiERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mpppmiERKN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mpppmiEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::operator-::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mpppmiEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="mppp::operator-::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppmiEN4mppp8rationalI5SSizeEERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Identity and negation operators.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(q\)</span> and <span class="math notranslate nohighlight">\(-q\)</span> respectively.</p>
 </dd>
 </dl>
@@ -1817,16 +1549,16 @@ type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the operation.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">mppp</span><span class="p">::</span><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><span class="n">zero_division_error</span></a></span></span> – if, in a division not involving floating-point or complex values,
 <em>y</em> is zero.</p>
 </dd>
@@ -1860,16 +1592,16 @@ type of the result is floating-point or complex; otherwise,</p></li>
 <li><p><span class="math notranslate nohighlight">\(\frac{x}{y}\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>x</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">mppp</span><span class="p">::</span><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><span class="n">zero_division_error</span></a></span></span> – if, in a division not involving floating-point or complex values,
 <em>y</em> is zero.</p></li>
@@ -1890,10 +1622,10 @@ of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 <span id="_CPPv3I_NSt6size_tEEN4mpppmmERN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mpppmmERN4mppp8rationalI5SSizeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mpppmmERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="mppp::operator--::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">--</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mpppmmERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="mppp::operator--::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppmmERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Prefix increment/decrement.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>q</em> after the increment/decrement.</p>
 </dd>
 </dl>
@@ -1909,10 +1641,10 @@ of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 <span id="_CPPv3I_NSt6size_tEEN4mpppmmERN4mppp8rationalI5SSizeEEi"></span><span id="_CPPv2I_NSt6size_tEEN4mpppmmERN4mppp8rationalI5SSizeEEi"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mpppmmEN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEEi" title="mppp::operator--::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">--</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mpppmmEN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEEi" title="mppp::operator--::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q</span></span>, <span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppmmEN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEEi" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Suffix increment/decrement.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a copy of <em>q</em> before the increment/decrement.</p>
 </dd>
 </dl>
@@ -1948,13 +1680,13 @@ of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 <span id="_CPPv3I0_N4mppp17rational_op_typesI1TEEEN4mpppgeERK1TRK1U"></span><span id="_CPPv2I0_N4mppp17rational_op_typesI1TEEEN4mpppgeERK1TRK1U"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I00EN4mppp17rational_op_typesE" title="mppp::rational_op_types"><span class="n"><span class="pre">rational_op_types</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mpppgeEbRK1TRK1U" title="mppp::operator&gt;=::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mpppgeEbRK1TRK1U" title="mppp::operator&gt;=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">op1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mpppgeEbRK1TRK1U" title="mppp::operator&gt;=::U"><span class="n"><span class="pre">U</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">op2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp17rational_op_typesI1TEEEN4mpppgeEbRK1TRK1U" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Binary comparison operators.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>op1</strong> – first argument.</p></li>
 <li><p><strong>op2</strong> – second argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the comparison.</p>
 </dd>
 </dl>
@@ -1962,7 +1694,7 @@ of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 
 </section>
 <section id="standard-library-specialisations">
-<span id="rational-std-specialisations"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this headline">#</a></h2>
+<span id="rational-std-specialisations"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this heading">#</a></h2>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I_NSt6size_tEENSt4hashIN4mppp8rationalI5SSizeEEEE">
 <span id="_CPPv3I_NSt6size_tEENSt4hashIN4mppp8rationalI5SSizeEEEE"></span><span id="_CPPv2I_NSt6size_tEENSt4hashIN4mppp8rationalI5SSizeEEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SSize</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">hash</span></span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEENSt4hashIN4mppp8rationalI5SSizeEEEE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I_NSt6size_tEENSt4hashIN4mppp8rationalI5SSizeEEEE" title="Permalink to this definition">#</a><br /></dt>
@@ -1985,10 +1717,10 @@ of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 <dt class="sig sig-object cpp" id="_CPPv4NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE"></span><span id="std::hash:mppp::rational:SSize::::call-operator__mppp::rational:SSize:CRC"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><span class="n"><span class="pre">rational</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tEENSt4hashIN4mppp8rationalI5SSizeEEEE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::SSize"><span class="n"><span class="pre">SSize</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">q</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>q</strong> – the input <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::rational</span></code></a>.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a hash value for <em>q</em>.</p>
 </dd>
 </dl>
@@ -1998,7 +1730,7 @@ of <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8rationalE" ti
 
 </section>
 <section id="user-defined-literals">
-<span id="rational-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">#</a></h2>
+<span id="rational-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this heading">#</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
 </div>
@@ -2027,7 +1759,7 @@ can be constructed via these literals.</p>
 <p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the input sequence of characters is not
 a valid integer literal (as defined by the C++ standard).</p>
 </dd>
@@ -2038,50 +1770,117 @@ a valid integer literal (as defined by the C++ standard).</p>
 </section>
 
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="integer.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Multiprecision integers</p>
-        </div>
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="integer.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Multiprecision integers</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="real128.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="real128.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Quadruple-precision floats</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rational-class">The rational class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types">Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concepts">Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#assignment">Assignment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion">Conversion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic">Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">Comparison</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#number-theoretic-functions">Number theoretic functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponentiation">Exponentiation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-output">Input/Output</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-operators">Mathematical operators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-library-specialisations">Standard library specialisations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-defined-literals">User-defined literals</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
   
-    By Francesco Biscani<br/>
-  
-      &copy; Copyright 2016-2021, Francesco Biscani.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
+<p class="component-author">
+By Francesco Biscani
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2016-2021, Francesco Biscani.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
 </div>
+          </footer>
+        
 
-
-      </div>
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>

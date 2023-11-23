@@ -1,720 +1,416 @@
 
+
 <!DOCTYPE html>
 
-<html lang="en">
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Multiprecision complex numbers &#8212; mp++ 0.27 documentation</title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'complex';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Utility functions" href="utilities.html" />
     <link rel="prev" title="Multiprecision floats" href="real.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
     
-    <div class="container-fluid" id="banner"></div>
-
     
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
 
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="index.html">
-      
-      
-      
-      <h1 class="site-logo" id="site-title">mp++ 0.27 documentation</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mp++ 0.27 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="installation.html">
-   Installation
-  </a>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="tutorial.html">
-   Tutorial
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_prelim.html">
-     Preliminaries
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_constr.html">
-     Construction, conversion and assignment
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_io.html">
-     Input and output
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_numtower.html">
-     The numerical tower and type coercion
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_commonops.html">
-     Common operators
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_api.html">
-     API overview
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_integer.html">
-     Integer tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_rational.html">
-     Rational tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_real128.html">
-     Quadruple-precision float tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_complex128.html">
-     Quadruple-precision complex numbers tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_real.html">
-     Multiprecision float tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_complex.html">
-     Multiprecision complex numbers tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_boost_s11n.html">
-     Boost.serialization support
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_pybind11.html">
-     Extra: integration with pybind11
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="interactive_notebooks.html">
-   Interactive notebooks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_basics.html">
-     Integer basics
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_formatted_output.html">
-     Integer formatted output
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_arithmetic.html">
-     Integer arithmetic
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_comparison.html">
-     Integer comparison
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
-     Integer logic and bit fiddling
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_s11n.html">
-     Integer serialisation
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/real_basics.html">
-     Real basics
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="reference.html">
-   Reference
-  </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="current">
-   <li class="toctree-l2">
-    <a class="reference internal" href="definitions.html">
-     Macros and definitions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="namespaces.html">
-     Namespaces
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="exceptions.html">
-     Exceptions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="concepts.html">
-     Common concepts
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="integer.html">
-     Multiprecision integers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="rational.html">
-     Multiprecision rationals
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="real128.html">
-     Quadruple-precision floats
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="complex128.html">
-     Quadruple-precision complex numbers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="real.html">
-     Multiprecision floats
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     Multiprecision complex numbers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="utilities.html">
-     Utility functions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="fwd_decl.html">
-     Forward declarations
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="benchmarks.html">
-   Benchmarks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="integer_benchmarks.html">
-     Integer benchmarks
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="changelog.html">
-   Changelog
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_constr.html">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex128.html">Quadruple-precision complex numbers tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex.html">Multiprecision complex numbers tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_boost_s11n.html">Boost.serialization support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="interactive_notebooks.html">Interactive notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_basics.html">Integer basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_formatted_output.html">Integer formatted output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_arithmetic.html">Integer arithmetic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_comparison.html">Integer comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_bit_fiddling.html">Integer logic and bit fiddling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_s11n.html">Integer serialisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/real_basics.html">Real basics</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="reference.html">Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex128.html">Quadruple-precision complex numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Multiprecision complex numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fwd_decl.html">Forward declarations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="benchmarks.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="integer_benchmarks.html">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/bluescarni/mppp" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Fcomplex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
 </div>
 
 
-          
-
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
-<div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
 
 
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/complex.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
   </span>
-
-</label>
-
-        
-    </div>
-    <div class="header-article__right">
-<button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
   <i class="fas fa-expand"></i>
   </span>
 
 </button>
 
-<div class="menu-dropdown menu-dropdown-repository-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Source repositories">
-      <i class="fab fa-github"></i>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://github.com/bluescarni/mppp"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Source repository"
->
-  
+`);
+</script>
 
-<span class="headerbtn__icon-container">
-  <i class="fab fa-github"></i>
-  </span>
-<span class="headerbtn__text-container">repository</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Fcomplex.html&body=Your%20issue%20content%20here."
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Open an issue"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-lightbulb"></i>
-  </span>
-<span class="headerbtn__text-container">open issue</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="_sources/complex.rst.txt"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="headerbtn__text-container">.rst</span>
-</a>
-
-      </li>
-      
-      <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="headerbtn__text-container">.pdf</span>
-</button>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
-
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-complex-class">
-   The complex class
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types">
-   Types
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#concepts">
-   Concepts
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#functions">
-   Functions
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#components-access">
-     Components access
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#precision-handling">
-     Precision handling
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#assignment">
-     Assignment
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#conversion">
-     Conversion
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#arithmetic">
-     Arithmetic
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#comparison">
-     Comparison
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#roots">
-     Roots
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#exponentiation">
-     Exponentiation
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#trigonometry">
-     Trigonometry
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#hyperbolic-functions">
-     Hyperbolic functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#logarithms-and-exponentials">
-     Logarithms and exponentials
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#arithmetic-geometric-mean">
-     Arithmetic-geometric mean
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-output">
-     Input/Output
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#mathematical-operators">
-   Mathematical operators
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#user-defined-literals">
-   User-defined literals
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Multiprecision complex numbers</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-complex-class">
-   The complex class
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types">
-   Types
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#concepts">
-   Concepts
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#functions">
-   Functions
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#components-access">
-     Components access
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#precision-handling">
-     Precision handling
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#assignment">
-     Assignment
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#conversion">
-     Conversion
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#arithmetic">
-     Arithmetic
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#comparison">
-     Comparison
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#roots">
-     Roots
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#exponentiation">
-     Exponentiation
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#trigonometry">
-     Trigonometry
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#hyperbolic-functions">
-     Hyperbolic functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#logarithms-and-exponentials">
-     Logarithms and exponentials
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#arithmetic-geometric-mean">
-     Arithmetic-geometric mean
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-output">
-     Input/Output
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#mathematical-operators">
-   Mathematical operators
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#user-defined-literals">
-   User-defined literals
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Multiprecision complex numbers</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complex-class">The complex class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types">Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concepts">Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#components-access">Components access</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#precision-handling">Precision handling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#assignment">Assignment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion">Conversion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic">Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">Comparison</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#roots">Roots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponentiation">Exponentiation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trigonometry">Trigonometry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperbolic-functions">Hyperbolic functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic-geometric-mean">Arithmetic-geometric mean</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-output">Input/Output</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-operators">Mathematical operators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-defined-literals">User-defined literals</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section id="multiprecision-complex-numbers">
-<h1>Multiprecision complex numbers<a class="headerlink" href="#multiprecision-complex-numbers" title="Permalink to this headline">#</a></h1>
+<h1>Multiprecision complex numbers<a class="headerlink" href="#multiprecision-complex-numbers" title="Permalink to this heading">#</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The functionality described in this section is available only if mp++ was configured
@@ -725,7 +421,7 @@ with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_
 </div>
 <p><em>#include &lt;mp++/complex.hpp&gt;</em></p>
 <section id="the-complex-class">
-<h2>The complex class<a class="headerlink" href="#the-complex-class" title="Permalink to this headline">#</a></h2>
+<h2>The complex class<a class="headerlink" href="#the-complex-class" title="Permalink to this heading">#</a></h2>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp7complexE">
 <span id="_CPPv3N4mppp7complexE"></span><span id="_CPPv2N4mppp7complexE"></span><span id="mppp::complex"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">complex</span></span></span><a class="headerlink" href="#_CPPv4N4mppp7complexE" title="Permalink to this definition">#</a><br /></dt>
@@ -745,7 +441,7 @@ is that in operations involving <a class="reference internal" href="#_CPPv4N4mpp
 by the precision of the operands, whereas in MPC the precision of the operation is determined by the precision
 of the return value (which is always passed as the first function parameter in the MPC API). For instance,
 in the following code,</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">complex</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">complex_prec_t</span><span class="p">(</span><span class="mi">200</span><span class="p">)}</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">complex_prec_t</span><span class="p">(</span><span class="mi">150</span><span class="p">)};</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">complex</span><span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">complex_prec_t</span><span class="p">(</span><span class="mi">200</span><span class="p">)}</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">real</span><span class="p">{</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">complex_prec_t</span><span class="p">(</span><span class="mi">150</span><span class="p">)};</span>
 </pre></div>
 </div>
 <p>the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
@@ -763,11 +459,11 @@ the desired precision value.</p>
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#complex-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding MPC functions minus the leading <code class="docutils literal notranslate"><span class="pre">mpc_</span></code>
 prefix. For instance, the MPC call</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpc_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">MPC_RNDNN</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpc_add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">MPC_RNDNN</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>that writes the result of <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code>, rounded to nearest, into <code class="docutils literal notranslate"><span class="pre">rop</span></code>, becomes simply</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">add</span><span class="p">(</span><span class="n">rop</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function is resolved via argument-dependent lookup. Function calls with overlapping arguments
@@ -802,7 +498,7 @@ the value returned by <a class="reference internal" href="real.html#_CPPv4N4mppp
 destruction, copy/move assignment and the invocation of the <a class="reference internal" href="#_CPPv4NK4mppp7complex8is_validEv" title="mppp::complex::is_valid"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">is_valid()</span></code></a>
 member function. After re-assignment, <em>other</em> can be used normally again.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> – the construction argument.</p>
 </dd>
 </dl>
@@ -824,13 +520,13 @@ otherwise the value will be copied exactly.</p>
 destruction, copy/move assignment and the invocation of the <a class="reference internal" href="#_CPPv4NK4mppp7complex8is_validEv" title="mppp::complex::is_valid"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">is_valid()</span></code></a>
 member function. After re-assignment, <em>other</em> can be used normally again.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>other</strong> – the construction argument.</p></li>
 <li><p><strong>p</strong> – the desired precision.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>p</em> is outside the range established by
 <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_minEv" title="mppp::real_prec_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_min()</span></code></a> and <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_maxEv" title="mppp::real_prec_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_max()</span></code></a>.</p>
 </dd>
@@ -862,13 +558,13 @@ following the same
 heuristics described in the generic constructor of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>).</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the construction argument.</p></li>
 <li><p><strong>p</strong> – the desired precision.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception raised by the invoked <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 constructor.</p>
 </dd>
@@ -892,14 +588,14 @@ of <em>x</em> and <em>y</em>. The precision deduction rules are the same explain
 constructors of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>. If <em>x</em> and/or <em>y</em> are <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>,
 the deduced precision is the output of <a class="reference internal" href="real.html#_CPPv4NK4mppp4real8get_precEv" title="mppp::real::get_prec"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::get_prec()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the real part of the value that will be used for the initialisation.</p></li>
 <li><p><strong>y</strong> – the imaginary part of the value that will be used for the initialisation.</p></li>
 <li><p><strong>p</strong> – the desired precision.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception raised by the invoked <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 constructor.</p>
 </dd>
@@ -932,14 +628,14 @@ are described in the documentation of the constructor from string of
 <p>The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be set to <em>p</em>.</p>
 <p>The second constructor calls the first one with a <em>base</em> value of 10.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>s</strong> – the input string.</p></li>
 <li><p><strong>base</strong> – the base used in the string representation.</p></li>
 <li><p><strong>p</strong> – the desired precision.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>base</em> is not zero and not in the
 <span class="math notranslate nohighlight">\(\left[ 2,62 \right]\)</span> range, or <em>s</em> cannot be interpreted as a complex number.</p></li>
@@ -965,7 +661,7 @@ which is interpreted as the string representation of a complex value in base <co
 string terminator, and invoke the constructor from string, base and precision.</p>
 <p>The second constructor calls the first one with a <em>base</em> value of 10.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>begin</strong> – the start of the input range.</p></li>
 <li><p><strong>end</strong> – the end of the input range.</p></li>
@@ -973,7 +669,7 @@ string terminator, and invoke the constructor from string, base and precision.</
 <li><p><strong>p</strong> – the desired precision.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the constructor from string, or by memory
 allocation errors in standard containers.</p>
 </dd>
@@ -996,7 +692,7 @@ and <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_maxEv"
 </ul>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the <a class="reference internal" href="#_CPPv45mpc_t" title="mpc_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpc_t</span></code></a> that will be deep-copied.</p>
 </dd>
 </dl>
@@ -1025,7 +721,7 @@ will take care of releasing them when the destructor is called.</p>
 <p>Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the <a class="reference internal" href="#_CPPv45mpc_t" title="mpc_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpc_t</span></code></a> that will be moved.</p>
 </dd>
 </dl>
@@ -1048,10 +744,10 @@ will take care of releasing them when the destructor is called.</p>
 <span id="_CPPv3N4mppp7complexaSERR7complex"></span><span id="_CPPv2N4mppp7complexaSERR7complex"></span><span id="mppp::complex::assign-operator__complexRR"></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N4mppp7complexaSERR7complex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Copy and move assignment operators.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1064,13 +760,13 @@ will take care of releasing them when the destructor is called.</p>
 <p>The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be set according to the same
 heuristics described in the generic constructor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the generic assignment operator
 of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
 </dd>
@@ -1093,10 +789,10 @@ and <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_maxEv"
 </ul>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1125,10 +821,10 @@ will take care of releasing them when the destructor is called.</p>
 <p>Due to a compiler bug, this operator is not available on Microsoft Visual Studio.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1143,7 +839,7 @@ as an argument to the move constructor, or after the extraction
 of the real/imaginary parts via the move overload
 of <a class="reference internal" href="#_CPPv4N4mppp13get_real_imagERKN4mppp7complexE" title="mppp::get_real_imag"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_real_imag()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is valid, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
 </dl>
@@ -1160,10 +856,10 @@ assignment, and a rounding might occur, depending on the values
 and the precisions of the operands.</p>
 <p>This function is a thin wrapper around the <code class="docutils literal notranslate"><span class="pre">mpc_set()</span></code> assignment function from the MPC API.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>other</strong> – the value to which <code class="docutils literal notranslate"><span class="pre">this</span></code> will be set.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1178,10 +874,10 @@ the precision of the assignment is dictated by the precision of <code class="doc
 being deduced from the type and value of <em>x</em>. Consequently, the precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered
 by the assignment, and a rounding might occur, depending on the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the value to which <code class="docutils literal notranslate"><span class="pre">this</span></code> will be set.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1201,16 +897,16 @@ precision of <code class="docutils literal notranslate"><span class="pre">this</
 <p>If <em>s</em> is not a valid representation of a complex number in base <em>base</em>, the real and imaginary
 parts of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be set to NaN and an error will be raised.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>s</strong> – the string to which <code class="docutils literal notranslate"><span class="pre">this</span></code> will be set.</p></li>
 <li><p><strong>base</strong> – the base used in the string representation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>s</em> cannot be parsed as a complex value, or if the value
 of <em>base</em> is invalid.</p></li>
@@ -1229,17 +925,17 @@ which is interpreted as the string representation of a complex value in base <em
 <p>Internally, the setter will copy the content of the range to a local buffer, add a
 string terminator, and invoke the setter to string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>begin</strong> – the start of the input range.</p></li>
 <li><p><strong>end</strong> – the end of the input range.</p></li>
 <li><p><strong>base</strong> – the base used in the string representation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the setter to string, or by memory
 allocation errors in standard containers.</p>
 </dd>
@@ -1267,10 +963,10 @@ and <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_maxEv"
 </ul>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1283,7 +979,7 @@ and <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_maxEv"
 <p>This member function will set both the real and imaginary parts of <code class="docutils literal notranslate"><span class="pre">this</span></code>
 to NaN.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1311,7 +1007,7 @@ within the bounds established by <a class="reference internal" href="real.html#_
 object must contain a valid <a class="reference internal" href="#_CPPv45mpc_t" title="mpc_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpc_t</span></code></a> object.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a const or mutable pointer to the internal MPC structure.</p>
 </dd>
 </dl>
@@ -1350,7 +1046,7 @@ numbers),</p></li>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inf_p()</span></code> and <code class="docutils literal notranslate"><span class="pre">number_p()</span></code> functions.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the result of the detection.</p>
 </dd>
 </dl>
@@ -1361,7 +1057,7 @@ numbers),</p></li>
 <span id="_CPPv3NK4mppp7complex8get_precEv"></span><span id="_CPPv2NK4mppp7complex8get_precEv"></span><span id="mppp::complex::get_precC"></span><a class="reference internal" href="real.html#_CPPv411mpfr_prec_t" title="mpfr_prec_t"><span class="n"><span class="pre">mpfr_prec_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_prec</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4mppp7complex8get_precEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Precision getter.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the precision of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1374,13 +1070,13 @@ numbers),</p></li>
 <p>This member function will set the precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> to exactly <em>p</em> bits. The value
 of the real and imaginary parts of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be set to NaN.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> – the desired precision.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>p</em> is outside the range established by
 <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_minEv" title="mppp::real_prec_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_min()</span></code></a> and <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_maxEv" title="mppp::real_prec_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_max()</span></code></a>.</p>
 </dd>
@@ -1395,13 +1091,13 @@ of the real and imaginary parts of <code class="docutils literal notranslate"><s
 is smaller than the current precision of <code class="docutils literal notranslate"><span class="pre">this</span></code>, a rounding operation will be performed,
 otherwise the current value will be preserved exactly.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>p</strong> – the desired precision.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>p</em> is outside the range established by
 <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_minEv" title="mppp::real_prec_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_min()</span></code></a> and <a class="reference internal" href="real.html#_CPPv4N4mppp13real_prec_maxEv" title="mppp::real_prec_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real_prec_max()</span></code></a>.</p>
 </dd>
@@ -1422,10 +1118,10 @@ a domain error will be raised.</p>
 <p>Conversion to complex-valued <a class="reference internal" href="#_CPPv4I0EN4mppp19complex_convertibleE" title="mppp::complex_convertible"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">complex_convertible</span></code></a> types
 is also implemented on top of the conversion operator of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to <code class="docutils literal notranslate"><span class="pre">T</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">domain_error</span></span></span> – if <code class="docutils literal notranslate"><span class="pre">T</span></code> is a real-valued type other than <code class="docutils literal notranslate"><span class="pre">bool</span></code> and
 the imaginary part of <code class="docutils literal notranslate"><span class="pre">this</span></code> is not zero.</p></li>
@@ -1445,10 +1141,10 @@ from the conversion operator, this function does not raise any exception: if the
 function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails,
 <em>rop</em> will not be altered.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rop</strong> – the variable which will store the result of the conversion.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail in the ways
 specified in the documentation of the conversion operator.</p>
 </dd>
@@ -1463,13 +1159,13 @@ specified in the documentation of the conversion operator.</p>
 to produce exactly the original value when used in one of the constructors from string of
 <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> (provided that the original precision and base are used in the construction).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>base</strong> – the base to be used for the string representation.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to a string.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by <a class="reference internal" href="real.html#_CPPv4NK4mppp4real9to_stringEi" title="mppp::real::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real::to_string()</span></code></a>.</p>
 </dd>
 </dl>
@@ -1491,13 +1187,13 @@ necessary to ensure that the current value of <code class="docutils literal notr
 can be recovered exactly from
 a string representation in the given <em>base</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>base</strong> – the base to be used for the string representation.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the minimum number of digits necessary for round-tripping.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>base</em> is not in the <span class="math notranslate nohighlight">\(\left[ 2,62 \right]\)</span> range.</p>
 </dd>
 </dl>
@@ -1516,7 +1212,7 @@ a string representation in the given <em>base</em>.</p>
 destruction, copy/move assignment and the invocation of the <a class="reference internal" href="#_CPPv4NK4mppp7complex8is_validEv" title="mppp::complex::is_valid"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">is_valid()</span></code></a>
 member function. After re-assignment, <code class="docutils literal notranslate"><span class="pre">this</span></code> can be used normally again.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a pair containing the real and imaginary parts of <code class="docutils literal notranslate"><span class="pre">this</span></code>, represented
 as <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects.</p>
 </dd>
@@ -1552,7 +1248,7 @@ wrappers to the real and imaginary parts of <code class="docutils literal notran
 and <a class="reference internal" href="#_CPPv4N4mppp7complex6im_refE" title="mppp::complex::im_ref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">im_ref</span></code></a> for information on how to
 use these classes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a <code class="docutils literal notranslate"><span class="pre">const</span></code> or mutable reference wrapper to the real or
 imaginary part of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
@@ -1627,10 +1323,10 @@ of the C99 standard when <code class="docutils literal notranslate"><span class=
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -1663,10 +1359,10 @@ of the C99 standard when <code class="docutils literal notranslate"><span class=
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -1695,7 +1391,7 @@ fails because of (unlikely) overflow conditions.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1741,7 +1437,7 @@ fails because of (unlikely) overflow conditions.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1787,7 +1483,7 @@ fails because of (unlikely) overflow conditions.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1809,10 +1505,10 @@ configured with the <code class="docutils literal notranslate"><span class="pre"
 <span class="math notranslate nohighlight">\(\operatorname{agm}\left( 1, z \right)\)</span>,
 where <span class="math notranslate nohighlight">\(z\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -1823,7 +1519,7 @@ fails because of (unlikely) overflow conditions.</p>
 
 </section>
 <section id="types">
-<h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">#</a></h2>
+<h2>Types<a class="headerlink" href="#types" title="Permalink to this heading">#</a></h2>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv45mpc_t">
 <span id="_CPPv35mpc_t"></span><span id="_CPPv25mpc_t"></span><span id="mpc_t"></span><span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mpc_t</span></span></span><a class="headerlink" href="#_CPPv45mpc_t" title="Permalink to this definition">#</a><br /></dt>
@@ -1848,7 +1544,7 @@ The MPC type <a class="reference internal" href="#_CPPv45mpc_t" title="mpc_t"><c
 
 </section>
 <section id="concepts">
-<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">#</a></h2>
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this heading">#</a></h2>
 <dl class="cpp concept">
 <dt class="sig sig-object cpp" id="_CPPv4I0EN4mppp11cvr_complexE">
 <span id="_CPPv3I0EN4mppp11cvr_complexE"></span><span id="_CPPv2I0EN4mppp11cvr_complexE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">concept</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">cvr_complex</span></span></span><a class="headerlink" href="#_CPPv4I0EN4mppp11cvr_complexE" title="Permalink to this definition">#</a><br /></dt>
@@ -1901,7 +1597,7 @@ or cv qualified.</p>
 <dd><p>This concept is satisfied if the types in the parameter pack <code class="docutils literal notranslate"><span class="pre">Args</span></code>
 can be used as argument types in one of the <a class="reference internal" href="#_CPPv4N4mppp7complex3setERK7complex" title="mppp::complex::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex::set()</span></code></a> member function overloads.
 In other words, this concept is satisfied if the expression</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
 </pre></div>
 </div>
 <p>is valid (where <code class="docutils literal notranslate"><span class="pre">c</span></code> is a non-const <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> and <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code>, etc. are const
@@ -1947,9 +1643,9 @@ of reference, is not const.</p>
 
 </section>
 <section id="functions">
-<span id="complex-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">#</a></h2>
+<span id="complex-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h2>
 <section id="components-access">
-<span id="complex-components-access"></span><h3>Components access<a class="headerlink" href="#components-access" title="Permalink to this headline">#</a></h3>
+<span id="complex-components-access"></span><h3>Components access<a class="headerlink" href="#components-access" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp13get_real_imagERKN4mppp7complexE">
 <span id="_CPPv3N4mppp13get_real_imagERKN4mppp7complexE"></span><span id="_CPPv2N4mppp13get_real_imagERKN4mppp7complexE"></span><span id="mppp::get_real_imag__mppp::complexCR"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><span class="n"><span class="pre">real</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_real_imag</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp13get_real_imagERKN4mppp7complexE" title="Permalink to this definition">#</a><br /></dt>
@@ -1963,10 +1659,10 @@ of reference, is not const.</p>
 destruction, copy/move assignment and the invocation of the <a class="reference internal" href="#_CPPv4NK4mppp7complex8is_validEv" title="mppp::complex::is_valid"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">is_valid()</span></code></a>
 member function. After re-assignment, <em>c</em> can be used normally again.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input parameter.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a pair containing the real and imaginary parts of <em>c</em>, represented
 as <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects.</p>
 </dd>
@@ -1983,18 +1679,18 @@ an instance of this class can be used to perform read-only operations
 on the real part of the <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> number
 via the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API.</p>
 <p>Here’s a typical usage pattern:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex</span><span class="w"> </span><span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex</span><span class="w"> </span><span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span>
 
-<span class="p">{</span><span class="w"></span>
+<span class="p">{</span>
 <span class="w">   </span><span class="c1">// Place the re_cref object in a new scope</span>
 <span class="w">   </span><span class="c1">// in order to minimise its lifetime.</span>
-<span class="w">   </span><span class="n">complex</span><span class="o">::</span><span class="n">re_cref</span><span class="w"> </span><span class="n">re</span><span class="p">{</span><span class="n">c</span><span class="p">};</span><span class="w"></span>
+<span class="w">   </span><span class="n">complex</span><span class="o">::</span><span class="n">re_cref</span><span class="w"> </span><span class="n">re</span><span class="p">{</span><span class="n">c</span><span class="p">};</span>
 
 <span class="w">   </span><span class="c1">// We can use &#39;re&#39; as-if it was a pointer</span>
 <span class="w">   </span><span class="c1">// to an mppp::real.</span>
-<span class="w">   </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;The real part of c is &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">re</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="w">   </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Is the real part of c one? &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">re</span><span class="o">-&gt;</span><span class="n">is_one</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">   </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;The real part of c is &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">re</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="w">   </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Is the real part of c one? &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">re</span><span class="o">-&gt;</span><span class="n">is_one</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>Because <a class="reference internal" href="#_CPPv4N4mppp7complex7re_crefE" title="mppp::complex::re_cref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">re_cref</span></code></a> shares data
@@ -2031,7 +1727,7 @@ the amount of typing).</p>
 <p>This is the only constructor available for a <a class="reference internal" href="#_CPPv4N4mppp7complex7re_crefE" title="mppp::complex::re_cref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">re_cref</span></code></a>
 object. It will create a reference to the real part of <em>c</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>.</p>
 </dd>
 </dl>
@@ -2070,7 +1766,7 @@ object. It will create a reference to the real part of <em>c</em>.</p>
 <p>These operators allow to interact with a <a class="reference internal" href="#_CPPv4N4mppp7complex7re_crefE" title="mppp::complex::re_cref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">re_cref</span></code></a>
 as-if it was a <code class="docutils literal notranslate"><span class="pre">const</span></code> pointer to a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a <code class="docutils literal notranslate"><span class="pre">const</span></code> reference/pointer to a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> object.</p>
 </dd>
 </dl>
@@ -2094,17 +1790,17 @@ an instance of this class can be used to perform non-<code class="docutils liter
 on the real part of the <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> number
 via the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API.</p>
 <p>Here’s a typical usage pattern:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex</span><span class="w"> </span><span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">complex</span><span class="w"> </span><span class="n">c</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span>
 
-<span class="p">{</span><span class="w"></span>
+<span class="p">{</span>
 <span class="w">   </span><span class="c1">// Place the re_ref object in a new scope</span>
 <span class="w">   </span><span class="c1">// in order to minimise its lifetime.</span>
-<span class="w">   </span><span class="n">complex</span><span class="o">::</span><span class="n">re_ref</span><span class="w"> </span><span class="n">re</span><span class="p">{</span><span class="n">c</span><span class="p">};</span><span class="w"></span>
+<span class="w">   </span><span class="n">complex</span><span class="o">::</span><span class="n">re_ref</span><span class="w"> </span><span class="n">re</span><span class="p">{</span><span class="n">c</span><span class="p">};</span>
 
 <span class="w">   </span><span class="c1">// We can use &#39;re&#39; as-if it was a pointer</span>
 <span class="w">   </span><span class="c1">// to an mppp::real.</span>
-<span class="w">   </span><span class="o">*</span><span class="n">re</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">   </span><span class="o">*</span><span class="n">re</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<span class="p">}</span>
 
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;c is now: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Will print &#39;(6.000..., 2.000...)&#39;.</span>
 </pre></div>
@@ -2160,7 +1856,7 @@ the amount of typing).</p>
 <p>This is the only constructor available for a <a class="reference internal" href="#_CPPv4N4mppp7complex6re_refE" title="mppp::complex::re_ref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">re_ref</span></code></a>
 object. It will take ownership of the real part of a <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>.</p>
 </dd>
 </dl>
@@ -2207,7 +1903,7 @@ from which the <a class="reference internal" href="#_CPPv4N4mppp7complex6re_refE
 <p>These operators allow to interact with a <a class="reference internal" href="#_CPPv4N4mppp7complex6re_refE" title="mppp::complex::re_ref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">re_ref</span></code></a>
 as-if it was a pointer to a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference/pointer to a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> object.</p>
 </dd>
 </dl>
@@ -2251,10 +1947,10 @@ wrappers to the real and imaginary parts of <em>c</em>.</p>
 and <a class="reference internal" href="#_CPPv4N4mppp7complex6im_refE" title="mppp::complex::im_ref"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">im_ref</span></code></a> for information on how to
 use these classes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input parameter.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a <code class="docutils literal notranslate"><span class="pre">const</span></code> or mutable reference wrapper to the real or
 imaginary part of <em>c</em>.</p>
 </dd>
@@ -2263,16 +1959,16 @@ imaginary part of <em>c</em>.</p>
 
 </section>
 <section id="precision-handling">
-<h3>Precision handling<a class="headerlink" href="#precision-handling" title="Permalink to this headline">#</a></h3>
+<h3>Precision handling<a class="headerlink" href="#precision-handling" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp8get_precERKN4mppp7complexE">
 <span id="_CPPv3N4mppp8get_precERKN4mppp7complexE"></span><span id="_CPPv2N4mppp8get_precERKN4mppp7complexE"></span><span id="mppp::get_prec__mppp::complexCR"></span><a class="reference internal" href="real.html#_CPPv411mpfr_prec_t" title="mpfr_prec_t"><span class="n"><span class="pre">mpfr_prec_t</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_prec</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8get_precERKN4mppp7complexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get the precision of a <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the precision of <em>c</em>.</p>
 </dd>
 </dl>
@@ -2292,13 +1988,13 @@ of <em>c</em> will be set to NaN.</p>
 <p>The second variant will preserve the current value of <em>c</em>, performing
 a rounding operation if <em>p</em> is less than the current precision of <em>c</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>c</strong> – the input argument.</p></li>
 <li><p><strong>p</strong> – the desired precision.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by <a class="reference internal" href="#_CPPv4N4mppp7complex8set_precE11mpfr_prec_t" title="mppp::complex::set_prec"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex::set_prec()</span></code></a>
 or <a class="reference internal" href="#_CPPv4N4mppp7complex10prec_roundE11mpfr_prec_t" title="mppp::complex::prec_round"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex::prec_round()</span></code></a>.</p>
 </dd>
@@ -2307,7 +2003,7 @@ or <a class="reference internal" href="#_CPPv4N4mppp7complex10prec_roundE11mpfr_
 
 </section>
 <section id="assignment">
-<h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">#</a></h3>
+<h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_DpN4mppp16complex_set_argsEEN4mppp3setERN4mppp7complexERN4mppp7complexEDpRK4Args">
 <span id="_CPPv3I_DpN4mppp16complex_set_argsEEN4mppp3setERN4mppp7complexEDpRK4Args"></span><span id="_CPPv2I_DpN4mppp16complex_set_argsEEN4mppp3setERN4mppp7complexEDpRK4Args"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4IDpEN4mppp16complex_set_argsE" title="mppp::complex_set_args"><span class="n"><span class="pre">complex_set_args</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Args</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_DpN4mppp16complex_set_argsEEN4mppp3setERN4mppp7complexERN4mppp7complexEDpRK4Args" title="mppp::set::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpN4mppp16complex_set_argsEEN4mppp3setERN4mppp7complexERN4mppp7complexEDpRK4Args" title="Permalink to this definition">#</a><br /></dt>
@@ -2315,21 +2011,21 @@ or <a class="reference internal" href="#_CPPv4N4mppp7complex10prec_roundE11mpfr_
 <p>This function will use the arguments <em>args</em> to set the value of the <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> <em>c</em>,
 using one of the available <a class="reference internal" href="#_CPPv4N4mppp7complex3setERK7complex" title="mppp::complex::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex::set()</span></code></a> overloads. That is,
 the body of this function is equivalent to</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">args</span><span class="p">...);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">args</span><span class="p">...);</span>
 </pre></div>
 </div>
 <p>The input arguments must satisfy the <a class="reference internal" href="#_CPPv4IDpEN4mppp16complex_set_argsE" title="mppp::complex_set_args"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::complex_set_args</span></code></a> concept.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>c</strong> – the return value.</p></li>
 <li><p><strong>args</strong> – the arguments that will be passed to <a class="reference internal" href="#_CPPv4N4mppp7complex3setERK7complex" title="mppp::complex::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex::set()</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>c</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the invoked <a class="reference internal" href="#_CPPv4N4mppp7complex3setERK7complex" title="mppp::complex::set"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::complex::set()</span></code></a> overload.</p>
 </dd>
 </dl>
@@ -2341,10 +2037,10 @@ the body of this function is equivalent to</p>
 <dd><p>Set to NaN.</p>
 <p>This function will set both the real and imaginary parts of <em>c</em> to NaN.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>c</em>.</p>
 </dd>
 </dl>
@@ -2357,7 +2053,7 @@ the body of this function is equivalent to</p>
 <p>This function will set <em>c</em> to <span class="math notranslate nohighlight">\(e^{2\pi\imath k/n}\)</span>. The precision
 of <em>c</em> will not be altered.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>c</strong> – the input argument.</p></li>
 <li><p><strong>n</strong> – the root order.</p></li>
@@ -2372,7 +2068,7 @@ of <em>c</em> will not be altered.</p>
 <span id="_CPPv3N4mppp4swapERN4mppp7complexERN4mppp7complexE"></span><span id="_CPPv2N4mppp4swapERN4mppp7complexERN4mppp7complexE"></span><span id="mppp::swap__mppp::complexR.mppp::complexR"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">swap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N4mppp4swapERN4mppp7complexERN4mppp7complexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Swap efficiently <em>a</em> and <em>b</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a</strong> – the first argument.</p></li>
 <li><p><strong>b</strong> – the second argument.</p></li>
@@ -2383,7 +2079,7 @@ of <em>c</em> will not be altered.</p>
 
 </section>
 <section id="conversion">
-<h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">#</a></h3>
+<h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp19complex_convertibleEEN4mppp3getEbR1TRKN4mppp7complexE">
 <span id="_CPPv3I_N4mppp19complex_convertibleEEN4mppp3getER1TRKN4mppp7complexE"></span><span id="_CPPv2I_N4mppp19complex_convertibleEEN4mppp3getER1TRKN4mppp7complexE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp19complex_convertibleE" title="mppp::complex_convertible"><span class="n"><span class="pre">complex_convertible</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp19complex_convertibleEEN4mppp3getEbR1TRKN4mppp7complexE" title="mppp::get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp19complex_convertibleEEN4mppp3getEbR1TRKN4mppp7complexE" title="Permalink to this definition">#</a><br /></dt>
@@ -2394,13 +2090,13 @@ If the conversion is successful, the function
 will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <em>rop</em> will
 not be altered.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the variable which will store the result of the conversion.</p></li>
 <li><p><strong>c</strong> – the input argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail in the ways
 specified in the documentation of the conversion operator for <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>.</p>
 </dd>
@@ -2423,16 +2119,16 @@ necessary to ensure that the current value of <em>c</em>
 can be recovered exactly from
 a string representation in the given <em>base</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>c</strong> – the input value.</p></li>
 <li><p><strong>base</strong> – the base to be used for the string representation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the minimum number of digits necessary for round-tripping.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>base</em> is not in the <span class="math notranslate nohighlight">\(\left[ 2,62 \right]\)</span> range.</p>
 </dd>
 </dl>
@@ -2440,7 +2136,7 @@ a string representation in the given <em>base</em>.</p>
 
 </section>
 <section id="arithmetic">
-<h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">#</a></h3>
+<h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3addERN4mppp7complexERN4mppp7complexERR1TRR1U">
 <span id="_CPPv3I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3addERN4mppp7complexERR1TRR1U"></span><span id="_CPPv2I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3addERN4mppp7complexERR1TRR1U"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">add</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3addERN4mppp7complexERN4mppp7complexERR1TRR1U" title="mppp::add::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3addERN4mppp7complexERN4mppp7complexERR1TRR1U" title="mppp::add::U"><span class="n"><span class="pre">U</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3addERN4mppp7complexERN4mppp7complexERR1TRR1U" title="Permalink to this definition">#</a><br /></dt>
@@ -2469,14 +2165,14 @@ a string representation in the given <em>base</em>.</p>
 </ul>
 <p>The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>a</strong> – the first operand.</p></li>
 <li><p><strong>b</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -2489,7 +2185,7 @@ a string representation in the given <em>base</em>.</p>
 <p>This function will set <em>rop</em> to <span class="math notranslate nohighlight">\(a \times b + c\)</span>.</p>
 <p>The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>a</strong> – the first operand.</p></li>
@@ -2497,7 +2193,7 @@ a string representation in the given <em>base</em>.</p>
 <li><p><strong>c</strong> – the third operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -2510,14 +2206,14 @@ a string representation in the given <em>base</em>.</p>
 <p>This function will return <span class="math notranslate nohighlight">\(a \times b + c\)</span>.</p>
 <p>The precision of the result will be the largest precision among the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a</strong> – the first operand.</p></li>
 <li><p><strong>b</strong> – the second operand.</p></li>
 <li><p><strong>c</strong> – the third operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(a \times b + c\)</span>.</p>
 </dd>
 </dl>
@@ -2591,16 +2287,16 @@ of the C99 standard when <em>z</em> is zero or an infinity.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>z</strong> – the argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -2675,13 +2371,13 @@ of the C99 standard when <em>z</em> is zero or an infinity.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inv()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>z</strong> – the argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the operation.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -2715,14 +2411,14 @@ multiplication/division by powers of 2.</p>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>c</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>c</strong> – the operand.</p></li>
 <li><p><strong>n</strong> – the power of 2.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -2755,13 +2451,13 @@ multiplication/division by powers of 2.</p>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>c</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>c</strong> – the operand.</p></li>
 <li><p><strong>n</strong> – the power of 2.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>c</em> multiplied/divided by <span class="math notranslate nohighlight">\(2^n\)</span>.</p>
 </dd>
 </dl>
@@ -2769,7 +2465,7 @@ multiplication/division by powers of 2.</p>
 
 </section>
 <section id="comparison">
-<h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">#</a></h3>
+<h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE">
 <span id="_CPPv3N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE"></span><span id="_CPPv2N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE"></span><span id="mppp::cmpabs__mppp::complexCR.mppp::complexCR"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">cmpabs</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6cmpabsERKN4mppp7complexERKN4mppp7complexE" title="Permalink to this definition">#</a><br /></dt>
@@ -2782,16 +2478,16 @@ multiplication/division by powers of 2.</p>
 </ul>
 <p>If at least one NaN component is involved in the comparison, an error will be raised.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a</strong> – the first operand.</p></li>
 <li><p><strong>b</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>an integral value expressing how the absolute values of <em>a</em> and <em>b</em> compare.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">domain_error</span></span></span> – if at least one of the components of <em>a</em> and <em>b</em> is NaN.</p>
 </dd>
 </dl>
@@ -2830,10 +2526,10 @@ numbers),</p></li>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">inf_p()</span></code> and <code class="docutils literal notranslate"><span class="pre">number_p()</span></code> functions.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the detection.</p>
 </dd>
 </dl>
@@ -2841,7 +2537,7 @@ numbers),</p></li>
 
 </section>
 <section id="roots">
-<h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">#</a></h3>
+<h3>Roots<a class="headerlink" href="#roots" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T">
 <span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">sqrt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T" title="mppp::sqrt::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sqrtERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">#</a><br /></dt>
@@ -2876,17 +2572,17 @@ of the C99 standard when <em>z</em> is zero or an infinity.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> and <code class="docutils literal notranslate"><span class="pre">rootn_ui()</span></code> functions.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>z</strong> – the operand.</p></li>
 <li><p><strong>k</strong> – the degree of the root.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -2927,16 +2623,16 @@ of the C99 standard when <em>z</em> is zero or an infinity.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">rec_sqrt()</span></code> and <code class="docutils literal notranslate"><span class="pre">rootn_ui()</span></code> functions.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>z</strong> – the operand.</p></li>
 <li><p><strong>k</strong> – the degree of the root.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the operation.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -2945,7 +2641,7 @@ fails because of (unlikely) overflow conditions.</p>
 
 </section>
 <section id="exponentiation">
-<h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">#</a></h3>
+<h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3powERN4mppp7complexERN4mppp7complexERR1TRR1U">
 <span id="_CPPv3I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3powERN4mppp7complexERR1TRR1U"></span><span id="_CPPv2I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3powERN4mppp7complexERR1TRR1U"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">pow</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3powERN4mppp7complexERN4mppp7complexERR1TRR1U" title="mppp::pow::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">op1</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3powERN4mppp7complexERN4mppp7complexERR1TRR1U" title="mppp::pow::U"><span class="n"><span class="pre">U</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">op2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexE_N4mppp11cvr_complexEEN4mppp3powERN4mppp7complexERN4mppp7complexERR1TRR1U" title="Permalink to this definition">#</a><br /></dt>
@@ -2953,14 +2649,14 @@ fails because of (unlikely) overflow conditions.</p>
 <p>This function will set <em>rop</em> to <em>op1</em> raised to the power of <em>op2</em>.
 The precision of <em>rop</em> will be set to the largest precision among the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>op1</strong> – the base.</p></li>
 <li><p><strong>op2</strong> – the exponent.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -2973,13 +2669,13 @@ The precision of <em>rop</em> will be set to the largest precision among the ope
 <p>This function will compute and return <em>op1</em> raised to the power of <em>op2</em>.
 The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>op1</strong> – the base.</p></li>
 <li><p><strong>op2</strong> – the exponent.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>op1</em> raised to the power of <em>op2</em>.</p>
 </dd>
 </dl>
@@ -2987,7 +2683,7 @@ The precision of the result will be set to the largest precision among the opera
 
 </section>
 <section id="trigonometry">
-<h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this headline">#</a></h3>
+<h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp11cvr_complexEEN4mppp3sinERN4mppp7complexERN4mppp7complexERR1T">
 <span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp3sinERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp3sinERN4mppp7complexERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">sin</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp3sinERN4mppp7complexERN4mppp7complexERR1T" title="mppp::sin::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp3sinERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">#</a><br /></dt>
@@ -3028,13 +2724,13 @@ The precision of the result will be set to the largest precision among the opera
 </ul>
 <p>The precision of the result will be equal to the precision of <em>z</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>z</strong> – the argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -3080,10 +2776,10 @@ The precision of the result will be set to the largest precision among the opera
 </ul>
 <p>The precision of the result will be equal to the precision of <em>z</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>z</strong> – the argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the trigonometric function of <em>z</em>.</p>
 </dd>
 </dl>
@@ -3097,14 +2793,14 @@ The precision of the result will be set to the largest precision among the opera
 <em>sop</em> and <em>cop</em> must be distinct objects. The precision of <em>sop</em> and <em>rop</em> will be set to the
 precision of <em>op</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sop</strong> – the sine return value.</p></li>
 <li><p><strong>cop</strong> – the cosine return value.</p></li>
 <li><p><strong>op</strong> – the operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>sop</em> and <em>cop</em> are the same object.</p>
 </dd>
 </dl>
@@ -3112,7 +2808,7 @@ precision of <em>op</em>.</p>
 
 </section>
 <section id="hyperbolic-functions">
-<h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this headline">#</a></h3>
+<h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4sinhERN4mppp7complexERN4mppp7complexERR1T">
 <span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4sinhERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4sinhERN4mppp7complexERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">sinh</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sinhERN4mppp7complexERN4mppp7complexERR1T" title="mppp::sinh::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4sinhERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">#</a><br /></dt>
@@ -3153,13 +2849,13 @@ precision of <em>op</em>.</p>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>z</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>z</strong> – the argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -3205,10 +2901,10 @@ precision of <em>op</em>.</p>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>z</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>z</strong> – the argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the hyperbolic function of <em>z</em>.</p>
 </dd>
 </dl>
@@ -3216,7 +2912,7 @@ precision of <em>op</em>.</p>
 
 </section>
 <section id="logarithms-and-exponentials">
-<h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this headline">#</a></h3>
+<h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp11cvr_complexEEN4mppp3expERN4mppp7complexERN4mppp7complexERR1T">
 <span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp3expERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp3expERN4mppp7complexERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">exp</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp3expERN4mppp7complexERN4mppp7complexERR1T" title="mppp::exp::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp3expERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">#</a><br /></dt>
@@ -3239,13 +2935,13 @@ precision of <em>op</em>.</p>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>z</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>z</strong> – the operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
 </dl>
@@ -3273,10 +2969,10 @@ precision of <em>op</em>.</p>
 </ul>
 <p>The precision of the result will be equal to the precision of <em>z</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>z</strong> – the argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the operation.</p>
 </dd>
 </dl>
@@ -3284,7 +2980,7 @@ precision of <em>op</em>.</p>
 
 </section>
 <section id="arithmetic-geometric-mean">
-<h3>Arithmetic-geometric mean<a class="headerlink" href="#arithmetic-geometric-mean" title="Permalink to this headline">#</a></h3>
+<h3>Arithmetic-geometric mean<a class="headerlink" href="#arithmetic-geometric-mean" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERN4mppp7complexERR1T">
 <span id="_CPPv3I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">agm1</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERN4mppp7complexERR1T" title="mppp::agm1::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mppp4agm1ERN4mppp7complexERN4mppp7complexERR1T" title="Permalink to this definition">#</a><br /></dt>
@@ -3311,17 +3007,17 @@ Arb 2.18 onwards.</p>
 </ul>
 <p>The precision of <em>rop</em> will be set to the largest precision among the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the return value.</p></li>
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>rop</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -3355,16 +3051,16 @@ Arb 2.18 onwards.</p>
 <p>The precision of the result will be equal to the highest precision
 among the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the operation.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the conversion between Arb and MPC types
 fails because of (unlikely) overflow conditions.</p>
 </dd>
@@ -3373,23 +3069,23 @@ fails because of (unlikely) overflow conditions.</p>
 
 </section>
 <section id="input-output">
-<h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">#</a></h3>
+<h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppplsERNSt7ostreamERKN4mppp7complexE">
 <span id="_CPPv3N4mppplsERNSt7ostreamERKN4mppp7complexE"></span><span id="_CPPv2N4mppplsERNSt7ostreamERKN4mppp7complexE"></span><span id="mppp::lshift-operator__osR.mppp::complexCR"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;&lt;</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppplsERNSt7ostreamERKN4mppp7complexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Output stream operator.</p>
 <p>This function will direct to the output stream <em>os</em> the input <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a> <em>c</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>os</strong> – the target stream.</p></li>
 <li><p><strong>c</strong> – the input argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>os</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">overflow_error</span></span></span> – in case of (unlikely) overflow errors.</p></li>
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the MPFR printing primitive <code class="docutils literal notranslate"><span class="pre">mpfr_asprintf()</span></code> returns an error code.</p></li>
@@ -3402,7 +3098,7 @@ fails because of (unlikely) overflow conditions.</p>
 </section>
 </section>
 <section id="mathematical-operators">
-<span id="complex-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">#</a></h2>
+<span id="complex-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this heading">#</a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp11cvr_complexEEN4mpppplEN4mppp7complexERR1T">
 <span id="_CPPv3I_N4mppp11cvr_complexEEN4mpppplERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mpppplERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mpppplEN4mppp7complexERR1T" title="mppp::operator+::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mpppplEN4mppp7complexERR1T" title="Permalink to this definition">#</a><br /></dt>
@@ -3413,10 +3109,10 @@ fails because of (unlikely) overflow conditions.</p>
 <span id="_CPPv3I_N4mppp11cvr_complexEEN4mpppmiERR1T"></span><span id="_CPPv2I_N4mppp11cvr_complexEEN4mpppmiERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp11cvr_complexE" title="mppp::cvr_complex"><span class="n"><span class="pre">cvr_complex</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp11cvr_complexEEN4mpppmiEN4mppp7complexERR1T" title="mppp::operator-::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp11cvr_complexEEN4mpppmiEN4mppp7complexERR1T" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Identity and negation operators.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(-c\)</span> respectively.</p>
 </dd>
 </dl>
@@ -3443,13 +3139,13 @@ fails because of (unlikely) overflow conditions.</p>
 <dd><p>Binary arithmetic operators.</p>
 <p>The precision of the result will be set to the largest precision among the operands.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a</strong> – the first operand.</p></li>
 <li><p><strong>b</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the binary operation.</p>
 </dd>
 </dl>
@@ -3476,30 +3172,30 @@ fails because of (unlikely) overflow conditions.</p>
 <dd><p>In-place arithmetic operators.</p>
 <p>If <em>a</em> is a <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>, then these operators are equivalent, respectively,
 to the expressions:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
-<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
-<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
-<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>Otherwise, these operators are equivalent to the expressions:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
-<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
-<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
-<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a</strong> – the first operand.</p></li>
 <li><p><strong>b</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>a</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the generic conversion operator of <a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">complex</span></code></a>.</p>
 </dd>
 </dl>
@@ -3515,10 +3211,10 @@ to the expressions:</p>
 <span id="_CPPv3N4mpppmmERN4mppp7complexE"></span><span id="_CPPv2N4mpppmmERN4mppp7complexE"></span><span id="mppp::dec-operator__mppp::complexR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">--</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmmERN4mppp7complexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Prefix increment/decrement.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>c</em> after the increment/decrement.</p>
 </dd>
 </dl>
@@ -3534,10 +3230,10 @@ to the expressions:</p>
 <span id="_CPPv3N4mpppmmERN4mppp7complexEi"></span><span id="_CPPv2N4mpppmmERN4mppp7complexEi"></span><span id="mppp::dec-operator__mppp::complexR.i"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">--</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span>, <span class="kt"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmmERN4mppp7complexEi" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Suffix increment/decrement.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a copy of <em>c</em> before the increment/decrement.</p>
 </dd>
 </dl>
@@ -3558,13 +3254,13 @@ and <code class="docutils literal notranslate"><span class="pre">false</span></c
 <p>These operators handle NaN in the same way specified by the IEEE floating-point
 standard.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a</strong> – the first operand.</p></li>
 <li><p><strong>b</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the comparison.</p>
 </dd>
 </dl>
@@ -3572,7 +3268,7 @@ standard.</p>
 
 </section>
 <section id="user-defined-literals">
-<h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">#</a></h2>
+<h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this heading">#</a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_DpcEN4mppp8literalsli7_icr128EN4mppp7complexEv">
 <span id="_CPPv3I_DpcEN4mppp8literalsli7_icr128Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli7_icr128Ev"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Chars</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7complexE" title="mppp::complex"><span class="n"><span class="pre">complex</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">literals</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="n"><span class="pre">_icr128</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli7_icr128EN4mppp7complexEv" title="Permalink to this definition">#</a><br /></dt>
@@ -3602,7 +3298,7 @@ hexadecimal format are supported.</p>
 <p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/floating_literal">https://en.cppreference.com/w/cpp/language/floating_literal</a></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the input sequence of characters is not
 a valid floating-point literal (as defined by the C++ standard).</p>
 </dd>
@@ -3613,50 +3309,121 @@ a valid floating-point literal (as defined by the C++ standard).</p>
 </section>
 
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="real.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Multiprecision floats</p>
-        </div>
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="real.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Multiprecision floats</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="utilities.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="utilities.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Utility functions</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complex-class">The complex class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types">Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concepts">Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#components-access">Components access</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#precision-handling">Precision handling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#assignment">Assignment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion">Conversion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic">Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">Comparison</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#roots">Roots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponentiation">Exponentiation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trigonometry">Trigonometry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperbolic-functions">Hyperbolic functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic-geometric-mean">Arithmetic-geometric mean</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-output">Input/Output</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-operators">Mathematical operators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-defined-literals">User-defined literals</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
   
-    By Francesco Biscani<br/>
-  
-      &copy; Copyright 2016-2021, Francesco Biscani.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
+<p class="component-author">
+By Francesco Biscani
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2016-2021, Francesco Biscani.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
 </div>
+          </footer>
+        
 
-
-      </div>
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>

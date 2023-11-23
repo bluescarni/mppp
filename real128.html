@@ -1,760 +1,420 @@
 
+
 <!DOCTYPE html>
 
-<html lang="en">
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Quadruple-precision floats &#8212; mp++ 0.27 documentation</title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'real128';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quadruple-precision complex numbers" href="complex128.html" />
     <link rel="prev" title="Multiprecision rationals" href="rational.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
     
-    <div class="container-fluid" id="banner"></div>
-
     
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
 
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="index.html">
-      
-      
-      
-      <h1 class="site-logo" id="site-title">mp++ 0.27 documentation</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mp++ 0.27 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="installation.html">
-   Installation
-  </a>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="tutorial.html">
-   Tutorial
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_prelim.html">
-     Preliminaries
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_constr.html">
-     Construction, conversion and assignment
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_io.html">
-     Input and output
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_numtower.html">
-     The numerical tower and type coercion
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_commonops.html">
-     Common operators
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_api.html">
-     API overview
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_integer.html">
-     Integer tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_rational.html">
-     Rational tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_real128.html">
-     Quadruple-precision float tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_complex128.html">
-     Quadruple-precision complex numbers tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_real.html">
-     Multiprecision float tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_complex.html">
-     Multiprecision complex numbers tutorial
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_boost_s11n.html">
-     Boost.serialization support
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="tutorial_pybind11.html">
-     Extra: integration with pybind11
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="interactive_notebooks.html">
-   Interactive notebooks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_basics.html">
-     Integer basics
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_formatted_output.html">
-     Integer formatted output
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_arithmetic.html">
-     Integer arithmetic
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_comparison.html">
-     Integer comparison
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_bit_fiddling.html">
-     Integer logic and bit fiddling
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/integer_s11n.html">
-     Integer serialisation
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="notebooks/real_basics.html">
-     Real basics
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="reference.html">
-   Reference
-  </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="current">
-   <li class="toctree-l2">
-    <a class="reference internal" href="definitions.html">
-     Macros and definitions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="namespaces.html">
-     Namespaces
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="exceptions.html">
-     Exceptions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="concepts.html">
-     Common concepts
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="integer.html">
-     Multiprecision integers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="rational.html">
-     Multiprecision rationals
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     Quadruple-precision floats
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="complex128.html">
-     Quadruple-precision complex numbers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="real.html">
-     Multiprecision floats
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="complex.html">
-     Multiprecision complex numbers
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="utilities.html">
-     Utility functions
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="fwd_decl.html">
-     Forward declarations
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="benchmarks.html">
-   Benchmarks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="integer_benchmarks.html">
-     Integer benchmarks
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="changelog.html">
-   Changelog
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_constr.html">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex128.html">Quadruple-precision complex numbers tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_complex.html">Multiprecision complex numbers tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_boost_s11n.html">Boost.serialization support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="interactive_notebooks.html">Interactive notebooks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_basics.html">Integer basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_formatted_output.html">Integer formatted output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_arithmetic.html">Integer arithmetic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_comparison.html">Integer comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_bit_fiddling.html">Integer logic and bit fiddling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/integer_s11n.html">Integer serialisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/real_basics.html">Real basics</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="reference.html">Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex128.html">Quadruple-precision complex numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="complex.html">Multiprecision complex numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fwd_decl.html">Forward declarations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="benchmarks.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="integer_benchmarks.html">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/bluescarni/mppp" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Freal128.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
 </div>
 
 
-          
-
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
-<div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
 
 
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/real128.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
   </span>
-
-</label>
-
-        
-    </div>
-    <div class="header-article__right">
-<button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
   <i class="fas fa-expand"></i>
   </span>
 
 </button>
 
-<div class="menu-dropdown menu-dropdown-repository-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Source repositories">
-      <i class="fab fa-github"></i>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://github.com/bluescarni/mppp"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Source repository"
->
-  
+`);
+</script>
 
-<span class="headerbtn__icon-container">
-  <i class="fab fa-github"></i>
-  </span>
-<span class="headerbtn__text-container">repository</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Freal128.html&body=Your%20issue%20content%20here."
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Open an issue"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-lightbulb"></i>
-  </span>
-<span class="headerbtn__text-container">open issue</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="_sources/real128.rst.txt"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="headerbtn__text-container">.rst</span>
-</a>
-
-      </li>
-      
-      <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="headerbtn__text-container">.pdf</span>
-</button>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
-
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-real128-class">
-   The real128 class
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types">
-   Types
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#concepts">
-   Concepts
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#functions">
-   Functions
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#conversion">
-     Conversion
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#arithmetic">
-     Arithmetic
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#comparison">
-     Comparison
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#roots">
-     Roots
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#exponentiation">
-     Exponentiation
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#trigonometry">
-     Trigonometry
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#hyperbolic-functions">
-     Hyperbolic functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#logarithms-and-exponentials">
-     Logarithms and exponentials
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#gamma-functions">
-     Gamma functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#bessel-functions">
-     Bessel functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#other-special-functions">
-     Other special functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#floating-point-manipulation">
-     Floating-point manipulation
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#integer-and-remainder-related-functions">
-     Integer and remainder-related functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-output">
-     Input/Output
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#other">
-     Other
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#mathematical-operators">
-   Mathematical operators
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#constants">
-   Constants
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#standard-library-specialisations">
-   Standard library specialisations
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#user-defined-literals">
-   User-defined literals
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Quadruple-precision floats</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-real128-class">
-   The real128 class
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#types">
-   Types
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#concepts">
-   Concepts
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#functions">
-   Functions
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#conversion">
-     Conversion
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#arithmetic">
-     Arithmetic
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#comparison">
-     Comparison
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#roots">
-     Roots
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#exponentiation">
-     Exponentiation
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#trigonometry">
-     Trigonometry
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#hyperbolic-functions">
-     Hyperbolic functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#logarithms-and-exponentials">
-     Logarithms and exponentials
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#gamma-functions">
-     Gamma functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#bessel-functions">
-     Bessel functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#other-special-functions">
-     Other special functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#floating-point-manipulation">
-     Floating-point manipulation
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#integer-and-remainder-related-functions">
-     Integer and remainder-related functions
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-output">
-     Input/Output
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#other">
-     Other
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#mathematical-operators">
-   Mathematical operators
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#constants">
-   Constants
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#standard-library-specialisations">
-   Standard library specialisations
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#user-defined-literals">
-   User-defined literals
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Quadruple-precision floats</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real128-class">The real128 class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types">Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concepts">Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion">Conversion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic">Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">Comparison</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#roots">Roots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponentiation">Exponentiation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trigonometry">Trigonometry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperbolic-functions">Hyperbolic functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gamma-functions">Gamma functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bessel-functions">Bessel functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-special-functions">Other special functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#floating-point-manipulation">Floating-point manipulation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#integer-and-remainder-related-functions">Integer and remainder-related functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-output">Input/Output</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-operators">Mathematical operators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constants">Constants</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-library-specialisations">Standard library specialisations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-defined-literals">User-defined literals</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section id="quadruple-precision-floats">
-<span id="real128-reference"></span><h1>Quadruple-precision floats<a class="headerlink" href="#quadruple-precision-floats" title="Permalink to this headline">#</a></h1>
+<span id="real128-reference"></span><h1>Quadruple-precision floats<a class="headerlink" href="#quadruple-precision-floats" title="Permalink to this heading">#</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The functionality described in this section is available only if mp++ was configured
@@ -765,7 +425,7 @@ with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_
 </div>
 <p><em>#include &lt;mp++/real128.hpp&gt;</em></p>
 <section id="the-real128-class">
-<h2>The real128 class<a class="headerlink" href="#the-real128-class" title="Permalink to this headline">#</a></h2>
+<h2>The real128 class<a class="headerlink" href="#the-real128-class" title="Permalink to this heading">#</a></h2>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp7real128E">
 <span id="_CPPv3N4mppp7real128E"></span><span id="_CPPv2N4mppp7real128E"></span><span id="mppp::real128"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">real128</span></span></span><a class="headerlink" href="#_CPPv4N4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -784,13 +444,13 @@ default-initialised to zero rather than to indefinite values, conversions must b
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#real128-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding quadmath functions minus the trailing <code class="docutils literal notranslate"><span class="pre">q</span></code>
 suffix. For instance, the quadmath code</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">__float128</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">::</span><span class="n">sinq</span><span class="p">(</span><span class="n">a</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">__float128</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">::</span><span class="n">sinq</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>that computes the sine of 1 in quadruple precision, storing the result in <code class="docutils literal notranslate"><span class="pre">b</span></code>, becomes in mp++</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span><span class="w"> </span><span class="n">a</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span><span class="w"></span>
-<span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span><span class="w"> </span><span class="n">a</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>where the <code class="docutils literal notranslate"><span class="pre">sin()</span></code> function is resolved via argument-dependent lookup.</p>
@@ -841,7 +501,7 @@ move constructible.</p>
 <p>This constructor will initialise the internal <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>
 value to <em>x</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> that will be assigned to the internal value.</p>
 </dd>
 </dl>
@@ -856,10 +516,10 @@ Depending on the value and type of <em>x</em>, <code class="docutils literal not
 to <em>x</em> after initialisation (e.g., if <em>x</em> is a very large
 <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the value that will be used for the initialisation.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">overflow_error</span></span></span> – in case of (unlikely) overflow errors during initialisation.</p>
 </dd>
 </dl>
@@ -878,10 +538,10 @@ to <em>x</em> after initialisation (e.g., if <em>x</em> is a very large
 <p>Constructor from complex C++ types.</p>
 <p>The initialisation is is successful only if the imaginary part of <em>c</em> is zero.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the input complex value.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">domain_error</span></span></span> – if the imaginary part of <em>c</em> is not zero.</p>
 </dd>
 </dl>
@@ -900,10 +560,10 @@ will raise an error.</p>
 <p><a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/strtoflt128.html">https://gcc.gnu.org/onlinedocs/libquadmath/strtoflt128.html</a></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>s</strong> – the string that will be used to initialise <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if <em>s</em> does not represent a valid quadruple-precision
 floating-point value.</p></li>
@@ -922,13 +582,13 @@ as the string representation of a floating-point value.</p>
 <p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and
 invoke the constructor from string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>begin</strong> – the begin of the input range.</p></li>
 <li><p><strong>end</strong> – the end of the input range.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the constructor from string or by memory errors in standard
 containers.</p>
 </dd>
@@ -956,10 +616,10 @@ move assignable.</p>
 </div>
 <p>Assignment from a <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> that will be assigned to the internal value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -974,13 +634,13 @@ move assignable.</p>
 </div>
 <p>Assignment from interoperable types.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the construction of a
 <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> from <em>x</em>.</p>
 </dd>
@@ -999,13 +659,13 @@ move assignable.</p>
 </div>
 <p>Assignment from complex C++ types.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>c</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">domain_error</span></span></span> – if the imaginary part of <em>c</em> is not zero.</p>
 </dd>
 </dl>
@@ -1042,13 +702,13 @@ is available only if mp++ was configured with the <code class="docutils literal 
 <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> and then move-assigning the result
 to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the assignment argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception raised by the conversion of <em>x</em>
 to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
 </dd>
@@ -1060,19 +720,19 @@ to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <span id="_CPPv3I_11string_typeEN4mppp7real128aSERK1T"></span><span id="_CPPv2I_11string_typeEN4mppp7real128aSERK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp11string_typeE" title="mppp::string_type"><span class="n"><span class="pre">string_type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_11string_typeEN4mppp7real128aSER7real128RK1T" title="mppp::real128::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_11string_typeEN4mppp7real128aSER7real128RK1T" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Assignment from string.</p>
 <p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">real128</span><span class="p">{</span><span class="n">s</span><span class="p">};</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">real128</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
 </pre></div>
 </div>
 <p>That is, a temporary <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> is constructed from <em>s</em>
 and it is then move-assigned to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>s</strong> – the string that will be used for the assignment.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the constructor from string.</p>
 </dd>
 </dl>
@@ -1083,7 +743,7 @@ and it is then move-assigned to <code class="docutils literal notranslate"><span
 <span id="_CPPv3NK4mppp7real128cvgEv"></span><span id="_CPPv2NK4mppp7real128cvgEv"></span><span id="mppp::real128::castto-__float128-operatorCCE"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="w"> </span><span class="kt"><span class="pre">__float128</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK4mppp7real128cvgEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Conversion to <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a copy of the <a class="reference internal" href="#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> value stored internally.</p>
 </dd>
 </dl>
@@ -1099,10 +759,10 @@ performed to ensure that the value of <code class="docutils literal notranslate"
 <p>Conversion to <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, if successful, is exact.</p>
 <p>Conversion to integral types will produce the truncated counterpart of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to <code class="docutils literal notranslate"><span class="pre">T</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">domain_error</span></span></span> – if <code class="docutils literal notranslate"><span class="pre">this</span></code> represents a non-finite value and <code class="docutils literal notranslate"><span class="pre">T</span></code>
 is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>.</p>
 </dd>
@@ -1121,7 +781,7 @@ is <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7i
 </div>
 <p>Conversion to complex C++ types.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to the type <code class="docutils literal notranslate"><span class="pre">T</span></code>.</p>
 </dd>
 </dl>
@@ -1151,10 +811,10 @@ conversion fails, <em>rop</em> will not be altered. The conversion can fail only
 <p><span class="versionmodified added">New in version 0.20: </span>The conversion function to complex C++ types.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rop</strong> – the variable which will store the result of the conversion.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeds, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
 </dl>
@@ -1173,10 +833,10 @@ constructed from the returned string will have a value identical to the value of
 <p><a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/quadmath_005fsnprintf.html">https://gcc.gnu.org/onlinedocs/libquadmath/quadmath_005fsnprintf.html</a></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a decimal string representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
-<dt class="field-even">Throws</dt>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
 <dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">runtime_error</span></span></span> – if the internal call to the <code class="docutils literal notranslate"><span class="pre">quadmath_snprintf()</span></code> function fails.</p>
 </dd>
 </dl>
@@ -1199,7 +859,7 @@ of the value. The returned tuple elements are, in order:</p>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format">https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format</a></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a tuple containing the IEEE quadruple-precision floating-point representation of the value stored
 in <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
@@ -1224,7 +884,7 @@ definition.</p>
 <p><span class="versionmodified added">New in version 0.21.</span></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the unbiased exponent of <code class="docutils literal notranslate"><span class="pre">this</span></code>, as an <code class="docutils literal notranslate"><span class="pre">int</span></code> or as a <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
 </dd>
 </dl>
@@ -1239,7 +899,7 @@ is not a NaN the function will return <code class="docutils literal notranslate"
 <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.
 If <code class="docutils literal notranslate"><span class="pre">this</span></code> is NaN, the sign bit of the NaN value will be returned.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the sign bit of <code class="docutils literal notranslate"><span class="pre">this</span></code> is set, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
 </dl>
@@ -1264,7 +924,7 @@ represented as <code class="docutils literal notranslate"><span class="pre">int<
 <li><p><code class="docutils literal notranslate"><span class="pre">FP_ZERO</span></code> for zero.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the category to which the value of <code class="docutils literal notranslate"><span class="pre">this</span></code> belongs.</p>
 </dd>
 </dl>
@@ -1304,7 +964,7 @@ normal value.</p>
 <p><span class="versionmodified added">New in version 0.22: </span><code class="docutils literal notranslate"><span class="pre">isfinite()</span></code> and <code class="docutils literal notranslate"><span class="pre">isnormal()</span></code>.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> is the value of <code class="docutils literal notranslate"><span class="pre">this</span></code> is, respectively,
 NaN, an infinity, finite or normal, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
@@ -1334,7 +994,7 @@ is being used.</p>
 <p><span class="versionmodified added">New in version 0.23: </span>The <code class="docutils literal notranslate"><span class="pre">fabs()</span></code> overload.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1356,7 +1016,7 @@ is being used.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1384,7 +1044,7 @@ is being used.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1412,7 +1072,7 @@ is being used.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1440,7 +1100,7 @@ is being used.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1468,7 +1128,7 @@ is being used.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1529,7 +1189,7 @@ definition.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">exp2()</span></code>, <code class="docutils literal notranslate"><span class="pre">expm1()</span></code> and <code class="docutils literal notranslate"><span class="pre">log1p()</span></code> functions.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1554,7 +1214,7 @@ definition.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">tgamma()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1591,7 +1251,7 @@ definition.</p>
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1616,7 +1276,7 @@ definition.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">erfc()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1667,7 +1327,7 @@ possibly raising the <code class="docutils literal notranslate"><span class="pre
 </ul>
 <p>where <span class="math notranslate nohighlight">\(x\)</span> is the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
 </dl>
@@ -1677,7 +1337,7 @@ possibly raising the <code class="docutils literal notranslate"><span class="pre
 
 </section>
 <section id="types">
-<h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">#</a></h2>
+<h2>Types<a class="headerlink" href="#types" title="Permalink to this heading">#</a></h2>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv410__float128">
 <span id="_CPPv310__float128"></span><span id="_CPPv210__float128"></span><span id="__float128"></span><span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">__float128</span></span></span><a class="headerlink" href="#_CPPv410__float128" title="Permalink to this definition">#</a><br /></dt>
@@ -1692,7 +1352,7 @@ This is the type wrapped by the <a class="reference internal" href="#_CPPv4N4mpp
 
 </section>
 <section id="concepts">
-<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">#</a></h2>
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this heading">#</a></h2>
 <dl class="cpp concept">
 <dt class="sig sig-object cpp" id="_CPPv4I0EN4mppp21real128_interoperableE">
 <span id="_CPPv3I0EN4mppp21real128_interoperableE"></span><span id="_CPPv2I0EN4mppp21real128_interoperableE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">concept</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">real128_interoperable</span></span></span><a class="headerlink" href="#_CPPv4I0EN4mppp21real128_interoperableE" title="Permalink to this definition">#</a><br /></dt>
@@ -1755,9 +1415,9 @@ involving <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mpp
 
 </section>
 <section id="functions">
-<span id="real128-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">#</a></h2>
+<span id="real128-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h2>
 <section id="conversion">
-<span id="real128-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">#</a></h3>
+<span id="real128-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I_N4mppp21real128_interoperableEEN4mppp3getEbR1TRKN4mppp7real128E">
 <span id="_CPPv3I_N4mppp21real128_interoperableEEN4mppp3getER1TRKN4mppp7real128E"></span><span id="_CPPv2I_N4mppp21real128_interoperableEEN4mppp3getER1TRKN4mppp7real128E"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0EN4mppp21real128_interoperableE" title="mppp::real128_interoperable"><span class="n"><span class="pre">real128_interoperable</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp21real128_interoperableEEN4mppp3getEbR1TRKN4mppp7real128E" title="mppp::get::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rop</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp21real128_interoperableEEN4mppp3getEbR1TRKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -1780,13 +1440,13 @@ not be altered. The conversion can fail only if <code class="docutils literal no
 is either <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> or <a class="reference internal" href="rational.html#_CPPv4I_NSt6size_tEEN4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>, and <em>x</em>
 represents a non-finite value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rop</strong> – the variable which will store the result of the conversion.</p></li>
 <li><p><strong>x</strong> – the input value.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeds, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
 </dl>
@@ -1802,13 +1462,13 @@ this function will return a <a class="reference internal" href="#_CPPv4N4mppp7re
 such that <span class="math notranslate nohighlight">\(r \times 2^n\)</span> equals to <span class="math notranslate nohighlight">\(x\)</span>. If <em>x</em> is a non-finite value, the return
 value will be <em>x</em> and an unspecified value will be stored in <em>exp</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p></li>
 <li><p><strong>exp</strong> – a pointer to the value that will store the exponent.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the binary significand of <em>x</em>.</p>
 </dd>
 </dl>
@@ -1833,10 +1493,10 @@ definition.</p>
 </div>
 <p>Unbiased exponent.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the unbiased exponent of <em>x</em>, as an <code class="docutils literal notranslate"><span class="pre">int</span></code> or as a <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
 </dd>
 </dl>
@@ -1844,7 +1504,7 @@ definition.</p>
 
 </section>
 <section id="arithmetic">
-<span id="real128-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">#</a></h3>
+<span id="real128-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp3fmaERKN4mppp7real128ERKN4mppp7real128ERKN4mppp7real128E">
 <span id="_CPPv3N4mppp3fmaERKN4mppp7real128ERKN4mppp7real128ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3fmaERKN4mppp7real128ERKN4mppp7real128ERKN4mppp7real128E"></span><span id="mppp::fma__mppp::real128CR.mppp::real128CR.mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">fma</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">z</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3fmaERKN4mppp7real128ERKN4mppp7real128ERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -1852,14 +1512,14 @@ definition.</p>
 <p>This function will return <span class="math notranslate nohighlight">\(\left(x \times y\right) + z\)</span> as if calculated to infinite precision and
 rounded once.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first factor.</p></li>
 <li><p><strong>y</strong> – the second factor.</p></li>
 <li><p><strong>z</strong> – the addend.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(\left(x \times y\right) + z\)</span>.</p>
 </dd>
 </dl>
@@ -1883,10 +1543,10 @@ is being used.</p>
 <p><span class="versionmodified added">New in version 0.23: </span>The <code class="docutils literal notranslate"><span class="pre">fabs()</span></code> overload.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> whose absolute value will be computed.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(\left| x \right|\)</span>.</p>
 </dd>
 </dl>
@@ -1910,13 +1570,13 @@ is being used.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">ldexp()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p></li>
 <li><p><strong>n</strong> – the power of 2 by which <em>x</em> will be multiplied.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(x \times 2^n\)</span>.</p>
 </dd>
 </dl>
@@ -1935,13 +1595,13 @@ Internally, the implementation uses the <code class="docutils literal notranslat
 after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 (if necessary).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first argument.</p></li>
 <li><p><strong>y</strong> – the second argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the positive difference of <em>x</em> and <em>y</em>.</p>
 </dd>
 </dl>
@@ -1949,16 +1609,16 @@ after the conversion of one of the operands to <a class="reference internal" hre
 
 </section>
 <section id="comparison">
-<span id="real128-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this headline">#</a></h3>
+<span id="real128-comparison"></span><h3>Comparison<a class="headerlink" href="#comparison" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp7signbitERKN4mppp7real128E">
 <span id="_CPPv3N4mppp7signbitERKN4mppp7real128E"></span><span id="_CPPv2N4mppp7signbitERKN4mppp7real128E"></span><span id="mppp::signbit__mppp::real128CR"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">signbit</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7signbitERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Sign bit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the sign bit of <em>x</em> (as returned by <a class="reference internal" href="#_CPPv4NK4mppp7real1287signbitEv" title="mppp::real128::signbit"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128::signbit()</span></code></a>).</p>
 </dd>
 </dl>
@@ -1974,10 +1634,10 @@ is being used.</p>
 </div>
 <p>Categorise a <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the value whose floating-point category will be returned.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the category of the value of <em>x</em>, as established by <a class="reference internal" href="#_CPPv4NK4mppp7real12810fpclassifyEv" title="mppp::real128::fpclassify"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128::fpclassify()</span></code></a>.</p>
 </dd>
 </dl>
@@ -2001,13 +1661,13 @@ Internally, the implementation uses the <code class="docutils literal notranslat
 after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 (if necessary).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first argument.</p></li>
 <li><p><strong>y</strong> – the second argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the maximum and minimum of the two input operands.</p>
 </dd>
 </dl>
@@ -2054,10 +1714,10 @@ is being used.</p>
 <p><span class="versionmodified added">New in version 0.22: </span><code class="docutils literal notranslate"><span class="pre">isfinite()</span></code> and <code class="docutils literal notranslate"><span class="pre">isnormal()</span></code>.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a boolean flag indicating if <em>x</em> is NaN, an infinity, a finite value or a normal value.</p>
 </dd>
 </dl>
@@ -2078,13 +1738,13 @@ if both operands are NaN, <code class="docutils literal notranslate"><span class
 <p>In other words, this function behaves like an equality operator which considers all NaN
 values equal to each other.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <span class="math notranslate nohighlight">\(x = y\)</span> (including the case in which both operands are NaN),
 <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
@@ -2107,13 +1767,13 @@ if <em>x</em> is not NaN, <code class="docutils literal notranslate"><span class
 greater than non-NaN values. This function can be used as a comparator in various facilities of the
 standard library (e.g., <code class="docutils literal notranslate"><span class="pre">std::sort()</span></code>, <code class="docutils literal notranslate"><span class="pre">std::set</span></code>, etc.).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <span class="math notranslate nohighlight">\(x &lt; y\)</span> (with NaN values considered greather than non-NaN values),
 <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
@@ -2136,13 +1796,13 @@ if <em>y</em> is not NaN, <code class="docutils literal notranslate"><span class
 greater than non-NaN values. This function can be used as a comparator in various facilities of the
 standard library (e.g., <code class="docutils literal notranslate"><span class="pre">std::sort()</span></code>, <code class="docutils literal notranslate"><span class="pre">std::set</span></code>, etc.).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <span class="math notranslate nohighlight">\(x &gt; y\)</span> (with NaN values considered greather than non-NaN values),
 <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 </dd>
@@ -2151,7 +1811,7 @@ standard library (e.g., <code class="docutils literal notranslate"><span class="
 
 </section>
 <section id="roots">
-<span id="real128-roots"></span><h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">#</a></h3>
+<span id="real128-roots"></span><h3>Roots<a class="headerlink" href="#roots" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp4sqrtERKN4mppp7real128E">
 <span id="_CPPv3N4mppp4sqrtERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4sqrtERKN4mppp7real128E"></span><span id="mppp::sqrt__mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">sqrt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4sqrtERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2167,10 +1827,10 @@ standard library (e.g., <code class="docutils literal notranslate"><span class="
 <li><p><span class="math notranslate nohighlight">\(\sqrt[3]{x}\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the square or cubic root of <em>x</em>.</p>
 </dd>
 </dl>
@@ -2191,13 +1851,13 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <p><span class="versionmodified added">New in version 0.21: </span>Support for types other than <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first argument.</p></li>
 <li><p><strong>y</strong> – the second argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(\sqrt{x^2+y^2}\)</span>.</p>
 </dd>
 </dl>
@@ -2205,7 +1865,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 
 </section>
 <section id="exponentiation">
-<span id="real128-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">#</a></h3>
+<span id="real128-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp3powEN4mppp7real128ERK1TRK1U">
 <span id="_CPPv3I0_N4mppp16real128_op_typesI1TEEEN4mppp3powERK1TRK1U"></span><span id="_CPPv2I0_N4mppp16real128_op_typesI1TEEEN4mppp3powERK1TRK1U"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I00EN4mppp16real128_op_typesE" title="mppp::real128_op_types"><span class="n"><span class="pre">real128_op_types</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp3powEN4mppp7real128ERK1TRK1U" title="mppp::pow::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">pow</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp3powEN4mppp7real128ERK1TRK1U" title="mppp::pow::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp3powEN4mppp7real128ERK1TRK1U" title="mppp::pow::U"><span class="n"><span class="pre">U</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0_N4mppp16real128_op_typesI1TEEEN4mppp3powEN4mppp7real128ERK1TRK1U" title="Permalink to this definition">#</a><br /></dt>
@@ -2214,13 +1874,13 @@ the implementation uses the <code class="docutils literal notranslate"><span cla
 after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 (if necessary).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the base.</p></li>
 <li><p><strong>y</strong> – the exponent.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(x^y\)</span>.</p>
 </dd>
 </dl>
@@ -2228,7 +1888,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 
 </section>
 <section id="trigonometry">
-<span id="real128-trig"></span><h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this headline">#</a></h3>
+<span id="real128-trig"></span><h3>Trigonometry<a class="headerlink" href="#trigonometry" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp3sinERKN4mppp7real128E">
 <span id="_CPPv3N4mppp3sinERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3sinERKN4mppp7real128E"></span><span id="mppp::sin__mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">sin</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3sinERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2268,10 +1928,10 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <li><p><span class="math notranslate nohighlight">\(\arctan x\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a trigonometric function of <em>x</em>.</p>
 </dd>
 </dl>
@@ -2289,13 +1949,13 @@ the implementation uses the <code class="docutils literal notranslate"><span cla
 after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 (if necessary).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>y</strong> – the sine argument.</p></li>
 <li><p><strong>x</strong> – the cosine argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(\arctan\left( y,x \right)\)</span>.</p>
 </dd>
 </dl>
@@ -2311,7 +1971,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <p>This function will set the variables pointed to by <em>s</em> and <em>c</em> to, respectively,
 <span class="math notranslate nohighlight">\(\sin x\)</span> and <span class="math notranslate nohighlight">\(\cos x\)</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the input argument.</p></li>
 <li><p><strong>s</strong> – a pointer to the sine return value.</p></li>
@@ -2323,7 +1983,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 
 </section>
 <section id="hyperbolic-functions">
-<span id="real128-hyper"></span><h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this headline">#</a></h3>
+<span id="real128-hyper"></span><h3>Hyperbolic functions<a class="headerlink" href="#hyperbolic-functions" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp4sinhERKN4mppp7real128E">
 <span id="_CPPv3N4mppp4sinhERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4sinhERKN4mppp7real128E"></span><span id="mppp::sinh__mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">sinh</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4sinhERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2363,10 +2023,10 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <li><p><span class="math notranslate nohighlight">\(\operatorname{arctanh} x\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a hyperbolic function of <em>x</em>.</p>
 </dd>
 </dl>
@@ -2374,7 +2034,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 
 </section>
 <section id="logarithms-and-exponentials">
-<span id="real128-logexp"></span><h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this headline">#</a></h3>
+<span id="real128-logexp"></span><h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp3expERKN4mppp7real128E">
 <span id="_CPPv3N4mppp3expERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3expERKN4mppp7real128E"></span><span id="mppp::exp__mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">exp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3expERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2429,10 +2089,10 @@ definition.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">exp2()</span></code>, <code class="docutils literal notranslate"><span class="pre">expm1()</span></code> and <code class="docutils literal notranslate"><span class="pre">log1p()</span></code> functions.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a logarithm/exponential of <em>x</em>.</p>
 </dd>
 </dl>
@@ -2440,7 +2100,7 @@ definition.</p>
 
 </section>
 <section id="gamma-functions">
-<span id="real128-gamma"></span><h3>Gamma functions<a class="headerlink" href="#gamma-functions" title="Permalink to this headline">#</a></h3>
+<span id="real128-gamma"></span><h3>Gamma functions<a class="headerlink" href="#gamma-functions" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp6lgammaERKN4mppp7real128E">
 <span id="_CPPv3N4mppp6lgammaERKN4mppp7real128E"></span><span id="_CPPv2N4mppp6lgammaERKN4mppp7real128E"></span><span id="mppp::lgamma__mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">lgamma</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp6lgammaERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2459,10 +2119,10 @@ definition.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">tgamma()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the operation.</p>
 </dd>
 </dl>
@@ -2470,7 +2130,7 @@ definition.</p>
 
 </section>
 <section id="bessel-functions">
-<h3>Bessel functions<a class="headerlink" href="#bessel-functions" title="Permalink to this headline">#</a></h3>
+<h3>Bessel functions<a class="headerlink" href="#bessel-functions" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp2j0ERKN4mppp7real128E">
 <span id="_CPPv3N4mppp2j0ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp2j0ERKN4mppp7real128E"></span><span id="mppp::j0__mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">j0</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp2j0ERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2513,13 +2173,13 @@ definition.</p>
 <li><p><span class="math notranslate nohighlight">\(Y_n\left( x \right)\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – the order of the Bessel function.</p></li>
 <li><p><strong>x</strong> – the argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a Bessel function of <em>x</em>.</p>
 </dd>
 </dl>
@@ -2527,7 +2187,7 @@ definition.</p>
 
 </section>
 <section id="other-special-functions">
-<span id="real128-miscfuncts"></span><h3>Other special functions<a class="headerlink" href="#other-special-functions" title="Permalink to this headline">#</a></h3>
+<span id="real128-miscfuncts"></span><h3>Other special functions<a class="headerlink" href="#other-special-functions" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp3erfERKN4mppp7real128E">
 <span id="_CPPv3N4mppp3erfERKN4mppp7real128E"></span><span id="_CPPv2N4mppp3erfERKN4mppp7real128E"></span><span id="mppp::erf__mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">erf</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3erfERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2546,10 +2206,10 @@ definition.</p>
 <p><span class="versionmodified added">New in version 0.21: </span>The <code class="docutils literal notranslate"><span class="pre">erfc()</span></code> function.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input value.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the (complementary) error function of <span class="math notranslate nohighlight">\(x\)</span>.</p>
 </dd>
 </dl>
@@ -2557,7 +2217,7 @@ definition.</p>
 
 </section>
 <section id="floating-point-manipulation">
-<span id="real128-fpmanip"></span><h3>Floating-point manipulation<a class="headerlink" href="#floating-point-manipulation" title="Permalink to this headline">#</a></h3>
+<span id="real128-fpmanip"></span><h3>Floating-point manipulation<a class="headerlink" href="#floating-point-manipulation" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp9nextafterERKN4mppp7real128ERKN4mppp7real128E">
 <span id="_CPPv3N4mppp9nextafterERKN4mppp7real128ERKN4mppp7real128E"></span><span id="_CPPv2N4mppp9nextafterERKN4mppp7real128ERKN4mppp7real128E"></span><span id="mppp::nextafter__mppp::real128CR.mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">nextafter</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">to</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp9nextafterERKN4mppp7real128ERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2567,13 +2227,13 @@ definition.</p>
 <p>This function returns the next representable value of <em>from</em> in the direction of <em>to</em>.</p>
 <p>If <em>from</em> equals to <em>to</em>, <em>to</em> is returned.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>from</strong> – the <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> whose next representable value will be returned.</p></li>
 <li><p><strong>to</strong> – the direction of the next representable value.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the next representable value of <em>from</em> in the direction of <em>to</em>.</p>
 </dd>
 </dl>
@@ -2591,13 +2251,13 @@ Internally, the implementation uses the <code class="docutils literal notranslat
 after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 (if necessary).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first argument.</p></li>
 <li><p><strong>y</strong> – the second argument.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a value with the magnitude of <em>x</em> and the sign of <em>y</em>.</p>
 </dd>
 </dl>
@@ -2605,7 +2265,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 
 </section>
 <section id="integer-and-remainder-related-functions">
-<h3>Integer and remainder-related functions<a class="headerlink" href="#integer-and-remainder-related-functions" title="Permalink to this headline">#</a></h3>
+<h3>Integer and remainder-related functions<a class="headerlink" href="#integer-and-remainder-related-functions" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp4ceilERKN4mppp7real128E">
 <span id="_CPPv3N4mppp4ceilERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4ceilERKN4mppp7real128E"></span><span id="mppp::ceil__mppp::real128CR"></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">ceil</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4ceilERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2683,10 +2343,10 @@ represented as a:</p>
 <li><p><span class="math notranslate nohighlight">\(\operatorname{trunc}\left( x \right)\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the operation.</p>
 </dd>
 </dl>
@@ -2714,13 +2374,13 @@ division <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
 after the conversion of one of the operands to <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 (if necessary).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the numerator.</p></li>
 <li><p><strong>y</strong> – the denominator.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the floating modulus or remainder of <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
 </dd>
 </dl>
@@ -2736,14 +2396,14 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <p>This function will return the remainder of the division <span class="math notranslate nohighlight">\(x/y\)</span>. Additionally,
 it will store the sign and at least three of the least significant bits of <span class="math notranslate nohighlight">\(x/y\)</span> in <em>quo</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the numerator.</p></li>
 <li><p><strong>y</strong> – the denominator.</p></li>
 <li><p><strong>quo</strong> – a pointer to the quotient return value.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the remainder of <span class="math notranslate nohighlight">\(x/y\)</span>.</p>
 </dd>
 </dl>
@@ -2759,13 +2419,13 @@ it will store the sign and at least three of the least significant bits of <span
 <p>This function will return the fractional part of <em>x</em>, and it will store
 the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the input argument.</p></li>
 <li><p><strong>iptr</strong> – a pointer to the return value for the integral part.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the fractional part of <em>x</em>.</p>
 </dd>
 </dl>
@@ -2773,23 +2433,23 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 
 </section>
 <section id="input-output">
-<span id="real128-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">#</a></h3>
+<span id="real128-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppplsERNSt7ostreamERKN4mppp7real128E">
 <span id="_CPPv3N4mppplsERNSt7ostreamERKN4mppp7real128E"></span><span id="_CPPv2N4mppplsERNSt7ostreamERKN4mppp7real128E"></span><span id="mppp::lshift-operator__osR.mppp::real128CR"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;&lt;</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">os</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppplsERNSt7ostreamERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Output stream operator.</p>
 <p>This function will direct to the output stream <em>os</em> the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> <em>x</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>os</strong> – the target stream.</p></li>
 <li><p><strong>x</strong> – the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>os</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">overflow_error</span></span></span> – in case of (unlikely) overflow errors.</p></li>
 <li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the quadmath printing primitive <code class="docutils literal notranslate"><span class="pre">quadmath_snprintf()</span></code> returns an error code.</p></li>
@@ -2801,7 +2461,7 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 
 </section>
 <section id="other">
-<h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">#</a></h3>
+<h3>Other<a class="headerlink" href="#other" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mppp4hashERKN4mppp7real128E">
 <span id="_CPPv3N4mppp4hashERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4hashERKN4mppp7real128E"></span><span id="mppp::hash__mppp::real128CR"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">hash</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4hashERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2811,10 +2471,10 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 <p>Hash function for <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
 <p>This function guarantees that <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">y</span></code> implies <code class="docutils literal notranslate"><span class="pre">hash(x)</span> <span class="pre">==</span> <span class="pre">hash(y)</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a hash value for <em>x</em>.</p>
 </dd>
 </dl>
@@ -2823,7 +2483,7 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 </section>
 </section>
 <section id="mathematical-operators">
-<span id="real128-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">#</a></h2>
+<span id="real128-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this heading">#</a></h2>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N4mpppplERKN4mppp7real128E">
 <span id="_CPPv3N4mpppplERKN4mppp7real128E"></span><span id="_CPPv2N4mpppplERKN4mppp7real128E"></span><span id="mppp::add-operator__mppp::real128CRCE"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppplERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
@@ -2834,10 +2494,10 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 <span id="_CPPv3N4mpppmiERKN4mppp7real128E"></span><span id="_CPPv2N4mpppmiERKN4mppp7real128E"></span><span id="mppp::sub-operator__mppp::real128CRCE"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">-</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppmiERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Identity and negation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(-x\)</span> respectively.</p>
 </dd>
 </dl>
@@ -2857,10 +2517,10 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 </div>
 <p>Prefix increment and decrement.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>x</em> after it has been incremented/decremented by one.</p>
 </dd>
 </dl>
@@ -2880,10 +2540,10 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 </div>
 <p>Suffix increment and decrement.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the argument.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a copy of <em>x</em> before the increment/decrement.</p>
 </dd>
 </dl>
@@ -2916,16 +2576,16 @@ the integral part of <em>x</em> into the variable pointed to by <em>iptr</em>.</
 <li><p><span class="math notranslate nohighlight">\(x / y\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the binary operation.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the constructor of <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 from mp++ types.</p>
 </dd>
@@ -2963,16 +2623,16 @@ from mp++ types.</p>
 <li><p><span class="math notranslate nohighlight">\(x / y\)</span>.</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a reference to <em>x</em>.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the corresponding binary operator, or by the conversion
 of <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> to mp++ types.</p>
 </dd>
@@ -3028,16 +2688,16 @@ For alternative comparison functions that treat NaN specially, please see the
 <p><span class="versionmodified added">New in version 0.20: </span>Equality and inequality comparison with <a class="reference internal" href="#_CPPv4I0EN4mppp19real128_cpp_complexE" title="mppp::real128_cpp_complex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">real128_cpp_complex</span></code></a> types.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – the first operand.</p></li>
 <li><p><strong>y</strong> – the second operand.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the result of the comparison.</p>
 </dd>
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">unspecified</span></span></span> – any exception thrown by the constructor of <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 from mp++ types.</p>
 </dd>
@@ -3046,7 +2706,7 @@ from mp++ types.</p>
 
 </section>
 <section id="constants">
-<span id="real128-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">#</a></h2>
+<span id="real128-constants"></span><h2>Constants<a class="headerlink" href="#constants" title="Permalink to this heading">#</a></h2>
 <p>A few mathematical constants are provided. The constants are available as inline variables
 (e.g., <a class="reference internal" href="#_CPPv4N4mppp6pi_128E" title="mppp::pi_128"><code class="xref cpp cpp-var docutils literal notranslate"><span class="pre">mppp::pi_128</span></code></a>, requires C++17 or later) and as constexpr functions (e.g., <a class="reference internal" href="#_CPPv4N4mppp10real128_piEv" title="mppp::real128_pi"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_pi()</span></code></a>,
 always available). Inline variables and constexpr functions provide exactly the same functionality,
@@ -3172,7 +2832,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 
 </section>
 <section id="standard-library-specialisations">
-<span id="real128-std-specs"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this headline">#</a></h2>
+<span id="real128-std-specs"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this heading">#</a></h2>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4IENSt14numeric_limitsIN4mppp7real128EEE">
 <span id="_CPPv3IENSt14numeric_limitsIN4mppp7real128EEE"></span><span id="_CPPv2IENSt14numeric_limitsIN4mppp7real128EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">numeric_limits</span></span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IENSt14numeric_limitsIN4mppp7real128EEE" title="Permalink to this definition">#</a><br /></dt>
@@ -3296,7 +2956,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE3minEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE3minEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE3minEv"></span><span id="std::numeric_limits:mppp::real128:::minCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE3minEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the output of <a class="reference internal" href="#_CPPv4N4mppp11real128_minEv" title="mppp::real128_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_min()</span></code></a>.</p>
 </dd>
 </dl>
@@ -3306,7 +2966,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE3maxEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE3maxEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE3maxEv"></span><span id="std::numeric_limits:mppp::real128:::maxCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE3maxEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the output of <a class="reference internal" href="#_CPPv4N4mppp11real128_maxEv" title="mppp::real128_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_max()</span></code></a>.</p>
 </dd>
 </dl>
@@ -3316,7 +2976,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE6lowestEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE6lowestEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE6lowestEv"></span><span id="std::numeric_limits:mppp::real128:::lowestCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lowest</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE6lowestEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the negative of the output of <a class="reference internal" href="#_CPPv4N4mppp11real128_maxEv" title="mppp::real128_max"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_max()</span></code></a>.</p>
 </dd>
 </dl>
@@ -3326,7 +2986,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE7epsilonEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE7epsilonEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE7epsilonEv"></span><span id="std::numeric_limits:mppp::real128:::epsilonCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">epsilon</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE7epsilonEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the output of <a class="reference internal" href="#_CPPv4N4mppp15real128_epsilonEv" title="mppp::real128_epsilon"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_epsilon()</span></code></a>.</p>
 </dd>
 </dl>
@@ -3336,7 +2996,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE11round_errorEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE11round_errorEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE11round_errorEv"></span><span id="std::numeric_limits:mppp::real128:::round_errorCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">round_error</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE11round_errorEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p>
 </dd>
 </dl>
@@ -3346,7 +3006,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE8infinityEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE8infinityEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE8infinityEv"></span><span id="std::numeric_limits:mppp::real128:::infinityCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">infinity</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE8infinityEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the output of <a class="reference internal" href="#_CPPv4N4mppp11real128_infEv" title="mppp::real128_inf"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_inf()</span></code></a>.</p>
 </dd>
 </dl>
@@ -3356,7 +3016,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE9quiet_NaNEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE9quiet_NaNEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE9quiet_NaNEv"></span><span id="std::numeric_limits:mppp::real128:::quiet_NaNCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quiet_NaN</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE9quiet_NaNEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the output of <a class="reference internal" href="#_CPPv4N4mppp11real128_nanEv" title="mppp::real128_nan"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_nan()</span></code></a>.</p>
 </dd>
 </dl>
@@ -3366,7 +3026,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE13signaling_NaNEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE13signaling_NaNEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE13signaling_NaNEv"></span><span id="std::numeric_limits:mppp::real128:::signaling_NaNCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">signaling_NaN</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE13signaling_NaNEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
 </dd>
 </dl>
@@ -3376,7 +3036,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NSt14numeric_limitsIN4mppp7real128EE10denorm_minEv">
 <span id="_CPPv3NSt14numeric_limitsIN4mppp7real128EE10denorm_minEv"></span><span id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE10denorm_minEv"></span><span id="std::numeric_limits:mppp::real128:::denorm_minCE"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">denorm_min</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4NSt14numeric_limitsIN4mppp7real128EE10denorm_minEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the output of <a class="reference internal" href="#_CPPv4N4mppp18real128_denorm_minEv" title="mppp::real128_denorm_min"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::real128_denorm_min()</span></code></a>.</p>
 </dd>
 </dl>
@@ -3410,10 +3070,10 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 <dt class="sig sig-object cpp" id="_CPPv4NKSt4hashIN4mppp7real128EEclERKN4mppp7real128E">
 <span id="_CPPv3NKSt4hashIN4mppp7real128EEclERKN4mppp7real128E"></span><span id="_CPPv2NKSt4hashIN4mppp7real128EEclERKN4mppp7real128E"></span><span id="std::hash:mppp::real128:::call-operator__mppp::real128CRC"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">mppp</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><span class="n"><span class="pre">real128</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NKSt4hashIN4mppp7real128EEclERKN4mppp7real128E" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – the input <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::real128</span></code></a>.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a hash value for <em>x</em>.</p>
 </dd>
 </dl>
@@ -3423,7 +3083,7 @@ by <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real
 
 </section>
 <section id="user-defined-literals">
-<span id="real128-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">#</a></h2>
+<span id="real128-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this heading">#</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 0.19.</span></p>
 </div>
@@ -3439,7 +3099,7 @@ hexadecimal format are supported.</p>
 <p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/floating_literal">https://en.cppreference.com/w/cpp/language/floating_literal</a></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Throws</dt>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if the input sequence of characters is not
 a valid floating-point literal (as defined by the C++ standard).</p>
 </dd>
@@ -3450,50 +3110,125 @@ a valid floating-point literal (as defined by the C++ standard).</p>
 </section>
 
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="rational.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Multiprecision rationals</p>
-        </div>
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="rational.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Multiprecision rationals</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="complex128.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="complex128.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Quadruple-precision complex numbers</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real128-class">The real128 class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types">Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#concepts">Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion">Conversion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arithmetic">Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison">Comparison</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#roots">Roots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponentiation">Exponentiation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trigonometry">Trigonometry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hyperbolic-functions">Hyperbolic functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gamma-functions">Gamma functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bessel-functions">Bessel functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-special-functions">Other special functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#floating-point-manipulation">Floating-point manipulation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#integer-and-remainder-related-functions">Integer and remainder-related functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-output">Input/Output</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-operators">Mathematical operators</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constants">Constants</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#standard-library-specialisations">Standard library specialisations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-defined-literals">User-defined literals</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
   
-    By Francesco Biscani<br/>
-  
-      &copy; Copyright 2016-2021, Francesco Biscani.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
+<p class="component-author">
+By Francesco Biscani
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2016-2021, Francesco Biscani.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
 </div>
+          </footer>
+        
 
-
-      </div>
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>
