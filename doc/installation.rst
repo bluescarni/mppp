@@ -19,7 +19,7 @@ a comprehensive continuous integration pipeline, which includes:
 mp++ has the following dependencies:
 
 * the `GMP <https://gmplib.org/>`__ library, **mandatory** (GMP 5 and later versions are supported,
-  the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
+  the `MPIR <https://github.com/wbhart/mpir>`__ fork of GMP can also be used);
 * the `GNU MPFR <https://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support
   for the ``long double`` type in :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`

@@ -7,36 +7,36 @@ on:
     branches:
       - master
 jobs:
-  osx_10_15:
-    runs-on: macos-10.15
+  osx_11:
+    runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build
         run: bash tools/gha_osx.sh
-  bionic_gcc7_conda_asan:
-    runs-on: ubuntu-18.04
+  conda_asan:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build
-        run: bash tools/gha_bionic_gcc7_conda_asan.sh
-  bionic_gcc7_conda_ubsan:
-    runs-on: ubuntu-18.04
+        run: bash tools/gha_conda_asan.sh
+  conda_ubsan:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build
-        run: bash tools/gha_bionic_gcc7_conda_ubsan.sh
-  focal_clang9_conda_tsan:
-    runs-on: ubuntu-20.04
+        run: bash tools/gha_conda_ubsan.sh
+  conda_tsan:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build
-        run: bash tools/gha_focal_clang9_conda_tsan.sh
-  focal_clang9_debuggmp:
-    runs-on: ubuntu-20.04
+        run: bash tools/gha_conda_tsan.sh
+  conda_debuggmp:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build
-        run: bash tools/gha_focal_clang9_debuggmp.sh
+        run: bash tools/gha_debuggmp.sh
   binder_cache:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
