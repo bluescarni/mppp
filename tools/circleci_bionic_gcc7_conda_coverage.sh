@@ -7,31 +7,41 @@ set -x
 set -e
 
 # Core deps.
-sudo apt-get install build-essential wget curl
+sudo apt-get install wget curl
 
 # Install conda+deps.
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O mambaforge.sh
 export deps_dir=$HOME/local
-export PATH="$HOME/miniconda/bin:$PATH"
-bash miniconda.sh -b -p $HOME/miniconda
-conda config --add channels conda-forge
-conda config --set channel_priority strict
-conda_pkgs="cmake gmp mpfr libflint arb mpc"
-conda create -q -p $deps_dir -y
+export PATH="$HOME/mambaforge/bin:$PATH"
+bash mambaforge.sh -b -p $HOME/mambaforge
+mamba create -y -p $deps_dir c-compiler cxx-compiler ninja cmake gmp mpfr 'libflint<3' arb mpc fmt libboost-devel lcov
 source activate $deps_dir
-conda install $conda_pkgs -y
 
 # Create the build dir and cd into it.
 mkdir build
 cd build
 
 # GCC build.
-cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_CXX_STANDARD=14 -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage -fconcepts -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC" -DMPPP_BUILD_STATIC_LIBRARY=yes -DMPPP_ENABLE_IPO=yes
-make -j2 VERBOSE=1
+cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_CXX_STANDARD=17 \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DMPPP_BUILD_TESTS=yes \
+    -DMPPP_WITH_MPFR=yes \
+    -DMPPP_WITH_MPC=yes \
+    -DMPPP_WITH_ARB=yes \
+    -DMPPP_WITH_QUADMATH=yes \
+    -DMPPP_WITH_BOOST_S11N=yes \
+    -DCMAKE_CXX_FLAGS="--coverage"
+make -j4 VERBOSE=1
 # Run the tests.
-ctest -V -j2
+ctest -V -j4
+
+# Create lcov report
+lcov --capture --directory . --output-file coverage.info
+
 # Upload coverage data.
-bash <(curl -s https://codecov.io/bash) -x gcov-7
+curl -Os https://uploader.codecov.io/latest/linux/codecov
+chmod +x codecov
+./codecov -f coverage.info -g --gx $deps_dir/bin/gcov
 
 set +e
 set +x
