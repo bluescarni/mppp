@@ -1,11 +1,13 @@
 # mp++
 [![Build Status](https://img.shields.io/circleci/project/github/bluescarni/mppp/master.svg?style=for-the-badge)](https://circleci.com/gh/bluescarni/mppp)
-[![Build Status](https://img.shields.io/github/workflow/status/bluescarni/mppp/GitHub%20CI?style=for-the-badge)](https://github.com/bluescarni/mppp/actions?query=workflow%3A%22GitHub+CI%22)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bluescarni/mppp/gh_actions_ci.yml?branch=master&style=for-the-badge)](https://github.com/bluescarni/mppp/actions?query=workflow%3A%22GitHub+CI%22)
 ![language](https://img.shields.io/badge/language-C%2B%2B11-red.svg?style=for-the-badge)
+![language](https://img.shields.io/badge/language-C%2B%2B17-red.svg?style=for-the-badge)
+![language](https://img.shields.io/badge/language-C%2B%2B20-red.svg?style=for-the-badge)
 [![Code Coverage](https://img.shields.io/codecov/c/github/bluescarni/mppp.svg?style=for-the-badge)](https://codecov.io/github/bluescarni/mppp?branch=master)
 [![Join the chat at https://gitter.im/bluescarni/mppp](https://img.shields.io/badge/gitter-join--chat-green.svg?logo=gitter-white&style=for-the-badge)](https://gitter.im/bluescarni/mppp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Anaconda-Server Badge](https://img.shields.io/conda/vn/conda-forge/mppp.svg?style=for-the-badge)](https://anaconda.org/conda-forge/mppp)
-[![DOI](https://zenodo.org/badge/66504757.svg)](https://doi.org/10.5281/zenodo.1043579)
+<!-- [![DOI](https://zenodo.org/badge/66504757.svg)](https://doi.org/10.5281/zenodo.1043579) -->
 
 mp++ is a C++11/14/17/20 library for multiprecision arithmetic,
 featuring:
