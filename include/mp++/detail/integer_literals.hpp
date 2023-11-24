@@ -403,7 +403,7 @@ inline namespace literals
 
 #define MPPP_DECLARE_INTEGRAL_UDL(n)                                                                                   \
     template <char... Chars>                                                                                           \
-    inline integer<n> operator"" _z##n()                                                                               \
+    inline integer<n> operator""_z##n()                                                                                \
     {                                                                                                                  \
         return detail::integer_literal_impl<n, Chars...>();                                                            \
     }

@@ -18,7 +18,7 @@ inline namespace literals
 {
 
 template <char... Chars>
-inline real128 operator"" _rq()
+inline real128 operator""_rq()
 {
     // Turn the sequence of input chars
     // into a null-terminated char array.
