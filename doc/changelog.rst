@@ -4,6 +4,11 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+New
+~~~
+
+- mp++ now uses semantic versioning.
+
 Fix
 ~~~
 
