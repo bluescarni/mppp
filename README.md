@@ -9,6 +9,23 @@
 [![Anaconda-Server Badge](https://img.shields.io/conda/vn/conda-forge/mppp.svg?style=for-the-badge)](https://anaconda.org/conda-forge/mppp)
 <!-- [![DOI](https://zenodo.org/badge/66504757.svg)](https://doi.org/10.5281/zenodo.1043579) -->
 
+<!-- PROJECT LOGO -->
+<br />
+<p align="center">
+  <p align="center">
+    Multiprecision for C++
+    <br />
+    <a href="https://bluescarni.github.io/mppp/index.html"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/bluescarni/mppp/issues/new/choose">Report bug</a>
+    ·
+    <a href="https://github.com/bluescarni/mppp/issues/new/choose">Request feature</a>
+    ·
+    <a href="https://github.com/bluescarni/mppp/discussions">Discuss</a>
+  </p>
+</p>
+
 mp++ is a C++11/14/17/20 library for multiprecision arithmetic,
 featuring:
 
@@ -54,6 +71,3 @@ at [this link](https://doi.org/10.5281/zenodo.1043579).
 
 The documentation is available [here](https://bluescarni.github.io/mppp/).
 
-> :warning: mp++ is under active development, and, although we try not to break the API
-> gratuitously, backwards-incompatible changes do happen from time to time.
-> The API will be stabilised with the upcoming release of version 1.0.

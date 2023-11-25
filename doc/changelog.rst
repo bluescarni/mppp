@@ -1,6 +1,18 @@
 Changelog
 =========
 
+1.0.0 (unreleased)
+------------------
+
+Fix
+~~~
+
+- Fix C++20 deprecations about user-defined literals
+  (`#303 <https://github.com/bluescarni/mppp/pull/303>`__).
+- Fix compilation in C++20 mode with recent versions
+  of the fmt library
+  (`#303 <https://github.com/bluescarni/mppp/pull/303>`__).
+
 0.27 (2022-10-21)
 -----------------
 
