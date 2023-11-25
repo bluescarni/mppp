@@ -21,6 +21,9 @@ source activate $deps_dir
 mkdir build
 cd build
 
+unset CFLAGS
+unset CXXFLAGS
+
 # GCC build.
 cmake ../ -G Ninja \
     -DCMAKE_PREFIX_PATH=$deps_dir \
