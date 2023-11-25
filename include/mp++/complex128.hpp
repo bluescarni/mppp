@@ -56,8 +56,7 @@
 
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 // Re-define in the mppp namespace the __complex128 type
 // (using another name). This allows us to avoid having
@@ -1310,7 +1309,7 @@ inline MPPP_CONSTEXPR_14 real128 &real128::operator=(const complex128 &x)
     return *this = static_cast<real128>(x);
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -1340,8 +1339,7 @@ struct formatter<mppp::complex128> : mppp::detail::to_string_formatter {
 
 #include <nlohmann/json.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 inline nlohmann::json mime_bundle_repr(const complex128 &c)
 {
@@ -1352,7 +1350,7 @@ inline nlohmann::json mime_bundle_repr(const complex128 &c)
     return bundle;
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif
 

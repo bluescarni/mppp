@@ -19,6 +19,9 @@ source activate $deps_dir
 mkdir build
 cd build
 
+unset CFLAGS
+unset CXXFLAGS
+
 cmake ../ -G Ninja \
     -DCMAKE_PREFIX_PATH=$deps_dir \
     -DCMAKE_CXX_STANDARD=20 \

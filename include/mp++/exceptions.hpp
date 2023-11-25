@@ -11,10 +11,10 @@
 
 #include <stdexcept>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/visibility.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 // Exception to signal division by zero.
 class MPPP_DLL_PUBLIC_INLINE_CLASS zero_division_error final : public std::domain_error
@@ -23,6 +23,6 @@ public:
     using std::domain_error::domain_error;
 };
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

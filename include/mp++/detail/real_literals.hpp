@@ -11,8 +11,7 @@
 
 #include <mp++/detail/mpfr.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -64,6 +63,6 @@ MPPP_DECLARE_REAL_UDL(1024)
 
 } // namespace literals
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

@@ -23,8 +23,7 @@
 #include <mp++/detail/visibility.hpp>
 #include <mp++/type_name.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -314,6 +313,7 @@ inline void hash_combine(std::size_t &seed, const T &val)
 
 #endif
 } // namespace detail
-} // namespace mppp
+
+MPPP_END_NAMESPACE
 
 #endif

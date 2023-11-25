@@ -21,8 +21,7 @@
 #include <mp++/detail/utils.hpp>
 
 // NOLINTNEXTLINE(modernize-concat-nested-namespaces)
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -105,4 +104,4 @@ std::string to_string(__int128_t n)
 
 } // namespace detail
 
-} // namespace mppp
+MPPP_END_NAMESPACE

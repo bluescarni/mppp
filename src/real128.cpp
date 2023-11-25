@@ -41,8 +41,7 @@
 #include <mp++/integer.hpp>
 #include <mp++/real128.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 // Double check our assumption regarding
 // the number of binary digits in the
@@ -527,4 +526,4 @@ void real128::load(boost::archive::binary_iarchive &ar, unsigned)
 
 #endif
 
-} // namespace mppp
+MPPP_END_NAMESPACE

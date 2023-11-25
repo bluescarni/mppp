@@ -20,9 +20,7 @@
 #include <mp++/type_name.hpp>
 
 // NOLINTNEXTLINE(modernize-concat-nested-namespaces)
-namespace mppp
-{
-
+MPPP_BEGIN_NAMESPACE
 namespace detail
 {
 
@@ -50,4 +48,4 @@ std::string demangle_from_typeid(const char *s)
 
 } // namespace detail
 
-} // namespace mppp
+MPPP_END_NAMESPACE

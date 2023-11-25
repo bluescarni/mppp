@@ -13,8 +13,7 @@
 
 #include <mp++/config.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 template <std::size_t>
 class integer;
@@ -41,6 +40,6 @@ class complex128;
 
 #endif
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

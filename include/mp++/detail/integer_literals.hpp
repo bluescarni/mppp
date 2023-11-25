@@ -21,8 +21,7 @@
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/utils.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -416,6 +415,6 @@ MPPP_DECLARE_INTEGRAL_UDL(3)
 
 } // namespace literals
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

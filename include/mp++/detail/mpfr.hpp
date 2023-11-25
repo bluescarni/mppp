@@ -13,6 +13,8 @@
 
 #include <mpfr.h>
 
+#include <mp++/config.hpp>
+
 #if MPFR_VERSION_MAJOR < 3
 
 #error Minimum supported MPFR version is 3.
@@ -28,8 +30,7 @@
 
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 // Minimum precision for a real.
 constexpr ::mpfr_prec_t real_prec_min()
@@ -82,6 +83,6 @@ struct mpfr_raii {
 
 } // namespace detail
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

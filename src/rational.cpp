@@ -25,8 +25,7 @@
 #include <mp++/rational.hpp>
 
 // NOLINTNEXTLINE(modernize-concat-nested-namespaces)
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -241,4 +240,4 @@ std::ostream &rational_stream_operator_impl(std::ostream &os, const mpz_struct_t
 
 } // namespace detail
 
-} // namespace mppp
+MPPP_END_NAMESPACE

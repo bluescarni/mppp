@@ -67,8 +67,7 @@
 #include <mp++/real128.hpp>
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -4587,7 +4586,7 @@ inline rational<SSize> &rational<SSize>::operator=(const real &x)
 // Hashing.
 MPPP_DLL_PUBLIC std::size_t hash(const real &);
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -4641,8 +4640,7 @@ struct formatter<mppp::real> : mppp::detail::to_string_formatter {
 
 #include <nlohmann/json.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 inline nlohmann::json mime_bundle_repr(const real &x)
 {
@@ -4653,7 +4651,7 @@ inline nlohmann::json mime_bundle_repr(const real &x)
     return bundle;
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif
 

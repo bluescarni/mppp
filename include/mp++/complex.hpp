@@ -61,8 +61,7 @@
 
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 // Detect real-valued interoperable types
 // for complex.
@@ -3199,7 +3198,7 @@ inline rational<SSize> &rational<SSize>::operator=(const complex &c)
     return *this = static_cast<rational<SSize>>(c);
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -3229,8 +3228,7 @@ struct formatter<mppp::complex> : mppp::detail::to_string_formatter {
 
 #include <nlohmann/json.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 inline nlohmann::json mime_bundle_repr(const complex &c)
 {
@@ -3241,7 +3239,7 @@ inline nlohmann::json mime_bundle_repr(const complex &c)
     return bundle;
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif
 

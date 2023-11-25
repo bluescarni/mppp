@@ -15,14 +15,15 @@
 
 #include <gmp.h>
 
+#include <mp++/config.hpp>
+
 #if __GNU_MP_VERSION < 5
 
 #error Minimum supported GMP version is 5.
 
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -98,6 +99,7 @@ struct mpf_raii {
     mpf_struct_t m_mpf;
 };
 } // namespace detail
-} // namespace mppp
+
+MPPP_END_NAMESPACE
 
 #endif

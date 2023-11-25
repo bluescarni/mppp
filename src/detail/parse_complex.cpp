@@ -15,8 +15,7 @@
 #include <mp++/detail/parse_complex.hpp>
 
 // NOLINTNEXTLINE(modernize-concat-nested-namespaces)
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -124,4 +123,4 @@ std::array<const char *, 4> parse_complex(const char *str)
 
 } // namespace detail
 
-} // namespace mppp
+MPPP_END_NAMESPACE

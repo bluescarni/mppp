@@ -21,6 +21,9 @@ source activate $deps_dir
 mkdir build
 cd build
 
+unset CFLAGS
+unset CXXFLAGS
+
 # Download and compile locally GMP in debug mode.
 GMP_VERSION="6.2.1"
 wget https://github.com/esa/manylinux_x86_64_with_deps/raw/master/gmp-${GMP_VERSION}.tar.bz2 -O gmp.tar.bz2
