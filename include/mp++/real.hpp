@@ -804,6 +804,9 @@ public:
         return mpfr_signbit(&m_mpfr) != 0;
     }
 
+    // Get the epsilon corresponding to the precision of this.
+    MPPP_NODISCARD real eps() const;
+
     // Get the precision of this.
     MPPP_NODISCARD ::mpfr_prec_t get_prec() const
     {
@@ -1946,6 +1949,12 @@ inline bool signbit(const real &r)
 {
     return r.signbit();
 }
+
+// Return the epsilon corresponding to the precision of the input value.
+MPPP_DLL_PUBLIC real eps(const real &);
+
+// Return the epsilon corresponding to the input precision value.
+MPPP_DLL_PUBLIC real prec_to_eps(::mpfr_prec_t);
 
 // Comparison.
 MPPP_DLL_PUBLIC int cmp(const real &, const real &);
