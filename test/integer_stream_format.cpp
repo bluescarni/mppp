@@ -638,13 +638,14 @@ TEST_CASE("out test")
 
 TEST_CASE("fmt test")
 {
-    using Catch::Matchers::Message;
-
     REQUIRE(fmt::format("{}", 0_z1) == (0_z1).to_string());
+    REQUIRE(fmt::format("foo {} bar", 0_z1) == "foo 0 bar");
     REQUIRE(fmt::format("{}", -123_z2) == (-123_z2).to_string());
+    REQUIRE(fmt::format("foo {} bar", -123_z2) == "foo -123 bar");
 
-    REQUIRE_THROWS_MATCHES(fmt::format("{:<30}", 0_z1), std::invalid_argument,
-                           Message("No format strings are currently supported for mp++'s classes"));
+    // Check that format strings are ignored.
+    REQUIRE(fmt::format("foo {:} bar", -123_z2) == "foo -123 bar");
+    REQUIRE(fmt::format("foo {:<30} bar", -123_z2) == "foo -123 bar");
 }
 
 #endif

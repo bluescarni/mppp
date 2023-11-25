@@ -319,13 +319,17 @@ TEST_CASE("ostream test")
 
 TEST_CASE("fmt test")
 {
-    using Catch::Matchers::Message;
-
     REQUIRE(fmt::format("{}", 0_icr256) == (0_icr256).to_string());
+    REQUIRE(fmt::format("foo {} bar", 0_icr256) == "foo " + (0_icr256).to_string() + " bar");
     REQUIRE(fmt::format("{}", -1.1_r256 + 2.1_icr256) == (-1.1_r256 + 2.1_icr256).to_string());
+    REQUIRE(fmt::format("foo {} bar", -1.1_r256 + 2.1_icr256)
+            == "foo " + (-1.1_r256 + 2.1_icr256).to_string() + " bar");
 
-    REQUIRE_THROWS_MATCHES(fmt::format("{:<30}", 2.1_icr256), std::invalid_argument,
-                           Message("No format strings are currently supported for mp++'s classes"));
+    // Check that format flags are ignored.
+    REQUIRE(fmt::format("foo {:<30} bar", -1.1_r256 + 2.1_icr256)
+            == "foo " + (-1.1_r256 + 2.1_icr256).to_string() + " bar");
+    REQUIRE(fmt::format("foo {:} bar", -1.1_r256 + 2.1_icr256)
+            == "foo " + (-1.1_r256 + 2.1_icr256).to_string() + " bar");
 }
 
 #endif

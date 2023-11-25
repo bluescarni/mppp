@@ -9,9 +9,9 @@
 #ifndef MPPP_DETAIL_FMT_HPP
 #define MPPP_DETAIL_FMT_HPP
 
-#include <stdexcept>
-
 #include <fmt/core.h>
+
+#include <mp++/config.hpp>
 
 namespace mppp
 {
@@ -21,13 +21,30 @@ namespace detail
 
 struct to_string_formatter {
     template <typename ParseContext>
-    auto parse(ParseContext &ctx) -> decltype(ctx.begin())
+    MPPP_CONSTEXPR_20 auto parse(ParseContext &ctx) -> decltype(ctx.begin())
     {
-        if (ctx.begin() != ctx.end()) {
-            throw std::invalid_argument("No format strings are currently supported for mp++'s classes");
+        auto it = ctx.begin();
+        const auto end = ctx.end();
+
+        // Handle the special case for the '{}' format string.
+        if (it == end) {
+            return it;
         }
 
-        return ctx.begin();
+        // Parse until we get to the end or we find
+        // the closing bracket '}', ignoring the format
+        // string.
+        for (; it != end; ++it) {
+            if (*it == '}') {
+                // NOTE: according to the docs, we must return
+                // an iterator pointing to '}'.
+                return it;
+            }
+        }
+
+        // LCOV_EXCL_START
+        fmt::throw_format_error("Invalid format");
+        // LCOV_EXCL_STOP
     }
 
     template <typename T, typename FormatContext>
