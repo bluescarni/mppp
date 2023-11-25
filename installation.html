@@ -403,12 +403,11 @@ document.write(`
 <p>mp++ is written in modern C++, and it requires a compiler able to understand
 at least C++11 (mp++ will also use features from C++14, C++17 and C++20,
 if supported by the compiler). The library is regularly tested on
-a comprehensive continuous integration pipeline, which includes:</p>
+a continuous integration pipeline which includes:</p>
 <ul class="simple">
-<li><p>various versions of the three major compilers (GCC, Clang and MSVC <a class="footnote-reference brackets" href="#f1" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>),</p></li>
-<li><p>various versions of the three major operating systems
-(Linux, Windows and OSX),</p></li>
-<li><p>x86, ARM and PowerPC processors.</p></li>
+<li><p>the three major compilers (GCC, Clang and MSVC),</p></li>
+<li><p>the three major operating systems (Linux, Windows and OSX),</p></li>
+<li><p>x86 and ARM processors.</p></li>
 </ul>
 <p>mp++ has the following dependencies:</p>
 <ul class="simple">
@@ -435,14 +434,6 @@ to provide formatting capabilities to the multiprecision classes and in the benc
 </ul>
 <p>Additionally, <a class="reference external" href="https://cmake.org/">CMake</a> is the build system used by mp++ and it must also be available when
 installing from source (the minimum required version is 3.8).</p>
-<p class="rubric">Footnotes</p>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="f1" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
-<p>The Intel compiler is also occasionally tested, but it is not part of the continuous
-integration setup.</p>
-</aside>
-</aside>
 </section>
 <section id="installation-from-source">
 <h2>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this heading">#</a></h2>
@@ -690,7 +681,7 @@ errors when performing <code class="docutils literal notranslate"><span class="p
 <p>MinGW:</p>
 <ul class="simple">
 <li><p>Due to a compiler bug in the implementation of <code class="docutils literal notranslate"><span class="pre">thread_local</span></code>
-storage <a class="footnote-reference brackets" href="#mingw-tls" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>,
+storage <a class="footnote-reference brackets" href="#mingw-tls" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>,
 certain performance optimisations are disabled
 when compiling with MinGW.</p></li>
 </ul>
@@ -709,16 +700,16 @@ functions are compile-time constants, the compiler
 <em>may</em> decide (depending on the optimisation level) to actually compute the
 result at compile time using full <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> precision.
 This behaviour can lead to subtle inconsistencies, and it results in one
-test case from the mp++ test suite failing on FreeBSD <a class="footnote-reference brackets" href="#freebsd-mppp-bug" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p></li>
+test case from the mp++ test suite failing on FreeBSD <a class="footnote-reference brackets" href="#freebsd-mppp-bug" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p></li>
 </ul>
 <p class="rubric">Footnotes</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="mingw-tls" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://sourceforge.net/p/mingw-w64/bugs/445/">https://sourceforge.net/p/mingw-w64/bugs/445/</a></p>
 </aside>
 <aside class="footnote brackets" id="freebsd-mppp-bug" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
 <p><a class="github reference external" href="https://github.com/bluescarni/mppp/issues/132">bluescarni/mppp#132</a></p>
 </aside>
 </aside>

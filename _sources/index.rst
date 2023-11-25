@@ -53,12 +53,6 @@ the repository and/or cite our work. The DOI of the latest version
 and other citation resources are available
 at `this link <https://doi.org/10.5281/zenodo.1043579>`__.
 
-.. warning::
-
-   mp++ is under active development, and, although we try not to break the API
-   gratuitously, backwards-incompatible changes do happen from time to time.
-   The API will be stabilised with the upcoming release of version 1.0.
-
 .. note::
 
    This documentation refers to the latest development version of mp++, and it may describe features
