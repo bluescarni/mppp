@@ -16,8 +16,7 @@
 #include <mp++/config.hpp>
 #include <mp++/detail/visibility.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -111,6 +110,6 @@ inline std::string type_name()
     return ret;
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

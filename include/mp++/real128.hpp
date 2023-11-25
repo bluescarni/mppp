@@ -60,8 +60,7 @@
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -2136,7 +2135,7 @@ inline rational<SSize> &rational<SSize>::operator=(const real128 &x)
     return *this = static_cast<rational<SSize>>(x);
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -2265,8 +2264,7 @@ struct formatter<mppp::real128> : mppp::detail::to_string_formatter {
 
 #include <nlohmann/json.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 inline nlohmann::json mime_bundle_repr(const real128 &x)
 {
@@ -2277,7 +2275,7 @@ inline nlohmann::json mime_bundle_repr(const real128 &x)
     return bundle;
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif
 

@@ -11,8 +11,9 @@
 
 #include <array>
 
-namespace mppp
-{
+#include <mp++/config.hpp>
+
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -21,6 +22,6 @@ std::array<const char *, 4> parse_complex(const char *);
 
 } // namespace detail
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

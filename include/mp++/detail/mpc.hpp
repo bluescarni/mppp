@@ -13,12 +13,13 @@
 
 #include <mpc.h>
 
-namespace mppp
-{
+#include <mp++/config.hpp>
+
+MPPP_BEGIN_NAMESPACE
 
 // The MPC structure underlying mpc_t.
 using mpc_struct_t = std::remove_extent<::mpc_t>::type;
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

@@ -11,8 +11,7 @@
 
 #include <mp++/integer.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 inline namespace literals
 {
@@ -32,6 +31,6 @@ MPPP_DECLARE_RATIONAL_UDL(3)
 
 } // namespace literals
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

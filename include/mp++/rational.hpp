@@ -60,8 +60,7 @@
 #include <mp++/detail/mpfr.hpp>
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 template <typename T, std::size_t SSize>
 using is_rational_interoperable
@@ -2280,7 +2279,7 @@ inline integer<SSize> &integer<SSize>::operator=(const rational<SSize> &q)
     return *this = static_cast<integer<SSize>>(q);
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -2348,8 +2347,7 @@ struct formatter<mppp::rational<SSize>> : mppp::detail::to_string_formatter {
 
 #include <nlohmann/json.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 template <std::size_t SSize>
 inline nlohmann::json mime_bundle_repr(const rational<SSize> &q)
@@ -2366,7 +2364,7 @@ inline nlohmann::json mime_bundle_repr(const rational<SSize> &q)
     return bundle;
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif
 

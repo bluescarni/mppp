@@ -40,8 +40,7 @@
 
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 static_assert(std::is_same<cplex128, __complex128>::value, "Mismatched __complex128 types.");
 
@@ -361,4 +360,4 @@ real &real::operator=(const complex128 &x)
 
 #endif
 
-} // namespace mppp
+MPPP_END_NAMESPACE

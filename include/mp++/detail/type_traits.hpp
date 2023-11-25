@@ -14,8 +14,7 @@
 #include <limits>
 #include <type_traits>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -296,6 +295,6 @@ struct nl_constants {
 
 } // namespace detail
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

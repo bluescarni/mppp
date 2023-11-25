@@ -111,8 +111,7 @@
 
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 // Strongly typed enum to represent a bit count in the constructor
 // of integer from number of bits.
@@ -8175,7 +8174,7 @@ inline T &operator^=(T &rop, const U &op)
     return rop;
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -8254,8 +8253,7 @@ struct formatter<mppp::integer<SSize>> : mppp::detail::to_string_formatter {
 
 #include <nlohmann/json.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 template <std::size_t SSize>
 inline nlohmann::json mime_bundle_repr(const integer<SSize> &n)
@@ -8267,7 +8265,7 @@ inline nlohmann::json mime_bundle_repr(const integer<SSize> &n)
     return bundle;
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif
 

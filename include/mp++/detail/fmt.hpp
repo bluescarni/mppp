@@ -13,8 +13,7 @@
 
 #include <mp++/config.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -56,6 +55,6 @@ struct to_string_formatter {
 
 } // namespace detail
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

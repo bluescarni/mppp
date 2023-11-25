@@ -62,8 +62,7 @@
 #include <mp++/real128.hpp>
 #endif
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -2924,7 +2923,7 @@ std::size_t prec_to_nlimbs(mpfr_prec_t p)
     return detail::rbs_prec_to_nlimbs(p);
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #if defined(_MSC_VER)
 

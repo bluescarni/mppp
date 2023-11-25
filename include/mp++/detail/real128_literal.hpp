@@ -11,8 +11,7 @@
 
 #include <stdexcept>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 inline namespace literals
 {
@@ -35,6 +34,6 @@ inline real128 operator""_rq()
 
 } // namespace literals
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

@@ -25,8 +25,7 @@
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -407,4 +406,4 @@ void free_integer_caches()
 #endif
 }
 
-} // namespace mppp
+MPPP_END_NAMESPACE

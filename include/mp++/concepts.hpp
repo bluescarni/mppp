@@ -22,8 +22,7 @@
 
 #include <mp++/detail/type_traits.hpp>
 
-namespace mppp
-{
+MPPP_BEGIN_NAMESPACE
 
 // Type trait to check if T is a C++ integral type, including possibly __(u)int128_t.
 // NOTE: mppp::detail::is_integral, for consistency with std::is_integral, will be true also for cv qualified
@@ -122,6 +121,6 @@ MPPP_CONCEPT_DECL string_type = is_string_type<T>::value;
 
 #endif
 
-} // namespace mppp
+MPPP_END_NAMESPACE
 
 #endif

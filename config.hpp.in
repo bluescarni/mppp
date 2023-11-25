@@ -37,6 +37,31 @@
 // clang-format on
 // End of defines instantiated by CMake.
 
+// Setup of the ABI versioning and tagging
+// machinery.
+
+#if defined(__GNUC__) || defined(__clang__)
+
+#define MPPP_ABI_TAG_ATTR __attribute__((abi_tag))
+
+#else
+
+#define MPPP_ABI_TAG_ATTR
+
+#endif
+
+// clang-format off
+#define MPPP_BEGIN_NAMESPACE                                                                                         \
+    namespace mppp                                                                                                   \
+    {                                                                                                                \
+    inline namespace v@MPPP_ABI_VERSION@ MPPP_ABI_TAG_ATTR                                                           \
+    {
+
+#define MPPP_END_NAMESPACE                                                                                           \
+    }                                                                                                                \
+    }
+// clang-format on
+
 // Compiler configuration.
 
 #if defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
