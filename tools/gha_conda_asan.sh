@@ -23,7 +23,7 @@ cd build
 
 cmake ../ -G Ninja \
     -DCMAKE_PREFIX_PATH=$deps_dir \
-    -DCMAKE_CXX_STANDARD=17 \
+    -DCMAKE_CXX_STANDARD=20 \
     -DCMAKE_BUILD_TYPE=Debug \
     -DMPPP_BUILD_TESTS=yes \
     -DBoost_NO_BOOST_CMAKE=yes \
