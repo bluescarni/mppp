@@ -9,12 +9,11 @@ Introduction
 mp++ is written in modern C++, and it requires a compiler able to understand
 at least C++11 (mp++ will also use features from C++14, C++17 and C++20,
 if supported by the compiler). The library is regularly tested on
-a comprehensive continuous integration pipeline, which includes:
+a continuous integration pipeline which includes:
 
-* various versions of the three major compilers (GCC, Clang and MSVC [#f1]_),
-* various versions of the three major operating systems
-  (Linux, Windows and OSX),
-* x86, ARM and PowerPC processors.
+* the three major compilers (GCC, Clang and MSVC),
+* the three major operating systems (Linux, Windows and OSX),
+* x86 and ARM processors.
 
 mp++ has the following dependencies:
 
@@ -41,11 +40,6 @@ mp++ has the following dependencies:
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
 installing from source (the minimum required version is 3.8).
-
-.. rubric:: Footnotes
-
-.. [#f1] The Intel compiler is also occasionally tested, but it is not part of the continuous
-     integration setup.
 
 Installation from source
 ------------------------
