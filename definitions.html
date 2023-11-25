@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Macros and definitions &#8212; mp++ 0.27 documentation</title>
+    <title>Macros and definitions &#8212; mp++ 1.0.0 documentation</title>
   
   
   
@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Namespaces" href="namespaces.html" />
-    <link rel="prev" title="Reference" href="reference.html" />
+    <link rel="prev" title="Versioning" href="versioning.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -128,7 +128,7 @@
   
   
   
-    <p class="title logo__title">mp++ 0.27 documentation</p>
+    <p class="title logo__title">mp++ 1.0.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -163,6 +163,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="reference.html">Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="versioning.html">Versioning</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Macros and definitions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
@@ -387,21 +388,31 @@ document.write(`
 <dt class="sig sig-object c" id="c.MPPP_VERSION_STRING">
 <span class="sig-name descname"><span class="n"><span class="pre">MPPP_VERSION_STRING</span></span></span><a class="headerlink" href="#c.MPPP_VERSION_STRING" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This definition expands to a string literal containing the full version of the mp++ library
-(e.g., for version 0.6 this macro expands to <code class="docutils literal notranslate"><span class="pre">&quot;0.6&quot;</span></code>).</p>
+(e.g., for version 1.2.3 this macro expands to <code class="docutils literal notranslate"><span class="pre">&quot;1.2.3&quot;</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.MPPP_VERSION_MAJOR">
 <span class="sig-name descname"><span class="n"><span class="pre">MPPP_VERSION_MAJOR</span></span></span><a class="headerlink" href="#c.MPPP_VERSION_MAJOR" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This definition expands to an integral literal corresponding to the major mp++ version (e.g.,
-for version 0.6, this macro expands to <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p>
+for version 1.2.3, this macro expands to <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.MPPP_VERSION_MINOR">
 <span class="sig-name descname"><span class="n"><span class="pre">MPPP_VERSION_MINOR</span></span></span><a class="headerlink" href="#c.MPPP_VERSION_MINOR" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This definition expands to an integral literal corresponding to the minor mp++ version (e.g.,
-for version 0.6, this macro expands to <code class="docutils literal notranslate"><span class="pre">6</span></code>).</p>
+for version 1.2.3, this macro expands to <code class="docutils literal notranslate"><span class="pre">2</span></code>).</p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.MPPP_VERSION_PATCH">
+<span class="sig-name descname"><span class="n"><span class="pre">MPPP_VERSION_PATCH</span></span></span><a class="headerlink" href="#c.MPPP_VERSION_PATCH" title="Permalink to this definition">#</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 1.0.0.</span></p>
+</div>
+<p>This definition expands to an integral literal corresponding to the patch mp++ version (e.g.,
+for version 1.2.3, this macro expands to <code class="docutils literal notranslate"><span class="pre">3</span></code>).</p>
 </dd></dl>
 
 <dl class="c macro">
@@ -533,12 +544,12 @@ class (available since C++17).</p>
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="reference.html"
+       href="versioning.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Reference</p>
+        <p class="prev-next-title">Versioning</p>
       </div>
     </a>
     <a class="right-next"

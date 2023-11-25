@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>mp++ &#8212; mp++ 1.0.0 documentation</title>
+    <title>Versioning &#8212; mp++ 1.0.0 documentation</title>
   
   
   
@@ -42,10 +42,11 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'versioning';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="next" title="Macros and definitions" href="definitions.html" />
+    <link rel="prev" title="Reference" href="reference.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -120,7 +121,7 @@
         <div class="sidebar-primary-item">
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="index.html">
   
   
   
@@ -132,7 +133,7 @@
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
@@ -161,8 +162,8 @@
 <li class="toctree-l2"><a class="reference internal" href="notebooks/real_basics.html">Real basics</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="reference.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="versioning.html">Versioning</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="reference.html">Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Versioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
@@ -253,7 +254,7 @@
       
       
       
-      <li><a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/bluescarni/mppp/issues/new?title=Issue%20on%20page%20%2Fversioning.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -283,7 +284,7 @@
       
       
       
-      <li><a href="_sources/index.rst" target="_blank"
+      <li><a href="_sources/versioning.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -363,7 +364,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>mp++</h1>
+    <h1>Versioning</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -377,67 +378,10 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="mp">
-<h1>mp++<a class="headerlink" href="#mp" title="Permalink to this heading">#</a></h1>
-<p>mp++ is a C++11/14/17/20 library for multiprecision arithmetic,
-featuring:</p>
-<ul class="simple">
-<li><p>arbitrary-precision integers,</p></li>
-<li><p>arbitrary-precision rationals,</p></li>
-<li><p>quadruple-precision floats,</p></li>
-<li><p>quadruple-precision complex numbers,</p></li>
-<li><p>arbitrary-precision floats,</p></li>
-<li><p>arbitrary-precision complex numbers.</p></li>
-</ul>
-<p>Design goals include:</p>
-<ul class="simple">
-<li><p>excellent performance for small integer and rational
-operands,</p></li>
-<li><p>easy embeddability in computer algebra systems and
-generic C++ libraries,</p></li>
-<li><p>a large collection of arbitrary-precision special functions,</p></li>
-<li><p>an ergonomic API based on modern C++ idioms.</p></li>
-</ul>
-<p>Design non-goals include:</p>
-<ul class="simple">
-<li><p>support for fixed-size wide integrals (i.e., no <code class="docutils literal notranslate"><span class="pre">uint512_t</span></code>,
-try <a class="reference external" href="https://www.boost.org/doc/libs/1_72_0/libs/multiprecision/doc/html/index.html">Boost Multiprecision</a>
-instead).</p></li>
-</ul>
-<p>Built on top of the GNU multiprecision stack (<a class="reference external" href="https://gmplib.org/">GMP</a>,
-<a class="reference external" href="https://www.mpfr.org">MPFR</a>, <a class="reference external" href="http://www.multiprecision.org/mpc/">MPC</a>),
-mp++ was initially conceived as a GMP wrapper with special focus on performance with
-small operands. In particular, a small buffer optimisation and custom
-implementations of basic mathematical primitives are instrumental in
-achieving a performance increase, with respect to GMP and other integer
-multiprecision libraries, which can be
-substantial (see the <a class="reference internal" href="benchmarks.html#benchmarks"><span class="std std-ref">benchmarks</span></a> section).</p>
-<p>Over time, mp++ has accrued many additional features, including
-multiprecision real and complex number types, and an expanding
-library of special functions (built in part on top of the excellent
-<a class="reference external" href="https://arblib.org/">Arb</a> library).</p>
-<p>mp++ is a spinoff of the <a class="reference external" href="https://github.com/bluescarni/piranha">Piranha</a> library, released under the
-<a class="reference external" href="https://www.mozilla.org/en-US/MPL/2.0/FAQ/">MPL2</a> license.
-If you are using mp++ as part of your research, teaching, or other
-activities, we would be grateful if you could star
-the repository and/or cite our work. The DOI of the latest version
-and other citation resources are available
-at <a class="reference external" href="https://doi.org/10.5281/zenodo.1043579">this link</a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This documentation refers to the latest development version of mp++, and it may describe features
-not yet available in mp++’s stable releases.</p>
-</div>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="interactive_notebooks.html">Interactive notebooks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
-</div>
+  <section id="versioning">
+<h1>Versioning<a class="headerlink" href="#versioning" title="Permalink to this heading">#</a></h1>
+<p>Beginning with version 1.0.0, mp++ adopts <a class="reference external" href="https://semver.org/">semantic versioning</a>.</p>
+<p>ABI compatibility is guaranteed only between patch versions.</p>
 </section>
 
 
@@ -451,12 +395,21 @@ not yet available in mp++’s stable releases.</p>
                 <footer class="prev-next-footer">
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="reference.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Reference</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="installation.html"
+       href="definitions.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation</p>
+        <p class="prev-next-title">Macros and definitions</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

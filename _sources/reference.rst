@@ -9,6 +9,7 @@ Before perusing the C++ reference, users are encouraged to first go through the 
 .. toctree::
    :maxdepth: 1
 
+   versioning.rst
    definitions.rst
    namespaces.rst
    exceptions.rst

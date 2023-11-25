@@ -4,6 +4,13 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+New
+~~~
+
+- mp++'s ABI is now versioned
+  (`#304 <https://github.com/bluescarni/mppp/pull/304>`__).
+- mp++ now uses semantic versioning.
+
 Fix
 ~~~
 
