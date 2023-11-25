@@ -12,7 +12,10 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 0.27 LANGUAGES CXX C)
+project(mp++ VERSION 1.0.0 LANGUAGES CXX C)
+
+# Setup the mp++ ABI version number.
+set(MPPP_ABI_VERSION 15)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -277,8 +280,8 @@ if(MPPP_BUILD_STATIC_LIBRARY)
 else()
     # Setup of the mp++ shared library.
     add_library(mp++ SHARED "${MPPP_SRC_FILES}")
-    set_property(TARGET mp++ PROPERTY VERSION "14.0")
-    set_property(TARGET mp++ PROPERTY SOVERSION 14)
+    set_property(TARGET mp++ PROPERTY VERSION "${MPPP_ABI_VERSION}.0")
+    set_property(TARGET mp++ PROPERTY SOVERSION ${MPPP_ABI_VERSION})
     set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
     set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
     set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
@@ -455,13 +458,10 @@ install(FILES
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 # Take care of versioning.
 include(CMakePackageConfigHelpers)
-# NOTE: SameMinorVersion available only
-# since CMake 3.11.
-if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-    write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" COMPATIBILITY SameMajorVersion)
-else()
-    write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" COMPATIBILITY SameMinorVersion)
-endif()
+# NOTE: since we use semantic versioning, the correct setting here is SameMajorVersion: it requires equality
+# in the major version, but higher minor versions will be considered compatible. So, if mp++ 2.0.0 is requested
+# and 2.1.0 is found, then all is good. However, the reverse will lead to a failure.
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" COMPATIBILITY SameMajorVersion)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 
 # This is just a simple counter variable, internal use only.

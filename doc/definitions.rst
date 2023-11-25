@@ -8,17 +8,24 @@ Macros and definitions
 .. c:macro:: MPPP_VERSION_STRING
 
    This definition expands to a string literal containing the full version of the mp++ library
-   (e.g., for version 0.6 this macro expands to ``"0.6"``).
+   (e.g., for version 1.2.3 this macro expands to ``"1.2.3"``).
 
 .. c:macro:: MPPP_VERSION_MAJOR
 
    This definition expands to an integral literal corresponding to the major mp++ version (e.g.,
-   for version 0.6, this macro expands to ``0``).
+   for version 1.2.3, this macro expands to ``1``).
 
 .. c:macro:: MPPP_VERSION_MINOR
 
    This definition expands to an integral literal corresponding to the minor mp++ version (e.g.,
-   for version 0.6, this macro expands to ``6``).
+   for version 1.2.3, this macro expands to ``2``).
+
+.. c:macro:: MPPP_VERSION_PATCH
+
+   .. versionadded:: 1.0.0
+
+   This definition expands to an integral literal corresponding to the patch mp++ version (e.g.,
+   for version 1.2.3, this macro expands to ``3``).
 
 .. c:macro:: MPPP_WITH_QUADMATH
 

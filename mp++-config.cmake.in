@@ -33,6 +33,9 @@ set(mp++_WITH_FMT @MPPP_WITH_FMT@)
 set(mp++_WITH_ARB @MPPP_WITH_ARB@)
 set(mp++_WITH_QUADMATH @MPPP_WITH_QUADMATH@)
 
+# Export the ABI version.
+set(mp++_ABI_VERSION @MPPP_ABI_VERSION@)
+
 # Restore original module path.
 set(CMAKE_MODULE_PATH "${_MPPP_CONFIG_OLD_MODULE_PATH}")
 unset(_MPPP_CONFIG_OLD_MODULE_PATH)
