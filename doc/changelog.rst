@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- mp++'s ABI is now versioned
+  (`#304 <https://github.com/bluescarni/mppp/pull/304>`__).
 - mp++ now uses semantic versioning.
 
 Fix
