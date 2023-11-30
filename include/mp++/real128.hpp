@@ -24,7 +24,6 @@
 #include <string>
 #include <tuple>
 #include <type_traits>
-#include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 

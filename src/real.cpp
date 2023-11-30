@@ -20,7 +20,6 @@
 #include <mp++/config.hpp>
 
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <cerrno>
 #include <cmath>
