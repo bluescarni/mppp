@@ -1,4 +1,4 @@
-// Copyright 2016-2021 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -20,7 +20,6 @@
 #include <mp++/config.hpp>
 
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <cerrno>
 #include <cmath>
