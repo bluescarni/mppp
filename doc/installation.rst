@@ -150,7 +150,7 @@ suite with the following command:
 Packages
 --------
 
-mp++ is also available from a variety of package managers on various platforms.
+mp++ is also available from several package managers on various platforms.
 
 Conda
 ^^^^^
