@@ -9,6 +9,8 @@
 #ifndef MPPP_DETAIL_FMT_HPP
 #define MPPP_DETAIL_FMT_HPP
 
+#include <stdexcept>
+
 #include <fmt/core.h>
 
 #include <mp++/config.hpp>
@@ -42,7 +44,11 @@ struct to_string_formatter {
         }
 
         // LCOV_EXCL_START
+#if FMT_VERSION < 100000
+        throw std::invalid_argument("Invalid format");
+#else
         fmt::throw_format_error("Invalid format");
+#endif
         // LCOV_EXCL_STOP
     }
 
