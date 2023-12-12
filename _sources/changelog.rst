@@ -1,6 +1,17 @@
 Changelog
 =========
 
+1.0.1 (2023-12-13)
+------------------
+
+Fix
+~~~
+
+- Fix constness of the formatters' ``parse()`` function
+  (`#308 <https://github.com/bluescarni/mppp/pull/308>`__).
+- Fix building against fmt 9
+  (`#308 <https://github.com/bluescarni/mppp/pull/308>`__).
+
 1.0.0 (2023-12-01)
 ------------------
 
