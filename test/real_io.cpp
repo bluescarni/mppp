@@ -16,10 +16,12 @@
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <vector>
 
 #if defined(MPPP_WITH_FMT)
 
 #include <fmt/core.h>
+#include <fmt/ranges.h>
 
 #endif
 
@@ -467,6 +469,9 @@ TEST_CASE("fmt test")
     // Check that the format string is ignored.
     REQUIRE(fmt::format("foo {:<30} bar", -1.1_r512) == "foo " + (-1.1_r512).to_string() + " bar");
     REQUIRE(fmt::format("foo {:} bar", -1.1_r512) == "foo " + (-1.1_r512).to_string() + " bar");
+
+    // Check range printing.
+    REQUIRE_NOTHROW(fmt::format("{}", std::vector{-1.1_r512, -1.2_r512}));
 }
 
 #endif

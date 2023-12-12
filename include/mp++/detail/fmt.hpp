@@ -9,6 +9,8 @@
 #ifndef MPPP_DETAIL_FMT_HPP
 #define MPPP_DETAIL_FMT_HPP
 
+#include <stdexcept>
+
 #include <fmt/core.h>
 
 #include <mp++/config.hpp>
@@ -42,12 +44,16 @@ struct to_string_formatter {
         }
 
         // LCOV_EXCL_START
+#if FMT_VERSION < 100000
+        throw std::invalid_argument("Invalid format");
+#else
         fmt::throw_format_error("Invalid format");
+#endif
         // LCOV_EXCL_STOP
     }
 
     template <typename T, typename FormatContext>
-    auto format(const T &x, FormatContext &ctx) -> decltype(ctx.out())
+    auto format(const T &x, FormatContext &ctx) const -> decltype(ctx.out())
     {
         return fmt::format_to(ctx.out(), "{}", x.to_string());
     }
