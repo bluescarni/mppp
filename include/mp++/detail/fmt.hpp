@@ -53,7 +53,7 @@ struct to_string_formatter {
     }
 
     template <typename T, typename FormatContext>
-    auto format(const T &x, FormatContext &ctx) -> decltype(ctx.out())
+    auto format(const T &x, FormatContext &ctx) const -> decltype(ctx.out())
     {
         return fmt::format_to(ctx.out(), "{}", x.to_string());
     }
