@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.0.2 (2023-12-22)
+------------------
+
+Fix
+~~~
+
+- Fix wrong version number in ``CMakeLists.txt``.
+
 1.0.1 (2023-12-13)
 ------------------
 
