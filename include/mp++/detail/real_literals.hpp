@@ -49,7 +49,7 @@ inline namespace literals
 
 #define MPPP_DECLARE_REAL_UDL(prec)                                                                                    \
     template <char... Chars>                                                                                           \
-    inline real operator""_r##prec()                                                                                   \
+    inline real operator"" _r##prec()                                                                                  \
     {                                                                                                                  \
         return detail::real_literal_impl<Chars...>(prec);                                                              \
     }
