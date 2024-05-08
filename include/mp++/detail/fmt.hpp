@@ -50,6 +50,8 @@ struct to_string_formatter {
         fmt::throw_format_error("Invalid format");
 #endif
         // LCOV_EXCL_STOP
+
+        return it;
     }
 
     template <typename T, typename FormatContext>
