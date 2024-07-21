@@ -3169,7 +3169,7 @@ inline namespace literals
 
 #define MPPP_DECLARE_COMPLEX_UDL(prec)                                                                                 \
     template <char... Chars>                                                                                           \
-    inline complex operator"" _icr##prec()                                                                              \
+    inline complex operator""_icr##prec()                                                                              \
     {                                                                                                                  \
         return complex{real{real_kind::zero, prec}, detail::real_literal_impl<Chars...>(prec)};                        \
     }
