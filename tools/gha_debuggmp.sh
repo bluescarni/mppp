@@ -25,7 +25,7 @@ unset CFLAGS
 unset CXXFLAGS
 
 # Download and compile locally GMP in debug mode.
-GMP_VERSION="6.2.1"
+GMP_VERSION="6.3.0"
 wget https://github.com/esa/manylinux_x86_64_with_deps/raw/master/gmp-${GMP_VERSION}.tar.bz2 -O gmp.tar.bz2
 tar xjvf gmp.tar.bz2
 cd gmp-${GMP_VERSION}
