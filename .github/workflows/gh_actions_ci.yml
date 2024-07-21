@@ -7,55 +7,60 @@ on:
     branches:
       - master
 jobs:
-  osx_11:
-    runs-on: macos-11
+  osx_13_x86:
+    runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Build
+        run: bash tools/gha_osx.sh
+  osx_14_arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
       - name: Build
         run: bash tools/gha_osx.sh
   conda_asan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build
         run: bash tools/gha_conda_asan.sh
   conda_ubsan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build
         run: bash tools/gha_conda_ubsan.sh
   conda_tsan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build
         run: bash tools/gha_conda_tsan.sh
   conda_debuggmp:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build
         run: bash tools/gha_debuggmp.sh
   windows_2022:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v3
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           python-version: "3.10"
           channels: conda-forge
           channel-priority: strict
+      - uses: ilammy/msvc-dev-cmd@v1
       - name: Build
         shell: pwsh
         run: |
           conda install -y cmake mpir mpfr 'libflint<3' arb mpc fmt libboost-devel
           mkdir build
           cd build
-          cmake ../ -G "Visual Studio 17 2022" -A x64 -DCMAKE_CXX_STANDARD=20 -DMPPP_GMP_INCLUDE_DIR=C:\Miniconda\envs\test\Library\include -DMPPP_GMP_LIBRARY=C:\Miniconda\envs\test\Library\lib\mpir.lib -DMPPP_BUILD_TESTS=yes -DBoost_NO_BOOST_CMAKE=yes -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_ENABLE_IPO=yes
+          cmake ../ -G "Visual Studio 17 2022" -A x64 -DCMAKE_CXX_STANDARD=20 -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_ENABLE_IPO=yes
           cmake --build . --config Release -j2
           copy Release\mp++.dll test\Release\
           ctest -j4 -V -C Release

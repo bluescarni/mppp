@@ -12,7 +12,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 1.0.2 LANGUAGES CXX C)
+project(mp++ VERSION 1.0.3 LANGUAGES CXX C)
 
 # Setup the mp++ ABI version number.
 set(MPPP_ABI_VERSION 15)
@@ -411,7 +411,18 @@ endif()
 # Optional dependency on Boost s11n.
 set(_MPPP_MIN_BOOST_VERSION "1.60")
 if(MPPP_WITH_BOOST_S11N)
-    find_package(Boost ${_MPPP_MIN_BOOST_VERSION} REQUIRED COMPONENTS serialization)
+    # NOTE: we look for Boost in CONFIG mode first, as that has become the official supported way
+    # of locating Boost in recent Boost/CMake versions. If we fail, we try again in
+    # MODULE mode as last resort.
+    find_package(Boost ${_MPPP_MIN_BOOST_VERSION} QUIET COMPONENTS serialization CONFIG)
+    if(NOT ${Boost_FOUND})
+        message(STATUS "Boost not found in CONFIG mode, retrying in MODULE mode.")
+        find_package(Boost ${_MPPP_MIN_BOOST_VERSION} QUIET MODULE COMPONENTS serialization)
+    endif()
+    if(NOT ${Boost_FOUND})
+        message(FATAL_ERROR "Could not locate Boost in either CONFIG or MODULE mode.")
+    endif()
+    message(STATUS "Found Boost version ${Boost_VERSION}.")
     target_link_libraries(mp++ PUBLIC Boost::serialization Boost::disable_autolinking)
 endif()
 
