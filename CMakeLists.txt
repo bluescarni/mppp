@@ -411,7 +411,7 @@ endif()
 # Optional dependency on Boost s11n.
 set(_MPPP_MIN_BOOST_VERSION "1.60")
 if(MPPP_WITH_BOOST_S11N)
-    # NOTE: we look in CONFIG mode first, as that has become the official supported way
+    # NOTE: we look for Boost in CONFIG mode first, as that has become the official supported way
     # of locating Boost in recent Boost/CMake versions. If we fail, we try again in
     # MODULE mode as last resort.
     find_package(Boost ${_MPPP_MIN_BOOST_VERSION} QUIET COMPONENTS serialization CONFIG)
