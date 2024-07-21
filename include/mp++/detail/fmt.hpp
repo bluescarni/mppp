@@ -44,14 +44,10 @@ struct to_string_formatter {
         }
 
         // LCOV_EXCL_START
-#if FMT_VERSION < 100000
         throw std::invalid_argument("Invalid format");
-#else
-        fmt::throw_format_error("Invalid format");
-#endif
-        // LCOV_EXCL_STOP
 
         return it;
+        // LCOV_EXCL_STOP
     }
 
     template <typename T, typename FormatContext>
