@@ -29,7 +29,6 @@ cmake ../ -G Ninja \
     -DCMAKE_CXX_STANDARD=20 \
     -DCMAKE_BUILD_TYPE=Debug \
     -DMPPP_BUILD_TESTS=yes \
-    -DBoost_NO_BOOST_CMAKE=yes \
     -DMPPP_WITH_BOOST_S11N=yes \
     -DMPPP_WITH_FMT=yes \
     -DMPPP_WITH_MPFR=yes \

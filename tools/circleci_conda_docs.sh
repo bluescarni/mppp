@@ -30,7 +30,6 @@ cmake ../ -G Ninja \
     -DCMAKE_INSTALL_PREFIX=$deps_dir \
     -DCMAKE_CXX_STANDARD=17 \
     -DCMAKE_BUILD_TYPE=Debug \
-    -DBoost_NO_BOOST_CMAKE=yes \
     -DMPPP_WITH_BOOST_S11N=yes \
     -DMPPP_WITH_FMT=yes \
     -DMPPP_WITH_MPFR=yes \
