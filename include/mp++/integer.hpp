@@ -423,14 +423,14 @@ constexpr int integral_sign(T n)
 // On compilers other than MSVC, this just returns the input value.
 template <typename T>
 inline auto make_uai(T *ptr) ->
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER < 1930
     decltype(stdext::make_unchecked_array_iterator(ptr))
 #else
     decltype(ptr)
 #endif
 {
     return
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER < 1930
         stdext::make_unchecked_array_iterator(ptr);
 #else
         ptr;
@@ -1357,8 +1357,8 @@ public:
         : integer(c.imag() == 0
                       ? c.real()
                       : throw std::domain_error(
-                          "Cannot construct an integer from a complex C++ value with a non-zero imaginary part of "
-                          + detail::to_string(c.imag())))
+                            "Cannot construct an integer from a complex C++ value with a non-zero imaginary part of "
+                            + detail::to_string(c.imag())))
     {
     }
 
