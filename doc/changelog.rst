@@ -1,6 +1,20 @@
 Changelog
 =========
 
+1.0.3 (unreleased)
+------------------
+
+Fix
+~~~
+
+- Fix compilation failure with fmt 11
+  (`#314 <https://github.com/bluescarni/mppp/pull/314>`__).
+- Fix warnings in the build system when using recent
+  versions of Boost/CMake
+  (`#314 <https://github.com/bluescarni/mppp/pull/314>`__).
+- Fix compiler warnings on recent MSVC versions
+  (`#314 <https://github.com/bluescarni/mppp/pull/314>`__).
+
 1.0.2 (2023-12-22)
 ------------------
 
