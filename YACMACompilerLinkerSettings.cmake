@@ -125,6 +125,18 @@ if(NOT _YACMACompilerLinkerSettingsRun)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Warray-bounds-pointer-arithmetic)
         # New warnings in clang 14.
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Warray-parameter)
+        # NOTE: clang 17 enables by default a new compiler flag called "-fassume-unique-vtables":
+        #
+        # https://releases.llvm.org/17.0.1/tools/clang/docs/ReleaseNotes.html#c-language-changes
+        #
+        # This flag however seems to be buggy:
+        #
+        # https://github.com/llvm/llvm-project/issues/71196
+        #
+        # On our part, in several projects we are experiencing Boost.serialization failures when
+        # (de)serialising derived objects through pointers to bases. Thus, we forcibly disable
+        # this new flag.
+        _YACMA_CHECK_ENABLE_CXX_FLAG(-fno-assume-unique-vtables)
     endif()
 
     # Common configuration for GCC, clang and Intel.
