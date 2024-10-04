@@ -60,7 +60,7 @@ jobs:
           SPLIT_TEST_NUM: 1
   conda_arm64:
     machine:
-      image: ubuntu-2004:202101-01
+      image: ubuntu-2204:current
     resource_class: arm.large
     steps:
     - checkout
