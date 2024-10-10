@@ -1,13 +1,13 @@
 Changelog
 =========
 
-1.0.4 (unreleased)
+1.0.4 (2024-10-10)
 ------------------
 
 Fix
 ~~~
 
-- Workaround for a clang 17 issue that would result in
+- Workaround for a clang 17 issue that could result in
   runtime exceptions during (de)serialisation.
 
 1.0.3 (2024-07-21)
