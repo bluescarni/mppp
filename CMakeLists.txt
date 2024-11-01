@@ -365,7 +365,8 @@ endif()
 # Optional dependency on Arb.
 if(MPPP_WITH_ARB)
     find_package(mp++_FLINT REQUIRED)
-    find_package(mp++_Arb REQUIRED)
+    # ARB has been merged into FLINT.
+    # find_package(mp++_Arb REQUIRED)
 
     # Check support for certain Arb functions.
     set(CMAKE_REQUIRED_INCLUDES "${MPPP_ARB_INCLUDE_DIR}")
@@ -374,7 +375,8 @@ if(MPPP_WITH_ARB)
     unset(CMAKE_REQUIRED_INCLUDES)
     unset(CMAKE_REQUIRED_LIBRARIES)
 
-    target_link_libraries(mp++ PRIVATE mp++::Arb mp++::FLINT)
+    #target_link_libraries(mp++ PRIVATE mp++::Arb mp++::FLINT)
+    target_link_libraries(mp++ PRIVATE mp++::FLINT)
     set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
 endif()
 

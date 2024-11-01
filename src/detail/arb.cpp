@@ -23,14 +23,14 @@
 #include <flint/flint.h>
 #include <flint/fmpz.h>
 
-#include <arb.h>
-#include <arb_hypgeom.h>
-#include <arf.h>
-#include <mag.h>
+#include <flint/arb.h>
+#include <flint/arb_hypgeom.h>
+#include <flint/arf.h>
+#include <flint/mag.h>
 
 #if defined(MPPP_WITH_MPC)
 
-#include <acb.h>
+#include <flint/acb.h>
 
 #endif
 
