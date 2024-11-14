@@ -400,18 +400,23 @@ inline integer<SSize> integer_literal_impl()
 inline namespace literals
 {
 
-#define MPPP_DECLARE_INTEGRAL_UDL(n)                                                                                   \
-    template <char... Chars>                                                                                           \
-    inline integer<n> operator""_z##n()                                                                                \
-    {                                                                                                                  \
-        return detail::integer_literal_impl<n, Chars...>();                                                            \
-    }
+template <char... Chars>
+inline integer<1> operator""_z1()
+{
+    return detail::integer_literal_impl<1, Chars...>();
+}
 
-MPPP_DECLARE_INTEGRAL_UDL(1)
-MPPP_DECLARE_INTEGRAL_UDL(2)
-MPPP_DECLARE_INTEGRAL_UDL(3)
+template <char... Chars>
+inline integer<2> operator""_z2()
+{
+    return detail::integer_literal_impl<2, Chars...>();
+}
 
-#undef MPPP_DECLARE_INTEGRAL_UDL
+template <char... Chars>
+inline integer<3> operator""_z3()
+{
+    return detail::integer_literal_impl<3, Chars...>();
+}
 
 } // namespace literals
 
