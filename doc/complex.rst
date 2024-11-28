@@ -655,7 +655,7 @@ The complex class
       .. note::
 
          The ``inv()`` function is available only if mp++ was
-         configured with the ``MPPP_WITH_ARB`` option enabled.
+         configured with the ``MPPP_WITH_FLINT`` option enabled.
 
       In-place basic aritmetic functions.
 
@@ -682,7 +682,7 @@ The complex class
 
       :return: a reference to ``this``.
 
-      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+      :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
         fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: complex &sqrt()
@@ -691,7 +691,7 @@ The complex class
       .. note::
 
          The ``rec_sqrt()`` function is available only if mp++ was
-         configured with the ``MPPP_WITH_ARB`` option enabled.
+         configured with the ``MPPP_WITH_FLINT`` option enabled.
 
       In-place roots.
 
@@ -711,7 +711,7 @@ The complex class
 
       :return: a reference to ``this``.
 
-      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+      :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
         fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: complex &exp()
@@ -781,7 +781,7 @@ The complex class
       .. note::
 
          This function is available only if mp++ was
-         configured with the ``MPPP_WITH_ARB`` option enabled.
+         configured with the ``MPPP_WITH_FLINT`` option enabled.
 
       Arithmetic-geometric mean.
 
@@ -791,7 +791,7 @@ The complex class
 
       :return: a reference to ``this``.
 
-      :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+      :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
         fails because of (unlikely) overflow conditions.
 
 Types
@@ -1325,7 +1325,7 @@ Arithmetic
    .. note::
 
       The ``inv()`` function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Basic binary arithmetic functions.
 
@@ -1355,7 +1355,7 @@ Arithmetic
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::neg(T &&z)
@@ -1371,7 +1371,7 @@ Arithmetic
    .. note::
 
       The ``inv()`` function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Basic unary arithmetic functions.
 
@@ -1400,7 +1400,7 @@ Arithmetic
 
    :return: the result of the operation.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex &mppp::mul_2ui(mppp::complex &rop, T &&c, unsigned long n)
@@ -1502,7 +1502,7 @@ Roots
    .. note::
 
       The ``rec_sqrt()`` and ``rootn_ui()`` functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Binary :cpp:class:`~mppp::complex` roots.
 
@@ -1530,7 +1530,7 @@ Roots
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::sqrt(T &&z)
@@ -1540,7 +1540,7 @@ Roots
    .. note::
 
       The ``rec_sqrt()`` and ``rootn_ui()`` functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Unary :cpp:class:`~mppp::complex` roots.
 
@@ -1567,7 +1567,7 @@ Roots
 
    :return: the result of the operation.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
      fails because of (unlikely) overflow conditions.
 
 Exponentiation
@@ -1767,10 +1767,7 @@ Arithmetic-geometric mean
    .. note::
 
       These functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
-
-      The ``agm()`` function is available only from
-      Arb 2.18 onwards.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    :cpp:class:`~mppp::complex` AGM functions.
 
@@ -1787,7 +1784,7 @@ Arithmetic-geometric mean
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_complex T> mppp::complex mppp::agm1(T &&x)
@@ -1798,10 +1795,7 @@ Arithmetic-geometric mean
    .. note::
 
       These functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
-
-      The ``agm()`` function is available only from
-      Arb 2.18 onwards.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    :cpp:class:`~mppp::complex` AGM functions.
 
@@ -1818,7 +1812,7 @@ Arithmetic-geometric mean
 
    :return: the result of the operation.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPC types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPC types
      fails because of (unlikely) overflow conditions.
 
 Input/Output

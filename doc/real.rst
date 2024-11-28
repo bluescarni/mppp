@@ -807,7 +807,7 @@ The real class
       .. note::
 
          The :cpp:func:`~mppp::real::sqrt1pm1()` function is available only if mp++ was
-         configured with the ``MPPP_WITH_ARB`` option enabled.
+         configured with the ``MPPP_WITH_FLINT`` option enabled.
 
       In-place roots.
 
@@ -831,7 +831,7 @@ The real class
 
       :return: a reference to ``this``.
 
-      :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+      :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
         fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: real &sin()
@@ -853,7 +853,7 @@ The real class
          :cpp:func:`~mppp::real::tan_pi()`, :cpp:func:`~mppp::real::cot_pi()`,
          :cpp:func:`~mppp::real::sinc()` and :cpp:func:`~mppp::real::sinc_pi()`
          functions are available only if mp++ was
-         configured with the ``MPPP_WITH_ARB`` option enabled.
+         configured with the ``MPPP_WITH_FLINT`` option enabled.
 
       In-place trigonometric functions.
 
@@ -883,7 +883,7 @@ The real class
 
       :return: a reference to ``this``.
 
-      :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+      :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
         fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: real &acos()
@@ -1015,7 +1015,7 @@ The real class
 
          The :cpp:func:`~mppp::real::lambert_w0()` and :cpp:func:`~mppp::real::lambert_wm1()`
          functions are available only if mp++ was
-         configured with the ``MPPP_WITH_ARB`` option enabled.
+         configured with the ``MPPP_WITH_FLINT`` option enabled.
 
       Other special functions, in-place variants.
 
@@ -1038,7 +1038,7 @@ The real class
 
       :return: a reference to ``this``.
 
-      :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+      :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
         fails because of (unlikely) overflow conditions.
 
    .. cpp:function:: real &ceil()
@@ -1915,7 +1915,7 @@ Roots
    .. note::
 
       This function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Binary :cpp:class:`~mppp::real` sqrt1pm1.
 
@@ -1928,7 +1928,7 @@ Roots
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sqrt1pm1(T &&r)
@@ -1938,7 +1938,7 @@ Roots
    .. note::
 
       This function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Unary :cpp:class:`~mppp::real` sqrt1pm1.
 
@@ -1950,7 +1950,7 @@ Roots
 
    :return: the sqrt1pm1 of *r*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::rec_sqrt(mppp::real &rop, T &&op)
@@ -2117,7 +2117,7 @@ Trigonometry
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Binary basic trigonometric functions.
 
@@ -2148,7 +2148,7 @@ Trigonometry
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::sin(T &&x)
@@ -2169,7 +2169,7 @@ Trigonometry
       The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
       ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
       if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Unary basic trigonometric functions.
 
@@ -2199,7 +2199,7 @@ Trigonometry
 
    :return: the trigonometric function of *x*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T> void mppp::sin_cos(mppp::real &sop, mppp::real &cop, T &&op)
@@ -2408,7 +2408,7 @@ Logarithms and exponentials
    .. note::
 
       The ``log_base_ui()`` function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Binary logarithms.
 
@@ -2432,7 +2432,7 @@ Logarithms and exponentials
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::log(T &&x)
@@ -2444,7 +2444,7 @@ Logarithms and exponentials
    .. note::
 
       The ``log_base_ui()`` function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Unary logarithms.
 
@@ -2467,7 +2467,7 @@ Logarithms and exponentials
 
    :return: the logarithm of *x*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::log_hypot(mppp::real &rop, T &&x, U &&y)
@@ -2477,7 +2477,7 @@ Logarithms and exponentials
    .. note::
 
       This function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Ternary log hypot function.
 
@@ -2490,7 +2490,7 @@ Logarithms and exponentials
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::log_hypot(T &&x, U &&y)
@@ -2500,7 +2500,7 @@ Logarithms and exponentials
    .. note::
 
       This function is available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Binary log hypot function.
 
@@ -2512,7 +2512,7 @@ Logarithms and exponentials
 
    :return: the log hypot function of *x* and *y*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 Polylogarithms
@@ -2525,7 +2525,7 @@ Polylogarithms
    .. note::
 
       The ``polylog_si()`` and ``polylog()`` functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Polylogarithms.
 
@@ -2548,7 +2548,7 @@ Polylogarithms
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::li2(T &&x)
@@ -2558,7 +2558,7 @@ Polylogarithms
    .. note::
 
       The ``polylog_si()`` and ``polylog()`` functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Polylogarithms.
 
@@ -2580,7 +2580,7 @@ Polylogarithms
 
    :return: the polylogarithm of *x*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. _real_gamma:
@@ -2734,7 +2734,7 @@ Bessel functions
    .. note::
 
       These functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Bessel functions of the first and second kind of real order.
 
@@ -2751,7 +2751,7 @@ Bessel functions
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::jx(T &&nu, U &&x)
@@ -2762,7 +2762,7 @@ Bessel functions
    .. note::
 
       These functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Bessel functions of the first and second kind of real order.
 
@@ -2778,7 +2778,7 @@ Bessel functions
 
    :return: the Bessel function of *x*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. _real_err_func:
@@ -2827,7 +2827,7 @@ Other special functions
    .. note::
 
       The ``lambert_w0()`` and ``lambert_wm1()`` functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Other binary special functions.
 
@@ -2849,7 +2849,7 @@ Other special functions
 
    :return: a reference to *rop*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::eint(T &&r)
@@ -2861,7 +2861,7 @@ Other special functions
    .. note::
 
       The ``lambert_w0()`` and ``lambert_wm1()`` functions are available only if mp++ was
-      configured with the ``MPPP_WITH_ARB`` option enabled.
+      configured with the ``MPPP_WITH_FLINT`` option enabled.
 
    Other unary special functions.
 
@@ -2882,7 +2882,7 @@ Other special functions
 
    :return: the exponential integral, Riemann Zeta function, Airy function or Lambert W function of *r*.
 
-   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+   :exception std\:\:invalid_argument: if the conversion between FLINT and MPFR types
      fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)

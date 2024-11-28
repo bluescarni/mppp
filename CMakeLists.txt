@@ -28,10 +28,8 @@ option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
 option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_BOOST)
-option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
-mark_as_advanced(MPPP_BENCHMARK_FLINT)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR." OFF)
-option(MPPP_WITH_ARB "Enable features relying on Arb." OFF)
+option(MPPP_WITH_FLINT "Enable features relying on FLINT." OFF)
 option(MPPP_WITH_MPC "Enable features relying on MPC." OFF)
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_WITH_BOOST_S11N "Enable features relying on the Boost.Serialization library." OFF)
@@ -46,8 +44,8 @@ endif()
 option(MPPP_ENABLE_IPO "Enable IPO (requires CMake >= 3.9 and compiler support)." OFF)
 mark_as_advanced(MPPP_ENABLE_IPO)
 
-if(MPPP_WITH_ARB AND NOT MPPP_WITH_MPFR)
-    message(FATAL_ERROR "Arb support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
+if(MPPP_WITH_FLINT AND NOT MPPP_WITH_MPFR)
+    message(FATAL_ERROR "FLINT support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
 endif()
 
 if(MPPP_WITH_MPC AND NOT MPPP_WITH_MPFR)
@@ -226,7 +224,7 @@ if(MPPP_WITH_MPFR)
         "${MPPP_SRC_FILES}")
 endif()
 
-if(MPPP_WITH_ARB)
+if(MPPP_WITH_FLINT)
     set(MPPP_SRC_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/arb.cpp"
         "${MPPP_SRC_FILES}")
@@ -359,20 +357,11 @@ if(MPPP_WITH_MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
 
-# Optional dependency on Arb.
-if(MPPP_WITH_ARB)
+# Optional dependency on FLINT.
+if(MPPP_WITH_FLINT)
     find_package(mp++_FLINT REQUIRED)
-    find_package(mp++_Arb REQUIRED)
-
-    # Check support for certain Arb functions.
-    set(CMAKE_REQUIRED_INCLUDES "${MPPP_ARB_INCLUDE_DIR}")
-    set(CMAKE_REQUIRED_LIBRARIES "${MPPP_ARB_LIBRARY}")
-    check_symbol_exists(acb_agm "acb.h" MPPP_ARB_HAVE_ACB_AGM)
-    unset(CMAKE_REQUIRED_INCLUDES)
-    unset(CMAKE_REQUIRED_LIBRARIES)
-
-    target_link_libraries(mp++ PRIVATE mp++::Arb mp++::FLINT)
-    set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
+    target_link_libraries(mp++ PRIVATE mp++::FLINT)
+    set(MPPP_ENABLE_FLINT "#define MPPP_WITH_FLINT")
 endif()
 
 # Optional dependency on quadmath.

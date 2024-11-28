@@ -197,7 +197,7 @@ if(MPPP_WITH_MPC)
   ADD_MPPP_TESTCASE(complex_literals)
   ADD_MPPP_TESTCASE(complex_io)
 
-  if(MPPP_WITH_ARB)
+  if(MPPP_WITH_FLINT)
     ADD_MPPP_TESTCASE(complex_agm)
   endif()
 endif()

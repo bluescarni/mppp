@@ -229,7 +229,7 @@ TEST_CASE("real agm")
     REQUIRE(agm(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 TEST_CASE("real lambert_w0")
 {

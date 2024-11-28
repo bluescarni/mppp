@@ -121,7 +121,7 @@ TEST_CASE("real li2")
     }
 }
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 TEST_CASE("real polylog_si")
 {

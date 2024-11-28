@@ -182,7 +182,7 @@ MPPP_DLL_PUBLIC void real_roundeven_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void real_trunc_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void real_frac_wrapper(::mpfr_t, const ::mpfr_t);
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 // The Arb MPFR wrappers.
 MPPP_DLL_PUBLIC void arb_sqrt1pm1(::mpfr_t, const ::mpfr_t);
@@ -461,8 +461,8 @@ public:
     explicit real(const T &c)
         : real(c.imag() == 0 ? c.real()
                              : throw std::domain_error(
-                                 "Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
-                                 + detail::to_string(c.imag())))
+                                   "Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
+                                   + detail::to_string(c.imag())))
     {
     }
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -474,8 +474,8 @@ public:
     explicit real(const T &c, ::mpfr_prec_t p)
         : real(c.imag() == 0 ? c.real()
                              : throw std::domain_error(
-                                 "Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
-                                 + detail::to_string(c.imag())),
+                                   "Cannot construct a real from a complex C++ value with a non-zero imaginary part of "
+                                   + detail::to_string(c.imag())),
                p)
     {
     }
@@ -1152,7 +1152,7 @@ public:
     real &sqrt();
     // In-place reciprocal square root.
     real &rec_sqrt();
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
     // In-place sqrt1pm1.
     real &sqrt1pm1();
 #endif
@@ -1174,7 +1174,7 @@ public:
     real &csc();
     // In-place cotangent.
     real &cot();
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
     // Trig functions from Arb.
     real &sin_pi();
     real &cos_pi();
@@ -1258,7 +1258,7 @@ public:
     real &erfc();
     // In-place Airy function.
     real &ai();
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
     // In-place Lambert W function.
     real &lambert_w0();
     real &lambert_wm1();
@@ -2074,7 +2074,7 @@ MPPP_REAL_MPFR_BINARY_IMPL(dim, ::mpfr_dim, true)
 // Square root.
 MPPP_REAL_MPFR_UNARY_IMPL(sqrt, ::mpfr_sqrt, true)
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 // sqrt1pm1.
 MPPP_REAL_MPFR_UNARY_IMPL(sqrt1pm1, detail::arb_sqrt1pm1, false)
@@ -2264,7 +2264,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(sec, ::mpfr_sec, true)
 MPPP_REAL_MPFR_UNARY_IMPL(csc, ::mpfr_csc, true)
 MPPP_REAL_MPFR_UNARY_IMPL(cot, ::mpfr_cot, true)
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 MPPP_REAL_MPFR_UNARY_IMPL(sin_pi, detail::arb_sin_pi, false)
 MPPP_REAL_MPFR_UNARY_IMPL(cos_pi, detail::arb_cos_pi, false)
@@ -2360,7 +2360,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(log2, ::mpfr_log2, true)
 MPPP_REAL_MPFR_UNARY_IMPL(log10, ::mpfr_log10, true)
 MPPP_REAL_MPFR_UNARY_IMPL(log1p, ::mpfr_log1p, true)
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 // log_hypot.
 MPPP_REAL_MPFR_BINARY_IMPL(log_hypot, detail::arb_log_hypot, false)
@@ -2456,7 +2456,7 @@ inline real yn(long n, T &&r)
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 MPPP_REAL_MPFR_BINARY_IMPL(jx, detail::arb_hypgeom_bessel_j, false)
 MPPP_REAL_MPFR_BINARY_IMPL(yx, detail::arb_hypgeom_bessel_y, false)
@@ -2466,7 +2466,7 @@ MPPP_REAL_MPFR_BINARY_IMPL(yx, detail::arb_hypgeom_bessel_y, false)
 // Polylogarithms.
 MPPP_REAL_MPFR_UNARY_IMPL(li2, detail::real_li2_wrapper, true)
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 // Polylogarithm, integer order.
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2503,7 +2503,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(erf, ::mpfr_erf, true)
 MPPP_REAL_MPFR_UNARY_IMPL(erfc, ::mpfr_erfc, true)
 MPPP_REAL_MPFR_UNARY_IMPL(ai, ::mpfr_ai, true)
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 MPPP_REAL_MPFR_UNARY_IMPL(lambert_w0, detail::arb_lambert_w0, false)
 MPPP_REAL_MPFR_UNARY_IMPL(lambert_wm1, detail::arb_lambert_wm1, false)

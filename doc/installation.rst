@@ -17,18 +17,17 @@ a continuous integration pipeline which includes:
 
 mp++ has the following dependencies:
 
-* the `GMP <https://gmplib.org/>`__ library, **mandatory** (GMP 5 and later versions are supported,
-  the `MPIR <https://github.com/wbhart/mpir>`__ fork of GMP can also be used);
+* the `GMP <https://gmplib.org/>`__ library, **mandatory** (GMP 5 and later versions are supported);
 * the `GNU MPFR <https://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support
   for the ``long double`` type in :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
   (MPFR 3 or a later version is required);
 * the `GNU MPC <http://www.multiprecision.org/mpc/>`__ multiprecision complex library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::complex` class;
-* the `Arb <https://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
+* the `FLINT <http://flintlib.org/>`__ library, *optional*,
   used in the implementation of additional special functions for the
   :cpp:class:`~mppp::real` and :cpp:class:`~mppp::complex` classes, and in the benchmarking
-  suite;
+  suite (FLINT 3 or a later version is required);
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
   in the implementation of the :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128` classes
   (typically, the quadmath library is part of GCC and it does not need to
@@ -56,7 +55,7 @@ path, etc.). The available configuration options are:
 * ``MPPP_WITH_MPC``: enable features relying on the GNU
   MPC library (off by default, requires the ``MPPP_WITH_MPFR``
   option to be active),
-* ``MPPP_WITH_ARB``: enable features relying on the Arb library
+* ``MPPP_WITH_FLINT``: enable features relying on the FLINT library
   (off by default, requires the ``MPPP_WITH_MPFR`` option to be active),
 * ``MPPP_WITH_QUADMATH``: enable features relying on the
   quadmath library (off by default),
@@ -82,10 +81,6 @@ path, etc.). The available configuration options are:
 
    The ``MPPP_BUILD_STATIC_LIBRARY`` and ``MPPP_MSVC_UNICODE`` build options.
 
-.. versionadded:: 0.19
-
-   The ``MPPP_WITH_ARB`` build option.
-
 .. versionadded:: 0.20
 
    The ``MPPP_WITH_MPC`` and ``MPPP_ENABLE_IPO`` build options.
@@ -97,6 +92,10 @@ path, etc.). The available configuration options are:
 .. versionadded:: 0.27
 
    The ``MPPP_WITH_FMT`` build option.
+
+.. versionadded:: 1.1.0
+
+   The ``MPPP_WITH_FLINT`` build option.
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions), Clang
@@ -277,7 +276,7 @@ variables to signal with which optional dependencies mp++ was compiled:
 
 * ``mp++_WITH_MPFR`` if MPFR support was enabled,
 * ``mp++_WITH_MPC`` if MPC support was enabled,
-* ``mp++_WITH_ARB`` if Arb support was enabled,
+* ``mp++_WITH_FLINT`` if FLINT support was enabled,
 * ``mp++_WITH_QUADMATH`` if quadmath support was enabled,
 * ``mp++_WITH_BOOST_S11N`` if Boost.serialization support was enabled,
 * ``mp++_WITH_FMT`` if fmt support was enabled.
