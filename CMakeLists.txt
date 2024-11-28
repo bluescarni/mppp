@@ -9,10 +9,10 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 1.0.4 LANGUAGES CXX C)
+project(mp++ VERSION 1.1.0 LANGUAGES CXX C)
 
 # Setup the mp++ ABI version number.
-set(MPPP_ABI_VERSION 15)
+set(MPPP_ABI_VERSION 16)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
