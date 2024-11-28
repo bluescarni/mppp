@@ -39,7 +39,7 @@ mp++ has the following dependencies:
   to provide formatting capabilities to the multiprecision classes and in the benchmarking suite.
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
-installing from source (the minimum required version is 3.8).
+installing from source (the minimum required version is 3.12).
 
 Installation from source
 ------------------------

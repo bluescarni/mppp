@@ -1,6 +1,15 @@
 Changelog
 =========
 
+1.1.0 (unreleased)
+------------------
+
+Change
+~~~~~~
+
+- mp++ now requires CMake >= 3.12
+  (`#319 <https://github.com/bluescarni/mppp/pull/319>`__).
+
 1.0.4 (2024-10-10)
 ------------------
 
