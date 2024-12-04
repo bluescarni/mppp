@@ -1,15 +1,14 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="./" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Multiprecision float tutorial &#8212; mp++ 1.0.4 documentation</title>
+    <title>Multiprecision float tutorial &#8212; mp++ 2.0.0 documentation</title>
   
   
   
@@ -17,31 +16,34 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
-  
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
   
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script src="_static/documentation_options.js?v=ce394494"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorial_real';</script>
@@ -51,6 +53,7 @@
     <link rel="prev" title="Quadruple-precision complex numbers tutorial" href="tutorial_complex128.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0" />
   </head>
   
   
@@ -66,19 +69,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -86,7 +78,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -94,8 +85,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -111,7 +102,8 @@
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -136,20 +128,16 @@
   
   
   
-    <p class="title logo__title">mp++ 1.0.4 documentation</p>
+    <p class="title logo__title">mp++ 2.0.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
@@ -356,24 +344,16 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
+</button>
 <button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
@@ -418,7 +398,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="multiprecision-float-tutorial">
-<span id="tutorial-real"></span><h1>Multiprecision float tutorial<a class="headerlink" href="#multiprecision-float-tutorial" title="Permalink to this heading">#</a></h1>
+<span id="tutorial-real"></span><h1>Multiprecision float tutorial<a class="headerlink" href="#multiprecision-float-tutorial" title="Link to this heading">#</a></h1>
 <p><a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is a floating-point
 class in which the number of digits of precision in the significand can
 be set at runtime to any value (limited only by the available
@@ -429,7 +409,7 @@ and it is designed to behave like a standard C++ floating-point type
 in which the precision is not a compile-time property of the class,
 but rather a runtime property of the class instances.</p>
 <section id="construction-and-precision-handling">
-<h2>Construction and precision handling<a class="headerlink" href="#construction-and-precision-handling" title="Permalink to this heading">#</a></h2>
+<h2>Construction and precision handling<a class="headerlink" href="#construction-and-precision-handling" title="Link to this heading">#</a></h2>
 <p>The precision of a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is measured in the number
 of bits in the significand, and it can be set at
 construction or changed at a later stage. A default-constructed
@@ -541,7 +521,7 @@ family of functions:</p>
 </div>
 </section>
 <section id="precision-propagation">
-<h2>Precision propagation<a class="headerlink" href="#precision-propagation" title="Permalink to this heading">#</a></h2>
+<h2>Precision propagation<a class="headerlink" href="#precision-propagation" title="Link to this heading">#</a></h2>
 <p>In the C++ language, mixed-precision floating-point operations promote the lower-precision operand
 to the higher-precision type. For instance, in the following code snippet,</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span><span class="w"> </span><span class="n">x1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
@@ -602,7 +582,7 @@ of the generic constructor of <a class="reference internal" href="real.html#_CPP
 </div>
 </section>
 <section id="move-awareness">
-<h2>Move awareness<a class="headerlink" href="#move-awareness" title="Permalink to this heading">#</a></h2>
+<h2>Move awareness<a class="headerlink" href="#move-awareness" title="Link to this heading">#</a></h2>
 <p>One of the major sources of inefficiency when working with <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects,
 especially at lower precisions, is the memory allocation overhead. The problem is
 particularly evident when creating complex mathematical expressions involving
@@ -705,7 +685,7 @@ limited to mathematical operators: all functions accepting one or more <a class=
 objects as input arguments are move-aware.</p>
 </section>
 <section id="special-functions">
-<h2>Special functions<a class="headerlink" href="#special-functions" title="Permalink to this heading">#</a></h2>
+<h2>Special functions<a class="headerlink" href="#special-functions" title="Link to this heading">#</a></h2>
 <p>One of the design goals of the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class is to provide a
 comprehensive library of special functions. <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> currently
 wraps all the special functions provided by the MPFR library, including:</p>
@@ -723,7 +703,7 @@ the <a class="reference external" href="https://arblib.org/">Arb</a> library to 
 not available in MPFR.</p>
 </section>
 <section id="constants">
-<h2>Constants<a class="headerlink" href="#constants" title="Permalink to this heading">#</a></h2>
+<h2>Constants<a class="headerlink" href="#constants" title="Link to this heading">#</a></h2>
 <p>The MPFR API provides the ability to compute a handful of
 constants in arbitrary precision. This capability is
 <a class="reference internal" href="real.html#real-constants"><span class="std std-ref">exposed</span></a>
@@ -740,7 +720,7 @@ with the <span class="math notranslate nohighlight">\(\pi\)</span> constant:</p>
 </div>
 </section>
 <section id="comparisons">
-<h2>Comparisons<a class="headerlink" href="#comparisons" title="Permalink to this heading">#</a></h2>
+<h2>Comparisons<a class="headerlink" href="#comparisons" title="Link to this heading">#</a></h2>
 <p>In addition to the <a class="reference internal" href="tutorial_commonops.html#tutorial-commonops"><span class="std std-ref">common comparison operators</span></a>
 available for all of mp++’s multiprecision classes,
 <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> supports additional comparison functions.</p>
@@ -784,7 +764,7 @@ and greater than non-NaN values:</p>
 </div>
 </section>
 <section id="interacting-with-the-mpfr-api">
-<h2>Interacting with the MPFR API<a class="headerlink" href="#interacting-with-the-mpfr-api" title="Permalink to this heading">#</a></h2>
+<h2>Interacting with the MPFR API<a class="headerlink" href="#interacting-with-the-mpfr-api" title="Link to this heading">#</a></h2>
 <p>Because <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> wraps an <a class="reference internal" href="real.html#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a>
 instance, it is trivial to use a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> in the MPFR API.
 Two member functions are provided for direct access to the internal
@@ -803,9 +783,9 @@ object must contain a valid <a class="reference internal" href="real.html#_CPPv4
 <a class="reference internal" href="real.html#_CPPv46mpfr_t" title="mpfr_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mpfr_t</span></code></a> are also available.</p>
 </section>
 <section id="serialisation">
-<h2>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this heading">#</a></h2>
+<h2>Serialisation<a class="headerlink" href="#serialisation" title="Link to this heading">#</a></h2>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 0.22.</span></p>
+<p><span class="versionmodified added">Added in version 0.22.</span></p>
 </div>
 <p>mp++ provides a simple <a class="reference internal" href="real.html#real-s11n"><span class="std std-ref">API for the (de)serialisation</span></a> of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> objects
 into/from memory buffers and C++ streams. Possible uses of the serialisation API include persistence (e.g.,
@@ -827,7 +807,7 @@ purposes, it is better to use the string representation of <a class="reference i
 </ul>
 </section>
 <section id="user-defined-literals">
-<h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this heading">#</a></h2>
+<h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Link to this heading">#</a></h2>
 <p>User-defined literals are available for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>.
 The <a class="reference internal" href="real.html#real-literals"><span class="std std-ref">literals</span></a>
 are defined within
@@ -889,7 +869,8 @@ with 128, 256, 512 and 1024 bits of precision:</p>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -955,8 +936,8 @@ By Francesco Biscani
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
   </footer>
