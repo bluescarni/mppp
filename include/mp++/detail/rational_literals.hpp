@@ -17,18 +17,18 @@ inline namespace literals
 {
 
 template <char... Chars>
-inline auto operator""_q1()
+inline rational<1> operator""_q1()
 {
     return rational<1>{detail::integer_literal_impl<1, Chars...>()};
 }
 template <char... Chars>
-inline auto operator""_q2()
+inline rational<2> operator""_q2()
 {
     return rational<2>{detail::integer_literal_impl<2, Chars...>()};
 }
 
 template <char... Chars>
-inline auto operator""_q3()
+inline rational<3> operator""_q3()
 {
     return rational<3>{detail::integer_literal_impl<3, Chars...>()};
 }
