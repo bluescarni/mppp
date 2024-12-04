@@ -734,7 +734,7 @@ TEST_CASE("fma")
     REQUIRE(r1.zero_p());
 }
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 TEST_CASE("inv")
 {

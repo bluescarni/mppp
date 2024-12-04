@@ -16,10 +16,6 @@ endif()
 # fmt is always required.
 find_package(fmt ${_MPPP_MIN_FMT_VERSION} REQUIRED CONFIG)
 
-if(MPPP_BENCHMARK_FLINT)
-  find_package(mp++_FLINT REQUIRED)
-endif()
-
 # The benchmarking helper library.
 add_library(mp++_benchmark STATIC utils.cpp)
 target_compile_options(mp++_benchmark PRIVATE
@@ -45,7 +41,7 @@ function(ADD_MPPP_BENCHMARK arg1)
     target_link_libraries(${arg1} PRIVATE Boost::boost mp++::GMP)
     target_compile_options(${arg1} PRIVATE "-DMPPP_BENCHMARK_BOOST")
   endif()
-  if(MPPP_BENCHMARK_FLINT)
+  if(MPPP_WITH_FLINT)
     target_link_libraries(${arg1} PRIVATE mp++::FLINT)
     target_compile_options(${arg1} PRIVATE "-DMPPP_BENCHMARK_FLINT")
   endif()

@@ -57,10 +57,10 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          conda install -y cmake mpir mpfr 'libflint<3' arb mpc fmt libboost-devel
+          conda install -y cmake gmp mpfr libflint mpc fmt libboost-devel
           mkdir build
           cd build
-          cmake ../ -G "Visual Studio 17 2022" -A x64 -DCMAKE_CXX_STANDARD=20 -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_ARB=yes -DMPPP_ENABLE_IPO=yes
+          cmake ../ -G "Visual Studio 17 2022" -A x64 -DCMAKE_CXX_STANDARD=20 -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_FLINT=yes -DMPPP_ENABLE_IPO=yes
           cmake --build . --config Release -j2
           copy Release\mp++.dll test\Release\
           ctest -j4 -V -C Release

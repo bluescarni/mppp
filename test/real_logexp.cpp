@@ -181,7 +181,7 @@ TEST_CASE("real log1p")
     REQUIRE(r0 == log(real{100}));
 }
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 TEST_CASE("real log_hypot")
 {

@@ -22,7 +22,7 @@
 
 #endif
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 #if defined(_MSC_VER) && !defined(__clang__)
 
@@ -145,7 +145,7 @@ MPPP_CONSTINIT const mpfr_global_cleanup mpfr_global_cleanup_inst;
 
 #endif
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 // A cleanup functor that will call flint_cleanup()
 // on destruction.
@@ -216,7 +216,7 @@ real::~real()
     detail::ignore(&detail::mpfr_tl_cleanup_inst);
     detail::ignore(&detail::mpfr_global_cleanup_inst);
 #endif
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
     detail::ignore(&detail::flint_cleanup_inst);
 #endif
 #endif
@@ -242,7 +242,7 @@ complex::~complex()
     detail::ignore(&detail::mpfr_tl_cleanup_inst);
     detail::ignore(&detail::mpfr_global_cleanup_inst);
 #endif
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
     detail::ignore(&detail::flint_cleanup_inst);
 #endif
 #endif

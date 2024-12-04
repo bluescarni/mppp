@@ -108,7 +108,7 @@ TEST_CASE("real yn")
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 TEST_CASE("real jx")
 {
