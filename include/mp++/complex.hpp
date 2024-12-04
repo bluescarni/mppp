@@ -1788,7 +1788,11 @@ inline complex complex_pow_impl(T &&a, const U &x)
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
     } else {
+#if defined(_MSC_VER)
+        auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_d(r, o, static_cast<double>(x), MPC_RNDNN); };
+#else
         auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ld(r, o, static_cast<long double>(x), MPC_RNDNN); };
+#endif
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
     }

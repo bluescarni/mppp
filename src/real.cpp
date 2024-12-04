@@ -368,7 +368,11 @@ void real::dispatch_construction(const double &x)
 
 void real::dispatch_construction(const long double &x)
 {
+#if defined(_MSC_VER)
+    dispatch_fp_construction(::mpfr_set_d, static_cast<double>(x));
+#else
     dispatch_fp_construction(::mpfr_set_ld, x);
+#endif
 }
 
 // Special casing for bool, otherwise MSVC warns if we fold this into the
@@ -1600,12 +1604,26 @@ bool dispatch_real_equality(const real &r, const double &x)
     }
 }
 
+namespace
+{
+
+int dispatch_real_cmp_ld(const real &r, const long double &x)
+{
+#if defined(_MSC_VER)
+    return ::mpfr_cmp_d(r.get_mpfr_t(), static_cast<double>(x));
+#else
+    return ::mpfr_cmp_ld(r.get_mpfr_t(), x);
+#endif
+}
+
+}
+
 bool dispatch_real_equality(const real &r, const long double &x)
 {
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) == 0;
+        return dispatch_real_cmp_ld(r,x) == 0;
     }
 }
 
@@ -1711,7 +1729,7 @@ bool dispatch_real_gt(const real &r, const long double &x)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) > 0;
+        return dispatch_real_cmp_ld(r,x) > 0;
     }
 }
 
@@ -1738,7 +1756,7 @@ bool dispatch_real_gt(const long double &x, const real &r)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) < 0;
+        return dispatch_real_cmp_ld(r,x) < 0;
     }
 }
 
@@ -1852,7 +1870,7 @@ bool dispatch_real_gte(const real &r, const long double &x)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) >= 0;
+        return dispatch_real_cmp_ld(r,x) >= 0;
     }
 }
 
@@ -1879,7 +1897,7 @@ bool dispatch_real_gte(const long double &x, const real &r)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) <= 0;
+        return dispatch_real_cmp_ld(r,x) <= 0;
     }
 }
 
@@ -1993,7 +2011,7 @@ bool dispatch_real_lt(const real &r, const long double &x)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) < 0;
+        return dispatch_real_cmp_ld(r,x) < 0;
     }
 }
 
@@ -2020,7 +2038,7 @@ bool dispatch_real_lt(const long double &x, const real &r)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) > 0;
+        return dispatch_real_cmp_ld(r,x) > 0;
     }
 }
 
@@ -2134,7 +2152,7 @@ bool dispatch_real_lte(const real &r, const long double &x)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) <= 0;
+        return dispatch_real_cmp_ld(r,x) <= 0;
     }
 }
 
@@ -2161,7 +2179,7 @@ bool dispatch_real_lte(const long double &x, const real &r)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return ::mpfr_cmp_ld(r.get_mpfr_t(), x) >= 0;
+        return dispatch_real_cmp_ld(r,x) >= 0;
     }
 }
 

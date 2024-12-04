@@ -256,7 +256,11 @@ private:
         // mpfr_get_q() does not exist.
         // NOTE: probably coming in MPFR 4:
         // https://lists.gforge.inria.fr/pipermail/mpfr-commits/2017-June/011186.html
+#if defined(_MSC_VER)
+        ::mpfr_set_d(&mpfr.m_mpfr, static_cast<double>(x), MPFR_RNDN);
+#else
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
+#endif
         ::mpfr_get_f(&mpf.m_mpf, &mpfr.m_mpfr, MPFR_RNDN);
         mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
         m_num = mpq_numref(&mpq.m_mpq);
@@ -535,7 +539,11 @@ private:
         MPPP_MAYBE_TLS detail::mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         const auto v = detail::get_mpq_view(*this);
         ::mpfr_set_q(&mpfr.m_mpfr, &v, MPFR_RNDN);
+#if defined(_MSC_VER)
+        return std::make_pair(true, static_cast<long double>(::mpfr_get_d(&mpfr.m_mpfr, MPFR_RNDN)));
+#else
         return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
+#endif
     }
 #endif
     // Conversion to std::complex.

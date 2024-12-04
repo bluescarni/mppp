@@ -566,7 +566,11 @@ private:
     template <bool SetPrec>
     void dispatch_assignment(const long double &x)
     {
+#if defined(_MSC_VER)
+        dispatch_fp_assignment<SetPrec>(::mpfr_set_d, static_cast<double>(x));
+#else
         dispatch_fp_assignment<SetPrec>(::mpfr_set_ld, x);
+#endif
     }
 
     // Assignment from integral types.
@@ -923,7 +927,11 @@ private:
             return static_cast<T>(::mpfr_get_d(&m_mpfr, MPFR_RNDN));
         }
         assert((std::is_same<T, long double>::value));
+#if defined(_MSC_VER)
+        return static_cast<T>(::mpfr_get_d(&m_mpfr, MPFR_RNDN));
+#else
         return static_cast<T>(::mpfr_get_ld(&m_mpfr, MPFR_RNDN));
+#endif
     }
     // Small helper to raise an exception when converting to C++ integrals.
     template <typename T>
