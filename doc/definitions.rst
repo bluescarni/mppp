@@ -85,7 +85,7 @@ Macros and definitions
 
 .. c:macro:: MPPP_WITH_FLINT
 
-   .. versionadded:: 1.1.0
+   .. versionadded:: 2.0.0
 
    This name is defined if mp++ was configured with support for the FLINT library
    (see the :ref:`installation instructions <installation>`).

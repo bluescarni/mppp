@@ -93,7 +93,7 @@ path, etc.). The available configuration options are:
 
    The ``MPPP_WITH_FMT`` build option.
 
-.. versionadded:: 1.1.0
+.. versionadded:: 2.0.0
 
    The ``MPPP_WITH_FLINT`` build option.
 
