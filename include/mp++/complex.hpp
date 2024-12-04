@@ -179,19 +179,14 @@ inline ::mpfr_prec_t real_deduce_precision(const complex128 &c)
 
 #endif
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 // The Arb MPC wrappers.
 MPPP_DLL_PUBLIC void acb_inv(::mpc_t, const ::mpc_t);
 MPPP_DLL_PUBLIC void acb_rec_sqrt(::mpc_t, const ::mpc_t);
 MPPP_DLL_PUBLIC void acb_rootn_ui(::mpc_t, const ::mpc_t, unsigned long);
 MPPP_DLL_PUBLIC void acb_agm1(::mpc_t, const ::mpc_t);
-
-#if defined(MPPP_ARB_HAVE_ACB_AGM)
-
 MPPP_DLL_PUBLIC void acb_agm(::mpc_t, const ::mpc_t, const ::mpc_t);
-
-#endif
 
 #endif
 
@@ -941,13 +936,13 @@ public:
     complex &proj();
     complex &sqr();
     complex &mul_i(int sgn = 0);
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
     complex &inv();
 #endif
 
     // Roots.
     complex &sqrt();
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
     complex &rec_sqrt();
 #endif
 
@@ -972,7 +967,7 @@ public:
     complex &acosh();
     complex &atanh();
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
     // AGM.
     complex &agm1();
 #endif
@@ -1642,7 +1637,7 @@ MPPP_DLL_PUBLIC real norm(const complex &);
 MPPP_DLL_PUBLIC real &arg(real &, const complex &);
 MPPP_DLL_PUBLIC real arg(const complex &);
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 // inv.
 MPPP_COMPLEX_MPC_UNARY_IMPL(inv, detail::acb_inv, false)
@@ -1678,7 +1673,7 @@ inline bool number_p(const complex &c)
 // Roots.
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 MPPP_COMPLEX_MPC_UNARY_IMPL(rec_sqrt, detail::acb_rec_sqrt, false)
 
@@ -1793,7 +1788,11 @@ inline complex complex_pow_impl(T &&a, const U &x)
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
     } else {
+#if defined(_MSC_VER)
+        auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_d(r, o, static_cast<double>(x), MPC_RNDNN); };
+#else
         auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ld(r, o, static_cast<long double>(x), MPC_RNDNN); };
+#endif
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
     }
@@ -1952,16 +1951,11 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(exp, ::mpc_exp, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(log, ::mpc_log, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(log10, ::mpc_log10, true)
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 // AGM.
 MPPP_COMPLEX_MPC_UNARY_IMPL(agm1, detail::acb_agm1, false)
-
-#if defined(MPPP_ARB_HAVE_ACB_AGM)
-
 MPPP_COMPLEX_MPC_BINARY_IMPL(agm, detail::acb_agm, false)
-
-#endif
 
 #endif
 

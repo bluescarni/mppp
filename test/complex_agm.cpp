@@ -81,8 +81,6 @@ TEST_CASE("agm1")
     }
 }
 
-#if defined(MPPP_ARB_HAVE_ACB_AGM)
-
 TEST_CASE("agm")
 {
     // Ternary agm.
@@ -306,5 +304,3 @@ TEST_CASE("agm")
 #endif
     }
 }
-
-#endif

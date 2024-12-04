@@ -20,17 +20,20 @@
 
 #endif
 
+// NOTE: this needs to be included early because certain arb functions
+// for interoperability with MPFR check if mpfr.h is included or not.
+#include <mp++/detail/mpfr.hpp>
+
+#include <flint/arb.h>
+#include <flint/arb_hypgeom.h>
+#include <flint/arf.h>
 #include <flint/flint.h>
 #include <flint/fmpz.h>
-
-#include <arb.h>
-#include <arb_hypgeom.h>
-#include <arf.h>
-#include <mag.h>
+#include <flint/mag.h>
 
 #if defined(MPPP_WITH_MPC)
 
-#include <acb.h>
+#include <flint/acb.h>
 
 #endif
 
@@ -40,7 +43,6 @@
 
 #endif
 
-#include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/real.hpp>
@@ -457,8 +459,6 @@ void acb_rootn_ui(::mpc_t rop, const ::mpc_t op, unsigned long n)
 
 MPPP_UNARY_ACB_WRAPPER(agm1)
 
-#if defined(MPPP_ARB_HAVE_ACB_AGM)
-
 void acb_agm(::mpc_t rop, const ::mpc_t op1, const ::mpc_t op2)
 {
     MPPP_MAYBE_TLS acb_raii acb_rop, acb_op1, acb_op2;
@@ -470,8 +470,6 @@ void acb_agm(::mpc_t rop, const ::mpc_t op1, const ::mpc_t op2)
 
     acb_to_mpc(rop, acb_rop.m_acb);
 }
-
-#endif
 
 #undef MPPP_UNARY_ACB_WRAPPER
 

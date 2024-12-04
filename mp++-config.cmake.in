@@ -39,7 +39,7 @@ endif()
 set(mp++_WITH_FMT @MPPP_WITH_FMT@)
 
 # Private optional deps.
-set(mp++_WITH_ARB @MPPP_WITH_ARB@)
+set(mp++_WITH_FLINT @MPPP_WITH_FLINT@)
 set(mp++_WITH_QUADMATH @MPPP_WITH_QUADMATH@)
 
 # Export the ABI version.

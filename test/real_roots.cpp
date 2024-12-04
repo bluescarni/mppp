@@ -139,7 +139,7 @@ TEST_CASE("real rootn_ui")
 
 #endif
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 TEST_CASE("real sqrt1pm1")
 {

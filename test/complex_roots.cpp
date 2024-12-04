@@ -53,7 +53,7 @@ TEST_CASE("sqrt")
     REQUIRE(r0.get_prec() == 128);
 }
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_FLINT)
 
 TEST_CASE("rec_sqrt")
 {

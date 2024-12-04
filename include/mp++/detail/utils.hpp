@@ -205,8 +205,8 @@ inline
     // LCOV_EXCL_START
     return retval.first ? retval.second
                         : throw std::overflow_error(
-                            "Error while trying to negate the unsigned integral value " + to_string(n)
-                            + ": the result does not fit in the range of the target type '" + type_name<T>() + "'");
+                              "Error while trying to negate the unsigned integral value " + to_string(n)
+                              + ": the result does not fit in the range of the target type '" + type_name<T>() + "'");
     // LCOV_EXCL_STOP
 }
 
@@ -219,8 +219,8 @@ constexpr T safe_cast(const U &n)
     return n <= nl_max<T>()
                ? static_cast<T>(n)
                : throw std::overflow_error(
-                   "Error in the safe conversion between unsigned integral types: the input value " + to_string(n)
-                   + " does not fit in the range of the target type '" + type_name<T>() + "'");
+                     "Error in the safe conversion between unsigned integral types: the input value " + to_string(n)
+                     + " does not fit in the range of the target type '" + type_name<T>() + "'");
 }
 
 template <typename T, typename U,
@@ -230,8 +230,8 @@ constexpr T safe_cast(const U &n)
     return (n <= nl_max<T>() && n >= nl_min<T>())
                ? static_cast<T>(n)
                : throw std::overflow_error(
-                   "Error in the safe conversion between signed integral types: the input value " + to_string(n)
-                   + " does not fit in the range of the target type '" + type_name<T>() + "'");
+                     "Error in the safe conversion between signed integral types: the input value " + to_string(n)
+                     + " does not fit in the range of the target type '" + type_name<T>() + "'");
 }
 
 template <typename T, typename U,

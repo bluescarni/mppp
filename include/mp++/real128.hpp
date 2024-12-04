@@ -399,8 +399,8 @@ public:
         : m_value(c.imag() == 0
                       ? c.real()
                       : throw std::domain_error(
-                          "Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
-                          + detail::to_string(c.imag())))
+                            "Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
+                            + detail::to_string(c.imag())))
     {
     }
 

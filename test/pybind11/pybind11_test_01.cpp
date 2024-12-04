@@ -75,9 +75,8 @@ PYBIND11_MODULE(pybind11_test_01, m)
     m.def("test_complex_conversion", [](const mppp::complex &c) { return c; });
     // NOTE: apparent coverage detection issues with multiline lambdas.
     // LCOV_EXCL_START
-    m.def("test_complex_conversion", [](const mppp::complex &c, ::mpfr_prec_t prec) {
-        return mppp::complex{c, mppp::complex_prec_t(prec)};
-    });
+    m.def("test_complex_conversion",
+          [](const mppp::complex &c, ::mpfr_prec_t prec) { return mppp::complex{c, mppp::complex_prec_t(prec)}; });
     // LCOV_EXCL_STOP
 #endif
 

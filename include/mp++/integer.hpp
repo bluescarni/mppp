@@ -735,7 +735,11 @@ union integer_union {
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS mpz_raii tmp;
+#if defined(_MSC_VER)
+        ::mpfr_set_d(&mpfr.m_mpfr, static_cast<double>(x), MPFR_RNDN);
+#else
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
+#endif
         ::mpfr_get_z(&tmp.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
         dispatch_mpz_ctor(&tmp.m_mpz);
     }
@@ -1533,7 +1537,11 @@ private:
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS detail::mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS detail::mpz_raii tmp;
+#if defined(_MSC_VER)
+        ::mpfr_set_d(&mpfr.m_mpfr, static_cast<double>(x), MPFR_RNDN);
+#else
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
+#endif
         ::mpfr_get_z(&tmp.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
         *this = &tmp.m_mpz;
     }
@@ -1900,7 +1908,11 @@ private:
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS detail::mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
+#if defined(_MSC_VER)
+        return std::make_pair(true, static_cast<long double>(::mpfr_get_d(&mpfr.m_mpfr, MPFR_RNDN)));
+#else
         return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
+#endif
     }
 #endif
     // Conversion to floating-point.

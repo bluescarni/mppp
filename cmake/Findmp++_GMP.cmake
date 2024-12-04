@@ -34,7 +34,7 @@ if(MPPP_GMP_INCLUDE_DIR AND MPPP_GMP_LIBRARY)
 endif()
 
 find_path(MPPP_GMP_INCLUDE_DIR NAMES gmp.h)
-find_library(MPPP_GMP_LIBRARY NAMES gmp mpir)
+find_library(MPPP_GMP_LIBRARY NAMES gmp)
 
 include(FindPackageHandleStandardArgs)
 

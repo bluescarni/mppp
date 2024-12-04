@@ -83,11 +83,11 @@ Macros and definitions
    This name is defined if mp++ was configured with support for the MPC library
    (see the :ref:`installation instructions <installation>`).
 
-.. c:macro:: MPPP_WITH_ARB
+.. c:macro:: MPPP_WITH_FLINT
 
-   .. versionadded:: 0.19
+   .. versionadded:: 2.0.0
 
-   This name is defined if mp++ was configured with support for the Arb library
+   This name is defined if mp++ was configured with support for the FLINT library
    (see the :ref:`installation instructions <installation>`).
 
 .. c:macro:: MPPP_HAVE_GCC_INT128
