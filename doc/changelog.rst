@@ -1,15 +1,15 @@
 Changelog
 =========
 
-1.1.0 (unreleased)
+2.0.0 (unreleased)
 ------------------
 
 Changes
 ~~~~~~~
 
-- When FLINT support is enabled, mp++ now requires FLINT>=3
+- **BREAKING**: when FLINT support is enabled, mp++ now requires FLINT>=3
   (`#319 <https://github.com/bluescarni/mppp/pull/319>`__).
-- mp++ now requires CMake>=3.12
+- **BREAKING**: mp++ now requires CMake>=3.12
   (`#319 <https://github.com/bluescarni/mppp/pull/319>`__).
 
 1.0.4 (2024-10-10)

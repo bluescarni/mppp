@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 1.1.0 LANGUAGES CXX C)
+project(mp++ VERSION 2.0.0 LANGUAGES CXX C)
 
 # Setup the mp++ ABI version number.
 set(MPPP_ABI_VERSION 16)
