@@ -12,6 +12,13 @@ Changes
 - **BREAKING**: mp++ now requires CMake>=3.12
   (`#319 <https://github.com/bluescarni/mppp/pull/319>`__).
 
+Fix
+~~~
+
+- Implement workaround to avoid segfaults when compiling with
+  MSVC against a MinGW build of MPFR and MPC
+  (`#319 <https://github.com/bluescarni/mppp/pull/319>`__).
+
 1.0.4 (2024-10-10)
 ------------------
 
