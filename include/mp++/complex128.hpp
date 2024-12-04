@@ -1278,7 +1278,7 @@ inline namespace literals
 template <char... Chars>
 inline complex128 operator""_icq()
 {
-    return complex128{0, operator""_rq < Chars... > ()};
+    return complex128{0, operator""_rq < Chars...>()};
 }
 
 } // namespace literals

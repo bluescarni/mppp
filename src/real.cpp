@@ -1616,14 +1616,14 @@ int dispatch_real_cmp_ld(const real &r, const long double &x)
 #endif
 }
 
-}
+} // namespace
 
 bool dispatch_real_equality(const real &r, const long double &x)
 {
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) == 0;
+        return dispatch_real_cmp_ld(r, x) == 0;
     }
 }
 
@@ -1729,7 +1729,7 @@ bool dispatch_real_gt(const real &r, const long double &x)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) > 0;
+        return dispatch_real_cmp_ld(r, x) > 0;
     }
 }
 
@@ -1756,7 +1756,7 @@ bool dispatch_real_gt(const long double &x, const real &r)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) < 0;
+        return dispatch_real_cmp_ld(r, x) < 0;
     }
 }
 
@@ -1870,7 +1870,7 @@ bool dispatch_real_gte(const real &r, const long double &x)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) >= 0;
+        return dispatch_real_cmp_ld(r, x) >= 0;
     }
 }
 
@@ -1897,7 +1897,7 @@ bool dispatch_real_gte(const long double &x, const real &r)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) <= 0;
+        return dispatch_real_cmp_ld(r, x) <= 0;
     }
 }
 
@@ -2011,7 +2011,7 @@ bool dispatch_real_lt(const real &r, const long double &x)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) < 0;
+        return dispatch_real_cmp_ld(r, x) < 0;
     }
 }
 
@@ -2038,7 +2038,7 @@ bool dispatch_real_lt(const long double &x, const real &r)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) > 0;
+        return dispatch_real_cmp_ld(r, x) > 0;
     }
 }
 
@@ -2152,7 +2152,7 @@ bool dispatch_real_lte(const real &r, const long double &x)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) <= 0;
+        return dispatch_real_cmp_ld(r, x) <= 0;
     }
 }
 
@@ -2179,7 +2179,7 @@ bool dispatch_real_lte(const long double &x, const real &r)
     if (r.nan_p() || std::isnan(x)) {
         return false;
     } else {
-        return dispatch_real_cmp_ld(r,x) >= 0;
+        return dispatch_real_cmp_ld(r, x) >= 0;
     }
 }
 

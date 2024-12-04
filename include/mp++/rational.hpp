@@ -274,11 +274,12 @@ private:
     // Constructor from std::complex.
     template <typename T>
     explicit rational(const ptag &p, const std::complex<T> &c)
-        : rational(p, c.imag() == 0
-                          ? c.real()
-                          : throw std::domain_error(
-                              "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
-                              + detail::to_string(c.imag())))
+        : rational(p,
+                   c.imag() == 0
+                       ? c.real()
+                       : throw std::domain_error(
+                             "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                             + detail::to_string(c.imag())))
     {
     }
 
