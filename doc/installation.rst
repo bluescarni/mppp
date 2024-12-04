@@ -320,8 +320,7 @@ Intel compiler:
 MinGW:
 
 * Due to a compiler bug in the implementation of ``thread_local``
-  storage [#mingw_tls]_,
-  certain performance optimisations are disabled
+  storage, certain performance optimisations are disabled
   when compiling with MinGW.
 
 OSX:
@@ -343,5 +342,4 @@ FreeBSD:
 
 .. rubric:: Footnotes
 
-.. [#mingw_tls] https://sourceforge.net/p/mingw-w64/bugs/445/
 .. [#freebsd_mppp_bug] https://github.com/bluescarni/mppp/issues/132
