@@ -1607,6 +1607,13 @@ bool dispatch_real_equality(const real &r, const double &x)
 namespace
 {
 
+// NOTE: this contraption is a workaround for ABI issues when compiling
+// mp++ with MSVC against a MinGW build of MPFR. We cannot pass long
+// double values into the MPFR API because MinGW implements them as
+// 80-bit floats, while MSVC implements them as 64-bit floats. We thus
+// cast x to double (which in any case does not remove precision as
+// long double == double in MSVC) and then invoke the mpfr_cmp_d()
+// function.
 int dispatch_real_cmp_ld(const real &r, const long double &x)
 {
 #if defined(_MSC_VER)
