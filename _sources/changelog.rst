@@ -7,6 +7,8 @@ Changelog
 Changes
 ~~~~~~~
 
+- **BREAKING**: interoperability with Python<3 has been dropped
+  (`#321 <https://github.com/bluescarni/mppp/pull/321>`__).
 - **BREAKING**: when FLINT support is enabled, mp++ now requires FLINT>=3
   (`#319 <https://github.com/bluescarni/mppp/pull/319>`__).
 - **BREAKING**: mp++ now requires CMake>=3.12
@@ -15,6 +17,8 @@ Changes
 Fix
 ~~~
 
+- Fix Python interoperability for Python>=3.12
+  (`#321 <https://github.com/bluescarni/mppp/pull/321>`__).
 - Implement workaround to avoid segfaults when compiling with
   MSVC against a MinGW build of MPFR and MPC
   (`#319 <https://github.com/bluescarni/mppp/pull/319>`__).
