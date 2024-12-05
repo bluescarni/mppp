@@ -19,17 +19,9 @@
 #include <Python.h>
 #include <pybind11/pybind11.h>
 
-#if PY_MAJOR_VERSION < 2 || (PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION < 7)
+#if PY_MAJOR_VERSION < 3
 
-#error Only Python >= 2.7 is supported.
-
-#endif
-
-#if PY_MAJOR_VERSION == 2
-
-// This includes the definition of the long integer structure
-// in Python 2.x.
-#include <longintrepr.h>
+#error Only Python >= 3 is supported.
 
 #endif
 
@@ -206,13 +198,11 @@ namespace detail
 template <std::size_t SSize>
 inline mppp::integer<SSize> py_long_to_mppp_int(const ::PyLongObject *nptr)
 {
+
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION <= 11
+
     // Get its signed size.
-    const auto ob_size =
-#if PY_MAJOR_VERSION == 2
-        nptr->ob_size;
-#else
-        nptr->ob_base.ob_size;
-#endif
+    const auto ob_size = nptr->ob_base.ob_size;
     if (!ob_size) {
         // The Python integer is zero, return a def cted value.
         return mppp::integer<SSize>{};
@@ -222,6 +212,29 @@ inline mppp::integer<SSize> py_long_to_mppp_int(const ::PyLongObject *nptr)
     const bool neg = ob_size < 0;
     using size_type = typename std::make_unsigned<typename std::remove_const<decltype(ob_size)>::type>::type;
     auto abs_ob_size = neg ? mppp::detail::nint_abs(ob_size) : static_cast<size_type>(ob_size);
+
+#else
+
+    // NOTE: these shifts and mask values come from here:
+    // https://github.com/python/cpython/blob/main/Include/internal/pycore_long.h
+    // Not sure if we can rely on this moving on, probably needs to be checked
+    // at every new Python release. Also, note that lv_tag is unsigned, so
+    // here we are always getting directly the absolute value of the size,
+    // unlike in Python<3.12 where we get out a signed size.
+    auto abs_ob_size = nptr->long_value.lv_tag >> 3;
+    if (!abs_ob_size) {
+        // The Python integer is zero, return a def cted value.
+        return mppp::integer<SSize>{};
+    }
+
+    // Is it negative?
+    const auto neg = (nptr->long_value.lv_tag & 3) == 2;
+
+    // Get the limbs array.
+    const auto *ob_digit = nptr->long_value.ob_digit;
+
+#endif
+
     static_assert(PyLong_SHIFT <= std::numeric_limits<::mp_bitcnt_t>::max(), "Overflow error.");
     if (mppp_unlikely(static_cast<::mp_bitcnt_t>(PyLong_SHIFT)
                       > std::numeric_limits<::mp_bitcnt_t>::max() / abs_ob_size)) {
@@ -250,26 +263,11 @@ inline mppp::integer<SSize> py_long_to_mppp_int(const ::PyLongObject *nptr)
 template <std::size_t SSize>
 inline bool py_integer_to_mppp_int(mppp::integer<SSize> &rop, const ::PyObject *source)
 {
-#if PY_MAJOR_VERSION == 2
-    const bool is_int = PyInt_Check(source), is_long = PyLong_Check(source);
-    if (!is_int && !is_long) {
-        return false;
-    }
-    if (is_long) {
-        assert(!is_int);
-        rop = py_long_to_mppp_int<SSize>((const ::PyLongObject *)source);
-        return true;
-    }
-    assert(is_int);
-    rop = ((const ::PyIntObject *)source)->ob_ival;
-    return true;
-#else
     if (!PyLong_Check(source)) {
         return false;
     }
     rop = py_long_to_mppp_int<SSize>((const ::PyLongObject *)source);
     return true;
-#endif
 }
 
 // Convert mppp integer to a python integer.
