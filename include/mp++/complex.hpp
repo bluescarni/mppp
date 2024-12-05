@@ -3161,19 +3161,29 @@ inline bool operator!=(const T &x, const U &y)
 inline namespace literals
 {
 
-#define MPPP_DECLARE_COMPLEX_UDL(prec)                                                                                 \
-    template <char... Chars>                                                                                           \
-    inline complex operator""_icr##prec()                                                                              \
-    {                                                                                                                  \
-        return complex{real{real_kind::zero, prec}, detail::real_literal_impl<Chars...>(prec)};                        \
-    }
+template <char... Chars>
+inline complex operator""_icr128()
+{
+    return complex{real{real_kind::zero, 128}, detail::real_literal_impl<Chars...>(128)};
+}
 
-MPPP_DECLARE_COMPLEX_UDL(128)
-MPPP_DECLARE_COMPLEX_UDL(256)
-MPPP_DECLARE_COMPLEX_UDL(512)
-MPPP_DECLARE_COMPLEX_UDL(1024)
+template <char... Chars>
+inline complex operator""_icr256()
+{
+    return complex{real{real_kind::zero, 256}, detail::real_literal_impl<Chars...>(256)};
+}
 
-#undef MPPP_DECLARE_COMPLEX_UDL
+template <char... Chars>
+inline complex operator""_icr512()
+{
+    return complex{real{real_kind::zero, 512}, detail::real_literal_impl<Chars...>(512)};
+}
+
+template <char... Chars>
+inline complex operator""_icr1024()
+{
+    return complex{real{real_kind::zero, 1024}, detail::real_literal_impl<Chars...>(1024)};
+}
 
 } // namespace literals
 

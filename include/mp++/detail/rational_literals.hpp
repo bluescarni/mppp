@@ -16,18 +16,22 @@ MPPP_BEGIN_NAMESPACE
 inline namespace literals
 {
 
-#define MPPP_DECLARE_RATIONAL_UDL(n)                                                                                   \
-    template <char... Chars>                                                                                           \
-    inline rational<n> operator""_q##n()                                                                               \
-    {                                                                                                                  \
-        return rational<n>{detail::integer_literal_impl<n, Chars...>()};                                               \
-    }
+template <char... Chars>
+inline rational<1> operator""_q1()
+{
+    return rational<1>{detail::integer_literal_impl<1, Chars...>()};
+}
+template <char... Chars>
+inline rational<2> operator""_q2()
+{
+    return rational<2>{detail::integer_literal_impl<2, Chars...>()};
+}
 
-MPPP_DECLARE_RATIONAL_UDL(1)
-MPPP_DECLARE_RATIONAL_UDL(2)
-MPPP_DECLARE_RATIONAL_UDL(3)
-
-#undef MPPP_DECLARE_RATIONAL_UDL
+template <char... Chars>
+inline rational<3> operator""_q3()
+{
+    return rational<3>{detail::integer_literal_impl<3, Chars...>()};
+}
 
 } // namespace literals
 

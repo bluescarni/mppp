@@ -47,19 +47,29 @@ inline real real_literal_impl(::mpfr_prec_t prec)
 inline namespace literals
 {
 
-#define MPPP_DECLARE_REAL_UDL(prec)                                                                                    \
-    template <char... Chars>                                                                                           \
-    inline real operator""_r##prec()                                                                                   \
-    {                                                                                                                  \
-        return detail::real_literal_impl<Chars...>(prec);                                                              \
-    }
+template <char... Chars>
+inline real operator""_r128()
+{
+    return detail::real_literal_impl<Chars...>(128);
+}
 
-MPPP_DECLARE_REAL_UDL(128)
-MPPP_DECLARE_REAL_UDL(256)
-MPPP_DECLARE_REAL_UDL(512)
-MPPP_DECLARE_REAL_UDL(1024)
+template <char... Chars>
+inline real operator""_r256()
+{
+    return detail::real_literal_impl<Chars...>(256);
+}
 
-#undef MPPP_DECLARE_REAL_UDL
+template <char... Chars>
+inline real operator""_r512()
+{
+    return detail::real_literal_impl<Chars...>(512);
+}
+
+template <char... Chars>
+inline real operator""_r1024()
+{
+    return detail::real_literal_impl<Chars...>(1024);
+}
 
 } // namespace literals
 
