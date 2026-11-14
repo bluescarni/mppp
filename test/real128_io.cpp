@@ -16,7 +16,7 @@
 
 #if defined(MPPP_WITH_FMT)
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #endif
 
