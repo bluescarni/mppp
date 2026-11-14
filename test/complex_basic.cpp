@@ -903,6 +903,13 @@ TEST_CASE("mpc move ctor")
 
 #endif
 
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+
+#endif
+
 TEST_CASE("copy move ass")
 {
     {
@@ -943,6 +950,12 @@ TEST_CASE("copy move ass")
         REQUIRE(c1 == complex{45, 46});
     }
 }
+
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
 
 TEST_CASE("generic assignment")
 {

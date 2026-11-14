@@ -68,8 +68,7 @@ using int_types = std::tuple<char, signed char, unsigned char, short, unsigned s
 #endif
                              >;
 
-struct no_const {
-};
+struct no_const {};
 
 // A seed that will be used to init rngs in the multithreaded tests. Each time a batch of N threads
 // finishes, this value gets bumped up by N, so that the next time a multithreaded test which uses rng
@@ -622,6 +621,13 @@ TEST_CASE("mpz_t constructor")
     tuple_for_each(sizes{}, mpz_ctor_tester{});
 }
 
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+
+#endif
+
 struct copy_move_tester {
     template <typename S>
     // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
@@ -909,6 +915,12 @@ struct copy_move_tester {
         REQUIRE(noexcept(swap(q, q2)));
     }
 };
+
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
 
 TEST_CASE("copy and move")
 {

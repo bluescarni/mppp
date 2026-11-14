@@ -61,8 +61,7 @@ static std::mt19937::result_type mt_rng_seed(0u);
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
-struct no_const {
-};
+struct no_const {};
 
 struct nbits_ctor_tester {
     template <typename S>
@@ -103,6 +102,13 @@ TEST_CASE("nbits constructor")
 {
     tuple_for_each(sizes{}, nbits_ctor_tester{});
 }
+
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+
+#endif
 
 struct copy_move_tester {
     template <typename S>
@@ -183,6 +189,12 @@ struct copy_move_tester {
         REQUIRE(m5 == 10);
     }
 };
+
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
 
 TEST_CASE("copy and move")
 {
