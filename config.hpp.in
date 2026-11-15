@@ -103,24 +103,6 @@
 
 #endif
 
-// Concepts setup.
-#if defined(__cpp_concepts)
-
-#define MPPP_HAVE_CONCEPTS
-
-// NOTE: GCC < 9 uses the syntax of the concept TS.
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 9
-
-#define MPPP_CONCEPT_DECL concept bool
-
-#else
-
-#define MPPP_CONCEPT_DECL concept
-
-#endif
-
-#endif
-
 // C++ standard check.
 //
 // NOTE: this is necessary because MSVC may not set correctly the __cplusplus macro.

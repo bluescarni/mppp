@@ -1074,12 +1074,8 @@ using is_integer_cpp_arithmetic = detail::conjunction<is_cpp_arithmetic<T>
 #endif
                                                       >;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL integer_cpp_arithmetic = is_integer_cpp_arithmetic<T>::value;
-
-#endif
+concept integer_cpp_arithmetic = is_integer_cpp_arithmetic<T>::value;
 
 // Detect C++ complex types compatible with integer.
 template <typename T>
@@ -1090,12 +1086,8 @@ using is_integer_cpp_complex = detail::conjunction<is_cpp_complex<T>
 #endif
                                                    >;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL integer_cpp_complex = is_integer_cpp_complex<T>::value;
-
-#endif
+concept integer_cpp_complex = is_integer_cpp_complex<T>::value;
 
 namespace detail
 {
@@ -1325,35 +1317,18 @@ public:
     // Constructor from number of bits.
     explicit integer(integer_bitcnt_t nbits) : m_int(nbits) {}
     // Generic constructor.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
         requires integer_cpp_arithmetic<T> && (!cpp_integral<T>)
-#else
-    template <typename T,
-              detail::enable_if_t<
-                  detail::conjunction<is_integer_cpp_arithmetic<T>, detail::negation<is_cpp_integral<T>>>::value, int>
-              = 0>
-#endif
     explicit integer(const T &x) : m_int(x)
     {
     }
-#if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
         requires integer_cpp_arithmetic<T> && cpp_integral<T>
-#else
-    template <typename T,
-              detail::enable_if_t<detail::conjunction<is_integer_cpp_arithmetic<T>, is_cpp_integral<T>>::value, int>
-              = 0>
-#endif
     integer(const T &x) : m_int(x)
     {
     }
     // Generic constructor from a C++ complex type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
     explicit integer(const T &c)
         : integer(c.imag() == 0
                       ? c.real()
@@ -1374,11 +1349,7 @@ private:
 
 public:
     // Constructor from string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     explicit integer(const T &s, int base = 10) : integer(ptag{}, s, base)
     {
     }
@@ -1543,22 +1514,14 @@ private:
 
 public:
     // Generic assignment operator from a fundamental C++ type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_arithmetic T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
-#endif
     integer &operator=(const T &x)
     {
         dispatch_assignment(x);
         return *this;
     }
     // Generic assignment operator from a complex C++ type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
     integer &operator=(const T &c)
     {
         if (mppp_unlikely(c.imag() != 0)) {
@@ -1584,11 +1547,7 @@ public:
 #endif
 
     // Assignment from string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     integer &operator=(const T &s)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
@@ -1961,11 +1920,7 @@ public:
     // SFINAE dispatching.
 
     // Generic conversion operator to a C++ fundamental type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_arithmetic T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
-#endif
     explicit operator T() const
     {
         auto retval = dispatch_conversion<T>();
@@ -1976,21 +1931,13 @@ public:
         return std::move(retval.second);
     }
     // Generic conversion operator to a C++ complex type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
     explicit operator T() const
     {
         return T(static_cast<typename T::value_type>(*this));
     }
     // Generic conversion member function to a C++ fundamental type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_arithmetic T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
-#endif
     bool get(T &rop) const
     {
         auto retval = dispatch_conversion<T>();
@@ -2001,11 +1948,7 @@ public:
         return false;
     }
     // Generic conversion member function to a C++ complex type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
     bool get(T &rop) const
     {
         rop = static_cast<T>(*this);
@@ -2568,22 +2511,14 @@ inline integer<SSize> &set_negative_one(integer<SSize> &n)
 }
 
 // Generic conversion function to C++ fundamental types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <integer_cpp_arithmetic T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
-#endif
 inline bool get(T &rop, const integer<SSize> &n)
 {
     return n.get(rop);
 }
 
 // Generic conversion function to C++ complex types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <integer_cpp_complex T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
 inline bool get(T &rop, const integer<SSize> &n)
 {
     return n.get(rop);
@@ -2645,24 +2580,16 @@ struct is_integer<integer<SSize>> : std::true_type {};
 template <typename T, typename U>
 using are_integer_op_types = detail::is_detected<detail::integer_common_t, T, U>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL integer_op_types = are_integer_op_types<T, U>::value;
-
-#endif
+concept integer_op_types = are_integer_op_types<T, U>::value;
 
 template <typename T, typename U>
 using are_integer_real_op_types
     = detail::conjunction<are_integer_op_types<T, U>, detail::negation<is_integer_cpp_complex<T>>,
                           detail::negation<is_integer_cpp_complex<U>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL integer_real_op_types = are_integer_real_op_types<T, U>::value;
-
-#endif
+concept integer_real_op_types = are_integer_real_op_types<T, U>::value;
 
 template <typename T, typename U>
 using are_integer_integral_op_types
@@ -2670,12 +2597,8 @@ using are_integer_integral_op_types
                           detail::conjunction<detail::is_integer<T>, is_cpp_integral<U>>,
                           detail::conjunction<detail::is_integer<U>, is_cpp_integral<T>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL integer_integral_op_types = are_integer_integral_op_types<T, U>::value;
-
-#endif
+concept integer_integral_op_types = are_integer_integral_op_types<T, U>::value;
 
 namespace detail
 {
@@ -3287,22 +3210,14 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
 } // namespace detail
 
 // Ternary addition with C++ unsigned integral types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, cpp_unsigned_integral T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     return detail::add_ui_impl(rop, op1, op2);
 }
 
 // Ternary addition with C++ signed integral types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, cpp_signed_integral T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     if (op2 >= detail::uncvref_t<decltype(op2)>(0)) {
@@ -3384,22 +3299,14 @@ inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op
 } // namespace detail
 
 // Ternary subtraction with C++ unsigned integral types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, cpp_unsigned_integral T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     return detail::sub_ui_impl(rop, op1, op2);
 }
 
 // Ternary subtraction with C++ signed integral types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, cpp_signed_integral T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &sub_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     if (op2 >= detail::uncvref_t<decltype(op2)>(0)) {
@@ -6559,15 +6466,9 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 } // namespace detail
 
 // Generic binomial coefficient.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-binomial(const T &n, const U &k)
+inline auto binomial(const T &n, const U &k)
 {
     return detail::binomial_impl(n, k);
 }
@@ -6700,13 +6601,8 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
 
 // Generic binary exponentiation.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-pow(const T &base, const U &exp)
+inline auto pow(const T &base, const U &exp)
 {
     return detail::pow_impl(base, exp);
 }
@@ -7126,24 +7022,15 @@ inline integer<SSize> operator+(const integer<SSize> &n)
 
 // Binary addition.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-operator+(const T &op1, const U &op2)
+inline auto operator+(const T &op1, const U &op2)
 {
     return detail::dispatch_binary_add(op1, op2);
 }
 
 // In-place addition operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator+=(T &rop, const U &op)
 {
     detail::dispatch_in_place_add(rop, op);
@@ -7263,24 +7150,15 @@ integer<SSize> operator-(const integer<SSize> &n)
 
 // Binary subtraction.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-operator-(const T &op1, const U &op2)
+inline auto operator-(const T &op1, const U &op2)
 {
     return detail::dispatch_binary_sub(op1, op2);
 }
 
 // In-place subtraction operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator-=(T &rop, const U &op)
 {
     detail::dispatch_in_place_sub(rop, op);
@@ -7378,24 +7256,15 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 
 // Binary multiplication.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-operator*(const T &op1, const U &op2)
+inline auto operator*(const T &op1, const U &op2)
 {
     return detail::dispatch_binary_mul(op1, op2);
 }
 
 // In-place multiplication operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator*=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mul(rop, op);
@@ -7520,24 +7389,15 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 
 // Binary division.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-operator/(const T &n, const U &d)
+inline auto operator/(const T &n, const U &d)
 {
     return detail::dispatch_binary_div(n, d);
 }
 
 // In-place division operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator/=(T &rop, const U &op)
 {
     detail::dispatch_in_place_div(rop, op);
@@ -7545,26 +7405,16 @@ inline T &operator/=(T &rop, const U &op)
 }
 
 // Binary modulo operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-operator%(const T &n, const U &d)
+inline auto operator%(const T &n, const U &d)
 {
     return detail::dispatch_binary_mod(n, d);
 }
 
 // In-place modulo operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator%=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mod(rop, op);
@@ -7572,11 +7422,7 @@ inline T &operator%=(T &rop, const U &op)
 }
 
 // Binary left shift operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_integral T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 {
     integer<SSize> retval;
@@ -7585,11 +7431,7 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 }
 
 // In-place left shift operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_integral T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 {
     mul_2exp(rop, rop, detail::safe_cast<::mp_bitcnt_t>(s));
@@ -7597,11 +7439,7 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 }
 
 // Binary right shift operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_integral T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 {
     integer<SSize> retval;
@@ -7610,11 +7448,7 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 }
 
 // In-place right shift operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_integral T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 {
     tdiv_q_2exp(rop, rop, detail::safe_cast<::mp_bitcnt_t>(s));
@@ -7850,72 +7684,48 @@ inline bool dispatch_less_than(T x, const integer<SSize> &a)
 } // namespace detail
 
 // Equality operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator==(const T &op1, const U &op2)
 {
     return detail::dispatch_equality(op1, op2);
 }
 
 // Inequality operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator!=(const T &op1, const U &op2)
 {
     return !(op1 == op2);
 }
 
 // Less-than operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator<(const T &op1, const U &op2)
 {
     return detail::dispatch_less_than(op1, op2);
 }
 
 // Less-than or equal operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator<=(const T &op1, const U &op2)
 {
     return !(op1 > op2);
 }
 
 // Greater-than operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator>(const T &op1, const U &op2)
 {
     return detail::dispatch_greater_than(op1, op2);
 }
 
 // Greater-than or equal operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator>=(const T &op1, const U &op2)
 {
     return !(op1 < op2);
@@ -7975,26 +7785,16 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
 } // namespace detail
 
 // Binary bitwise OR operator
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-operator|(const T &op1, const U &op2)
+inline auto operator|(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_or(op1, op2);
 }
 
 // In-place bitwise OR operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator|=(T &rop, const U &op)
 {
     detail::dispatch_in_place_or(rop, op);
@@ -8046,26 +7846,16 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
 } // namespace detail
 
 // Binary bitwise AND operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-operator&(const T &op1, const U &op2)
+inline auto operator&(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_and(op1, op2);
 }
 
 // In-place bitwise AND operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator&=(T &rop, const U &op)
 {
     detail::dispatch_in_place_and(rop, op);
@@ -8117,26 +7907,16 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
 } // namespace detail
 
 // Binary bitwise XOR operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-operator^(const T &op1, const U &op2)
+inline auto operator^(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_xor(op1, op2);
 }
 
 // In-place bitwise XOR operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator^=(T &rop, const U &op)
 {
     detail::dispatch_in_place_xor(rop, op);

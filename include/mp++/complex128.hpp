@@ -93,12 +93,8 @@ using is_complex128_interoperable = detail::disjunction<is_real128_interoperable
 #endif
                                                         >;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL complex128_interoperable = is_complex128_interoperable<T>::value;
-
-#endif
+concept complex128_interoperable = is_complex128_interoperable<T>::value;
 
 constexpr complex128 conj(const complex128 &);
 
@@ -176,54 +172,30 @@ private:
 
 public:
     // Generic ctor.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
         requires complex128_interoperable<T>
 #if defined(MPPP_WITH_MPFR)
                  && (!std::is_same<T, real>::value)
 #endif
-#else
-    template <typename T, detail::enable_if_t<detail::conjunction<is_complex128_interoperable<T>
-#if defined(MPPP_WITH_MPFR)
-                                                                  ,
-                                                                  detail::negation<std::is_same<T, real>>
-#endif
-                                                                  >::value,
-                                              int> = 0>
-#endif
     constexpr complex128(const T &x) : m_value{cast_to_f128(x, detail::is_complex128_mppp_interoperable<T>{})}
     {
     }
 #if defined(MPPP_WITH_MPFR)
-#if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
         requires std::is_same<T, real>::value
-#else
-    template <typename T, detail::enable_if_t<std::is_same<T, real>::value, int> = 0>
-#endif
     explicit complex128(const T &x) : m_value{cast_to_f128(x, std::true_type{})}
     {
     }
 #endif
     // Binary generic ctors.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex128_interoperable T, complex128_interoperable U>
-#else
-    template <typename T, typename U,
-              detail::enable_if_t<
-                  detail::conjunction<is_complex128_interoperable<T>, is_complex128_interoperable<U>>::value, int> = 0>
-#endif
     constexpr explicit complex128(const T &re, const U &im)
         : m_value{cast_to_f128(re, detail::is_complex128_mppp_interoperable<T>{}),
                   cast_to_f128(im, detail::is_complex128_mppp_interoperable<U>{})}
     {
     }
     // Constructor from std::complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
-#endif
     constexpr complex128(const T &c) : m_value{static_cast<__float128>(c.real()), static_cast<__float128>(c.imag())}
     {
     }
@@ -238,11 +210,7 @@ private:
 
 public:
     // Constructor from string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex128(const T &s) : complex128(ptag{}, s)
     {
@@ -265,11 +233,7 @@ public:
     }
 
     // Assignment from real-valued interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex128_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
-#endif
     constexpr complex128 &operator=(const T &x)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
@@ -277,11 +241,7 @@ public:
     }
 
     // Assignment from std::complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
-#endif
     constexpr complex128 &operator=(const T &c)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
@@ -292,11 +252,7 @@ public:
 #endif
 
     // Assignment from string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     complex128 &operator=(const T &s)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
@@ -357,11 +313,7 @@ public:
     }
 
     // Conversion operator to real-valued interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex128_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
-#endif
     constexpr explicit operator T() const
     {
         return imag() == 0 ? static_cast<T>(real())
@@ -371,11 +323,7 @@ public:
     }
 
     // Conversion to complex C++ types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
-#endif
     constexpr explicit operator T() const
     {
         using value_t = typename T::value_type;
@@ -404,11 +352,7 @@ private:
 
 public:
     // Conversion member function to real-valued interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex128_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
-#endif
     constexpr bool get(T &rop) const
     {
         if (imag() == 0) {
@@ -418,11 +362,7 @@ public:
         }
     }
     // Conversion member function to complex C++ types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
-#endif
     constexpr bool get(T &rop) const
     {
         using value_t = typename T::value_type;
@@ -567,12 +507,8 @@ using are_complex128_op_types
                           detail::conjunction<std::is_same<real128, T>, is_real128_cpp_complex<U>>,
                           detail::conjunction<std::is_same<real128, U>, is_real128_cpp_complex<T>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL complex128_op_types = are_complex128_op_types<T, U>::value;
-
-#endif
+concept complex128_op_types = are_complex128_op_types<T, U>::value;
 
 namespace detail
 {
@@ -605,12 +541,8 @@ inline complex128 complex128_pow_impl(const std::complex<T> &x, const real128 &y
 
 } // namespace detail
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 inline complex128 pow(const T &x, const U &y)
 {
     return detail::complex128_pow_impl(x, y);
@@ -704,12 +636,8 @@ constexpr complex128 complex128_binary_add_impl(const std::complex<T> &c, const 
 } // namespace detail
 
 // Binary plus.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr complex128 operator+(const T &x, const U &y)
 {
     return detail::complex128_binary_add_impl(x, y);
@@ -765,12 +693,8 @@ constexpr void complex128_in_place_add_impl(std::complex<T> &c, const real128 &x
 } // namespace detail
 
 // In-place plus.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr T &operator+=(T &x, const U &y)
 {
     detail::complex128_in_place_add_impl(x, y);
@@ -859,12 +783,8 @@ constexpr complex128 complex128_binary_sub_impl(const std::complex<T> &c, const 
 } // namespace detail
 
 // Binary minus.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr complex128 operator-(const T &x, const U &y)
 {
     return detail::complex128_binary_sub_impl(x, y);
@@ -909,12 +829,8 @@ constexpr void complex128_in_place_sub_impl(std::complex<T> &c, const real128 &x
 } // namespace detail
 
 // In-place minus.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr T &operator-=(T &x, const U &y)
 {
     detail::complex128_in_place_sub_impl(x, y);
@@ -978,12 +894,8 @@ constexpr complex128 complex128_binary_mul_impl(const std::complex<T> &c, const 
 } // namespace detail
 
 // Binary mul.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr complex128 operator*(const T &x, const U &y)
 {
     return detail::complex128_binary_mul_impl(x, y);
@@ -1028,12 +940,8 @@ constexpr void complex128_in_place_mul_impl(std::complex<T> &c, const real128 &x
 } // namespace detail
 
 // In-place mul.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr T &operator*=(T &x, const U &y)
 {
     detail::complex128_in_place_mul_impl(x, y);
@@ -1097,12 +1005,8 @@ constexpr complex128 complex128_binary_div_impl(const std::complex<T> &c, const 
 } // namespace detail
 
 // Binary div.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr complex128 operator/(const T &x, const U &y)
 {
     return detail::complex128_binary_div_impl(x, y);
@@ -1147,12 +1051,8 @@ constexpr void complex128_in_place_div_impl(std::complex<T> &c, const real128 &x
 } // namespace detail
 
 // In-place div.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr T &operator/=(T &x, const U &y)
 {
     detail::complex128_in_place_div_impl(x, y);
@@ -1169,12 +1069,8 @@ using are_complex128_cmp_op_types
                           detail::conjunction<std::is_same<T, complex128>, is_real128_cpp_complex<U>>,
                           detail::conjunction<std::is_same<U, complex128>, is_real128_cpp_complex<T>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL complex128_cmp_op_types = are_complex128_cmp_op_types<T, U>::value;
-
-#endif
+concept complex128_cmp_op_types = are_complex128_cmp_op_types<T, U>::value;
 
 namespace detail
 {
@@ -1235,23 +1131,15 @@ constexpr bool complex128_eq_impl(const std::complex<T> &c2, const complex128 &c
 
 } // namespace detail
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_cmp_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
-#endif
 constexpr bool operator==(const T &x, const U &y)
 {
     return detail::complex128_eq_impl(x, y);
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex128_cmp_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
-#endif
 constexpr bool operator!=(const T &x, const U &y)
 {
     return !(x == y);

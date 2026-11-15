@@ -126,12 +126,8 @@ template <typename T>
 using is_real128_interoperable
     = detail::disjunction<detail::is_real128_cpp_interoperable<T>, detail::is_real128_mppp_interoperable<T>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL real128_interoperable = is_real128_interoperable<T>::value;
-
-#endif
+concept real128_interoperable = is_real128_interoperable<T>::value;
 
 template <typename T>
 using is_real128_cpp_complex = detail::conjunction<is_cpp_complex<T>
@@ -141,12 +137,8 @@ using is_real128_cpp_complex = detail::conjunction<is_cpp_complex<T>
 #endif
                                                    >;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL real128_cpp_complex = is_real128_cpp_complex<T>::value;
-
-#endif
+concept real128_cpp_complex = is_real128_cpp_complex<T>::value;
 
 template <typename T, typename U>
 using are_real128_op_types
@@ -154,12 +146,8 @@ using are_real128_op_types
                           detail::conjunction<std::is_same<T, real128>, is_real128_interoperable<U>>,
                           detail::conjunction<std::is_same<U, real128>, is_real128_interoperable<T>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL real128_op_types = are_real128_op_types<T, U>::value;
-
-#endif
+concept real128_op_types = are_real128_op_types<T, U>::value;
 
 // Fwd declare the abs() function.
 constexpr real128 abs(const real128 &);
@@ -345,20 +333,12 @@ private:
 
 public:
     // Constructor from interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
-#endif
     constexpr real128(const T &x) : m_value(cast_to_float128(x))
     {
     }
     // Constructor from std::complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
-#endif
     constexpr explicit real128(const T &c)
         : m_value(c.imag() == 0
                       ? c.real()
@@ -377,11 +357,7 @@ private:
 
 public:
     // Constructor from string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real128(const T &s) : real128(ptag{}, s)
     {
@@ -404,11 +380,7 @@ public:
     }
 
     // Assignment from interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
-#endif
     constexpr real128 &operator=(const T &x)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
@@ -416,11 +388,7 @@ public:
     }
 
     // Assignment from C++ complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
-#endif
     constexpr real128 &operator=(const T &c)
     {
         if (mppp_unlikely(c.imag()) != 0) {
@@ -441,11 +409,7 @@ public:
 #endif
 
     // Assignment from string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     real128 &operator=(const T &s)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
@@ -590,22 +554,14 @@ private:
 
 public:
     // Conversion operator to interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
-#endif
     constexpr explicit operator T() const
     {
         return dispatch_conversion<T>(detail::is_real128_cpp_interoperable<T>{});
     }
 
     // Conversion operator to C++ complex types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
-#endif
     constexpr explicit operator T() const
     {
         using value_t = typename T::value_type;
@@ -629,22 +585,14 @@ private:
 
 public:
     // Conversion member function to interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
-#endif
     constexpr bool get(T &rop) const
     {
         return dispatch_get(rop, detail::is_real128_cpp_interoperable<T>{});
     }
 
     // Conversion member function to C++ complex types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real128_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
-#endif
     constexpr bool get(T &rop) const
     {
         using value_type = typename T::value_type;
@@ -882,14 +830,9 @@ MPPP_DLL_PUBLIC real128 sqrt(const real128 &);
 MPPP_DLL_PUBLIC real128 cbrt(const real128 &);
 
 // Machinery to define binary operations involving real128.
-#if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_REAL128_BINARY_OP_HEADER                                                                                  \
     template <typename T, typename U>                                                                                  \
         requires real128_op_types<T, U>
-#else
-#define MPPP_REAL128_BINARY_OP_HEADER                                                                                  \
-    template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 
 #define MPPP_REAL128_IMPLEMENT_BINARY_OPERATION(fname)                                                                 \
     namespace detail                                                                                                   \
@@ -1040,12 +983,8 @@ real128 dispatch_add(const T &, const real128 &);
 } // namespace detail
 
 // Binary addition.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr real128 operator+(const T &x, const U &y)
 {
     return detail::dispatch_add(x, y);
@@ -1099,12 +1038,8 @@ inline void dispatch_in_place_add(T &x, const real128 &y)
 } // namespace detail
 
 // In-place addition.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr T &operator+=(T &x, const U &y)
 {
     detail::dispatch_in_place_add(x, y);
@@ -1161,12 +1096,8 @@ real128 dispatch_sub(const T &, const real128 &);
 } // namespace detail
 
 // Binary subtraction.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr real128 operator-(const T &x, const U &y)
 {
     return detail::dispatch_sub(x, y);
@@ -1219,12 +1150,8 @@ inline void dispatch_in_place_sub(T &x, const real128 &y)
 } // namespace detail
 
 // In-place subtraction.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr T &operator-=(T &x, const U &y)
 {
     detail::dispatch_in_place_sub(x, y);
@@ -1275,12 +1202,8 @@ real128 dispatch_mul(const T &, const real128 &);
 } // namespace detail
 
 // Binary multiplication.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr real128 operator*(const T &x, const U &y)
 {
     return detail::dispatch_mul(x, y);
@@ -1333,12 +1256,8 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
 } // namespace detail
 
 // In-place multiplication.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr T &operator*=(T &x, const U &y)
 {
     detail::dispatch_in_place_mul(x, y);
@@ -1374,12 +1293,8 @@ real128 dispatch_div(const T &, const real128 &);
 } // namespace detail
 
 // Binary division.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr real128 operator/(const T &x, const U &y)
 {
     return detail::dispatch_div(x, y);
@@ -1432,12 +1347,8 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
 } // namespace detail
 
 // In-place division.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr T &operator/=(T &x, const U &y)
 {
     detail::dispatch_in_place_div(x, y);
@@ -1450,12 +1361,8 @@ using are_real128_eq_op_types
                           detail::conjunction<std::is_same<T, real128>, is_real128_cpp_complex<U>>,
                           detail::conjunction<std::is_same<U, real128>, is_real128_cpp_complex<T>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL real128_eq_op_types = are_real128_eq_op_types<T, U>::value;
-
-#endif
+concept real128_eq_op_types = are_real128_eq_op_types<T, U>::value;
 
 namespace detail
 {
@@ -1501,12 +1408,8 @@ bool dispatch_eq(const T &, const real128 &);
 } // namespace detail
 
 // Equality operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_eq_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
-#endif
 constexpr bool operator==(const T &x, const U &y)
 {
     return detail::dispatch_eq(x, y);
@@ -1530,12 +1433,8 @@ inline bool dispatch_eq(const T &x, const real128 &y)
 } // namespace detail
 
 // Inequality operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_eq_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_eq_op_types<T, U>::value, int> = 0>
-#endif
 constexpr bool operator!=(const T &x, const U &y)
 {
     return !(x == y);
@@ -1570,12 +1469,8 @@ bool dispatch_lt(const T &, const real128 &);
 } // namespace detail
 
 // Less-than operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr bool operator<(const T &x, const U &y)
 {
     return detail::dispatch_lt(x, y);
@@ -1622,12 +1517,8 @@ bool dispatch_lte(const T &, const real128 &);
 } // namespace detail
 
 // Less-than or equal operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr bool operator<=(const T &x, const U &y)
 {
     return detail::dispatch_lte(x, y);
@@ -1674,12 +1565,8 @@ bool dispatch_gt(const T &, const real128 &);
 } // namespace detail
 
 // Greater-than operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr bool operator>(const T &x, const U &y)
 {
     return detail::dispatch_gt(x, y);
@@ -1726,12 +1613,8 @@ bool dispatch_gte(const T &, const real128 &);
 } // namespace detail
 
 // Greater-than or equal operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real128_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
-#endif
 constexpr bool operator>=(const T &x, const U &y)
 {
     return detail::dispatch_gte(x, y);

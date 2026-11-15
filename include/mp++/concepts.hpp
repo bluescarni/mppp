@@ -12,7 +12,6 @@
 #include <mp++/config.hpp>
 
 #include <complex>
-#include <cstddef>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -29,63 +28,39 @@ MPPP_BEGIN_NAMESPACE
 template <typename T>
 using is_cpp_integral = detail::conjunction<detail::is_integral<T>, std::is_same<detail::remove_cv_t<T>, T>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL cpp_integral = is_cpp_integral<T>::value;
-
-#endif
+concept cpp_integral = is_cpp_integral<T>::value;
 
 template <typename T>
 using is_cpp_unsigned_integral = detail::conjunction<is_cpp_integral<T>, detail::is_unsigned<T>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL cpp_unsigned_integral = is_cpp_unsigned_integral<T>::value;
-
-#endif
+concept cpp_unsigned_integral = is_cpp_unsigned_integral<T>::value;
 
 template <typename T>
 using is_cpp_signed_integral = detail::conjunction<is_cpp_integral<T>, detail::is_signed<T>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL cpp_signed_integral = is_cpp_signed_integral<T>::value;
-
-#endif
+concept cpp_signed_integral = is_cpp_signed_integral<T>::value;
 
 template <typename T>
 using is_cpp_floating_point = detail::conjunction<std::is_floating_point<T>, std::is_same<detail::remove_cv_t<T>, T>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL cpp_floating_point = is_cpp_floating_point<T>::value;
-
-#endif
+concept cpp_floating_point = is_cpp_floating_point<T>::value;
 
 template <typename T>
 using is_cpp_arithmetic = detail::disjunction<is_cpp_integral<T>, is_cpp_floating_point<T>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL cpp_arithmetic = is_cpp_arithmetic<T>::value;
-
-#endif
+concept cpp_arithmetic = is_cpp_arithmetic<T>::value;
 
 template <typename T>
 using is_cpp_complex = detail::disjunction<std::is_same<T, std::complex<float>>, std::is_same<T, std::complex<double>>,
                                            std::is_same<T, std::complex<long double>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL cpp_complex = is_cpp_complex<T>::value;
-
-#endif
+concept cpp_complex = is_cpp_complex<T>::value;
 
 namespace detail
 {
@@ -107,12 +82,8 @@ using is_string_type
                                               std::is_same<detail::remove_extent_t<detail::remove_cv_t<T>>, char>>,
                           std::is_same<detail::remove_cv_t<T>, std::string_view>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL string_type = is_string_type<T>::value;
-
-#endif
+concept string_type = is_string_type<T>::value;
 
 MPPP_END_NAMESPACE
 
