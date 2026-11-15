@@ -121,7 +121,7 @@
 
 #endif
 
-// C++ standard setup.
+// C++ standard check.
 //
 // NOTE: this is necessary because MSVC may not set correctly the __cplusplus macro.
 #if defined(_MSC_VER)
