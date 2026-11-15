@@ -79,32 +79,25 @@ using std::negation;
 #else
 
 template <class...>
-struct conjunction : std::true_type {
-};
+struct conjunction : std::true_type {};
 
 template <class B1>
-struct conjunction<B1> : B1 {
-};
+struct conjunction<B1> : B1 {};
 
 template <class B1, class... Bn>
-struct conjunction<B1, Bn...> : std::conditional<B1::value != false, conjunction<Bn...>, B1>::type {
-};
+struct conjunction<B1, Bn...> : std::conditional<B1::value != false, conjunction<Bn...>, B1>::type {};
 
 template <class...>
-struct disjunction : std::false_type {
-};
+struct disjunction : std::false_type {};
 
 template <class B1>
-struct disjunction<B1> : B1 {
-};
+struct disjunction<B1> : B1 {};
 
 template <class B1, class... Bn>
-struct disjunction<B1, Bn...> : std::conditional<B1::value != false, B1, disjunction<Bn...>>::type {
-};
+struct disjunction<B1, Bn...> : std::conditional<B1::value != false, B1, disjunction<Bn...>>::type {};
 
 template <class B>
-struct negation : std::integral_constant<bool, !B::value> {
-};
+struct negation : std::integral_constant<bool, !B::value> {};
 
 #endif
 
@@ -263,7 +256,7 @@ constexpr int nl_digits<__int128_t>() noexcept
 template <>
 constexpr __uint128_t nl_max<__uint128_t>() noexcept
 {
-    return ~__uint128_t(0);
+    return ~static_cast<__uint128_t>(0);
 }
 
 template <>
@@ -275,7 +268,7 @@ constexpr __uint128_t nl_min<__uint128_t>() noexcept
 template <>
 constexpr __int128_t nl_max<__int128_t>() noexcept
 {
-    return static_cast<__int128_t>((__uint128_t(1) << 127u) - 1u);
+    return static_cast<__int128_t>((static_cast<__uint128_t>(1) << 127u) - 1u);
 }
 
 template <>

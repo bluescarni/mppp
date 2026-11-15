@@ -42,6 +42,7 @@ namespace detail
 template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 constexpr int sgn(const T &n)
 {
+    // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
     return n ? (n > T(0) ? 1 : -1) : 0;
 }
 
@@ -147,8 +148,7 @@ constexpr
 #else
 inline
 #endif
-    std::pair<bool, T>
-    unsigned_to_nsigned(U n)
+    std::pair<bool, T> unsigned_to_nsigned(U n)
 {
     static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
     static_assert(is_integral<U>::value && is_unsigned<U>::value, "Invalid type.");
@@ -198,8 +198,7 @@ constexpr
 #else
 inline
 #endif
-    T
-    negate_unsigned(U n)
+    T negate_unsigned(U n)
 {
     const auto retval = unsigned_to_nsigned<T>(n);
     // LCOV_EXCL_START
@@ -292,6 +291,8 @@ inline make_signed_t<T> make_signed(const T &n, int s)
     //   unsigned T).
     // NOTE: the right shift behaviour for signed operands is standardised
     // only since C++20, but in practice it should work everywhere.
+    //
+    // NOLINTNEXTLINE(bugprone-signed-bitwise)
     const auto s_ex = static_cast<T>(s >> (std::numeric_limits<int>::digits - 1));
 
     // (n ^ s_ex) - s_ex returns n if s_ex is 0, -n (still represented
@@ -304,6 +305,7 @@ inline make_signed_t<T> make_signed(const T &n, int s)
 template <typename T>
 inline void hash_combine(std::size_t &seed, const T &val)
 {
+    // NOLINTNEXTLINE(bugprone-signed-bitwise)
     seed ^= std::hash<T>{}(val) + static_cast<std::size_t>(0x9e3779b9ull) + (seed << 6) + (seed >> 2);
 }
 

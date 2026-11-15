@@ -203,8 +203,11 @@ MPPP_DLL_PUBLIC void mpz_init_nlimbs(mpz_struct_t &, std::size_t);
 // Small helper to determine how many GMP limbs we need to fit nbits bits.
 constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
 {
-    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    return static_cast<::mp_bitcnt_t>(nbits / unsigned(GMP_NUMB_BITS) + ((nbits % unsigned(GMP_NUMB_BITS)) != 0u));
+    // NOLINTNEXTLINE(readability-redundant-casting)
+    return static_cast<::mp_bitcnt_t>(
+        (nbits / static_cast<unsigned>(GMP_NUMB_BITS))
+        // NOLINTNEXTLINE(readability-implicit-bool-conversion,readability-redundant-casting)
+        + ((nbits % static_cast<unsigned>(GMP_NUMB_BITS)) != 0u));
 }
 
 // Helper function to init an mpz to zero with enough space for nbits bits. The
@@ -302,7 +305,7 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
     // Implementation using GCC/clang builtins.
     // NOTE: here we need nl_digits<::mp_limb_t>() (instead of GMP_NUMB_BITS) because
     // builtin_clz() counts zeroes also in the nail bits.
-    return (unsigned(nl_digits<::mp_limb_t>()) - builtin_clz(l & GMP_NUMB_MASK));
+    return (static_cast<unsigned>(nl_digits<::mp_limb_t>()) - builtin_clz(l & GMP_NUMB_MASK));
 #elif defined(_MSC_VER)
     // Implementation using MSVC's intrinsics.
     unsigned long index;
@@ -404,7 +407,7 @@ inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
     //  0 |  1 | 0 * 2 + (1 & 1) = 1
     //  0 |  0 | 0 * 2 + (1 & 0) = 0
     // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    return static_cast<mpz_size_t>(hinz * 2u + (static_cast<unsigned>(!hinz) & lonz));
+    return static_cast<mpz_size_t>((hinz * 2u) + (static_cast<unsigned>(!hinz) & lonz));
 }
 
 // Branchless sign function for C++ integrals:
@@ -458,7 +461,7 @@ struct static_int {
     void zero_upper_limbs(std::size_t idx)
     {
         if (SSize <= opt_size) {
-            std::fill(m_limbs.begin() + idx, m_limbs.end(), ::mp_limb_t(0));
+            std::fill(m_limbs.begin() + idx, m_limbs.end(), static_cast<::mp_limb_t>(0));
         }
     }
     // Zero the limbs that are not used for representing the value, but only
@@ -806,7 +809,7 @@ union integer_union {
     }
 #if !defined(_MSC_VER)
     // Move ctor from mpz_t.
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init,cppcoreguidelines-rvalue-reference-param-not-moved)
     explicit integer_union(::mpz_t &&n)
     {
         const auto asize = get_mpz_size(n);
@@ -1230,7 +1233,7 @@ class integer
         MPPP_MAYBE_TLS std::vector<char> buffer;
 
         // Recover the size.
-        decltype(buffer.size()) s;
+        decltype(buffer.size()) s{};
         ar >> s;
         buffer.resize(s);
 
@@ -1282,7 +1285,7 @@ class integer
             // NOTE: explicitly initialize mpz_struct_t() in order to avoid reading from
             // uninited memory in the move constructor, in case of a dynamic view.
             : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : detail::mpz_struct_t()),
-              m_ptr(n.is_static() ? &m_static_view : &(n.m_int.g_dy()))
+              m_ptr(n.is_static() ? &m_static_view : &n.m_int.g_dy())
         {
         }
         mpz_view(const mpz_view &) = delete;
@@ -1297,7 +1300,7 @@ class integer
         ~mpz_view() = default;
         mpz_view &operator=(const mpz_view &) = delete;
         mpz_view &operator=(mpz_view &&) = delete;
-        // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+        // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions,cppcoreguidelines-explicit-constructor,misc-explicit-constructor)
         operator const detail::mpz_struct_t *() const
         {
             return get();
@@ -1368,8 +1371,7 @@ public:
 
 private:
     // A tag to call private ctors.
-    struct ptag {
-    };
+    struct ptag {};
     explicit integer(const ptag &, const char *s, int base) : m_int(s, base) {}
     explicit integer(const ptag &, const std::string &s, int base) : integer(s.c_str(), base) {}
 #if defined(MPPP_HAVE_STRING_VIEW)
@@ -1799,8 +1801,7 @@ private:
     // Conversion to unsigned ints, excluding bool.
     template <typename T, detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>,
                                                                   detail::negation<std::is_same<bool, T>>>::value,
-                                              int>
-                          = 0>
+                                              int> = 0>
     MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
@@ -2631,8 +2632,7 @@ namespace detail
 // Machinery for the determination of the result of a binary operation involving integer.
 // Default is empty for SFINAE.
 template <typename, typename, typename = void>
-struct integer_common_type {
-};
+struct integer_common_type {};
 
 template <std::size_t SSize>
 struct integer_common_type<integer<SSize>, integer<SSize>> {
@@ -2666,20 +2666,16 @@ using integer_common_t = typename integer_common_type<T, U>::type;
 
 // Various utilities used in both the operators and the functions.
 template <typename T, typename U>
-struct is_same_ssize_integer : std::false_type {
-};
+struct is_same_ssize_integer : std::false_type {};
 
 template <std::size_t SSize>
-struct is_same_ssize_integer<integer<SSize>, integer<SSize>> : std::true_type {
-};
+struct is_same_ssize_integer<integer<SSize>, integer<SSize>> : std::true_type {};
 
 template <typename T>
-struct is_integer : std::false_type {
-};
+struct is_integer : std::false_type {};
 
 template <std::size_t SSize>
-struct is_integer<integer<SSize>> : std::true_type {
-};
+struct is_integer<integer<SSize>> : std::true_type {};
 
 } // namespace detail
 
@@ -8251,8 +8247,7 @@ namespace fmt
 {
 
 template <std::size_t SSize>
-struct formatter<mppp::integer<SSize>> : mppp::detail::to_string_formatter {
-};
+struct formatter<mppp::integer<SSize>> : mppp::detail::to_string_formatter {};
 
 } // namespace fmt
 

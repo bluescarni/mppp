@@ -32,12 +32,10 @@ namespace detail
 // NOTE: we need this function in the C++11/C++14 implementation
 // as well, so use MPPP_CONSTEXPR_14, MPPP_FALLTHROUGH, etc.
 template <std::size_t Size>
-inline
 #if !defined(_MSC_VER) || defined(__clang__)
-    MPPP_CONSTEXPR_14
+MPPP_CONSTEXPR_14
 #endif
-    int
-    integer_literal_check_str(const char (&arr)[Size])
+    int integer_literal_check_str(const char (&arr)[Size])
 {
     // We expect the size of the array to be
     // always at least 2, the null terminator
@@ -145,7 +143,6 @@ inline
     // after we already checked the first 2 digits.
     // For bases 2 and 16, we need to have other digits,
     // otherwise the literal is malformed.
-    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (base) {
         case 2:
             if (str_length == 2u) {
@@ -172,6 +169,11 @@ inline
             for (std::size_t i = 2; i < str_length; ++i) {
                 base16_digit_check(arr[i]);
             }
+            break;
+            // LCOV_EXCL_START
+        default:
+            assert(false);
+            // LCOV_EXCL_STOP
     }
 
     return base;
@@ -245,8 +247,7 @@ inline integer<SSize> integer_literal_impl()
 #if defined(__clang__) && (defined(__apple_build_version__) || __clang_major__ <= 8)
     static
 #endif
-        constexpr char arr[]
-        = {Chars..., '\0'};
+        constexpr char arr[] = {Chars..., '\0'};
 
 #if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__)) && !defined(__INTEL_COMPILER)
     // Run the checks on the char sequence, and determine the base.
@@ -256,11 +257,12 @@ inline integer<SSize> integer_literal_impl()
     // The actual number of digits in the literal
     // (discounting prefixes).
     constexpr auto ndigits = (base == 2 || base == 16) ? (sizeof...(Chars) - 2u)
+                                                       // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
                                                        : (base == 8 ? (sizeof...(Chars) - 1u) : sizeof...(Chars));
 
     // Determine how many digits in the given base we can always fit
     // into a single mp_limb_t.
-    constexpr auto nd_limb = static_cast<unsigned>([]() {
+    constexpr auto nd_limb = static_cast<unsigned>([] {
         [[maybe_unused]] constexpr auto nbits = std::numeric_limits<::mp_limb_t>::digits;
 
         if constexpr (base == 2) {
@@ -280,7 +282,7 @@ inline integer<SSize> integer_literal_impl()
 
     // Determine how many instances of mp_limb_t we need
     // to represent the literal.
-    constexpr auto nlimbs = ndigits / nd_limb + static_cast<unsigned>(ndigits % nd_limb != 0u);
+    constexpr auto nlimbs = (ndigits / nd_limb) + static_cast<unsigned>(ndigits % nd_limb != 0u);
     static_assert(nlimbs > 0u);
 
     // Helper function to parse a single limb from a subset
@@ -319,7 +321,7 @@ inline integer<SSize> integer_literal_impl()
             ::mp_limb_t arr[nlimbs];
         };
 
-        constexpr auto limb_arr = [parse_limb]() {
+        constexpr auto limb_arr = [parse_limb] {
             arr_wrap retval{};
 
             // Manually compute the first limb, which might
@@ -330,7 +332,7 @@ inline integer<SSize> integer_literal_impl()
             retval.arr[0] = parse_limb(sizeof...(Chars) - ndigits, idx_end1);
 
             for (std::size_t i = 1; i < nlimbs; ++i) {
-                retval.arr[i] = parse_limb(idx_end1 + (i - 1u) * nd_limb, idx_end1 + i * nd_limb);
+                retval.arr[i] = parse_limb(idx_end1 + ((i - 1u) * nd_limb), idx_end1 + (i * nd_limb));
             }
 
             return retval;
@@ -341,7 +343,7 @@ inline integer<SSize> integer_literal_impl()
         integer<SSize> retval{limb_arr.arr[nlimbs - 1u]}, tmp;
 
         // A couple of variables used only in base 10.
-        [[maybe_unused]] const auto factor10 = []() {
+        [[maybe_unused]] const auto factor10 = [] {
             if constexpr (base == 10) {
                 return mppp::pow_ui(integer<SSize>{10}, nd_limb);
             } else {
