@@ -17,14 +17,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -121,7 +118,6 @@ struct string_ass_tester {
             return std::string(ia.what())
                    == "A zero denominator was detected in the constructor of a rational from string";
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
         q = std::string_view{"1"};
         REQUIRE(q == 1);
         q = std::string_view{"-23"};
@@ -137,7 +133,6 @@ struct string_ass_tester {
             return std::string(ia.what())
                    == "A zero denominator was detected in the constructor of a rational from string";
         });
-#endif
     }
 };
 
@@ -361,11 +356,9 @@ TEST_CASE("generic assignment")
     tuple_for_each(sizes{}, gen_ass_tester{});
 }
 
-struct yes {
-};
+struct yes {};
 
-struct no {
-};
+struct no {};
 
 template <typename From, typename To>
 static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<const From &>())), yes{});
@@ -389,8 +382,7 @@ static inline bool roundtrip_conversion(const T &x)
     return retval;
 }
 
-struct no_conv {
-};
+struct no_conv {};
 
 struct int_convert_tester {
     template <typename S>

@@ -22,14 +22,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -74,8 +71,6 @@ static std::mt19937 rng;
 static constexpr auto delta64 = detail::nl_digits<std::uint_least64_t>() - 64;
 static constexpr auto delta49 = detail::nl_digits<std::uint_least64_t>() - 49;
 
-#if MPPP_CPLUSPLUS >= 201402L
-
 constexpr auto test_cexpr_complex(std::complex<double> c)
 {
     real128 out{c};
@@ -88,10 +83,6 @@ constexpr auto test_cexpr_complex_ass(std::complex<double> c)
     out = c;
     return out;
 }
-
-#endif
-
-#if MPPP_CPLUSPLUS >= 202002L
 
 template <typename T>
 constexpr auto test_cexpr_complex_get1(real128 r)
@@ -108,8 +99,6 @@ constexpr auto test_cexpr_complex_get2(real128 r)
     get(out, r);
     return out;
 }
-
-#endif
 
 // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real128 constructors")
@@ -265,12 +254,10 @@ TEST_CASE("real128 constructors")
         Message("Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
                 + detail::to_string(5.l)));
 #endif
-#if MPPP_CPLUSPLUS >= 201402L
     {
         constexpr auto tca = test_cexpr_complex(std::complex<double>{4, 0});
         REQUIRE(tca == 4);
     }
-#endif
     // String ctors.
     REQUIRE((real128{"0"}.m_value == 0));
     REQUIRE((real128{"-0"}.m_value == 0));
@@ -290,14 +277,12 @@ TEST_CASE("real128 constructors")
             return std::string(ex.what())
                    == "The string '-1234 ' does not represent a valid quadruple-precision floating-point value";
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((real128{std::string_view{tmp_char + 6, 5}}.m_value == -1234));
     REQUIRE_THROWS_PREDICATE(
         (real128{std::string_view{tmp_char + 6, 6}}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return std::string(ex.what())
                    == "The string '-1234 ' does not represent a valid quadruple-precision floating-point value";
         });
-#endif
     REQUIRE((real128{"  -12300e-2"}.m_value == -123));
     REQUIRE_THROWS_PREDICATE(real128{""}, std::invalid_argument, [](const std::invalid_argument &ex) {
         return std::string(ex.what())
@@ -358,16 +343,12 @@ TEST_CASE("real128 constructors")
 #else
     REQUIRE(!std::is_assignable<real128 &, std::complex<long double>>::value);
 #endif
-#if MPPP_CPLUSPLUS >= 201402L
     {
         constexpr auto tca = test_cexpr_complex_ass(std::complex<double>{4, 0});
         REQUIRE(tca == 4);
     }
-#endif
-#if defined(MPPP_HAVE_STRING_VIEW)
     ra = std::string_view{tmp_char + 6, 5};
     REQUIRE((ra.m_value == -1234));
-#endif
 
 #if defined(MPPP_WITH_MPFR)
     ra = real{123};
@@ -634,7 +615,7 @@ TEST_CASE("real128 conversions")
 
     // Conversion to C++ complex types.
     {
-        MPPP_CONSTEXPR_14 auto cf = static_cast<std::complex<float>>(real128{12});
+        constexpr auto cf = static_cast<std::complex<float>>(real128{12});
         REQUIRE(cf.real() == 12);
         REQUIRE(cf.imag() == 0);
 
@@ -644,18 +625,12 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cf2, real128{1}));
         REQUIRE(cf2 == std::complex<float>{1, 0});
 
-        // NOTE: there seems to be a constexpr bug currently
-        // on GCC which makes this test fail. Clang seems to do fine:
-        // https://godbolt.org/z/5jK5voPfK
-        // Let's disable this test on GCC for the time being.
-#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cf3 = test_cexpr_complex_get1<float>(real128{7});
         REQUIRE(cf3 == std::complex<float>{7, 0});
         constexpr auto cf4 = test_cexpr_complex_get2<float>(real128{7});
         REQUIRE(cf4 == std::complex<float>{7, 0});
-#endif
 
-        MPPP_CONSTEXPR_14 auto cd = static_cast<std::complex<double>>(real128{-12});
+        constexpr auto cd = static_cast<std::complex<double>>(real128{-12});
         REQUIRE(cd.real() == -12);
         REQUIRE(cd.imag() == 0);
 
@@ -665,15 +640,13 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cd2, real128{1}));
         REQUIRE(cd2 == std::complex<double>{1, 0});
 
-#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cd3 = test_cexpr_complex_get1<double>(real128{7});
         REQUIRE(cd3 == std::complex<double>{7, 0});
         constexpr auto cd4 = test_cexpr_complex_get2<double>(real128{7});
         REQUIRE(cd4 == std::complex<double>{7, 0});
-#endif
 
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-        MPPP_CONSTEXPR_14 auto cld = static_cast<std::complex<long double>>(real128{-15});
+        constexpr auto cld = static_cast<std::complex<long double>>(real128{-15});
         REQUIRE(cld.real() == -15);
         REQUIRE(cld.imag() == 0);
 
@@ -683,12 +656,10 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cld2, real128{1}));
         REQUIRE(cld2 == std::complex<long double>{1, 0});
 
-#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cld3 = test_cexpr_complex_get1<long double>(real128{7});
         REQUIRE(cld3 == std::complex<long double>{7, 0});
         constexpr auto cld4 = test_cexpr_complex_get2<long double>(real128{7});
         REQUIRE(cld4 == std::complex<long double>{7, 0});
-#endif
 #else
         REQUIRE(!std::is_convertible<real128, std::complex<long double>>::value);
 #endif

@@ -1,17 +1,6 @@
 Common concepts
 ===============
 
-.. note::
-
-   Generic functions and classes in mp++ support `concepts <https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)>`__
-   to constrain the types with which they can be used. C++ concepts are part of the C++20 standard, and they are
-   currently available only on GCC>=6, Clang>=10 and MSVC>=16.3. When used with compilers which do not
-   support concepts natively, mp++ will employ a concept emulation layer in order to provide the same functionality as native
-   C++ concepts.
-
-   Since the syntax of native C++ concepts is clearer than that of the concept emulation layer, the mp++ documentation describes
-   and refers to concepts in their native C++ form.
-
 *#include <mp++/concepts.hpp>*
 
 .. cpp:concept:: template <typename T> mppp::cpp_integral
@@ -53,7 +42,6 @@ Common concepts
 
    * ``std::string``,
    * a pointer to (possibly cv qualified) ``char``,
-   * a ``char`` array of any size.
+   * a ``char`` array of any size,
+   * ``std::string_view``.
 
-   Additionally, if at least C++17 is being used, the concept is satisfied also by ``std::string_view``
-   (see also the :c:macro:`MPPP_HAVE_STRING_VIEW` definition).

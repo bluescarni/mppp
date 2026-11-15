@@ -41,14 +41,12 @@ TEST_CASE("real_literals_tests")
 
     // Runtime failures.
     real r;
-#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r128, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_r128, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
-#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_r128, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
@@ -72,14 +70,12 @@ TEST_CASE("real_literals_tests")
 #endif
 
     // Runtime failures.
-#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r256, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_r256, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
-#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_r256, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
@@ -103,14 +99,12 @@ TEST_CASE("real_literals_tests")
 #endif
 
     // Runtime failures.
-#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r512, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_r512, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
-#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_r512, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
@@ -134,14 +128,12 @@ TEST_CASE("real_literals_tests")
 #endif
 
     // Runtime failures.
-#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r1024, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_r1024, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
-#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_r1024, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });

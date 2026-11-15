@@ -16,13 +16,8 @@
 #include <ostream>
 #include <sstream>
 #include <string>
-#include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
 #include <string_view>
-
-#endif
+#include <vector>
 
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
@@ -274,11 +269,7 @@ complex128::complex128(const char *begin, const char *end)
     construct_from_nts(buffer.data());
 }
 
-#if defined(MPPP_HAVE_STRING_VIEW)
-
 complex128::complex128(const ptag &, const std::string_view &s) : complex128(s.data(), s.data() + s.size()) {}
-
-#endif
 
 #if defined(MPPP_WITH_MPFR)
 

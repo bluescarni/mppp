@@ -18,12 +18,9 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -391,9 +388,7 @@ private:
     MPPP_DLL_LOCAL void construct_from_c_string(const char *, int, ::mpfr_prec_t);
     explicit complex(const stag &, const char *, int, ::mpfr_prec_t);
     explicit complex(const stag &, const std::string &, int, ::mpfr_prec_t);
-#if defined(MPPP_HAVE_STRING_VIEW)
     explicit complex(const stag &, const std::string_view &, int, ::mpfr_prec_t);
-#endif
 
 public:
     // Constructor from string, base and precision.
@@ -555,9 +550,7 @@ private:
     MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
     complex &set_impl(const char *, int);
     complex &set_impl(const std::string &, int);
-#if defined(MPPP_HAVE_STRING_VIEW)
     complex &set_impl(const std::string_view &, int);
-#endif
 
 public:
     // Setter to string.

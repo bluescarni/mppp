@@ -17,15 +17,12 @@
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>
@@ -480,7 +477,6 @@ struct string_ctor_tester {
         const char *cs = "-1234/345\0";
         REQUIRE((rational{cs, cs + 9} == rational{-1234, 345}));
         REQUIRE((rational{cs, cs + 8} == rational{-617, 17}));
-#if defined(MPPP_HAVE_STRING_VIEW)
         std::string_view sv = "-1234/345";
         REQUIRE((rational{sv} == rational{-1234, 345}));
         REQUIRE((rational{std::string_view{sv.data(), 8u}} == rational{-617, 17}));
@@ -492,7 +488,6 @@ struct string_ctor_tester {
         });
         REQUIRE((rational{std::string_view{cs, 9}} == rational{-1234, 345}));
         REQUIRE((rational{std::string_view{cs, 8}} == rational{-617, 17}));
-#endif
     }
 };
 

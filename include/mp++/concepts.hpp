@@ -14,11 +14,8 @@
 #include <complex>
 #include <cstddef>
 #include <string>
-#include <type_traits>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
-#endif
+#include <type_traits>
 
 #include <mp++/detail/type_traits.hpp>
 
@@ -107,12 +104,8 @@ using is_string_type
     = detail::disjunction<std::is_same<detail::remove_cv_t<T>, std::string>, detail::is_char_pointer<T>,
                           // NOTE: detail::remove_cv_t does remove cv qualifiers from arrays.
                           detail::conjunction<std::is_array<detail::remove_cv_t<T>>,
-                                              std::is_same<detail::remove_extent_t<detail::remove_cv_t<T>>, char>>
-#if defined(MPPP_HAVE_STRING_VIEW)
-                          ,
-                          std::is_same<detail::remove_cv_t<T>, std::string_view>
-#endif
-                          >;
+                                              std::is_same<detail::remove_extent_t<detail::remove_cv_t<T>>, char>>,
+                          std::is_same<detail::remove_cv_t<T>, std::string_view>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 

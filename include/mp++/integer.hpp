@@ -31,16 +31,11 @@
 #include <new>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
-#include <string_view>
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -1374,11 +1369,9 @@ private:
     struct ptag {};
     explicit integer(const ptag &, const char *s, int base) : m_int(s, base) {}
     explicit integer(const ptag &, const std::string &s, int base) : integer(s.c_str(), base) {}
-#if defined(MPPP_HAVE_STRING_VIEW)
     explicit integer(const ptag &, const std::string_view &s, int base) : integer(s.data(), s.data() + s.size(), base)
     {
     }
-#endif
 
 public:
     // Constructor from string.
@@ -6525,9 +6518,7 @@ namespace detail
 template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline unsigned long integer_exp_to_ulong(const T &exp)
 {
-#if !defined(__INTEL_COMPILER)
     assert(exp >= T(0));
-#endif
     // NOTE: make_unsigned_t<T> is T if T is already unsigned.
     // Don't use the make_unsigned() helper, as exp might be
     // unsigned already.

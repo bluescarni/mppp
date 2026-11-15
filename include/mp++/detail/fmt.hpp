@@ -22,7 +22,7 @@ namespace detail
 
 struct to_string_formatter {
     template <typename ParseContext>
-    MPPP_CONSTEXPR_20 auto parse(ParseContext &ctx) -> decltype(ctx.begin())
+    constexpr auto parse(ParseContext &ctx) -> decltype(ctx.begin())
     {
         auto it = ctx.begin();
         const auto end = ctx.end();

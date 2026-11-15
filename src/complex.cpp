@@ -22,15 +22,10 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
-#include <string_view>
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -181,12 +176,10 @@ complex::complex(const stag &, const std::string &s, int base, ::mpfr_prec_t p)
 {
 }
 
-#if defined(MPPP_HAVE_STRING_VIEW)
 complex::complex(const stag &, const std::string_view &s, int base, ::mpfr_prec_t p)
     : complex(s.data(), s.data() + s.size(), base, complex_prec_t(p))
 {
 }
-#endif
 
 // Constructor from range of characters, base and precision.
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
@@ -318,12 +311,10 @@ complex &complex::set_impl(const std::string &s, int base)
     return set(s.c_str(), base);
 }
 
-#if defined(MPPP_HAVE_STRING_VIEW)
 complex &complex::set_impl(const std::string_view &s, int base)
 {
     return set(s.data(), s.data() + s.size(), base);
 }
-#endif
 
 // Set to character range.
 complex &complex::set(const char *begin, const char *end, int base)

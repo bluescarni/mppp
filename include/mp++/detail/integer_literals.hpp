@@ -26,16 +26,10 @@ MPPP_BEGIN_NAMESPACE
 namespace detail
 {
 
-// Helper to check if an integral literal is valid.
-// It will return the base of the literal. Supported
-// bases are 2, 8, 10 and 16.
-// NOTE: we need this function in the C++11/C++14 implementation
-// as well, so use MPPP_CONSTEXPR_14, MPPP_FALLTHROUGH, etc.
+// Helper to check if an integral literal is valid. It will return the base of the literal. Supported bases are 2, 8, 10
+// and 16.
 template <std::size_t Size>
-#if !defined(_MSC_VER) || defined(__clang__)
-MPPP_CONSTEXPR_14
-#endif
-    int integer_literal_check_str(const char (&arr)[Size])
+constexpr int integer_literal_check_str(const char (&arr)[Size])
 {
     // We expect the size of the array to be
     // always at least 2, the null terminator
@@ -249,7 +243,7 @@ inline integer<SSize> integer_literal_impl()
 #endif
         constexpr char arr[] = {Chars..., '\0'};
 
-#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__)) && !defined(__INTEL_COMPILER)
+#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
     // Run the checks on the char sequence, and determine the base.
     constexpr auto base = integer_literal_check_str(arr);
     static_assert(base == 2 || base == 8 || base == 10 || base == 16);

@@ -13,15 +13,10 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
-#include <string_view>
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -48,8 +43,6 @@
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
-
-#if MPPP_CPLUSPLUS >= 201402L
 
 constexpr auto test_constexpr_cm_assignment(const complex128 &c)
 {
@@ -97,14 +90,10 @@ constexpr auto test_constexpr_setters2(double re, double im)
     return c2;
 }
 
-#endif
-
 TEST_CASE("basic constructors")
 {
     using Catch::Matchers::Message;
-#if defined(MPPP_HAVE_STRING_VIEW)
     using namespace std::literals;
-#endif
 
     // Default ctor.
     complex128 c0;
@@ -171,12 +160,12 @@ TEST_CASE("basic constructors")
 #endif
 
     // Ctor from std::complex.
-    MPPP_CONSTEXPR_14 complex128 c10{std::complex<double>{1, 2}};
+    constexpr complex128 c10{std::complex<double>{1, 2}};
     REQUIRE(c10.m_value == cplex128{1, 2});
-    MPPP_CONSTEXPR_14 complex128 c11{std::complex<float>{-1, -3}};
+    constexpr complex128 c11{std::complex<float>{-1, -3}};
     REQUIRE(c11.m_value == cplex128{-1, -3});
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-    MPPP_CONSTEXPR_14 complex128 c12{std::complex<long double>{1, 2}};
+    constexpr complex128 c12{std::complex<long double>{1, 2}};
     REQUIRE(c12.m_value == cplex128{1, 2});
 #else
     REQUIRE(!std::is_constructible<complex128, std::complex<long double>>::value);
@@ -230,9 +219,7 @@ TEST_CASE("implicit generic ctor")
 TEST_CASE("string constructors")
 {
     using Catch::Matchers::Message;
-#if defined(MPPP_HAVE_STRING_VIEW)
     using namespace std::literals;
-#endif
 
     std::vector<char> buffer;
 
@@ -259,9 +246,7 @@ TEST_CASE("string constructors")
     constexpr char str1[] = "123456";
     REQUIRE(complex128{str1, str1 + 3}.m_value == 123);
     REQUIRE(complex128{str1 + 3, str1 + 6}.m_value == 456);
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE(complex128{"123"sv}.m_value == 123);
-#endif
     REQUIRE(complex128{" 456"}.m_value == 456);
     REQUIRE(complex128{"  789"}.m_value == 789);
     REQUIRE(complex128{"  -0x2f2"}.m_value == -754);
@@ -289,9 +274,7 @@ TEST_CASE("string constructors")
     constexpr char str2[] = "(123)(456)";
     REQUIRE(complex128{str2, str2 + 5}.m_value == 123);
     REQUIRE(complex128{str2 + 5, str2 + 10}.m_value == 456);
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE(complex128{"(123)"sv}.m_value == 123);
-#endif
     REQUIRE(complex128{" (123)"}.m_value == 123);
     REQUIRE(complex128{" ( 123)"}.m_value == 123);
     REQUIRE(complex128{"  ( -0x2f2)"}.m_value == -754);
@@ -319,9 +302,7 @@ TEST_CASE("string constructors")
     constexpr char str3[] = "(123,456)(-123,-456)";
     REQUIRE(complex128{str3, str3 + 9}.m_value == cplex128{123, 456});
     REQUIRE(complex128{str3 + 9, str3 + 20}.m_value == -cplex128{123, 456});
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE(complex128{"(123,12)"sv}.m_value == cplex128{123, 12});
-#endif
     REQUIRE(complex128{" (123,12)"}.m_value == cplex128{123, 12});
     REQUIRE(complex128{" ( 123,12)"}.m_value == cplex128{123, 12});
     REQUIRE(complex128{" ( 123, 12)"}.m_value == cplex128{123, 12});
@@ -384,27 +365,22 @@ TEST_CASE("assignment operators")
     REQUIRE(c.real() == 1);
     REQUIRE(c.imag() == 2);
 
-    // NOTE: icpc ICEs on this test.
-#if MPPP_CPLUSPLUS >= 201402L && !defined(__INTEL_COMPILER)
     {
         constexpr auto tca = test_constexpr_cm_assignment(complex128{-1, 3});
         REQUIRE(tca.first == complex128{-1, 3});
         REQUIRE(tca.second == complex128{-1, 3});
     }
-#endif
 
     // Assignment from __complex128.
     c = cplex128{4, -5};
     REQUIRE(c.real() == 4);
     REQUIRE(c.imag() == -5);
 
-#if MPPP_CPLUSPLUS >= 201402L
     {
         constexpr auto tca = test_constexpr_c128_assignment(cplex128{4, 5});
         REQUIRE(tca.real() == 4);
         REQUIRE(tca.imag() == 5);
     }
-#endif
 
     // Assignment from interoperable types.
     c = 4;
@@ -437,13 +413,11 @@ TEST_CASE("assignment operators")
     REQUIRE(c.imag() == 0);
 #endif
 
-#if MPPP_CPLUSPLUS >= 201402L
     {
         constexpr auto tca = test_constexpr_interop_assignment(42);
         REQUIRE(tca.real() == 42);
         REQUIRE(tca.imag() == 0);
     }
-#endif
 
     // Assignment from C++ complex.
     c = std::complex<float>{4, 5};
@@ -460,13 +434,11 @@ TEST_CASE("assignment operators")
     REQUIRE(!std::is_assignable<complex128 &, std::complex<long double>>::value);
 #endif
 
-#if MPPP_CPLUSPLUS >= 201402L
     {
         constexpr auto tca = test_constexpr_cpp_complex_assignment(std::complex<double>{1, 2});
         REQUIRE(tca.real() == 1);
         REQUIRE(tca.imag() == 2);
     }
-#endif
 
     // Assignment from strings.
     c = "123";
@@ -507,7 +479,6 @@ TEST_CASE("setters getters")
     REQUIRE(std::is_same<complex128 &, decltype(set_real(c2, real128{-4}))>::value);
     REQUIRE(std::is_same<complex128 &, decltype(set_imag(c2, real128{-4}))>::value);
 
-#if MPPP_CPLUSPLUS >= 201402L
     {
         constexpr auto tca1 = test_constexpr_setters1(6., 7.);
         REQUIRE(tca1.real() == 6);
@@ -517,7 +488,6 @@ TEST_CASE("setters getters")
         REQUIRE(tca2.real() == 6);
         REQUIRE(tca2.imag() == 7);
     }
-#endif
 }
 
 TEST_CASE("conversions")
@@ -581,12 +551,12 @@ TEST_CASE("conversions")
     {
         // To c++ complex.
         constexpr auto c = complex128{1, 2};
-        MPPP_CONSTEXPR_14 auto cf = static_cast<std::complex<float>>(c);
+        constexpr auto cf = static_cast<std::complex<float>>(c);
         REQUIRE(cf == std::complex<float>{1, 2});
-        MPPP_CONSTEXPR_14 auto cd = static_cast<std::complex<double>>(c);
+        constexpr auto cd = static_cast<std::complex<double>>(c);
         REQUIRE(cd == std::complex<double>{1, 2});
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-        MPPP_CONSTEXPR_14 auto cld = static_cast<std::complex<long double>>(c);
+        constexpr auto cld = static_cast<std::complex<long double>>(c);
         REQUIRE(cld == std::complex<long double>{1, 2});
 #else
         REQUIRE(!std::is_convertible<complex128, std::complex<long double>>::value);
@@ -608,8 +578,6 @@ TEST_CASE("stream operator")
     REQUIRE(oss.str() == complex128{1, 2}.to_string());
 }
 
-#if MPPP_CPLUSPLUS >= 201402L
-
 constexpr auto test_constexpr_get1(const complex128 &c)
 {
     int n1 = -1;
@@ -626,10 +594,6 @@ constexpr auto test_constexpr_get2(const complex128 &c)
     return n1;
 }
 
-#endif
-
-#if MPPP_CPLUSPLUS >= 202002L
-
 constexpr auto test_constexpr_get3(const complex128 &c)
 {
     std::complex<double> ret{1, 5};
@@ -637,8 +601,6 @@ constexpr auto test_constexpr_get3(const complex128 &c)
     get(ret, c);
     return ret;
 }
-
-#endif
 
 TEST_CASE("get")
 {
@@ -661,10 +623,8 @@ TEST_CASE("get")
         REQUIRE(!get(n, complex128{43, 1}));
         REQUIRE(n == 43);
 
-#if MPPP_CPLUSPLUS >= 201402L
         constexpr auto tmp = test_constexpr_get1(complex128{44});
         REQUIRE(tmp == 44);
-#endif
     }
 
 #if defined(MPPP_HAVE_GCC_INT128)
@@ -768,10 +728,8 @@ TEST_CASE("get")
         REQUIRE(!get(n, complex128{43, 44}));
         REQUIRE(n == 43);
 
-#if MPPP_CPLUSPLUS >= 201402L
         constexpr auto tmp = test_constexpr_get2(complex128{44});
         REQUIRE(tmp == 44);
-#endif
     }
 
 #if defined(MPPP_WITH_MPFR)
@@ -821,14 +779,8 @@ TEST_CASE("get")
         REQUIRE(get(c, complex128{41, -1}));
         REQUIRE(c == std::complex<float>{41, -1});
 
-        // NOTE: there seems to be a constexpr bug currently
-        // on GCC which makes this test fail. Clang seems to do fine:
-        // https://godbolt.org/z/5jK5voPfK
-        // Let's disable this test on GCC for the time being.
-#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto tmp = test_constexpr_get3(complex128{44, -89});
         REQUIRE(tmp == std::complex<double>{44, -89});
-#endif
     }
 
     {
@@ -860,16 +812,12 @@ TEST_CASE("get")
 #endif
 }
 
-#if MPPP_CPLUSPLUS >= 201402L
-
 constexpr real128 test_rc128_cexpr_ass()
 {
     real128 ret;
     ret = complex128{42};
     return ret;
 }
-
-#endif
 
 TEST_CASE("down_assignment")
 {
@@ -888,10 +836,8 @@ TEST_CASE("down_assignment")
     REQUIRE(r == 4);
     REQUIRE_THROWS_AS((r = complex128{4, 5}), std::domain_error);
 
-#if MPPP_CPLUSPLUS >= 201402L
     constexpr auto tca = test_rc128_cexpr_ass();
     REQUIRE(tca == 42);
-#endif
 
 #if defined(MPPP_WITH_MPFR)
     auto rr = 123_r256;

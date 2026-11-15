@@ -21,15 +21,12 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -104,8 +101,7 @@ static std::mt19937::result_type mt_rng_seed(0u);
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
-struct no_const {
-};
+struct no_const {};
 
 struct fp_ass_tester {
     template <typename S>
@@ -387,7 +383,6 @@ struct string_ctor_tester {
         const char *cs = "-1234\0";
         REQUIRE((integer{cs, cs + 5} == -1234));
         REQUIRE((integer{cs, cs + 4} == -123));
-#if defined(MPPP_HAVE_STRING_VIEW)
         std::string_view sv = "-1234";
         REQUIRE((integer{sv} == -1234));
         REQUIRE((integer{std::string_view{sv.data(), 4u}} == -123));
@@ -399,7 +394,6 @@ struct string_ctor_tester {
         });
         REQUIRE((integer{std::string_view{cs, 5}} == -1234));
         REQUIRE((integer{std::string_view{cs, 4}} == -123));
-#endif
     }
 };
 

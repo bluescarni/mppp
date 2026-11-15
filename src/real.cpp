@@ -33,14 +33,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -426,12 +423,10 @@ real::real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
 
 real::real(const ptag &, const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
 
-#if defined(MPPP_HAVE_STRING_VIEW)
 real::real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p)
     : real(s.data(), s.data() + s.size(), base, p)
 {
 }
-#endif
 
 // Constructor from range of characters, base and precision.
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
@@ -591,12 +586,10 @@ real &real::set_impl(const std::string &s, int base)
     return set(s.c_str(), base);
 }
 
-#if defined(MPPP_HAVE_STRING_VIEW)
 real &real::set_impl(const std::string_view &s, int base)
 {
     return set(s.data(), s.data() + s.size(), base);
 }
-#endif
 
 // Set to character range.
 real &real::set(const char *begin, const char *end, int base)

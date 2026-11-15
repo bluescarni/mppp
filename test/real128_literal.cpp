@@ -40,14 +40,12 @@ TEST_CASE("real128_literal_tests")
 
     // Runtime failures.
     real128 r;
-#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_rq, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real128 cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_rq, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real128 cannot be constructed from binary or octal literals");
     });
-#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_rq, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real128 cannot be constructed from binary or octal literals");
     });

@@ -98,8 +98,7 @@ path, etc.). The available configuration options are:
    The ``MPPP_WITH_FLINT`` build option.
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
-using GCC (all the supported versions), Clang
-(since version 3.9) and the Intel compiler. When this option is active,
+using GCC and Clang. When this option is active,
 mp++ needs access at build time to both the quadmath header
 ``quadmath.h`` and the quadmath library
 ``libquadmath.so``, which may be installed in
@@ -305,17 +304,6 @@ Clang:
   operations with ``long double``. Accordingly,
   :cpp:class:`~mppp::real128` will disable interoperability with
   ``long double`` if Clang<7 is being used.
-
-Intel compiler:
-
-* The Intel compiler does not implement certain :cpp:type:`__float128`
-  floating-point primitives
-  as constant expressions. As a result, a few :cpp:class:`~mppp::real128`
-  functions which are ``constexpr`` on GCC and Clang are not ``constexpr``
-  when using the Intel compiler. These occurrences are marked in the API
-  reference. Also, the Intel compiler seems to be prone to internal
-  errors when performing ``constexpr`` computations with
-  :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`.
 
 MinGW:
 

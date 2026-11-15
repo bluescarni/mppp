@@ -29,15 +29,6 @@ using namespace mppp;
 using int_t = integer<1>;
 using rat_t = rational<1>;
 
-// Some tests involving constexpr result in an ICE on GCC < 6.
-#if (defined(_MSC_VER) || defined(__clang__) || __GNUC__ >= 6) && MPPP_CPLUSPLUS >= 201402L
-
-#define MPPP_ENABLE_CONSTEXPR_TESTS
-
-#endif
-
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
-
 static constexpr real128 test_constexpr_incr()
 {
     real128 retval;
@@ -97,8 +88,6 @@ static constexpr real128 test_constexpr_ipd()
     n /= real128{-2};
     return n / retval;
 }
-
-#endif
 
 template <typename T, typename U>
 using binary_add_t = decltype(std::declval<const T &>() + std::declval<const U &>());
@@ -178,10 +167,8 @@ TEST_CASE("real128 ops")
     REQUIRE(((++x).m_value == 6));
     REQUIRE(((x++).m_value == 6));
     REQUIRE(((x).m_value == 7));
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr auto z4 = test_constexpr_incr();
     REQUIRE((z4.m_value == 2));
-#endif
 #if defined(MPPP_HAVE_GCC_INT128)
     constexpr auto q1 = real128{1} + __int128_t{2};
     REQUIRE(q1 == 3);
@@ -215,10 +202,8 @@ TEST_CASE("real128 ops")
     REQUIRE(((--x).m_value == 6));
     REQUIRE(((x--).m_value == 6));
     REQUIRE(((x).m_value == 5));
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr auto z6 = test_constexpr_decr();
     REQUIRE((z6.m_value == -2));
-#endif
 #if defined(MPPP_HAVE_GCC_INT128)
     constexpr auto s1 = real128{1} - __int128_t{2};
     REQUIRE(s1 == -1);
@@ -303,10 +288,8 @@ TEST_CASE("real128 ops")
     rat_t q{5, 2};
     q += real128{-1.5};
     REQUIRE(q == 1);
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr real128 z11 = test_constexpr_ipa();
     REQUIRE(z11 == 0);
-#endif
 #if defined(MPPP_HAVE_GCC_INT128)
     {
         real128 z11a;
@@ -346,10 +329,8 @@ TEST_CASE("real128 ops")
     q = rat_t{5, 2};
     q -= real128{-1.5};
     REQUIRE(q == 4);
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr real128 z12 = test_constexpr_ips();
     REQUIRE(z12 == 8);
-#endif
 #if defined(MPPP_HAVE_GCC_INT128)
     {
         real128 z11a;
@@ -389,10 +370,8 @@ TEST_CASE("real128 ops")
     q = rat_t{5, 2};
     q *= real128{-2};
     REQUIRE(q == -5);
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr real128 z13 = test_constexpr_ipm();
     REQUIRE(z13 == -24);
-#endif
 #if defined(MPPP_HAVE_GCC_INT128)
     {
         real128 z11a{1};
@@ -432,10 +411,8 @@ TEST_CASE("real128 ops")
     q = rat_t{5, 2};
     q /= real128{-2};
     REQUIRE((q == rat_t{5, -4}));
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr real128 z14 = test_constexpr_ipd();
     REQUIRE(z14 == -3);
-#endif
 #if defined(MPPP_HAVE_GCC_INT128)
     {
         real128 z11a{20};

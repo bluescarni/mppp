@@ -22,14 +22,9 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
-#include <string_view>
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -194,11 +189,7 @@ MPPP_CONCEPT_DECL real128_op_types = are_real128_op_types<T, U>::value;
 #endif
 
 // Fwd declare the abs() function.
-#if !defined(__INTEL_COMPILER)
-constexpr
-#endif
-    real128
-    abs(const real128 &);
+constexpr real128 abs(const real128 &);
 
 // For the future:
 // - the constructor from integer *may* be implemented in a faster way by reading directly the hi/lo parts
@@ -395,7 +386,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
 #endif
-    MPPP_CONSTEXPR_14 explicit real128(const T &c)
+    constexpr explicit real128(const T &c)
         : m_value(c.imag() == 0
                       ? c.real()
                       : throw std::domain_error(
@@ -406,13 +397,10 @@ public:
 
 private:
     // A tag to call private ctors.
-    struct ptag {
-    };
+    struct ptag {};
     explicit real128(const ptag &, const char *);
     explicit real128(const ptag &, const std::string &);
-#if defined(MPPP_HAVE_STRING_VIEW)
     explicit real128(const ptag &, const std::string_view &);
-#endif
 
 public:
     // Constructor from string.
@@ -436,7 +424,7 @@ public:
     real128 &operator=(real128 &&) = default;
 
     // Assignment from a quadruple-precision floating-point value.
-    MPPP_CONSTEXPR_14 real128 &operator=(const __float128 &x)
+    constexpr real128 &operator=(const __float128 &x)
     {
         m_value = x;
         return *this;
@@ -448,7 +436,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
 #endif
-    MPPP_CONSTEXPR_14 real128 &operator=(const T &x)
+    constexpr real128 &operator=(const T &x)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
         return *this = real128{x};
@@ -460,15 +448,9 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
 #endif
-    MPPP_CONSTEXPR_14 real128 &operator=(const T &c)
+    constexpr real128 &operator=(const T &c)
     {
-        // NOTE: icpc does not like __builtin_expect()
-        // in constexpr contexts.
-#if defined(__INTEL_COMPILER)
-        if (c.imag() != 0) {
-#else
         if (mppp_unlikely(c.imag()) != 0) {
-#endif
             throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part of "
                                     + detail::to_string(c.imag()) + " to a real128");
         }
@@ -480,7 +462,7 @@ public:
 #if defined(MPPP_WITH_MPFR)
     real128 &operator=(const real &);
 #endif
-    MPPP_CONSTEXPR_14 real128 &operator=(const complex128 &);
+    constexpr real128 &operator=(const complex128 &);
 #if defined(MPPP_WITH_MPC)
     real128 &operator=(const complex &);
 #endif
@@ -651,7 +633,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
 #endif
-    MPPP_CONSTEXPR_14 explicit operator T() const
+    constexpr explicit operator T() const
     {
         using value_t = typename T::value_type;
 
@@ -661,7 +643,7 @@ public:
 private:
     // get() implementation for C++ types.
     template <typename T>
-    MPPP_CONSTEXPR_14 bool dispatch_get(T &rop, std::true_type) const
+    constexpr bool dispatch_get(T &rop, std::true_type) const
     {
         return rop = static_cast<T>(m_value), true;
     }
@@ -679,7 +661,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
 #endif
-    MPPP_CONSTEXPR_14 bool get(T &rop) const
+    constexpr bool get(T &rop) const
     {
         return dispatch_get(rop, detail::is_real128_cpp_interoperable<T>{});
     }
@@ -690,14 +672,10 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_real128_cpp_complex<T>::value, int> = 0>
 #endif
-    MPPP_CONSTEXPR_20 bool get(T &rop) const
+    constexpr bool get(T &rop) const
     {
         using value_type = typename T::value_type;
 
-        // NOTE: constexpr mutation of a std::complex
-        // seems to be available only since C++20:
-        // https://en.cppreference.com/w/cpp/numeric/complex/real
-        // https://en.cppreference.com/w/cpp/numeric/complex/operator%3D
         rop.real(static_cast<value_type>(m_value));
         rop.imag(static_cast<value_type>(0));
 
@@ -727,11 +705,7 @@ public:
     MPPP_NODISCARD bool signbit() const;
     // Categorise the floating point value.
     MPPP_NODISCARD
-#if !defined(__INTEL_COMPILER)
-    constexpr
-#endif
-        int
-        fpclassify() const
+    constexpr int fpclassify() const
     {
         // NOTE: according to the docs the builtin accepts generic floating-point types:
         // https://gcc.gnu.org/onlinedocs/gcc-7.2.0/gcc/Other-Builtins.html
@@ -741,66 +715,40 @@ public:
     }
     // Detect NaN.
     MPPP_NODISCARD
-#if !defined(__INTEL_COMPILER)
-    constexpr
-#endif
-        bool
-        isnan() const
+    constexpr bool isnan() const
     {
         return fpclassify() == FP_NAN;
     }
     // Detect infinity.
     MPPP_NODISCARD
-#if !defined(__INTEL_COMPILER)
-    constexpr
-#endif
-        bool
-        isinf() const
+    constexpr bool isinf() const
     {
         return fpclassify() == FP_INFINITE;
     }
     // Detect finite value.
     MPPP_NODISCARD
-#if !defined(__INTEL_COMPILER)
-    constexpr
-#endif
-        bool
-        finite() const
+    constexpr bool finite() const
     {
         return !isnan() && !isinf();
     }
     MPPP_NODISCARD
-#if !defined(__INTEL_COMPILER)
-    constexpr
-#endif
-        bool
-        isfinite() const
+    constexpr bool isfinite() const
     {
         return finite();
     }
     // Detect normal value.
     MPPP_NODISCARD
-#if !defined(__INTEL_COMPILER)
-    constexpr
-#endif
-        bool
-        isnormal() const
+    constexpr bool isnormal() const
     {
         return fpclassify() == FP_NORMAL;
     }
 
     // In-place absolute value.
-#if !defined(__INTEL_COMPILER)
-    MPPP_CONSTEXPR_14
-#endif
-    real128 &abs()
+    constexpr real128 &abs()
     {
         return *this = mppp::abs(*this);
     }
-#if !defined(__INTEL_COMPILER)
-    MPPP_CONSTEXPR_14
-#endif
-    real128 &fabs()
+    constexpr real128 &fabs()
     {
         return this->abs();
     }
@@ -868,7 +816,7 @@ static_assert(std::is_standard_layout<real128>::value, "real128 is not a standar
 
 // Conversion function.
 template <typename T>
-inline MPPP_CONSTEXPR_14 auto get(T &rop, const real128 &x) -> decltype(x.get(rop))
+constexpr auto get(T &rop, const real128 &x) -> decltype(x.get(rop))
 {
     return x.get(rop);
 }
@@ -886,26 +834,14 @@ MPPP_DLL_PUBLIC real128 logb(const real128 &);
 MPPP_DLL_PUBLIC real128 fma(const real128 &, const real128 &, const real128 &);
 
 // Absolute value.
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    real128
-    abs(const real128 &x)
+constexpr real128 abs(const real128 &x)
 {
     return x.fpclassify() == FP_NAN
                ? x
                : (x.fpclassify() == FP_ZERO ? real128{} : (x.m_value < 0 ? real128{-x.m_value} : x));
 }
 
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    real128
-    fabs(const real128 &x)
+constexpr real128 fabs(const real128 &x)
 {
     return mppp::abs(x);
 }
@@ -925,96 +861,48 @@ inline bool signbit(const real128 &x)
 }
 
 // Categorisation.
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    int
-    fpclassify(const real128 &x)
+constexpr int fpclassify(const real128 &x)
 {
     return x.fpclassify();
 }
 
 // Detect NaN.
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    bool
-    isnan(const real128 &x)
+constexpr bool isnan(const real128 &x)
 {
     return x.isnan();
 }
 
 // Detect infinity.
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    bool
-    isinf(const real128 &x)
+constexpr bool isinf(const real128 &x)
 {
     return x.isinf();
 }
 
 // Detect finite value.
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    bool
-    finite(const real128 &x)
+constexpr bool finite(const real128 &x)
 {
     return x.finite();
 }
 
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    bool
-    isfinite(const real128 &x)
+constexpr bool isfinite(const real128 &x)
 {
     return x.isfinite();
 }
 
 // Detect normal value.
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    bool
-    isnormal(const real128 &x)
+constexpr bool isnormal(const real128 &x)
 {
     return x.isnormal();
 }
 
 // Equality predicate with special NaN handling.
-#if !defined(__INTEL_COMPILER)
-constexpr
-#endif
-    bool
-    real128_equal_to(const real128 &, const real128 &);
+constexpr bool real128_equal_to(const real128 &, const real128 &);
 
 // Less-than predicate with special NaN handling.
-#if !defined(__INTEL_COMPILER)
-constexpr
-#endif
-    bool
-    real128_lt(const real128 &, const real128 &);
+constexpr bool real128_lt(const real128 &, const real128 &);
 
 // Greater-than predicate with special NaN handling.
-#if !defined(__INTEL_COMPILER)
-constexpr
-#endif
-    bool
-    real128_gt(const real128 &, const real128 &);
+constexpr bool real128_gt(const real128 &, const real128 &);
 
 // Roots.
 MPPP_DLL_PUBLIC real128 sqrt(const real128 &);
@@ -1206,21 +1094,19 @@ inline real128 dispatch_add(const T &x, const real128 &y)
     return real128{x} + y;
 }
 
-// NOTE: we need the MPPP_CONSTEXPR_14 construct in the implementation detail as well,
-// as returning void in a constexpr function is not allowed in C++11.
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(real128 &x, const real128 &y)
+constexpr void dispatch_in_place_add(real128 &x, const real128 &y)
 {
     x.m_value += y.m_value;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(real128 &x, const T &y)
+constexpr void dispatch_in_place_add(real128 &x, const T &y)
 {
     x.m_value += y;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(T &x, const real128 &y)
+constexpr void dispatch_in_place_add(T &x, const real128 &y)
 {
     x = static_cast<T>(x + y.m_value);
 }
@@ -1246,21 +1132,21 @@ template <typename T, typename U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-inline MPPP_CONSTEXPR_14 T &operator+=(T &x, const U &y)
+constexpr T &operator+=(T &x, const U &y)
 {
     detail::dispatch_in_place_add(x, y);
     return x;
 }
 
 // Prefix increment.
-inline MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
+constexpr real128 &operator++(real128 &x)
 {
     x.m_value += 1;
     return x;
 }
 
 // Suffix increment.
-inline MPPP_CONSTEXPR_14 real128 operator++(real128 &x, int)
+constexpr real128 operator++(real128 &x, int)
 {
     auto retval(x);
     ++x;
@@ -1328,19 +1214,19 @@ inline real128 dispatch_sub(const T &x, const real128 &y)
     return real128{x} - y;
 }
 
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(real128 &x, const real128 &y)
+constexpr void dispatch_in_place_sub(real128 &x, const real128 &y)
 {
     x.m_value -= y.m_value;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(real128 &x, const T &y)
+constexpr void dispatch_in_place_sub(real128 &x, const T &y)
 {
     x.m_value -= y;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(T &x, const real128 &y)
+constexpr void dispatch_in_place_sub(T &x, const real128 &y)
 {
     x = static_cast<T>(x - y.m_value);
 }
@@ -1366,21 +1252,21 @@ template <typename T, typename U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
+constexpr T &operator-=(T &x, const U &y)
 {
     detail::dispatch_in_place_sub(x, y);
     return x;
 }
 
 // Prefix decrement.
-inline MPPP_CONSTEXPR_14 real128 &operator--(real128 &x)
+constexpr real128 &operator--(real128 &x)
 {
     x.m_value -= 1;
     return x;
 }
 
 // Suffix decrement.
-inline MPPP_CONSTEXPR_14 real128 operator--(real128 &x, int)
+constexpr real128 operator--(real128 &x, int)
 {
     auto retval(x);
     --x;
@@ -1442,19 +1328,19 @@ inline real128 dispatch_mul(const T &x, const real128 &y)
     return real128{x} * y;
 }
 
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(real128 &x, const real128 &y)
+constexpr void dispatch_in_place_mul(real128 &x, const real128 &y)
 {
     x.m_value *= y.m_value;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(real128 &x, const T &y)
+constexpr void dispatch_in_place_mul(real128 &x, const T &y)
 {
     x.m_value *= y;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(T &x, const real128 &y)
+constexpr void dispatch_in_place_mul(T &x, const real128 &y)
 {
     x = static_cast<T>(x * y.m_value);
 }
@@ -1480,7 +1366,7 @@ template <typename T, typename U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-inline MPPP_CONSTEXPR_14 T &operator*=(T &x, const U &y)
+constexpr T &operator*=(T &x, const U &y)
 {
     detail::dispatch_in_place_mul(x, y);
     return x;
@@ -1541,19 +1427,19 @@ inline real128 dispatch_div(const T &x, const real128 &y)
     return real128{x} / y;
 }
 
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(real128 &x, const real128 &y)
+constexpr void dispatch_in_place_div(real128 &x, const real128 &y)
 {
     x.m_value /= y.m_value;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(real128 &x, const T &y)
+constexpr void dispatch_in_place_div(real128 &x, const T &y)
 {
     x.m_value /= y;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(T &x, const real128 &y)
+constexpr void dispatch_in_place_div(T &x, const real128 &y)
 {
     x = static_cast<T>(x / y.m_value);
 }
@@ -1579,7 +1465,7 @@ template <typename T, typename U>
 #else
 template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>::value, int> = 0>
 #endif
-inline MPPP_CONSTEXPR_14 T &operator/=(T &x, const U &y)
+constexpr T &operator/=(T &x, const U &y)
 {
     detail::dispatch_in_place_div(x, y);
     return x;
@@ -1957,7 +1843,7 @@ constexpr real128 real128_denorm_min()
 // Positive inf.
 constexpr real128 real128_inf()
 {
-#if defined(__INTEL_COMPILER) || !defined(__GNUC__) || __GNUC__ < 7
+#if !defined(__GNUC__) || __GNUC__ < 7
     // NOTE: it seems like there's no way to arithmetically construct infinity in constexpr.
     // I tried 1/0 and repeated multiplications by a large int, but it always ends up in
     // a 'not a constant expression' error message.
@@ -1974,7 +1860,7 @@ constexpr real128 real128_inf()
 // NaN.
 constexpr real128 real128_nan()
 {
-#if defined(__INTEL_COMPILER) || !defined(__GNUC__) || __GNUC__ < 7
+#if !defined(__GNUC__) || __GNUC__ < 7
     // Same as above - GCC would accept arithmetic generation of NaN,
     // but Clang does not.
     return real128{std::numeric_limits<double>::quiet_NaN()};
@@ -2075,24 +1961,12 @@ inline std::size_t hash(const real128 &x)
 }
 
 // NOTE: put these definitions here, as we need the comparison operators to be available.
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    bool
-    real128_equal_to(const real128 &x, const real128 &y)
+constexpr bool real128_equal_to(const real128 &x, const real128 &y)
 {
     return (!x.isnan() && !y.isnan()) ? (x == y) : (x.isnan() && y.isnan());
 }
 
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    bool
-    real128_lt(const real128 &x, const real128 &y)
+constexpr bool real128_lt(const real128 &x, const real128 &y)
 {
     // NOTE: in case at least one op is NaN, we have the following possibilities:
     // - NaN vs NaN -> false,
@@ -2101,13 +1975,7 @@ constexpr
     return (!x.isnan() && !y.isnan()) ? (x < y) : !x.isnan();
 }
 
-#if defined(__INTEL_COMPILER)
-inline
-#else
-constexpr
-#endif
-    bool
-    real128_gt(const real128 &x, const real128 &y)
+constexpr bool real128_gt(const real128 &x, const real128 &y)
 {
     // NOTE: in case at least one op is NaN, we have the following possibilities:
     // - NaN vs NaN -> false,
@@ -2249,8 +2117,7 @@ namespace fmt
 {
 
 template <>
-struct formatter<mppp::real128> : mppp::detail::to_string_formatter {
-};
+struct formatter<mppp::real128> : mppp::detail::to_string_formatter {};
 
 } // namespace fmt
 

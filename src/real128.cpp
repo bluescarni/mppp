@@ -17,13 +17,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
 #include <string_view>
-
-#endif
+#include <vector>
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -110,11 +105,7 @@ real128::real128(const ptag &, const char *s) : m_value(detail::str_to_float128(
 
 real128::real128(const ptag &, const std::string &s) : real128(s.c_str()) {}
 
-#if defined(MPPP_HAVE_STRING_VIEW)
-
 real128::real128(const ptag &, const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
-
-#endif
 
 // Constructor from range of characters.
 real128::real128(const char *begin, const char *end)

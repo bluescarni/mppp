@@ -18,15 +18,12 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -172,8 +169,7 @@ struct fp_ctor_tester {
     }
 };
 
-struct foobar {
-};
+struct foobar {};
 
 // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real constructors")
@@ -304,35 +300,25 @@ TEST_CASE("real constructors")
     REQUIRE((real{"123", 100}.get_prec() == 100));
     REQUIRE((real{std::string{"123"}, 111}.get_prec() == 111));
     REQUIRE((::mpfr_equal_p(real{std::string{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((real{std::string_view{"123"}, 10, 100}.get_prec() == 100));
     REQUIRE((::mpfr_equal_p(real{std::string_view{"123"}, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((real{std::string_view{"123"}, 100}.get_prec() == 100));
-#endif
     // Leading whitespaces are ok.
     REQUIRE((::mpfr_equal_p(real{"   123", 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"   123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{"   123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
-#endif
     REQUIRE((real{"123", 10, 100}.get_prec() == 100));
     REQUIRE((real{std::string{"123"}, 10, 100}.get_prec() == 100));
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((real{std::string_view{"123"}, 10, 100}.get_prec() == 100));
-#endif
     REQUIRE((::mpfr_equal_p(real{"-1.23E2", 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"-1.23E2"}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{"-1.23E2"}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-#endif
     if (std::numeric_limits<double>::radix == 2) {
         REQUIRE((::mpfr_equal_p(real{"5E-1", 10, 100}.get_mpfr_t(), real{.5}.get_mpfr_t())));
         REQUIRE((::mpfr_equal_p(real{"-25e-2", 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
         REQUIRE((::mpfr_equal_p(real{std::string{"-25e-2"}, 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
-#if defined(MPPP_HAVE_STRING_VIEW)
         REQUIRE((::mpfr_equal_p(real{std::string_view{"-25e-2"}, 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
-#endif
     }
     REQUIRE((::mpfr_equal_p(real{"-11120", 3, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"-11120", 3, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
@@ -359,7 +345,6 @@ TEST_CASE("real constructors")
                        "Cannot construct a real from a string in base -1: the base must either be zero or in "
                        "the [2,62] range");
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE_THROWS_PREDICATE(
         (real{std::string_view{"12"}, -1, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
@@ -367,7 +352,6 @@ TEST_CASE("real constructors")
                        "Cannot construct a real from a string in base -1: the base must either be zero or in "
                        "the [2,62] range");
         });
-#endif
     REQUIRE_THROWS_PREDICATE(
         (real{std::string{"12"}, 80, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
@@ -446,14 +430,12 @@ TEST_CASE("real constructors")
                           + detail::to_string(real_prec_max()) + ", the minimum allowed precision is "
                           + detail::to_string(real_prec_min());
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 2, 4}, 10, 100}.get_mpfr_t(), real{1234}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 1, 4}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE_THROWS_PREDICATE(
         (real{std::string_view{vc.data(), 6}, 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what() == std::string("The string ',-1234' does not represent a valid real in base 10");
         });
-#endif
     tuple_for_each(int_types{}, int_ctor_tester{});
     tuple_for_each(fp_types{}, fp_ctor_tester{});
     // Special handling of bool.
@@ -1131,7 +1113,6 @@ TEST_CASE("real assignment")
             return ex.what()
                    == std::string{"The string ',-12' cannot be interpreted as a floating-point value in base 0"};
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
     r8.set(std::string_view{"-4.321e3"});
     REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
     r8.set(std::string_view{"4.321e3"}, 0);
@@ -1175,7 +1156,6 @@ TEST_CASE("real assignment")
                    == std::string{"The string 'baboo' cannot be interpreted as a floating-point value in base 0"};
         });
     REQUIRE(r8.nan_p());
-#endif
     {
         // Assignment from mpfr_t.
         ::mpfr_t m;

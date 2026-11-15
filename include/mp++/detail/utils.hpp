@@ -88,23 +88,15 @@ MPPP_DLL_PUBLIC std::string to_string(__int128_t);
 
 #endif
 
-// Compute the absolute value of a negative integer, returning the result as an instance
-// of the corresponding unsigned type. Requires T to be a signed integral type and n
-// to be negative.
+// Compute the absolute value of a negative integer, returning the result as an instance of the corresponding unsigned
+// type. Requires T to be a signed integral type and n to be negative.
+//
 // NOTE: here we are using cast to unsigned + unary minus to extract the abs value of a signed negative
 // integral. See:
+//
 // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
-// This technique is not 100% portable in C++ < 20: it requires an implementation
-// of signed integers such that the absolute value of the minimum (negative) value is not greater than
-// the maximum value of the unsigned counterpart. This is guaranteed on all computer architectures in use today,
-// but in theory there could be architectures where the assumption is not respected. See for instance the
-// discussion here:
-// http://stackoverflow.com/questions/11372044/unsigned-vs-signed-range-guarantees
-// Note that in any case we never run into UB, the only consequence is that for very large negative values
-// we could init the integer with the wrong value, and we should be able to detect this in the unit tests.
-// Let's keep this in mind in the remote case this ever becomes a problem.
-// Since C++20, integers are guaranteed to be represented via two's complement, and thus
-// this function is portable.
+//
+// Since C++20, integers are guaranteed to be represented via two's complement, and thus this function is portable.
 template <typename T>
 constexpr make_unsigned_t<T> nint_abs(T n) noexcept
 {
@@ -279,18 +271,15 @@ inline make_signed_t<T> make_signed(const T &n, int s)
     // NOTE: avoid integral promotion bullshit.
     static_assert(std::is_same<T, decltype(n + n)>::value, "make_signed() cannot be used with short integral types.");
 
-    // Consistency checks: s must be one of [0, -1, 1], and, if s is zero,
-    // then n must also be zero.
+    // Consistency checks: s must be one of [0, -1, 1], and, if s is zero, then n must also be zero.
     assert(s == 0 || s == -1 || s == 1);
     assert(s != 0 || n == 0u);
 
     // NOTE: s_ex will be:
+    //
     // - 0 if s is 0 or 1,
-    // - the max value representable by T if s is -1 (this is because the
-    //   right shift produces the int -1, which is then converted to the
-    //   unsigned T).
-    // NOTE: the right shift behaviour for signed operands is standardised
-    // only since C++20, but in practice it should work everywhere.
+    // - the max value representable by T if s is -1 (this is because the right shift produces the int -1, which is then
+    //   converted to the unsigned T).
     //
     // NOLINTNEXTLINE(bugprone-signed-bitwise)
     const auto s_ex = static_cast<T>(s >> (std::numeric_limits<int>::digits - 1));

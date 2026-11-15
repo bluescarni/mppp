@@ -14,13 +14,10 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -786,13 +783,11 @@ TEST_CASE("string constructors")
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
         REQUIRE(c.get_prec() == 256);
     }
-#if defined(MPPP_HAVE_STRING_VIEW)
     {
         complex c{std::string_view("(-1.1,-2.3)"), 10, complex_prec_t(256)};
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
         REQUIRE(c.get_prec() == 256);
     }
-#endif
     {
         complex c{" (-1.1,-2.3)", 0, complex_prec_t(256)};
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
@@ -1182,11 +1177,9 @@ TEST_CASE("set")
         REQUIRE(c.get_prec() == 14);
         REQUIRE(c == complex{456, complex_prec_t(14)});
 
-#if defined(MPPP_HAVE_STRING_VIEW)
         c.set(std::string_view("(456)"));
         REQUIRE(c.get_prec() == 14);
         REQUIRE(c == complex{456, complex_prec_t(14)});
-#endif
 
         // Try different base as well.
         c.set("(1111011,111001000)", 2);

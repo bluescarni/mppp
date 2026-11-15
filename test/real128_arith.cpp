@@ -27,15 +27,6 @@ TEST_CASE("real128 fma")
     REQUIRE((fma(x, y, z).m_value == x.m_value));
 }
 
-// Some tests involving constexpr result in an ICE on GCC < 6.
-#if (defined(_MSC_VER) || defined(__clang__) || __GNUC__ >= 6) && MPPP_CPLUSPLUS >= 201402L
-
-#define MPPP_ENABLE_CONSTEXPR_TESTS
-
-#endif
-
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS) && !defined(__INTEL_COMPILER)
-
 static constexpr real128 test_constexpr_abs()
 {
     real128 retval{-5};
@@ -61,14 +52,6 @@ static constexpr real128 test_constexpr_fabs_ff()
     real128 retval{-5};
     return fabs(retval);
 }
-
-#endif
-
-#if defined(__INTEL_COMPILER)
-#define MPPP_INTEL_CONSTEXPR const
-#else
-#define MPPP_INTEL_CONSTEXPR constexpr
-#endif
 
 TEST_CASE("real128 abs")
 {
@@ -136,11 +119,10 @@ TEST_CASE("real128 abs")
     r = "-nan";
     REQUIRE(abs(r).isnan());
     REQUIRE(r.abs().isnan());
-    MPPP_INTEL_CONSTEXPR auto c0 = abs(real128{-5});
+    constexpr auto c0 = abs(real128{-5});
     REQUIRE(c0 == 5);
-    MPPP_INTEL_CONSTEXPR auto c1 = abs(real128{42});
+    constexpr auto c1 = abs(real128{42});
     REQUIRE(c1 == 42);
-#if defined(MPPP_ENABLE_CONSTEXPR_TESTS) && !defined(__INTEL_COMPILER)
     constexpr auto c3 = test_constexpr_abs();
     REQUIRE(c3 == 5);
     constexpr auto c4 = test_constexpr_fabs();
@@ -149,7 +131,6 @@ TEST_CASE("real128 abs")
     REQUIRE(c5 == 5);
     constexpr auto c6 = test_constexpr_fabs_ff();
     REQUIRE(c6 == 5);
-#endif
 }
 
 TEST_CASE("real128 scalb")

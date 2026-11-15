@@ -16,14 +16,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #include <gmp.h>
 
@@ -115,9 +112,7 @@ struct copy_move_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
-#if MPPP_CPLUSPLUS >= 201402L
         REQUIRE(std::is_nothrow_move_constructible<integer>::value);
-#endif
         integer n;
         REQUIRE(n.is_static());
         n = 123;
@@ -346,7 +341,6 @@ struct string_ass_tester {
         REQUIRE_THROWS_PREDICATE(n = "", std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
         n = std::string_view(" -123 ");
         REQUIRE(n == -123);
         n = std::string_view("4563 ");
@@ -354,7 +348,6 @@ struct string_ass_tester {
         REQUIRE_THROWS_PREDICATE(n = std::string_view(""), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
         });
-#endif
     }
 };
 

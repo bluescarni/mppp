@@ -21,13 +21,10 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -118,21 +115,17 @@ inline void fix_den_sign(rational<SSize> &q)
 
 // Detect rational.
 template <typename T>
-struct is_rational : std::false_type {
-};
+struct is_rational : std::false_type {};
 
 template <std::size_t SSize>
-struct is_rational<rational<SSize>> : std::true_type {
-};
+struct is_rational<rational<SSize>> : std::true_type {};
 
 // Detect rationals with the same static size.
 template <typename T, typename U>
-struct is_same_ssize_rational : std::false_type {
-};
+struct is_same_ssize_rational : std::false_type {};
 
 template <std::size_t SSize>
-struct is_same_ssize_rational<rational<SSize>, rational<SSize>> : std::true_type {
-};
+struct is_same_ssize_rational<rational<SSize>, rational<SSize>> : std::true_type {};
 
 // mpq_view getter fwd declaration.
 // NOTE: the returned mpq_struct_t should always be marked as const, as we cannot modify its content
@@ -225,8 +218,7 @@ public:
 
 private:
     // A tag for private constructors.
-    struct ptag {
-    };
+    struct ptag {};
     template <typename T,
               detail::enable_if_t<detail::disjunction<std::is_same<float, T>, std::is_same<double, T>>::value, int> = 0>
     explicit rational(const ptag &, const T &x)
@@ -293,8 +285,7 @@ public:
         typename T,
         detail::enable_if_t<detail::conjunction<is_rational_cvr_interoperable<T, SSize>,
                                                 detail::negation<is_rational_integral_interoperable<T, SSize>>>::value,
-                            int>
-        = 0>
+                            int> = 0>
 #endif
     // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
     explicit rational(T &&x) : rational(ptag{}, std::forward<T>(x))
@@ -306,8 +297,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<detail::conjunction<is_rational_cvr_interoperable<T, SSize>,
                                                                   is_rational_integral_interoperable<T, SSize>>::value,
-                                              int>
-                          = 0>
+                                              int> = 0>
 #endif
     // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
     rational(T &&x) : rational(ptag{}, std::forward<T>(x))
@@ -320,8 +310,7 @@ public:
     template <typename T, typename U,
               detail::enable_if_t<detail::conjunction<is_rational_cvr_integral_interoperable<T, SSize>,
                                                       is_rational_cvr_integral_interoperable<U, SSize>>::value,
-                                  int>
-              = 0>
+                                  int> = 0>
 #endif
     explicit rational(T &&n, U &&d, bool make_canonical = true) : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
     {
@@ -359,11 +348,9 @@ private:
         dispatch_c_string_ctor(s, base);
     }
     explicit rational(const ptag &, const std::string &s, int base) : rational(s.c_str(), base) {}
-#if defined(MPPP_HAVE_STRING_VIEW)
     explicit rational(const ptag &, const std::string_view &s, int base) : rational(s.data(), s.data() + s.size(), base)
     {
     }
-#endif
 
 public:
     // Constructor from string.
@@ -517,8 +504,7 @@ private:
     // Conversion to integral types other than bool.
     template <typename T,
               detail::enable_if_t<
-                  detail::conjunction<detail::is_integral<T>, detail::negation<std::is_same<bool, T>>>::value, int>
-              = 0>
+                  detail::conjunction<detail::is_integral<T>, detail::negation<std::is_same<bool, T>>>::value, int> = 0>
     MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
     {
         return static_cast<int_t>(*this).template dispatch_conversion<T>();
@@ -760,8 +746,7 @@ inline mpq_struct_t get_mpq_view(const rational<SSize> &q)
 // Machinery for the determination of the result of a binary operation involving rational.
 // Default is empty for SFINAE.
 template <typename, typename, typename = void>
-struct rational_common_type {
-};
+struct rational_common_type {};
 
 template <std::size_t SSize>
 struct rational_common_type<rational<SSize>, rational<SSize>> {
@@ -2342,8 +2327,7 @@ namespace fmt
 {
 
 template <std::size_t SSize>
-struct formatter<mppp::rational<SSize>> : mppp::detail::to_string_formatter {
-};
+struct formatter<mppp::rational<SSize>> : mppp::detail::to_string_formatter {};
 
 } // namespace fmt
 

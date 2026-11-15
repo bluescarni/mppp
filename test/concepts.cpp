@@ -10,10 +10,7 @@
 
 #include <sstream>
 #include <string>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
-#endif
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/type_traits.hpp>
@@ -102,8 +99,8 @@ TEST_CASE("concepts")
     REQUIRE(is_string_type<char[2]>::value);
     REQUIRE(is_string_type<char[10]>::value);
     REQUIRE(is_string_type<const char[10]>::value);
-    REQUIRE(!is_string_type<const char(&)[10]>::value);
-    REQUIRE(!is_string_type<char(&)[10]>::value);
+    REQUIRE(!is_string_type<const char (&)[10]>::value);
+    REQUIRE(!is_string_type<char (&)[10]>::value);
     REQUIRE(!is_string_type<char>::value);
     REQUIRE(!is_string_type<const char>::value);
     REQUIRE(!is_string_type<int>::value);
@@ -111,16 +108,14 @@ TEST_CASE("concepts")
     REQUIRE(!is_string_type<std::string &>::value);
     REQUIRE(!is_string_type<const std::string &>::value);
     REQUIRE(is_string_type<const std::string>::value);
-    REQUIRE(!is_string_type<char(&)[]>::value);
-    REQUIRE(!is_string_type<char(&)[1]>::value);
+    REQUIRE(!is_string_type<char (&)[]>::value);
+    REQUIRE(!is_string_type<char (&)[1]>::value);
     REQUIRE(is_string_type<const char[2]>::value);
-    REQUIRE(!is_string_type<char(&&)[10]>::value);
-#if defined(MPPP_HAVE_STRING_VIEW)
+    REQUIRE(!is_string_type<char (&&)[10]>::value);
     REQUIRE(is_string_type<std::string_view>::value);
     REQUIRE(!is_string_type<std::string_view &>::value);
     REQUIRE(!is_string_type<const std::string_view &>::value);
     REQUIRE(is_string_type<const std::string_view>::value);
-#endif
     std::string s{"foo"};
     check_dispatch(std::string{"foo"});
     check_dispatch(s);
@@ -132,10 +127,8 @@ TEST_CASE("concepts")
     char s2[] = "blab";
     check_dispatch(s2);
     check_dispatch(&s2[0]);
-#if defined(MPPP_HAVE_STRING_VIEW)
     const std::string_view sv1{"bubbbbba"};
     check_dispatch(sv1);
     std::string_view sv2{"bubbbba"};
     check_dispatch(sv2);
-#endif
 }

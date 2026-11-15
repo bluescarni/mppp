@@ -22,10 +22,6 @@ using int_t = integer<1>;
 
 TEST_CASE("real128 get_ieee()")
 {
-    // NOTE: not sure why, but we get
-    // a compiler error with ICC in C++17
-    // on these tuple operations below.
-#if !defined(__INTEL_COMPILER) || MPPP_CPLUSPLUS < 201703L
     std::uint_least8_t sign{};
     std::uint_least16_t exp{};
     std::uint_least64_t hi{};
@@ -81,5 +77,4 @@ TEST_CASE("real128 get_ieee()")
     REQUIRE(!exp);
     REQUIRE(!hi);
     REQUIRE(lo == 1u);
-#endif
 }

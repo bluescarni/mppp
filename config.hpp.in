@@ -63,10 +63,9 @@
 
 // Compiler configuration.
 
-#if defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
+#if defined(__clang__) || defined(__GNUC__)
 
-// NOTE: GCC, clang (including clang-cl) and the Intel compiler support
-// __builtin_expect() and __restrict.
+// NOTE: GCC and clang (including clang-cl) support __builtin_expect() and __restrict.
 #define mppp_likely(x) __builtin_expect(static_cast<bool>(x), 1)
 #define mppp_unlikely(x) __builtin_expect(static_cast<bool>(x), 0)
 #define MPPP_RESTRICT __restrict
@@ -87,24 +86,12 @@
 
 #endif
 
-// thread_local configuration:
-// - on clang/osx, this seems to be supported since xcode 8:
-//   https://stackoverflow.com/questions/28094794/why-does-apple-clang-disallow-c11-thread-local-when-official-clang-supports
-//   Note that additional conditions might be needed for iOS, if it ever comes
-//   to that. Regarding the versioning, it seems the clang version macros are set
-//   to the xcode version:
-//   https://stackoverflow.com/questions/19387043/how-can-i-reliably-detect-the-version-of-clang-at-preprocessing-time
-//   xcode 8.x is appleclang 8.y:
-//   https://en.wikipedia.org/wiki/Xcode#8.x_series
-// - at least some MinGW versions have a buggy thread_local implementation. This is shown by testing,
-//   and reported in a bunch of places as well:
-//   https://sourceforge.net/p/mingw-w64/bugs/445/
-//   https://github.com/Alexpux/MINGW-packages/issues/2519
+// At least some MinGW versions have a buggy thread_local implementation. This is shown by testing, and reported in a
+// bunch of places as well:
 //
-// NOTE: at least some early versions of the Intel compiler have a buggy implementation,
-// but recent versions seem ok.
-
-#if (defined(__APPLE__) && __clang_major__ < 8) || defined(__MINGW32__)
+// https://sourceforge.net/p/mingw-w64/bugs/445/
+// https://github.com/Alexpux/MINGW-packages/issues/2519
+#if defined(__MINGW32__)
 
 #define MPPP_MAYBE_TLS
 
@@ -135,8 +122,8 @@
 #endif
 
 // C++ standard setup.
-// NOTE: this is necessary because at this time MSVC does not set correctly the
-// __cplusplus macro.
+//
+// NOTE: this is necessary because MSVC may not set correctly the __cplusplus macro.
 #if defined(_MSC_VER)
 
 #define MPPP_CPLUSPLUS _MSVC_LANG
@@ -147,50 +134,22 @@
 
 #endif
 
-// constexpr setup.
-#if MPPP_CPLUSPLUS >= 201402L
+#if MPPP_CPLUSPLUS < 202002L
 
-#define MPPP_CONSTEXPR_14 constexpr
-
-#else
-
-#define MPPP_CONSTEXPR_14
-
-#endif
-
-#if MPPP_CPLUSPLUS >= 202002L
-
-#define MPPP_CONSTEXPR_20 constexpr
-
-#else
-
-#define MPPP_CONSTEXPR_20
+#error "mp++ requires C++20 or later."
 
 #endif
 
 // Detect if the compiler supports GCC-style 128-bit integers.
+//
 // NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
+//
 // http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
+//
 // NOTE: clang-cl supports the types, but not all the arithmetic operations on them. Let's disable it for now.
-#if ((defined(__clang__) && !defined(_MSC_VER)) || defined(__GNUC__) || defined(__INTEL_COMPILER))                     \
-    && defined(__SIZEOF_INT128__)
+#if ((defined(__clang__) && !defined(_MSC_VER)) || defined(__GNUC__)) && defined(__SIZEOF_INT128__)
 
 #define MPPP_HAVE_GCC_INT128
-
-#endif
-
-// Check if we have std::string_view available.
-// Older compilers might advertise C++17 support
-// without implementing all the necessary library
-// components - this is the case with MSVC 2015
-// and std::string_view.
-#if MPPP_CPLUSPLUS >= 201703L
-
-#if __has_include(<string_view>)
-
-#define MPPP_HAVE_STRING_VIEW
-
-#endif
 
 #endif
 
@@ -199,7 +158,7 @@
 
 #define MPPP_FALLTHROUGH [[fallthrough]]
 
-#elif !defined(__INTEL_COMPILER) && !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 7
+#elif !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 7
 
 // On GCC>=7, if we are not using C++17 we can use
 // an alternative attribute:
