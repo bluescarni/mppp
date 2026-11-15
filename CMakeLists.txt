@@ -1,3 +1,6 @@
+# NOTE: C++20 supported since CMake 3.12.0:
+#
+# https://cmake.org/cmake/help/v3.12/prop_tgt/CXX_STANDARD.html
 cmake_minimum_required(VERSION 3.12.0)
 
 # Set default build type to "Release".
@@ -9,10 +12,10 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 2.0.0 LANGUAGES CXX C)
+project(mp++ VERSION 3.0.0 LANGUAGES CXX C)
 
 # Setup the mp++ ABI version number.
-set(MPPP_ABI_VERSION 16)
+set(MPPP_ABI_VERSION 17)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -41,7 +44,7 @@ if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_UNICODE "Enable Unicode solutions for MSVC." OFF)
 endif()
 # Build option: enable IPO.
-option(MPPP_ENABLE_IPO "Enable IPO (requires CMake >= 3.9 and compiler support)." OFF)
+option(MPPP_ENABLE_IPO "Enable IPO (requires compiler support)." OFF)
 mark_as_advanced(MPPP_ENABLE_IPO)
 
 if(MPPP_WITH_FLINT AND NOT MPPP_WITH_MPFR)
@@ -280,8 +283,8 @@ target_compile_options(mp++ PRIVATE
     "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
 )
 
-# Ensure that C++11 is employed when both compiling and consuming mp++.
-target_compile_features(mp++ PUBLIC cxx_std_11)
+# Ensure that C++20 is employed when both compiling and consuming mp++.
+target_compile_features(mp++ PUBLIC cxx_std_20)
 # Enforce vanilla C++ when compiling mp++.
 set_property(TARGET mp++ PROPERTY CXX_EXTENSIONS NO)
 
@@ -291,19 +294,17 @@ target_include_directories(mp++ PUBLIC
     $<INSTALL_INTERFACE:include>)
 
 # IPO setup.
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0")
-    if(MPPP_ENABLE_IPO)
-        include(CheckIPOSupported)
-        check_ipo_supported(RESULT _MPPP_IPO_RESULT OUTPUT _MPPP_IPO_OUTPUT)
-        if (_MPPP_IPO_RESULT)
-            message(STATUS "IPO requested and supported, enabling.")
-            set_property(TARGET mp++ PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-        else()
-            message(STATUS "IPO requested, but it is not supported by the compiler:\n${_MPPP_IPO_OUTPUT}")
-        endif()
-        unset(_MPPP_IPO_RESULT)
-        unset(_MPPP_IPO_OUTPUT)
+if(MPPP_ENABLE_IPO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT _MPPP_IPO_RESULT OUTPUT _MPPP_IPO_OUTPUT)
+    if (_MPPP_IPO_RESULT)
+        message(STATUS "IPO requested and supported, enabling.")
+        set_property(TARGET mp++ PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(STATUS "IPO requested, but it is not supported by the compiler:\n${_MPPP_IPO_OUTPUT}")
     endif()
+    unset(_MPPP_IPO_RESULT)
+    unset(_MPPP_IPO_OUTPUT)
 endif()
 
 # Find GMP first of all. We will make mp++ link to the imported

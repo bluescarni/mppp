@@ -14,7 +14,6 @@
 
 #include <mp++/config.hpp>
 
-#include <ciso646>
 #include <complex>
 #include <cstdint>
 #include <initializer_list>
@@ -120,12 +119,7 @@ TEST_CASE("real128 constructors")
     REQUIRE(std::is_nothrow_destructible<real128>::value);
     REQUIRE(std::is_nothrow_move_constructible<real128>::value);
     REQUIRE(std::is_nothrow_move_assignable<real128>::value);
-#if defined(_LIBCPP_VERSION) || (defined(__GNUC__) && __GNUC__ >= 5)
-    // NOTE: libstdc++ earlier than GCC 5 has a different non-standard name
-    // for this type trait. So we enable the test only if we are using libc++ (from clang)
-    // or if the GCC version is at least 5.
     REQUIRE(std::is_trivially_copyable<real128>::value);
-#endif
     real128 r;
     REQUIRE((r.m_value == 0));
     constexpr real128 rc;

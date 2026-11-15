@@ -45,7 +45,7 @@ function(ADD_MPPP_PYBIND11_TESTCASE arg1)
     )
     set_target_properties(${arg1} PROPERTIES CXX_VISIBILITY_PRESET hidden)
     set_target_properties(${arg1} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
-    target_compile_features(${arg1} PRIVATE cxx_std_11)
+    target_compile_features(${arg1} PRIVATE cxx_std_20)
     set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
     # Copy over the Python test runner.
     # NOTE: need to use file(GENERATE) because in multi-config build systems (e.g., MSVC) we need to copy

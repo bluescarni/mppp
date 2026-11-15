@@ -25,7 +25,7 @@ target_compile_options(mp++_benchmark PRIVATE
   "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
 )
 target_link_libraries(mp++_benchmark PRIVATE Boost::boost Boost::filesystem)
-target_compile_features(mp++_benchmark PRIVATE cxx_std_11)
+target_compile_features(mp++_benchmark PRIVATE cxx_std_20)
 set_property(TARGET mp++_benchmark PROPERTY CXX_EXTENSIONS NO)
 
 # Custom target to run all benchmarks.
@@ -52,7 +52,7 @@ function(ADD_MPPP_BENCHMARK arg1)
     "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
     "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
   )
-  target_compile_features(${arg1} PRIVATE cxx_std_11)
+  target_compile_features(${arg1} PRIVATE cxx_std_20)
   set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
 
   # Visibility settings.
@@ -80,7 +80,7 @@ if(NOT WIN32 AND UNIX AND NOT APPLE)
       "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
       "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
   )
-  target_compile_features(track_malloc PRIVATE cxx_std_11)
+  target_compile_features(track_malloc PRIVATE cxx_std_20)
   set_property(TARGET track_malloc PROPERTY CXX_EXTENSIONS NO)
 endif()
 
