@@ -304,11 +304,11 @@ public:
     }
 
     // Getters for the real/imaginary parts.
-    MPPP_NODISCARD constexpr real128 real() const
+    [[nodiscard]] constexpr real128 real() const
     {
         return real128{__real__ m_value};
     }
-    MPPP_NODISCARD constexpr real128 imag() const
+    [[nodiscard]] constexpr real128 imag() const
     {
         return real128{__imag__ m_value};
     }
@@ -434,7 +434,7 @@ public:
     }
 
     // Conversion to string.
-    MPPP_NODISCARD std::string to_string() const;
+    [[nodiscard]] std::string to_string() const;
 
     // Complex absolute value.
     complex128 &abs();

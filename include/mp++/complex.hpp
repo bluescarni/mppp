@@ -504,7 +504,7 @@ public:
 #endif
 
     // Check validity.
-    MPPP_NODISCARD bool is_valid() const noexcept
+    [[nodiscard]] bool is_valid() const noexcept
     {
         return mpc_realref(&m_mpc)->_mpfr_d != nullptr;
     }
@@ -692,9 +692,7 @@ public:
         real m_value;
     };
 
-#if MPPP_CPLUSPLUS >= 201703L
     // Helpers to construct re/im refs.
-    // They require C++17.
     [[nodiscard]] re_cref real_cref() const
     {
         return re_cref{*this};
@@ -711,9 +709,9 @@ public:
     {
         return im_ref{*this};
     }
-#endif
+
     // Extract copies of the real/imaginary parts.
-    MPPP_NODISCARD std::pair<real, real> get_real_imag() const &;
+    [[nodiscard]] std::pair<real, real> get_real_imag() const &;
     // Move out the real/imaginary parts.
     std::pair<real, real> get_real_imag() &&
     {
@@ -727,7 +725,7 @@ public:
     }
 
     // Precision getter.
-    MPPP_NODISCARD ::mpfr_prec_t get_prec() const
+    [[nodiscard]] ::mpfr_prec_t get_prec() const
     {
         assert(mpfr_get_prec(mpc_realref(&m_mpc)) == mpfr_get_prec(mpc_imagref(&m_mpc)));
 
@@ -767,7 +765,7 @@ public:
     complex &prec_round(::mpfr_prec_t);
 
     // mpc_t getters.
-    MPPP_NODISCARD const mpc_struct_t *get_mpc_t() const
+    [[nodiscard]] const mpc_struct_t *get_mpc_t() const
     {
         return &m_mpc;
     }
@@ -777,24 +775,24 @@ public:
     }
 
     // Detect special values.
-    MPPP_NODISCARD bool zero_p() const
+    [[nodiscard]] bool zero_p() const
     {
         return detail::mpc_is_zero(&m_mpc);
     }
-    MPPP_NODISCARD bool inf_p() const
+    [[nodiscard]] bool inf_p() const
     {
         return detail::mpc_is_inf(&m_mpc);
     }
-    MPPP_NODISCARD bool number_p() const
+    [[nodiscard]] bool number_p() const
     {
         return detail::mpc_is_finite(&m_mpc);
     }
-    MPPP_NODISCARD bool is_one() const;
+    [[nodiscard]] bool is_one() const;
 
 private:
     // Implementation of the conversion operator.
     template <typename T>
-    MPPP_NODISCARD T dispatch_conversion(std::true_type) const
+    [[nodiscard]] T dispatch_conversion(std::true_type) const
     {
         if (std::is_same<T, bool>::value) {
             return static_cast<T>(!zero_p());
@@ -810,7 +808,7 @@ private:
         }
     }
     template <typename T>
-    MPPP_NODISCARD T dispatch_conversion(std::false_type) const
+    [[nodiscard]] T dispatch_conversion(std::false_type) const
     {
         using value_type = typename T::value_type;
 
@@ -897,11 +895,11 @@ public:
             std::integral_constant<int, is_rv_complex_interoperable<T>::value + std::is_same<T, real>::value * 2>{});
     }
 
-    MPPP_NODISCARD std::string to_string(int base = 10) const;
+    [[nodiscard]] std::string to_string(int base = 10) const;
 
 #if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
     // Get the number of significant digits required for a round-tripping representation.
-    MPPP_NODISCARD std::size_t get_str_ndigits(int = 10) const;
+    [[nodiscard]] std::size_t get_str_ndigits(int = 10) const;
 #endif
 
 private:
@@ -1080,8 +1078,6 @@ inline std::pair<real, real> get_real_imag(const complex &c)
     return c.get_real_imag();
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
 inline complex::re_cref real_cref(const complex &c)
 {
     return c.real_cref();
@@ -1101,8 +1097,6 @@ inline complex::im_ref imag_ref(complex &c)
 {
     return c.imag_ref();
 }
-
-#endif
 
 namespace detail
 {

@@ -18,8 +18,6 @@
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
-#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
-
 TEST_CASE("integer_literal_check_str_test")
 {
     // Decimal.
@@ -236,8 +234,6 @@ TEST_CASE("integer_literal_check_str_test")
         REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
 }
-
-#endif
 
 // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("z1_test")

@@ -746,8 +746,6 @@ TEST_CASE("stream")
     tuple_for_each(sizes{}, stream_tester{});
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
 TEST_CASE("rational nts")
 {
     REQUIRE(std::is_nothrow_swappable_v<rational<1>>);
@@ -756,8 +754,6 @@ TEST_CASE("rational nts")
     REQUIRE(std::is_nothrow_swappable_v<rational<10>>);
     REQUIRE(std::is_nothrow_swappable_v<rational<15>>);
 }
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 

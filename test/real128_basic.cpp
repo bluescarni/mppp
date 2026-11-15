@@ -757,14 +757,10 @@ TEST_CASE("real128 numeric_limits")
     static_assert(std::numeric_limits<real128>::round_style == std::round_to_nearest, "");
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
 TEST_CASE("real128 nts")
 {
     REQUIRE(std::is_nothrow_swappable_v<real128>);
 }
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 

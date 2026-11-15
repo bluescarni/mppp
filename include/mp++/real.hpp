@@ -676,7 +676,7 @@ public:
 #endif
 
     // Check validity.
-    MPPP_NODISCARD bool is_valid() const noexcept
+    [[nodiscard]] bool is_valid() const noexcept
     {
         return m_mpfr._mpfr_d != nullptr;
     }
@@ -742,7 +742,7 @@ public:
     real &set_zero(int sign = 0);
 
     // Const reference to the internal mpfr_t.
-    MPPP_NODISCARD const mpfr_struct_t *get_mpfr_t() const
+    [[nodiscard]] const mpfr_struct_t *get_mpfr_t() const
     {
         return &m_mpfr;
     }
@@ -753,37 +753,37 @@ public:
     }
 
     // Detect NaN.
-    MPPP_NODISCARD bool nan_p() const
+    [[nodiscard]] bool nan_p() const
     {
         return mpfr_nan_p(&m_mpfr) != 0;
     }
     // Detect infinity.
-    MPPP_NODISCARD bool inf_p() const
+    [[nodiscard]] bool inf_p() const
     {
         return mpfr_inf_p(&m_mpfr) != 0;
     }
     // Detect finite number.
-    MPPP_NODISCARD bool number_p() const
+    [[nodiscard]] bool number_p() const
     {
         return mpfr_number_p(&m_mpfr) != 0;
     }
     // Detect zero.
-    MPPP_NODISCARD bool zero_p() const
+    [[nodiscard]] bool zero_p() const
     {
         return mpfr_zero_p(&m_mpfr) != 0;
     }
     // Detect regular number.
-    MPPP_NODISCARD bool regular_p() const
+    [[nodiscard]] bool regular_p() const
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
     // Detect integer.
-    MPPP_NODISCARD bool integer_p() const;
+    [[nodiscard]] bool integer_p() const;
     // Detect one.
-    MPPP_NODISCARD bool is_one() const;
+    [[nodiscard]] bool is_one() const;
 
     // Detect sign.
-    MPPP_NODISCARD int sgn() const
+    [[nodiscard]] int sgn() const
     {
         if (mppp_unlikely(nan_p())) {
             // NOTE: mpfr_sgn() in this case would set an error flag, and we generally
@@ -793,19 +793,19 @@ public:
         return mpfr_sgn(&m_mpfr);
     }
     // Get the sign bit.
-    MPPP_NODISCARD bool signbit() const
+    [[nodiscard]] bool signbit() const
     {
         return mpfr_signbit(&m_mpfr) != 0;
     }
 
     // Get the precision of this.
-    MPPP_NODISCARD ::mpfr_prec_t get_prec() const
+    [[nodiscard]] ::mpfr_prec_t get_prec() const
     {
         return mpfr_get_prec(&m_mpfr);
     }
 
     // Get the number of limbs necessary to represent this.
-    MPPP_NODISCARD std::size_t get_nlimbs() const;
+    [[nodiscard]] std::size_t get_nlimbs() const;
 
 private:
     // Utility function to check precision in set_prec().
@@ -841,7 +841,7 @@ private:
     // Generic conversion.
     // integer.
     template <typename T, detail::enable_if_t<detail::is_integer<T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to an integer");
@@ -894,7 +894,7 @@ private:
 #endif
     }
     template <typename T, detail::enable_if_t<detail::is_rational<T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a rational");
@@ -909,7 +909,7 @@ private:
     }
     // C++ floating-point.
     template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (std::is_same<T, float>::value) {
             return static_cast<T>(::mpfr_get_flt(&m_mpfr, MPFR_RNDN));
@@ -960,7 +960,7 @@ private:
               detail::enable_if_t<detail::conjunction<detail::negation<std::is_same<bool, T>>, detail::is_integral<T>,
                                                       detail::is_unsigned<T>>::value,
                                   int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a C++ unsigned integral type");
@@ -973,7 +973,7 @@ private:
     }
     // bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         // NOTE: in C/C++ the conversion of NaN to bool gives true:
         // https://stackoverflow.com/questions/9158567/nan-to-bool-conversion-true-or-false
@@ -1004,7 +1004,7 @@ private:
     }
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a C++ signed integral type");
@@ -1017,11 +1017,11 @@ private:
     }
 #if defined(MPPP_WITH_QUADMATH)
     template <typename T, detail::enable_if_t<std::is_same<real128, T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         return convert_to_real128();
     }
-    MPPP_NODISCARD real128 convert_to_real128() const;
+    [[nodiscard]] real128 convert_to_real128() const;
 #endif
 
 public:
@@ -1126,7 +1126,7 @@ public:
     }
 
     // Convert to string.
-    MPPP_NODISCARD std::string to_string(int base = 10) const;
+    [[nodiscard]] std::string to_string(int base = 10) const;
 
 private:
     template <typename T>
@@ -1274,11 +1274,11 @@ public:
 
 #if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
     // Get the number of significant digits required for a round-tripping representation.
-    MPPP_NODISCARD std::size_t get_str_ndigits(int = 10) const;
+    [[nodiscard]] std::size_t get_str_ndigits(int = 10) const;
 #endif
 
     // Size of the serialised binary representation.
-    MPPP_NODISCARD std::size_t binary_size() const;
+    [[nodiscard]] std::size_t binary_size() const;
 
 private:
     void binary_save_impl(char *, std::size_t) const;
@@ -4583,13 +4583,6 @@ namespace std
 // Specialisation of std::hash for real.
 template <>
 struct hash<mppp::real> {
-    // NOTE: these typedefs have been deprecated in C++17.
-#if MPPP_CPLUSPLUS < 201703L
-    // The argument type.
-    using argument_type = mppp::real;
-    // The result type.
-    using result_type = size_t;
-#endif
     // Call operator.
     size_t operator()(const mppp::real &x) const
     {

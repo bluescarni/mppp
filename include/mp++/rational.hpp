@@ -480,7 +480,7 @@ public:
     }
 #endif
     // Convert to string.
-    MPPP_NODISCARD std::string to_string(int base = 10) const
+    [[nodiscard]] std::string to_string(int base = 10) const
     {
         if (m_den.is_one()) {
             return m_num.to_string(base);
@@ -491,13 +491,13 @@ public:
 private:
     // Conversion to int_t.
     template <typename T, detail::enable_if_t<std::is_same<int_t, T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_num / m_den);
     }
     // Conversion to bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_num.m_int.m_st._mp_size != 0);
     }
@@ -505,14 +505,14 @@ private:
     template <typename T,
               detail::enable_if_t<
                   detail::conjunction<detail::is_integral<T>, detail::negation<std::is_same<bool, T>>>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         return static_cast<int_t>(*this).template dispatch_conversion<T>();
     }
     // Conversion to float/double.
     template <typename T,
               detail::enable_if_t<detail::disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         const auto v = detail::get_mpq_view(*this);
         return std::make_pair(true, static_cast<T>(mpq_get_d(&v)));
@@ -520,7 +520,7 @@ private:
 #if defined(MPPP_WITH_MPFR)
     // Conversion to long double.
     template <typename T, detail::enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS detail::mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
@@ -535,7 +535,7 @@ private:
 #endif
     // Conversion to std::complex.
     template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, T(static_cast<typename T::value_type>(*this)));
     }
@@ -587,12 +587,12 @@ public:
         return dispatch_get(rop);
     }
     // Const numerator getter.
-    MPPP_NODISCARD const int_t &get_num() const
+    [[nodiscard]] const int_t &get_num() const
     {
         return m_num;
     }
     // Const denominator getter.
-    MPPP_NODISCARD const int_t &get_den() const
+    [[nodiscard]] const int_t &get_den() const
     {
         return m_den;
     }
@@ -633,7 +633,7 @@ public:
         return *this;
     }
     // Check canonical form.
-    MPPP_NODISCARD bool is_canonical() const
+    [[nodiscard]] bool is_canonical() const
     {
         if (m_num.is_zero()) {
             // If num is zero, den must be one.
@@ -653,7 +653,7 @@ public:
         return g.is_one();
     }
     // Sign.
-    MPPP_NODISCARD int sgn() const
+    [[nodiscard]] int sgn() const
     {
         return mppp::sgn(m_num);
     }
@@ -680,17 +680,17 @@ public:
         return *this;
     }
     // Test if the value is zero.
-    MPPP_NODISCARD bool is_zero() const
+    [[nodiscard]] bool is_zero() const
     {
         return mppp::is_zero(m_num);
     }
     // Test if the value is one.
-    MPPP_NODISCARD bool is_one() const
+    [[nodiscard]] bool is_one() const
     {
         return mppp::is_one(m_num) && mppp::is_one(m_den);
     }
     // Test if the value is minus one.
-    MPPP_NODISCARD bool is_negative_one() const
+    [[nodiscard]] bool is_negative_one() const
     {
         return mppp::is_negative_one(m_num) && mppp::is_one(m_den);
     }
@@ -699,15 +699,6 @@ private:
     int_t m_num;
     int_t m_den;
 };
-
-#if MPPP_CPLUSPLUS < 201703L
-
-// NOTE: see the explanation in integer.hpp regarding static constexpr variables in C++17.
-
-template <std::size_t SSize>
-constexpr std::size_t rational<SSize>::ssize;
-
-#endif
 
 // Swap.
 template <std::size_t SSize>
@@ -2308,10 +2299,6 @@ namespace std
 // Specialisation of std::hash for mppp::rational.
 template <size_t SSize>
 struct hash<mppp::rational<SSize>> {
-#if MPPP_CPLUSPLUS < 201703L
-    using argument_type = mppp::rational<SSize>;
-    using result_type = size_t;
-#endif
     size_t operator()(const mppp::rational<SSize> &q) const
     {
         return mppp::hash(q);

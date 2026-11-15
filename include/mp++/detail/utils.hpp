@@ -59,11 +59,9 @@ template <typename T>
 constexpr make_unsigned_t<T> make_unsigned(T n) noexcept
 {
     static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
-#if MPPP_CPLUSPLUS >= 201703L
     // LCOV_EXCL_START
     assert(n >= T(0));
     // LCOV_EXCL_STOP
-#endif
     return static_cast<make_unsigned_t<T>>(n);
 }
 
@@ -100,14 +98,9 @@ MPPP_DLL_PUBLIC std::string to_string(__int128_t);
 template <typename T>
 constexpr make_unsigned_t<T> nint_abs(T n) noexcept
 {
-    // NOTE: we should assert about negative n, but this is guaranteed to work properly in
-    // constexpr functions only from C++17:
-    // https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
-#if MPPP_CPLUSPLUS >= 201703L
     // LCOV_EXCL_START
     assert(n < T(0));
     // LCOV_EXCL_STOP
-#endif
     static_assert(is_integral<T>::value && is_signed<T>::value,
                   "The sint_abs() function can be used only with signed integral types.");
     using uT = make_unsigned_t<T>;
@@ -134,13 +127,7 @@ constexpr T c_min(T a, T b) noexcept
 
 // A small helper to convert the input unsigned n to -n, represented as the signed T.
 template <typename T, typename U>
-// NOTE: C++17 because we are using assert().
-#if MPPP_CPLUSPLUS >= 201703L
-constexpr
-#else
-inline
-#endif
-    std::pair<bool, T> unsigned_to_nsigned(U n)
+constexpr std::pair<bool, T> unsigned_to_nsigned(U n)
 {
     static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
     static_assert(is_integral<U>::value && is_unsigned<U>::value, "Invalid type.");
@@ -185,12 +172,7 @@ inline
 
 // Like above, but throw on failure.
 template <typename T, typename U>
-#if MPPP_CPLUSPLUS >= 201703L
-constexpr
-#else
-inline
-#endif
-    T negate_unsigned(U n)
+constexpr T negate_unsigned(U n)
 {
     const auto retval = unsigned_to_nsigned<T>(n);
     // LCOV_EXCL_START

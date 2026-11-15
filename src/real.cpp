@@ -100,10 +100,7 @@ static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offseto
 // Double check that real is a standard layout class.
 static_assert(std::is_standard_layout<real>::value, "real is not a standard layout class.");
 
-#if MPPP_CPLUSPLUS >= 201703L
-
-// If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
-// and its members' types.
+// We can use structured bindings to test the layout of mpfr_struct_t and its members' types.
 constexpr bool test_mpfr_struct_t()
 {
     auto [prec, sign, exp, ptr] = mpfr_struct_t{};
@@ -114,8 +111,6 @@ constexpr bool test_mpfr_struct_t()
 }
 
 static_assert(test_mpfr_struct_t());
-
-#endif
 
 } // namespace
 

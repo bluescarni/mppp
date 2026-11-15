@@ -153,43 +153,12 @@
 
 #endif
 
-// Wrapper for the C++17 [[fallthrough]] attribute.
-#if MPPP_CPLUSPLUS >= 201703L
-
-#define MPPP_FALLTHROUGH [[fallthrough]]
-
-#elif !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 7
-
-// On GCC>=7, if we are not using C++17 we can use
-// an alternative attribute:
-// https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
-// This may be supported on some clang versions as well:
-// https://reviews.llvm.org/D63260
-#define MPPP_FALLTHROUGH [[gnu::fallthrough]]
-
-#else
-
-#define MPPP_FALLTHROUGH void(0)
-
-#endif
-
-// Wrapper for the C++17 [[nodiscard]], [[maybe_unused]] attributes.
-#if MPPP_CPLUSPLUS >= 201703L
-
-#define MPPP_NODISCARD [[nodiscard]]
-#define MPPP_MAYBE_UNUSED [[maybe_unused]]
-
-#else
-
-#define MPPP_NODISCARD
-#define MPPP_MAYBE_UNUSED
-
-#endif
-
 // C++20 constinit.
+//
 // NOTE: this seems to be buggy currently on MSVC:
+//
 // https://github.com/bluescarni/mppp/issues/291
-#if defined(__cpp_constinit) && (!defined(_MSC_VER) || defined(__clang__))
+#if !defined(_MSC_VER) || defined(__clang__)
 
 #define MPPP_CONSTINIT constinit
 
@@ -201,43 +170,13 @@
 
 #if defined(MPPP_WITH_QUADMATH)
 
-// Define the MPPP_FLOAT128_WITH_LONG_DOUBLE name
-// if __float128 can interact with long double.
+// Define the MPPP_FLOAT128_WITH_LONG_DOUBLE name if __float128 can interact with long double.
 
-#if defined(__clang__)
-
-#if defined(__apple_build_version__)
-
-// NOTE: according to https://en.wikipedia.org/wiki/Xcode#Toolchain_versions,
-// clang 7 starts in Xcode 10.2.
-#if __clang_major__ > 10 || (__clang_major__ == 10 && __clang_minor__ >= 2)
-
-#define MPPP_FLOAT128_WITH_LONG_DOUBLE
-
-#endif
-
-#else
-
-// Vanilla clang.
-#if __clang_major__ >= 7
-
-#define MPPP_FLOAT128_WITH_LONG_DOUBLE
-
-#endif
-
-#endif
-
-#else
-
-// On non-clang, let's always assume that __float128
-// can interact with long double, *unless* we are on
-// PowerPC. On such a setup, GCC disables interaction
-// between __float128 and long double.
+// We always assume that __float128 can interact with long double, *unless* we are on PowerPC. On such a setup, GCC
+// disables interaction between __float128 and long double.
 #if !defined(__PPC__)
 
 #define MPPP_FLOAT128_WITH_LONG_DOUBLE
-
-#endif
 
 #endif
 

@@ -69,10 +69,7 @@ static_assert(sizeof(expected_mpc_struct_t) == sizeof(mpc_struct_t) && offsetof(
 // Double check that complex is a standard layout class.
 static_assert(std::is_standard_layout<complex>::value, "complex is not a standard layout class.");
 
-#if MPPP_CPLUSPLUS >= 201703L
-
-// If we have C++17, we can use structured bindings to test the layout of mpc_struct_t
-// and its members' types.
+// We can use structured bindings to test the layout of mpc_struct_t and its members' types.
 constexpr bool test_mpc_struct_t()
 {
     auto [re, im] = mpc_struct_t{};
@@ -86,8 +83,6 @@ constexpr bool test_mpc_struct_t()
 }
 
 static_assert(test_mpc_struct_t());
-
-#endif
 
 } // namespace
 

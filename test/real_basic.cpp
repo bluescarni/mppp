@@ -1704,14 +1704,10 @@ TEST_CASE("real mt cleanup")
     t4.join();
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
 TEST_CASE("real nts")
 {
     REQUIRE(std::is_nothrow_swappable_v<real>);
 }
-
-#endif
 
 #if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
 

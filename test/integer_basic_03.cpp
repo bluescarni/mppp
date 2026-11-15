@@ -871,8 +871,6 @@ TEST_CASE("binary s11n")
     tuple_for_each(sizes{}, binary_s11n_tester{});
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
 TEST_CASE("integer nts")
 {
     REQUIRE(std::is_nothrow_swappable_v<integer<1>>);
@@ -881,8 +879,6 @@ TEST_CASE("integer nts")
     REQUIRE(std::is_nothrow_swappable_v<integer<10>>);
     REQUIRE(std::is_nothrow_swappable_v<integer<15>>);
 }
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 

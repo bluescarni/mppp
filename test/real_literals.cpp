@@ -30,14 +30,12 @@ TEST_CASE("real_literals_tests")
     REQUIRE(0._r128 == -real{"0.", 128});
     REQUIRE(0_r128 == -real{"0", 128});
     REQUIRE(-.123e-7_r128 == -real{".123e-7", 128});
-#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_r128 == real{"0x123.p-7", 16, 128});
     REQUIRE(-0X123.p-7_r128 == -real{"0x123.p-7", 16, 128});
     REQUIRE(0x123.P-7_r128 == real{"0x123.p-7", 16, 128});
     REQUIRE(-0X123.P-7_r128 == -real{"0x123.p-7", 16, 128});
     REQUIRE(-0X0.123P-7_r128 == -real{"0x0.123p-7", 16, 128});
-#endif
 
     // Runtime failures.
     real r;
@@ -60,14 +58,12 @@ TEST_CASE("real_literals_tests")
     REQUIRE(0._r256 == -real{"0.", 256});
     REQUIRE(0_r256 == -real{"0", 256});
     REQUIRE(-.123e-7_r256 == -real{".123e-7", 256});
-#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_r256 == real{"0x123.p-7", 16, 256});
     REQUIRE(-0X123.p-7_r256 == -real{"0x123.p-7", 16, 256});
     REQUIRE(0x123.P-7_r256 == real{"0x123.p-7", 16, 256});
     REQUIRE(-0X123.P-7_r256 == -real{"0x123.p-7", 16, 256});
     REQUIRE(-0X0.123P-7_r256 == -real{"0x0.123p-7", 16, 256});
-#endif
 
     // Runtime failures.
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r256, std::invalid_argument, [](const std::invalid_argument &ia) {
@@ -89,14 +85,12 @@ TEST_CASE("real_literals_tests")
     REQUIRE(0._r512 == -real{"0.", 512});
     REQUIRE(0_r512 == -real{"0", 512});
     REQUIRE(-.123e-7_r512 == -real{".123e-7", 512});
-#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_r512 == real{"0x123.p-7", 16, 512});
     REQUIRE(-0X123.p-7_r512 == -real{"0x123.p-7", 16, 512});
     REQUIRE(0x123.P-7_r512 == real{"0x123.p-7", 16, 512});
     REQUIRE(-0X123.P-7_r512 == -real{"0x123.p-7", 16, 512});
     REQUIRE(-0X0.123P-7_r512 == -real{"0x0.123p-7", 16, 512});
-#endif
 
     // Runtime failures.
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r512, std::invalid_argument, [](const std::invalid_argument &ia) {
@@ -118,14 +112,12 @@ TEST_CASE("real_literals_tests")
     REQUIRE(0._r1024 == -real{"0", 1024});
     REQUIRE(0_r1024 == -real{"0", 1024});
     REQUIRE(-.123e-7_r1024 == -real{".123e-7", 1024});
-#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_r1024 == real{"0x123.p-7", 16, 1024});
     REQUIRE(-0X123.p-7_r1024 == -real{"0x123.p-7", 16, 1024});
     REQUIRE(0x123.P-7_r1024 == real{"0x123.p-7", 16, 1024});
     REQUIRE(-0X123.P-7_r1024 == -real{"0x123.p-7", 16, 1024});
     REQUIRE(-0X0.123P-7_r1024 == -real{"0x0.123p-7", 16, 1024});
-#endif
 
     // Runtime failures.
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r1024, std::invalid_argument, [](const std::invalid_argument &ia) {

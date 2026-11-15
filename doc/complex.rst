@@ -627,10 +627,6 @@ The complex class
    .. cpp:function:: re_ref real_ref()
    .. cpp:function:: im_ref imag_ref()
 
-      .. note::
-
-        These member functions are available only if at least C++17 is being used.
-
       These member functions facilitate the creation of ``const`` or mutable reference
       wrappers to the real and imaginary parts of ``this``.
 
@@ -968,7 +964,7 @@ Components access
    * exit the new scope as soon as you are finished interacting
      with the :cpp:class:`~mppp::complex::re_cref` object.
 
-   When using at least C++17, the creation of a :cpp:class:`~mppp::complex::re_cref`
+   The creation of a :cpp:class:`~mppp::complex::re_cref`
    can also be accomplished via the :cpp:func:`mppp::complex::real_cref()`
    and :cpp:func:`mppp::real_cref()` functions (which slightly reduce
    the amount of typing).
@@ -1072,7 +1068,7 @@ Components access
    * exit the new scope as soon as you are finished interacting
      with the :cpp:class:`~mppp::complex::re_ref` object.
 
-   When using at least C++17, the creation of a :cpp:class:`~mppp::complex::re_ref`
+   The creation of a :cpp:class:`~mppp::complex::re_ref`
    can also be accomplished via the :cpp:func:`mppp::complex::real_ref()`
    and :cpp:func:`mppp::real_ref()` functions (which slightly reduce
    the amount of typing).
@@ -1119,10 +1115,6 @@ Components access
 .. cpp:function:: mppp::complex::im_cref mppp::imag_cref(const mppp::complex &c)
 .. cpp:function:: mppp::complex::re_ref mppp::real_ref(mppp::complex &c)
 .. cpp:function:: mppp::complex::im_ref mppp::imag_ref(mppp::complex &c)
-
-   .. note::
-
-      These functions are available only if at least C++17 is being used.
 
    These functions facilitate the creation of ``const`` or mutable reference
    wrappers to the real and imaginary parts of *c*.

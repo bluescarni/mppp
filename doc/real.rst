@@ -3462,13 +3462,6 @@ Standard library specialisations
 
    The hash is computed via :cpp:func:`std::size_t mppp::hash(const mppp::real &)`.
 
-   .. cpp:type:: public argument_type = mppp::real
-   .. cpp:type:: public result_type = std::size_t
-
-   .. note::
-
-      The :cpp:type:`argument_type` and :cpp:type:`result_type` type aliases are defined only until C++14.
-
    .. cpp:function:: public std::size_t operator()(const mppp::real &x) const
 
       :param x: the input :cpp:class:`mppp::real`.

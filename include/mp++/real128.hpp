@@ -103,42 +103,15 @@ MPPP_DLL_PUBLIC __float128 scalblnq(__float128, long);
 template <typename T>
 using is_real128_mppp_interoperable = disjunction<is_integer<T>, is_rational<T>>;
 
-// Story time!
-//
-// Since 3.9, clang supports the __float128 type. However, interactions between long double and __float128 are disabled.
-// The rationale is given here:
-//
-// https://reviews.llvm.org/D15120
-//
-// Basically, it boils down to the fact that on at least one platform (PPC) the long double type (which is implemented
-// as a double-double) can represent exactly some values that __float128 cannot (double-double is a strange beast).
-// On the other hand, __float128 can also
-// represent values that double-double cannot, so it is not clear which floating-point type should have the higher
-// rank. Note that C and C++ mandate, for the standard FP types, that higher rank FPs can represent all values
-// that lower rank FPs can. So, the decision was made to just disable the interaction. This is in line with the
-// following TS for che C language ("Floating-point extensions for C"):
-//
-// http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1945.pdf (page 20)
-//
-// (this is not necessarily a very good way of doing things though, as it seems to create portability concerns)
-//
-// This is part of a larger problem having to do with the fact that, while the properties of __float128 are exactly
-// specified (i.e., quad-precision IEEE), the properties of the standard floating-point types are *not*. So, a
-// *truly* generic real128 class would need, for instance:
-//
-// - to check which C++ types can interact with __float128 and enable only those,
-// - possibly return types other than real128 in binary operations (maybe long double is strictly bigger than quad
-//   precision?),
-// - etc. etc.
-//
-// For the moment, though, it seems like on all platforms __float128 is at least the same rank as double. For long
-// double, clang and GCC diverge, and we follow whatever the compiler is doing. So we just hard-code the behaviour
-// here, we can always write a more sophisticated solution later if the need arises.
-//
-// NOTE: since version 7 the behaviour of clang changed, now matching GCC. See the logic implemented
-// in config.hpp.
-
 // For internal use only.
+//
+// NOTE: while the format of __float128 is fully specified (i.e., IEEE quadruple precision), the properties of the
+// standard floating-point types are not. Here we assume that __float128 ranks at least as high as double on all
+// platforms, and we hard-code real128 as the result type of mixed-mode operations, rather than inspecting the
+// platform's floating-point types. A more sophisticated solution can be implemented later if the need arises.
+//
+// NOTE: interoperability between __float128 and long double varies depending on the platform, and it is signalled by
+// the MPPP_FLOAT128_WITH_LONG_DOUBLE macro.
 template <typename T>
 using is_real128_cpp_interoperable = detail::conjunction<is_cpp_arithmetic<T>
 #if !defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
@@ -488,7 +461,7 @@ public:
 private:
     // Conversion to C++ types.
     template <typename T>
-    MPPP_NODISCARD constexpr T dispatch_conversion(std::true_type) const
+    [[nodiscard]] constexpr T dispatch_conversion(std::true_type) const
     {
         return static_cast<T>(m_value);
     }
@@ -605,7 +578,7 @@ private:
 
     // Conversion to mp++ types.
     template <typename T>
-    MPPP_NODISCARD T dispatch_conversion(std::false_type) const
+    [[nodiscard]] T dispatch_conversion(std::false_type) const
     {
         T retval;
         if (mppp_unlikely(!mppp_conversion(retval))) {
@@ -683,16 +656,16 @@ public:
     }
 
     // Convert to string.
-    MPPP_NODISCARD std::string to_string() const;
+    [[nodiscard]] std::string to_string() const;
 
     // Unbiased exponent.
-    MPPP_NODISCARD int ilogb() const;
+    [[nodiscard]] int ilogb() const;
 #if defined(MPPP_QUADMATH_HAVE_LOGBQ)
-    MPPP_NODISCARD real128 logb() const;
+    [[nodiscard]] real128 logb() const;
 #endif
 
     // Get the IEEE representation of the value.
-    MPPP_NODISCARD std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t>
+    [[nodiscard]] std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t>
     get_ieee() const
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
@@ -702,9 +675,9 @@ public:
                                std::uint_least64_t(ie.i_eee.mant_high), std::uint_least64_t(ie.i_eee.mant_low));
     }
     // Sign bit.
-    MPPP_NODISCARD bool signbit() const;
+    [[nodiscard]] bool signbit() const;
     // Categorise the floating point value.
-    MPPP_NODISCARD
+    [[nodiscard]]
     constexpr int fpclassify() const
     {
         // NOTE: according to the docs the builtin accepts generic floating-point types:
@@ -714,30 +687,30 @@ public:
         return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value);
     }
     // Detect NaN.
-    MPPP_NODISCARD
+    [[nodiscard]]
     constexpr bool isnan() const
     {
         return fpclassify() == FP_NAN;
     }
     // Detect infinity.
-    MPPP_NODISCARD
+    [[nodiscard]]
     constexpr bool isinf() const
     {
         return fpclassify() == FP_INFINITE;
     }
     // Detect finite value.
-    MPPP_NODISCARD
+    [[nodiscard]]
     constexpr bool finite() const
     {
         return !isnan() && !isinf();
     }
-    MPPP_NODISCARD
+    [[nodiscard]]
     constexpr bool isfinite() const
     {
         return finite();
     }
     // Detect normal value.
-    MPPP_NODISCARD
+    [[nodiscard]]
     constexpr bool isnormal() const
     {
         return fpclassify() == FP_NORMAL;
@@ -1888,11 +1861,10 @@ constexpr real128 real128_sqrt2()
     return 14486024992869247637ull * detail::two_112() + 116590752822204ull * detail::two_48() + 1;
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
-// NOTE: namespace scope constexpr variables are *not* implicitly inline, so we need
-// inline explicitly here:
+// NOTE: namespace scope constexpr variables are *not* implicitly inline, so we need inline explicitly here:
+//
 // http://en.cppreference.com/w/cpp/language/inline
+//
 // Note that constexpr static member variables are implicitly inline instead.
 
 // The number of binary digits in the significand.
@@ -1924,8 +1896,6 @@ inline constexpr real128 e_128 = real128_e();
 
 // Quadruple-precision sqrt2.
 inline constexpr real128 sqrt2_128 = real128_sqrt2();
-
-#endif
 
 // Hash.
 inline std::size_t hash(const real128 &x)
@@ -2020,14 +1990,6 @@ template <>
 class numeric_limits<mppp::real128>
 {
 public:
-    // NOTE: in C++17 and later, constexpr implies inline. That is,
-    // we have no need for the initialisation of the static member outside the class.
-    // Before C++17, however, we *should* do the external initialisation, but, since
-    // this is a full specialisation, that would lead to multiply-defined references
-    // when dealing with multiple translation units. So we avoid that, but that means
-    // that certain uses of the static data members may lead to undefined references
-    // before C++17. See:
-    // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#454
     // NOTE: this is mostly lifted from Boost.Multiprecision.
     static constexpr bool is_specialized = true;
     static constexpr mppp::real128(min)()
@@ -2093,13 +2055,6 @@ public:
 // Specialisation of std::hash for real128.
 template <>
 struct hash<mppp::real128> {
-    // NOTE: these typedefs have been deprecated in C++17.
-#if MPPP_CPLUSPLUS < 201703L
-    // The argument type.
-    using argument_type = mppp::real128;
-    // The result type.
-    using result_type = size_t;
-#endif
     // Call operator.
     size_t operator()(const mppp::real128 &x) const
     {

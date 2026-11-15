@@ -15,7 +15,6 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <utility>
 
 #include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
@@ -35,9 +34,7 @@ constexpr int integer_literal_check_str(const char (&arr)[Size])
     // always at least 2, the null terminator
     // plus at least one char from the literal.
     static_assert(Size >= 2u, "Invalid array size.");
-#if MPPP_CPLUSPLUS >= 201703L
     assert(arr[Size - 1u] == '\0');
-#endif
 
     // The actual string length of the literal.
     constexpr auto str_length = Size - 1u;
@@ -65,27 +62,27 @@ constexpr int integer_literal_check_str(const char (&arr)[Size])
         if (c < '0' || c > '9') {
             switch (c) {
                 case 'a':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'b':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'c':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'd':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'e':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'f':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'A':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'B':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'C':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'D':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'E':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'F':
                     return;
                 default:
@@ -129,9 +126,7 @@ constexpr int integer_literal_check_str(const char (&arr)[Size])
         }
     }();
 
-#if MPPP_CPLUSPLUS >= 201703L
     assert(base == 2 || base == 8 || base == 10 || base == 16);
-#endif
 
     // Run the checks on the rest of the literal,
     // after we already checked the first 2 digits.
@@ -172,8 +167,6 @@ constexpr int integer_literal_check_str(const char (&arr)[Size])
 
     return base;
 }
-
-#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
 
 // Small helper to convert the char representation
 // of a digit into the corresponding numerical
@@ -228,22 +221,11 @@ constexpr Int digit_to_value(char c)
     }
 }
 
-#endif
-
 template <std::size_t SSize, char... Chars>
 inline integer<SSize> integer_literal_impl()
 {
-    // Turn the sequence of input chars
-    // into a null-terminated char array.
-    // NOTE: earlier clang versions won't properly
-    // capture arr in the lambdas below if it is
-    // not marked as static.
-#if defined(__clang__) && (defined(__apple_build_version__) || __clang_major__ <= 8)
-    static
-#endif
-        constexpr char arr[] = {Chars..., '\0'};
+    constexpr char arr[] = {Chars..., '\0'};
 
-#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
     // Run the checks on the char sequence, and determine the base.
     constexpr auto base = integer_literal_check_str(arr);
     static_assert(base == 2 || base == 8 || base == 10 || base == 16);
@@ -373,22 +355,6 @@ inline integer<SSize> integer_literal_impl()
 
         return retval;
     }
-#else
-    // Run the checks on the char sequence, and determine the base.
-    const auto base = integer_literal_check_str(arr);
-    assert(base == 2 || base == 8 || base == 10 || base == 16);
-
-    switch (base) {
-        case 2:
-            return integer<SSize>{arr + 2, arr + sizeof(arr) - 1, 2};
-        case 8:
-            return integer<SSize>{arr + 1, arr + sizeof(arr) - 1, 8};
-        case 16:
-            return integer<SSize>{arr + 2, arr + sizeof(arr) - 1, 16};
-        default:
-            return integer<SSize>{arr};
-    }
-#endif
 }
 
 } // namespace detail

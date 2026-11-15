@@ -29,14 +29,12 @@ TEST_CASE("real128_literal_tests")
     REQUIRE(0._rq == -real128{});
     REQUIRE(0_rq == -real128{});
     REQUIRE(-.123e-7_rq == -real128{".123e-7"});
-#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_rq == real128{"0x123.p-7"});
     REQUIRE(-0X123.p-7_rq == -real128{"0x123.p-7"});
     REQUIRE(0x123.P-7_rq == real128{"0x123.p-7"});
     REQUIRE(-0X123.P-7_rq == -real128{"0x123.p-7"});
     REQUIRE(-0X0.123P-7_rq == -real128{"0x0.123p-7"});
-#endif
 
     // Runtime failures.
     real128 r;

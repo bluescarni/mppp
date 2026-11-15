@@ -32,7 +32,6 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -582,7 +581,7 @@ struct static_int {
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
 
 #endif
-    MPPP_NODISCARD bool dtor_checks() const
+    [[nodiscard]] bool dtor_checks() const
     {
         // LCOV_EXCL_START
         const auto asize = abs_size();
@@ -620,13 +619,13 @@ struct static_int {
         assert(dtor_checks());
     }
     // Size in limbs (absolute value of the _mp_size member).
-    MPPP_NODISCARD mpz_size_t abs_size() const
+    [[nodiscard]] mpz_size_t abs_size() const
     {
         return std::abs(_mp_size);
     }
     // NOTE: the retval here can be used only in read-only mode, otherwise
     // we will have UB due to the const_cast use.
-    MPPP_NODISCARD mpz_struct_t get_mpz_view() const
+    [[nodiscard]] mpz_struct_t get_mpz_view() const
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
         return mpz_struct_t{_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
@@ -962,16 +961,16 @@ union integer_union {
         g_dy().~d_storage();
     }
     // Check storage type.
-    MPPP_NODISCARD bool is_static() const
+    [[nodiscard]] bool is_static() const
     {
         return m_st._mp_alloc == s_storage::s_alloc;
     }
-    MPPP_NODISCARD bool is_dynamic() const
+    [[nodiscard]] bool is_dynamic() const
     {
         return m_st._mp_alloc != s_storage::s_alloc;
     }
     // Getters for st and dy.
-    MPPP_NODISCARD const s_storage &g_st() const
+    [[nodiscard]] const s_storage &g_st() const
     {
         assert(is_static());
         return m_st;
@@ -981,7 +980,7 @@ union integer_union {
         assert(is_static());
         return m_st;
     }
-    MPPP_NODISCARD const d_storage &g_dy() const
+    [[nodiscard]] const d_storage &g_dy() const
     {
         assert(is_dynamic());
         return m_dy;
@@ -1300,7 +1299,7 @@ class integer
         {
             return get();
         }
-        MPPP_NODISCARD const detail::mpz_struct_t *get() const
+        [[nodiscard]] const detail::mpz_struct_t *get() const
         {
             return m_ptr;
         }
@@ -1707,17 +1706,17 @@ public:
         return set_one_impl<false>();
     }
     // Test for static storage.
-    MPPP_NODISCARD bool is_static() const
+    [[nodiscard]] bool is_static() const
     {
         return m_int.is_static();
     }
     // Test for dynamic storage.
-    MPPP_NODISCARD bool is_dynamic() const
+    [[nodiscard]] bool is_dynamic() const
     {
         return m_int.is_dynamic();
     }
     // Conversion to string.
-    MPPP_NODISCARD std::string to_string(int base = 10) const
+    [[nodiscard]] std::string to_string(int base = 10) const
     {
         if (mppp_unlikely(base < 2 || base > 62)) {
             throw std::invalid_argument("Invalid base for string conversion: the base must be between "
@@ -1732,13 +1731,13 @@ public:
 private:
     // Conversion to bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
     template <typename T, bool Sign, detail::enable_if_t<(detail::nl_constants<T>::digits <= GMP_NUMB_BITS), int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> convert_to_unsigned() const
+    [[nodiscard]] std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
@@ -1757,7 +1756,7 @@ private:
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
     template <typename T, bool Sign, detail::enable_if_t<(detail::nl_constants<T>::digits > GMP_NUMB_BITS), int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> convert_to_unsigned() const
+    [[nodiscard]] std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
@@ -1795,7 +1794,7 @@ private:
     template <typename T, detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>,
                                                                   detail::negation<std::is_same<bool, T>>>::value,
                                               int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1825,7 +1824,7 @@ private:
     };
     // Overload if the all the absolute values of T fit into a limb.
     template <typename T, detail::enable_if_t<sconv_is_small<T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> convert_to_signed() const
+    [[nodiscard]] std::pair<bool, T> convert_to_signed() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_signed<T>::value, "Invalid type.");
         assert(size());
@@ -1852,7 +1851,7 @@ private:
     }
     // Overload if not all the absolute values of T fit into a limb.
     template <typename T, detail::enable_if_t<!sconv_is_small<T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> convert_to_signed() const
+    [[nodiscard]] std::pair<bool, T> convert_to_signed() const
     {
         // Cache for convenience.
         constexpr auto Tmax = detail::make_unsigned(detail::nl_max<T>());
@@ -1880,7 +1879,7 @@ private:
     }
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1911,7 +1910,7 @@ private:
 #endif
     // Conversion to floating-point.
     template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -2030,7 +2029,7 @@ public:
         return false;
     }
     // Size in bits.
-    MPPP_NODISCARD std::size_t nbits() const
+    [[nodiscard]] std::size_t nbits() const
     {
         const std::size_t ls = size();
         if (ls == 0u) {
@@ -2049,7 +2048,7 @@ public:
         return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS) + detail::limb_size_nbits(lptr[idx]));
     }
     // Size in limbs.
-    MPPP_NODISCARD std::size_t size() const
+    [[nodiscard]] std::size_t size() const
     {
         // NOTE: the idea here is that, regardless of what mpz_size_t is exactly, the
         // asize of an integer represents ultimately the size of a limb array, and as such
@@ -2058,13 +2057,13 @@ public:
                                           : static_cast<std::size_t>(detail::nint_abs(m_int.m_st._mp_size));
     }
     // Sign.
-    MPPP_NODISCARD int sgn() const
+    [[nodiscard]] int sgn() const
     {
         // NOTE: size is part of the common initial sequence.
         return detail::integral_sign(m_int.m_st._mp_size);
     }
     // Get an mpz_t view.
-    MPPP_NODISCARD mpz_view get_mpz_view() const
+    [[nodiscard]] mpz_view get_mpz_view() const
     {
         return mpz_view(*this);
     }
@@ -2093,7 +2092,7 @@ public:
         return *this;
     }
     // Test primality.
-    MPPP_NODISCARD int probab_prime_p(int reps = 25) const
+    [[nodiscard]] int probab_prime_p(int reps = 25) const
     {
         if (mppp_unlikely(reps < 1)) {
             throw std::invalid_argument("The number of primality tests must be at least 1, but a value of "
@@ -2115,7 +2114,7 @@ public:
         return mppp::sqr(*this, *this);
     }
     // Test if value is odd.
-    MPPP_NODISCARD bool odd_p() const
+    [[nodiscard]] bool odd_p() const
     {
         if (is_static()) {
             if (SSize <= s_storage::opt_size) {
@@ -2130,7 +2129,7 @@ public:
         return mpz_odd_p(&m_int.g_dy());
     }
     // Test if value is even.
-    MPPP_NODISCARD bool even_p() const
+    [[nodiscard]] bool even_p() const
     {
         return !odd_p();
     }
@@ -2140,7 +2139,7 @@ public:
         return m_int;
     }
     // Return a const reference to the internal union.
-    MPPP_NODISCARD const detail::integer_union<SSize> &_get_union() const
+    [[nodiscard]] const detail::integer_union<SSize> &_get_union() const
     {
         return m_int;
     }
@@ -2151,7 +2150,7 @@ public:
         return &m_int.g_dy();
     }
     // Test if the value is zero.
-    MPPP_NODISCARD bool is_zero() const
+    [[nodiscard]] bool is_zero() const
     {
         return m_int.m_st._mp_size == 0;
     }
@@ -2159,7 +2158,7 @@ public:
 private:
     // Implementation of is_one()/is_negative_one().
     template <int One>
-    MPPP_NODISCARD bool is_one_impl() const
+    [[nodiscard]] bool is_one_impl() const
     {
         if (m_int.m_st._mp_size != One) {
             return false;
@@ -2171,12 +2170,12 @@ private:
 
 public:
     // Test if the value is equal to one.
-    MPPP_NODISCARD bool is_one() const
+    [[nodiscard]] bool is_one() const
     {
         return is_one_impl<1>();
     }
     // Test if the value is equal to minus one.
-    MPPP_NODISCARD bool is_negative_one() const
+    [[nodiscard]] bool is_negative_one() const
     {
         return is_one_impl<-1>();
     }
@@ -2187,7 +2186,7 @@ private:
 
 public:
     // Size of the serialised binary representation.
-    MPPP_NODISCARD std::size_t binary_size() const
+    [[nodiscard]] std::size_t binary_size() const
     {
         const auto asize = size();
         // LCOV_EXCL_START
@@ -2395,16 +2394,7 @@ public:
     // Load a value from a memory buffer.
     std::size_t binary_load(const char *src)
     {
-        // NOTE: disable the use of structured bindings
-        // on MSVC altogether, due to this clang-cl issue:
-        // https://bugs.llvm.org/show_bug.cgi?id=41745
-#if MPPP_CPLUSPLUS >= 201703L && !defined(_MSC_VER)
         const auto [size, asize] = bl_read_size_asize(src);
-#else
-        detail::mpz_size_t size;
-        detail::make_unsigned_t<detail::mpz_size_t> asize;
-        std::tie(size, asize) = bl_read_size_asize(src);
-#endif
         binary_load_impl(src + sizeof(detail::mpz_size_t), size, asize);
         return read_bytes(asize);
     }
@@ -2423,16 +2413,7 @@ private:
         }
         // Size in bytes of the limbs portion of the data.
         const auto lsize = src.size() - sizeof(detail::mpz_size_t);
-#if MPPP_CPLUSPLUS >= 201703L && !defined(_MSC_VER)
-        // NOTE: not sure why the coverage is not detected here.
-        // LCOV_EXCL_START
         const auto [size, asize] = bl_read_size_asize(src.data());
-        // LCOV_EXCL_STOP
-#else
-        detail::mpz_size_t size;
-        detail::make_unsigned_t<detail::mpz_size_t> asize;
-        std::tie(size, asize) = bl_read_size_asize(src.data());
-#endif
         // The number of entire limbs stored in the vector must be at least the integer
         // limb size stored at the beginning of the vector.
         if (mppp_unlikely(lsize / sizeof(::mp_limb_t) < asize)) {
@@ -2507,17 +2488,6 @@ public:
 private:
     detail::integer_union<SSize> m_int;
 };
-
-#if MPPP_CPLUSPLUS < 201703L
-
-// NOTE: from C++17 static constexpr members are implicitly inline, and it's not necessary
-// any more (actually, it's deprecated) to re-declare them outside the class.
-// https://stackoverflow.com/questions/39646958/constexpr-static-member-before-after-c17
-
-template <std::size_t SSize>
-constexpr std::size_t integer<SSize>::ssize;
-
-#endif
 
 template <std::size_t SSize>
 const char integer<SSize>::binary_size_errmsg[] = "Overflow in the computation of the binary size of an integer";
@@ -2818,7 +2788,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         if (asize1 > asize2 || (asize1 == asize2 && mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
             // abs(op1) >= abs(op2).
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
-            MPPP_MAYBE_UNUSED ::mp_limb_t br;
+            [[maybe_unused]] ::mp_limb_t br;
             if (asize2 == 1) {
                 br = mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
             } else if (asize1 == asize2) {
@@ -2834,7 +2804,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         } else {
             // abs(op2) > abs(op1).
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
-            MPPP_MAYBE_UNUSED ::mp_limb_t br;
+            [[maybe_unused]] ::mp_limb_t br;
             if (asize1 == 1) {
                 br = mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
             } else {
@@ -8208,13 +8178,6 @@ namespace std
 // Specialisation of std::hash for mppp::integer.
 template <size_t SSize>
 struct hash<mppp::integer<SSize>> {
-    // NOTE: these typedefs have been deprecated in C++17.
-#if MPPP_CPLUSPLUS < 201703L
-    // The argument type.
-    using argument_type = mppp::integer<SSize>;
-    // The result type.
-    using result_type = size_t;
-#endif
     // Call operator.
     size_t operator()(const mppp::integer<SSize> &n) const
     {

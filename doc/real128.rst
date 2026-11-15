@@ -1418,9 +1418,8 @@ Constants
 ---------
 
 A few mathematical constants are provided. The constants are available as inline variables
-(e.g., :cpp:var:`mppp::pi_128`, requires C++17 or later) and as constexpr functions (e.g., :cpp:func:`mppp::real128_pi()`,
-always available). Inline variables and constexpr functions provide exactly the same functionality,
-but inline variables are more convenient if C++17 is an option.
+and as constexpr functions (e.g., :cpp:func:`mppp::real128_pi()`,
+always available).
 
 .. note::
    Some of these constants are also available as
@@ -1554,13 +1553,6 @@ Standard library specialisations
    Specialisation of ``std::hash`` for :cpp:class:`mppp::real128`.
 
    The hash is computed via :cpp:func:`std::size_t mppp::hash(const mppp::real128 &)`.
-
-   .. cpp:type:: public argument_type = mppp::real128
-   .. cpp:type:: public result_type = std::size_t
-
-   .. note::
-
-      The :cpp:type:`argument_type` and :cpp:type:`result_type` type aliases are defined only until C++14.
 
    .. cpp:function:: public std::size_t operator()(const mppp::real128 &x) const
 
