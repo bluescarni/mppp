@@ -2776,7 +2776,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 
     // Optimise the case in which the addition can be performed
     // via the signed counterpart of mp_limb_t.
-    if (mppp_likely(l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)))) {
+    if (mppp_likely(l1 < (::mp_limb_t(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2))
+                    && l2 < (::mp_limb_t(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2)))) {
         const auto x = make_signed(l1, sign1);
         const auto y = make_signed(l2, sign2);
 
@@ -2999,7 +3000,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
     // as it could be.
     const bool c1
         = static_cast<std::size_t>(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-    const bool c2 = SSize == 1u && (l2 >> (GMP_NUMB_BITS - 1));
+    const bool c2 = SSize == 1u && (l2 >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
     if (mppp_unlikely(c1 || c2)) {
         return false;
     }
@@ -3053,7 +3054,8 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 
     // Optimise the case in which the add/sub can be performed
     // via the signed counterpart of mp_limb_t.
-    if (mppp_likely(l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)))) {
+    if (mppp_likely(l1 < (::mp_limb_t(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2))
+                    && l2 < (::mp_limb_t(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2)))) {
         const auto x = make_signed(l1, sign1);
         const auto y = static_cast<make_signed_t<::mp_limb_t>>(l2);
 
@@ -3621,8 +3623,8 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
 
     // Optimise the case in which the addition can be performed
     // via the signed counterpart of mp_limb_t.
-    if (rlimb < (static_cast<::mp_limb_t>(1) << (GMP_NUMB_BITS - 2))
-        && prod < (static_cast<::mp_limb_t>(1) << (GMP_NUMB_BITS - 2))) {
+    if (rlimb < (static_cast<::mp_limb_t>(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2))
+        && prod < (static_cast<::mp_limb_t>(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2))) {
         const auto x = make_signed(rlimb, signr);
         const auto y = make_signed(prod, sign_prod);
 
@@ -5386,7 +5388,7 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
     // the two's complement to get its absolute value:
     // (0) ... 0 0 0 1 0 1
     // So the final result is -5.
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOTE: at least 1 of the operands is strictly negative, so the result
     // has to be negative as well (because of ORing the sign bits).
     rop._mp_size = -1;
@@ -5437,7 +5439,7 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return;
     }
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5547,7 +5549,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
         return;
     }
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5643,7 +5645,7 @@ inline bool static_and_impl(static_int<1> &rop, const static_int<1> &op1, const 
         rop.m_limbs[0] = ret;
         return true;
     }
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
@@ -5705,7 +5707,7 @@ inline bool static_and_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return true;
     }
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5790,7 +5792,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         rop._mp_size = compute_static_int_asize(rop, asize2);
         return true;
     }
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5902,7 +5904,7 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
         rop.m_limbs[0] = ret;
         return false;
     }
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
@@ -5966,7 +5968,7 @@ inline bool static_xor_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return true;
     }
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -6052,7 +6054,7 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         rop._mp_size = compute_static_int_asize(rop, asize1);
         return true;
     }
-    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
