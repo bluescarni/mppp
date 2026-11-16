@@ -75,6 +75,13 @@ jobs:
           cmake --build . --config Release -j2
           copy Release\mp++.dll test\Release\
           ctest -j4 -V -C Release
+  # clang-tidy build of the library and of the test suite.
+  clang_tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build and test
+        run: bash tools/gha_clang_tidy.sh
   # Coverage build, uploaded to codecov.
   coverage:
     runs-on: ubuntu-latest
