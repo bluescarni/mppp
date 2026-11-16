@@ -1988,7 +1988,7 @@ public:
         // LCOV_EXCL_STOP
         // Index of the most significant limb.
         const std::size_t idx = ls - 1u;
-        return static_cast<std::size_t>(idx * static_cast<unsigned>(GMP_NUMB_BITS)
+        return static_cast<std::size_t>((idx * static_cast<unsigned>(GMP_NUMB_BITS))
                                         + detail::limb_size_nbits(lptr[idx]));
     }
     // Size in limbs.
@@ -2143,7 +2143,7 @@ public:
             throw std::overflow_error(binary_size_errmsg);
         }
         // LCOV_EXCL_STOP
-        return sizeof(detail::mpz_size_t) + asize * sizeof(::mp_limb_t);
+        return sizeof(detail::mpz_size_t) + (asize * sizeof(::mp_limb_t));
     }
 
 private:
@@ -2332,7 +2332,7 @@ private:
     // in binary_size(), where we do have to check for overflow).
     static std::size_t read_bytes(const detail::make_unsigned_t<detail::mpz_size_t> &asize)
     {
-        return static_cast<std::size_t>(sizeof(detail::mpz_size_t) + asize * sizeof(::mp_limb_t));
+        return static_cast<std::size_t>(sizeof(detail::mpz_size_t) + (asize * sizeof(::mp_limb_t)));
     }
 
 public:
@@ -3013,7 +3013,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
             // The asize can be the original one or original - 1 (we subtracted a limb). If size1 was positive,
             // sign2 has to be negative and we potentially subtract 1, if size1 was negative then sign2 has to be
             // positive and we potentially add 1.
-            rop._mp_size = size1 + sign2 * !(rdata[asize1 - 1] & GMP_NUMB_MASK);
+            rop._mp_size = size1 + (sign2 * !(rdata[asize1 - 1] & GMP_NUMB_MASK));
         } else {
             // abs(op2) > abs(op1).
             const auto br = mpn_sub_1(rdata, &l2, 1, data1[0]);
@@ -3376,7 +3376,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         res_data[asize2] = hi;
     } else if (asize1 == asize2) {
         mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
-        hi = res_data[2 * asize1 - 1];
+        hi = res_data[(2 * asize1) - 1];
     } else if (asize1 >= asize2) {
         hi = mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
     } else {
@@ -3562,7 +3562,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     if (mppp_unlikely(
             static_mul_impl(prod, op1, op2, asize1, asize2, sign1, sign2, std::integral_constant<int, 0>{}))) {
         // This is the maximum size a static addmul can have.
-        return SSize * 2u + 1u;
+        return (SSize * 2u) + 1u;
     }
     // Determine sign and asize of the product.
     mpz_size_t asize_prod = prod._mp_size;
@@ -3906,7 +3906,7 @@ inline std::size_t static_mul_2exp(static_int<1> &rop, const static_int<1> &n, s
         // limbs add to the current size (1), +1 because another limb might be needed.
         // NOTE: paranoia static assert to make sure there's no chance of overflowing.
         static_assert(GMP_NUMB_BITS > 1, "Invalid number of bits.");
-        return s / static_cast<unsigned>(GMP_NUMB_BITS) + 2u;
+        return (s / static_cast<unsigned>(GMP_NUMB_BITS)) + 2u;
     }
     // Write out.
     rop.m_limbs[0] = l << s;
@@ -3935,7 +3935,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
         // NOTE: paranoia static assert to make sure there's no chance of overflowing.
         static_assert(GMP_NUMB_BITS > 1, "Invalid number of bits.");
         // NOTE: asize is 2 at most, no need to check for overflow.
-        return s / static_cast<unsigned>(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
+        return (s / static_cast<unsigned>(GMP_NUMB_BITS)) + 1u + static_cast<std::size_t>(asize);
     }
     if (s == static_cast<unsigned>(GMP_NUMB_BITS)) {
         // This case can be dealt with moving lo into hi, but only if asize is 1.
@@ -3953,7 +3953,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
     ::mp_limb_t lo = n.m_limbs[0u], hi = n.m_limbs[1u];
     if (s > static_cast<unsigned>(GMP_NUMB_BITS)) {
         if (mppp_unlikely(asize == 2)) {
-            return s / static_cast<unsigned>(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
+            return (s / static_cast<unsigned>(GMP_NUMB_BITS)) + 1u + static_cast<std::size_t>(asize);
         }
         // Move lo to hi and set lo to zero.
         hi = n.m_limbs[0u];
@@ -4054,7 +4054,7 @@ inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSiz
     // Compute the actual size of the result: it could be asize * 2
     // or 1 less, depending on whether the most significant limb of the
     // result is zero.
-    const auto res_size = asize * 2u - static_cast<std::size_t>((res_data[asize * 2u - 1u] & GMP_NUMB_MASK) == 0u);
+    const auto res_size = (asize * 2u) - static_cast<std::size_t>((res_data[(asize * 2u) - 1u] & GMP_NUMB_MASK) == 0u);
     if (res_size > SSize) {
         // Not enough space: return asize * 2, which is
         // what mpz_mul() would like to allocate for the result.
@@ -4224,7 +4224,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     // or 1 less, depending on whether the most significant limb of the
     // result is zero.
     const auto sqr_res_asize
-        = asize * 2u - static_cast<std::size_t>((sqr_res_data[asize * 2u - 1u] & GMP_NUMB_MASK) == 0u);
+        = (asize * 2u) - static_cast<std::size_t>((sqr_res_data[(asize * 2u) - 1u] & GMP_NUMB_MASK) == 0u);
 
     if (mod_asize > sqr_res_asize) {
         // The divisor is larger than the square of op.
@@ -6647,7 +6647,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
             const auto rs_data = rs.m_limbs.data(), out_ptr = overlap ? tmp.data() : rs_data;
             mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
             // Compute the size of the output (which is ceil(size / 2)).
-            const auto new_size = size / 2u + size % 2u;
+            const auto new_size = (size / 2u) + (size % 2u);
             assert(!new_size || (out_ptr[new_size - 1u] & GMP_NUMB_MASK));
             // Write out the result.
             rs._mp_size = static_cast<mpz_size_t>(new_size);
@@ -6711,7 +6711,7 @@ inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, con
         // Do the computation. The function will return the size of the remainder.
         const auto rem_size = mpn_sqrtrem(out_ptr, rems_data, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
         // Compute the size of the output (which is ceil(size / 2)).
-        const auto rop_size = size / 2u + size % 2u;
+        const auto rop_size = (size / 2u) + (size % 2u);
         assert(!rop_size || (out_ptr[rop_size - 1u] & GMP_NUMB_MASK));
         // Write out the result, clearing the unused limbs.
         rops._mp_size = static_cast<mpz_size_t>(rop_size);

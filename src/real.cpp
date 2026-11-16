@@ -2540,7 +2540,8 @@ std::size_t rbs_prec_to_nlimbs(::mpfr_prec_t p)
     // NOTE: currently both mpfr_prec_t and GMP_NUMB_BITS
     // are signed.
     using uprec_t = std::make_unsigned<::mpfr_prec_t>::type;
-    return safe_cast<std::size_t>(static_cast<uprec_t>(p / GMP_NUMB_BITS + static_cast<int>((p % GMP_NUMB_BITS) != 0)));
+    return safe_cast<std::size_t>(
+        static_cast<uprec_t>((p / GMP_NUMB_BITS) + static_cast<int>((p % GMP_NUMB_BITS) != 0)));
 }
 
 // Turn an MPFR precision into the number of bytes

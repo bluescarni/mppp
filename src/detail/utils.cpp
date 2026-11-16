@@ -44,12 +44,12 @@ char *to_string_impl(char (&output)[N], __uint128_t n)
     // Reduce n iteratively by a factor of 100, and print the remainder at each iteration.
     auto r = static_cast<unsigned>(n % 100u);
     for (; n >= 100u; n = n / 100u, r = static_cast<unsigned>(n % 100u)) {
-        output[idx++] = d2_text[r * 2u + 1u];
+        output[idx++] = d2_text[(r * 2u) + 1u];
         output[idx++] = d2_text[r * 2u];
     }
     // Write the last two digits, skipping the second one if the current
     // remainder is not at least 10.
-    output[idx++] = d2_text[r * 2u + 1u];
+    output[idx++] = d2_text[(r * 2u) + 1u];
     if (r >= 10u) {
         output[idx++] = d2_text[r * 2u];
     }
