@@ -190,7 +190,7 @@ void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
             std::abort();
         }
         // LCOV_EXCL_STOP
-        const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
+        const auto nbits = static_cast<std::size_t>(static_cast<unsigned>(GMP_NUMB_BITS) * nlimbs);
         // LCOV_EXCL_START
         if (mppp_unlikely(nbits > nl_max<::mp_bitcnt_t>())) {
             std::abort();

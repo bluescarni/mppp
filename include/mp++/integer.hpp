@@ -1728,7 +1728,7 @@ private:
         // Add the other limbs, if any.
         constexpr unsigned u_bits = detail::nl_digits<T>();
         unsigned shift(GMP_NUMB_BITS);
-        for (std::size_t i = 1u; i < asize; ++i, shift += unsigned(GMP_NUMB_BITS)) {
+        for (std::size_t i = 1u; i < asize; ++i, shift += static_cast<unsigned>(GMP_NUMB_BITS)) {
             if (shift >= u_bits) {
                 // We need to shift left the current limb. If the shift is too large, we run into UB
                 // and it also means that the value does not fit in T.
@@ -1988,7 +1988,8 @@ public:
         // LCOV_EXCL_STOP
         // Index of the most significant limb.
         const std::size_t idx = ls - 1u;
-        return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS) + detail::limb_size_nbits(lptr[idx]));
+        return static_cast<std::size_t>(idx * static_cast<unsigned>(GMP_NUMB_BITS)
+                                        + detail::limb_size_nbits(lptr[idx]));
     }
     // Size in limbs.
     [[nodiscard]] std::size_t size() const
@@ -2063,10 +2064,11 @@ public:
             if (SSize <= s_storage::opt_size) {
                 // NOTE: when SSize is an optimised size, we can be sure the first limb
                 // has been zeroed even if the value of the integer is zero.
-                return (m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1);
+                return (m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & static_cast<::mp_limb_t>(1);
             } else {
                 // Otherwise, we add an extra check for zero.
-                return m_int.g_st()._mp_size && ((m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1));
+                return m_int.g_st()._mp_size
+                       && ((m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & static_cast<::mp_limb_t>(1));
             }
         }
         return mpz_odd_p(&m_int.g_dy());
@@ -2661,8 +2663,10 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // possibility of recovering. The alternative would be to do the computation in some local buffer and then
     // copy it out, but that is rather costly. Note that this means that in principle a computation that could fit in
     // static storage ends up triggering a promotion.
-    const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-    const bool c2 = std::size_t(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c1
+        = static_cast<std::size_t>(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c2
+        = static_cast<std::size_t>(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
     if (mppp_unlikely(c1 || c2)) {
         return false;
     }
@@ -2981,7 +2985,8 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
     }
     // This is the same overflow check as in static_addsub(). As in static_addsub(), this is not as tight/precise
     // as it could be.
-    const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c1
+        = static_cast<std::size_t>(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
     const bool c2 = SSize == 1u && (l2 >> (GMP_NUMB_BITS - 1));
     if (mppp_unlikely(c1 || c2)) {
         return false;
@@ -3378,10 +3383,10 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         hi = mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
     }
     // The actual size.
-    const std::size_t asize = max_asize - unsigned(hi == 0u);
+    const std::size_t asize = max_asize - static_cast<unsigned>(hi == 0u);
     if (res_data == rdata) {
         // If we wrote directly into rop, it means that we had enough storage in it to begin with.
-        rop._mp_size = mpz_size_t(asize);
+        rop._mp_size = static_cast<mpz_size_t>(asize);
         if (sign1 != sign2) {
             rop._mp_size = -rop._mp_size;
         }
@@ -3393,7 +3398,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         return asize;
     }
     // Enough space, set size and copy limbs.
-    rop._mp_size = mpz_size_t(asize);
+    rop._mp_size = static_cast<mpz_size_t>(asize);
     if (sign1 != sign2) {
         rop._mp_size = -rop._mp_size;
     }
@@ -3413,7 +3418,7 @@ inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 
 inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 {
-    const dlimb_t res = dlimb_t(op1) * op2;
+    const dlimb_t res = static_cast<dlimb_t>(op1) * op2;
     *hi = static_cast<::mp_limb_t>(res >> GMP_NUMB_BITS);
     return static_cast<::mp_limb_t>(res);
 }
@@ -3473,7 +3478,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         const auto cy = limb_add_overflow(cb_lo, ca_hi, &tmp1);
         tmp2 = cb_hi + cy;
         // Now determine the size. asize must be at least 2.
-        const mpz_size_t asize = 2 + mpz_size_t(tmp2 != 0u);
+        const mpz_size_t asize = 2 + static_cast<mpz_size_t>(tmp2 != 0u);
         if (asize == 2) {
             // Size is good, write out the result.
             rop._mp_size = sign1 * sign2 * asize;
@@ -3597,7 +3602,8 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
 
     // Optimise the case in which the addition can be performed
     // via the signed counterpart of mp_limb_t.
-    if (rlimb < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && prod < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2))) {
+    if (rlimb < (static_cast<::mp_limb_t>(1) << (GMP_NUMB_BITS - 2))
+        && prod < (static_cast<::mp_limb_t>(1) << (GMP_NUMB_BITS - 2))) {
         const auto x = make_signed(rlimb, signr);
         const auto y = make_signed(prod, sign_prod);
 
@@ -3818,7 +3824,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
     }
     // ls: number of entire limbs shifted.
     // rs: effective shift that will be passed to the mpn function.
-    const std::size_t ls = s / unsigned(GMP_NUMB_BITS), rs = s % unsigned(GMP_NUMB_BITS);
+    const std::size_t ls = s / static_cast<unsigned>(GMP_NUMB_BITS), rs = s % static_cast<unsigned>(GMP_NUMB_BITS);
     // At the very minimum, the new asize will be the old asize plus ls.
     // Check if we can represent it first.
     // NOTE: use >= because we may need to increase by 1 new_asize at the end, as a size hint.
@@ -3835,7 +3841,8 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
         if (rs) {
             // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
             // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() + ls >= n.m_limbs.data().
-            ret = mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs));
+            ret = mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize),
+                             static_cast<unsigned>(rs));
             // Write bits spilling out.
             rop.m_limbs[new_asize] = ret;
         } else {
@@ -3848,7 +3855,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
         }
         // Zero the lower limbs vacated by the shift. We need to do this as we don't know
         // the state of rop.
-        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
+        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, static_cast<::mp_limb_t>(0));
         // Set the size.
         rop._mp_size = sign * (static_cast<mpz_size_t>(new_asize) + (ret != 0u));
         return 0u;
@@ -3858,7 +3865,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
             // In this case the operation may fail, so we need to write to temporary storage.
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, SSize> tmp;
-            if (mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
+            if (mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), static_cast<unsigned>(rs))) {
                 return SSize + 1u;
             }
             // The shift was successful without spill over, copy the content from the tmp
@@ -3870,7 +3877,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
             std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
         }
         // Zero the lower limbs vacated by the shift.
-        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
+        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, static_cast<::mp_limb_t>(0));
         // Set the size.
         rop._mp_size = sign * static_cast<mpz_size_t>(new_asize);
         return 0u;
@@ -3899,7 +3906,7 @@ inline std::size_t static_mul_2exp(static_int<1> &rop, const static_int<1> &n, s
         // limbs add to the current size (1), +1 because another limb might be needed.
         // NOTE: paranoia static assert to make sure there's no chance of overflowing.
         static_assert(GMP_NUMB_BITS > 1, "Invalid number of bits.");
-        return s / unsigned(GMP_NUMB_BITS) + 2u;
+        return s / static_cast<unsigned>(GMP_NUMB_BITS) + 2u;
     }
     // Write out.
     rop.m_limbs[0] = l << s;
@@ -3922,15 +3929,15 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
     }
     const int sign = integral_sign(n._mp_size);
     // Too much shift, this can never work on a nonzero value.
-    static_assert(unsigned(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
+    static_assert(static_cast<unsigned>(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
     if (mppp_unlikely(s >= 2u * unsigned(GMP_NUMB_BITS))) {
         // NOTE: this is the generic formula to estimate the final size.
         // NOTE: paranoia static assert to make sure there's no chance of overflowing.
         static_assert(GMP_NUMB_BITS > 1, "Invalid number of bits.");
         // NOTE: asize is 2 at most, no need to check for overflow.
-        return s / unsigned(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
+        return s / static_cast<unsigned>(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
     }
-    if (s == unsigned(GMP_NUMB_BITS)) {
+    if (s == static_cast<unsigned>(GMP_NUMB_BITS)) {
         // This case can be dealt with moving lo into hi, but only if asize is 1.
         if (mppp_unlikely(asize == 2)) {
             // asize is 2, shift is too much.
@@ -3944,15 +3951,15 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
     }
     // Temp hi lo limbs to store the result that will eventually go into rop.
     ::mp_limb_t lo = n.m_limbs[0u], hi = n.m_limbs[1u];
-    if (s > unsigned(GMP_NUMB_BITS)) {
+    if (s > static_cast<unsigned>(GMP_NUMB_BITS)) {
         if (mppp_unlikely(asize == 2)) {
-            return s / unsigned(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
+            return s / static_cast<unsigned>(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
         }
         // Move lo to hi and set lo to zero.
         hi = n.m_limbs[0u];
         lo = 0u;
         // Update the shift.
-        s = static_cast<std::size_t>(s - unsigned(GMP_NUMB_BITS));
+        s = static_cast<std::size_t>(s - static_cast<unsigned>(GMP_NUMB_BITS));
     }
     // Check that hi will not be shifted too much. Note that
     // here and below s can never be zero, so we never shift too much.
@@ -3961,7 +3968,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
         return 3u;
     }
     // Shift hi and lo. hi gets the carry over from lo.
-    hi = ((hi & GMP_NUMB_MASK) << s) + ((lo & GMP_NUMB_MASK) >> (unsigned(GMP_NUMB_BITS) - s));
+    hi = ((hi & GMP_NUMB_MASK) << s) + ((lo & GMP_NUMB_MASK) >> (static_cast<unsigned>(GMP_NUMB_BITS) - s));
     // NOTE: here the result needs to be masked as well as the shift could
     // end up writing in nail bits.
     lo = ((lo & GMP_NUMB_MASK) << s) & GMP_NUMB_MASK;
@@ -4269,7 +4276,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
 
 inline ::mp_limb_t static_sqrm_impl_1(::mp_limb_t op, ::mp_limb_t mod)
 {
-    return static_cast<::mp_limb_t>((dlimb_t(op) * op) % mod);
+    return static_cast<::mp_limb_t>((static_cast<dlimb_t>(op) * op) % mod);
 }
 
 #endif
@@ -4436,12 +4443,12 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
-        r.m_limbs[0]
-            = mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        r.m_limbs[0] = mpn_divrem_1(q.m_limbs.data(), static_cast<::mp_size_t>(0), data1,
+                                    static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
         // General implementation.
-        mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
-                    static_cast<::mp_size_t>(asize2));
+        mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), static_cast<::mp_size_t>(0), data1,
+                    static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
     }
     // Complete the quotient: compute size and sign.
     q._mp_size = asize1 - asize2 + 1;
@@ -4492,12 +4499,12 @@ inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, 
                           ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
                           ::mp_limb_t *MPPP_RESTRICT r2)
 {
-    const auto op1 = op11 + (dlimb_t(op12) << GMP_NUMB_BITS);
-    const auto op2 = op21 + (dlimb_t(op22) << GMP_NUMB_BITS);
+    const auto op1 = op11 + (static_cast<dlimb_t>(op12) << GMP_NUMB_BITS);
+    const auto op2 = op21 + (static_cast<dlimb_t>(op22) << GMP_NUMB_BITS);
     const auto q = op1 / op2, r = op1 % op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q1 = static_cast<::mp_limb_t>(q & static_cast<::mp_limb_t>(-1));
     *q2 = static_cast<::mp_limb_t>(q >> GMP_NUMB_BITS);
-    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+    *r1 = static_cast<::mp_limb_t>(r & static_cast<::mp_limb_t>(-1));
     *r2 = static_cast<::mp_limb_t>(r >> GMP_NUMB_BITS);
 }
 
@@ -4505,10 +4512,10 @@ inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, 
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    const auto op1 = op11 + (dlimb_t(op12) << GMP_NUMB_BITS);
-    const auto op2 = op21 + (dlimb_t(op22) << GMP_NUMB_BITS);
+    const auto op1 = op11 + (static_cast<dlimb_t>(op12) << GMP_NUMB_BITS);
+    const auto op2 = op21 + (static_cast<dlimb_t>(op22) << GMP_NUMB_BITS);
     const auto q = op1 / op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q1 = static_cast<::mp_limb_t>(q & static_cast<::mp_limb_t>(-1));
     *q2 = static_cast<::mp_limb_t>(q >> GMP_NUMB_BITS);
 }
 
@@ -4636,13 +4643,13 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
-        mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        mpn_divrem_1(q.m_limbs.data(), static_cast<::mp_size_t>(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> r_unused;
         // General implementation.
-        mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
-                    static_cast<::mp_size_t>(asize2));
+        mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), static_cast<::mp_size_t>(0), data1,
+                    static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
     }
     // Complete the quotient: compute size and sign.
     q._mp_size = asize1 - asize2 + 1;
@@ -4942,7 +4949,7 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
     }
     // ls: number of entire limbs shifted.
     // rs: effective shift that will be passed to the mpn function.
-    const auto ls = s / unsigned(GMP_NUMB_BITS), rs = s % unsigned(GMP_NUMB_BITS);
+    const auto ls = s / static_cast<unsigned>(GMP_NUMB_BITS), rs = s % static_cast<unsigned>(GMP_NUMB_BITS);
     if (ls >= static_cast<std::size_t>(asize)) {
         // If we shift by a number of entire limbs equal to or larger than the asize,
         // the result will be zero.
@@ -4954,7 +4961,8 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
     if (rs) {
         // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
         // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() <= n.m_limbs.data() + ls.
-        mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
+        mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize),
+                   static_cast<unsigned>(rs));
     } else {
         // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
         // NOTE: std::move requires that the destination iterator is not within the input range.
@@ -4975,7 +4983,7 @@ inline void static_tdiv_q_2exp(static_int<1> &rop, const static_int<1> &n, ::mp_
         rop = n;
         return;
     }
-    if (s >= unsigned(GMP_NUMB_BITS)) {
+    if (s >= static_cast<unsigned>(GMP_NUMB_BITS)) {
         // We are shifting by the limb's bit size or greater, the result will be zero.
         rop._mp_size = 0;
         rop.m_limbs[0] = 0u;
@@ -5002,17 +5010,17 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
         sign = -1;
     }
     // If shift is too large, zero the result and return.
-    static_assert(unsigned(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
-    if (s >= 2u * unsigned(GMP_NUMB_BITS)) {
+    static_assert(static_cast<unsigned>(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
+    if (s >= 2u * static_cast<unsigned>(GMP_NUMB_BITS)) {
         rop._mp_size = 0;
         rop.m_limbs[0u] = 0u;
         rop.m_limbs[1u] = 0u;
         return;
     }
-    if (s >= unsigned(GMP_NUMB_BITS)) {
+    if (s >= static_cast<unsigned>(GMP_NUMB_BITS)) {
         // NOTE: here the effective shift < GMP_NUMB_BITS, otherwise it would have been caught
         // in the check above.
-        const auto lo = (n.m_limbs[1u] & GMP_NUMB_MASK) >> (s - unsigned(GMP_NUMB_BITS));
+        const auto lo = (n.m_limbs[1u] & GMP_NUMB_MASK) >> (s - static_cast<unsigned>(GMP_NUMB_BITS));
         // The size could be zero or +-1, depending
         // on the new content of m_limbs[0] and the previous
         // sign of _mp_size.
@@ -5025,13 +5033,13 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
     // This represents the bits in hi that will be shifted down into lo.
     // We move them up so we can add tmp to the new lo to account for them.
     // NOTE: mask the final result to avoid spillover into potential nail bits.
-    const auto tmp = ((n.m_limbs[1u] & GMP_NUMB_MASK) << (unsigned(GMP_NUMB_BITS) - s)) & GMP_NUMB_MASK;
+    const auto tmp = ((n.m_limbs[1u] & GMP_NUMB_MASK) << (static_cast<unsigned>(GMP_NUMB_BITS) - s)) & GMP_NUMB_MASK;
     rop.m_limbs[0u] = ((n.m_limbs[0u] & GMP_NUMB_MASK) >> s) + tmp;
     rop.m_limbs[1u] = (n.m_limbs[1u] & GMP_NUMB_MASK) >> s;
     // The effective shift was less than 1 entire limb. The new asize must be the old one,
     // or one less than that.
     // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    rop._mp_size = sign * (asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u));
+    rop._mp_size = sign * (asize - ((rop.m_limbs[static_cast<std::size_t>(asize - 1)] & GMP_NUMB_MASK) == 0u));
 }
 } // namespace detail
 
@@ -5112,10 +5120,12 @@ inline int static_cmp(const static_int<2> &n1, const static_int<2> &n2)
     auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
     while (asize != 0) {
         --asize;
-        if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) > (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+        if ((n1.m_limbs[static_cast<std::size_t>(asize)] & GMP_NUMB_MASK)
+            > (n2.m_limbs[static_cast<std::size_t>(asize)] & GMP_NUMB_MASK)) {
             return (n1._mp_size >= 0) ? 1 : -1;
         }
-        if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) < (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+        if ((n1.m_limbs[static_cast<std::size_t>(asize)] & GMP_NUMB_MASK)
+            < (n2.m_limbs[static_cast<std::size_t>(asize)] & GMP_NUMB_MASK)) {
             return (n1._mp_size >= 0) ? -1 : 1;
         }
     }
@@ -5208,7 +5218,7 @@ inline bool static_not_impl(static_int<2> &rop, const static_int<2> &op, mpz_siz
             // The static has the maximum possible value, NOT will overflow it.
             return false;
         }
-        const ::mp_limb_t new_lo = (lo + 1u) & GMP_NUMB_MASK, new_hi = hi + unsigned(lo == GMP_NUMB_MAX);
+        const ::mp_limb_t new_lo = (lo + 1u) & GMP_NUMB_MASK, new_hi = hi + static_cast<unsigned>(lo == GMP_NUMB_MAX);
         // asize can be -1 or -2, never zero.
         // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = -1 - (new_hi != 0u);
@@ -5216,7 +5226,7 @@ inline bool static_not_impl(static_int<2> &rop, const static_int<2> &op, mpz_siz
         rop.m_limbs[1] = new_hi;
         return true;
     }
-    const ::mp_limb_t new_lo = (lo - 1u) & GMP_NUMB_MASK, new_hi = hi - unsigned(lo == 0u);
+    const ::mp_limb_t new_lo = (lo - 1u) & GMP_NUMB_MASK, new_hi = hi - static_cast<unsigned>(lo == 0u);
     // Size could be 0, 1 or 2.
     rop._mp_size = size_from_lohi(new_lo, new_hi);
     rop.m_limbs[0] = new_lo;
@@ -5333,7 +5343,7 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
     // the two's complement to get its absolute value:
     // (0) ... 0 0 0 1 0 1
     // So the final result is -5.
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOTE: at least 1 of the operands is strictly negative, so the result
     // has to be negative as well (because of ORing the sign bits).
     rop._mp_size = -1;
@@ -5363,7 +5373,7 @@ inline void twosc(std::array<::mp_limb_t, 2> &arr, ::mp_limb_t lo, ::mp_limb_t h
 {
     assert(hi != 0u || lo != 0u);
     arr[0] = (~lo + 1u) & GMP_NUMB_MASK;
-    arr[1] = (~hi + unsigned(lo == 0u)) & GMP_NUMB_MASK;
+    arr[1] = (~hi + static_cast<unsigned>(lo == 0u)) & GMP_NUMB_MASK;
 }
 
 // 2-limbs implementation.
@@ -5380,7 +5390,7 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5485,7 +5495,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
         return;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5577,7 +5587,7 @@ inline bool static_and_impl(static_int<1> &rop, const static_int<1> &op1, const 
         rop.m_limbs[0] = ret;
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
@@ -5638,7 +5648,7 @@ inline bool static_and_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5720,7 +5730,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         rop._mp_size = compute_static_int_asize(rop, asize2);
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5830,7 +5840,7 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
         rop.m_limbs[0] = ret;
         return false;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
@@ -5892,7 +5902,7 @@ inline bool static_xor_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5975,7 +5985,7 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         rop._mp_size = compute_static_int_asize(rop, asize1);
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
