@@ -985,6 +985,8 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
         // Fix den sign.
         detail::fix_den_sign(rop);
         // Multiply by op1.
+        //
+        // NOLINTNEXTLINE(readability-suspicious-call-argument)
         mul(rop, rop, op1);
         return rop;
     }

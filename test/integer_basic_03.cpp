@@ -58,7 +58,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -176,7 +176,7 @@ struct fp_ass_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(fp_types{}, runner<S>{});
     }
@@ -255,7 +255,7 @@ struct complex_ass_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(complex_types{}, runner<S>{});
     }
@@ -268,7 +268,7 @@ TEST_CASE("complex assignment")
 
 struct mppp_ass_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         using rational = rational<S::value>;
@@ -388,6 +388,8 @@ struct string_ctor_tester {
         REQUIRE((integer{cs, cs + 4} == -123));
         std::string_view sv = "-1234";
         REQUIRE((integer{sv} == -1234));
+        // NOTE: a size is passed explicitly, the data() pointer is not used as a null-terminated string.
+        // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
         REQUIRE((integer{std::string_view{sv.data(), 4u}} == -123));
         sv = "0x7b";
         REQUIRE((integer{sv, 0} == 123));
@@ -460,24 +462,24 @@ struct mpz_move_ctor_tester {
         using integer = integer<S::value>;
         ::mpz_t m0;
         mpz_init(m0);
-        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
+        // NOLINTNEXTLINE(hicpp-move-const-arg,performance-move-const-arg,bugprone-use-after-move)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "0");
         mpz_init(m0);
         mpz_set_si(m0, 1234);
-        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
+        // NOLINTNEXTLINE(hicpp-move-const-arg,performance-move-const-arg,bugprone-use-after-move)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "1234");
         mpz_init(m0);
         mpz_set_si(m0, -1234);
-        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
+        // NOLINTNEXTLINE(hicpp-move-const-arg,performance-move-const-arg,bugprone-use-after-move)
         REQUIRE(lex_cast(integer{std::move(m0)}) == "-1234");
         mpz_init(m0);
         mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
-        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
+        // NOLINTNEXTLINE(hicpp-move-const-arg,performance-move-const-arg,bugprone-use-after-move)
         REQUIRE(lex_cast(integer{std::move(m0)})
                 == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
         mpz_init(m0);
         mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
-        // NOLINTNEXTLINE(hicpp-move-const-arg, performance-move-const-arg)
+        // NOLINTNEXTLINE(hicpp-move-const-arg,performance-move-const-arg,bugprone-use-after-move)
         REQUIRE(lex_cast(integer{std::move(m0)})
                 == "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
         // Random testing.
@@ -592,7 +594,7 @@ struct binary_s11n_tester {
 #endif
         std::vector<char> buffer;
         std::stringstream ss;
-        auto clear_ss = [&ss]() {
+        auto clear_ss = [&ss] {
             ss.clear();
             ss.str("");
         };
@@ -741,7 +743,7 @@ struct binary_s11n_tester {
         // Load into a static int a static value with topmost limb 0.
         n1 = integer{-1};
         size = 1;
-        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * unsigned(size)));
+        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * static_cast<unsigned>(size)));
         ::mp_limb_t l = 0;
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
@@ -758,12 +760,12 @@ struct binary_s11n_tester {
         // Load into a static int a dynamic value with topmost limb 0.
         n1 = integer{-1};
         size = static_cast<detail::mpz_size_t>(S::value + 1u);
-        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * unsigned(size)));
+        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * static_cast<unsigned>(size)));
         std::array<::mp_limb_t, S::value + 1u> sbuffer{{}};
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
-                  reinterpret_cast<char *>(sbuffer.data()) + (sizeof(::mp_limb_t) * unsigned(size)),
+                  reinterpret_cast<char *>(sbuffer.data()) + (sizeof(::mp_limb_t) * static_cast<unsigned>(size)),
                   detail::make_uai(buffer.data() + sizeof(size)));
         REQUIRE_THROWS_PREDICATE(
             n1.binary_load(buffer.data()), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -777,7 +779,7 @@ struct binary_s11n_tester {
         n1 = integer{-1};
         n1.promote();
         size = 1;
-        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * unsigned(size)));
+        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * static_cast<unsigned>(size)));
         l = 0;
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
@@ -795,12 +797,12 @@ struct binary_s11n_tester {
         n1 = integer{-1};
         n1.promote();
         size = static_cast<detail::mpz_size_t>(S::value + 1u);
-        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * unsigned(size)));
+        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * static_cast<unsigned>(size)));
         sbuffer = std::array<::mp_limb_t, S::value + 1u>{{}};
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
-                  reinterpret_cast<char *>(sbuffer.data()) + (sizeof(::mp_limb_t) * unsigned(size)),
+                  reinterpret_cast<char *>(sbuffer.data()) + (sizeof(::mp_limb_t) * static_cast<unsigned>(size)),
                   detail::make_uai(buffer.data() + sizeof(size)));
         REQUIRE_THROWS_PREDICATE(
             n1.binary_load(buffer.data()), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -923,4 +925,4 @@ TEST_CASE("boost_s11n")
 
 #endif
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

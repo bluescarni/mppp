@@ -25,7 +25,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -271,7 +271,7 @@ struct div_tester {
                 REQUIRE((std::is_same<double &, decltype(x /= rational{-4})>::value));
                 REQUIRE((std::abs(-2. - x) < 1E-8));
                 x /= rational{-5, 2};
-                REQUIRE((std::abs(4. / 5 - x) < 1E-8));
+                REQUIRE((std::abs((4. / 5) - x) < 1E-8));
                 REQUIRE_THROWS_PREDICATE(retval /= 0., std::domain_error, [](const std::domain_error &ex) {
                     return std::string(ex.what())
                            == "Cannot construct a rational from the non-finite floating-point value "
@@ -286,7 +286,7 @@ struct div_tester {
                 x /= rational{-5, 2};
                 REQUIRE((std::abs(-2.l - x) < 1E-8));
                 x /= rational{-5, 2};
-                REQUIRE((std::abs(4.l / 5 - x) < 1E-8));
+                REQUIRE((std::abs((4.l / 5) - x) < 1E-8));
             }
         }
 #endif
@@ -343,4 +343,4 @@ TEST_CASE("div")
     tuple_for_each(sizes{}, div_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

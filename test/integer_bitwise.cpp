@@ -20,7 +20,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -41,7 +41,7 @@ static std::mt19937 rng;
 struct ior_tester {
     template <typename S>
     // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
@@ -426,7 +426,7 @@ struct ior_tester {
             bitwise_ior(n1, n3, n2);
             mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
-            arr1 = {{0u, 0u, ::mp_limb_t{1} << (GMP_NUMB_BITS - 1)}};
+            arr1 = {{0u, 0u, ::mp_limb_t{1} << static_cast<unsigned>(GMP_NUMB_BITS - 1)}};
             n2 = integer{arr1.data(), 3};
             mpz_set(&m2.m_mpz, n2.get_mpz_view());
             bitwise_ior(n1, n2, n3);
@@ -480,7 +480,7 @@ struct ior_tester {
         n128 |= integer{-5};
         REQUIRE(n128 == -5);
         __uint128_t un128{25};
-        un128 |= 5;
+        un128 |= 5u;
         REQUIRE(un128 == 29);
 #endif
     }
@@ -493,7 +493,7 @@ TEST_CASE("integer ior")
 
 struct not_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
@@ -794,7 +794,7 @@ TEST_CASE("integer not")
 struct and_tester {
     template <typename S>
     // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
@@ -1207,7 +1207,7 @@ struct and_tester {
             bitwise_and(n1, n3, n2);
             mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
-            arr1 = {{0u, 0u, ::mp_limb_t{1} << (GMP_NUMB_BITS - 1)}};
+            arr1 = {{0u, 0u, ::mp_limb_t{1} << static_cast<unsigned>(GMP_NUMB_BITS - 1)}};
             n2 = integer{arr1.data(), 3};
             mpz_set(&m2.m_mpz, n2.get_mpz_view());
             bitwise_and(n1, n2, n3);
@@ -1275,7 +1275,7 @@ struct and_tester {
         n128 &= integer{-5};
         REQUIRE(n128 == 25);
         __uint128_t un128{25};
-        un128 &= 5;
+        un128 &= 5u;
         REQUIRE(un128 == 1);
 #endif
     }
@@ -1289,7 +1289,7 @@ TEST_CASE("integer and")
 struct xor_tester {
     template <typename S>
     // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
@@ -1452,7 +1452,7 @@ struct xor_tester {
             mpz_xor(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
             REQUIRE(n1 == (n3 ^ n2));
-            n2 = (~::mp_limb_t(2338848) + 1u) & GMP_NUMB_MASK;
+            n2 = (~static_cast<::mp_limb_t>(2338848) + 1u) & GMP_NUMB_MASK;
             n3 = -2338848ll;
             mpz_set(&m2.m_mpz, n2.get_mpz_view());
             mpz_set(&m3.m_mpz, n3.get_mpz_view());
@@ -1563,8 +1563,9 @@ struct xor_tester {
             mpz_xor(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
             REQUIRE(n1 == (n3 ^ n2));
-            n2 = (~::mp_limb_t(2338848) + (integer{~::mp_limb_t(2338848)} << GMP_NUMB_BITS) + 1u);
-            n3 = -(::mp_limb_t(2338848) + (integer{::mp_limb_t(2338848)} << GMP_NUMB_BITS));
+            n2 = (~static_cast<::mp_limb_t>(2338848) + (integer{~static_cast<::mp_limb_t>(2338848)} << GMP_NUMB_BITS)
+                  + 1u);
+            n3 = -(static_cast<::mp_limb_t>(2338848) + (integer{static_cast<::mp_limb_t>(2338848)} << GMP_NUMB_BITS));
             mpz_set(&m2.m_mpz, n2.get_mpz_view());
             mpz_set(&m3.m_mpz, n3.get_mpz_view());
             bitwise_xor(n1, n2, n3);
@@ -1736,7 +1737,7 @@ struct xor_tester {
             bitwise_xor(n1, n3, n2);
             mpz_xor(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
-            arr1 = {{0u, 0u, ::mp_limb_t{1} << (GMP_NUMB_BITS - 1)}};
+            arr1 = {{0u, 0u, ::mp_limb_t{1} << static_cast<unsigned>(GMP_NUMB_BITS - 1)}};
             n2 = integer{arr1.data(), 3};
             mpz_set(&m2.m_mpz, n2.get_mpz_view());
             bitwise_xor(n1, n2, n3);
@@ -1783,10 +1784,10 @@ struct xor_tester {
             mpz_xor(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
             REQUIRE(n1 == (n3 ^ n2));
-            n2 = (~::mp_limb_t(2338845) + (integer{~::mp_limb_t(2338848)} << GMP_NUMB_BITS)
-                  + (integer{~::mp_limb_t(23)} << (GMP_NUMB_BITS * 2)) + 1u);
-            n3 = -(::mp_limb_t(2338845) + (integer{::mp_limb_t(2338848)} << GMP_NUMB_BITS)
-                   + (integer{::mp_limb_t(23)} << (GMP_NUMB_BITS * 2)));
+            n2 = (~static_cast<::mp_limb_t>(2338845) + (integer{~static_cast<::mp_limb_t>(2338848)} << GMP_NUMB_BITS)
+                  + (integer{~static_cast<::mp_limb_t>(23)} << (GMP_NUMB_BITS * 2)) + 1u);
+            n3 = -(static_cast<::mp_limb_t>(2338845) + (integer{static_cast<::mp_limb_t>(2338848)} << GMP_NUMB_BITS)
+                   + (integer{static_cast<::mp_limb_t>(23)} << (GMP_NUMB_BITS * 2)));
             mpz_set(&m2.m_mpz, n2.get_mpz_view());
             mpz_set(&m3.m_mpz, n3.get_mpz_view());
             bitwise_xor(n1, n2, n3);
@@ -1822,7 +1823,7 @@ struct xor_tester {
         n128 ^= integer{-5};
         REQUIRE(n128 == -30);
         __uint128_t un128{25};
-        un128 ^= 5;
+        un128 ^= 5u;
         REQUIRE(un128 == 28);
 #endif
     }
@@ -1833,4 +1834,4 @@ TEST_CASE("integer xor")
     tuple_for_each(sizes{}, xor_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

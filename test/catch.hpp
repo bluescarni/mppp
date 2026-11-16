@@ -161,7 +161,13 @@ namespace Catch {
 // ```
 //
 // Therefore, `CATCH_INTERNAL_IGNORE_BUT_WARN` is not implemented.
-#  if !defined(__ibmxl__) && !defined(__CUDACC__)
+//
+// NOTE (mp++ local patch): also disabled under clang-tidy/the clang static analyzer
+// (__clang_analyzer__). The analyzer treats the never-evaluated copy of the REQUIRE()
+// expression inside __builtin_constant_p() as a real evaluation, which produces spurious
+// moved-from warnings for expressions such as REQUIRE(f(std::move(x)) == ...). The empty
+// fallback definition of CATCH_INTERNAL_IGNORE_BUT_WARN further below is used instead.
+#  if !defined(__ibmxl__) && !defined(__CUDACC__) && !defined(__clang_analyzer__)
 #    define CATCH_INTERNAL_IGNORE_BUT_WARN(...) (void)__builtin_constant_p(__VA_ARGS__) /* NOLINT(cppcoreguidelines-pro-type-vararg, hicpp-vararg) */
 #  endif
 

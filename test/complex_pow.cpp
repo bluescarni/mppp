@@ -27,7 +27,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -236,14 +236,14 @@ TEST_CASE("pow")
         REQUIRE(mppp::pow(c, __uint128_t(-1)) == 0);
         REQUIRE(mppp::pow(c, __uint128_t(-1)).get_prec() == 128);
 
-        ret = mppp::pow(std::move(c), __uint128_t(-1));
+        ret = mppp::pow(std::move(c), static_cast<__uint128_t>(-1));
         REQUIRE(ret == 0);
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c.is_valid());
 
         c = complex{0, complex_prec_t(256)};
-        ret = mppp::pow(std::move(c), __uint128_t(-1));
+        ret = mppp::pow(std::move(c), static_cast<__uint128_t>(-1));
         REQUIRE(ret == 0);
         REQUIRE(ret.get_prec() == 256);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
@@ -291,7 +291,7 @@ TEST_CASE("pow")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Try large value.
         c = complex{0, complex_prec_t(64)};
-        auto big_n = __int128_t(1) << 87;
+        auto big_n = static_cast<__int128_t>(1) << 87;
         REQUIRE(mppp::pow(c, big_n) == 0);
         REQUIRE(mppp::pow(c, big_n).get_prec() == 128);
 
@@ -607,4 +607,4 @@ TEST_CASE("pow")
     }
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

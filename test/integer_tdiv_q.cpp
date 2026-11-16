@@ -17,7 +17,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -37,7 +37,7 @@ static std::mt19937 rng;
 
 struct tdiv_q_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         detail::mpz_raii m1, m3, m4;
@@ -72,7 +72,7 @@ struct tdiv_q_tester {
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 // Helper to generate randomly dividend and divisor.
-                auto random_34 = [&]() {
+                auto random_34 = [&] {
                     random_integer(tmp, x, rng);
                     mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = &tmp.m_mpz;
@@ -85,6 +85,7 @@ struct tdiv_q_tester {
                         n3.promote();
                     }
                     // Make sure divisor is not zero.
+                    // NOLINTNEXTLINE(cppcoreguidelines-avoid-do-while)
                     do {
                         random_integer(tmp, y, rng);
                         mpz_set(&m4.m_mpz, &tmp.m_mpz);
@@ -170,4 +171,4 @@ TEST_CASE("tdiv_q")
     tuple_for_each(sizes{}, tdiv_q_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

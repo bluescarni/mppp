@@ -26,7 +26,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -1026,7 +1026,7 @@ TEST_CASE("cmp")
         constexpr bool b0 = complex128{45, 0} == 45;
         constexpr bool b1 = complex128{45, 0} != 45ull;
         constexpr bool b0a = 45l == complex128{45, 0};
-        constexpr bool b1a = short(45) != complex128{45, 0};
+        constexpr bool b1a = static_cast<short>(45) != complex128{45, 0};
         REQUIRE(b0);
         REQUIRE(!b1);
         REQUIRE(b0a);
@@ -1041,9 +1041,9 @@ TEST_CASE("cmp")
         REQUIRE(!b2a);
         REQUIRE(b3a);
 
-        constexpr bool b4 = complex128{45, 1} == char(45);
+        constexpr bool b4 = complex128{45, 1} == static_cast<char>(45);
         constexpr bool b5 = complex128{45, 1} != 45u;
-        constexpr bool b4a = char(45) == complex128{45, 1};
+        constexpr bool b4a = static_cast<char>(45) == complex128{45, 1};
         constexpr bool b5a = 45u != complex128{45, 1};
         REQUIRE(!b4);
         REQUIRE(b5);
@@ -1164,4 +1164,4 @@ TEST_CASE("cmp")
     }
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

@@ -32,7 +32,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -130,7 +130,7 @@ struct add_tester {
         REQUIRE((lex_cast(retval) == "2"));
         retval += 1;
         REQUIRE((lex_cast(retval) == "3"));
-        retval += short(-1);
+        retval += static_cast<short>(-1);
         REQUIRE((lex_cast(retval) == "2"));
         retval += static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "1"));
@@ -194,12 +194,12 @@ struct add_tester {
                 });
         }
         // In-place with interop on the lhs.
-        short nl = 1;
-        nl += integer{1};
-        REQUIRE((std::is_same<short &, decltype(nl += integer{1})>::value));
-        REQUIRE(nl == 2);
-        nl += integer{-3};
-        REQUIRE(nl == -1);
+        short cpp_n = 1;
+        cpp_n += integer{1};
+        REQUIRE((std::is_same<short &, decltype(cpp_n += integer{1})>::value));
+        REQUIRE(cpp_n == 2);
+        cpp_n += integer{-3};
+        REQUIRE(cpp_n == -1);
         unsigned long long unl = 1;
         unl += integer{1};
         REQUIRE(unl == 2);
@@ -394,7 +394,7 @@ struct sub_tester {
         REQUIRE((lex_cast(retval) == "0"));
         retval -= 1;
         REQUIRE((lex_cast(retval) == "-1"));
-        retval -= short(-1);
+        retval -= static_cast<short>(-1);
         REQUIRE((lex_cast(retval) == "0"));
         retval -= static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "1"));
@@ -470,12 +470,12 @@ struct sub_tester {
         // in GCC perhaps related to all the union shenanigans going
         // on in the implementation of the integer class, but pinning
         // this down could be a major time sink...
-        int nl = 1;
-        nl -= integer{1};
-        REQUIRE((std::is_same<int &, decltype(nl -= integer{1})>::value));
-        REQUIRE(nl == 0);
-        nl -= integer{-3};
-        REQUIRE(nl == 3);
+        int cpp_n = 1;
+        cpp_n -= integer{1};
+        REQUIRE((std::is_same<int &, decltype(cpp_n -= integer{1})>::value));
+        REQUIRE(cpp_n == 0);
+        cpp_n -= integer{-3};
+        REQUIRE(cpp_n == 3);
         unsigned long long unl = 1;
         unl -= integer{1};
         REQUIRE(unl == 0);
@@ -662,7 +662,7 @@ struct mul_tester {
         REQUIRE((lex_cast(retval) == "1"));
         retval *= 1;
         REQUIRE((lex_cast(retval) == "1"));
-        retval *= short(-1);
+        retval *= static_cast<short>(-1);
         REQUIRE((lex_cast(retval) == "-1"));
         retval *= static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "1"));
@@ -726,12 +726,12 @@ struct mul_tester {
                 });
         }
         // In-place with interop on the lhs.
-        short nl = 1;
-        nl *= integer{3};
-        REQUIRE((std::is_same<short &, decltype(nl *= integer{1})>::value));
-        REQUIRE(nl == 3);
-        nl *= integer{-3};
-        REQUIRE(nl == -9);
+        short cpp_n = 1;
+        cpp_n *= integer{3};
+        REQUIRE((std::is_same<short &, decltype(cpp_n *= integer{1})>::value));
+        REQUIRE(cpp_n == 3);
+        cpp_n *= integer{-3};
+        REQUIRE(cpp_n == -9);
         unsigned long long unl = 1;
         unl *= integer{2};
         REQUIRE(unl == 2);
@@ -793,7 +793,7 @@ TEST_CASE("mul")
     tuple_for_each(sizes{}, mul_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #if defined(_MSC_VER)
 

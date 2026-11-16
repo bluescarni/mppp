@@ -40,7 +40,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -478,7 +478,7 @@ TEST_CASE("real constructors")
     REQUIRE(mpfr_cmp_si((real{-int_t{42}}).get_mpfr_t(), -42l) == 0);
     REQUIRE(real{int_t{-42}}.get_prec() == GMP_NUMB_BITS);
     real r0{int_t{42} << GMP_NUMB_BITS};
-    REQUIRE(r0.get_prec() == 2 * GMP_NUMB_BITS);
+    REQUIRE(r0.get_prec() == 2 * static_cast<::mpfr_prec_t>(GMP_NUMB_BITS));
     real tmp{42};
     ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
@@ -883,7 +883,7 @@ TEST_CASE("real assignment")
     REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
     REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
     r8 = int_t{42} << GMP_NUMB_BITS;
-    REQUIRE(r8.get_prec() == 2 * GMP_NUMB_BITS);
+    REQUIRE(r8.get_prec() == 2 * static_cast<::mpfr_prec_t>(GMP_NUMB_BITS));
     real tmp{42};
     ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
     REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r8.get_mpfr_t())));
@@ -967,7 +967,7 @@ TEST_CASE("real assignment")
     REQUIRE(r8.get_prec() == 115);
     REQUIRE(mpfr_cmp_ui((r8).get_mpfr_t(), 12ul) == 0);
     r8.set_prec(116);
-    r8.set(short(-42));
+    r8.set(static_cast<short>(-42));
     REQUIRE(r8.get_prec() == 116);
     REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
     r8.set_prec(26);
@@ -1694,7 +1694,7 @@ TEST_CASE("real mt cleanup")
     // should print, in debug mode, the cleanup message
     // once for each thread.
     std::atomic<unsigned> counter(0);
-    auto func = [&counter]() {
+    auto func = [&counter] {
         ++counter;
         while (counter.load() != 4u) {
         }
@@ -1758,4 +1758,4 @@ TEST_CASE("prec_to_nlimbs failure")
                                    + " was passed to prec_to_nlimbs()"));
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

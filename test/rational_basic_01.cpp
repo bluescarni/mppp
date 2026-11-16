@@ -45,7 +45,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -120,7 +120,7 @@ struct int_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(int_types{}, runner<S>{});
         using rational = rational<S::value>;
@@ -293,7 +293,7 @@ struct fp_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(fp_types{}, runner<S>{});
     }
@@ -386,7 +386,7 @@ struct complex_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(complex_types{}, runner<S>{});
     }
@@ -482,6 +482,8 @@ struct string_ctor_tester {
         REQUIRE((rational{cs, cs + 8} == rational{-617, 17}));
         std::string_view sv = "-1234/345";
         REQUIRE((rational{sv} == rational{-1234, 345}));
+        // NOTE: a size is passed explicitly, the data() pointer is not used as a null-terminated string.
+        // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
         REQUIRE((rational{std::string_view{sv.data(), 8u}} == rational{-617, 17}));
         sv = "0x7b";
         REQUIRE((rational{sv, 0} == 123));
@@ -925,4 +927,4 @@ TEST_CASE("copy and move")
     tuple_for_each(sizes{}, copy_move_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

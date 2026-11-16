@@ -41,7 +41,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -76,6 +76,7 @@ constexpr auto test_constexpr_cpp_complex_assignment(const std::complex<double> 
     return c2;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr auto test_constexpr_setters1(double re, double im)
 {
     complex128 c2{};
@@ -84,6 +85,7 @@ constexpr auto test_constexpr_setters1(double re, double im)
     return c2;
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr auto test_constexpr_setters2(double re, double im)
 {
     complex128 c2{};
@@ -136,7 +138,7 @@ TEST_CASE("basic constructors")
 #endif
 
     // Binary generic ctor.
-    constexpr complex128 c7{4, char(5)};
+    constexpr complex128 c7{4, static_cast<char>(5)};
     REQUIRE(c7.m_value == cplex128{4, 5});
     constexpr complex128 c8{-4., -5.f};
     REQUIRE(c8.m_value == cplex128{-4, -5});
@@ -879,4 +881,4 @@ TEST_CASE("boost_s11n")
 
 #endif
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

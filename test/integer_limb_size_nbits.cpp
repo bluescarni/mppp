@@ -11,7 +11,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -36,14 +36,14 @@ TEST_CASE("limb_size_nbits")
     REQUIRE(static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2)) == 2u);
     l = 4;
     REQUIRE(static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2)) == 3u);
-    l = ::mp_limb_t(1) << (GMP_NUMB_BITS - 1);
+    l = static_cast<::mp_limb_t>(1) << (GMP_NUMB_BITS - 1);
     REQUIRE(static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2)) == GMP_NUMB_BITS);
     l += 1;
     REQUIRE(static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2)) == GMP_NUMB_BITS);
-    l = ::mp_limb_t(1) << (GMP_NUMB_BITS - 2);
+    l = static_cast<::mp_limb_t>(1) << (GMP_NUMB_BITS - 2);
     REQUIRE(static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2)) == GMP_NUMB_BITS - 1);
     l += 1;
     REQUIRE(static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2)) == GMP_NUMB_BITS - 1);
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

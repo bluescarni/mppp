@@ -28,7 +28,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -266,26 +266,26 @@ TEST_CASE("binary plus")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Try with a large integral.
         c1 = c2;
-        ret = __uint128_t(-1) + std::move(c1);
+        ret = static_cast<__uint128_t>(-1) + std::move(c1);
         REQUIRE(ret == complex{1_z1 + __uint128_t(-1), 1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
-        ret = __uint128_t(-1) + std::move(c1);
+        ret = static_cast<__uint128_t>(-1) + std::move(c1);
         REQUIRE(ret == complex{1_z1 + __uint128_t(-1), 1, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
-        ret = std::move(c1) + __uint128_t(-1);
+        ret = std::move(c1) + static_cast<__uint128_t>(-1);
         REQUIRE(ret == complex{1_z1 + __uint128_t(-1), 1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
-        ret = std::move(c1) + __uint128_t(-1);
+        ret = std::move(c1) + static_cast<__uint128_t>(-1);
         REQUIRE(ret == complex{1_z1 + __uint128_t(-1), 1, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
@@ -537,13 +537,13 @@ TEST_CASE("in-place plus")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Test with large unsigned integral type.
         c1 = complex{1, 0, complex_prec_t(real_prec_min())};
-        c1 += __uint128_t(-1);
+        c1 += static_cast<__uint128_t>(-1);
         REQUIRE(std::is_same<complex &, decltype(c1 += __uint128_t(-1))>::value);
         REQUIRE(c1 == 1_z1 + __uint128_t(-1));
         REQUIRE(c1.get_prec() == 128);
 
         c1 = complex{1, 0, complex_prec_t(256)};
-        c1 += __uint128_t(-1);
+        c1 += static_cast<__uint128_t>(-1);
         REQUIRE(c1 == 1_z1 + __uint128_t(-1));
         REQUIRE(c1.get_prec() == 256);
 #endif
@@ -928,26 +928,26 @@ TEST_CASE("binary minus")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Try with a large integral.
         c1 = c2;
-        ret = __uint128_t(-1) - std::move(c1);
+        ret = static_cast<__uint128_t>(-1) - std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1) - 1u, -1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
-        ret = __uint128_t(-1) - std::move(c1);
+        ret = static_cast<__uint128_t>(-1) - std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1) - 1u, -1, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
-        ret = std::move(c1) - __uint128_t(-1);
+        ret = std::move(c1) - static_cast<__uint128_t>(-1);
         REQUIRE(ret == complex{1_z1 - __uint128_t(-1), 1, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
-        ret = std::move(c1) - __uint128_t(-1);
+        ret = std::move(c1) - static_cast<__uint128_t>(-1);
         REQUIRE(ret == complex{1_z1 - __uint128_t(-1), 1, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
@@ -1199,13 +1199,13 @@ TEST_CASE("in-place minus")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Test with large unsigned integral type.
         c1 = complex{1, 0, complex_prec_t(real_prec_min())};
-        c1 -= __uint128_t(-1);
+        c1 -= static_cast<__uint128_t>(-1);
         REQUIRE(std::is_same<complex &, decltype(c1 -= __uint128_t(-1))>::value);
         REQUIRE(c1 == 1_z1 - __uint128_t(-1));
         REQUIRE(c1.get_prec() == 128);
 
         c1 = complex{1, 0, complex_prec_t(256)};
-        c1 -= __uint128_t(-1);
+        c1 -= static_cast<__uint128_t>(-1);
         REQUIRE(c1 == 1_z1 - __uint128_t(-1));
         REQUIRE(c1.get_prec() == 256);
 #endif
@@ -1558,26 +1558,26 @@ TEST_CASE("binary mul")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Try with a large integral.
         c1 = c2;
-        ret = __uint128_t(-1) * std::move(c1);
+        ret = static_cast<__uint128_t>(-1) * std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1), __uint128_t(-1), complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
-        ret = __uint128_t(-1) * std::move(c1);
+        ret = static_cast<__uint128_t>(-1) * std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1), __uint128_t(-1), complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = c2;
-        ret = std::move(c1) * __uint128_t(-1);
+        ret = std::move(c1) * static_cast<__uint128_t>(-1);
         REQUIRE(ret == complex{__uint128_t(-1), __uint128_t(-1), complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, 1, complex_prec_t(129)};
-        ret = std::move(c1) * __uint128_t(-1);
+        ret = std::move(c1) * static_cast<__uint128_t>(-1);
         REQUIRE(ret == complex{__uint128_t(-1), __uint128_t(-1), complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
@@ -1635,7 +1635,7 @@ TEST_CASE("binary mul")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Try with a large integral.
         c1 = c2;
-        const auto big_n = -(__int128_t(1) << 86);
+        const auto big_n = -(static_cast<__int128_t>(1) << 86);
         ret = big_n * std::move(c1);
         REQUIRE(ret == complex{big_n, big_n, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
@@ -1933,13 +1933,13 @@ TEST_CASE("in-place mul")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Test with large unsigned integral type.
         c1 = complex{1, 0, complex_prec_t(real_prec_min())};
-        c1 *= __uint128_t(-1);
+        c1 *= static_cast<__uint128_t>(-1);
         REQUIRE(std::is_same<complex &, decltype(c1 *= __uint128_t(-1))>::value);
         REQUIRE(c1 == 1_z1 * __uint128_t(-1));
         REQUIRE(c1.get_prec() == 128);
 
         c1 = complex{1, 0, complex_prec_t(256)};
-        c1 *= __uint128_t(-1);
+        c1 *= static_cast<__uint128_t>(-1);
         REQUIRE(c1 == 1_z1 * __uint128_t(-1));
         REQUIRE(c1.get_prec() == 256);
 #endif
@@ -1989,7 +1989,7 @@ TEST_CASE("in-place mul")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Test with large unsigned integral type.
         c1 = complex{1, 0, complex_prec_t(real_prec_min())};
-        const auto big_n = -(__int128_t(1) << 87);
+        const auto big_n = -(static_cast<__int128_t>(1) << 87);
         c1 *= big_n;
         REQUIRE(std::is_same<complex &, decltype(c1 *= big_n)>::value);
         REQUIRE(c1 == 1_z1 * big_n);
@@ -2332,26 +2332,26 @@ TEST_CASE("binary div")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Try with a large integral.
         c1 = complex{1, complex_prec_t(real_prec_min())};
-        ret = __uint128_t(-1) / std::move(c1);
+        ret = static_cast<__uint128_t>(-1) / std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1), 0, complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, complex_prec_t(129)};
-        ret = __uint128_t(-1) / std::move(c1);
+        ret = static_cast<__uint128_t>(-1) / std::move(c1);
         REQUIRE(ret == complex{__uint128_t(-1), 0, complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(!c1.is_valid());
 
         c1 = complex{1, complex_prec_t(real_prec_min())};
-        ret = std::move(c1) / __uint128_t(-1);
+        ret = std::move(c1) / static_cast<__uint128_t>(-1);
         REQUIRE(ret == complex{1_q1 / __uint128_t(-1), complex_prec_t(128)});
         REQUIRE(ret.get_prec() == 128);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
         REQUIRE(c1.is_valid());
         c1 = complex{1, complex_prec_t(129)};
-        ret = std::move(c1) / __uint128_t(-1);
+        ret = std::move(c1) / static_cast<__uint128_t>(-1);
         REQUIRE(ret == complex{1_q1 / __uint128_t(-1), complex_prec_t(129)});
         REQUIRE(ret.get_prec() == 129);
         // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
@@ -2621,13 +2621,13 @@ TEST_CASE("in-place div")
 #if defined(MPPP_HAVE_GCC_INT128)
         // Test with large unsigned integral type.
         c1 = complex{8, -16, complex_prec_t(real_prec_min())};
-        c1 /= __uint128_t(-1);
+        c1 /= static_cast<__uint128_t>(-1);
         REQUIRE(std::is_same<complex &, decltype(c1 /= __uint128_t(-1))>::value);
         REQUIRE(c1 == complex{8_q1 / __uint128_t(-1), -16_q1 / __uint128_t(-1), complex_prec_t(128)});
         REQUIRE(c1.get_prec() == 128);
 
         c1 = complex{8, -16, complex_prec_t(256)};
-        c1 /= __uint128_t(-1);
+        c1 /= static_cast<__uint128_t>(-1);
         REQUIRE(c1 == complex{8_q1 / __uint128_t(-1), -16_q1 / __uint128_t(-1), complex_prec_t(256)});
         REQUIRE(c1.get_prec() == 256);
 #endif
@@ -2978,4 +2978,4 @@ TEST_CASE("eq ineq")
 #endif
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

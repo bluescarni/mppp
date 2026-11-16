@@ -17,7 +17,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -37,7 +37,7 @@ static std::mt19937 rng;
 
 struct add_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
@@ -199,7 +199,7 @@ struct add_tester {
             // Carry only from lo.
             max_integer(m2, 1u);
             mpz_set_ui(&m3.m_mpz, 1u);
-            n2 = integer(::mp_limb_t(-1) & GMP_NUMB_MAX);
+            n2 = integer(static_cast<::mp_limb_t>(-1) & GMP_NUMB_MAX);
             n3 = integer(1);
             mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
             add(n1, n2, n3);
@@ -300,7 +300,7 @@ TEST_CASE("add")
 
 struct sub_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
@@ -447,7 +447,7 @@ struct sub_tester {
         if (S::value == 2u) {
             max_integer(m2, 1u);
             mpz_set_ui(&m3.m_mpz, 1u);
-            n2 = integer(::mp_limb_t(-1) & GMP_NUMB_MAX);
+            n2 = integer(static_cast<::mp_limb_t>(-1) & GMP_NUMB_MAX);
             n3 = integer(1);
             mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
             sub(n1, n2, n3);
@@ -536,7 +536,7 @@ TEST_CASE("sub")
 
 struct mul_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with zeroes.
@@ -645,14 +645,16 @@ struct mul_tester {
                 // Specific test for single-limb optimization.
                 if (S::value == 1u && x == 1u && y == 1u) {
                     n1 = integer{};
-                    random_integer(tmp, 1, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
+                    random_integer(tmp, 1, rng,
+                                   static_cast<::mp_limb_t>(1) << static_cast<unsigned>(GMP_NUMB_BITS / 2));
                     mpz_set(&m2.m_mpz, &tmp.m_mpz);
                     n2 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         n2.neg();
                         mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     }
-                    random_integer(tmp, 1, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
+                    random_integer(tmp, 1, rng,
+                                   static_cast<::mp_limb_t>(1) << static_cast<unsigned>(GMP_NUMB_BITS / 2));
                     mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
@@ -744,7 +746,7 @@ TEST_CASE("mul")
 
 struct addmul_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with zeroes.
@@ -912,8 +914,8 @@ struct addmul_tester {
                     // be optimised with the sign extension approach,
                     // n2 and n3 have different signs and they are larger
                     // in magnitude than new_n1.
-                    n2 = -integer(::mp_limb_t(1) << (GMP_NUMB_BITS / 2 - 1));
-                    n3 = integer(::mp_limb_t(1) << (GMP_NUMB_BITS / 2 - 1));
+                    n2 = -integer(static_cast<::mp_limb_t>(1) << static_cast<unsigned>((GMP_NUMB_BITS / 2) - 1));
+                    n3 = integer(static_cast<::mp_limb_t>(1) << static_cast<unsigned>((GMP_NUMB_BITS / 2) - 1));
                     integer new_n1 = idist(rng), new_n1_copy(new_n1);
                     addmul(new_n1, n2, n3);
                     REQUIRE(new_n1 == new_n1_copy + (n2 * n3));
@@ -989,7 +991,7 @@ struct addmul_tester {
                 if (S::value == 2) {
                     std::uniform_int_distribution<int> idist(1, 40);
                     auto i1 = idist(rng), i2 = idist(rng);
-                    mpz_set_si(&m1.m_mpz, i1 * i2);
+                    mpz_set_si(&m1.m_mpz, static_cast<long>(i1) * i2);
                     n1 = integer(i1 * i2);
                     mpz_set_si(&m2.m_mpz, i1);
                     n2 = integer(i1);
@@ -1039,7 +1041,7 @@ TEST_CASE("addmul")
 
 struct submul_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with zeroes.
@@ -1275,7 +1277,7 @@ struct submul_tester {
                 if (S::value == 2) {
                     std::uniform_int_distribution<int> idist(-40, -1);
                     auto i1 = idist(rng), i2 = idist(rng);
-                    mpz_set_si(&m1.m_mpz, i1 * i2);
+                    mpz_set_si(&m1.m_mpz, static_cast<long>(i1) * i2);
                     n1 = integer(i1 * i2);
                     mpz_set_si(&m2.m_mpz, i1);
                     n2 = integer(i1);
@@ -1325,7 +1327,7 @@ TEST_CASE("submul")
 
 struct div_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         detail::mpz_raii m1, m2, m3, m4;
@@ -1363,7 +1365,7 @@ struct div_tester {
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 // Helper to generate randomly dividend and divisor.
-                auto random_34 = [&]() {
+                auto random_34 = [&] {
                     random_integer(tmp, x, rng);
                     mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = &tmp.m_mpz;
@@ -1376,6 +1378,7 @@ struct div_tester {
                         n3.promote();
                     }
                     // Make sure divisor is not zero.
+                    // NOLINTNEXTLINE(cppcoreguidelines-avoid-do-while)
                     do {
                         random_integer(tmp, y, rng);
                         mpz_set(&m4.m_mpz, &tmp.m_mpz);
@@ -1480,7 +1483,7 @@ TEST_CASE("div")
 
 struct lshift_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // A few zero tests to start.
@@ -1785,7 +1788,7 @@ TEST_CASE("lshift")
 
 struct rshift_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // A few zero tests to start.
@@ -2088,4 +2091,4 @@ TEST_CASE("rshift")
     tuple_for_each(sizes{}, rshift_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

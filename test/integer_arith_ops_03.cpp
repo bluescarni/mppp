@@ -31,7 +31,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -241,7 +241,7 @@ struct mod_tester {
         retval %= 2;
         REQUIRE((lex_cast(retval) == "1"));
         retval = -3;
-        retval %= short(2);
+        retval %= static_cast<short>(2);
         REQUIRE((lex_cast(retval) == "-1"));
         retval %= static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "0"));
@@ -536,7 +536,7 @@ TEST_CASE("rel")
     tuple_for_each(sizes{}, rel_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #if defined(_MSC_VER)
 

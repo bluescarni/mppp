@@ -3004,8 +3004,8 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
     }
     // This is the same overflow check as in static_addsub(). As in static_addsub(), this is not as tight/precise
     // as it could be.
-    const bool c1
-        = static_cast<std::size_t>(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c1 = static_cast<std::size_t>(asize1) == SSize
+                    && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
     const bool c2 = SSize == 1u && (l2 >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
     if (mppp_unlikely(c1 || c2)) {
         return false;
@@ -6729,6 +6729,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
             // Write out the result.
             rs._mp_size = static_cast<mpz_size_t>(new_size);
             if (overlap) {
+                // NOLINTNEXTLINE(readability-suspicious-call-argument)
                 copy_limbs_no(out_ptr, out_ptr + new_size, rs_data);
             }
             // Clear out unused limbs, if needed.
@@ -6794,6 +6795,7 @@ inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, con
         // Write out the result, clearing the unused limbs.
         rops._mp_size = static_cast<mpz_size_t>(rop_size);
         if (overlap) {
+            // NOLINTNEXTLINE(readability-suspicious-call-argument)
             copy_limbs_no(out_ptr, out_ptr + rop_size, rops_data);
         }
         rops.zero_upper_limbs(static_cast<std::size_t>(rop_size));

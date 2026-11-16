@@ -28,7 +28,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
@@ -476,17 +476,17 @@ TEST_CASE("real128 sort")
 {
     std::vector<real128> v0{real128{1}, real128{2}, real128{3}, real128{4}, real128{5}};
     std::shuffle(v0.begin(), v0.end(), rng);
-    std::sort(v0.begin(), v0.end());
+    std::ranges::sort(v0);
     REQUIRE((v0 == std::vector<real128>{real128{1}, real128{2}, real128{3}, real128{4}, real128{5}}));
     v0 = std::vector<real128>{real128{1}, real128{2}, real128{3}, real128_nan(), -real128_nan()};
     std::shuffle(v0.begin(), v0.end(), rng);
-    std::sort(v0.begin(), v0.end(), mppp::real128_lt);
+    std::ranges::sort(v0, mppp::real128_lt);
     REQUIRE(
         (std::vector<real128>(v0.begin(), v0.begin() + 3) == std::vector<real128>{real128{1}, real128{2}, real128{3}}));
     REQUIRE(v0[3].isnan());
     REQUIRE(v0[4].isnan());
     std::shuffle(v0.begin(), v0.end(), rng);
-    std::sort(v0.begin(), v0.end(), mppp::real128_gt);
+    std::ranges::sort(v0, mppp::real128_gt);
     REQUIRE((std::vector<real128>(v0.begin() + 2, v0.begin() + 5)
              == std::vector<real128>{real128{3}, real128{2}, real128{1}}));
     REQUIRE(v0[0].isnan());
@@ -504,4 +504,4 @@ TEST_CASE("real128 sort")
     REQUIRE(s0.rbegin()->isnan());
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

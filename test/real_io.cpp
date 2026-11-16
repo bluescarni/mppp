@@ -33,7 +33,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #include "test_utils.hpp"
 
@@ -383,7 +383,8 @@ struct int_io_tester {
     void operator()(const T &) const
     {
         integral_minmax_dist<T> int_dist;
-        std::uniform_int_distribution<::mpfr_prec_t> prec_dist(::mpfr_prec_t(real_prec_min()), ::mpfr_prec_t(200));
+        std::uniform_int_distribution<::mpfr_prec_t> prec_dist(static_cast<::mpfr_prec_t>(real_prec_min()),
+                                                               static_cast<::mpfr_prec_t>(200));
         std::uniform_int_distribution<int> base_dist(2, 62);
         for (auto i = 0; i < ntrials; ++i) {
             const auto tmp = int_dist(rng);
@@ -401,7 +402,8 @@ struct fp_io_tester {
     void operator()(const T &) const
     {
         auto dist = std::uniform_real_distribution<T>(T(-100), T(100));
-        std::uniform_int_distribution<::mpfr_prec_t> prec_dist(::mpfr_prec_t(real_prec_min()), ::mpfr_prec_t(200));
+        std::uniform_int_distribution<::mpfr_prec_t> prec_dist(static_cast<::mpfr_prec_t>(real_prec_min()),
+                                                               static_cast<::mpfr_prec_t>(200));
         std::uniform_int_distribution<int> base_dist(2, 62);
         for (auto i = 0; i < ntrials; ++i) {
             const auto tmp = dist(rng);
@@ -479,4 +481,4 @@ TEST_CASE("fmt test")
 
 #endif
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

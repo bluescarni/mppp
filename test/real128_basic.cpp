@@ -57,7 +57,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -119,7 +119,7 @@ TEST_CASE("real128 constructors")
     real128 r2{r};
     REQUIRE((r2.m_value == 12));
     // Do some constexpr checks as well.
-    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{__float128(45)}, rc6{wchar_t{4}};
+    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{static_cast<__float128>(45)}, rc6{wchar_t{4}};
     REQUIRE((rc3.m_value == 12));
     REQUIRE((rc4.m_value == 5));
     REQUIRE((rc5.m_value == 45));
@@ -129,7 +129,7 @@ TEST_CASE("real128 constructors")
     REQUIRE((r3.m_value == 12));
     // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE((r.m_value == 12));
-    real128 r4{__float128(-56)};
+    real128 r4{static_cast<__float128>(-56)};
     REQUIRE((r4.m_value == -56));
     real128 r5{-123};
     REQUIRE((r5.m_value == -123));
@@ -175,10 +175,10 @@ TEST_CASE("real128 constructors")
     // Use two limbs, nbits dividing exactly.
     n = -2;
     n <<= (2 * GMP_NUMB_BITS) - 1;
-    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(-2), 2 * GMP_NUMB_BITS - 1)));
+    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(-2), (2 * GMP_NUMB_BITS) - 1)));
     n.promote();
     n.neg();
-    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(2), 2 * GMP_NUMB_BITS - 1)));
+    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(2), (2 * GMP_NUMB_BITS) - 1)));
     n = 1;
     n <<= 16500ul;
     REQUIRE((real128{n}.m_value == real128{"inf"}.m_value));
@@ -186,8 +186,10 @@ TEST_CASE("real128 constructors")
     n <<= 16500ul;
     REQUIRE((real128{n}.m_value == real128{"-inf"}.m_value));
     // Random testing.
-    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (std::uint_least64_t(-1) << delta64) >> delta64);
-    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (std::uint_least64_t(-1) << delta49) >> delta49);
+    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (static_cast<std::uint_least64_t>(-1) << delta64)
+                                                                      >> delta64);
+    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (static_cast<std::uint_least64_t>(-1) << delta49)
+                                                                      >> delta49);
     std::uniform_int_distribution<int> sdist(0, 1);
     std::uniform_int_distribution<int> extra_bits(0, 8);
     for (int i = 0; i < ntries; ++i) {
@@ -196,11 +198,11 @@ TEST_CASE("real128 constructors")
         const auto sign = sdist(rng) != 0 ? 1 : -1;
         const auto ebits = extra_bits(rng);
         auto tmp_r = real128{((int_t{hi} << 64) * sign + lo) << ebits};
-        auto cmp_r = ::scalbnq(::scalbnq(__float128(hi) * sign, 64) + lo, ebits);
+        auto cmp_r = ::scalbnq(::scalbnq(static_cast<__float128>(hi) * sign, 64) + lo, ebits);
         REQUIRE((tmp_r.m_value == cmp_r));
         REQUIRE(static_cast<int_t>(tmp_r) == ((int_t{hi} << 64) * sign + lo) << ebits);
         tmp_r = real128{(int_t{hi} << (64 - ebits)) * sign + (lo >> ebits)};
-        cmp_r = ::scalbnq(__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
+        cmp_r = ::scalbnq(static_cast<__float128>(hi) * sign, 64 - ebits) + (lo >> ebits);
         REQUIRE((tmp_r.m_value == cmp_r));
         REQUIRE(static_cast<int_t>(tmp_r) == (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits));
     }
@@ -308,7 +310,7 @@ TEST_CASE("real128 constructors")
     REQUIRE((ra.m_value == 2));
     ra = real128{123};
     REQUIRE((ra.m_value == 123));
-    ra = __float128(-345);
+    ra = static_cast<__float128>(-345);
     REQUIRE((ra.m_value == -345));
     ra = 456.;
     REQUIRE((ra.m_value == 456));
@@ -481,8 +483,10 @@ TEST_CASE("real128 conversions")
         REQUIRE(static_cast<int_t>(tmp) == 0);
     }
     // Test with integral values.
-    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (std::uint_least64_t(-1) << delta64) >> delta64);
-    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (std::uint_least64_t(-1) << delta49) >> delta49);
+    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (static_cast<std::uint_least64_t>(-1) << delta64)
+                                                                      >> delta64);
+    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (static_cast<std::uint_least64_t>(-1) << delta49)
+                                                                      >> delta49);
     std::uniform_int_distribution<int> extra_bits(0, 8);
     for (int i = 0; i < ntries; ++i) {
         const auto hi = dist49(rng);
@@ -490,10 +494,10 @@ TEST_CASE("real128 conversions")
         const auto sign = sdist(rng) != 0 ? 1 : -1;
         const auto ebits = extra_bits(rng);
         auto tmp_int = ((int_t{hi} << 64) * sign + lo) << ebits;
-        auto r = ::scalbnq(::scalbnq(__float128(hi) * sign, 64) + lo, ebits);
+        auto r = ::scalbnq(::scalbnq(static_cast<__float128>(hi) * sign, 64) + lo, ebits);
         REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
         tmp_int = (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits);
-        r = ::scalbnq(__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
+        r = ::scalbnq(static_cast<__float128>(hi) * sign, 64 - ebits) + (lo >> ebits);
         REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
         REQUIRE(real128{r}.get(nrop));
         REQUIRE(get(nrop, real128{r}));
@@ -794,4 +798,4 @@ TEST_CASE("real128 boost_s11n")
 
 #endif
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
