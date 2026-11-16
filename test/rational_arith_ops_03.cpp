@@ -25,7 +25,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
 
 #include "test_utils.hpp"
 
@@ -318,4 +318,4 @@ TEST_CASE("incdec")
     tuple_for_each(sizes{}, incdec_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)

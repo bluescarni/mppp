@@ -293,7 +293,7 @@ private:
 
             const auto shift = n_bits - sig_digits;
             tdiv_q_2exp(n, q.get_num(), detail::safe_cast<::mp_bitcnt_t>(shift));
-            auto retval = real128{n}.m_value / real128{q.get_den()}.m_value;
+            auto const retval = real128{n}.m_value / real128{q.get_den()}.m_value;
             return detail::scalblnq(retval, detail::safe_cast<long>(shift));
         } else if (n_bits <= sig_digits && d_bits > sig_digits) {
             // The opposite of above.
@@ -301,7 +301,7 @@ private:
 
             const auto shift = d_bits - sig_digits;
             tdiv_q_2exp(d, q.get_den(), detail::safe_cast<::mp_bitcnt_t>(shift));
-            auto retval = real128{q.get_num()}.m_value / real128{d}.m_value;
+            auto const retval = real128{q.get_num()}.m_value / real128{d}.m_value;
             return detail::scalblnq(retval, detail::negate_unsigned<long>(shift));
         } else {
             // Both num and den have more bits than quad's significand. We will downshift
@@ -315,7 +315,7 @@ private:
             tdiv_q_2exp(n, q.get_num(), detail::safe_cast<::mp_bitcnt_t>(n_shift));
             tdiv_q_2exp(d, q.get_den(), detail::safe_cast<::mp_bitcnt_t>(d_shift));
 
-            auto retval = real128{n}.m_value / real128{d}.m_value;
+            auto const retval = real128{n}.m_value / real128{d}.m_value;
             if (n_shift >= d_shift) {
                 return detail::scalblnq(retval, detail::safe_cast<long>(n_shift - d_shift));
             } else {

@@ -1599,7 +1599,10 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
         // We can steal from one or more args, and the precision of
         // the largest-precision arg we can steal from matches
         // the target precision. Use it.
+        //
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(),
+                               // NOLINTNEXTLINE(bugprone-use-after-move)
                                args.get_mpfr_t()...);
         return std::move(*p.first);
     } else {
@@ -1678,56 +1681,56 @@ inline real fms(T &&a, U &&b, V &&c)
 template <cvr_real T>
 inline real mul_2ui(T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
 template <cvr_real T>
 inline real &mul_2ui(real &rop, T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
 template <cvr_real T>
 inline real mul_2si(T &&x, long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
 template <cvr_real T>
 inline real &mul_2si(real &rop, T &&x, long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
 template <cvr_real T>
 inline real div_2ui(T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
 template <cvr_real T>
 inline real &div_2ui(real &rop, T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
 template <cvr_real T>
 inline real div_2si(T &&x, long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
 template <cvr_real T>
 inline real &div_2si(real &rop, T &&x, long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
@@ -1937,14 +1940,14 @@ MPPP_REAL_MPFR_UNARY_IMPL(cbrt, ::mpfr_cbrt, true)
 template <cvr_real T>
 inline real &rootn_ui(real &rop, T &&op, unsigned long k)
 {
-    auto wrapper = [k](::mpfr_t r, const ::mpfr_t o) { ::mpfr_rootn_ui(r, o, k, MPFR_RNDN); };
+    auto const wrapper = [k](::mpfr_t r, const ::mpfr_t o) { ::mpfr_rootn_ui(r, o, k, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
 template <cvr_real T>
 inline real rootn_ui(T &&r, unsigned long k)
 {
-    auto wrapper = [k](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_rootn_ui(rop, op, k, MPFR_RNDN); };
+    auto const wrapper = [k](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_rootn_ui(rop, op, k, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -1971,7 +1974,7 @@ inline real dispatch_real_pow(T &&op1, U &&op2)
 template <typename T, std::size_t SSize, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -1984,7 +1987,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_pow(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -1997,7 +2000,8 @@ inline real dispatch_real_pow(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2007,7 +2011,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_pow(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -2052,7 +2057,7 @@ template <typename T, typename U,
 inline real dispatch_real_pow(const T &n, U &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<U>(a));
@@ -2065,7 +2070,8 @@ inline real dispatch_real_pow(const T &n, U &&a)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_pow(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2190,14 +2196,14 @@ MPPP_REAL_MPFR_BINARY_IMPL(log_hypot, detail::arb_log_hypot, false)
 template <cvr_real T>
 inline real &log_base_ui(real &rop, T &&op, unsigned long b)
 {
-    auto wrapper = [b](::mpfr_t r, const ::mpfr_t o) { detail::arb_log_base_ui(r, o, b); };
+    auto const wrapper = [b](::mpfr_t r, const ::mpfr_t o) { detail::arb_log_base_ui(r, o, b); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
 template <cvr_real T>
 inline real log_base_ui(T &&r, unsigned long b)
 {
-    auto wrapper = [b](::mpfr_t rop, const ::mpfr_t op) { detail::arb_log_base_ui(rop, op, b); };
+    auto const wrapper = [b](::mpfr_t rop, const ::mpfr_t op) { detail::arb_log_base_ui(rop, op, b); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -2224,14 +2230,14 @@ MPPP_REAL_MPFR_UNARY_IMPL(j1, ::mpfr_j1, true)
 template <cvr_real T>
 inline real &jn(real &rop, long n, T &&op)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_jn(r, n, o, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_jn(r, n, o, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
 template <cvr_real T>
 inline real jn(long n, T &&r)
 {
-    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_jn(rop, n, op, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_jn(rop, n, op, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -2242,14 +2248,14 @@ MPPP_REAL_MPFR_UNARY_IMPL(y1, ::mpfr_y1, true)
 template <cvr_real T>
 inline real &yn(real &rop, long n, T &&op)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_yn(r, n, o, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_yn(r, n, o, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
 template <cvr_real T>
 inline real yn(long n, T &&r)
 {
-    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_yn(rop, n, op, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_yn(rop, n, op, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -2269,14 +2275,14 @@ MPPP_REAL_MPFR_UNARY_IMPL(li2, detail::real_li2_wrapper, true)
 template <cvr_real T>
 inline real &polylog_si(real &rop, long n, T &&op)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { detail::arb_polylog_si(r, n, o); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { detail::arb_polylog_si(r, n, o); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
 template <cvr_real T>
 inline real polylog_si(long n, T &&r)
 {
-    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { detail::arb_polylog_si(rop, n, op); };
+    auto const wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { detail::arb_polylog_si(rop, n, op); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -2357,7 +2363,8 @@ MPPP_REAL_MPFR_BINARY_IMPL(remainder, ::mpfr_remainder, true)
 template <cvr_real T, cvr_real U>
 inline real &remquo(real &rop, long *q, T &&x, U &&y)
 {
-    auto wrapper = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_remquo(r, q, o1, o2, MPFR_RNDN); };
+    auto const wrapper
+        = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_remquo(r, q, o1, o2, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x), std::forward<U>(y));
 }
 
@@ -2366,7 +2373,8 @@ inline real &remquo(real &rop, long *q, T &&x, U &&y)
 template <cvr_real T, cvr_real U>
 inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 {
-    auto wrapper = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_fmodquo(r, q, o1, o2, MPFR_RNDN); };
+    auto const wrapper
+        = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_fmodquo(r, q, o1, o2, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x), std::forward<U>(y));
 }
 
@@ -2486,7 +2494,7 @@ inline real dispatch_real_binary_add(T &&a, U &&b)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_add(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -2506,7 +2514,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_add(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2521,7 +2529,8 @@ inline real dispatch_real_binary_add(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_add(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -2537,7 +2546,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_add(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -2558,7 +2568,7 @@ inline real dispatch_real_binary_add(T &&a, const rational<SSize> &q)
 {
     const auto qv = detail::get_mpq_view(q);
 
-    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_q(r, o, &qv, MPFR_RNDN); };
+    auto const wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_q(r, o, &qv, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
 }
@@ -2583,7 +2593,7 @@ inline real dispatch_real_binary_add(T &&a, const U &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_add_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
@@ -2663,7 +2673,7 @@ template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_add(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -2682,7 +2692,8 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_add(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -2757,7 +2768,7 @@ inline real dispatch_real_binary_sub(T &&a, U &&b)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_sub(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -2769,7 +2780,7 @@ inline real dispatch_real_binary_sub(T &&a, const integer<SSize> &n)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_sub(const integer<SSize> &n, T &&a)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_z_sub(r, n.get_mpz_view(), o, MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_z_sub(r, n.get_mpz_view(), o, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2779,7 +2790,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_sub(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2793,7 +2804,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_sub(const U &n, T &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2808,7 +2819,8 @@ inline real dispatch_real_binary_sub(const U &n, T &&a)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -2816,7 +2828,8 @@ inline real dispatch_real_binary_sub(T &&a, const bool &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_sub(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -2825,7 +2838,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_sub(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -2838,7 +2852,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_sub(const U &n, T &&a)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_sub(r, static_cast<long>(n), o, MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_sub(r, static_cast<long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -2852,7 +2867,7 @@ inline real dispatch_real_binary_sub(T &&a, const rational<SSize> &q)
 {
     const auto qv = detail::get_mpq_view(q);
 
-    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_q(r, o, &qv, MPFR_RNDN); };
+    auto const wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_q(r, o, &qv, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
 }
@@ -2878,7 +2893,7 @@ inline real dispatch_real_binary_sub(T &&a, const U &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_sub_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
@@ -2896,7 +2911,7 @@ inline real dispatch_real_binary_sub(const U &x, T &&a)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_d_sub() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_sub(r, static_cast<double>(x), o, MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_sub(r, static_cast<double>(x), o, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
@@ -2969,7 +2984,7 @@ template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_sub(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -2988,7 +3003,8 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_sub(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3054,7 +3070,7 @@ inline real dispatch_real_binary_mul(T &&a, U &&b)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_mul(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -3074,7 +3090,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -3089,7 +3105,8 @@ inline real dispatch_real_binary_mul(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3105,7 +3122,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3126,7 +3143,7 @@ inline real dispatch_real_binary_mul(T &&a, const rational<SSize> &q)
 {
     const auto qv = detail::get_mpq_view(q);
 
-    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_q(r, o, &qv, MPFR_RNDN); };
+    auto const wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_q(r, o, &qv, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
 }
@@ -3151,7 +3168,7 @@ inline real dispatch_real_binary_mul(T &&a, const U &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_mul_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
@@ -3231,7 +3248,7 @@ template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_mul(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -3250,7 +3267,7 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_mul(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3330,7 +3347,7 @@ inline real dispatch_real_binary_div(const U &x, T &&a)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_div(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -3343,7 +3360,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -3357,7 +3374,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(const U &n, T &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_div(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -3372,7 +3389,8 @@ inline real dispatch_real_binary_div(const U &n, T &&a)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_div(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3380,7 +3398,8 @@ inline real dispatch_real_binary_div(T &&a, const bool &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_div(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_div(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_div(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3389,7 +3408,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3402,7 +3421,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(const U &n, T &&a)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_div(r, static_cast<long>(n), o, MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_div(r, static_cast<long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3416,7 +3436,7 @@ inline real dispatch_real_binary_div(T &&a, const rational<SSize> &q)
 {
     const auto qv = detail::get_mpq_view(q);
 
-    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_q(r, o, &qv, MPFR_RNDN); };
+    auto const wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_q(r, o, &qv, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
 }
@@ -3434,7 +3454,7 @@ inline real dispatch_real_binary_div(T &&a, const U &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_div_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
@@ -3452,7 +3472,7 @@ inline real dispatch_real_binary_div(const U &x, T &&a)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_d_div() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_div(r, static_cast<double>(x), o, MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_div(r, static_cast<double>(x), o, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
@@ -3507,7 +3527,7 @@ template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_div(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -3526,7 +3546,7 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_div(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {

@@ -12,7 +12,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -89,4 +89,4 @@ TEST_CASE("atanh")
     REQUIRE(abs(complex128{atanh(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)

@@ -500,6 +500,9 @@ public:
     template <rational_interoperable<SSize> T>
     explicit operator T() const
     {
+        // NOTE: not const, as retval.second is moved from below.
+        //
+        // NOLINTNEXTLINE(misc-const-correctness)
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
             throw std::overflow_error("Conversion of the rational " + to_string() + " to the type '" + type_name<T>()
@@ -518,6 +521,9 @@ private:
     template <typename T>
     bool dispatch_get(T &rop) const
     {
+        // NOTE: not const, as retval.second is moved from below.
+        //
+        // NOLINTNEXTLINE(misc-const-correctness)
         auto retval = dispatch_conversion<T>();
         if (retval.first) {
             rop = std::move(retval.second);
@@ -678,6 +684,10 @@ namespace detail
 template <std::size_t SSize>
 inline mpq_struct_t get_mpq_view(const rational<SSize> &q)
 {
+    // NOTE: the mpz_view temporaries are only used to read out the mpz_struct_t values, which are copied into the
+    // return value. Their _mp_d pointers refer to q's limbs, not to the temporaries.
+    //
+    // NOLINTNEXTLINE(clang-analyzer-core.StackAddressEscape)
     return mpq_struct_t{*q.get_num().get_mpz_view().get(), *q.get_den().get_mpz_view().get()};
 }
 
@@ -807,7 +817,7 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
         } else {
             // Eliminate common factors between the dens.
             auto t = divexact_gcd(op2.get_den(), g);
-            auto tmp2 = divexact_gcd(op1.get_den(), g);
+            auto const tmp2 = divexact_gcd(op1.get_den(), g);
 
             // Compute the numerator (will be t).
             auto tmp1 = op1.get_num() * t;

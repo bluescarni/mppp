@@ -57,7 +57,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -174,7 +174,7 @@ TEST_CASE("real128 constructors")
     REQUIRE((real128{n}.m_value == ::scalbnq(__float128(1), GMP_NUMB_BITS + 1)));
     // Use two limbs, nbits dividing exactly.
     n = -2;
-    n <<= 2 * GMP_NUMB_BITS - 1;
+    n <<= (2 * GMP_NUMB_BITS) - 1;
     REQUIRE((real128{n}.m_value == ::scalbnq(__float128(-2), 2 * GMP_NUMB_BITS - 1)));
     n.promote();
     n.neg();
@@ -794,4 +794,4 @@ TEST_CASE("real128 boost_s11n")
 
 #endif
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)

@@ -17,7 +17,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
 
 #include "test_utils.hpp"
 
@@ -897,7 +897,7 @@ struct addmul_tester {
                     mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     // Prod different sign from rop and larger in abs.
-                    i2 = -idist(rng), i3 = idist(rng), i1 = -i2 * i3 - 1;
+                    i2 = -idist(rng), i3 = idist(rng), i1 = (-i2 * i3) - 1;
                     n1 = integer(i1);
                     n2 = integer(i2);
                     n3 = integer(i3);
@@ -1193,7 +1193,7 @@ struct submul_tester {
                     mpz_submul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     // Prod different sign from rop and larger in abs.
-                    i2 = -idist(rng), i3 = idist(rng), i1 = i2 * i3 + 1;
+                    i2 = -idist(rng), i3 = idist(rng), i1 = (i2 * i3) + 1;
                     n1 = integer(i1);
                     n2 = integer(i2);
                     n3 = integer(i3);
@@ -2088,4 +2088,4 @@ TEST_CASE("rshift")
     tuple_for_each(sizes{}, rshift_tester{});
 }
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)

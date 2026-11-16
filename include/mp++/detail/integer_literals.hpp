@@ -326,6 +326,7 @@ inline integer<SSize> integer_literal_impl()
                 return 0;
             }
         }();
+        // NOLINTNEXTLINE(misc-const-correctness)
         [[maybe_unused]] auto cur_factor10(factor10);
 
         if constexpr (base != 10) {

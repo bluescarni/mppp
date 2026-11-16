@@ -58,7 +58,7 @@
 
 #include "catch.hpp"
 
-// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)
 
 #include "test_utils.hpp"
 
@@ -641,7 +641,7 @@ struct binary_s11n_tester {
         std::vector<char> vbuffer;
         // Make space for plenty of limbs.
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-        std::array<char, sizeof(detail::mpz_size_t) + sizeof(::mp_limb_t) * 100u> sb;
+        std::array<char, sizeof(detail::mpz_size_t) + (sizeof(::mp_limb_t) * 100u)> sb;
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
@@ -741,7 +741,7 @@ struct binary_s11n_tester {
         // Load into a static int a static value with topmost limb 0.
         n1 = integer{-1};
         size = 1;
-        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * unsigned(size)));
         ::mp_limb_t l = 0;
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
@@ -758,12 +758,12 @@ struct binary_s11n_tester {
         // Load into a static int a dynamic value with topmost limb 0.
         n1 = integer{-1};
         size = static_cast<detail::mpz_size_t>(S::value + 1u);
-        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * unsigned(size)));
         std::array<::mp_limb_t, S::value + 1u> sbuffer{{}};
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
-                  reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
+                  reinterpret_cast<char *>(sbuffer.data()) + (sizeof(::mp_limb_t) * unsigned(size)),
                   detail::make_uai(buffer.data() + sizeof(size)));
         REQUIRE_THROWS_PREDICATE(
             n1.binary_load(buffer.data()), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -777,7 +777,7 @@ struct binary_s11n_tester {
         n1 = integer{-1};
         n1.promote();
         size = 1;
-        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * unsigned(size)));
         l = 0;
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
@@ -795,12 +795,12 @@ struct binary_s11n_tester {
         n1 = integer{-1};
         n1.promote();
         size = static_cast<detail::mpz_size_t>(S::value + 1u);
-        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        buffer.resize(sizeof(size) + (sizeof(::mp_limb_t) * unsigned(size)));
         sbuffer = std::array<::mp_limb_t, S::value + 1u>{{}};
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
-                  reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
+                  reinterpret_cast<char *>(sbuffer.data()) + (sizeof(::mp_limb_t) * unsigned(size)),
                   detail::make_uai(buffer.data() + sizeof(size)));
         REQUIRE_THROWS_PREDICATE(
             n1.binary_load(buffer.data()), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -828,7 +828,7 @@ struct binary_s11n_tester {
                           + std::to_string(sizeof(detail::mpz_size_t)) + " bytes, but it is only 0 bytes";
         });
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-        std::array<char, sizeof(detail::mpz_size_t) + sizeof(::mp_limb_t) * 2u> small_arr;
+        std::array<char, sizeof(detail::mpz_size_t) + (sizeof(::mp_limb_t) * 2u)> small_arr;
         const detail::mpz_size_t tmp_size = 3;
         std::copy(reinterpret_cast<const char *>(&tmp_size),
                   reinterpret_cast<const char *>(&tmp_size) + sizeof(detail::mpz_size_t),
@@ -841,7 +841,7 @@ struct binary_s11n_tester {
                                                "than the integer size in limbs stored in the header of the vector (3)";
                                  });
         std::vector<char> small_vec;
-        small_vec.resize(sizeof(detail::mpz_size_t) + sizeof(::mp_limb_t) * 2u);
+        small_vec.resize(sizeof(detail::mpz_size_t) + (sizeof(::mp_limb_t) * 2u));
         std::copy(reinterpret_cast<const char *>(&tmp_size),
                   reinterpret_cast<const char *>(&tmp_size) + sizeof(detail::mpz_size_t),
                   detail::make_uai(small_vec.data()));
@@ -923,4 +923,4 @@ TEST_CASE("boost_s11n")
 
 #endif
 
-// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization)

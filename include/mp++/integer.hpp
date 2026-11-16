@@ -1929,6 +1929,9 @@ public:
     template <integer_cpp_arithmetic T>
     explicit operator T() const
     {
+        // NOTE: not const, as retval.second is moved from below.
+        //
+        // NOLINTNEXTLINE(misc-const-correctness)
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
             throw std::overflow_error("The conversion of the integer " + to_string() + " to the type '" + type_name<T>()
@@ -1946,6 +1949,9 @@ public:
     template <integer_cpp_arithmetic T>
     bool get(T &rop) const
     {
+        // NOTE: not const, as retval.second is moved from below.
+        //
+        // NOLINTNEXTLINE(misc-const-correctness)
         auto retval = dispatch_conversion<T>();
         if (retval.first) {
             rop = std::move(retval.second);
@@ -2003,7 +2009,7 @@ public:
         // NOTE: the idea here is that, regardless of what mpz_size_t is exactly, the
         // asize of an integer represents ultimately the size of a limb array, and as such
         // it has to be representable by std::size_t.
-        return (m_int.m_st._mp_size) >= 0 ? static_cast<std::size_t>(m_int.m_st._mp_size)
+        return (m_int.m_st._mp_size >= 0) ? static_cast<std::size_t>(m_int.m_st._mp_size)
                                           : static_cast<std::size_t>(detail::nint_abs(m_int.m_st._mp_size));
     }
     // Sign.
@@ -2671,10 +2677,10 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // possibility of recovering. The alternative would be to do the computation in some local buffer and then
     // copy it out, but that is rather costly. Note that this means that in principle a computation that could fit in
     // static storage ends up triggering a promotion.
-    const bool c1
-        = static_cast<std::size_t>(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-    const bool c2
-        = static_cast<std::size_t>(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c1 = static_cast<std::size_t>(asize1) == SSize
+                    && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
+    const bool c2 = static_cast<std::size_t>(asize2) == SSize
+                    && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
     if (mppp_unlikely(c1 || c2)) {
         return false;
     }
