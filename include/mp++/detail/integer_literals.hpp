@@ -224,7 +224,8 @@ constexpr Int digit_to_value(char c)
 template <std::size_t SSize, char... Chars>
 inline integer<SSize> integer_literal_impl()
 {
-    constexpr char arr[] = {Chars..., '\0'};
+    // NOTE: arr is static so that the lambdas below can use it without capturing it (MSVC errors out otherwise).
+    static constexpr char arr[] = {Chars..., '\0'};
 
     // Run the checks on the char sequence, and determine the base.
     constexpr auto base = integer_literal_check_str(arr);
@@ -263,7 +264,7 @@ inline integer<SSize> integer_literal_impl()
 
     // Helper function to parse a single limb from a subset
     // of digits at indices [begin, end) in the literal.
-    const auto parse_limb = [](std::size_t begin, std::size_t end) {
+    constexpr auto parse_limb = [](std::size_t begin, std::size_t end) {
         ::mp_limb_t retval = 0, shifter = 1;
 
         for (auto i = end; i > begin; --i) {

@@ -65,7 +65,6 @@ jobs:
           miniforge-version: latest
           # See: https://github.com/conda-incubator/setup-miniconda?tab=readme-ov-file#example-14-remove-defaults-channel
           conda-remove-defaults: "true"
-      - uses: ilammy/msvc-dev-cmd@v1
       - name: Build
         shell: pwsh
         run: |
