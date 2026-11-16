@@ -126,10 +126,12 @@ struct acb_raii {
     // NOTE: the docs of ulong state that it has exactly either 64 or 32 bit width,
     // depending on the architecture.
     if (nl_digits<::ulong>() == 64) {
+        // NOLINTNEXTLINE(bugprone-signed-bitwise)
         if (mppp_unlikely(ret > (1ll << 32))) {
             throw std::invalid_argument("A precision of " + to_string(ret) + " bits is too large for Arb's functions");
         }
     } else {
+        // NOLINTNEXTLINE(bugprone-signed-bitwise)
         if (mppp_unlikely(ret > (1ll << 20))) {
             throw std::invalid_argument("A precision of " + to_string(ret) + " bits is too large for Arb's functions");
         }

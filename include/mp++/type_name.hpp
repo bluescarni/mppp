@@ -9,6 +9,7 @@
 #ifndef MPPP_TYPE_NAME_HPP
 #define MPPP_TYPE_NAME_HPP
 
+#include <cassert>
 #include <string>
 #include <type_traits>
 #include <typeinfo>
@@ -84,12 +85,8 @@ inline std::string type_name()
 
     // Redecorate it with cv qualifiers.
     constexpr unsigned flag = unsigned(std::is_const<typename std::remove_reference<T>::type>::value)
-                              + (unsigned(std::is_volatile<typename std::remove_reference<T>::type>::value) << 1);
-    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
+                              + (unsigned(std::is_volatile<typename std::remove_reference<T>::type>::value) << 1u);
     switch (flag) {
-        case 0u:
-            // NOTE: handle this explicitly to keep compiler warnings at bay.
-            break;
         case 1u:
             ret += " const";
             break;
@@ -98,6 +95,9 @@ inline std::string type_name()
             break;
         case 3u:
             ret += " const volatile";
+            break;
+        default:
+            assert(flag == 0u);
     }
 
     // Re-add the reference, if necessary.

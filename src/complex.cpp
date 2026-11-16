@@ -630,8 +630,8 @@ void dispatch_complex_in_place_div(complex &a, bool n)
 bool dispatch_complex_equality(const complex &c1, const complex &c2)
 {
     // NOTE: don't use mpc_cmp() as it does not handle NaNs properly.
-    complex::re_cref re1{c1}, re2{c2};
-    complex::im_cref im1{c1}, im2{c2};
+    const complex::re_cref re1{c1}, re2{c2};
+    const complex::im_cref im1{c1}, im2{c2};
 
     return *re1 == *re2 && *im1 == *im2;
 }

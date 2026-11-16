@@ -19,7 +19,6 @@
 #include <cmath>
 #include <complex>
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <limits>
@@ -73,6 +72,7 @@ namespace detail
 // operator.
 constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 {
+    // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
     return real_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
 }
 
@@ -228,6 +228,8 @@ template <typename T>
 concept cvr_real = is_cvr_real<T>::value;
 
 // Special initialisation tags for real.
+//
+// NOLINTNEXTLINE(performance-enum-size)
 enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
     nan = MPFR_NAN_KIND,
     inf = MPFR_INF_KIND,
@@ -416,7 +418,7 @@ private:
 public:
     // Generic constructors.
     template <real_interoperable T>
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init,cppcoreguidelines-explicit-constructor,google-explicit-constructor,misc-explicit-constructor)
     real(const T &x) : real(ptag{}, detail::real_deduce_precision(x), true)
     {
         dispatch_construction(x);
@@ -476,6 +478,8 @@ public:
     explicit real(const ::mpfr_t);
 #if !defined(_MSC_VER) || defined(__clang__)
     // Move constructor from mpfr_t.
+    //
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
 #endif
 
@@ -1388,6 +1392,7 @@ namespace detail
 // A small helper to init the pairs in the functions below. We need this because
 // we cannot take the address of a const real as a real *.
 template <typename Arg, enable_if_t<!is_ncrvr<Arg &&>::value, int> = 0>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
@@ -1395,6 +1400,7 @@ inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min
 }
 
 template <typename Arg, enable_if_t<is_ncrvr<Arg &&>::value, int> = 0>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is a non-const rvalue ref, and a candidate for stealing resources.
@@ -1415,6 +1421,7 @@ template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value,
 void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
@@ -1424,6 +1431,7 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
 }
 
 template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int>>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     const auto prec0 = arg0.get_prec();
@@ -1501,7 +1509,10 @@ inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Ar
     if (p.second == r_prec) {
         // The target precision and the precision of the return value
         // match. No need to steal, just execute the function.
+        //
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
+                               // NOLINTNEXTLINE(bugprone-use-after-move)
                                args.get_mpfr_t()...);
     } else {
         if (r_prec > p.second) {
@@ -2101,6 +2112,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(atan, ::mpfr_atan, true)
 // of this function. We keep the signature with cvr_real
 // for consistency with the other functions.
 template <cvr_real T>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void sin_cos(real &sop, real &cop, T &&op)
 {
     if (mppp_unlikely(&sop == &cop)) {
@@ -2139,6 +2151,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(atanh, ::mpfr_atanh, true)
 // of this function. We keep the signature with cvr_real
 // for consistency with the other functions.
 template <cvr_real T>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void sinh_cosh(real &sop, real &cop, T &&op)
 {
     if (mppp_unlikely(&sop == &cop)) {
@@ -2315,6 +2328,7 @@ MPPP_REAL_MPFR_UNARY_IMPL(frac, detail::real_frac_wrapper, false)
 // of this function. We keep the signature with cvr_real
 // for consistency with the other functions.
 template <cvr_real T>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void modf(real &iop, real &fop, T &&op)
 {
     if (mppp_unlikely(&iop == &fop)) {

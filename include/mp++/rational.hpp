@@ -269,7 +269,7 @@ public:
     }
     template <typename T>
         requires rational_cvr_interoperable<T, SSize> && rational_integral_interoperable<T, SSize>
-    // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+    // NOLINTNEXTLINE(bugprone-forwarding-reference-overload,cppcoreguidelines-explicit-constructor,google-explicit-constructor,misc-explicit-constructor)
     rational(T &&x) : rational(ptag{}, std::forward<T>(x))
     {
     }
@@ -336,6 +336,8 @@ public:
     explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q)) {}
 #if !defined(_MSC_VER)
     // Move constructor from mpq_t.
+    //
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     explicit rational(::mpq_t &&q) : m_num(::mpz_t{*mpq_numref(q)}), m_den(::mpz_t{*mpq_denref(q)}) {}
 #endif
 
@@ -423,6 +425,8 @@ public:
     }
 #if !defined(_MSC_VER)
     // Move assignment from mpq_t.
+    //
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     rational &operator=(::mpq_t &&q)
     {
         m_num = ::mpz_t{*mpq_numref(q)};
