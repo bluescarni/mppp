@@ -42,8 +42,8 @@ char *to_string_impl(char (&output)[N], __uint128_t n)
     std::size_t idx = 0;
     output[idx++] = '\0';
     // Reduce n iteratively by a factor of 100, and print the remainder at each iteration.
-    auto r = static_cast<unsigned>(n % 100u);
-    for (; n >= 100u; n = n / 100u, r = static_cast<unsigned>(n % 100u)) {
+    auto r = static_cast<std::size_t>(n % 100u);
+    for (; n >= 100u; n = n / 100u, r = static_cast<std::size_t>(n % 100u)) {
         output[idx++] = d2_text[(r * 2u) + 1u];
         output[idx++] = d2_text[r * 2u];
     }
@@ -68,7 +68,7 @@ std::string to_string(__uint128_t n)
     // the original iterator is decreased by one. Hence, we can build the begin directly
     // from o (which points 1 past the last written char), and the end from output + 1
     // (so that it will point to the terminator).
-    return std::string(std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1));
+    return {std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1)};
 }
 
 std::string to_string(__int128_t n)
@@ -81,7 +81,7 @@ std::string to_string(__int128_t n)
     if (neg) {
         *(o++) = '-';
     }
-    return std::string(std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1));
+    return {std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1)};
 }
 
 #endif

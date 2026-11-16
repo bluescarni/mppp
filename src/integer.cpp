@@ -90,6 +90,7 @@ static_assert(nl_digits<::mp_limb_t>() == GMP_LIMB_BITS,
 void mpz_alloc_cache::clear() noexcept
 {
 #if !defined(NDEBUG)
+    // NOLINTNEXTLINE(performance-avoid-endl)
     std::cout << "Cleaning up the mpz alloc cache." << std::endl;
 #endif
     // Get the GMP free() function.

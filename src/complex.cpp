@@ -117,16 +117,16 @@ complex::complex(const complex &other, complex_prec_t p)
     ::mpc_set(&m_mpc, &other.m_mpc, MPC_RNDNN);
 }
 
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-complex::complex(complex &&other, complex_prec_t p_)
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+complex::complex(complex &&other, complex_prec_t p_) : m_mpc(other.m_mpc)
 {
     const auto p = static_cast<::mpfr_prec_t>(p_);
 
     // Check the precision first of all.
     check_init_prec(p);
 
-    // Shallow copy other.
-    m_mpc = other.m_mpc;
+    // NOTE: at this point, other has been shallow-copied into this and we know the precision is valid.
+
     // Mark the other as moved-from.
     other.m_mpc.re->_mpfr_d = nullptr;
 
@@ -231,6 +231,8 @@ complex &complex::operator=(const ::mpc_t c)
 #if !defined(_MSC_VER) || defined(__clang__)
 
 // Move assignment from mpc_t.
+//
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 complex &complex::operator=(::mpc_t &&c)
 {
     // Clear this.

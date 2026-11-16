@@ -105,6 +105,7 @@ struct mpfr_tl_cleanup {
     ~mpfr_tl_cleanup()
     {
 #if !defined(NDEBUG)
+        // NOLINTNEXTLINE(performance-avoid-endl)
         std::cout << "Cleaning up thread local MPFR caches." << std::endl;
 #endif
         ::mpfr_free_cache2(MPFR_FREE_LOCAL_CACHE);
@@ -117,6 +118,7 @@ struct mpfr_global_cleanup {
     ~mpfr_global_cleanup()
     {
 #if !defined(NDEBUG)
+        // NOLINTNEXTLINE(performance-avoid-endl)
         std::cout << "Cleaning up global MPFR caches." << std::endl;
 #endif
         ::mpfr_free_cache2(MPFR_FREE_GLOBAL_CACHE);
@@ -159,6 +161,8 @@ struct flint_cleanup {
         // the sync setting on cout by the time we execute the following line.
         // However, we print only in debug mode, so it should not be too much of a problem
         // in practice.
+        //
+        // NOLINTNEXTLINE(performance-avoid-endl)
         std::cout << "Cleaning up thread local FLINT caches." << std::endl;
 #endif
         ::flint_cleanup();
