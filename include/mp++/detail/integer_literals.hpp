@@ -40,25 +40,25 @@ constexpr int integer_literal_check_str(const char (&arr)[Size])
     constexpr auto str_length = Size - 1u;
 
     // Helpers to check a digit in various bases.
-    auto base10_digit_check = [&arr](char c) {
+    const auto base10_digit_check = [&arr](char c) {
         if (c < '0' || c > '9') {
             throw std::invalid_argument("Invalid integral literal: " + std::string(arr));
         }
     };
 
-    auto base8_digit_check = [&arr](char c) {
+    const auto base8_digit_check = [&arr](char c) {
         if (c < '0' || c > '7') {
             throw std::invalid_argument("Invalid integral literal: " + std::string(arr));
         }
     };
 
-    auto base2_digit_check = [&arr](char c) {
+    const auto base2_digit_check = [&arr](char c) {
         if (c != '0' && c != '1') {
             throw std::invalid_argument("Invalid integral literal: " + std::string(arr));
         }
     };
 
-    auto base16_digit_check = [&arr](char c) {
+    const auto base16_digit_check = [&arr](char c) {
         if (c < '0' || c > '9') {
             switch (c) {
                 case 'a':
@@ -263,7 +263,7 @@ inline integer<SSize> integer_literal_impl()
 
     // Helper function to parse a single limb from a subset
     // of digits at indices [begin, end) in the literal.
-    auto parse_limb = [](std::size_t begin, std::size_t end) {
+    const auto parse_limb = [](std::size_t begin, std::size_t end) {
         ::mp_limb_t retval = 0, shifter = 1;
 
         for (auto i = end; i > begin; --i) {

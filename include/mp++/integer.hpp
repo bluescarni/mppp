@@ -7555,7 +7555,7 @@ inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
         = size_a >= 0 ? static_cast<std::size_t>(size_a) : static_cast<std::size_t>(nint_abs(size_a));
     const ::mp_limb_t *ptr_a = a.is_static() ? a._get_union().g_st().m_limbs.data() : a._get_union().g_dy()._mp_d;
     const ::mp_limb_t *ptr_b = b.is_static() ? b._get_union().g_st().m_limbs.data() : b._get_union().g_dy()._mp_d;
-    auto limb_cmp
+    const auto limb_cmp
         = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
     // NOTE: cannot understand why, but MSVC wants a checked iterator as 3rd
     // parameter here.

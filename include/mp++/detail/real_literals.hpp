@@ -32,7 +32,7 @@ inline real real_literal_impl(::mpfr_prec_t prec)
     // Infer the base. Default is 10, if the string
     // contains 'x'/'X' then we assume base 16.
     int base = 10;
-    for (auto c : arr) {
+    for (const auto c : arr) {
         if (c == 'x' || c == 'X') {
             base = 16;
             break;
