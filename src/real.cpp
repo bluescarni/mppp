@@ -671,13 +671,13 @@ void real::assign_real128(const real128 &x)
     const auto t = x.get_ieee();
     // A utility function to write the significand of x
     // as a big integer inside m_mpfr.
-    auto write_significand = [this, &t]() {
+    auto const write_significand = [this, &t] {
         // The 4 32-bits part of the significand, from most to least
         // significant digits.
-        const auto p1 = std::get<2>(t) >> 32;
-        const auto p2 = std::get<2>(t) % (1ull << 32);
-        const auto p3 = std::get<3>(t) >> 32;
-        const auto p4 = std::get<3>(t) % (1ull << 32);
+        const auto p1 = std::get<2>(t) >> 32u;
+        const auto p2 = std::get<2>(t) % (1ull << 32u);
+        const auto p3 = std::get<3>(t) >> 32u;
+        const auto p4 = std::get<3>(t) % (1ull << 32u);
         // Build the significand, from most to least significant.
         // NOTE: unsigned long is guaranteed to be at least 32 bit.
         mpfr_set_ui(&this->m_mpfr, static_cast<unsigned long>(p1), MPFR_RNDN);
@@ -736,9 +736,12 @@ real128 real::convert_to_real128() const
     //
     // NOTE: the reason why we do these checks with large positive and negative exponents
     // is that they ensure we can safely convert _mpfr_exp to long later.
+    //
+    // NOLINTNEXTLINE(bugprone-signed-bitwise)
     if (inf_p() || m_mpfr._mpfr_exp > (1l << 18)) {
         return sgn() > 0 ? real128_inf() : -real128_inf();
     }
+    // NOLINTNEXTLINE(bugprone-signed-bitwise)
     if (zero_p() || m_mpfr._mpfr_exp < -(1l << 18)) {
         // Preserve the signedness of zero.
         return signbit() ? -real128{} : real128{};

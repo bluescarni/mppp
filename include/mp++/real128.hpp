@@ -229,22 +229,22 @@ private:
         const std::size_t n_bits = n.nbits();
 
         // Let's get the size in limbs from the size in bits, as we already made the effort.
-        const auto rem_bits = n_bits % unsigned(GMP_NUMB_BITS);
-        std::size_t ls = n_bits / unsigned(GMP_NUMB_BITS) + static_cast<bool>(rem_bits);
+        const auto rem_bits = n_bits % static_cast<unsigned>(GMP_NUMB_BITS);
+        std::size_t ls = (n_bits / static_cast<unsigned>(GMP_NUMB_BITS)) + static_cast<bool>(rem_bits);
         assert(ls && n_bits && ls == n.size());
 
         // Init value with the most significant limb, and move to the next limb.
         __float128 retval = ptr[--ls] & GMP_NUMB_MASK;
 
         // Number of bits read so far from n: it is the size in bits of the top limb.
-        auto read_bits = static_cast<unsigned>(rem_bits ? rem_bits : unsigned(GMP_NUMB_BITS));
+        auto read_bits = static_cast<unsigned>(rem_bits ? rem_bits : static_cast<unsigned>(GMP_NUMB_BITS));
         assert(read_bits);
 
         // Keep on reading as long as we have limbs and as long as we haven't read enough bits
         // to fill up the significand of retval.
         while (ls && read_bits < sig_digits) {
             // Number of bits to be read from the current limb: GMP_NUMB_BITS or less.
-            const unsigned rbits = detail::c_min(unsigned(GMP_NUMB_BITS), sig_digits - read_bits);
+            const unsigned rbits = detail::c_min(static_cast<unsigned>(GMP_NUMB_BITS), sig_digits - read_bits);
 
             // Shift retval by rbits.
             // NOTE: safe to cast to int here, as rbits is not greater than GMP_NUMB_BITS which in turn fits in int.
@@ -252,7 +252,7 @@ private:
 
             // Add the bottom part, and move to the next limb. We might need to remove lower bits
             // in case rbits is not exactly GMP_NUMB_BITS.
-            retval += (ptr[--ls] & GMP_NUMB_MASK) >> (unsigned(GMP_NUMB_BITS) - rbits);
+            retval += (ptr[--ls] & GMP_NUMB_MASK) >> (static_cast<unsigned>(GMP_NUMB_BITS) - rbits);
 
             // Update the number of read bits.
             // NOTE: read_bits can never be increased past sig_digits, due to the definition of rbits.
@@ -334,6 +334,7 @@ private:
 public:
     // Constructor from interoperable types.
     template <real128_interoperable T>
+    // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor,google-explicit-constructor,misc-explicit-constructor)
     constexpr real128(const T &x) : m_value(cast_to_float128(x))
     {
     }
@@ -619,8 +620,9 @@ public:
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         detail::ieee_float128 ie;
         ie.value = m_value;
-        return std::make_tuple(std::uint_least8_t(ie.i_eee.negative), std::uint_least16_t(ie.i_eee.exponent),
-                               std::uint_least64_t(ie.i_eee.mant_high), std::uint_least64_t(ie.i_eee.mant_low));
+        return std::make_tuple(
+            static_cast<std::uint_least8_t>(ie.i_eee.negative), static_cast<std::uint_least16_t>(ie.i_eee.exponent),
+            static_cast<std::uint_least64_t>(ie.i_eee.mant_high), static_cast<std::uint_least64_t>(ie.i_eee.mant_low));
     }
     // Sign bit.
     [[nodiscard]] bool signbit() const;
@@ -759,6 +761,7 @@ constexpr real128 abs(const real128 &x)
 {
     return x.fpclassify() == FP_NAN
                ? x
+               // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
                : (x.fpclassify() == FP_ZERO ? real128{} : (x.m_value < 0 ? real128{-x.m_value} : x));
 }
 
@@ -1638,12 +1641,12 @@ inline bool dispatch_gte(const T &x, const real128 &y)
 // Functions useful for the implementation of real128 constants below.
 constexpr real128 two_112()
 {
-    return real128{1} / (1ull << 32) / (1ull << 32) / (1ull << 48);
+    return real128{1} / (1ull << 32u) / (1ull << 32u) / (1ull << 48u);
 }
 
 constexpr real128 two_48()
 {
-    return real128{1} / (1ull << 48);
+    return real128{1} / (1ull << 48u);
 }
 
 // Recursively calculate 2**N, where N is a power of two greater than 32.
@@ -1657,7 +1660,7 @@ constexpr real128 two_ptwo()
 template <>
 constexpr real128 two_ptwo<32ul>()
 {
-    return real128{1ull << 32};
+    return real128{1ull << 32u};
 }
 } // namespace detail
 
@@ -1673,7 +1676,7 @@ constexpr real128 real128_max()
     return (18446744073709551615ull * detail::two_112() + 281474976710655ull * detail::two_48() + 1)
            * detail::two_ptwo<8192>() * detail::two_ptwo<4096>() * detail::two_ptwo<2048>() * detail::two_ptwo<1024>()
            * detail::two_ptwo<512>() * detail::two_ptwo<256>() * detail::two_ptwo<128>() * detail::two_ptwo<64>()
-           * detail::two_ptwo<32>() * (1ull << 31);
+           * detail::two_ptwo<32>() * (1ull << 31u);
 }
 
 // The smallest positive value.
@@ -1681,19 +1684,19 @@ constexpr real128 real128_min()
 {
     return 1 / detail::two_ptwo<8192>() / detail::two_ptwo<4096>() / detail::two_ptwo<2048>() / detail::two_ptwo<1024>()
            / detail::two_ptwo<512>() / detail::two_ptwo<256>() / detail::two_ptwo<128>() / detail::two_ptwo<64>()
-           / detail::two_ptwo<32>() / (1ull << 30);
+           / detail::two_ptwo<32>() / (1ull << 30u);
 }
 
 // The difference between 1 and the next larger number.
 constexpr real128 real128_epsilon()
 {
-    return 1 / detail::two_ptwo<64>() / detail::two_ptwo<32>() / (1ull << 16);
+    return 1 / detail::two_ptwo<64>() / detail::two_ptwo<32>() / (1ull << 16u);
 }
 
 // The smallest positive denormalized number.
 constexpr real128 real128_denorm_min()
 {
-    return 1 / detail::two_ptwo<8192>() / detail::two_ptwo<8192>() / detail::two_ptwo<64>() / (1ull << 46);
+    return 1 / detail::two_ptwo<8192>() / detail::two_ptwo<8192>() / detail::two_ptwo<64>() / (1ull << 46u);
 }
 
 // Positive inf.

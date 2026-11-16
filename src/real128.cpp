@@ -75,7 +75,7 @@ __float128 str_to_float128(const char *s)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     char *endptr;
-    auto retval = ::strtoflt128(s, &endptr);
+    auto const retval = ::strtoflt128(s, &endptr);
     if (mppp_unlikely(endptr == s || *endptr != '\0')) {
         // NOTE: the first condition handles an empty string.
         // endptr will point to the first character in the string which

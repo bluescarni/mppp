@@ -177,6 +177,7 @@ public:
 #if defined(MPPP_WITH_MPFR)
                  && (!std::is_same<T, real>::value)
 #endif
+    // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor,google-explicit-constructor,misc-explicit-constructor)
     constexpr complex128(const T &x) : m_value{cast_to_f128(x, detail::is_complex128_mppp_interoperable<T>{})}
     {
     }
@@ -190,12 +191,15 @@ public:
     // Binary generic ctors.
     template <complex128_interoperable T, complex128_interoperable U>
     constexpr explicit complex128(const T &re, const U &im)
-        : m_value{cast_to_f128(re, detail::is_complex128_mppp_interoperable<T>{}),
-                  cast_to_f128(im, detail::is_complex128_mppp_interoperable<U>{})}
+        : m_value{
+              cast_to_f128(re, detail::is_complex128_mppp_interoperable<T>{}),
+              cast_to_f128(im, detail::is_complex128_mppp_interoperable<U>{}),
+          }
     {
     }
     // Constructor from std::complex.
     template <real128_cpp_complex T>
+    // NOLINTNEXTLINE(cppcoreguidelines-explicit-constructor,google-explicit-constructor,misc-explicit-constructor)
     constexpr complex128(const T &c) : m_value{static_cast<__float128>(c.real()), static_cast<__float128>(c.imag())}
     {
     }
