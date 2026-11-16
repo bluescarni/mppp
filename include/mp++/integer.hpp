@@ -2631,6 +2631,7 @@ inline mpz_size_t integer_sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t 
 // (i.e., the addition overflows and the static size is not enough).
 template <std::size_t SSize>
 inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 0> &)
 {
@@ -2749,6 +2750,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 // Optimization for single-limb statics with no nails.
 template <std::size_t SSize>
 inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 1> &)
 {
@@ -2838,6 +2840,7 @@ inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *
 // Optimization for two-limbs statics with no nails.
 template <std::size_t SSize>
 inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 2> &)
 {
@@ -2962,6 +2965,7 @@ using integer_static_addsub_1_algo = std::integral_constant<
 
 // mpn implementation.
 template <bool AddOrSub, std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
                                  ::mp_limb_t l2, const std::integral_constant<int, 0> &)
 {
@@ -3028,6 +3032,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 
 // 1-limb optimisation (no nails).
 template <bool AddOrSub, std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
                                  ::mp_limb_t l2, const std::integral_constant<int, 1> &)
 {
@@ -3088,6 +3093,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 
 // 2-limb optimisation (no nails).
 template <bool AddOrSub, std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
                                  ::mp_limb_t l2, const std::integral_constant<int, 2> &)
 {
@@ -3344,6 +3350,7 @@ using integer_static_mul_algo
 // about the size in limbs of the result.
 template <std::size_t SSize>
 inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                    mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                    const std::integral_constant<int, 0> &)
 {
@@ -3445,6 +3452,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
 // 2-limb optimization via dlimb.
 template <std::size_t SSize>
 inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                    mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                    const std::integral_constant<int, 2> &)
 {
@@ -3553,6 +3561,7 @@ using integer_static_addmul_algo = std::integral_constant<
 template <std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
+                                      // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                       mpz_size_t asize2, int signr, int sign1, int sign2,
                                       const std::integral_constant<int, 0> &)
 {
@@ -3646,6 +3655,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
 template <std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
+                                      // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                       mpz_size_t asize2, int signr, int sign1, int sign2,
                                       const std::integral_constant<int, 2> &)
 {
@@ -4195,6 +4205,7 @@ using integer_static_sqrm_algo = std::integral_constant<
 // mpn implementation.
 // NOTE: this assumes that mod is not zero.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op, const static_int<SSize> &mod,
                              const std::integral_constant<int, 0> &)
 {
@@ -4405,6 +4416,7 @@ using integer_static_div_algo
 // mpn implementation.
 template <std::size_t SSize>
 inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                                // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                 const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1,
                                 int sign2, const std::integral_constant<int, 0> &)
 {
@@ -4469,6 +4481,7 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
 
 // 1-limb optimisation.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
                                 const static_int<SSize> &op2, mpz_size_t, mpz_size_t, int sign1, int sign2,
                                 const std::integral_constant<int, 1> &)
@@ -4494,7 +4507,9 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
 #if defined(MPPP_HAVE_DLIMB_T)
 
 // Quotient+remainder.
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                           ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
                           ::mp_limb_t *MPPP_RESTRICT r2)
 {
@@ -4508,6 +4523,7 @@ inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, 
 }
 
 // Quotient only.
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
@@ -4522,7 +4538,9 @@ inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, :
 
 // 2-limbs optimisation.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                                // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                 const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1,
                                 int sign2, const std::integral_constant<int, 2> &)
 {
@@ -4607,6 +4625,7 @@ namespace detail
 // mpn implementation.
 template <std::size_t SSize>
 inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                               // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                const std::integral_constant<int, 0> &)
 {
@@ -4679,6 +4698,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
 // 2-limbs optimisation.
 template <std::size_t SSize>
 inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                               // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                const std::integral_constant<int, 2> &)
 {
@@ -4748,6 +4768,7 @@ namespace detail
 // NOTE: the Gcd flag specifies whether the divisor op2 is a strictly positive quantity.
 template <bool Gcd, std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                  mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                  const std::integral_constant<int, 0> &)
 {
@@ -4801,6 +4822,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 // 2-limbs optimisation.
 template <bool Gcd, std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                  mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                  const std::integral_constant<int, 2> &)
 {
@@ -5235,6 +5257,7 @@ inline bool static_not_impl(static_int<2> &rop, const static_int<2> &op, mpz_siz
 
 // n-limbs implementation.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op, mpz_size_t asize, int sign)
 {
     auto data = op.m_limbs.data();
@@ -5462,6 +5485,7 @@ inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
 // mpn implementation.
 template <std::size_t SSize>
 inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2)
 {
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
@@ -5707,6 +5731,7 @@ inline mpz_size_t compute_static_int_asize(const static_int<SSize> &r, mpz_size_
 // mpn implementation.
 template <std::size_t SSize>
 inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2)
 {
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
@@ -5950,6 +5975,7 @@ inline bool static_xor_impl(static_int<2> &rop, const static_int<2> &op1, const 
 // mpn implementation.
 template <std::size_t SSize>
 inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2)
 {
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
@@ -6691,6 +6717,7 @@ namespace detail
 
 // Static sqrtrem implementation.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, const static_int<SSize> &ns)
 {
     // NOTE: we require non-negative n (this is checked in sqrtrem()).
@@ -6819,6 +6846,7 @@ inline integer<SSize> root(const integer<SSize> &n, unsigned long m)
 
 // m-th root with remainder.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void rootrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSize> &n, unsigned long m)
 {
     if (mppp_unlikely(!m)) {
@@ -7470,6 +7498,7 @@ namespace detail
 // Equality operator.
 // NOTE: special implementation instead of using cmp, this should be faster.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
 {
     const mp_size_t size_a = a._get_union().m_st._mp_size, size_b = b._get_union().m_st._mp_size;
