@@ -16,6 +16,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -479,3 +481,5 @@ TEST_CASE("real dim")
     REQUIRE(dim(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
     REQUIRE(dim(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

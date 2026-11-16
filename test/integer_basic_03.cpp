@@ -57,6 +57,9 @@
 #endif
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -919,3 +922,5 @@ TEST_CASE("boost_s11n")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

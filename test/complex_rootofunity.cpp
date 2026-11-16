@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -22,3 +24,5 @@ TEST_CASE("rootofunity")
     REQUIRE(&set_rootofunity(c, 10, 8) == &c);
     REQUIRE(abs(mppp::pow(c, 10) - 1) < mppp::pow(2_r128, -126));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

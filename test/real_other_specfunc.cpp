@@ -13,6 +13,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -264,3 +266,5 @@ TEST_CASE("real lambert_wm1")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

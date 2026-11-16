@@ -28,6 +28,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -2975,3 +2977,5 @@ TEST_CASE("eq ineq")
     REQUIRE(!(complex128{"(nan,nan)"} == complex{"(nan,nan)", complex_prec_t(5)}));
 #endif
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

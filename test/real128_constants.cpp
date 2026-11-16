@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -69,3 +71,5 @@ TEST_CASE("real128 constants")
     REQUIRE((epsilon_128.m_value == real128_epsilon().m_value));
     REQUIRE((denorm_min_128.m_value == real128_denorm_min().m_value));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -42,3 +44,5 @@ TEST_CASE("real128 fmin")
     REQUIRE(fmin(-1_rq, 1_z1) == -1);
     REQUIRE(fmin(1_q1, 1_rq) == 1);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

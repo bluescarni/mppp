@@ -15,6 +15,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -251,3 +253,5 @@ TEST_CASE("sin_cos")
     REQUIRE(sop == sin(real{2, detail::real_deduce_precision(0) * 3}));
     REQUIRE(cop == cos(real{2, detail::real_deduce_precision(0) * 3}));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

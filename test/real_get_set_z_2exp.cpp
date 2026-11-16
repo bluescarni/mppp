@@ -11,6 +11,9 @@
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -82,3 +85,5 @@ TEST_CASE("real set_ui_si_2exp")
     REQUIRE(!r0.signbit());
     REQUIRE(r0.get_prec() == detail::real_deduce_precision(45));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

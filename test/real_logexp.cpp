@@ -14,6 +14,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -311,3 +313,5 @@ TEST_CASE("real log_base_ui")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

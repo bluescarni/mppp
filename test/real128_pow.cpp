@@ -23,6 +23,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -76,3 +78,5 @@ TEST_CASE("real128 pow")
     REQUIRE(!detail::is_detected<pow_t, long double, real128>::value);
 #endif
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

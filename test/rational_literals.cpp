@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -44,3 +46,5 @@ TEST_CASE("rational_literals_tests")
     REQUIRE(-0xf_q3 == -15);
     REQUIRE(4_q3 / -6 == -rational<3>{2, 3});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

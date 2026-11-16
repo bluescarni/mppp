@@ -16,6 +16,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #if defined(_MSC_VER)
 
 template <typename... Args>
@@ -828,3 +830,5 @@ TEST_CASE("inv")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

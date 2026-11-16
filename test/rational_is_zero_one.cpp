@@ -13,6 +13,9 @@
 #include <mp++/rational.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -116,3 +119,5 @@ TEST_CASE("is_zero_one")
 {
     tuple_for_each(sizes{}, is_zero_one_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

@@ -15,6 +15,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -370,3 +373,5 @@ TEST_CASE("lcm")
     REQUIRE(n3 == m3);
     REQUIRE(lcm(n1, n2) == n3);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

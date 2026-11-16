@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -50,3 +52,5 @@ TEST_CASE("real hash")
     // A test changing the exponent.
     REQUIRE(std::hash<real>{}(real{"-1.1", 113}) != hash(real{"-1.1", 113} * 16 * 16));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

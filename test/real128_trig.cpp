@@ -23,6 +23,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -138,3 +140,5 @@ TEST_CASE("real128 sincos sim")
     REQUIRE(s == sin(1.2_rq));
     REQUIRE(c == cos(1.2_rq));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

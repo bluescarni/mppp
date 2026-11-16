@@ -14,6 +14,9 @@
 #include <mp++/rational.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -86,3 +89,5 @@ TEST_CASE("binomial")
 {
     tuple_for_each(sizes{}, binomial_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

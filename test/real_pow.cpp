@@ -23,6 +23,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -213,3 +215,5 @@ TEST_CASE("real sqr")
     REQUIRE(sqr(real{"nan", 34}).nan_p());
     REQUIRE(sqr(real{"nan", 34}).get_prec() == 34);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

@@ -39,6 +39,9 @@
 #endif
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -1754,3 +1757,5 @@ TEST_CASE("prec_to_nlimbs failure")
                            Message("An invalid input precision of " + detail::to_string(real_prec_max() + 1)
                                    + " was passed to prec_to_nlimbs()"));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

@@ -11,6 +11,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -43,3 +45,5 @@ TEST_CASE("limb_size_nbits")
     l += 1;
     REQUIRE(static_cast<unsigned>(mpn_sizeinbase(&l, 1, 2)) == GMP_NUMB_BITS - 1);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

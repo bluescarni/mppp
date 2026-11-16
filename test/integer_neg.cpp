@@ -16,6 +16,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -91,3 +94,5 @@ TEST_CASE("neg")
 {
     tuple_for_each(sizes{}, neg_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

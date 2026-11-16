@@ -13,6 +13,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -197,3 +199,5 @@ TEST_CASE("div_2si")
     REQUIRE(abs(r0 - c) / c < mppp::pow(2_r128, -126));
     REQUIRE(r0.get_prec() == 128);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

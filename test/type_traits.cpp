@@ -13,6 +13,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -98,3 +100,5 @@ TEST_CASE("type traits")
     REQUIRE(static_cast<__int128_t>(__uint128_t(1) << 127) == detail::nl_min<__int128_t>());
 #endif
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

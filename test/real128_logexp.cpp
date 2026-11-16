@@ -11,6 +11,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -77,3 +79,5 @@ TEST_CASE("real128 logexp")
     x.log1p();
     REQUIRE(x == log1p(real128{2}));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

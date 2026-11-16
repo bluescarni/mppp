@@ -10,6 +10,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -44,3 +46,5 @@ TEST_CASE("real128 tgamma")
     REQUIRE(x.tgamma() == 1);
     REQUIRE(abs(tgamma(real128{"1.234"}) - real128{"0.909847380128661106639623421763461722"}) < 1E-34);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

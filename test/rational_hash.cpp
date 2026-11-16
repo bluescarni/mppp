@@ -17,6 +17,9 @@
 #include <mp++/rational.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -89,3 +92,5 @@ TEST_CASE("hash")
 {
     tuple_for_each(sizes{}, hash_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

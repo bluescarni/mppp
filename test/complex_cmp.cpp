@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -122,3 +124,5 @@ TEST_CASE("number_p")
     REQUIRE(!complex{"(nan, -2)", complex_prec_t(32)}.number_p());
     REQUIRE(!number_p(complex{"(-nan, 2)", complex_prec_t(32)}));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

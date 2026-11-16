@@ -11,6 +11,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -56,3 +58,5 @@ TEST_CASE("literals test")
     REQUIRE(0x123.p-7_icr1024 == complex{"(0,0x123.p-7)", 16, complex_prec_t(1024)});
     REQUIRE(-0X123.p-7_icr1024 == -complex{"(0,0x123.p-7)", 16, complex_prec_t(1024)});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

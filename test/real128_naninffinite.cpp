@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -161,3 +163,5 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(fpclassify(real128{"1E-4931"}) == FP_NORMAL);
     REQUIRE(fpclassify(-real128{"1E-4931"}) == FP_NORMAL);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

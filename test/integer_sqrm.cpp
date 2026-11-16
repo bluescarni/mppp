@@ -25,6 +25,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -201,6 +204,8 @@ TEST_CASE("sqrm")
 {
     tuple_for_each(sizes{}, sqrm_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)
 
 #if defined(_MSC_VER)
 

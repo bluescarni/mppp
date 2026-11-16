@@ -16,6 +16,9 @@
 #include <mp++/rational.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -155,3 +158,5 @@ TEST_CASE("cmp")
 {
     tuple_for_each(sizes{}, cmp_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

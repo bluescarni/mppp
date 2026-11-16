@@ -10,6 +10,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -195,3 +197,5 @@ TEST_CASE("real128 scalb")
     REQUIRE(scalbn(-real128_nan(), -1).isnan());
     REQUIRE(ldexp(-real128_nan(), -1).isnan());
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

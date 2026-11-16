@@ -28,6 +28,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
@@ -501,3 +503,5 @@ TEST_CASE("real128 sort")
     REQUIRE(std::equal(v0.begin(), v0.begin() + 4, s0.begin()));
     REQUIRE(s0.rbegin()->isnan());
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

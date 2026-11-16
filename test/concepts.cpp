@@ -17,8 +17,13 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+
+namespace
+{
 
 template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 void check_dispatch(const T &s)
@@ -27,6 +32,8 @@ void check_dispatch(const T &s)
     o << s;
     REQUIRE(o.str() == s);
 }
+
+} // namespace
 
 TEST_CASE("concepts")
 {
@@ -132,3 +139,5 @@ TEST_CASE("concepts")
     std::string_view sv2{"bubbbba"};
     check_dispatch(sv2);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

@@ -27,6 +27,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -604,3 +606,5 @@ TEST_CASE("pow")
         REQUIRE(mppp::pow(c, r).get_prec() == detail::real_deduce_precision(c));
     }
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

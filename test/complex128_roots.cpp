@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -26,3 +28,5 @@ TEST_CASE("sqrt")
     REQUIRE(std::is_same<complex128, decltype(sqrt(complex128{3, 4}))>::value);
     REQUIRE(abs(complex128{sqrt(complex128{3, 4}).m_value - cmp.m_value}) < 1E-32);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

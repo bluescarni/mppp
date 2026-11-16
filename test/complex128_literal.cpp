@@ -10,6 +10,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -18,3 +20,5 @@ TEST_CASE("literal")
     REQUIRE(1.1_icq == complex128{0, real128{"1.1"}});
     REQUIRE(1.1_rq + 1.1_icq == complex128{real128{"1.1"}, real128{"1.1"}});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

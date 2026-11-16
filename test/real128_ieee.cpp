@@ -15,6 +15,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -78,3 +80,5 @@ TEST_CASE("real128 get_ieee()")
     REQUIRE(!hi);
     REQUIRE(lo == 1u);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

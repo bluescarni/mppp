@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -28,3 +30,5 @@ TEST_CASE("real128 fdim")
     REQUIRE(fdim(-1_rq, 1_z1) == 0);
     REQUIRE(fdim(1_q1, 1_rq) == 0);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

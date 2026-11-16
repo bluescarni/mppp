@@ -15,6 +15,9 @@
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -226,3 +229,5 @@ TEST_CASE("real cmp_2_exp")
         return ex.what() == std::string("Cannot compare a real NaN to an integral multiple of a power of 2");
     });
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

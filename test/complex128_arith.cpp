@@ -13,6 +13,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -73,3 +75,5 @@ TEST_CASE("proj")
     REQUIRE(proj(complex128{real128_inf(), -123}).m_value == cplex128{real128_inf().m_value, 0});
     REQUIRE(proj(complex128{real128_inf(), -123}).imag().signbit());
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

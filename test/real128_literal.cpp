@@ -14,6 +14,9 @@
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -48,3 +51,5 @@ TEST_CASE("real128_literal_tests")
         return ia.what() == std::string("A real128 cannot be constructed from binary or octal literals");
     });
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

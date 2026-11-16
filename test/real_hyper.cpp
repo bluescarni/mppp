@@ -13,6 +13,9 @@
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -169,3 +172,5 @@ TEST_CASE("real hyper")
     REQUIRE(sop == sinh(real{2, detail::real_deduce_precision(0) * 3}));
     REQUIRE(cop == cosh(real{2, detail::real_deduce_precision(0) * 3}));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

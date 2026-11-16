@@ -14,6 +14,9 @@
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -130,3 +133,5 @@ TEST_CASE("real_literals_tests")
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

@@ -12,6 +12,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -68,3 +70,5 @@ TEST_CASE("real abs")
     REQUIRE(r0 == real{123});
     REQUIRE(r0.get_prec() == detail::nl_digits<int>() + 1);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

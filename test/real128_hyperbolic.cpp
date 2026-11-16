@@ -10,6 +10,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -63,3 +65,5 @@ TEST_CASE("real128 inversefunctions")
         REQUIRE(abs(atanh(tanh(real128{"0.234"})) - real128{"0.234"}) < 1E-33);
     }
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

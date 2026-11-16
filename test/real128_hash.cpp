@@ -13,6 +13,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -39,3 +41,5 @@ TEST_CASE("real128 hash")
     REQUIRE(hash(-real128_max()) != 0u);
     REQUIRE(hash(-real128_max()) != std::size_t(-1));
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

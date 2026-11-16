@@ -10,6 +10,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -54,3 +56,5 @@ TEST_CASE("real128 yn")
 {
     REQUIRE(abs(yn(7, real128{1}) - -30588.9570521239888408800675925647278_rq) < 1E-34);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

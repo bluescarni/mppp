@@ -13,6 +13,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -123,3 +125,5 @@ TEST_CASE("real nextafter binary")
     REQUIRE(isnan(rop));
     REQUIRE(rop.get_prec() == x.get_prec());
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

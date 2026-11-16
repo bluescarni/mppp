@@ -15,6 +15,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -512,3 +514,5 @@ TEST_CASE("integer_literals_init_list")
     REQUIRE(v[1] == 2);
     REQUIRE(v[2] == 3);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

@@ -18,6 +18,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -88,3 +90,5 @@ TEST_CASE("type_name")
     t5.join();
     t6.join();
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

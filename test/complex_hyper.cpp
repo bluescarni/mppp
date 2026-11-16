@@ -14,6 +14,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -209,3 +211,5 @@ TEST_CASE("atanh")
     REQUIRE(abs(r0 - cmp) / abs(cmp) < pow(2_r128, -120));
     REQUIRE(r0.get_prec() == 128);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

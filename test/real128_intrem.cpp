@@ -14,6 +14,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -276,3 +278,5 @@ TEST_CASE("real128 remquo")
     REQUIRE(remquo(-1_rq, 2_rq, &quo) == -1);
     REQUIRE(remquo(1_rq, 2_rq, &quo) == 1);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)

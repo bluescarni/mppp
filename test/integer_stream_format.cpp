@@ -26,6 +26,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -649,3 +652,5 @@ TEST_CASE("fmt test")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison)
