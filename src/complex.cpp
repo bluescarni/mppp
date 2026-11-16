@@ -323,8 +323,8 @@ complex &complex::set(const char *begin, const char *end, int base)
 // Detect one.
 bool complex::is_one() const
 {
-    re_cref re{*this};
-    im_cref im{*this};
+    re_cref const re{*this};
+    im_cref const im{*this};
 
     return im->zero_p() && re->is_one();
 }
@@ -345,8 +345,8 @@ complex &complex::prec_round(::mpfr_prec_t p)
 
 std::string complex::to_string(int base) const
 {
-    re_cref re{*this};
-    im_cref im{*this};
+    re_cref const re{*this};
+    im_cref const im{*this};
 
     return '(' + re->to_string(base) + ',' + im->to_string(base) + ')';
 }
@@ -354,7 +354,7 @@ std::string complex::to_string(int base) const
 int cmpabs(const complex &c1, const complex &c2)
 {
     ::mpfr_clear_erangeflag();
-    auto retval = ::mpc_cmp_abs(c1.get_mpc_t(), c2.get_mpc_t());
+    auto const retval = ::mpc_cmp_abs(c1.get_mpc_t(), c2.get_mpc_t());
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
         throw std::domain_error(
@@ -458,7 +458,7 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
         throw std::invalid_argument("The mpfr_asprintf() function returned the error code -1");
         // LCOV_EXCL_STOP
     }
-    out_str_cleaner re_osc{out_str};
+    out_str_cleaner const re_osc{out_str};
 
     tmp += out_str;
     tmp += ',';
@@ -474,7 +474,7 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
         throw std::invalid_argument("The mpfr_asprintf() function returned the error code -1");
         // LCOV_EXCL_STOP
     }
-    out_str_cleaner im_osc{out_str};
+    out_str_cleaner const im_osc{out_str};
 
     tmp += out_str;
     tmp += ')';
@@ -518,7 +518,7 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
 // Get the number of significant digits required for a round-tripping representation.
 std::size_t complex::get_str_ndigits(int base) const
 {
-    re_cref re{*this};
+    re_cref const re{*this};
 
     return re->get_str_ndigits(base);
 }
@@ -567,56 +567,60 @@ namespace detail
 
 void dispatch_complex_in_place_add(complex &a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_add(complex &a, bool n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_sub(complex &a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_sub_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_sub_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_sub(complex &a, bool n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_mul(complex &a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_mul_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_mul_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_mul(complex &a, bool n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_div(complex &a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_div_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_div_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_div(complex &a, bool n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }

@@ -41,7 +41,7 @@ std::array<const char *, 4> parse_complex(const char *str)
 
     // Small helper to raise an error in case
     // of a malformed string.
-    auto raise_error = [str]() {
+    auto const raise_error = [str]() {
         throw std::invalid_argument(std::string("The string '") + str
                                     + "' is not a valid representation of a complex value");
     };

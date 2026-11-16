@@ -1370,7 +1370,7 @@ inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
     }
     MPPP_MAYBE_TLS detail::mpz_raii m;
     ::mpfr_clear_erangeflag();
-    auto retval = ::mpfr_get_z_2exp(&m.m_mpz, r.get_mpfr_t());
+    auto const retval = ::mpfr_get_z_2exp(&m.m_mpz, r.get_mpfr_t());
     // LCOV_EXCL_START
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();

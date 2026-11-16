@@ -5320,7 +5320,7 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // The easy case: both are nonnegative.
         // NOTE: no need to mask, as we masked l1 and l2 already, and OR
         // won't turn on any upper bit.
-        ::mp_limb_t ret = l1 | l2;
+        ::mp_limb_t const ret = l1 | l2;
         // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
@@ -5581,7 +5581,7 @@ inline bool static_and_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // The easy case: both are nonnegative.
         // NOTE: no need to mask, as we masked l1 and l2 already, and AND
         // won't turn on any upper bit.
-        ::mp_limb_t ret = l1 & l2;
+        ::mp_limb_t const ret = l1 & l2;
         // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
@@ -5834,7 +5834,7 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // The easy case: both are nonnegative.
         // NOTE: no need to mask, as we masked l1 and l2 already, and XOR
         // won't turn on any upper bit.
-        ::mp_limb_t ret = l1 ^ l2;
+        ::mp_limb_t const ret = l1 ^ l2;
         // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
