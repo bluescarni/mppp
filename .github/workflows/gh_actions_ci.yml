@@ -75,6 +75,48 @@ jobs:
           cmake --build . --config Release -j2
           copy Release\mp++.dll test\Release\
           ctest -j4 -V -C Release
+  # Coverage build, uploaded to codecov.
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build and test
+        run: bash tools/gha_coverage.sh
+      - uses: codecov/codecov-action@v7
+        with:
+          fail_ci_if_error: true
+          files: ./build/coverage.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+  # Build the docs and upload them as a GitHub Pages artifact.
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build docs
+        run: bash tools/gha_docs.sh
+      - name: Upload docs
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: doc/_build/html
+  # Deploy the docs to GitHub Pages (master only).
+  docs_deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: docs
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Allow only one concurrent deployment, but do not cancel in-progress deployments.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
   binder_cache:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
