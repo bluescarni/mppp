@@ -197,11 +197,9 @@ MPPP_DLL_PUBLIC void mpz_init_nlimbs(mpz_struct_t &, std::size_t);
 // Small helper to determine how many GMP limbs we need to fit nbits bits.
 constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
 {
-    // NOLINTNEXTLINE(readability-redundant-casting)
-    return static_cast<::mp_bitcnt_t>(
-        (nbits / static_cast<unsigned>(GMP_NUMB_BITS))
-        // NOLINTNEXTLINE(readability-implicit-bool-conversion,readability-redundant-casting)
-        + ((nbits % static_cast<unsigned>(GMP_NUMB_BITS)) != 0u));
+    return static_cast<::mp_bitcnt_t>((nbits / static_cast<unsigned>(GMP_NUMB_BITS))
+                                      // NOLINTNEXTLINE(readability-implicit-bool-conversion)
+                                      + ((nbits % static_cast<unsigned>(GMP_NUMB_BITS)) != 0u));
 }
 
 // Helper function to init an mpz to zero with enough space for nbits bits. The
@@ -628,7 +626,8 @@ struct static_int {
     [[nodiscard]] mpz_struct_t get_mpz_view() const
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        return mpz_struct_t{_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
+        return mpz_struct_t{
+            ._mp_alloc = _mp_alloc, ._mp_size = _mp_size, ._mp_d = const_cast<::mp_limb_t *>(m_limbs.data())};
     }
     mpz_alloc_t _mp_alloc = s_alloc;
     // NOLINTNEXTLINE(modernize-use-default-member-init)
@@ -3197,7 +3196,7 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
         // NOTE: we have 1 allocated limb, with address &op2_copy. The size has to be 1,
         // as op2 is unsigned, fits in an mp_limbt_t and it is not zero (otherwise we would've taken
         // the other branch).
-        const detail::mpz_struct_t tmp_mpz{1, 1, op2_copy};
+        const detail::mpz_struct_t tmp_mpz{._mp_alloc = 1, ._mp_size = 1, ._mp_d = op2_copy};
         mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
@@ -3286,7 +3285,7 @@ inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op
     } else {
         // LCOV_EXCL_START
         ::mp_limb_t op2_copy[1] = {static_cast<::mp_limb_t>(op2)};
-        const detail::mpz_struct_t tmp_mpz{1, 1, op2_copy};
+        const detail::mpz_struct_t tmp_mpz{._mp_alloc = 1, ._mp_size = 1, ._mp_d = op2_copy};
         mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
@@ -3716,7 +3715,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     } else {
         // When the signs differ, we need to implement addition as a subtraction.
         if (asizer > asize_prod
-            || (asizer == asize_prod && integer_compare_limbs_2(&rop.m_limbs[0], &prod[0], asizer) >= 0)) {
+            || (asizer == asize_prod && integer_compare_limbs_2(&rop.m_limbs[0], prod.data(), asizer) >= 0)) {
             // rop >= prod in absolute value.
             const auto lo = rop.m_limbs[0] - prod[0];
             // If there's a borrow, then hi1 > hi2, otherwise we would have a negative result.
@@ -7942,23 +7941,18 @@ MPPP_END_NAMESPACE
 // macro, which does not support directly
 // class templates.
 
-namespace boost
-{
-
-namespace serialization
+namespace boost::serialization
 {
 
 template <std::size_t SSize>
 struct tracking_level<mppp::integer<SSize>> {
-    typedef mpl::integral_c_tag tag;
-    typedef mpl::int_<track_never> type;
+    using tag = mpl::integral_c_tag;
+    using type = mpl::int_<track_never>;
     BOOST_STATIC_CONSTANT(int, value = tracking_level::type::value);
     BOOST_STATIC_ASSERT((mpl::greater<implementation_level<mppp::integer<SSize>>, mpl::int_<primitive_type>>::value));
 };
 
-} // namespace serialization
-
-} // namespace boost
+} // namespace boost::serialization
 
 #endif
 

@@ -2133,23 +2133,18 @@ MPPP_END_NAMESPACE
 // macro, which does not support directly
 // class templates.
 
-namespace boost
-{
-
-namespace serialization
+namespace boost::serialization
 {
 
 template <std::size_t SSize>
 struct tracking_level<mppp::rational<SSize>> {
-    typedef mpl::integral_c_tag tag;
-    typedef mpl::int_<track_never> type;
+    using tag = mpl::integral_c_tag;
+    using type = mpl::int_<track_never>;
     BOOST_STATIC_CONSTANT(int, value = tracking_level::type::value);
     BOOST_STATIC_ASSERT((mpl::greater<implementation_level<mppp::rational<SSize>>, mpl::int_<primitive_type>>::value));
 };
 
-} // namespace serialization
-
-} // namespace boost
+} // namespace boost::serialization
 
 #endif
 

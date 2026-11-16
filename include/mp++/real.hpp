@@ -231,7 +231,7 @@ concept cvr_real = is_cvr_real<T>::value;
 enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
     nan = MPFR_NAN_KIND,
     inf = MPFR_INF_KIND,
-    zero = MPFR_ZERO_KIND
+    zero = MPFR_ZERO_KIND,
 };
 
 // For the future:

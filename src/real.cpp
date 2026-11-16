@@ -327,14 +327,15 @@ real::real(const real &other, ::mpfr_prec_t p)
 }
 
 // Move constructor with custom precision.
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-real::real(real &&other, ::mpfr_prec_t p)
+//
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+real::real(real &&other, ::mpfr_prec_t p) : m_mpfr(other.m_mpfr)
 {
     // Check the precision first of all.
     check_init_prec(p);
 
-    // Shallow copy other.
-    m_mpfr = other.m_mpfr;
+    // NOTE: at this point, other has been shallow-copied into this and we know the precision is valid.
+
     // Mark the other as moved-from.
     other.m_mpfr._mpfr_d = nullptr;
 
@@ -553,6 +554,8 @@ real &real::operator=(const ::mpfr_t x)
 #if !defined(_MSC_VER) || defined(__clang__)
 
 // Move assignment from mpfr_t.
+//
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 real &real::operator=(::mpfr_t &&x)
 {
     // Clear this.
@@ -745,7 +748,7 @@ real128 real::convert_to_real128() const
     const auto prec = get_prec();
     // Number of limbs in this.
     // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    auto nlimbs = prec / ::mp_bits_per_limb + static_cast<bool>(prec % ::mp_bits_per_limb);
+    auto nlimbs = (prec / ::mp_bits_per_limb) + static_cast<bool>(prec % ::mp_bits_per_limb);
     assert(nlimbs != 0);
     // NOTE: in MPFR the most significant (nonzero) bit of the significand
     // is always at the high end of the most significand limb. In other words,
@@ -2834,7 +2837,7 @@ std::size_t real::binary_load(std::istream &src)
     // Set the exponent.
     m_mpfr._mpfr_exp = e;
     // Copy over the limbs.
-    std::copy(buffer.begin(), buffer.end(), reinterpret_cast<char *>(m_mpfr._mpfr_d));
+    std::ranges::copy(buffer, reinterpret_cast<char *>(m_mpfr._mpfr_d));
 
     return retval;
 }
