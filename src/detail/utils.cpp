@@ -6,13 +6,12 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
 #include <cassert>
 #include <cstddef>
 #include <iterator>
 #include <string>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/utils.hpp>
 
 // NOLINTNEXTLINE(modernize-concat-nested-namespaces)

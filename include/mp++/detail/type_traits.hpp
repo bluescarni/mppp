@@ -9,10 +9,10 @@
 #ifndef MPPP_DETAIL_TYPE_TRAITS_HPP
 #define MPPP_DETAIL_TYPE_TRAITS_HPP
 
-#include <mp++/config.hpp>
-
 #include <limits>
 #include <type_traits>
+
+#include <mp++/config.hpp>
 
 MPPP_BEGIN_NAMESPACE
 

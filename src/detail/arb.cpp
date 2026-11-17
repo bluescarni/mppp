@@ -6,8 +6,6 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
 #include <stdexcept>
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -20,6 +18,7 @@
 
 #endif
 
+#include <mp++/config.hpp>
 // NOTE: this needs to be included early because certain arb functions
 // for interoperability with MPFR check if mpfr.h is included or not.
 #include <mp++/detail/mpfr.hpp>

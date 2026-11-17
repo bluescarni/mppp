@@ -6,8 +6,6 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
 #include <algorithm>
 #include <cstdint>
 #include <numeric>
@@ -32,6 +30,7 @@
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
 #if defined(MPPP_BENCHMARK_BOOST)

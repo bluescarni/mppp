@@ -9,22 +9,21 @@
 #ifndef MPPP_CONCEPTS_HPP
 #define MPPP_CONCEPTS_HPP
 
-#include <mp++/config.hpp>
-
 #include <complex>
 #include <string>
 #include <string_view>
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
 
 MPPP_BEGIN_NAMESPACE
 
 // Type trait to check if T is a C++ integral type, including possibly __(u)int128_t.
-// NOTE: mppp::detail::is_integral, for consistency with std::is_integral, will be true also for cv qualified
-// integral types. is_cpp_integral, however, is used in contexts where the cv qualifications
-// matter, and we want this type trait not to be satisfied by integral types which are, e.g.,
-// const qualified.
+//
+// NOTE: mppp::detail::is_integral, for consistency with std::is_integral, will be true also for cv qualified integral
+// types. is_cpp_integral, however, is used in contexts where the cv qualifications matter, and we want this type trait
+// not to be satisfied by integral types which are, e.g., const qualified.
 template <typename T>
 using is_cpp_integral = detail::conjunction<detail::is_integral<T>, std::is_same<detail::remove_cv_t<T>, T>>;
 
@@ -66,9 +65,11 @@ namespace detail
 {
 
 // NOTE: remove_pointer_t removes the top level qualifiers of the pointer as well:
+//
 // http://en.cppreference.com/w/cpp/types/remove_pointer
-// After removal of pointer, we could still have a type which is cv qualified. Thus,
-// we remove cv qualifications after pointer removal.
+//
+// After removal of pointer, we could still have a type which is cv qualified. Thus, we remove cv qualifications after
+// pointer removal.
 template <typename T>
 using is_char_pointer = conjunction<std::is_pointer<T>, std::is_same<remove_cv_t<remove_pointer_t<T>>, char>>;
 
