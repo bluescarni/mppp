@@ -392,7 +392,7 @@ public:
     template <real128_cpp_complex T>
     constexpr real128 &operator=(const T &c)
     {
-        if (mppp_unlikely(c.imag()) != 0) {
+        if (mppp_unlikely(c.imag() != 0)) {
             throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part of "
                                     + detail::to_string(c.imag()) + " to a real128");
         }
