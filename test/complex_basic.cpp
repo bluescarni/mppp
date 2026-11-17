@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -14,13 +14,10 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -48,6 +45,8 @@
 #endif
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -670,7 +669,6 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
-#if MPPP_CPLUSPLUS >= 201703L
     {
         constexpr char str[] = "  -0x2f2.1aa4p0";
 
@@ -691,7 +689,7 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
-#endif
+
     REQUIRE_THROWS_MATCHES((complex{"1.1 ", 10, complex_prec_t(128)}), std::invalid_argument,
                            Message("The string '1.1 ' does not represent a valid real in base 10"));
     REQUIRE_THROWS_MATCHES((complex{"hello world", 12, complex_prec_t(128)}), std::invalid_argument,
@@ -719,7 +717,6 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
-#if MPPP_CPLUSPLUS >= 201703L
     {
         complex c{std::string(" ( -0x2f2.1aa4p0)"), 16, complex_prec_t(128)};
         REQUIRE(c == -0x2f2.1aa4p0_r128);
@@ -738,7 +735,6 @@ TEST_CASE("string constructors")
         REQUIRE(im->zero_p());
         REQUIRE(!im->signbit());
     }
-#endif
     {
         complex c{" ( 1.1)", complex_prec_t(128)};
         REQUIRE(c == 1.1_r128);
@@ -786,13 +782,11 @@ TEST_CASE("string constructors")
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
         REQUIRE(c.get_prec() == 256);
     }
-#if defined(MPPP_HAVE_STRING_VIEW)
     {
         complex c{std::string_view("(-1.1,-2.3)"), 10, complex_prec_t(256)};
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
         REQUIRE(c.get_prec() == 256);
     }
-#endif
     {
         complex c{" (-1.1,-2.3)", 0, complex_prec_t(256)};
         REQUIRE(c == complex{-1.1_r256, -2.3_r256});
@@ -819,7 +813,6 @@ TEST_CASE("string constructors")
         REQUIRE(c == complex{-1.3_r128, 0.7_r128});
         REQUIRE(c.get_prec() == 128);
     }
-#if MPPP_CPLUSPLUS >= 201703L
     {
         complex c{"(   -0x2f2.1aa4p0, 0x123.aaap4)", 16, complex_prec_t(128)};
         REQUIRE(c == complex{-0x2f2.1aa4p0_r128, 0x123.aaap4_r128});
@@ -830,7 +823,6 @@ TEST_CASE("string constructors")
         REQUIRE(c == complex{-0x2f2.1aa4p0_r128, 0x123.aaap4_r128});
         REQUIRE(c.get_prec() == 128);
     }
-#endif
     REQUIRE_THROWS_MATCHES((complex{" (hello, 2)", 10, complex_prec_t(128)}), std::invalid_argument,
                            Message("The string 'hello' does not represent a valid real in base 10"));
     REQUIRE_THROWS_MATCHES((complex{"(2, world )", 12, complex_prec_t(128)}), std::invalid_argument,
@@ -847,7 +839,6 @@ TEST_CASE("ref getters")
         REQUIRE((*re) == 1);
         REQUIRE((*im) == -2);
     }
-#if MPPP_CPLUSPLUS >= 201703L
     {
         REQUIRE(*c.real_cref() == 1);
         REQUIRE(*c.imag_cref() == -2);
@@ -855,7 +846,6 @@ TEST_CASE("ref getters")
         REQUIRE(*real_cref(c) == 1);
         REQUIRE(*imag_cref(c) == -2);
     }
-#endif
     {
         complex::re_ref re{c};
         complex::im_ref im{c};
@@ -867,7 +857,6 @@ TEST_CASE("ref getters")
         REQUIRE((*im) == 100);
     }
     REQUIRE(c == complex{-1, 100});
-#if MPPP_CPLUSPLUS >= 201703L
     {
         *c.real_ref() = 42;
         *c.imag_ref() = -43;
@@ -882,7 +871,6 @@ TEST_CASE("ref getters")
         REQUIRE(*imag_ref(c) == -6);
     }
     REQUIRE(c == complex{-5, -6});
-#endif
 }
 
 #if !defined(_MSC_VER) || defined(__clang__)
@@ -900,6 +888,13 @@ TEST_CASE("mpc move ctor")
     REQUIRE(c2.get_prec() == 14);
     REQUIRE(c2 == complex{1.1, -2.3, complex_prec_t(14)});
 }
+
+#endif
+
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
 
 #endif
 
@@ -943,6 +938,12 @@ TEST_CASE("copy move ass")
         REQUIRE(c1 == complex{45, 46});
     }
 }
+
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
 
 TEST_CASE("generic assignment")
 {
@@ -1169,11 +1170,9 @@ TEST_CASE("set")
         REQUIRE(c.get_prec() == 14);
         REQUIRE(c == complex{456, complex_prec_t(14)});
 
-#if defined(MPPP_HAVE_STRING_VIEW)
         c.set(std::string_view("(456)"));
         REQUIRE(c.get_prec() == 14);
         REQUIRE(c == complex{456, complex_prec_t(14)});
-#endif
 
         // Try different base as well.
         c.set("(1111011,111001000)", 2);
@@ -1625,9 +1624,7 @@ TEST_CASE("swap")
     REQUIRE(c1 == complex{67, 89, complex_prec_t(23)});
     REQUIRE(c2 == complex{123, -45, complex_prec_t(45)});
 
-#if MPPP_CPLUSPLUS >= 201703L
     REQUIRE(std::is_nothrow_swappable_v<complex>);
-#endif
 }
 
 TEST_CASE("to_string")
@@ -1805,3 +1802,5 @@ TEST_CASE("real str_ndigits")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

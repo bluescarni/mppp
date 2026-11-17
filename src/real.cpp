@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -33,14 +33,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -103,10 +100,7 @@ static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offseto
 // Double check that real is a standard layout class.
 static_assert(std::is_standard_layout<real>::value, "real is not a standard layout class.");
 
-#if MPPP_CPLUSPLUS >= 201703L
-
-// If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
-// and its members' types.
+// We can use structured bindings to test the layout of mpfr_struct_t and its members' types.
 constexpr bool test_mpfr_struct_t()
 {
     auto [prec, sign, exp, ptr] = mpfr_struct_t{};
@@ -117,8 +111,6 @@ constexpr bool test_mpfr_struct_t()
 }
 
 static_assert(test_mpfr_struct_t());
-
-#endif
 
 } // namespace
 
@@ -237,7 +229,8 @@ void mpfr_to_string(const ::mpfr_t r, std::ostream &os, int base)
     // Get the string fractional representation via the MPFR function,
     // and wrap it into a smart pointer.
     ::mpfr_exp_t exp(0);
-    std::unique_ptr<char, void (*)(char *)> str(::mpfr_get_str(nullptr, &exp, base, 0, r, MPFR_RNDN), ::mpfr_free_str);
+    std::unique_ptr<char, void (*)(char *)> const str(::mpfr_get_str(nullptr, &exp, base, 0, r, MPFR_RNDN),
+                                                      ::mpfr_free_str);
     // LCOV_EXCL_START
     if (mppp_unlikely(!str)) {
         throw std::runtime_error("Error in the conversion of a real to string: the call to mpfr_get_str() failed");
@@ -334,14 +327,15 @@ real::real(const real &other, ::mpfr_prec_t p)
 }
 
 // Move constructor with custom precision.
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-real::real(real &&other, ::mpfr_prec_t p)
+//
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+real::real(real &&other, ::mpfr_prec_t p) : m_mpfr(other.m_mpfr)
 {
     // Check the precision first of all.
     check_init_prec(p);
 
-    // Shallow copy other.
-    m_mpfr = other.m_mpfr;
+    // NOTE: at this point, other has been shallow-copied into this and we know the precision is valid.
+
     // Mark the other as moved-from.
     other.m_mpfr._mpfr_d = nullptr;
 
@@ -426,12 +420,10 @@ real::real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
 
 real::real(const ptag &, const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
 
-#if defined(MPPP_HAVE_STRING_VIEW)
 real::real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p)
     : real(s.data(), s.data() + s.size(), base, p)
 {
 }
-#endif
 
 // Constructor from range of characters, base and precision.
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
@@ -562,6 +554,8 @@ real &real::operator=(const ::mpfr_t x)
 #if !defined(_MSC_VER) || defined(__clang__)
 
 // Move assignment from mpfr_t.
+//
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 real &real::operator=(::mpfr_t &&x)
 {
     // Clear this.
@@ -591,12 +585,10 @@ real &real::set_impl(const std::string &s, int base)
     return set(s.c_str(), base);
 }
 
-#if defined(MPPP_HAVE_STRING_VIEW)
 real &real::set_impl(const std::string_view &s, int base)
 {
     return set(s.data(), s.data() + s.size(), base);
 }
-#endif
 
 // Set to character range.
 real &real::set(const char *begin, const char *end, int base)
@@ -679,13 +671,13 @@ void real::assign_real128(const real128 &x)
     const auto t = x.get_ieee();
     // A utility function to write the significand of x
     // as a big integer inside m_mpfr.
-    auto write_significand = [this, &t]() {
+    auto const write_significand = [this, &t] {
         // The 4 32-bits part of the significand, from most to least
         // significant digits.
-        const auto p1 = std::get<2>(t) >> 32;
-        const auto p2 = std::get<2>(t) % (1ull << 32);
-        const auto p3 = std::get<3>(t) >> 32;
-        const auto p4 = std::get<3>(t) % (1ull << 32);
+        const auto p1 = std::get<2>(t) >> 32u;
+        const auto p2 = std::get<2>(t) % (1ull << 32u);
+        const auto p3 = std::get<3>(t) >> 32u;
+        const auto p4 = std::get<3>(t) % (1ull << 32u);
         // Build the significand, from most to least significant.
         // NOTE: unsigned long is guaranteed to be at least 32 bit.
         mpfr_set_ui(&this->m_mpfr, static_cast<unsigned long>(p1), MPFR_RNDN);
@@ -744,9 +736,12 @@ real128 real::convert_to_real128() const
     //
     // NOTE: the reason why we do these checks with large positive and negative exponents
     // is that they ensure we can safely convert _mpfr_exp to long later.
+    //
+    // NOLINTNEXTLINE(bugprone-signed-bitwise)
     if (inf_p() || m_mpfr._mpfr_exp > (1l << 18)) {
         return sgn() > 0 ? real128_inf() : -real128_inf();
     }
+    // NOLINTNEXTLINE(bugprone-signed-bitwise)
     if (zero_p() || m_mpfr._mpfr_exp < -(1l << 18)) {
         // Preserve the signedness of zero.
         return signbit() ? -real128{} : real128{};
@@ -756,7 +751,7 @@ real128 real::convert_to_real128() const
     const auto prec = get_prec();
     // Number of limbs in this.
     // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    auto nlimbs = prec / ::mp_bits_per_limb + static_cast<bool>(prec % ::mp_bits_per_limb);
+    auto nlimbs = (prec / ::mp_bits_per_limb) + static_cast<bool>(prec % ::mp_bits_per_limb);
     assert(nlimbs != 0);
     // NOTE: in MPFR the most significant (nonzero) bit of the significand
     // is always at the high end of the most significand limb. In other words,
@@ -1172,7 +1167,7 @@ namespace detail
 
 void dispatch_real_in_place_add_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_z(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_z(r, o, n, MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -1182,14 +1177,15 @@ void dispatch_real_in_place_add_integer_impl(real &a, const ::mpz_t n, ::mpfr_pr
 
 void dispatch_real_in_place_add(real &a, bool n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_real_in_place_add_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
 {
-    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_q(r, o, q, MPFR_RNDN); };
+    auto const wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_q(r, o, q, MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
 }
@@ -1207,7 +1203,7 @@ inline void dispatch_real_in_place_add_fd_impl(real &a, const T &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_add_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
 }
@@ -1276,7 +1272,7 @@ namespace detail
 
 void dispatch_real_in_place_sub_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_z(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_z(r, o, n, MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -1286,14 +1282,15 @@ void dispatch_real_in_place_sub_integer_impl(real &a, const ::mpz_t n, ::mpfr_pr
 
 void dispatch_real_in_place_sub(real &a, bool n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_real_in_place_sub_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
 {
-    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_q(r, o, q, MPFR_RNDN); };
+    auto const wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_q(r, o, q, MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
 }
@@ -1311,7 +1308,7 @@ inline void dispatch_real_in_place_sub_fd_impl(real &a, const T &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_sub_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
 }
@@ -1380,7 +1377,7 @@ namespace detail
 
 void dispatch_real_in_place_mul_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_z(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_z(r, o, n, MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -1390,14 +1387,15 @@ void dispatch_real_in_place_mul_integer_impl(real &a, const ::mpz_t n, ::mpfr_pr
 
 void dispatch_real_in_place_mul(real &a, bool n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_real_in_place_mul_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
 {
-    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_q(r, o, q, MPFR_RNDN); };
+    auto const wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_q(r, o, q, MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
 }
@@ -1415,7 +1413,7 @@ inline void dispatch_real_in_place_mul_fd_impl(real &a, const T &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_mul_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
 }
@@ -1468,7 +1466,7 @@ namespace detail
 
 void dispatch_real_in_place_div_integer_impl(real &a, const ::mpz_t n, ::mpfr_prec_t dprec)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_z(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_z(r, o, n, MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -1478,14 +1476,15 @@ void dispatch_real_in_place_div_integer_impl(real &a, const ::mpz_t n, ::mpfr_pr
 
 void dispatch_real_in_place_div(real &a, bool n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_real_in_place_div_rational_impl(real &a, const ::mpq_t q, ::mpfr_prec_t dprec)
 {
-    auto wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_q(r, o, q, MPFR_RNDN); };
+    auto const wrapper = [&q](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_q(r, o, q, MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(dprec, wrapper, a, a);
 }
@@ -1503,7 +1502,7 @@ inline void dispatch_real_in_place_div_fd_impl(real &a, const T &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_div_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     mpfr_nary_op_impl<false>(real_deduce_precision(x), wrapper, a, a);
 }
@@ -2218,7 +2217,7 @@ bool dispatch_real_lte(const real128 &r1, const real &r2)
 int cmp(const real &a, const real &b)
 {
     ::mpfr_clear_erangeflag();
-    auto retval = mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
+    auto const retval = mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
         throw std::domain_error("Cannot compare two reals if at least one of them is NaN");
@@ -2230,7 +2229,7 @@ int cmp(const real &a, const real &b)
 int cmpabs(const real &a, const real &b)
 {
     ::mpfr_clear_erangeflag();
-    auto retval = ::mpfr_cmpabs(a.get_mpfr_t(), b.get_mpfr_t());
+    auto const retval = ::mpfr_cmpabs(a.get_mpfr_t(), b.get_mpfr_t());
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
         throw std::domain_error("Cannot compare the absolute values of two reals if at least one of them is NaN");
@@ -2242,7 +2241,7 @@ int cmpabs(const real &a, const real &b)
 int cmp_ui_2exp(const real &x, unsigned long n, ::mpfr_exp_t e)
 {
     ::mpfr_clear_erangeflag();
-    auto retval = ::mpfr_cmp_ui_2exp(x.get_mpfr_t(), n, e);
+    auto const retval = ::mpfr_cmp_ui_2exp(x.get_mpfr_t(), n, e);
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
         throw std::domain_error("Cannot compare a real NaN to an integral multiple of a power of 2");
@@ -2253,7 +2252,7 @@ int cmp_ui_2exp(const real &x, unsigned long n, ::mpfr_exp_t e)
 int cmp_si_2exp(const real &x, long n, ::mpfr_exp_t e)
 {
     ::mpfr_clear_erangeflag();
-    auto retval = ::mpfr_cmp_si_2exp(x.get_mpfr_t(), n, e);
+    auto const retval = ::mpfr_cmp_si_2exp(x.get_mpfr_t(), n, e);
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
         throw std::domain_error("Cannot compare a real NaN to an integral multiple of a power of 2");
@@ -2393,7 +2392,7 @@ std::ostream &operator<<(std::ostream &os, const real &r)
         char *ptr;
     };
 
-    out_str_cleaner osc{out_str};
+    out_str_cleaner const osc{out_str};
 
     // NOTE: I am not sure if it is possible to get a string of size 0
     // from a printf() function. Let's throw for the time being in such a case,
@@ -2547,7 +2546,8 @@ std::size_t rbs_prec_to_nlimbs(::mpfr_prec_t p)
     // NOTE: currently both mpfr_prec_t and GMP_NUMB_BITS
     // are signed.
     using uprec_t = std::make_unsigned<::mpfr_prec_t>::type;
-    return safe_cast<std::size_t>(static_cast<uprec_t>(p / GMP_NUMB_BITS + static_cast<int>((p % GMP_NUMB_BITS) != 0)));
+    return safe_cast<std::size_t>(
+        static_cast<uprec_t>((p / GMP_NUMB_BITS) + static_cast<int>((p % GMP_NUMB_BITS) != 0)));
 }
 
 // Turn an MPFR precision into the number of bytes
@@ -2736,7 +2736,7 @@ std::size_t real::binary_load_impl(const char *src)
     const auto sbs = detail::rbs_prec_to_size(p);
 
     // Compute the return value.
-    auto retval = detail::rbs_checked_add(detail::rbs_base_size(), sbs);
+    auto const retval = detail::rbs_checked_add(detail::rbs_base_size(), sbs);
 
     // Set the precision of this.
     set_prec(p);
@@ -2830,7 +2830,7 @@ std::size_t real::binary_load(std::istream &src)
     }
 
     // Compute the return value.
-    auto retval = detail::rbs_checked_add(detail::rbs_base_size(), sbs);
+    auto const retval = detail::rbs_checked_add(detail::rbs_base_size(), sbs);
 
     // Set the precision of this.
     set_prec(p);
@@ -2840,7 +2840,7 @@ std::size_t real::binary_load(std::istream &src)
     // Set the exponent.
     m_mpfr._mpfr_exp = e;
     // Copy over the limbs.
-    std::copy(buffer.begin(), buffer.end(), reinterpret_cast<char *>(m_mpfr._mpfr_d));
+    std::ranges::copy(buffer, reinterpret_cast<char *>(m_mpfr._mpfr_d));
 
     return retval;
 }

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -18,6 +18,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -36,7 +39,7 @@ static std::mt19937 rng;
 
 struct sqrt_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
@@ -177,7 +180,7 @@ TEST_CASE("sqrt")
 
 struct sqrtrem_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
@@ -325,7 +328,7 @@ TEST_CASE("sqrtrem")
 
 struct perfect_square_p_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
 
@@ -376,7 +379,7 @@ TEST_CASE("perfect_square_p")
 
 struct root_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
 
@@ -435,7 +438,7 @@ TEST_CASE("root")
 
 struct rootrem_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         integer rop, rem;
@@ -500,7 +503,7 @@ TEST_CASE("rootrem")
 
 struct perfect_power_p_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         REQUIRE(perfect_power_p(integer{}));
@@ -525,3 +528,5 @@ TEST_CASE("perfect_power_p")
 {
     tuple_for_each(sizes{}, perfect_power_p_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

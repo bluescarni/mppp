@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -28,6 +28,8 @@
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -127,7 +129,6 @@ TEST_CASE("real binary_save_load")
                                                         + sizeof(::mpfr_exp_t) + sizeof(::mp_limb_t))
                                        + " bytes, but it is only 1 bytes"));
 
-#if MPPP_CPLUSPLUS >= 201703L
         std::stringstream ss2;
         REQUIRE(r.binary_load(ss2) == 0u);
         ss2 = std::stringstream{};
@@ -161,7 +162,6 @@ TEST_CASE("real binary_save_load")
 
         REQUIRE(r == 0);
         REQUIRE(r.get_prec() == real_prec_min());
-#endif
     }
 
     // Prime number of bits of precision.
@@ -240,7 +240,6 @@ TEST_CASE("real binary_save_load")
                                                         + sizeof(::mpfr_exp_t) + sizeof(::mp_limb_t))
                                        + " bytes, but it is only 0 bytes"));
 
-#if MPPP_CPLUSPLUS >= 201703L
         std::stringstream ss2;
         REQUIRE(r.binary_load(ss2) == 0u);
         ss2 = std::stringstream{};
@@ -274,7 +273,6 @@ TEST_CASE("real binary_save_load")
 
         REQUIRE(r == real{"1.3", 419});
         REQUIRE(r.get_prec() == 419);
-#endif
     }
 
     // Precision exactly dividing limb size on 64-bit archs.
@@ -352,7 +350,6 @@ TEST_CASE("real binary_save_load")
                                                         + sizeof(::mpfr_exp_t) + sizeof(::mp_limb_t))
                                        + " bytes, but it is only 0 bytes"));
 
-#if MPPP_CPLUSPLUS >= 201703L
         std::stringstream ss2;
         REQUIRE(r.binary_load(ss2) == 0u);
         ss2 = std::stringstream{};
@@ -386,7 +383,6 @@ TEST_CASE("real binary_save_load")
 
         REQUIRE(r == real{"1.3", 128});
         REQUIRE(r.get_prec() == 128);
-#endif
     }
 }
 
@@ -420,3 +416,5 @@ TEST_CASE("boost_s11n")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -28,6 +28,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
@@ -49,12 +51,6 @@ using is_eq_comparable = std::integral_constant<bool, std::is_same<detail::detec
 template <typename T, typename U>
 using is_ineq_comparable = std::integral_constant<bool, std::is_same<detail::detected_t<inequal_t, T, U>, bool>::value>;
 
-#if defined(__INTEL_COMPILER)
-#define MPPP_INTEL_CONSTEXPR const
-#else
-#define MPPP_INTEL_CONSTEXPR constexpr
-#endif
-
 TEST_CASE("real128 equality")
 {
     REQUIRE((std::is_same<decltype(real128{} == real128{}), bool>::value));
@@ -67,13 +63,13 @@ TEST_CASE("real128 equality")
     REQUIRE((!is_ineq_comparable<std::string, real128>::value));
     constexpr bool c0 = real128{} == real128{};
     constexpr bool c0a = real128{} != real128{};
-    MPPP_INTEL_CONSTEXPR bool c0b = real128_equal_to(real128{}, real128{});
+    constexpr bool c0b = real128_equal_to(real128{}, real128{});
     REQUIRE(c0);
     REQUIRE(!c0a);
     REQUIRE(c0b);
     constexpr bool c1 = real128{-1} == real128{1};
     constexpr bool c1a = real128{-1} != real128{1};
-    MPPP_INTEL_CONSTEXPR bool c1b = real128_equal_to(real128{-1}, real128{1});
+    constexpr bool c1b = real128_equal_to(real128{-1}, real128{1});
     REQUIRE(!c1);
     REQUIRE(c1a);
     REQUIRE(!c1b);
@@ -203,11 +199,11 @@ TEST_CASE("real128 lt")
     REQUIRE((!is_lt_comparable<real128, std::string>::value));
     REQUIRE((!is_lt_comparable<std::string, real128>::value));
     constexpr bool c0 = real128{} < real128{};
-    MPPP_INTEL_CONSTEXPR bool c0b = real128_lt(real128{}, real128{});
+    constexpr bool c0b = real128_lt(real128{}, real128{});
     REQUIRE(!c0);
     REQUIRE(!c0b);
     constexpr bool c1 = real128{-1} < real128{1};
-    MPPP_INTEL_CONSTEXPR bool c1b = real128_lt(real128{-1}, real128{1});
+    constexpr bool c1b = real128_lt(real128{-1}, real128{1});
     REQUIRE(c1);
     REQUIRE(c1b);
     constexpr bool c2 = real128{1} < -1;
@@ -346,11 +342,11 @@ TEST_CASE("real128 gt")
     REQUIRE((!is_gt_comparable<real128, std::string>::value));
     REQUIRE((!is_gt_comparable<std::string, real128>::value));
     constexpr bool c0 = real128{} > real128{};
-    MPPP_INTEL_CONSTEXPR bool c0b = real128_gt(real128{}, real128{});
+    constexpr bool c0b = real128_gt(real128{}, real128{});
     REQUIRE(!c0);
     REQUIRE(!c0b);
     constexpr bool c1 = real128{-1} > real128{1};
-    MPPP_INTEL_CONSTEXPR bool c1b = real128_gt(real128{-1}, real128{1});
+    constexpr bool c1b = real128_gt(real128{-1}, real128{1});
     REQUIRE(!c1);
     REQUIRE(!c1b);
     constexpr bool c2 = real128{1} > -1;
@@ -480,17 +476,17 @@ TEST_CASE("real128 sort")
 {
     std::vector<real128> v0{real128{1}, real128{2}, real128{3}, real128{4}, real128{5}};
     std::shuffle(v0.begin(), v0.end(), rng);
-    std::sort(v0.begin(), v0.end());
+    std::ranges::sort(v0);
     REQUIRE((v0 == std::vector<real128>{real128{1}, real128{2}, real128{3}, real128{4}, real128{5}}));
     v0 = std::vector<real128>{real128{1}, real128{2}, real128{3}, real128_nan(), -real128_nan()};
     std::shuffle(v0.begin(), v0.end(), rng);
-    std::sort(v0.begin(), v0.end(), mppp::real128_lt);
+    std::ranges::sort(v0, mppp::real128_lt);
     REQUIRE(
         (std::vector<real128>(v0.begin(), v0.begin() + 3) == std::vector<real128>{real128{1}, real128{2}, real128{3}}));
     REQUIRE(v0[3].isnan());
     REQUIRE(v0[4].isnan());
     std::shuffle(v0.begin(), v0.end(), rng);
-    std::sort(v0.begin(), v0.end(), mppp::real128_gt);
+    std::ranges::sort(v0, mppp::real128_gt);
     REQUIRE((std::vector<real128>(v0.begin() + 2, v0.begin() + 5)
              == std::vector<real128>{real128{3}, real128{2}, real128{1}}));
     REQUIRE(v0[0].isnan());
@@ -507,3 +503,5 @@ TEST_CASE("real128 sort")
     REQUIRE(std::equal(v0.begin(), v0.begin() + 4, s0.begin()));
     REQUIRE(s0.rbegin()->isnan());
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

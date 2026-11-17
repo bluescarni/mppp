@@ -1,3 +1,6 @@
+# NOTE: C++20 supported since CMake 3.12.0:
+#
+# https://cmake.org/cmake/help/v3.12/prop_tgt/CXX_STANDARD.html
 cmake_minimum_required(VERSION 3.12.0)
 
 # Set default build type to "Release".
@@ -9,10 +12,10 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 2.0.0 LANGUAGES CXX C)
+project(mp++ VERSION 3.0.0 LANGUAGES CXX C)
 
 # Setup the mp++ ABI version number.
-set(MPPP_ABI_VERSION 16)
+set(MPPP_ABI_VERSION 17)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -34,14 +37,12 @@ option(MPPP_WITH_MPC "Enable features relying on MPC." OFF)
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_WITH_BOOST_S11N "Enable features relying on the Boost.Serialization library." OFF)
 option(MPPP_WITH_FMT "Enable support for the fmt library." OFF)
-option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
-mark_as_advanced(MPPP_TEST_PYBIND11)
 option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_UNICODE "Enable Unicode solutions for MSVC." OFF)
 endif()
 # Build option: enable IPO.
-option(MPPP_ENABLE_IPO "Enable IPO (requires CMake >= 3.9 and compiler support)." OFF)
+option(MPPP_ENABLE_IPO "Enable IPO (requires compiler support)." OFF)
 mark_as_advanced(MPPP_ENABLE_IPO)
 
 if(MPPP_WITH_FLINT AND NOT MPPP_WITH_MPFR)
@@ -153,12 +154,6 @@ if(YACMA_COMPILER_IS_MSVC)
     list(APPEND MPPP_CXX_FLAGS_RELEASE "/wd4459" "/wd4127")
   endif()
 endif()
-if(YACMA_COMPILER_IS_INTELXX)
-  # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
-  # in icc influence the behaviour at instantiation point, not at definition point).
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-diag-disable" "3373,1682,2259")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-diag-disable" "3373,1682,2259")
-endif()
 if(MINGW)
   # In MinGW some tests generate big object files.
   message(STATUS "Enabling the '-Wa,-mbig-obj' flag for MinGW.")
@@ -251,7 +246,6 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/visibility.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/parse_complex.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/extra/pybind11.hpp"
   )
   source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" PREFIX "Header Files" FILES ${MPPP_HEADER_FILES})
   set(MPPP_SRC_FILES ${MPPP_SRC_FILES} ${MPPP_HEADER_FILES})
@@ -280,8 +274,8 @@ target_compile_options(mp++ PRIVATE
     "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
 )
 
-# Ensure that C++11 is employed when both compiling and consuming mp++.
-target_compile_features(mp++ PUBLIC cxx_std_11)
+# Ensure that C++20 is employed when both compiling and consuming mp++.
+target_compile_features(mp++ PUBLIC cxx_std_20)
 # Enforce vanilla C++ when compiling mp++.
 set_property(TARGET mp++ PROPERTY CXX_EXTENSIONS NO)
 
@@ -291,19 +285,17 @@ target_include_directories(mp++ PUBLIC
     $<INSTALL_INTERFACE:include>)
 
 # IPO setup.
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0")
-    if(MPPP_ENABLE_IPO)
-        include(CheckIPOSupported)
-        check_ipo_supported(RESULT _MPPP_IPO_RESULT OUTPUT _MPPP_IPO_OUTPUT)
-        if (_MPPP_IPO_RESULT)
-            message(STATUS "IPO requested and supported, enabling.")
-            set_property(TARGET mp++ PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-        else()
-            message(STATUS "IPO requested, but it is not supported by the compiler:\n${_MPPP_IPO_OUTPUT}")
-        endif()
-        unset(_MPPP_IPO_RESULT)
-        unset(_MPPP_IPO_OUTPUT)
+if(MPPP_ENABLE_IPO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT _MPPP_IPO_RESULT OUTPUT _MPPP_IPO_OUTPUT)
+    if (_MPPP_IPO_RESULT)
+        message(STATUS "IPO requested and supported, enabling.")
+        set_property(TARGET mp++ PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(STATUS "IPO requested, but it is not supported by the compiler:\n${_MPPP_IPO_OUTPUT}")
     endif()
+    unset(_MPPP_IPO_RESULT)
+    unset(_MPPP_IPO_OUTPUT)
 endif()
 
 # Find GMP first of all. We will make mp++ link to the imported
@@ -402,9 +394,8 @@ if(MPPP_WITH_BOOST_S11N)
     target_link_libraries(mp++ PUBLIC Boost::serialization Boost::disable_autolinking)
 endif()
 
-# NOTE: need at least version 6.2
-# to print 128-bit integers.
-set(_MPPP_MIN_FMT_VERSION "6.2")
+# NOTE: fmt >= 11 provides the lightweight fmt/base.h header, and it supports __float128 directly.
+set(_MPPP_MIN_FMT_VERSION "11")
 if(MPPP_WITH_FMT)
     find_package(fmt ${_MPPP_MIN_FMT_VERSION} REQUIRED CONFIG)
     message(STATUS "fmt version: ${fmt_VERSION}")

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -25,6 +25,9 @@
 #include <mp++/rational.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -506,7 +509,7 @@ struct sub_tester {
                 REQUIRE((std::is_same<double &, decltype(x -= rational{-4})>::value));
                 REQUIRE((lex_cast(x) == "9"));
                 x -= rational{-5, 2};
-                REQUIRE((std::abs(23. / 2 - x) < 1E-8));
+                REQUIRE((std::abs((23. / 2) - x) < 1E-8));
                 retval = 1;
                 REQUIRE_THROWS_PREDICATE(
                     retval -= std::numeric_limits<double>::infinity(), std::domain_error,
@@ -524,7 +527,7 @@ struct sub_tester {
                 x -= rational{-4};
                 REQUIRE((lex_cast(x) == "9"));
                 x -= rational{-5, 2};
-                REQUIRE((std::abs(23.l / 2 - x) < 1E-8l));
+                REQUIRE((std::abs((23.l / 2) - x) < 1E-8l));
             }
         }
 #endif
@@ -779,9 +782,9 @@ struct mul_tester {
                 double x = 5;
                 x *= rational{-5, 2};
                 REQUIRE((std::is_same<double &, decltype(x *= rational{-4})>::value));
-                REQUIRE((std::abs(-25. / 2 - x) < 1E-8));
+                REQUIRE((std::abs((-25. / 2) - x) < 1E-8));
                 x *= rational{-5, 2};
-                REQUIRE((std::abs(125. / 4 - x) < 1E-8));
+                REQUIRE((std::abs((125. / 4) - x) < 1E-8));
                 retval = 1;
                 REQUIRE_THROWS_PREDICATE(
                     retval *= std::numeric_limits<double>::infinity(), std::domain_error,
@@ -797,9 +800,9 @@ struct mul_tester {
             if (std::numeric_limits<long double>::is_iec559) {
                 long double x = 5;
                 x *= rational{-5, 2};
-                REQUIRE((std::abs(-25. / 2 - x) < 1E-8));
+                REQUIRE((std::abs((-25. / 2) - x) < 1E-8));
                 x *= rational{-5, 2};
-                REQUIRE((std::abs(125. / 4 - x) < 1E-8));
+                REQUIRE((std::abs((125. / 4) - x) < 1E-8));
             }
         }
 #endif
@@ -855,3 +858,5 @@ TEST_CASE("mul")
 {
     tuple_for_each(sizes{}, mul_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

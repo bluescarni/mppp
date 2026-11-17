@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -9,10 +9,10 @@
 #ifndef MPPP_DETAIL_TYPE_TRAITS_HPP
 #define MPPP_DETAIL_TYPE_TRAITS_HPP
 
-#include <mp++/config.hpp>
-
 #include <limits>
 #include <type_traits>
+
+#include <mp++/config.hpp>
 
 MPPP_BEGIN_NAMESPACE
 
@@ -20,23 +20,6 @@ namespace detail
 {
 
 // A bunch of useful utilities from C++14/C++17.
-
-// http://en.cppreference.com/w/cpp/types/void_t
-#if MPPP_CPLUSPLUS >= 201703L
-
-using std::void_t;
-
-#else
-
-template <typename... Ts>
-struct make_void {
-    typedef void type;
-};
-
-template <typename... Ts>
-using void_t = typename make_void<Ts...>::type;
-
-#endif
 
 // http://en.cppreference.com/w/cpp/experimental/is_detected
 template <class Default, class AlwaysVoid, template <class...> class Op, class... Args>
@@ -46,7 +29,7 @@ struct detector {
 };
 
 template <class Default, template <class...> class Op, class... Args>
-struct detector<Default, void_t<Op<Args...>>, Op, Args...> {
+struct detector<Default, std::void_t<Op<Args...>>, Op, Args...> {
     using value_t = std::true_type;
     using type = Op<Args...>;
 };
@@ -67,46 +50,9 @@ using is_detected = typename detector<nonesuch, void, Op, Args...>::value_t;
 template <template <class...> class Op, class... Args>
 using detected_t = typename detector<nonesuch, void, Op, Args...>::type;
 
-// http://en.cppreference.com/w/cpp/types/conjunction
-// http://en.cppreference.com/w/cpp/types/disjunction
-// http://en.cppreference.com/w/cpp/types/negation
-#if MPPP_CPLUSPLUS >= 201703L
-
 using std::conjunction;
 using std::disjunction;
 using std::negation;
-
-#else
-
-template <class...>
-struct conjunction : std::true_type {
-};
-
-template <class B1>
-struct conjunction<B1> : B1 {
-};
-
-template <class B1, class... Bn>
-struct conjunction<B1, Bn...> : std::conditional<B1::value != false, conjunction<Bn...>, B1>::type {
-};
-
-template <class...>
-struct disjunction : std::false_type {
-};
-
-template <class B1>
-struct disjunction<B1> : B1 {
-};
-
-template <class B1, class... Bn>
-struct disjunction<B1, Bn...> : std::conditional<B1::value != false, B1, disjunction<Bn...>>::type {
-};
-
-template <class B>
-struct negation : std::integral_constant<bool, !B::value> {
-};
-
-#endif
 
 // Small helpers, like C++14.
 template <bool B, typename T = void>
@@ -263,7 +209,7 @@ constexpr int nl_digits<__int128_t>() noexcept
 template <>
 constexpr __uint128_t nl_max<__uint128_t>() noexcept
 {
-    return ~__uint128_t(0);
+    return ~static_cast<__uint128_t>(0);
 }
 
 template <>
@@ -275,7 +221,7 @@ constexpr __uint128_t nl_min<__uint128_t>() noexcept
 template <>
 constexpr __int128_t nl_max<__int128_t>() noexcept
 {
-    return static_cast<__int128_t>((__uint128_t(1) << 127u) - 1u);
+    return static_cast<__int128_t>((static_cast<__uint128_t>(1) << 127u) - 1u);
 }
 
 template <>

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -41,7 +41,7 @@ std::array<const char *, 4> parse_complex(const char *str)
 
     // Small helper to raise an error in case
     // of a malformed string.
-    auto raise_error = [str]() {
+    auto const raise_error = [str] {
         throw std::invalid_argument(std::string("The string '") + str
                                     + "' is not a valid representation of a complex value");
     };

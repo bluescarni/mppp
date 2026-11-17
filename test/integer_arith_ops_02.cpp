@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -31,6 +31,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -122,7 +125,7 @@ struct div_tester {
         retval = 2;
         retval /= 1;
         REQUIRE((lex_cast(retval) == "2"));
-        retval /= short(-1);
+        retval /= static_cast<short>(-1);
         REQUIRE((lex_cast(retval) == "-2"));
         retval /= static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "2"));
@@ -179,13 +182,13 @@ struct div_tester {
         REQUIRE((retval == -1));
 #endif
         // In-place with interop on the lhs.
-        short nl = 12;
-        nl /= integer{3};
-        REQUIRE((std::is_same<short &, decltype(nl /= integer{1})>::value));
-        REQUIRE(nl == 4);
-        nl /= integer{-2};
-        REQUIRE(nl == -2);
-        REQUIRE_THROWS_AS(nl /= integer{}, zero_division_error);
+        short cpp_n = 12;
+        cpp_n /= integer{3};
+        REQUIRE((std::is_same<short &, decltype(cpp_n /= integer{1})>::value));
+        REQUIRE(cpp_n == 4);
+        cpp_n /= integer{-2};
+        REQUIRE(cpp_n == -2);
+        REQUIRE_THROWS_AS(cpp_n /= integer{}, zero_division_error);
         unsigned long long unl = 24;
         unl /= integer{2};
         REQUIRE(unl == 12);
@@ -288,6 +291,8 @@ TEST_CASE("div")
 {
     tuple_for_each(sizes{}, div_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 #if defined(_MSC_VER)
 

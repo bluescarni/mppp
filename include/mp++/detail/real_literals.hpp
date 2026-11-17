@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -32,7 +32,7 @@ inline real real_literal_impl(::mpfr_prec_t prec)
     // Infer the base. Default is 10, if the string
     // contains 'x'/'X' then we assume base 16.
     int base = 10;
-    for (auto c : arr) {
+    for (const auto c : arr) {
         if (c == 'x' || c == 'X') {
             base = 16;
             break;

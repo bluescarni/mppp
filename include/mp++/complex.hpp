@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -18,12 +18,9 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -36,7 +33,7 @@
 
 #if defined(MPPP_WITH_FMT)
 
-#include <fmt/core.h>
+#include <fmt/base.h>
 
 #include <mp++/detail/fmt.hpp>
 
@@ -99,31 +96,20 @@ using is_complex_interoperable
 template <typename T>
 using is_complex_convertible = detail::conjunction<is_complex_interoperable<T>, std::is_same<T, detail::uncvref_t<T>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+concept rv_complex_interoperable = is_rv_complex_interoperable<T>::value;
 
 template <typename T>
-MPPP_CONCEPT_DECL rv_complex_interoperable = is_rv_complex_interoperable<T>::value;
+concept complex_interoperable = is_complex_interoperable<T>::value;
 
 template <typename T>
-MPPP_CONCEPT_DECL complex_interoperable = is_complex_interoperable<T>::value;
-
-template <typename T>
-MPPP_CONCEPT_DECL complex_convertible = is_complex_convertible<T>::value;
-
-#endif
+concept complex_convertible = is_complex_convertible<T>::value;
 
 template <typename T>
 using is_cvr_complex = std::is_same<detail::uncvref_t<T>, complex>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL cvr_complex = is_cvr_complex<T>::value;
-
-#endif
-
-template <typename... Args>
-using cvr_complex_enabler = detail::enable_if_t<detail::conjunction<is_cvr_complex<Args>...>::value, int>;
+concept cvr_complex = is_cvr_complex<T>::value;
 
 // Fwd declare swap.
 void swap(complex &, complex &) noexcept;
@@ -211,8 +197,8 @@ class MPPP_DLL_PUBLIC complex
     template <typename Archive>
     void save(Archive &ar, unsigned) const
     {
-        re_cref re{*this};
-        im_cref im{*this};
+        const re_cref re{*this};
+        const im_cref im{*this};
 
         ar << *re;
         ar << *im;
@@ -258,8 +244,7 @@ public:
 
 private:
     // A tag to call private ctors.
-    struct ptag {
-    };
+    struct ptag {};
     // Private ctor that sets to NaN with a certain precision,
     // without checking the input precision value.
     explicit complex(const ptag &, ::mpfr_prec_t, bool);
@@ -283,8 +268,7 @@ public:
 
 private:
     // A tag for private generic ctors.
-    struct gtag {
-    };
+    struct gtag {};
     // From real-valued interoperable types + optional precision.
     template <typename T, typename... Args>
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
@@ -318,21 +302,13 @@ private:
 
 public:
     // Ctor from interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
-#endif
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init, bugprone-forwarding-reference-overload)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init,bugprone-forwarding-reference-overload,google-explicit-constructor,cppcoreguidelines-explicit-constructor,misc-explicit-constructor)
     complex(T &&x) : complex(gtag{}, is_rv_complex_interoperable<T>{}, std::forward<T>(x))
     {
     }
     // Ctor from interoperable types + precision.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(T &&x, complex_prec_t p) : complex(gtag{}, is_rv_complex_interoperable<T>{}, std::forward<T>(x), p)
     {
@@ -358,14 +334,7 @@ private:
 
 public:
     // Binary ctor from real-valued interoperable types.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <rv_complex_interoperable T, rv_complex_interoperable U>
-#else
-    template <typename T, typename U,
-              detail::enable_if_t<
-                  detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int>
-              = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(T &&re, U &&im)
     {
@@ -375,14 +344,7 @@ public:
                             detail::c_max(detail::real_deduce_precision(re), detail::real_deduce_precision(im)));
     }
     // Binary ctor from real-valued interoperable types + prec.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <rv_complex_interoperable T, rv_complex_interoperable U>
-#else
-    template <typename T, typename U,
-              detail::enable_if_t<
-                  detail::conjunction<is_rv_complex_interoperable<T>, is_rv_complex_interoperable<U>>::value, int>
-              = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(T &&re, U &&im, complex_prec_t p)
     {
@@ -391,32 +353,21 @@ public:
 
 private:
     // A tag for private string ctors.
-    struct stag {
-    };
+    struct stag {};
     MPPP_DLL_LOCAL void construct_from_c_string(const char *, int, ::mpfr_prec_t);
     explicit complex(const stag &, const char *, int, ::mpfr_prec_t);
     explicit complex(const stag &, const std::string &, int, ::mpfr_prec_t);
-#if defined(MPPP_HAVE_STRING_VIEW)
     explicit complex(const stag &, const std::string_view &, int, ::mpfr_prec_t);
-#endif
 
 public:
     // Constructor from string, base and precision.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(const T &s, int base, complex_prec_t p) : complex(stag{}, s, base, static_cast<::mpfr_prec_t>(p))
     {
     }
     // Constructor from string and precision.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit complex(const T &s, complex_prec_t p) : complex(s, 10, p)
     {
@@ -430,6 +381,8 @@ public:
     explicit complex(const ::mpc_t);
 #if !defined(_MSC_VER) || defined(__clang__)
     // Move constructor from mpc_t.
+    //
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     explicit complex(::mpc_t &&c) : m_mpc(*c) {}
 #endif
 
@@ -491,11 +444,7 @@ private:
     }
 
 public:
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
     complex &operator=(T &&x)
     {
@@ -512,7 +461,7 @@ public:
 #endif
 
     // Check validity.
-    MPPP_NODISCARD bool is_valid() const noexcept
+    [[nodiscard]] bool is_valid() const noexcept
     {
         return mpc_realref(&m_mpc)->_mpfr_d != nullptr;
     }
@@ -542,11 +491,7 @@ private:
 
 public:
     // Generic setter.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_complex_interoperable<T>::value, int> = 0>
-#endif
     complex &set(const T &other)
     {
         set_impl(other, is_rv_complex_interoperable<T>{});
@@ -558,17 +503,11 @@ private:
     MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
     complex &set_impl(const char *, int);
     complex &set_impl(const std::string &, int);
-#if defined(MPPP_HAVE_STRING_VIEW)
     complex &set_impl(const std::string_view &, int);
-#endif
 
 public:
     // Setter to string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     complex &set(const T &s, int base = 10)
     {
         return set_impl(s, base);
@@ -702,9 +641,7 @@ public:
         real m_value;
     };
 
-#if MPPP_CPLUSPLUS >= 201703L
     // Helpers to construct re/im refs.
-    // They require C++17.
     [[nodiscard]] re_cref real_cref() const
     {
         return re_cref{*this};
@@ -721,9 +658,9 @@ public:
     {
         return im_ref{*this};
     }
-#endif
+
     // Extract copies of the real/imaginary parts.
-    MPPP_NODISCARD std::pair<real, real> get_real_imag() const &;
+    [[nodiscard]] std::pair<real, real> get_real_imag() const &;
     // Move out the real/imaginary parts.
     std::pair<real, real> get_real_imag() &&
     {
@@ -737,7 +674,7 @@ public:
     }
 
     // Precision getter.
-    MPPP_NODISCARD ::mpfr_prec_t get_prec() const
+    [[nodiscard]] ::mpfr_prec_t get_prec() const
     {
         assert(mpfr_get_prec(mpc_realref(&m_mpc)) == mpfr_get_prec(mpc_imagref(&m_mpc)));
 
@@ -777,7 +714,7 @@ public:
     complex &prec_round(::mpfr_prec_t);
 
     // mpc_t getters.
-    MPPP_NODISCARD const mpc_struct_t *get_mpc_t() const
+    [[nodiscard]] const mpc_struct_t *get_mpc_t() const
     {
         return &m_mpc;
     }
@@ -787,24 +724,24 @@ public:
     }
 
     // Detect special values.
-    MPPP_NODISCARD bool zero_p() const
+    [[nodiscard]] bool zero_p() const
     {
         return detail::mpc_is_zero(&m_mpc);
     }
-    MPPP_NODISCARD bool inf_p() const
+    [[nodiscard]] bool inf_p() const
     {
         return detail::mpc_is_inf(&m_mpc);
     }
-    MPPP_NODISCARD bool number_p() const
+    [[nodiscard]] bool number_p() const
     {
         return detail::mpc_is_finite(&m_mpc);
     }
-    MPPP_NODISCARD bool is_one() const;
+    [[nodiscard]] bool is_one() const;
 
 private:
     // Implementation of the conversion operator.
     template <typename T>
-    MPPP_NODISCARD T dispatch_conversion(std::true_type) const
+    [[nodiscard]] T dispatch_conversion(std::true_type) const
     {
         if (std::is_same<T, bool>::value) {
             return static_cast<T>(!zero_p());
@@ -814,28 +751,24 @@ private:
                                         + type_name<T>() + "': the imaginary part is not zero");
             }
 
-            re_cref re{*this};
+            const re_cref re{*this};
 
             return static_cast<T>(*re);
         }
     }
     template <typename T>
-    MPPP_NODISCARD T dispatch_conversion(std::false_type) const
+    [[nodiscard]] T dispatch_conversion(std::false_type) const
     {
         using value_type = typename T::value_type;
 
-        re_cref re{*this};
-        im_cref im{*this};
+        const re_cref re{*this};
+        const im_cref im{*this};
 
         return T{static_cast<value_type>(*re), static_cast<value_type>(*im)};
     }
 
 public:
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex_convertible T>
-#else
-    template <typename T, detail::enable_if_t<is_complex_convertible<T>::value, int> = 0>
-#endif
     explicit operator T() const
     {
         return dispatch_conversion<T>(is_rv_complex_interoperable<T>{});
@@ -855,7 +788,7 @@ private:
                 return false;
             }
 
-            re_cref re{*this};
+            const re_cref re{*this};
 
             return re->get(rop);
         }
@@ -868,7 +801,7 @@ private:
             return false;
         }
 
-        re_cref re{*this};
+        const re_cref re{*this};
 
         rop = *re;
 
@@ -880,8 +813,8 @@ private:
     {
         using value_type = typename T::value_type;
 
-        re_cref re{*this};
-        im_cref im{*this};
+        const re_cref re{*this};
+        const im_cref im{*this};
 
         // NOTE: currently here T is always either
         // std::complex or complex128, and thus the conversion
@@ -895,11 +828,7 @@ private:
     }
 
 public:
-#if defined(MPPP_HAVE_CONCEPTS)
     template <complex_convertible T>
-#else
-    template <typename T, detail::enable_if_t<is_complex_convertible<T>::value, int> = 0>
-#endif
     bool get(T &rop) const
     {
         return dispatch_get(
@@ -907,11 +836,11 @@ public:
             std::integral_constant<int, is_rv_complex_interoperable<T>::value + std::is_same<T, real>::value * 2>{});
     }
 
-    MPPP_NODISCARD std::string to_string(int base = 10) const;
+    [[nodiscard]] std::string to_string(int base = 10) const;
 
 #if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
     // Get the number of significant digits required for a round-tripping representation.
-    MPPP_NODISCARD std::size_t get_str_ndigits(int = 10) const;
+    [[nodiscard]] std::size_t get_str_ndigits(int = 10) const;
 #endif
 
 private:
@@ -998,18 +927,14 @@ template <typename T, typename U>
 using are_complex_in_place_op_types
     = detail::conjunction<detail::negation<std::is_const<detail::unref_t<T>>>, are_complex_op_types<T, U>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+concept complex_eq_op_types = are_complex_eq_op_types<T, U>::value;
 
 template <typename T, typename U>
-MPPP_CONCEPT_DECL complex_eq_op_types = are_complex_eq_op_types<T, U>::value;
+concept complex_op_types = are_complex_op_types<T, U>::value;
 
 template <typename T, typename U>
-MPPP_CONCEPT_DECL complex_op_types = are_complex_op_types<T, U>::value;
-
-template <typename T, typename U>
-MPPP_CONCEPT_DECL complex_in_place_op_types = are_complex_in_place_op_types<T, U>::value;
-
-#endif
+concept complex_in_place_op_types = are_complex_in_place_op_types<T, U>::value;
 
 // Precision handling.
 inline ::mpfr_prec_t get_prec(const complex &c)
@@ -1035,19 +960,11 @@ using complex_set_t = decltype(std::declval<complex &>().set(std::declval<const 
 
 } // namespace detail
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename... Args>
-MPPP_CONCEPT_DECL complex_set_args = detail::is_detected<detail::complex_set_t, Args...>::value;
-
-#endif
+concept complex_set_args = detail::is_detected<detail::complex_set_t, Args...>::value;
 
 // Generic setter.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <complex_set_args... Args>
-#else
-template <typename... Args, detail::enable_if_t<detail::is_detected<detail::complex_set_t, Args...>::value, int> = 0>
-#endif
 inline complex &set(complex &c, const Args &...args)
 {
     return c.set(args...);
@@ -1069,11 +986,7 @@ inline void swap(complex &a, complex &b) noexcept
 }
 
 // Generic conversion function.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <complex_convertible T>
-#else
-template <typename T, detail::enable_if_t<is_complex_convertible<T>::value, int> = 0>
-#endif
 inline bool get(T &rop, const complex &c)
 {
     return c.get(rop);
@@ -1089,8 +1002,6 @@ inline std::pair<real, real> get_real_imag(const complex &c)
 {
     return c.get_real_imag();
 }
-
-#if MPPP_CPLUSPLUS >= 201703L
 
 inline complex::re_cref real_cref(const complex &c)
 {
@@ -1112,8 +1023,6 @@ inline complex::im_ref imag_ref(complex &c)
     return c.imag_ref();
 }
 
-#endif
-
 namespace detail
 {
 
@@ -1124,6 +1033,7 @@ namespace detail
 // A small helper to init the pairs in the functions below. We need this because
 // we cannot take the address of a const complex as a complex *.
 template <typename Arg, enable_if_t<!is_ncrvr<Arg &&>::value, int> = 0>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline std::pair<complex *, ::mpfr_prec_t> mpc_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
@@ -1131,6 +1041,7 @@ inline std::pair<complex *, ::mpfr_prec_t> mpc_nary_op_init_pair(::mpfr_prec_t m
 }
 
 template <typename Arg, enable_if_t<is_ncrvr<Arg &&>::value, int> = 0>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline std::pair<complex *, ::mpfr_prec_t> mpc_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is a non-const rvalue ref, and a candidate for stealing resources.
@@ -1151,6 +1062,7 @@ template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value,
 void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
@@ -1160,6 +1072,7 @@ inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0
 }
 
 template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int>>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void mpc_nary_op_check_steal(std::pair<complex *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     const auto prec0 = arg0.get_prec();
@@ -1237,7 +1150,10 @@ inline complex &mpc_nary_op_impl(::mpfr_prec_t min_prec, const F &f, complex &ro
     if (p.second == r_prec) {
         // The target precision and the precision of the return value
         // match. No need to steal, just execute the function.
+        //
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         mpc_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpc_t(), arg0.get_mpc_t(),
+                              // NOLINTNEXTLINE(bugprone-use-after-move)
                               args.get_mpc_t()...);
     } else {
         if (r_prec > p.second) {
@@ -1324,7 +1240,10 @@ inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 
         // We can steal from one or more args, and the precision of
         // the largest-precision arg we can steal from matches
         // the target precision. Use it.
+        //
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         mpc_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpc_t(), arg0.get_mpc_t(),
+                              // NOLINTNEXTLINE(bugprone-use-after-move)
                               args.get_mpc_t()...);
         return std::move(*p.first);
     } else {
@@ -1349,11 +1268,7 @@ inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 
 
 // These are the headers of the overloads that will be produced. They are different depending
 // on whether concepts are available or not.
-#if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_COMPLEX_MPC_UNARY_HEADER template <cvr_complex T>
-#else
-#define MPPP_COMPLEX_MPC_UNARY_HEADER template <typename T, detail::enable_if_t<is_cvr_complex<T>::value, int> = 0>
-#endif
 
 #define MPPP_COMPLEX_MPC_UNARY_IMPL(name, fname, rnd)                                                                  \
     MPPP_COMPLEX_MPC_UNARY_HEADER inline complex &name(complex &rop, T &&op)                                           \
@@ -1385,14 +1300,8 @@ inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 
 
 // These are the headers of the overloads that will be produced. They are different depending
 // on whether concepts are available or not.
-#if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_COMPLEX_MPC_BINARY_HEADER1 template <cvr_complex T, cvr_complex U>
 #define MPPP_COMPLEX_MPC_BINARY_HEADER2 template <typename T, complex_op_types<T> U>
-#else
-#define MPPP_COMPLEX_MPC_BINARY_HEADER1 template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
-#define MPPP_COMPLEX_MPC_BINARY_HEADER2                                                                                \
-    template <typename T, typename U, detail::enable_if_t<are_complex_op_types<U, T>::value, int> = 0>
-#endif
 
 // The actual macro.
 #define MPPP_COMPLEX_MPC_BINARY_IMPL(name, fname, rnd)                                                                 \
@@ -1405,7 +1314,7 @@ inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 
     namespace detail                                                                                                   \
     {                                                                                                                  \
     /* Both arguments are complex. */                                                                                  \
-    template <typename T, typename U, cvr_complex_enabler<T, U> = 0>                                                   \
+    template <cvr_complex T, cvr_complex U>                                                                            \
     inline complex dispatch_##name(T &&y, U &&x)                                                                       \
     {                                                                                                                  \
         return mpc_nary_op_return_impl<rnd>(0, fname, std::forward<T>(y), std::forward<U>(x));                         \
@@ -1440,55 +1349,35 @@ inline complex mpc_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 
 // Basic arithmetics.
 
 // Ternary addition.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T, cvr_complex U>
-#else
-template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
-#endif
 inline complex &add(complex &rop, T &&a, U &&b)
 {
     return detail::mpc_nary_op_impl<true>(0, ::mpc_add, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 // Ternary subtraction.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T, cvr_complex U>
-#else
-template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
-#endif
 inline complex &sub(complex &rop, T &&a, U &&b)
 {
     return detail::mpc_nary_op_impl<true>(0, ::mpc_sub, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 // Ternary multiplication.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T, cvr_complex U>
-#else
-template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
-#endif
 inline complex &mul(complex &rop, T &&a, U &&b)
 {
     return detail::mpc_nary_op_impl<true>(0, ::mpc_mul, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 // Ternary division.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T, cvr_complex U>
-#else
-template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
-#endif
 inline complex &div(complex &rop, T &&a, U &&b)
 {
     return detail::mpc_nary_op_impl<true>(0, ::mpc_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 // Quaternary fused multiply–add.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T, cvr_complex U, cvr_complex V>
-#else
-template <typename T, typename U, typename V, cvr_complex_enabler<T, U, V> = 0>
-#endif
 inline complex &fma(complex &rop, T &&a, U &&b, V &&c)
 {
     return detail::mpc_nary_op_impl<true>(0, ::mpc_fma, rop, std::forward<T>(a), std::forward<U>(b),
@@ -1496,11 +1385,7 @@ inline complex &fma(complex &rop, T &&a, U &&b, V &&c)
 }
 
 // Ternary fused multiply–add.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T, cvr_complex U, cvr_complex V>
-#else
-template <typename T, typename U, typename V, cvr_complex_enabler<T, U, V> = 0>
-#endif
 inline complex fma(T &&a, U &&b, V &&c)
 {
     return detail::mpc_nary_op_return_impl<true>(0, ::mpc_fma, std::forward<T>(a), std::forward<U>(b),
@@ -1508,91 +1393,59 @@ inline complex fma(T &&a, U &&b, V &&c)
 }
 
 // mul2/div2 primitives.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex mul_2ui(T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2ui(r, o, n, MPC_RNDNN); };
+    auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2ui(r, o, n, MPC_RNDNN); };
     return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex &mul_2ui(complex &rop, T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2ui(r, o, n, MPC_RNDNN); };
+    auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2ui(r, o, n, MPC_RNDNN); };
     return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex mul_2si(T &&x, long n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2si(r, o, n, MPC_RNDNN); };
+    auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2si(r, o, n, MPC_RNDNN); };
     return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex &mul_2si(complex &rop, T &&x, long n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2si(r, o, n, MPC_RNDNN); };
+    auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_mul_2si(r, o, n, MPC_RNDNN); };
     return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex div_2ui(T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2ui(r, o, n, MPC_RNDNN); };
+    auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2ui(r, o, n, MPC_RNDNN); };
     return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex &div_2ui(complex &rop, T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2ui(r, o, n, MPC_RNDNN); };
+    auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2ui(r, o, n, MPC_RNDNN); };
     return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex div_2si(T &&x, long n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2si(r, o, n, MPC_RNDNN); };
+    auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2si(r, o, n, MPC_RNDNN); };
     return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex &div_2si(complex &rop, T &&x, long n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2si(r, o, n, MPC_RNDNN); };
+    auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_div_2si(r, o, n, MPC_RNDNN); };
     return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
@@ -1602,26 +1455,18 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(proj, ::mpc_proj, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(sqr, ::mpc_sqr, true)
 
 // Multiplication by +-i.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex &mul_i(complex &rop, T &&c, int sgn = 0)
 {
-    auto wrapper = [sgn](::mpc_t r, const ::mpc_t o) { ::mpc_mul_i(r, o, sgn, MPC_RNDNN); };
+    auto const wrapper = [sgn](::mpc_t r, const ::mpc_t o) { ::mpc_mul_i(r, o, sgn, MPC_RNDNN); };
 
     return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(c));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex mul_i(T &&c, int sgn = 0)
 {
-    auto wrapper = [sgn](::mpc_t rop, const ::mpc_t o) { ::mpc_mul_i(rop, o, sgn, MPC_RNDNN); };
+    auto const wrapper = [sgn](::mpc_t rop, const ::mpc_t o) { ::mpc_mul_i(rop, o, sgn, MPC_RNDNN); };
 
     return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(c));
 }
@@ -1678,36 +1523,24 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(sqrt, ::mpc_sqrt, true)
 MPPP_COMPLEX_MPC_UNARY_IMPL(rec_sqrt, detail::acb_rec_sqrt, false)
 
 // K-th root.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex &rootn_ui(complex &rop, T &&op, unsigned long k)
 {
-    auto wrapper = [k](::mpc_t r, const ::mpc_t o) { detail::acb_rootn_ui(r, o, k); };
+    auto const wrapper = [k](::mpc_t r, const ::mpc_t o) { detail::acb_rootn_ui(r, o, k); };
     return detail::mpc_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex rootn_ui(T &&r, unsigned long k)
 {
-    auto wrapper = [k](::mpc_t rop, const ::mpc_t op) { detail::acb_rootn_ui(rop, op, k); };
+    auto const wrapper = [k](::mpc_t rop, const ::mpc_t op) { detail::acb_rootn_ui(rop, op, k); };
     return detail::mpc_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
 #endif
 
 // Ternary exponentiation.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T, cvr_complex U>
-#else
-template <typename T, typename U, cvr_complex_enabler<T, U> = 0>
-#endif
 inline complex &pow(complex &rop, T &&op1, U &&op2)
 {
     return detail::mpc_nary_op_impl<true>(0, ::mpc_pow, rop, std::forward<T>(op1), std::forward<U>(op2));
@@ -1727,7 +1560,7 @@ inline complex complex_pow_impl(T &&a, U &&b)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex complex_pow_impl(T &&a, const real &b)
 {
-    auto wrapper = [&b](::mpc_t r, const ::mpc_t o) { ::mpc_pow_fr(r, o, b.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&b](::mpc_t r, const ::mpc_t o) { ::mpc_pow_fr(r, o, b.get_mpfr_t(), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(b.get_prec(), wrapper, std::forward<T>(a));
 }
@@ -1736,7 +1569,7 @@ inline complex complex_pow_impl(T &&a, const real &b)
 template <typename T, std::size_t SSize, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex complex_pow_impl(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_z(r, o, n.get_mpz_view(), MPC_RNDNN); };
+    auto const wrapper = [&n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_z(r, o, n.get_mpz_view(), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -1747,7 +1580,7 @@ template <typename T, typename U,
 inline complex complex_pow_impl(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ui(r, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -1760,7 +1593,8 @@ inline complex complex_pow_impl(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex complex_pow_impl(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ui(r, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ui(r, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -1771,7 +1605,7 @@ template <typename T, typename U,
 inline complex complex_pow_impl(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_si(r, o, static_cast<long>(n), MPC_RNDNN); };
+        auto const wrapper = [n](::mpc_t r, const ::mpc_t o) { ::mpc_pow_si(r, o, static_cast<long>(n), MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -1784,14 +1618,15 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_complex<T>, is_
 inline complex complex_pow_impl(T &&a, const U &x)
 {
     if (std::is_same<U, float>::value || std::is_same<U, double>::value) {
-        auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_d(r, o, static_cast<double>(x), MPC_RNDNN); };
+        auto const wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_d(r, o, static_cast<double>(x), MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
     } else {
 #if defined(_MSC_VER)
         auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_d(r, o, static_cast<double>(x), MPC_RNDNN); };
 #else
-        auto wrapper = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ld(r, o, static_cast<long double>(x), MPC_RNDNN); };
+        auto const wrapper
+            = [x](::mpc_t r, const ::mpc_t o) { ::mpc_pow_ld(r, o, static_cast<long double>(x), MPC_RNDNN); };
 #endif
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
@@ -1806,8 +1641,7 @@ template <typename T, typename U,
                                                                  std::is_same<U, real128>
 #endif
                                                                  >>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline complex complex_pow_impl(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -1890,12 +1724,8 @@ inline complex complex_pow_impl(const T &c, const real &x)
 } // namespace detail
 
 // Binary exponentiation.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
-#endif
 inline complex pow(T &&a, U &&b)
 {
     return detail::complex_pow_impl(std::forward<T>(a), std::forward<U>(b));
@@ -1914,11 +1744,8 @@ MPPP_COMPLEX_MPC_UNARY_IMPL(atan, ::mpc_atan, true)
 // for multiple retvals, thus we do a manual implementation
 // of this function. We keep the signature with cvr_complex
 // for consistency with the other functions.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void sin_cos(complex &sop, complex &cop, T &&op)
 {
     if (mppp_unlikely(&sop == &cop)) {
@@ -1965,11 +1792,7 @@ MPPP_COMPLEX_MPC_BINARY_IMPL(agm, detail::acb_agm, false)
 #undef MPPP_COMPLEX_MPC_BINARY_HEADER2
 #undef MPPP_COMPLEX_MPC_BINARY_IMPL
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex operator+(T &&c)
 {
     return std::forward<T>(c);
@@ -1998,7 +1821,7 @@ inline complex dispatch_complex_binary_add(T &&a, const real &x)
     // NOTE: this is the usual pattern in which we transform a non-MPC-like binary operation
     // into an unary MPC-like operation and account for the non-mpc_t argument's precision
     // via the min_prec parameter of mpc_nary_op_return_impl().
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
 }
@@ -2016,8 +1839,7 @@ inline complex dispatch_complex_binary_add(const real &x, T &&a)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline complex dispatch_complex_binary_add(T &&a, const U &x)
 {
     // NOTE: another way of implementing this is via the conversion
@@ -2055,8 +1877,7 @@ inline complex dispatch_complex_binary_add(T &&a, const U &x)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline complex dispatch_complex_binary_add(const U &x, T &&a)
 {
     return dispatch_complex_binary_add(std::forward<T>(a), x);
@@ -2068,7 +1889,7 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_add(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2083,7 +1904,8 @@ inline complex dispatch_complex_binary_add(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_add(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2147,12 +1969,8 @@ inline complex dispatch_complex_binary_add(const T &c, U &&x)
 } // namespace detail
 
 // Binary addition.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
-#endif
 inline complex operator+(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_add(std::forward<T>(a), std::forward<U>(b));
@@ -2200,7 +2018,7 @@ template <typename T, enable_if_t<conjunction<is_cpp_unsigned_integral<T>>::valu
 inline void dispatch_complex_in_place_add(complex &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -2237,8 +2055,7 @@ template <typename T, typename U,
           enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
                                   conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
                                   conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline void dispatch_complex_in_place_add(T &x, U &&a)
 {
     x = static_cast<T>(x + std::forward<U>(a));
@@ -2247,23 +2064,15 @@ inline void dispatch_complex_in_place_add(T &x, U &&a)
 } // namespace detail
 
 // In-place addition.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_in_place_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator+=(T &a, U &&b)
 {
     detail::dispatch_complex_in_place_add(a, std::forward<U>(b));
     return a;
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_complex T>
-#else
-template <typename T, cvr_complex_enabler<T> = 0>
-#endif
 inline complex operator-(T &&c)
 {
     complex ret{std::forward<T>(c)};
@@ -2291,7 +2100,7 @@ inline complex dispatch_complex_binary_sub(T &&a, U &&b)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_sub(T &&a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_sub_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_sub_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
 }
@@ -2300,7 +2109,7 @@ inline complex dispatch_complex_binary_sub(T &&a, const real &x)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_sub(const real &x, T &&a)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_fr_sub(c, x.get_mpfr_t(), o, MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_fr_sub(c, x.get_mpfr_t(), o, MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
 }
@@ -2309,8 +2118,7 @@ inline complex dispatch_complex_binary_sub(const real &x, T &&a)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline complex dispatch_complex_binary_sub(T &&a, const U &x)
 {
     const auto a_prec = a.get_prec();
@@ -2334,8 +2142,7 @@ inline complex dispatch_complex_binary_sub(T &&a, const U &x)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline complex dispatch_complex_binary_sub(const U &x, T &&a)
 {
     return -dispatch_complex_binary_sub(std::forward<T>(a), x);
@@ -2347,7 +2154,7 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_sub(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2362,7 +2169,8 @@ inline complex dispatch_complex_binary_sub(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_sub(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2373,7 +2181,8 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_sub(const T &n, U &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper = [n](::mpc_t c, const ::mpc_t o) { mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+        auto const wrapper
+            = [n](::mpc_t c, const ::mpc_t o) { mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<U>(a));
     } else {
@@ -2385,7 +2194,8 @@ inline complex dispatch_complex_binary_sub(const T &n, U &&a)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_sub(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { mpc_ui_sub(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2437,12 +2247,8 @@ inline complex dispatch_complex_binary_sub(const T &c, U &&x)
 } // namespace detail
 
 // Binary subtraction.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
-#endif
 inline complex operator-(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_sub(std::forward<T>(a), std::forward<U>(b));
@@ -2487,7 +2293,7 @@ template <typename T, enable_if_t<conjunction<is_cpp_unsigned_integral<T>>::valu
 inline void dispatch_complex_in_place_sub(complex &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -2517,8 +2323,7 @@ template <typename T, typename U,
           enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
                                   conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
                                   conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline void dispatch_complex_in_place_sub(T &x, U &&a)
 {
     x = static_cast<T>(x - std::forward<U>(a));
@@ -2527,12 +2332,8 @@ inline void dispatch_complex_in_place_sub(T &x, U &&a)
 } // namespace detail
 
 // In-place subtraction.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_in_place_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator-=(T &a, U &&b)
 {
     detail::dispatch_complex_in_place_sub(a, std::forward<U>(b));
@@ -2553,7 +2354,7 @@ inline complex dispatch_complex_binary_mul(T &&a, U &&b)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_mul(T &&a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_mul_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_mul_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
 }
@@ -2566,10 +2367,10 @@ inline complex dispatch_complex_binary_mul(const real &x, T &&a)
 }
 
 // complex-(anything real-valued other than integral or real).
-template <typename T, typename U,
-          enable_if_t<
-              conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>, negation<is_cpp_integral<U>>>::value, int>
-          = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>, negation<is_cpp_integral<U>>>::value,
+                int> = 0>
 inline complex dispatch_complex_binary_mul(T &&a, const U &x)
 {
     const auto a_prec = a.get_prec();
@@ -2592,10 +2393,10 @@ inline complex dispatch_complex_binary_mul(T &&a, const U &x)
 }
 
 // (anything real-valued other than integral or real)-complex.
-template <typename T, typename U,
-          enable_if_t<
-              conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>, negation<is_cpp_integral<U>>>::value, int>
-          = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>, negation<is_cpp_integral<U>>>::value,
+                int> = 0>
 inline complex dispatch_complex_binary_mul(const U &x, T &&a)
 {
     return dispatch_complex_binary_mul(std::forward<T>(a), x);
@@ -2607,7 +2408,7 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2622,7 +2423,8 @@ inline complex dispatch_complex_binary_mul(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_mul(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2641,7 +2443,7 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_si(c, o, static_cast<long>(n), MPC_RNDNN); };
+        auto const wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_si(c, o, static_cast<long>(n), MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -2700,12 +2502,8 @@ inline complex dispatch_complex_binary_mul(const T &c, U &&x)
 } // namespace detail
 
 // Binary multiplication.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
-#endif
 inline complex operator*(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_mul(std::forward<T>(a), std::forward<U>(b));
@@ -2748,7 +2546,7 @@ template <typename T, enable_if_t<conjunction<is_cpp_unsigned_integral<T>>::valu
 inline void dispatch_complex_in_place_mul(complex &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -2767,7 +2565,7 @@ template <typename T, enable_if_t<conjunction<is_cpp_signed_integral<T>>::value,
 inline void dispatch_complex_in_place_mul(complex &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_si(c, o, static_cast<long>(n), MPC_RNDNN); };
+        auto const wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_si(c, o, static_cast<long>(n), MPC_RNDNN); };
 
         mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -2791,8 +2589,7 @@ template <typename T, typename U,
           enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
                                   conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
                                   conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline void dispatch_complex_in_place_mul(T &x, U &&a)
 {
     x = static_cast<T>(x * std::forward<U>(a));
@@ -2801,12 +2598,8 @@ inline void dispatch_complex_in_place_mul(T &x, U &&a)
 } // namespace detail
 
 // In-place multiplication.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_in_place_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator*=(T &a, U &&b)
 {
     detail::dispatch_complex_in_place_mul(a, std::forward<U>(b));
@@ -2827,7 +2620,7 @@ inline complex dispatch_complex_binary_div(T &&a, U &&b)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_div(T &&a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_div_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_div_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
 }
@@ -2836,7 +2629,7 @@ inline complex dispatch_complex_binary_div(T &&a, const real &x)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_div(const real &x, T &&a)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_fr_div(c, x.get_mpfr_t(), o, MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_fr_div(c, x.get_mpfr_t(), o, MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(x.get_prec(), wrapper, std::forward<T>(a));
 }
@@ -2845,8 +2638,7 @@ inline complex dispatch_complex_binary_div(const real &x, T &&a)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline complex dispatch_complex_binary_div(T &&a, const U &x)
 {
     const auto a_prec = a.get_prec();
@@ -2872,8 +2664,7 @@ inline complex dispatch_complex_binary_div(T &&a, const U &x)
 template <typename T, typename U,
           enable_if_t<conjunction<is_cvr_complex<T>, is_rv_complex_interoperable<U>,
                                   negation<is_cpp_unsigned_integral<U>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline complex dispatch_complex_binary_div(const U &x, T &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -2889,7 +2680,7 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2904,7 +2695,8 @@ inline complex dispatch_complex_binary_div(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_div(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2915,7 +2707,7 @@ template <typename T, typename U,
 inline complex dispatch_complex_binary_div(const T &n, U &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_div(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
 
         return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<U>(a));
@@ -2928,7 +2720,8 @@ inline complex dispatch_complex_binary_div(const T &n, U &&a)
 template <typename T, enable_if_t<is_cvr_complex<T>::value, int> = 0>
 inline complex dispatch_complex_binary_div(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_div(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_ui_div(c, static_cast<unsigned long>(n), o, MPC_RNDNN); };
 
     return mpc_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2989,12 +2782,8 @@ inline complex dispatch_complex_binary_div(const T &c, U &&x)
 } // namespace detail
 
 // Binary division.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_op_types<T, U>::value, int> = 0>
-#endif
 inline complex operator/(T &&a, U &&b)
 {
     return detail::dispatch_complex_binary_div(std::forward<T>(a), std::forward<U>(b));
@@ -3038,7 +2827,7 @@ template <typename T, enable_if_t<conjunction<is_cpp_unsigned_integral<T>>::valu
 inline void dispatch_complex_in_place_div(complex &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
         mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -3068,8 +2857,7 @@ template <typename T, typename U,
           enable_if_t<disjunction<conjunction<is_complex_interoperable<T>, is_cvr_complex<U>>,
                                   conjunction<std::is_same<real, T>, is_complex_interoperable<U>>,
                                   conjunction<is_cvr_real<U>, is_complex_interoperable<T>>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline void dispatch_complex_in_place_div(T &x, U &&a)
 {
     x = static_cast<T>(x / std::forward<U>(a));
@@ -3078,12 +2866,8 @@ inline void dispatch_complex_in_place_div(T &x, U &&a)
 } // namespace detail
 
 // In-place division.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_in_place_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_in_place_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator/=(T &a, U &&b)
 {
     detail::dispatch_complex_in_place_div(a, std::forward<U>(b));
@@ -3110,7 +2894,7 @@ MPPP_DLL_PUBLIC bool dispatch_complex_equality(const complex &, const complex &)
 template <typename T, enable_if_t<is_rv_complex_interoperable<T>::value, int> = 0>
 inline bool dispatch_complex_equality(const complex &c, const T &x)
 {
-    complex::re_cref rex{c};
+    const complex::re_cref rex{c};
 
     return mpfr_zero_p(mpc_imagref(c.get_mpc_t())) != 0 && *rex == x;
 }
@@ -3119,8 +2903,8 @@ inline bool dispatch_complex_equality(const complex &c, const T &x)
 template <typename T, enable_if_t<is_cv_complex_interoperable<T>::value, int> = 0>
 inline bool dispatch_complex_equality(const complex &c1, const T &c2)
 {
-    complex::re_cref re{c1};
-    complex::im_cref im{c1};
+    const complex::re_cref re{c1};
+    const complex::im_cref im{c1};
 
     return *re == c2.real() && *im == c2.imag();
 }
@@ -3135,24 +2919,16 @@ inline bool dispatch_complex_equality(const T &x, const complex &c)
 } // namespace detail
 
 // Equality.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_eq_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_eq_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator==(const T &x, const U &y)
 {
     return detail::dispatch_complex_equality(x, y);
 }
 
 // Inequality.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires complex_eq_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_complex_eq_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator!=(const T &x, const U &y)
 {
     return !(x == y);
@@ -3218,8 +2994,7 @@ namespace fmt
 {
 
 template <>
-struct formatter<mppp::complex> : mppp::detail::to_string_formatter {
-};
+struct formatter<mppp::complex> : mppp::detail::to_string_formatter {};
 
 } // namespace fmt
 

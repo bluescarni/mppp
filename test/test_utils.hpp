@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -52,21 +52,17 @@ struct merge_and_renumber;
 
 template <std::size_t... I1, std::size_t... I2>
 struct merge_and_renumber<index_sequence<I1...>, index_sequence<I2...>>
-    : index_sequence<I1..., (sizeof...(I1) + I2)...> {
-};
+    : index_sequence<I1..., (sizeof...(I1) + I2)...> {};
 } // namespace impl
 
 template <std::size_t N>
 struct make_index_sequence
-    : merge_and_renumber<typename make_index_sequence<N / 2>::type, typename make_index_sequence<N - N / 2>::type> {
-};
+    : merge_and_renumber<typename make_index_sequence<N / 2>::type, typename make_index_sequence<N - (N / 2)>::type> {};
 
 template <>
-struct make_index_sequence<0> : index_sequence<> {
-};
+struct make_index_sequence<0> : index_sequence<> {};
 template <>
-struct make_index_sequence<1> : index_sequence<0> {
-};
+struct make_index_sequence<1> : index_sequence<0> {};
 
 inline namespace impl
 {
@@ -74,6 +70,7 @@ inline namespace impl
 template <typename T, typename F, std::size_t... Is>
 inline void apply_to_each_item(T &&t, const F &f, index_sequence<Is...>)
 {
+    // NOLINTNEXTLINE(bugprone-use-after-move)
     (void)std::initializer_list<int>{0, (void(f(std::get<Is>(std::forward<T>(t)))), 0)...};
 }
 } // namespace impl
@@ -92,9 +89,8 @@ inline void tuple_for_each(Tuple &&t, const F &f)
 inline namespace impl
 {
 
-template <typename T,
-          typename std::enable_if<mppp::detail::is_integral<T>::value && mppp::detail::is_signed<T>::value, int>::type
-          = 0>
+template <typename T, typename std::enable_if<mppp::detail::is_integral<T>::value && mppp::detail::is_signed<T>::value,
+                                              int>::type = 0>
 inline long long lex_cast_tr(T n)
 {
     return static_cast<long long>(n);
@@ -261,11 +257,11 @@ struct integral_minmax_dist<
 
 template <>
 struct integral_minmax_dist<__uint128_t, void> {
-    integral_minmax_dist() : m_dist(0u, static_cast<std::uint_least64_t>(__uint128_t(-1) >> 64)) {}
+    integral_minmax_dist() : m_dist(0u, static_cast<std::uint_least64_t>(static_cast<__uint128_t>(-1) >> 64u)) {}
     template <typename E>
     __uint128_t operator()(E &e)
     {
-        return m_dist(e) + (__uint128_t(m_dist(e)) << 64);
+        return m_dist(e) + (static_cast<__uint128_t>(m_dist(e)) << 64u);
     }
     std::uniform_int_distribution<std::uint_least64_t> m_dist;
 };

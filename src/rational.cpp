@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -44,8 +44,6 @@ static_assert(sizeof(expected_mpq_struct_t) == sizeof(mpq_struct_t)
                   && offsetof(mpq_struct_t, _mp_den) == offsetof(expected_mpq_struct_t, _mp_den),
               "Invalid mpq_t struct layout.");
 
-#if MPPP_CPLUSPLUS >= 201703L
-
 constexpr bool test_mpq_struct_t()
 {
     auto [num, den] = mpq_struct_t{};
@@ -55,8 +53,6 @@ constexpr bool test_mpq_struct_t()
 }
 
 static_assert(test_mpq_struct_t(), "The mpq_struct_t does not have the expected layout.");
-
-#endif
 
 } // namespace
 

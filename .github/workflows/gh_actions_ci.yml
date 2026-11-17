@@ -7,69 +7,129 @@ on:
     branches:
       - master
 jobs:
-  osx_13_x86:
-    runs-on: macos-13
+  # Linux and OSX builds, all driven by tools/conda_generic.sh.
+  # NOTE: sanitizers run only on Linux x86_64.
+  conda:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64.
+          - name: linux_x86_64_asan
+            os: ubuntu-latest
+            cxx_flags: "-fsanitize=address"
+          - name: linux_x86_64_ubsan
+            os: ubuntu-latest
+            cxx_flags: "-fsanitize=undefined -fno-sanitize-recover=all"
+          - name: linux_x86_64_tsan
+            os: ubuntu-latest
+            cxx_flags: "-fsanitize=thread"
+          - name: linux_x86_64_release
+            os: ubuntu-latest
+            build_type: Release
+          - name: linux_x86_64_cxx23
+            os: ubuntu-latest
+            cxx_standard: 23
+          # Linux arm64.
+          - name: linux_arm64_debug
+            os: ubuntu-24.04-arm
+          # OSX.
+          - name: osx_arm64_debug
+            os: macos-15
+          - name: osx_x86_64_debug
+            os: macos-15-intel
+    env:
+      MPPP_BUILD_TYPE: ${{ matrix.build_type || 'Debug' }}
+      MPPP_CXX_FLAGS: ${{ matrix.cxx_flags || '' }}
+      MPPP_CXX_STANDARD: ${{ matrix.cxx_standard || '' }}
+      MPPP_CMAKE_EXTRA: ${{ matrix.cmake_extra || '' }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Build
-        run: bash tools/gha_osx.sh
-  osx_14_arm64:
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build
-        run: bash tools/gha_osx.sh
-  conda_asan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build
-        run: bash tools/gha_conda_asan.sh
-  conda_ubsan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build
-        run: bash tools/gha_conda_ubsan.sh
-  conda_tsan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build
-        run: bash tools/gha_conda_tsan.sh
+      - uses: actions/checkout@v6
+      - name: Build and test
+        run: bash tools/conda_generic.sh
+  # Debug build of GMP with assertions enabled.
   conda_debuggmp:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build
         run: bash tools/gha_debuggmp.sh
   windows_2022:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: actions/checkout@v6
+      - uses: conda-incubator/setup-miniconda@v4
         with:
-          auto-update-conda: true
-          python-version: "3.10"
-          channels: conda-forge
-          channel-priority: strict
-      - uses: ilammy/msvc-dev-cmd@v1
+          miniforge-version: latest
+          # See: https://github.com/conda-incubator/setup-miniconda?tab=readme-ov-file#example-14-remove-defaults-channel
+          conda-remove-defaults: "true"
       - name: Build
         shell: pwsh
         run: |
           conda install -y cmake gmp mpfr libflint mpc fmt libboost-devel
           mkdir build
           cd build
-          cmake ../ -G "Visual Studio 17 2022" -A x64 -DCMAKE_CXX_STANDARD=20 -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_FLINT=yes -DMPPP_ENABLE_IPO=yes
+          cmake ../ -G "Visual Studio 17 2022" -A x64 -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_BOOST_S11N=yes -DMPPP_WITH_FMT=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_MPC=yes -DMPPP_WITH_FLINT=yes -DMPPP_ENABLE_IPO=yes
           cmake --build . --config Release -j2
           copy Release\mp++.dll test\Release\
           ctest -j4 -V -C Release
-  binder_cache:
+  # clang-tidy build of the library and of the test suite.
+  clang_tidy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
     steps:
-    - name: cache binder build on mybinder.org
-      uses: jupyterhub/repo2docker-action@master
-      with:
-        NO_PUSH: true
-        MYBINDERORG_TAG: ${{ github.event.ref }} # This builds the container on mybinder.org with the branch that was pushed on.
+      - uses: actions/checkout@v6
+      - name: Build and test
+        run: bash tools/gha_clang_tidy.sh
+  # Coverage build, uploaded to codecov.
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build and test
+        run: bash tools/gha_coverage.sh
+      - uses: codecov/codecov-action@v7
+        with:
+          fail_ci_if_error: true
+          files: ./build/coverage.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+  # Build the docs and upload them as a GitHub Pages artifact.
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build docs
+        run: bash tools/gha_docs.sh
+      - name: Upload docs
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: doc/_build/html
+  # Deploy the docs to GitHub Pages (master only).
+  docs_deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: docs
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Allow only one concurrent deployment, but do not cancel in-progress deployments.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+  # binder_cache:
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/master'
+  #   steps:
+  #   - name: cache binder build on mybinder.org
+  #     uses: jupyterhub/repo2docker-action@master
+  #     with:
+  #       NO_PUSH: true
+  #       MYBINDERORG_TAG: ${{ github.event.ref }} # This builds the container on mybinder.org with the branch that was pushed on.

@@ -1,12 +1,10 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#include <mp++/config.hpp>
 
 #include <atomic>
 #include <complex>
@@ -17,16 +15,14 @@
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
-
+#include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
@@ -47,6 +43,9 @@
 #endif
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -68,8 +67,7 @@ using int_types = std::tuple<char, signed char, unsigned char, short, unsigned s
 #endif
                              >;
 
-struct no_const {
-};
+struct no_const {};
 
 // A seed that will be used to init rngs in the multithreaded tests. Each time a batch of N threads
 // finishes, this value gets bumped up by N, so that the next time a multithreaded test which uses rng
@@ -121,7 +119,7 @@ struct int_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(int_types{}, runner<S>{});
         using rational = rational<S::value>;
@@ -294,7 +292,7 @@ struct fp_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(fp_types{}, runner<S>{});
     }
@@ -387,7 +385,7 @@ struct complex_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(complex_types{}, runner<S>{});
     }
@@ -481,9 +479,10 @@ struct string_ctor_tester {
         const char *cs = "-1234/345\0";
         REQUIRE((rational{cs, cs + 9} == rational{-1234, 345}));
         REQUIRE((rational{cs, cs + 8} == rational{-617, 17}));
-#if defined(MPPP_HAVE_STRING_VIEW)
         std::string_view sv = "-1234/345";
         REQUIRE((rational{sv} == rational{-1234, 345}));
+        // NOTE: a size is passed explicitly, the data() pointer is not used as a null-terminated string.
+        // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
         REQUIRE((rational{std::string_view{sv.data(), 8u}} == rational{-617, 17}));
         sv = "0x7b";
         REQUIRE((rational{sv, 0} == 123));
@@ -493,7 +492,6 @@ struct string_ctor_tester {
         });
         REQUIRE((rational{std::string_view{cs, 9}} == rational{-1234, 345}));
         REQUIRE((rational{std::string_view{cs, 8}} == rational{-617, 17}));
-#endif
     }
 };
 
@@ -621,6 +619,13 @@ TEST_CASE("mpz_t constructor")
 {
     tuple_for_each(sizes{}, mpz_ctor_tester{});
 }
+
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+
+#endif
 
 struct copy_move_tester {
     template <typename S>
@@ -910,7 +915,15 @@ struct copy_move_tester {
     }
 };
 
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
+
 TEST_CASE("copy and move")
 {
     tuple_for_each(sizes{}, copy_move_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

@@ -102,9 +102,3 @@ Macros and definitions
    This name is defined if mp++ was built as a static library, instead of a dynamic
    library (see the :ref:`installation instructions <installation>`).
 
-.. c:macro:: MPPP_HAVE_STRING_VIEW
-
-   .. versionadded:: 0.17
-
-   This name is defined if mp++ detects the availability of the ``std::string_view``
-   class (available since C++17).

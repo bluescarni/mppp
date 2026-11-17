@@ -11,9 +11,5 @@ doc/conf.py
 *~
 *.bak
 
-# .orig files from patch.
-*.orig
-
 # Editor bits.
 .cache/
-

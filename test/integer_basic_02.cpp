@@ -1,12 +1,10 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#include <mp++/config.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -16,21 +14,22 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
-
 #include <gmp.h>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -61,8 +60,7 @@ static std::mt19937::result_type mt_rng_seed(0u);
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
-struct no_const {
-};
+struct no_const {};
 
 struct nbits_ctor_tester {
     template <typename S>
@@ -104,14 +102,19 @@ TEST_CASE("nbits constructor")
     tuple_for_each(sizes{}, nbits_ctor_tester{});
 }
 
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+
+#endif
+
 struct copy_move_tester {
     template <typename S>
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
-#if MPPP_CPLUSPLUS >= 201402L
         REQUIRE(std::is_nothrow_move_constructible<integer>::value);
-#endif
         integer n;
         REQUIRE(n.is_static());
         n = 123;
@@ -183,6 +186,12 @@ struct copy_move_tester {
         REQUIRE(m5 == 10);
     }
 };
+
+#if defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
 
 TEST_CASE("copy and move")
 {
@@ -334,7 +343,6 @@ struct string_ass_tester {
         REQUIRE_THROWS_PREDICATE(n = "", std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
         n = std::string_view(" -123 ");
         REQUIRE(n == -123);
         n = std::string_view("4563 ");
@@ -342,7 +350,6 @@ struct string_ass_tester {
         REQUIRE_THROWS_PREDICATE(n = std::string_view(""), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
         });
-#endif
     }
 };
 
@@ -482,3 +489,5 @@ TEST_CASE("stream")
 {
     tuple_for_each(sizes{}, stream_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

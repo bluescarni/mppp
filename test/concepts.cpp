@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -6,22 +6,23 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
 #include <sstream>
 #include <string>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
-#endif
 
 #include <mp++/concepts.hpp>
+#include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
+
+namespace
+{
 
 template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 void check_dispatch(const T &s)
@@ -30,6 +31,8 @@ void check_dispatch(const T &s)
     o << s;
     REQUIRE(o.str() == s);
 }
+
+} // namespace
 
 TEST_CASE("concepts")
 {
@@ -102,8 +105,8 @@ TEST_CASE("concepts")
     REQUIRE(is_string_type<char[2]>::value);
     REQUIRE(is_string_type<char[10]>::value);
     REQUIRE(is_string_type<const char[10]>::value);
-    REQUIRE(!is_string_type<const char(&)[10]>::value);
-    REQUIRE(!is_string_type<char(&)[10]>::value);
+    REQUIRE(!is_string_type<const char (&)[10]>::value);
+    REQUIRE(!is_string_type<char (&)[10]>::value);
     REQUIRE(!is_string_type<char>::value);
     REQUIRE(!is_string_type<const char>::value);
     REQUIRE(!is_string_type<int>::value);
@@ -111,16 +114,14 @@ TEST_CASE("concepts")
     REQUIRE(!is_string_type<std::string &>::value);
     REQUIRE(!is_string_type<const std::string &>::value);
     REQUIRE(is_string_type<const std::string>::value);
-    REQUIRE(!is_string_type<char(&)[]>::value);
-    REQUIRE(!is_string_type<char(&)[1]>::value);
+    REQUIRE(!is_string_type<char (&)[]>::value);
+    REQUIRE(!is_string_type<char (&)[1]>::value);
     REQUIRE(is_string_type<const char[2]>::value);
-    REQUIRE(!is_string_type<char(&&)[10]>::value);
-#if defined(MPPP_HAVE_STRING_VIEW)
+    REQUIRE(!is_string_type<char (&&)[10]>::value);
     REQUIRE(is_string_type<std::string_view>::value);
     REQUIRE(!is_string_type<std::string_view &>::value);
     REQUIRE(!is_string_type<const std::string_view &>::value);
     REQUIRE(is_string_type<const std::string_view>::value);
-#endif
     std::string s{"foo"};
     check_dispatch(std::string{"foo"});
     check_dispatch(s);
@@ -132,10 +133,10 @@ TEST_CASE("concepts")
     char s2[] = "blab";
     check_dispatch(s2);
     check_dispatch(&s2[0]);
-#if defined(MPPP_HAVE_STRING_VIEW)
     const std::string_view sv1{"bubbbbba"};
     check_dispatch(sv1);
     std::string_view sv2{"bubbbba"};
     check_dispatch(sv2);
-#endif
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

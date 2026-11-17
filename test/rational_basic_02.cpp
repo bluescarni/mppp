@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -17,14 +17,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -55,6 +52,9 @@
 #endif
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -121,7 +121,6 @@ struct string_ass_tester {
             return std::string(ia.what())
                    == "A zero denominator was detected in the constructor of a rational from string";
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
         q = std::string_view{"1"};
         REQUIRE(q == 1);
         q = std::string_view{"-23"};
@@ -137,7 +136,6 @@ struct string_ass_tester {
             return std::string(ia.what())
                    == "A zero denominator was detected in the constructor of a rational from string";
         });
-#endif
     }
 };
 
@@ -361,11 +359,9 @@ TEST_CASE("generic assignment")
     tuple_for_each(sizes{}, gen_ass_tester{});
 }
 
-struct yes {
-};
+struct yes {};
 
-struct no {
-};
+struct no {};
 
 template <typename From, typename To>
 static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<const From &>())), yes{});
@@ -389,8 +385,7 @@ static inline bool roundtrip_conversion(const T &x)
     return retval;
 }
 
-struct no_conv {
-};
+struct no_conv {};
 
 struct int_convert_tester {
     template <typename S>
@@ -473,7 +468,7 @@ struct int_convert_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(int_types{}, runner<S>{});
         // Some testing for bool.
@@ -597,7 +592,7 @@ struct fp_convert_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(fp_types{}, runner<S>{});
     }
@@ -648,7 +643,7 @@ struct complex_convert_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(complex_types{}, runner<S>{});
     }
@@ -661,7 +656,7 @@ TEST_CASE("complex conversions")
 
 struct is_canonical_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using rational = rational<S::value>;
         rational q;
@@ -686,7 +681,7 @@ TEST_CASE("is_canonical")
 
 struct canonicalise_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using rational = rational<S::value>;
         rational q;
@@ -754,8 +749,6 @@ TEST_CASE("stream")
     tuple_for_each(sizes{}, stream_tester{});
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
 TEST_CASE("rational nts")
 {
     REQUIRE(std::is_nothrow_swappable_v<rational<1>>);
@@ -764,8 +757,6 @@ TEST_CASE("rational nts")
     REQUIRE(std::is_nothrow_swappable_v<rational<10>>);
     REQUIRE(std::is_nothrow_swappable_v<rational<15>>);
 }
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -806,3 +797,5 @@ TEST_CASE("boost_s11n")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

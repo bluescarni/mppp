@@ -6,10 +6,8 @@ Installation
 Introduction
 ------------
 
-mp++ is written in modern C++, and it requires a compiler able to understand
-at least C++11 (mp++ will also use features from C++14, C++17 and C++20,
-if supported by the compiler). The library is regularly tested on
-a continuous integration pipeline which includes:
+mp++ is written in modern C++, and it requires a compiler able to understand at least C++20.
+The library is regularly tested on a continuous integration pipeline which includes:
 
 * the three major compilers (GCC, Clang and MSVC),
 * the three major operating systems (Linux, Windows and OSX),
@@ -34,7 +32,7 @@ mp++ has the following dependencies:
   be installed separately);
 * the `Boost <https://www.boost.org/>`__ libraries, *optional*, currently used
   for implementing (de)serialisation and in the benchmarking suite;
-* the `{fmt} <https://fmt.dev/latest/index.html>`__ library (at least version 6.2), *optional*, used
+* the `{fmt} <https://fmt.dev/latest/index.html>`__ library (at least version 11), *optional*, used
   to provide formatting capabilities to the multiprecision classes and in the benchmarking suite.
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
@@ -70,8 +68,7 @@ path, etc.). The available configuration options are:
 * ``MPPP_MSVC_UNICODE``: enable Unicode solutions for MSVC (available only
   when using MSVC, off by default),
 * ``MPPP_ENABLE_IPO``: enable link-time optimisations when building
-  the mp++ library (requires CMake >= 3.9 and compiler support,
-  off by default).
+  the mp++ library (requires compiler support, off by default).
 
 .. versionadded:: 0.5
 
@@ -98,8 +95,7 @@ path, etc.). The available configuration options are:
    The ``MPPP_WITH_FLINT`` build option.
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
-using GCC (all the supported versions), Clang
-(since version 3.9) and the Intel compiler. When this option is active,
+using GCC and Clang. When this option is active,
 mp++ needs access at build time to both the quadmath header
 ``quadmath.h`` and the quadmath library
 ``libquadmath.so``, which may be installed in
@@ -207,11 +203,11 @@ system you can compile this example with the following command:
 
 .. code-block:: console
 
-   $ g++ -std=c++11 main.cpp -lmp++ -lgmp
+   $ g++ -std=c++20 main.cpp -lmp++ -lgmp
 
 .. note::
 
-   The ``-std=c++11`` flag is not necessary if your GCC version is recent enough (i.e., for GCC 6 and later).
+   The ``-std=c++20`` flag is not necessary if your GCC version is recent enough.
 
 Because parts of mp++ are implemented using templates,
 users of the library will have to explicitly link to GMP
@@ -253,8 +249,8 @@ program presented earlier may look like this:
 
 .. code-block:: cmake
 
-  # mp++ requires at least CMake 3.8.
-  cmake_minimum_required(VERSION 3.8.0)
+   # mp++ requires at least CMake 3.12.
+   cmake_minimum_required(VERSION 3.12.0)
 
    # The name of our project.
    project(sample_project)
@@ -299,35 +295,19 @@ Visual Studio:
   turning on the ``MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME``
   advanced CMake option.
 
-Clang:
-
-* On Clang<7, :cpp:type:`__float128` cannot be used in mixed-mode
-  operations with ``long double``. Accordingly,
-  :cpp:class:`~mppp::real128` will disable interoperability with
-  ``long double`` if Clang<7 is being used.
-
-Intel compiler:
-
-* The Intel compiler does not implement certain :cpp:type:`__float128`
-  floating-point primitives
-  as constant expressions. As a result, a few :cpp:class:`~mppp::real128`
-  functions which are ``constexpr`` on GCC and Clang are not ``constexpr``
-  when using the Intel compiler. These occurrences are marked in the API
-  reference. Also, the Intel compiler seems to be prone to internal
-  errors when performing ``constexpr`` computations with
-  :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128`.
-
 MinGW:
 
 * Due to a compiler bug in the implementation of ``thread_local``
   storage, certain performance optimisations are disabled
   when compiling with MinGW.
 
-OSX:
+PowerPC:
 
-* When using older versions of Xcode, performance in multi-threading
-  scenarios might be reduced due to lack of support for the C++11
-  ``thread_local`` feature.
+* On PowerPC, :cpp:type:`__float128` cannot be used in mixed-mode
+  operations with ``long double``. Accordingly,
+  :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::complex128` will
+  disable interoperability with ``long double`` and ``std::complex<long double>``
+  on PowerPC (see also the :c:macro:`MPPP_FLOAT128_WITH_LONG_DOUBLE` definition).
 
 FreeBSD:
 

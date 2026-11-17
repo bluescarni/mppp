@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -31,6 +31,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -72,8 +75,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937::result_type mt_rng_seed(0u);
 
-struct no_const {
-};
+struct no_const {};
 
 struct int_ctor_tester {
     template <typename S>
@@ -119,7 +121,7 @@ struct int_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(int_types{}, runner<S>{});
         // Some testing for bool.
@@ -194,7 +196,7 @@ struct int_ass_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(int_types{}, runner<S>{});
         // Some testing for bool.
@@ -279,7 +281,7 @@ struct fp_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(fp_types{}, runner<S>{});
     }
@@ -355,7 +357,7 @@ struct complex_ctor_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(complex_types{}, runner<S>{});
     }
@@ -365,3 +367,5 @@ TEST_CASE("complex constructors")
 {
     tuple_for_each(sizes{}, complex_ctor_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

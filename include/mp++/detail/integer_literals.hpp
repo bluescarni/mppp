@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -15,7 +15,6 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <utility>
 
 #include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
@@ -26,74 +25,64 @@ MPPP_BEGIN_NAMESPACE
 namespace detail
 {
 
-// Helper to check if an integral literal is valid.
-// It will return the base of the literal. Supported
-// bases are 2, 8, 10 and 16.
-// NOTE: we need this function in the C++11/C++14 implementation
-// as well, so use MPPP_CONSTEXPR_14, MPPP_FALLTHROUGH, etc.
+// Helper to check if an integral literal is valid. It will return the base of the literal. Supported bases are 2, 8, 10
+// and 16.
 template <std::size_t Size>
-inline
-#if !defined(_MSC_VER) || defined(__clang__)
-    MPPP_CONSTEXPR_14
-#endif
-    int
-    integer_literal_check_str(const char (&arr)[Size])
+constexpr int integer_literal_check_str(const char (&arr)[Size])
 {
     // We expect the size of the array to be
     // always at least 2, the null terminator
     // plus at least one char from the literal.
     static_assert(Size >= 2u, "Invalid array size.");
-#if MPPP_CPLUSPLUS >= 201703L
     assert(arr[Size - 1u] == '\0');
-#endif
 
     // The actual string length of the literal.
     constexpr auto str_length = Size - 1u;
 
     // Helpers to check a digit in various bases.
-    auto base10_digit_check = [&arr](char c) {
+    const auto base10_digit_check = [&arr](char c) {
         if (c < '0' || c > '9') {
             throw std::invalid_argument("Invalid integral literal: " + std::string(arr));
         }
     };
 
-    auto base8_digit_check = [&arr](char c) {
+    const auto base8_digit_check = [&arr](char c) {
         if (c < '0' || c > '7') {
             throw std::invalid_argument("Invalid integral literal: " + std::string(arr));
         }
     };
 
-    auto base2_digit_check = [&arr](char c) {
+    const auto base2_digit_check = [&arr](char c) {
         if (c != '0' && c != '1') {
             throw std::invalid_argument("Invalid integral literal: " + std::string(arr));
         }
     };
 
-    auto base16_digit_check = [&arr](char c) {
+    const auto base16_digit_check = [&arr](char c) {
         if (c < '0' || c > '9') {
             switch (c) {
                 case 'a':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'b':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'c':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'd':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'e':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'f':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'A':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'B':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'C':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'D':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'E':
-                    MPPP_FALLTHROUGH;
+                    [[fallthrough]];
                 case 'F':
                     return;
                 default:
@@ -137,15 +126,12 @@ inline
         }
     }();
 
-#if MPPP_CPLUSPLUS >= 201703L
     assert(base == 2 || base == 8 || base == 10 || base == 16);
-#endif
 
     // Run the checks on the rest of the literal,
     // after we already checked the first 2 digits.
     // For bases 2 and 16, we need to have other digits,
     // otherwise the literal is malformed.
-    // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (base) {
         case 2:
             if (str_length == 2u) {
@@ -172,12 +158,15 @@ inline
             for (std::size_t i = 2; i < str_length; ++i) {
                 base16_digit_check(arr[i]);
             }
+            break;
+            // LCOV_EXCL_START
+        default:
+            assert(false);
+            // LCOV_EXCL_STOP
     }
 
     return base;
 }
-
-#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
 
 // Small helper to convert the char representation
 // of a digit into the corresponding numerical
@@ -232,23 +221,12 @@ constexpr Int digit_to_value(char c)
     }
 }
 
-#endif
-
 template <std::size_t SSize, char... Chars>
 inline integer<SSize> integer_literal_impl()
 {
-    // Turn the sequence of input chars
-    // into a null-terminated char array.
-    // NOTE: earlier clang versions won't properly
-    // capture arr in the lambdas below if it is
-    // not marked as static.
-#if defined(__clang__) && (defined(__apple_build_version__) || __clang_major__ <= 8)
-    static
-#endif
-        constexpr char arr[]
-        = {Chars..., '\0'};
+    // NOTE: arr is static so that the lambdas below can use it without capturing it (MSVC errors out otherwise).
+    static constexpr char arr[] = {Chars..., '\0'};
 
-#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__)) && !defined(__INTEL_COMPILER)
     // Run the checks on the char sequence, and determine the base.
     constexpr auto base = integer_literal_check_str(arr);
     static_assert(base == 2 || base == 8 || base == 10 || base == 16);
@@ -256,11 +234,12 @@ inline integer<SSize> integer_literal_impl()
     // The actual number of digits in the literal
     // (discounting prefixes).
     constexpr auto ndigits = (base == 2 || base == 16) ? (sizeof...(Chars) - 2u)
+                                                       // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
                                                        : (base == 8 ? (sizeof...(Chars) - 1u) : sizeof...(Chars));
 
     // Determine how many digits in the given base we can always fit
     // into a single mp_limb_t.
-    constexpr auto nd_limb = static_cast<unsigned>([]() {
+    constexpr auto nd_limb = static_cast<unsigned>([] {
         [[maybe_unused]] constexpr auto nbits = std::numeric_limits<::mp_limb_t>::digits;
 
         if constexpr (base == 2) {
@@ -280,12 +259,12 @@ inline integer<SSize> integer_literal_impl()
 
     // Determine how many instances of mp_limb_t we need
     // to represent the literal.
-    constexpr auto nlimbs = ndigits / nd_limb + static_cast<unsigned>(ndigits % nd_limb != 0u);
+    constexpr auto nlimbs = (ndigits / nd_limb) + static_cast<unsigned>(ndigits % nd_limb != 0u);
     static_assert(nlimbs > 0u);
 
     // Helper function to parse a single limb from a subset
     // of digits at indices [begin, end) in the literal.
-    auto parse_limb = [](std::size_t begin, std::size_t end) {
+    constexpr auto parse_limb = [](std::size_t begin, std::size_t end) {
         ::mp_limb_t retval = 0, shifter = 1;
 
         for (auto i = end; i > begin; --i) {
@@ -319,7 +298,7 @@ inline integer<SSize> integer_literal_impl()
             ::mp_limb_t arr[nlimbs];
         };
 
-        constexpr auto limb_arr = [parse_limb]() {
+        constexpr auto limb_arr = [parse_limb] {
             arr_wrap retval{};
 
             // Manually compute the first limb, which might
@@ -330,7 +309,7 @@ inline integer<SSize> integer_literal_impl()
             retval.arr[0] = parse_limb(sizeof...(Chars) - ndigits, idx_end1);
 
             for (std::size_t i = 1; i < nlimbs; ++i) {
-                retval.arr[i] = parse_limb(idx_end1 + (i - 1u) * nd_limb, idx_end1 + i * nd_limb);
+                retval.arr[i] = parse_limb(idx_end1 + ((i - 1u) * nd_limb), idx_end1 + (i * nd_limb));
             }
 
             return retval;
@@ -341,13 +320,14 @@ inline integer<SSize> integer_literal_impl()
         integer<SSize> retval{limb_arr.arr[nlimbs - 1u]}, tmp;
 
         // A couple of variables used only in base 10.
-        [[maybe_unused]] const auto factor10 = []() {
+        [[maybe_unused]] const auto factor10 = [] {
             if constexpr (base == 10) {
                 return mppp::pow_ui(integer<SSize>{10}, nd_limb);
             } else {
                 return 0;
             }
         }();
+        // NOLINTNEXTLINE(misc-const-correctness)
         [[maybe_unused]] auto cur_factor10(factor10);
 
         if constexpr (base != 10) {
@@ -377,22 +357,6 @@ inline integer<SSize> integer_literal_impl()
 
         return retval;
     }
-#else
-    // Run the checks on the char sequence, and determine the base.
-    const auto base = integer_literal_check_str(arr);
-    assert(base == 2 || base == 8 || base == 10 || base == 16);
-
-    switch (base) {
-        case 2:
-            return integer<SSize>{arr + 2, arr + sizeof(arr) - 1, 2};
-        case 8:
-            return integer<SSize>{arr + 1, arr + sizeof(arr) - 1, 8};
-        case 16:
-            return integer<SSize>{arr + 2, arr + sizeof(arr) - 1, 16};
-        default:
-            return integer<SSize>{arr};
-    }
-#endif
 }
 
 } // namespace detail

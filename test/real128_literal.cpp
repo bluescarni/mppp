@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -14,6 +14,9 @@
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -29,26 +32,24 @@ TEST_CASE("real128_literal_tests")
     REQUIRE(0._rq == -real128{});
     REQUIRE(0_rq == -real128{});
     REQUIRE(-.123e-7_rq == -real128{".123e-7"});
-#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_rq == real128{"0x123.p-7"});
     REQUIRE(-0X123.p-7_rq == -real128{"0x123.p-7"});
     REQUIRE(0x123.P-7_rq == real128{"0x123.p-7"});
     REQUIRE(-0X123.P-7_rq == -real128{"0x123.p-7"});
     REQUIRE(-0X0.123P-7_rq == -real128{"0x0.123p-7"});
-#endif
 
     // Runtime failures.
     real128 r;
-#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_rq, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real128 cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_rq, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real128 cannot be constructed from binary or octal literals");
     });
-#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_rq, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real128 cannot be constructed from binary or octal literals");
     });
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

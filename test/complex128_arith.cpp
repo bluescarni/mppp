@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -9,22 +9,19 @@
 #include <type_traits>
 
 #include <mp++/complex128.hpp>
-#include <mp++/config.hpp>
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
-
-#if MPPP_CPLUSPLUS >= 201402L
 
 constexpr auto test_constexpr_conj(complex128 c)
 {
     return c.conj();
 }
-
-#endif
 
 TEST_CASE("abs")
 {
@@ -56,20 +53,13 @@ TEST_CASE("conj")
     REQUIRE(c == complex128{3, 3});
     REQUIRE(std::is_same<complex128 &, decltype(c.conj())>::value);
 
-    // NOTE: it looks like on ICC there might
-    // be a codegen issue that discards the sign
-    // of a negative zero in certain circumstances.
-#if !defined(__INTEL_COMPILER)
     c = complex128{1, 0};
     REQUIRE(!c.imag().signbit());
     c.conj();
     REQUIRE(c.imag().signbit());
-#endif
 
-#if MPPP_CPLUSPLUS >= 201402L && !defined(__INTEL_COMPILER)
     constexpr auto cnj2 = test_constexpr_conj(complex128{0, 3});
     REQUIRE(cnj2 == complex128{0, -3});
-#endif
 }
 
 TEST_CASE("proj")
@@ -85,3 +75,5 @@ TEST_CASE("proj")
     REQUIRE(proj(complex128{real128_inf(), -123}).m_value == cplex128{real128_inf().m_value, 0});
     REQUIRE(proj(complex128{real128_inf(), -123}).imag().signbit());
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

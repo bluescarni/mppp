@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -6,19 +6,12 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
 #include <algorithm>
 #include <cstdint>
+#include <numeric>
 #include <random>
 #include <utility>
 #include <vector>
-
-#if MPPP_CPLUSPLUS >= 201703L
-
-#include <numeric>
-
-#endif
 
 #if defined(MPPP_BENCHMARK_BOOST)
 
@@ -37,6 +30,7 @@
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
 #if defined(MPPP_BENCHMARK_BOOST)
@@ -111,7 +105,6 @@ int main()
         fmt::print(mppp_benchmark::res_print_format, name, runtime, ret);
     }
 
-#if MPPP_CPLUSPLUS >= 201703L
     {
         auto p = get_init_vectors<std::int_least64_t>();
         constexpr auto name = "std::int64_t";
@@ -129,7 +122,6 @@ int main()
         bdata.emplace_back(name, runtime);
         fmt::print(mppp_benchmark::res_print_format, name, runtime, ret);
     }
-#endif
 
 #if defined(MPPP_BENCHMARK_BOOST)
     {

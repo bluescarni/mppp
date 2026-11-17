@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -12,14 +12,10 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
-
-#if defined(__INTEL_COMPILER)
-#define MPPP_INTEL_CONSTEXPR const
-#else
-#define MPPP_INTEL_CONSTEXPR constexpr
-#endif
 
 TEST_CASE("real128 naninffinite")
 {
@@ -34,20 +30,20 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(!isinf(r));
     REQUIRE(!r.isnan());
     REQUIRE(!isnan(r));
-    MPPP_INTEL_CONSTEXPR bool c0 = real128{}.isnan();
+    constexpr bool c0 = real128{}.isnan();
     REQUIRE(!c0);
-    MPPP_INTEL_CONSTEXPR bool c1 = isnan(real128{});
+    constexpr bool c1 = isnan(real128{});
     REQUIRE(!c1);
-    MPPP_INTEL_CONSTEXPR int c2 = real128{}.fpclassify();
+    constexpr int c2 = real128{}.fpclassify();
     REQUIRE(c2 == FP_ZERO);
     REQUIRE(c2 == fpclassify(real128{}));
-    MPPP_INTEL_CONSTEXPR bool c3 = isinf(real128{});
+    constexpr bool c3 = isinf(real128{});
     REQUIRE(!c3);
-    MPPP_INTEL_CONSTEXPR bool c4 = real128{}.isinf();
+    constexpr bool c4 = real128{}.isinf();
     REQUIRE(!c4);
-    MPPP_INTEL_CONSTEXPR bool c5 = finite(real128{});
+    constexpr bool c5 = finite(real128{});
     REQUIRE(c5);
-    MPPP_INTEL_CONSTEXPR bool c6 = real128{}.finite();
+    constexpr bool c6 = real128{}.finite();
     REQUIRE(c6);
     r = -1;
     REQUIRE(r.finite());
@@ -60,20 +56,20 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(!isinf(r));
     REQUIRE(!r.isnan());
     REQUIRE(!isnan(r));
-    MPPP_INTEL_CONSTEXPR bool d0 = real128{1}.isnan();
+    constexpr bool d0 = real128{1}.isnan();
     REQUIRE(!d0);
-    MPPP_INTEL_CONSTEXPR bool d1 = isnan(real128{1});
+    constexpr bool d1 = isnan(real128{1});
     REQUIRE(!d1);
-    MPPP_INTEL_CONSTEXPR int d2 = fpclassify(real128{-1});
+    constexpr int d2 = fpclassify(real128{-1});
     REQUIRE(d2 == FP_NORMAL);
     REQUIRE(d2 == real128{-1}.fpclassify());
-    MPPP_INTEL_CONSTEXPR bool d3 = isinf(real128{});
+    constexpr bool d3 = isinf(real128{});
     REQUIRE(!d3);
-    MPPP_INTEL_CONSTEXPR bool d4 = real128{}.isinf();
+    constexpr bool d4 = real128{}.isinf();
     REQUIRE(!d4);
-    MPPP_INTEL_CONSTEXPR bool d5 = finite(real128{});
+    constexpr bool d5 = finite(real128{});
     REQUIRE(d5);
-    MPPP_INTEL_CONSTEXPR bool d6 = real128{}.finite();
+    constexpr bool d6 = real128{}.finite();
     REQUIRE(d6);
     r = 123;
     REQUIRE(r.finite());
@@ -97,20 +93,20 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(isinf(r));
     REQUIRE(!r.isnan());
     REQUIRE(!isnan(r));
-    MPPP_INTEL_CONSTEXPR bool e0 = real128_inf().isnan();
+    constexpr bool e0 = real128_inf().isnan();
     REQUIRE(!e0);
-    MPPP_INTEL_CONSTEXPR bool e1 = isnan(real128_inf());
+    constexpr bool e1 = isnan(real128_inf());
     REQUIRE(!e1);
-    MPPP_INTEL_CONSTEXPR int e2 = fpclassify(real128_inf());
+    constexpr int e2 = fpclassify(real128_inf());
     REQUIRE(e2 == FP_INFINITE);
     REQUIRE(e2 == real128{"inf"}.fpclassify());
-    MPPP_INTEL_CONSTEXPR bool e3 = isinf(real128_inf());
+    constexpr bool e3 = isinf(real128_inf());
     REQUIRE(e3);
-    MPPP_INTEL_CONSTEXPR bool e4 = real128_inf().isinf();
+    constexpr bool e4 = real128_inf().isinf();
     REQUIRE(e4);
-    MPPP_INTEL_CONSTEXPR bool e5 = finite(real128_inf());
+    constexpr bool e5 = finite(real128_inf());
     REQUIRE(!e5);
-    MPPP_INTEL_CONSTEXPR bool e6 = real128_inf().finite();
+    constexpr bool e6 = real128_inf().finite();
     REQUIRE(!e6);
     r = "-inf";
     REQUIRE(!r.finite());
@@ -130,20 +126,20 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(!isinf(r));
     REQUIRE(r.isnan());
     REQUIRE(isnan(r));
-    MPPP_INTEL_CONSTEXPR bool f0 = real128_nan().isnan();
+    constexpr bool f0 = real128_nan().isnan();
     REQUIRE(f0);
-    MPPP_INTEL_CONSTEXPR bool f1 = isnan(real128_nan());
+    constexpr bool f1 = isnan(real128_nan());
     REQUIRE(f1);
-    MPPP_INTEL_CONSTEXPR int f2 = fpclassify(real128_nan());
+    constexpr int f2 = fpclassify(real128_nan());
     REQUIRE(f2 == FP_NAN);
     REQUIRE(f2 == real128{"-nan"}.fpclassify());
-    MPPP_INTEL_CONSTEXPR bool f3 = isinf(real128_nan());
+    constexpr bool f3 = isinf(real128_nan());
     REQUIRE(!f3);
-    MPPP_INTEL_CONSTEXPR bool f4 = real128_nan().isinf();
+    constexpr bool f4 = real128_nan().isinf();
     REQUIRE(!f4);
-    MPPP_INTEL_CONSTEXPR bool f5 = finite(real128_nan());
+    constexpr bool f5 = finite(real128_nan());
     REQUIRE(!f5);
-    MPPP_INTEL_CONSTEXPR bool f6 = real128_nan().finite();
+    constexpr bool f6 = real128_nan().finite();
     REQUIRE(!f6);
     // Subnormals.
     REQUIRE(fpclassify(real128{"1E-4940"}) == FP_SUBNORMAL);
@@ -167,3 +163,5 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(fpclassify(real128{"1E-4931"}) == FP_NORMAL);
     REQUIRE(fpclassify(-real128{"1E-4931"}) == FP_NORMAL);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -31,16 +31,10 @@
 #include <new>
 #include <stdexcept>
 #include <string>
-#include <tuple>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
-#include <string_view>
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -56,7 +50,7 @@
 
 #if defined(MPPP_WITH_FMT)
 
-#include <fmt/core.h>
+#include <fmt/base.h>
 
 #include <mp++/detail/fmt.hpp>
 
@@ -203,8 +197,9 @@ MPPP_DLL_PUBLIC void mpz_init_nlimbs(mpz_struct_t &, std::size_t);
 // Small helper to determine how many GMP limbs we need to fit nbits bits.
 constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
 {
-    // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    return static_cast<::mp_bitcnt_t>(nbits / unsigned(GMP_NUMB_BITS) + ((nbits % unsigned(GMP_NUMB_BITS)) != 0u));
+    return static_cast<::mp_bitcnt_t>((nbits / static_cast<unsigned>(GMP_NUMB_BITS))
+                                      // NOLINTNEXTLINE(readability-implicit-bool-conversion)
+                                      + ((nbits % static_cast<unsigned>(GMP_NUMB_BITS)) != 0u));
 }
 
 // Helper function to init an mpz to zero with enough space for nbits bits. The
@@ -302,7 +297,7 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
     // Implementation using GCC/clang builtins.
     // NOTE: here we need nl_digits<::mp_limb_t>() (instead of GMP_NUMB_BITS) because
     // builtin_clz() counts zeroes also in the nail bits.
-    return (unsigned(nl_digits<::mp_limb_t>()) - builtin_clz(l & GMP_NUMB_MASK));
+    return (static_cast<unsigned>(nl_digits<::mp_limb_t>()) - builtin_clz(l & GMP_NUMB_MASK));
 #elif defined(_MSC_VER)
     // Implementation using MSVC's intrinsics.
     unsigned long index;
@@ -404,7 +399,7 @@ inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
     //  0 |  1 | 0 * 2 + (1 & 1) = 1
     //  0 |  0 | 0 * 2 + (1 & 0) = 0
     // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    return static_cast<mpz_size_t>(hinz * 2u + (static_cast<unsigned>(!hinz) & lonz));
+    return static_cast<mpz_size_t>((hinz * 2u) + (static_cast<unsigned>(!hinz) & lonz));
 }
 
 // Branchless sign function for C++ integrals:
@@ -458,7 +453,7 @@ struct static_int {
     void zero_upper_limbs(std::size_t idx)
     {
         if (SSize <= opt_size) {
-            std::fill(m_limbs.begin() + idx, m_limbs.end(), ::mp_limb_t(0));
+            std::fill(m_limbs.begin() + idx, m_limbs.end(), static_cast<::mp_limb_t>(0));
         }
     }
     // Zero the limbs that are not used for representing the value, but only
@@ -521,6 +516,7 @@ struct static_int {
         // Input sanity checks.
         assert(asize <= SSize);
         assert(size <= s_size && size >= -s_size);
+        // NOLINTNEXTLINE(modernize-use-integer-sign-comparison)
         assert(size == static_cast<mpz_size_t>(asize) || size == -static_cast<mpz_size_t>(asize));
         // Copy the input limbs.
         // NOTE: here we are constructing a *new* object, thus I don't think it's possible that begin
@@ -584,7 +580,7 @@ struct static_int {
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
 
 #endif
-    MPPP_NODISCARD bool dtor_checks() const
+    [[nodiscard]] bool dtor_checks() const
     {
         // LCOV_EXCL_START
         const auto asize = abs_size();
@@ -622,16 +618,20 @@ struct static_int {
         assert(dtor_checks());
     }
     // Size in limbs (absolute value of the _mp_size member).
-    MPPP_NODISCARD mpz_size_t abs_size() const
+    [[nodiscard]] mpz_size_t abs_size() const
     {
         return std::abs(_mp_size);
     }
     // NOTE: the retval here can be used only in read-only mode, otherwise
     // we will have UB due to the const_cast use.
-    MPPP_NODISCARD mpz_struct_t get_mpz_view() const
+    [[nodiscard]] mpz_struct_t get_mpz_view() const
     {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-        return mpz_struct_t{_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
+        return mpz_struct_t{
+            ._mp_alloc = _mp_alloc,
+            ._mp_size = _mp_size,
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+            ._mp_d = const_cast<::mp_limb_t *>(m_limbs.data()),
+        };
     }
     mpz_alloc_t _mp_alloc = s_alloc;
     // NOLINTNEXTLINE(modernize-use-default-member-init)
@@ -806,7 +806,7 @@ union integer_union {
     }
 #if !defined(_MSC_VER)
     // Move ctor from mpz_t.
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init,cppcoreguidelines-rvalue-reference-param-not-moved)
     explicit integer_union(::mpz_t &&n)
     {
         const auto asize = get_mpz_size(n);
@@ -964,16 +964,16 @@ union integer_union {
         g_dy().~d_storage();
     }
     // Check storage type.
-    MPPP_NODISCARD bool is_static() const
+    [[nodiscard]] bool is_static() const
     {
         return m_st._mp_alloc == s_storage::s_alloc;
     }
-    MPPP_NODISCARD bool is_dynamic() const
+    [[nodiscard]] bool is_dynamic() const
     {
         return m_st._mp_alloc != s_storage::s_alloc;
     }
     // Getters for st and dy.
-    MPPP_NODISCARD const s_storage &g_st() const
+    [[nodiscard]] const s_storage &g_st() const
     {
         assert(is_static());
         return m_st;
@@ -983,7 +983,7 @@ union integer_union {
         assert(is_static());
         return m_st;
     }
-    MPPP_NODISCARD const d_storage &g_dy() const
+    [[nodiscard]] const d_storage &g_dy() const
     {
         assert(is_dynamic());
         return m_dy;
@@ -1077,12 +1077,8 @@ using is_integer_cpp_arithmetic = detail::conjunction<is_cpp_arithmetic<T>
 #endif
                                                       >;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL integer_cpp_arithmetic = is_integer_cpp_arithmetic<T>::value;
-
-#endif
+concept integer_cpp_arithmetic = is_integer_cpp_arithmetic<T>::value;
 
 // Detect C++ complex types compatible with integer.
 template <typename T>
@@ -1093,12 +1089,8 @@ using is_integer_cpp_complex = detail::conjunction<is_cpp_complex<T>
 #endif
                                                    >;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL integer_cpp_complex = is_integer_cpp_complex<T>::value;
-
-#endif
+concept integer_cpp_complex = is_integer_cpp_complex<T>::value;
 
 namespace detail
 {
@@ -1230,7 +1222,7 @@ class integer
         MPPP_MAYBE_TLS std::vector<char> buffer;
 
         // Recover the size.
-        decltype(buffer.size()) s;
+        decltype(buffer.size()) s{};
         ar >> s;
         buffer.resize(s);
 
@@ -1282,7 +1274,7 @@ class integer
             // NOTE: explicitly initialize mpz_struct_t() in order to avoid reading from
             // uninited memory in the move constructor, in case of a dynamic view.
             : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : detail::mpz_struct_t()),
-              m_ptr(n.is_static() ? &m_static_view : &(n.m_int.g_dy()))
+              m_ptr(n.is_static() ? &m_static_view : &n.m_int.g_dy())
         {
         }
         mpz_view(const mpz_view &) = delete;
@@ -1297,12 +1289,12 @@ class integer
         ~mpz_view() = default;
         mpz_view &operator=(const mpz_view &) = delete;
         mpz_view &operator=(mpz_view &&) = delete;
-        // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+        // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions,cppcoreguidelines-explicit-constructor,misc-explicit-constructor)
         operator const detail::mpz_struct_t *() const
         {
             return get();
         }
-        MPPP_NODISCARD const detail::mpz_struct_t *get() const
+        [[nodiscard]] const detail::mpz_struct_t *get() const
         {
             return m_ptr;
         }
@@ -1328,35 +1320,19 @@ public:
     // Constructor from number of bits.
     explicit integer(integer_bitcnt_t nbits) : m_int(nbits) {}
     // Generic constructor.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
         requires integer_cpp_arithmetic<T> && (!cpp_integral<T>)
-#else
-    template <typename T,
-              detail::enable_if_t<
-                  detail::conjunction<is_integer_cpp_arithmetic<T>, detail::negation<is_cpp_integral<T>>>::value, int>
-              = 0>
-#endif
     explicit integer(const T &x) : m_int(x)
     {
     }
-#if defined(MPPP_HAVE_CONCEPTS)
     template <typename T>
         requires integer_cpp_arithmetic<T> && cpp_integral<T>
-#else
-    template <typename T,
-              detail::enable_if_t<detail::conjunction<is_integer_cpp_arithmetic<T>, is_cpp_integral<T>>::value, int>
-              = 0>
-#endif
+    // NOLINTNEXTLINE(google-explicit-constructor,cppcoreguidelines-explicit-constructor,misc-explicit-constructor)
     integer(const T &x) : m_int(x)
     {
     }
     // Generic constructor from a C++ complex type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
     explicit integer(const T &c)
         : integer(c.imag() == 0
                       ? c.real()
@@ -1368,23 +1344,16 @@ public:
 
 private:
     // A tag to call private ctors.
-    struct ptag {
-    };
+    struct ptag {};
     explicit integer(const ptag &, const char *s, int base) : m_int(s, base) {}
     explicit integer(const ptag &, const std::string &s, int base) : integer(s.c_str(), base) {}
-#if defined(MPPP_HAVE_STRING_VIEW)
     explicit integer(const ptag &, const std::string_view &s, int base) : integer(s.data(), s.data() + s.size(), base)
     {
     }
-#endif
 
 public:
     // Constructor from string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     explicit integer(const T &s, int base = 10) : integer(ptag{}, s, base)
     {
     }
@@ -1549,22 +1518,14 @@ private:
 
 public:
     // Generic assignment operator from a fundamental C++ type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_arithmetic T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
-#endif
     integer &operator=(const T &x)
     {
         dispatch_assignment(x);
         return *this;
     }
     // Generic assignment operator from a complex C++ type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
     integer &operator=(const T &c)
     {
         if (mppp_unlikely(c.imag() != 0)) {
@@ -1590,11 +1551,7 @@ public:
 #endif
 
     // Assignment from string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     integer &operator=(const T &s)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
@@ -1633,6 +1590,8 @@ public:
     }
 #if !defined(_MSC_VER)
     // Move assignment from mpz_t.
+    //
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     integer &operator=(::mpz_t &&n)
     {
         const auto asize = detail::get_mpz_size(n);
@@ -1712,17 +1671,17 @@ public:
         return set_one_impl<false>();
     }
     // Test for static storage.
-    MPPP_NODISCARD bool is_static() const
+    [[nodiscard]] bool is_static() const
     {
         return m_int.is_static();
     }
     // Test for dynamic storage.
-    MPPP_NODISCARD bool is_dynamic() const
+    [[nodiscard]] bool is_dynamic() const
     {
         return m_int.is_dynamic();
     }
     // Conversion to string.
-    MPPP_NODISCARD std::string to_string(int base = 10) const
+    [[nodiscard]] std::string to_string(int base = 10) const
     {
         if (mppp_unlikely(base < 2 || base > 62)) {
             throw std::invalid_argument("Invalid base for string conversion: the base must be between "
@@ -1737,13 +1696,13 @@ public:
 private:
     // Conversion to bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
     template <typename T, bool Sign, detail::enable_if_t<(detail::nl_constants<T>::digits <= GMP_NUMB_BITS), int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> convert_to_unsigned() const
+    [[nodiscard]] std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
@@ -1762,7 +1721,7 @@ private:
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
     template <typename T, bool Sign, detail::enable_if_t<(detail::nl_constants<T>::digits > GMP_NUMB_BITS), int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> convert_to_unsigned() const
+    [[nodiscard]] std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
@@ -1775,7 +1734,7 @@ private:
         // Add the other limbs, if any.
         constexpr unsigned u_bits = detail::nl_digits<T>();
         unsigned shift(GMP_NUMB_BITS);
-        for (std::size_t i = 1u; i < asize; ++i, shift += unsigned(GMP_NUMB_BITS)) {
+        for (std::size_t i = 1u; i < asize; ++i, shift += static_cast<unsigned>(GMP_NUMB_BITS)) {
             if (shift >= u_bits) {
                 // We need to shift left the current limb. If the shift is too large, we run into UB
                 // and it also means that the value does not fit in T.
@@ -1799,9 +1758,8 @@ private:
     // Conversion to unsigned ints, excluding bool.
     template <typename T, detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>,
                                                                   detail::negation<std::is_same<bool, T>>>::value,
-                                              int>
-                          = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+                                              int> = 0>
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1831,7 +1789,7 @@ private:
     };
     // Overload if the all the absolute values of T fit into a limb.
     template <typename T, detail::enable_if_t<sconv_is_small<T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> convert_to_signed() const
+    [[nodiscard]] std::pair<bool, T> convert_to_signed() const
     {
         static_assert(detail::is_integral<T>::value && detail::is_signed<T>::value, "Invalid type.");
         assert(size());
@@ -1858,7 +1816,7 @@ private:
     }
     // Overload if not all the absolute values of T fit into a limb.
     template <typename T, detail::enable_if_t<!sconv_is_small<T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> convert_to_signed() const
+    [[nodiscard]] std::pair<bool, T> convert_to_signed() const
     {
         // Cache for convenience.
         constexpr auto Tmax = detail::make_unsigned(detail::nl_max<T>());
@@ -1886,7 +1844,7 @@ private:
     }
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1917,7 +1875,7 @@ private:
 #endif
     // Conversion to floating-point.
     template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    MPPP_NODISCARD std::pair<bool, T> dispatch_conversion() const
+    [[nodiscard]] std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1968,13 +1926,12 @@ public:
     // SFINAE dispatching.
 
     // Generic conversion operator to a C++ fundamental type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_arithmetic T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
-#endif
     explicit operator T() const
     {
+        // NOTE: not const, as retval.second is moved from below.
+        //
+        // NOLINTNEXTLINE(misc-const-correctness)
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
             throw std::overflow_error("The conversion of the integer " + to_string() + " to the type '" + type_name<T>()
@@ -1983,23 +1940,18 @@ public:
         return std::move(retval.second);
     }
     // Generic conversion operator to a C++ complex type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
     explicit operator T() const
     {
         return T(static_cast<typename T::value_type>(*this));
     }
     // Generic conversion member function to a C++ fundamental type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_arithmetic T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
-#endif
     bool get(T &rop) const
     {
+        // NOTE: not const, as retval.second is moved from below.
+        //
+        // NOLINTNEXTLINE(misc-const-correctness)
         auto retval = dispatch_conversion<T>();
         if (retval.first) {
             rop = std::move(retval.second);
@@ -2008,11 +1960,7 @@ public:
         return false;
     }
     // Generic conversion member function to a C++ complex type.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <integer_cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
     bool get(T &rop) const
     {
         rop = static_cast<T>(*this);
@@ -2036,7 +1984,7 @@ public:
         return false;
     }
     // Size in bits.
-    MPPP_NODISCARD std::size_t nbits() const
+    [[nodiscard]] std::size_t nbits() const
     {
         const std::size_t ls = size();
         if (ls == 0u) {
@@ -2052,25 +2000,26 @@ public:
         // LCOV_EXCL_STOP
         // Index of the most significant limb.
         const std::size_t idx = ls - 1u;
-        return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS) + detail::limb_size_nbits(lptr[idx]));
+        return static_cast<std::size_t>((idx * static_cast<unsigned>(GMP_NUMB_BITS))
+                                        + detail::limb_size_nbits(lptr[idx]));
     }
     // Size in limbs.
-    MPPP_NODISCARD std::size_t size() const
+    [[nodiscard]] std::size_t size() const
     {
         // NOTE: the idea here is that, regardless of what mpz_size_t is exactly, the
         // asize of an integer represents ultimately the size of a limb array, and as such
         // it has to be representable by std::size_t.
-        return (m_int.m_st._mp_size) >= 0 ? static_cast<std::size_t>(m_int.m_st._mp_size)
+        return (m_int.m_st._mp_size >= 0) ? static_cast<std::size_t>(m_int.m_st._mp_size)
                                           : static_cast<std::size_t>(detail::nint_abs(m_int.m_st._mp_size));
     }
     // Sign.
-    MPPP_NODISCARD int sgn() const
+    [[nodiscard]] int sgn() const
     {
         // NOTE: size is part of the common initial sequence.
         return detail::integral_sign(m_int.m_st._mp_size);
     }
     // Get an mpz_t view.
-    MPPP_NODISCARD mpz_view get_mpz_view() const
+    [[nodiscard]] mpz_view get_mpz_view() const
     {
         return mpz_view(*this);
     }
@@ -2099,7 +2048,7 @@ public:
         return *this;
     }
     // Test primality.
-    MPPP_NODISCARD int probab_prime_p(int reps = 25) const
+    [[nodiscard]] int probab_prime_p(int reps = 25) const
     {
         if (mppp_unlikely(reps < 1)) {
             throw std::invalid_argument("The number of primality tests must be at least 1, but a value of "
@@ -2121,22 +2070,23 @@ public:
         return mppp::sqr(*this, *this);
     }
     // Test if value is odd.
-    MPPP_NODISCARD bool odd_p() const
+    [[nodiscard]] bool odd_p() const
     {
         if (is_static()) {
             if (SSize <= s_storage::opt_size) {
                 // NOTE: when SSize is an optimised size, we can be sure the first limb
                 // has been zeroed even if the value of the integer is zero.
-                return (m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1);
+                return (m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & static_cast<::mp_limb_t>(1);
             } else {
                 // Otherwise, we add an extra check for zero.
-                return m_int.g_st()._mp_size && ((m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1));
+                return m_int.g_st()._mp_size
+                       && ((m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & static_cast<::mp_limb_t>(1));
             }
         }
         return mpz_odd_p(&m_int.g_dy());
     }
     // Test if value is even.
-    MPPP_NODISCARD bool even_p() const
+    [[nodiscard]] bool even_p() const
     {
         return !odd_p();
     }
@@ -2146,7 +2096,7 @@ public:
         return m_int;
     }
     // Return a const reference to the internal union.
-    MPPP_NODISCARD const detail::integer_union<SSize> &_get_union() const
+    [[nodiscard]] const detail::integer_union<SSize> &_get_union() const
     {
         return m_int;
     }
@@ -2157,7 +2107,7 @@ public:
         return &m_int.g_dy();
     }
     // Test if the value is zero.
-    MPPP_NODISCARD bool is_zero() const
+    [[nodiscard]] bool is_zero() const
     {
         return m_int.m_st._mp_size == 0;
     }
@@ -2165,7 +2115,7 @@ public:
 private:
     // Implementation of is_one()/is_negative_one().
     template <int One>
-    MPPP_NODISCARD bool is_one_impl() const
+    [[nodiscard]] bool is_one_impl() const
     {
         if (m_int.m_st._mp_size != One) {
             return false;
@@ -2177,12 +2127,12 @@ private:
 
 public:
     // Test if the value is equal to one.
-    MPPP_NODISCARD bool is_one() const
+    [[nodiscard]] bool is_one() const
     {
         return is_one_impl<1>();
     }
     // Test if the value is equal to minus one.
-    MPPP_NODISCARD bool is_negative_one() const
+    [[nodiscard]] bool is_negative_one() const
     {
         return is_one_impl<-1>();
     }
@@ -2193,7 +2143,7 @@ private:
 
 public:
     // Size of the serialised binary representation.
-    MPPP_NODISCARD std::size_t binary_size() const
+    [[nodiscard]] std::size_t binary_size() const
     {
         const auto asize = size();
         // LCOV_EXCL_START
@@ -2205,7 +2155,7 @@ public:
             throw std::overflow_error(binary_size_errmsg);
         }
         // LCOV_EXCL_STOP
-        return sizeof(detail::mpz_size_t) + asize * sizeof(::mp_limb_t);
+        return sizeof(detail::mpz_size_t) + (asize * sizeof(::mp_limb_t));
     }
 
 private:
@@ -2394,23 +2344,14 @@ private:
     // in binary_size(), where we do have to check for overflow).
     static std::size_t read_bytes(const detail::make_unsigned_t<detail::mpz_size_t> &asize)
     {
-        return static_cast<std::size_t>(sizeof(detail::mpz_size_t) + asize * sizeof(::mp_limb_t));
+        return static_cast<std::size_t>(sizeof(detail::mpz_size_t) + (asize * sizeof(::mp_limb_t)));
     }
 
 public:
     // Load a value from a memory buffer.
     std::size_t binary_load(const char *src)
     {
-        // NOTE: disable the use of structured bindings
-        // on MSVC altogether, due to this clang-cl issue:
-        // https://bugs.llvm.org/show_bug.cgi?id=41745
-#if MPPP_CPLUSPLUS >= 201703L && !defined(_MSC_VER)
         const auto [size, asize] = bl_read_size_asize(src);
-#else
-        detail::mpz_size_t size;
-        detail::make_unsigned_t<detail::mpz_size_t> asize;
-        std::tie(size, asize) = bl_read_size_asize(src);
-#endif
         binary_load_impl(src + sizeof(detail::mpz_size_t), size, asize);
         return read_bytes(asize);
     }
@@ -2429,16 +2370,7 @@ private:
         }
         // Size in bytes of the limbs portion of the data.
         const auto lsize = src.size() - sizeof(detail::mpz_size_t);
-#if MPPP_CPLUSPLUS >= 201703L && !defined(_MSC_VER)
-        // NOTE: not sure why the coverage is not detected here.
-        // LCOV_EXCL_START
         const auto [size, asize] = bl_read_size_asize(src.data());
-        // LCOV_EXCL_STOP
-#else
-        detail::mpz_size_t size;
-        detail::make_unsigned_t<detail::mpz_size_t> asize;
-        std::tie(size, asize) = bl_read_size_asize(src.data());
-#endif
         // The number of entire limbs stored in the vector must be at least the integer
         // limb size stored at the beginning of the vector.
         if (mppp_unlikely(lsize / sizeof(::mp_limb_t) < asize)) {
@@ -2513,17 +2445,6 @@ public:
 private:
     detail::integer_union<SSize> m_int;
 };
-
-#if MPPP_CPLUSPLUS < 201703L
-
-// NOTE: from C++17 static constexpr members are implicitly inline, and it's not necessary
-// any more (actually, it's deprecated) to re-declare them outside the class.
-// https://stackoverflow.com/questions/39646958/constexpr-static-member-before-after-c17
-
-template <std::size_t SSize>
-constexpr std::size_t integer<SSize>::ssize;
-
-#endif
 
 template <std::size_t SSize>
 const char integer<SSize>::binary_size_errmsg[] = "Overflow in the computation of the binary size of an integer";
@@ -2604,22 +2525,14 @@ inline integer<SSize> &set_negative_one(integer<SSize> &n)
 }
 
 // Generic conversion function to C++ fundamental types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <integer_cpp_arithmetic T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_integer_cpp_arithmetic<T>::value, int> = 0>
-#endif
 inline bool get(T &rop, const integer<SSize> &n)
 {
     return n.get(rop);
 }
 
 // Generic conversion function to C++ complex types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <integer_cpp_complex T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_integer_cpp_complex<T>::value, int> = 0>
-#endif
 inline bool get(T &rop, const integer<SSize> &n)
 {
     return n.get(rop);
@@ -2631,8 +2544,7 @@ namespace detail
 // Machinery for the determination of the result of a binary operation involving integer.
 // Default is empty for SFINAE.
 template <typename, typename, typename = void>
-struct integer_common_type {
-};
+struct integer_common_type {};
 
 template <std::size_t SSize>
 struct integer_common_type<integer<SSize>, integer<SSize>> {
@@ -2666,44 +2578,32 @@ using integer_common_t = typename integer_common_type<T, U>::type;
 
 // Various utilities used in both the operators and the functions.
 template <typename T, typename U>
-struct is_same_ssize_integer : std::false_type {
-};
+struct is_same_ssize_integer : std::false_type {};
 
 template <std::size_t SSize>
-struct is_same_ssize_integer<integer<SSize>, integer<SSize>> : std::true_type {
-};
+struct is_same_ssize_integer<integer<SSize>, integer<SSize>> : std::true_type {};
 
 template <typename T>
-struct is_integer : std::false_type {
-};
+struct is_integer : std::false_type {};
 
 template <std::size_t SSize>
-struct is_integer<integer<SSize>> : std::true_type {
-};
+struct is_integer<integer<SSize>> : std::true_type {};
 
 } // namespace detail
 
 template <typename T, typename U>
 using are_integer_op_types = detail::is_detected<detail::integer_common_t, T, U>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL integer_op_types = are_integer_op_types<T, U>::value;
-
-#endif
+concept integer_op_types = are_integer_op_types<T, U>::value;
 
 template <typename T, typename U>
 using are_integer_real_op_types
     = detail::conjunction<are_integer_op_types<T, U>, detail::negation<is_integer_cpp_complex<T>>,
                           detail::negation<is_integer_cpp_complex<U>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL integer_real_op_types = are_integer_real_op_types<T, U>::value;
-
-#endif
+concept integer_real_op_types = are_integer_real_op_types<T, U>::value;
 
 template <typename T, typename U>
 using are_integer_integral_op_types
@@ -2711,12 +2611,8 @@ using are_integer_integral_op_types
                           detail::conjunction<detail::is_integer<T>, is_cpp_integral<U>>,
                           detail::conjunction<detail::is_integer<U>, is_cpp_integral<T>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL integer_integral_op_types = are_integer_integral_op_types<T, U>::value;
-
-#endif
+concept integer_integral_op_types = are_integer_integral_op_types<T, U>::value;
 
 namespace detail
 {
@@ -2728,6 +2624,7 @@ namespace detail
 // - 2: selected when there are no nail bits and the static size is 2.
 template <typename SInt>
 using integer_static_add_algo = std::integral_constant<
+    // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
     int, (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
 
 // General implementation via mpn.
@@ -2748,6 +2645,7 @@ inline mpz_size_t integer_sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t 
 // (i.e., the addition overflows and the static size is not enough).
 template <std::size_t SSize>
 inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 0> &)
 {
@@ -2779,8 +2677,10 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // possibility of recovering. The alternative would be to do the computation in some local buffer and then
     // copy it out, but that is rather costly. Note that this means that in principle a computation that could fit in
     // static storage ends up triggering a promotion.
-    const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-    const bool c2 = std::size_t(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c1 = static_cast<std::size_t>(asize1) == SSize
+                    && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
+    const bool c2 = static_cast<std::size_t>(asize2) == SSize
+                    && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
     if (mppp_unlikely(c1 || c2)) {
         return false;
     }
@@ -2829,7 +2729,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         if (asize1 > asize2 || (asize1 == asize2 && mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
             // abs(op1) >= abs(op2).
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
-            MPPP_MAYBE_UNUSED ::mp_limb_t br;
+            [[maybe_unused]] ::mp_limb_t br;
             if (asize2 == 1) {
                 br = mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
             } else if (asize1 == asize2) {
@@ -2845,7 +2745,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         } else {
             // abs(op2) > abs(op1).
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
-            MPPP_MAYBE_UNUSED ::mp_limb_t br;
+            [[maybe_unused]] ::mp_limb_t br;
             if (asize1 == 1) {
                 br = mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
             } else {
@@ -2864,6 +2764,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 // Optimization for single-limb statics with no nails.
 template <std::size_t SSize>
 inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 1> &)
 {
@@ -2881,7 +2782,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 
     // Optimise the case in which the addition can be performed
     // via the signed counterpart of mp_limb_t.
-    if (mppp_likely(l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)))) {
+    if (mppp_likely(l1 < (::mp_limb_t(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2))
+                    && l2 < (::mp_limb_t(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2)))) {
         const auto x = make_signed(l1, sign1);
         const auto y = make_signed(l2, sign2);
 
@@ -2953,6 +2855,7 @@ inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *
 // Optimization for two-limbs statics with no nails.
 template <std::size_t SSize>
 inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 2> &)
 {
@@ -3073,10 +2976,12 @@ namespace detail
 // - 2: selected when there are no nail bits and the static size is 2.
 template <typename SInt>
 using integer_static_addsub_1_algo = std::integral_constant<
+    // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
     int, (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
 
 // mpn implementation.
 template <bool AddOrSub, std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
                                  ::mp_limb_t l2, const std::integral_constant<int, 0> &)
 {
@@ -3099,8 +3004,9 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
     }
     // This is the same overflow check as in static_addsub(). As in static_addsub(), this is not as tight/precise
     // as it could be.
-    const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-    const bool c2 = SSize == 1u && (l2 >> (GMP_NUMB_BITS - 1));
+    const bool c1 = static_cast<std::size_t>(asize1) == SSize
+                    && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
+    const bool c2 = SSize == 1u && (l2 >> static_cast<unsigned>(GMP_NUMB_BITS - 1));
     if (mppp_unlikely(c1 || c2)) {
         return false;
     }
@@ -3126,7 +3032,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
             // The asize can be the original one or original - 1 (we subtracted a limb). If size1 was positive,
             // sign2 has to be negative and we potentially subtract 1, if size1 was negative then sign2 has to be
             // positive and we potentially add 1.
-            rop._mp_size = size1 + sign2 * !(rdata[asize1 - 1] & GMP_NUMB_MASK);
+            rop._mp_size = size1 + (sign2 * !(rdata[asize1 - 1] & GMP_NUMB_MASK));
         } else {
             // abs(op2) > abs(op1).
             const auto br = mpn_sub_1(rdata, &l2, 1, data1[0]);
@@ -3142,6 +3048,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 
 // 1-limb optimisation (no nails).
 template <bool AddOrSub, std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
                                  ::mp_limb_t l2, const std::integral_constant<int, 1> &)
 {
@@ -3153,7 +3060,8 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 
     // Optimise the case in which the add/sub can be performed
     // via the signed counterpart of mp_limb_t.
-    if (mppp_likely(l1 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && l2 < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)))) {
+    if (mppp_likely(l1 < (::mp_limb_t(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2))
+                    && l2 < (::mp_limb_t(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2)))) {
         const auto x = make_signed(l1, sign1);
         const auto y = static_cast<make_signed_t<::mp_limb_t>>(l2);
 
@@ -3202,6 +3110,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 
 // 2-limb optimisation (no nails).
 template <bool AddOrSub, std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
                                  ::mp_limb_t l2, const std::integral_constant<int, 2> &)
 {
@@ -3310,7 +3219,7 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
         // NOTE: we have 1 allocated limb, with address &op2_copy. The size has to be 1,
         // as op2 is unsigned, fits in an mp_limbt_t and it is not zero (otherwise we would've taken
         // the other branch).
-        const detail::mpz_struct_t tmp_mpz{1, 1, op2_copy};
+        const detail::mpz_struct_t tmp_mpz{._mp_alloc = 1, ._mp_size = 1, ._mp_d = op2_copy};
         mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
@@ -3328,22 +3237,14 @@ inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op
 } // namespace detail
 
 // Ternary addition with C++ unsigned integral types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, cpp_unsigned_integral T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     return detail::add_ui_impl(rop, op1, op2);
 }
 
 // Ternary addition with C++ signed integral types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, cpp_signed_integral T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     if (op2 >= detail::uncvref_t<decltype(op2)>(0)) {
@@ -3407,7 +3308,7 @@ inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op
     } else {
         // LCOV_EXCL_START
         ::mp_limb_t op2_copy[1] = {static_cast<::mp_limb_t>(op2)};
-        const detail::mpz_struct_t tmp_mpz{1, 1, op2_copy};
+        const detail::mpz_struct_t tmp_mpz{._mp_alloc = 1, ._mp_size = 1, ._mp_d = op2_copy};
         mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
@@ -3425,22 +3326,14 @@ inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op
 } // namespace detail
 
 // Ternary subtraction with C++ unsigned integral types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, cpp_unsigned_integral T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     return detail::sub_ui_impl(rop, op1, op2);
 }
 
 // Ternary subtraction with C++ signed integral types.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize, cpp_signed_integral T>
-#else
-template <std::size_t SSize, typename T, detail::enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &sub_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     if (op2 >= detail::uncvref_t<decltype(op2)>(0)) {
@@ -3467,6 +3360,7 @@ template <typename SInt>
 using integer_static_mul_algo
     = std::integral_constant<int, (SInt::s_size == 1 && integer_have_dlimb_mul::value)
                                       ? 1
+                                      // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
                                       : ((SInt::s_size == 2 && integer_have_dlimb_mul::value) ? 2 : 0)>;
 
 // mpn implementation.
@@ -3474,6 +3368,7 @@ using integer_static_mul_algo
 // about the size in limbs of the result.
 template <std::size_t SSize>
 inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                    mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                    const std::integral_constant<int, 0> &)
 {
@@ -3505,17 +3400,17 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         res_data[asize2] = hi;
     } else if (asize1 == asize2) {
         mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
-        hi = res_data[2 * asize1 - 1];
+        hi = res_data[(2 * asize1) - 1];
     } else if (asize1 >= asize2) {
         hi = mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
     } else {
         hi = mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
     }
     // The actual size.
-    const std::size_t asize = max_asize - unsigned(hi == 0u);
+    const std::size_t asize = max_asize - static_cast<unsigned>(hi == 0u);
     if (res_data == rdata) {
         // If we wrote directly into rop, it means that we had enough storage in it to begin with.
-        rop._mp_size = mpz_size_t(asize);
+        rop._mp_size = static_cast<mpz_size_t>(asize);
         if (sign1 != sign2) {
             rop._mp_size = -rop._mp_size;
         }
@@ -3527,7 +3422,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         return asize;
     }
     // Enough space, set size and copy limbs.
-    rop._mp_size = mpz_size_t(asize);
+    rop._mp_size = static_cast<mpz_size_t>(asize);
     if (sign1 != sign2) {
         rop._mp_size = -rop._mp_size;
     }
@@ -3547,7 +3442,7 @@ inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 
 inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 {
-    const dlimb_t res = dlimb_t(op1) * op2;
+    const dlimb_t res = static_cast<dlimb_t>(op1) * op2;
     *hi = static_cast<::mp_limb_t>(res >> GMP_NUMB_BITS);
     return static_cast<::mp_limb_t>(res);
 }
@@ -3575,6 +3470,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
 // 2-limb optimization via dlimb.
 template <std::size_t SSize>
 inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                    mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                    const std::integral_constant<int, 2> &)
 {
@@ -3607,7 +3503,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         const auto cy = limb_add_overflow(cb_lo, ca_hi, &tmp1);
         tmp2 = cb_hi + cy;
         // Now determine the size. asize must be at least 2.
-        const mpz_size_t asize = 2 + mpz_size_t(tmp2 != 0u);
+        const mpz_size_t asize = 2 + static_cast<mpz_size_t>(tmp2 != 0u);
         if (asize == 2) {
             // Size is good, write out the result.
             rop._mp_size = sign1 * sign2 * asize;
@@ -3677,12 +3573,14 @@ template <typename SInt>
 using integer_static_addmul_algo = std::integral_constant<
     int, (integer_static_add_algo<SInt>::value == 2 && integer_static_mul_algo<SInt>::value == 2)
              ? 2
+             // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
              : ((integer_static_add_algo<SInt>::value == 1 && integer_static_mul_algo<SInt>::value == 1) ? 1 : 0)>;
 
 // NOTE: same return value as mul: 0 for success, otherwise a hint for the size of the result.
 template <std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
+                                      // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                       mpz_size_t asize2, int signr, int sign1, int sign2,
                                       const std::integral_constant<int, 0> &)
 {
@@ -3691,7 +3589,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     if (mppp_unlikely(
             static_mul_impl(prod, op1, op2, asize1, asize2, sign1, sign2, std::integral_constant<int, 0>{}))) {
         // This is the maximum size a static addmul can have.
-        return SSize * 2u + 1u;
+        return (SSize * 2u) + 1u;
     }
     // Determine sign and asize of the product.
     mpz_size_t asize_prod = prod._mp_size;
@@ -3731,7 +3629,8 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
 
     // Optimise the case in which the addition can be performed
     // via the signed counterpart of mp_limb_t.
-    if (rlimb < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) && prod < (::mp_limb_t(1) << (GMP_NUMB_BITS - 2))) {
+    if (rlimb < (static_cast<::mp_limb_t>(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2))
+        && prod < (static_cast<::mp_limb_t>(1) << static_cast<unsigned>(GMP_NUMB_BITS - 2))) {
         const auto x = make_signed(rlimb, signr);
         const auto y = make_signed(prod, sign_prod);
 
@@ -3775,6 +3674,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
 template <std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
+                                      // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                       mpz_size_t asize2, int signr, int sign1, int sign2,
                                       const std::integral_constant<int, 2> &)
 {
@@ -3844,7 +3744,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     } else {
         // When the signs differ, we need to implement addition as a subtraction.
         if (asizer > asize_prod
-            || (asizer == asize_prod && integer_compare_limbs_2(&rop.m_limbs[0], &prod[0], asizer) >= 0)) {
+            || (asizer == asize_prod && integer_compare_limbs_2(&rop.m_limbs[0], prod.data(), asizer) >= 0)) {
             // rop >= prod in absolute value.
             const auto lo = rop.m_limbs[0] - prod[0];
             // If there's a borrow, then hi1 > hi2, otherwise we would have a negative result.
@@ -3952,7 +3852,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
     }
     // ls: number of entire limbs shifted.
     // rs: effective shift that will be passed to the mpn function.
-    const std::size_t ls = s / unsigned(GMP_NUMB_BITS), rs = s % unsigned(GMP_NUMB_BITS);
+    const std::size_t ls = s / static_cast<unsigned>(GMP_NUMB_BITS), rs = s % static_cast<unsigned>(GMP_NUMB_BITS);
     // At the very minimum, the new asize will be the old asize plus ls.
     // Check if we can represent it first.
     // NOTE: use >= because we may need to increase by 1 new_asize at the end, as a size hint.
@@ -3969,7 +3869,8 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
         if (rs) {
             // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
             // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() + ls >= n.m_limbs.data().
-            ret = mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs));
+            ret = mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize),
+                             static_cast<unsigned>(rs));
             // Write bits spilling out.
             rop.m_limbs[new_asize] = ret;
         } else {
@@ -3977,12 +3878,14 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
             // NOTE: we have to use move_backward here because the ranges may be overlapping but not
             // starting at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not
             // zero: we don't have a remainder, and s == 0 was already handled above. Hence, new_asize > asize.
+            //
+            // NOLINTNEXTLINE(modernize-use-integer-sign-comparison)
             assert(new_asize > static_cast<std::size_t>(asize));
             std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
         }
         // Zero the lower limbs vacated by the shift. We need to do this as we don't know
         // the state of rop.
-        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
+        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, static_cast<::mp_limb_t>(0));
         // Set the size.
         rop._mp_size = sign * (static_cast<mpz_size_t>(new_asize) + (ret != 0u));
         return 0u;
@@ -3992,7 +3895,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
             // In this case the operation may fail, so we need to write to temporary storage.
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
             std::array<::mp_limb_t, SSize> tmp;
-            if (mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
+            if (mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), static_cast<unsigned>(rs))) {
                 return SSize + 1u;
             }
             // The shift was successful without spill over, copy the content from the tmp
@@ -4000,11 +3903,13 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
             copy_limbs_no(tmp.data(), tmp.data() + asize, rop.m_limbs.data() + ls);
         } else {
             // If we shifted by a multiple of the limb size, then we can write directly to rop.
+            //
+            // NOLINTNEXTLINE(modernize-use-integer-sign-comparison)
             assert(new_asize > static_cast<std::size_t>(asize));
             std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
         }
         // Zero the lower limbs vacated by the shift.
-        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
+        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, static_cast<::mp_limb_t>(0));
         // Set the size.
         rop._mp_size = sign * static_cast<mpz_size_t>(new_asize);
         return 0u;
@@ -4033,7 +3938,7 @@ inline std::size_t static_mul_2exp(static_int<1> &rop, const static_int<1> &n, s
         // limbs add to the current size (1), +1 because another limb might be needed.
         // NOTE: paranoia static assert to make sure there's no chance of overflowing.
         static_assert(GMP_NUMB_BITS > 1, "Invalid number of bits.");
-        return s / unsigned(GMP_NUMB_BITS) + 2u;
+        return (s / static_cast<unsigned>(GMP_NUMB_BITS)) + 2u;
     }
     // Write out.
     rop.m_limbs[0] = l << s;
@@ -4056,15 +3961,15 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
     }
     const int sign = integral_sign(n._mp_size);
     // Too much shift, this can never work on a nonzero value.
-    static_assert(unsigned(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
-    if (mppp_unlikely(s >= 2u * unsigned(GMP_NUMB_BITS))) {
+    static_assert(static_cast<unsigned>(GMP_NUMB_BITS) <= nl_max<std::size_t>() / 2u, "Overflow error.");
+    if (mppp_unlikely(s >= 2u * static_cast<std::size_t>(GMP_NUMB_BITS))) {
         // NOTE: this is the generic formula to estimate the final size.
         // NOTE: paranoia static assert to make sure there's no chance of overflowing.
         static_assert(GMP_NUMB_BITS > 1, "Invalid number of bits.");
         // NOTE: asize is 2 at most, no need to check for overflow.
-        return s / unsigned(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
+        return (s / static_cast<unsigned>(GMP_NUMB_BITS)) + 1u + static_cast<std::size_t>(asize);
     }
-    if (s == unsigned(GMP_NUMB_BITS)) {
+    if (s == static_cast<unsigned>(GMP_NUMB_BITS)) {
         // This case can be dealt with moving lo into hi, but only if asize is 1.
         if (mppp_unlikely(asize == 2)) {
             // asize is 2, shift is too much.
@@ -4078,15 +3983,15 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
     }
     // Temp hi lo limbs to store the result that will eventually go into rop.
     ::mp_limb_t lo = n.m_limbs[0u], hi = n.m_limbs[1u];
-    if (s > unsigned(GMP_NUMB_BITS)) {
+    if (s > static_cast<unsigned>(GMP_NUMB_BITS)) {
         if (mppp_unlikely(asize == 2)) {
-            return s / unsigned(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
+            return (s / static_cast<unsigned>(GMP_NUMB_BITS)) + 1u + static_cast<std::size_t>(asize);
         }
         // Move lo to hi and set lo to zero.
         hi = n.m_limbs[0u];
         lo = 0u;
         // Update the shift.
-        s = static_cast<std::size_t>(s - unsigned(GMP_NUMB_BITS));
+        s = static_cast<std::size_t>(s - static_cast<unsigned>(GMP_NUMB_BITS));
     }
     // Check that hi will not be shifted too much. Note that
     // here and below s can never be zero, so we never shift too much.
@@ -4095,7 +4000,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
         return 3u;
     }
     // Shift hi and lo. hi gets the carry over from lo.
-    hi = ((hi & GMP_NUMB_MASK) << s) + ((lo & GMP_NUMB_MASK) >> (unsigned(GMP_NUMB_BITS) - s));
+    hi = ((hi & GMP_NUMB_MASK) << s) + ((lo & GMP_NUMB_MASK) >> (static_cast<unsigned>(GMP_NUMB_BITS) - s));
     // NOTE: here the result needs to be masked as well as the shift could
     // end up writing in nail bits.
     lo = ((lo & GMP_NUMB_MASK) << s) & GMP_NUMB_MASK;
@@ -4147,6 +4052,7 @@ template <typename SInt>
 using integer_static_sqr_algo
     = std::integral_constant<int, (SInt::s_size == 1 && integer_have_dlimb_mul::value)
                                       ? 1
+                                      // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
                                       : ((SInt::s_size == 2 && integer_have_dlimb_mul::value) ? 2 : 0)>;
 
 // mpn implementation.
@@ -4181,7 +4087,7 @@ inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSiz
     // Compute the actual size of the result: it could be asize * 2
     // or 1 less, depending on whether the most significant limb of the
     // result is zero.
-    const auto res_size = asize * 2u - static_cast<std::size_t>((res_data[asize * 2u - 1u] & GMP_NUMB_MASK) == 0u);
+    const auto res_size = (asize * 2u) - static_cast<std::size_t>((res_data[(asize * 2u) - 1u] & GMP_NUMB_MASK) == 0u);
     if (res_size > SSize) {
         // Not enough space: return asize * 2, which is
         // what mpz_mul() would like to allocate for the result.
@@ -4323,6 +4229,7 @@ using integer_static_sqrm_algo = std::integral_constant<
 // mpn implementation.
 // NOTE: this assumes that mod is not zero.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op, const static_int<SSize> &mod,
                              const std::integral_constant<int, 0> &)
 {
@@ -4351,7 +4258,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     // or 1 less, depending on whether the most significant limb of the
     // result is zero.
     const auto sqr_res_asize
-        = asize * 2u - static_cast<std::size_t>((sqr_res_data[asize * 2u - 1u] & GMP_NUMB_MASK) == 0u);
+        = (asize * 2u) - static_cast<std::size_t>((sqr_res_data[(asize * 2u) - 1u] & GMP_NUMB_MASK) == 0u);
 
     if (mod_asize > sqr_res_asize) {
         // The divisor is larger than the square of op.
@@ -4403,7 +4310,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
 
 inline ::mp_limb_t static_sqrm_impl_1(::mp_limb_t op, ::mp_limb_t mod)
 {
-    return static_cast<::mp_limb_t>((dlimb_t(op) * op) % mod);
+    return static_cast<::mp_limb_t>((static_cast<dlimb_t>(op) * op) % mod);
 }
 
 #endif
@@ -4528,11 +4435,13 @@ namespace detail
 template <typename SInt>
 using integer_static_div_algo
     = std::integral_constant<int,
+                             // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
                              SInt::s_size == 1 ? 1 : ((SInt::s_size == 2 && integer_have_dlimb_div::value) ? 2 : 0)>;
 
 // mpn implementation.
 template <std::size_t SSize>
 inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                                // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                 const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1,
                                 int sign2, const std::integral_constant<int, 0> &)
 {
@@ -4570,12 +4479,12 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
-        r.m_limbs[0]
-            = mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        r.m_limbs[0] = mpn_divrem_1(q.m_limbs.data(), static_cast<::mp_size_t>(0), data1,
+                                    static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
         // General implementation.
-        mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
-                    static_cast<::mp_size_t>(asize2));
+        mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), static_cast<::mp_size_t>(0), data1,
+                    static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
     }
     // Complete the quotient: compute size and sign.
     q._mp_size = asize1 - asize2 + 1;
@@ -4597,6 +4506,7 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
 
 // 1-limb optimisation.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
                                 const static_int<SSize> &op2, mpz_size_t, mpz_size_t, int sign1, int sign2,
                                 const std::integral_constant<int, 1> &)
@@ -4622,27 +4532,30 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
 #if defined(MPPP_HAVE_DLIMB_T)
 
 // Quotient+remainder.
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                           ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
                           ::mp_limb_t *MPPP_RESTRICT r2)
 {
-    const auto op1 = op11 + (dlimb_t(op12) << GMP_NUMB_BITS);
-    const auto op2 = op21 + (dlimb_t(op22) << GMP_NUMB_BITS);
+    const auto op1 = op11 + (static_cast<dlimb_t>(op12) << GMP_NUMB_BITS);
+    const auto op2 = op21 + (static_cast<dlimb_t>(op22) << GMP_NUMB_BITS);
     const auto q = op1 / op2, r = op1 % op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q1 = static_cast<::mp_limb_t>(q & static_cast<::mp_limb_t>(-1));
     *q2 = static_cast<::mp_limb_t>(q >> GMP_NUMB_BITS);
-    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+    *r1 = static_cast<::mp_limb_t>(r & static_cast<::mp_limb_t>(-1));
     *r2 = static_cast<::mp_limb_t>(r >> GMP_NUMB_BITS);
 }
 
 // Quotient only.
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    const auto op1 = op11 + (dlimb_t(op12) << GMP_NUMB_BITS);
-    const auto op2 = op21 + (dlimb_t(op22) << GMP_NUMB_BITS);
+    const auto op1 = op11 + (static_cast<dlimb_t>(op12) << GMP_NUMB_BITS);
+    const auto op2 = op21 + (static_cast<dlimb_t>(op22) << GMP_NUMB_BITS);
     const auto q = op1 / op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q1 = static_cast<::mp_limb_t>(q & static_cast<::mp_limb_t>(-1));
     *q2 = static_cast<::mp_limb_t>(q >> GMP_NUMB_BITS);
 }
 
@@ -4650,7 +4563,9 @@ inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, :
 
 // 2-limbs optimisation.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                                // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                 const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1,
                                 int sign2, const std::integral_constant<int, 2> &)
 {
@@ -4735,6 +4650,7 @@ namespace detail
 // mpn implementation.
 template <std::size_t SSize>
 inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                               // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                const std::integral_constant<int, 0> &)
 {
@@ -4770,13 +4686,13 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
-        mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        mpn_divrem_1(q.m_limbs.data(), static_cast<::mp_size_t>(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
     } else {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
         std::array<::mp_limb_t, SSize> r_unused;
         // General implementation.
-        mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
-                    static_cast<::mp_size_t>(asize2));
+        mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), static_cast<::mp_size_t>(0), data1,
+                    static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
     }
     // Complete the quotient: compute size and sign.
     q._mp_size = asize1 - asize2 + 1;
@@ -4807,6 +4723,7 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
 // 2-limbs optimisation.
 template <std::size_t SSize>
 inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                               // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                const std::integral_constant<int, 2> &)
 {
@@ -4876,6 +4793,7 @@ namespace detail
 // NOTE: the Gcd flag specifies whether the divisor op2 is a strictly positive quantity.
 template <bool Gcd, std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                  mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                  const std::integral_constant<int, 0> &)
 {
@@ -4929,6 +4847,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 // 2-limbs optimisation.
 template <bool Gcd, std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                                  mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                  const std::integral_constant<int, 2> &)
 {
@@ -5076,7 +4995,8 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
     }
     // ls: number of entire limbs shifted.
     // rs: effective shift that will be passed to the mpn function.
-    const auto ls = s / unsigned(GMP_NUMB_BITS), rs = s % unsigned(GMP_NUMB_BITS);
+    const auto ls = s / static_cast<unsigned>(GMP_NUMB_BITS), rs = s % static_cast<unsigned>(GMP_NUMB_BITS);
+    // NOLINTNEXTLINE(modernize-use-integer-sign-comparison)
     if (ls >= static_cast<std::size_t>(asize)) {
         // If we shift by a number of entire limbs equal to or larger than the asize,
         // the result will be zero.
@@ -5088,7 +5008,8 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
     if (rs) {
         // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
         // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() <= n.m_limbs.data() + ls.
-        mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
+        mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize),
+                   static_cast<unsigned>(rs));
     } else {
         // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
         // NOTE: std::move requires that the destination iterator is not within the input range.
@@ -5109,7 +5030,7 @@ inline void static_tdiv_q_2exp(static_int<1> &rop, const static_int<1> &n, ::mp_
         rop = n;
         return;
     }
-    if (s >= unsigned(GMP_NUMB_BITS)) {
+    if (s >= static_cast<unsigned>(GMP_NUMB_BITS)) {
         // We are shifting by the limb's bit size or greater, the result will be zero.
         rop._mp_size = 0;
         rop.m_limbs[0] = 0u;
@@ -5136,17 +5057,17 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
         sign = -1;
     }
     // If shift is too large, zero the result and return.
-    static_assert(unsigned(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
-    if (s >= 2u * unsigned(GMP_NUMB_BITS)) {
+    static_assert(static_cast<unsigned>(GMP_NUMB_BITS) <= nl_max<::mp_bitcnt_t>() / 2u, "Overflow error.");
+    if (s >= 2u * static_cast<::mp_bitcnt_t>(GMP_NUMB_BITS)) {
         rop._mp_size = 0;
         rop.m_limbs[0u] = 0u;
         rop.m_limbs[1u] = 0u;
         return;
     }
-    if (s >= unsigned(GMP_NUMB_BITS)) {
+    if (s >= static_cast<unsigned>(GMP_NUMB_BITS)) {
         // NOTE: here the effective shift < GMP_NUMB_BITS, otherwise it would have been caught
         // in the check above.
-        const auto lo = (n.m_limbs[1u] & GMP_NUMB_MASK) >> (s - unsigned(GMP_NUMB_BITS));
+        const auto lo = (n.m_limbs[1u] & GMP_NUMB_MASK) >> (s - static_cast<unsigned>(GMP_NUMB_BITS));
         // The size could be zero or +-1, depending
         // on the new content of m_limbs[0] and the previous
         // sign of _mp_size.
@@ -5159,13 +5080,13 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
     // This represents the bits in hi that will be shifted down into lo.
     // We move them up so we can add tmp to the new lo to account for them.
     // NOTE: mask the final result to avoid spillover into potential nail bits.
-    const auto tmp = ((n.m_limbs[1u] & GMP_NUMB_MASK) << (unsigned(GMP_NUMB_BITS) - s)) & GMP_NUMB_MASK;
+    const auto tmp = ((n.m_limbs[1u] & GMP_NUMB_MASK) << (static_cast<unsigned>(GMP_NUMB_BITS) - s)) & GMP_NUMB_MASK;
     rop.m_limbs[0u] = ((n.m_limbs[0u] & GMP_NUMB_MASK) >> s) + tmp;
     rop.m_limbs[1u] = (n.m_limbs[1u] & GMP_NUMB_MASK) >> s;
     // The effective shift was less than 1 entire limb. The new asize must be the old one,
     // or one less than that.
     // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-    rop._mp_size = sign * (asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u));
+    rop._mp_size = sign * (asize - ((rop.m_limbs[static_cast<std::size_t>(asize - 1)] & GMP_NUMB_MASK) == 0u));
 }
 } // namespace detail
 
@@ -5246,10 +5167,12 @@ inline int static_cmp(const static_int<2> &n1, const static_int<2> &n2)
     auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
     while (asize != 0) {
         --asize;
-        if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) > (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+        if ((n1.m_limbs[static_cast<std::size_t>(asize)] & GMP_NUMB_MASK)
+            > (n2.m_limbs[static_cast<std::size_t>(asize)] & GMP_NUMB_MASK)) {
             return (n1._mp_size >= 0) ? 1 : -1;
         }
-        if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) < (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+        if ((n1.m_limbs[static_cast<std::size_t>(asize)] & GMP_NUMB_MASK)
+            < (n2.m_limbs[static_cast<std::size_t>(asize)] & GMP_NUMB_MASK)) {
             return (n1._mp_size >= 0) ? -1 : 1;
         }
     }
@@ -5342,7 +5265,7 @@ inline bool static_not_impl(static_int<2> &rop, const static_int<2> &op, mpz_siz
             // The static has the maximum possible value, NOT will overflow it.
             return false;
         }
-        const ::mp_limb_t new_lo = (lo + 1u) & GMP_NUMB_MASK, new_hi = hi + unsigned(lo == GMP_NUMB_MAX);
+        const ::mp_limb_t new_lo = (lo + 1u) & GMP_NUMB_MASK, new_hi = hi + static_cast<unsigned>(lo == GMP_NUMB_MAX);
         // asize can be -1 or -2, never zero.
         // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = -1 - (new_hi != 0u);
@@ -5350,7 +5273,7 @@ inline bool static_not_impl(static_int<2> &rop, const static_int<2> &op, mpz_siz
         rop.m_limbs[1] = new_hi;
         return true;
     }
-    const ::mp_limb_t new_lo = (lo - 1u) & GMP_NUMB_MASK, new_hi = hi - unsigned(lo == 0u);
+    const ::mp_limb_t new_lo = (lo - 1u) & GMP_NUMB_MASK, new_hi = hi - static_cast<unsigned>(lo == 0u);
     // Size could be 0, 1 or 2.
     rop._mp_size = size_from_lohi(new_lo, new_hi);
     rop.m_limbs[0] = new_lo;
@@ -5360,10 +5283,12 @@ inline bool static_not_impl(static_int<2> &rop, const static_int<2> &op, mpz_siz
 
 // n-limbs implementation.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op, mpz_size_t asize, int sign)
 {
     auto data = op.m_limbs.data();
     if (sign >= 0) {
+        // NOLINTNEXTLINE(modernize-use-integer-sign-comparison)
         if (mppp_unlikely(static_cast<mpz_size_t>(SSize) == asize && std::all_of(data, data + asize, [](::mp_limb_t l) {
                               return (l & GMP_NUMB_MASK) == GMP_NUMB_MAX;
                           }))) {
@@ -5376,6 +5301,8 @@ inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op,
                 = static_cast<mpz_size_t>(mpn_add_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1));
             if (cy) {
                 // If there's a carry, we'll need to write into the upper limb.
+                //
+                // NOLINTNEXTLINE(modernize-use-integer-sign-comparison)
                 assert(asize < static_cast<mpz_size_t>(SSize));
                 rop.m_limbs[static_cast<std::size_t>(asize)] = 1;
             }
@@ -5444,7 +5371,7 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // The easy case: both are nonnegative.
         // NOTE: no need to mask, as we masked l1 and l2 already, and OR
         // won't turn on any upper bit.
-        ::mp_limb_t ret = l1 | l2;
+        ::mp_limb_t const ret = l1 | l2;
         // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
@@ -5467,7 +5394,7 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
     // the two's complement to get its absolute value:
     // (0) ... 0 0 0 1 0 1
     // So the final result is -5.
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOTE: at least 1 of the operands is strictly negative, so the result
     // has to be negative as well (because of ORing the sign bits).
     rop._mp_size = -1;
@@ -5489,6 +5416,10 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
             // Both negative.
             rop.m_limbs[0] = ~((~l1 + 1u) | (~l2 + 1u)) + 1u;
             break;
+            // LCOV_EXCL_START
+        default:
+            assert(false);
+            // LCOV_EXCL_STOP
     }
 }
 
@@ -5497,7 +5428,7 @@ inline void twosc(std::array<::mp_limb_t, 2> &arr, ::mp_limb_t lo, ::mp_limb_t h
 {
     assert(hi != 0u || lo != 0u);
     arr[0] = (~lo + 1u) & GMP_NUMB_MASK;
-    arr[1] = (~hi + unsigned(lo == 0u)) & GMP_NUMB_MASK;
+    arr[1] = (~hi + static_cast<unsigned>(lo == 0u)) & GMP_NUMB_MASK;
 }
 
 // 2-limbs implementation.
@@ -5514,7 +5445,7 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5537,6 +5468,10 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
             twosc(tmp2, lo2, hi2);
             twosc(rop.m_limbs, tmp1[0] | tmp2[0], tmp1[1] | tmp2[1]);
             break;
+            // LCOV_EXCL_START
+        default:
+            assert(false);
+            // LCOV_EXCL_STOP
     }
     // Size is -1 or -2: we could have 1-limb operands, and even with
     // 2-limbs operands, the final 2sc - in case of negative values - could
@@ -5587,6 +5522,7 @@ inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
 // mpn implementation.
 template <std::size_t SSize>
 inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2)
 {
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
@@ -5619,7 +5555,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
         return;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5651,6 +5587,10 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             mpn_ior_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
             rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize2);
             break;
+            // LCOV_EXCL_START
+        default:
+            assert(false);
+            // LCOV_EXCL_STOP
     }
 }
 
@@ -5705,13 +5645,13 @@ inline bool static_and_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // The easy case: both are nonnegative.
         // NOTE: no need to mask, as we masked l1 and l2 already, and AND
         // won't turn on any upper bit.
-        ::mp_limb_t ret = l1 & l2;
+        ::mp_limb_t const ret = l1 & l2;
         // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
@@ -5750,9 +5690,10 @@ inline bool static_and_impl(static_int<1> &rop, const static_int<1> &op1, const 
             rop.m_limbs[0] = ret;
             return true;
         }
+        // LCOV_EXCL_START
+        default:
+            assert(false);
     }
-    // Keep the compiler happy.
-    // LCOV_EXCL_START
     assert(false);
     return true;
     // LCOV_EXCL_STOP
@@ -5772,7 +5713,7 @@ inline bool static_and_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5808,8 +5749,10 @@ inline bool static_and_impl(static_int<2> &rop, const static_int<2> &op1, const 
             rop._mp_size = -size_from_lohi(rop.m_limbs[0], rop.m_limbs[1]);
             return true;
         }
+        // LCOV_EXCL_START
+        default:
+            assert(false);
     }
-    // LCOV_EXCL_START
     assert(false);
     return true;
     // LCOV_EXCL_STOP
@@ -5832,6 +5775,7 @@ inline mpz_size_t compute_static_int_asize(const static_int<SSize> &r, mpz_size_
 // mpn implementation.
 template <std::size_t SSize>
 inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2)
 {
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
@@ -5854,7 +5798,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         rop._mp_size = compute_static_int_asize(rop, asize2);
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -5898,8 +5842,10 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             }
             rop._mp_size = -twosc(rop.m_limbs.data(), tmpr.data(), asize1);
             return true;
+            // LCOV_EXCL_START
+        default:
+            assert(false);
     }
-    // LCOV_EXCL_START
     assert(false);
     return true;
     // LCOV_EXCL_STOP
@@ -5958,13 +5904,13 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
         // The easy case: both are nonnegative.
         // NOTE: no need to mask, as we masked l1 and l2 already, and XOR
         // won't turn on any upper bit.
-        ::mp_limb_t ret = l1 ^ l2;
+        ::mp_limb_t const ret = l1 ^ l2;
         // NOLINTNEXTLINE(readability-implicit-bool-conversion)
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
         return false;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
     switch (sign_mask) {
         case 1u: {
@@ -6005,8 +5951,10 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
             rop.m_limbs[0] = ret;
             return true;
         }
+        // LCOV_EXCL_START
+        default:
+            assert(false);
     }
-    // LCOV_EXCL_START
     assert(false);
     return true;
     // LCOV_EXCL_STOP
@@ -6026,7 +5974,7 @@ inline bool static_xor_impl(static_int<2> &rop, const static_int<2> &op1, const 
         rop.m_limbs[1] = hi;
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, 2> tmp1, tmp2;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -6065,8 +6013,10 @@ inline bool static_xor_impl(static_int<2> &rop, const static_int<2> &op1, const 
             rop._mp_size = size_from_lohi(rop.m_limbs[0], rop.m_limbs[1]);
             return true;
         }
+        // LCOV_EXCL_START
+        default:
+            assert(false);
     }
-    // LCOV_EXCL_START
     assert(false);
     return true;
     // LCOV_EXCL_STOP
@@ -6075,6 +6025,7 @@ inline bool static_xor_impl(static_int<2> &rop, const static_int<2> &op1, const 
 // mpn implementation.
 template <std::size_t SSize>
 inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2)
 {
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
@@ -6109,7 +6060,7 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         rop._mp_size = compute_static_int_asize(rop, asize1);
         return true;
     }
-    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    const unsigned sign_mask = static_cast<unsigned>(sign1 < 0) + (static_cast<unsigned>(sign2 < 0) << 1u);
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
     // NOLINTNEXTLINE(hicpp-multiway-paths-covered)
@@ -6159,8 +6110,10 @@ inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             }
             rop._mp_size = compute_static_int_asize(rop, asize1);
             return true;
+            // LCOV_EXCL_START
+        default:
+            assert(false);
     }
-    // LCOV_EXCL_START
     assert(false);
     return true;
     // LCOV_EXCL_STOP
@@ -6529,9 +6482,7 @@ namespace detail
 template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline unsigned long integer_exp_to_ulong(const T &exp)
 {
-#if !defined(__INTEL_COMPILER)
     assert(exp >= T(0));
-#endif
     // NOTE: make_unsigned_t<T> is T if T is already unsigned.
     // Don't use the make_unsigned() helper, as exp might be
     // unsigned already.
@@ -6602,15 +6553,9 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 } // namespace detail
 
 // Generic binomial coefficient.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-binomial(const T &n, const U &k)
+inline auto binomial(const T &n, const U &k)
 {
     return detail::binomial_impl(n, k);
 }
@@ -6743,13 +6688,8 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
 
 // Generic binary exponentiation.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-pow(const T &base, const U &exp)
+inline auto pow(const T &base, const U &exp)
 {
     return detail::pow_impl(base, exp);
 }
@@ -6784,11 +6724,12 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
             const auto rs_data = rs.m_limbs.data(), out_ptr = overlap ? tmp.data() : rs_data;
             mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
             // Compute the size of the output (which is ceil(size / 2)).
-            const auto new_size = size / 2u + size % 2u;
+            const auto new_size = (size / 2u) + (size % 2u);
             assert(!new_size || (out_ptr[new_size - 1u] & GMP_NUMB_MASK));
             // Write out the result.
             rs._mp_size = static_cast<mpz_size_t>(new_size);
             if (overlap) {
+                // NOLINTNEXTLINE(readability-suspicious-call-argument)
                 copy_limbs_no(out_ptr, out_ptr + new_size, rs_data);
             }
             // Clear out unused limbs, if needed.
@@ -6829,6 +6770,7 @@ namespace detail
 
 // Static sqrtrem implementation.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, const static_int<SSize> &ns)
 {
     // NOTE: we require non-negative n (this is checked in sqrtrem()).
@@ -6848,11 +6790,12 @@ inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, con
         // Do the computation. The function will return the size of the remainder.
         const auto rem_size = mpn_sqrtrem(out_ptr, rems_data, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
         // Compute the size of the output (which is ceil(size / 2)).
-        const auto rop_size = size / 2u + size % 2u;
+        const auto rop_size = (size / 2u) + (size % 2u);
         assert(!rop_size || (out_ptr[rop_size - 1u] & GMP_NUMB_MASK));
         // Write out the result, clearing the unused limbs.
         rops._mp_size = static_cast<mpz_size_t>(rop_size);
         if (overlap) {
+            // NOLINTNEXTLINE(readability-suspicious-call-argument)
             copy_limbs_no(out_ptr, out_ptr + rop_size, rops_data);
         }
         rops.zero_upper_limbs(static_cast<std::size_t>(rop_size));
@@ -6957,6 +6900,7 @@ inline integer<SSize> root(const integer<SSize> &n, unsigned long m)
 
 // m-th root with remainder.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline void rootrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSize> &n, unsigned long m)
 {
     if (mppp_unlikely(!m)) {
@@ -7169,24 +7113,15 @@ inline integer<SSize> operator+(const integer<SSize> &n)
 
 // Binary addition.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-operator+(const T &op1, const U &op2)
+inline auto operator+(const T &op1, const U &op2)
 {
     return detail::dispatch_binary_add(op1, op2);
 }
 
 // In-place addition operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator+=(T &rop, const U &op)
 {
     detail::dispatch_in_place_add(rop, op);
@@ -7306,24 +7241,15 @@ integer<SSize> operator-(const integer<SSize> &n)
 
 // Binary subtraction.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-operator-(const T &op1, const U &op2)
+inline auto operator-(const T &op1, const U &op2)
 {
     return detail::dispatch_binary_sub(op1, op2);
 }
 
 // In-place subtraction operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator-=(T &rop, const U &op)
 {
     detail::dispatch_in_place_sub(rop, op);
@@ -7421,24 +7347,15 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 
 // Binary multiplication.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-operator*(const T &op1, const U &op2)
+inline auto operator*(const T &op1, const U &op2)
 {
     return detail::dispatch_binary_mul(op1, op2);
 }
 
 // In-place multiplication operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator*=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mul(rop, op);
@@ -7563,24 +7480,15 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 
 // Binary division.
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
     requires integer_op_types<T, U>
-inline auto
-#else
-inline detail::integer_common_t<T, U>
-#endif
-operator/(const T &n, const U &d)
+inline auto operator/(const T &n, const U &d)
 {
     return detail::dispatch_binary_div(n, d);
 }
 
 // In-place division operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator/=(T &rop, const U &op)
 {
     detail::dispatch_in_place_div(rop, op);
@@ -7588,26 +7496,16 @@ inline T &operator/=(T &rop, const U &op)
 }
 
 // Binary modulo operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-operator%(const T &n, const U &d)
+inline auto operator%(const T &n, const U &d)
 {
     return detail::dispatch_binary_mod(n, d);
 }
 
 // In-place modulo operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator%=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mod(rop, op);
@@ -7615,11 +7513,7 @@ inline T &operator%=(T &rop, const U &op)
 }
 
 // Binary left shift operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_integral T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 {
     integer<SSize> retval;
@@ -7628,11 +7522,7 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 }
 
 // In-place left shift operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_integral T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 {
     mul_2exp(rop, rop, detail::safe_cast<::mp_bitcnt_t>(s));
@@ -7640,11 +7530,7 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 }
 
 // Binary right shift operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_integral T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 {
     integer<SSize> retval;
@@ -7653,11 +7539,7 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 }
 
 // In-place right shift operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_integral T, std::size_t SSize>
-#else
-template <typename T, std::size_t SSize, detail::enable_if_t<is_cpp_integral<T>::value, int> = 0>
-#endif
 inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 {
     tdiv_q_2exp(rop, rop, detail::safe_cast<::mp_bitcnt_t>(s));
@@ -7670,6 +7552,7 @@ namespace detail
 // Equality operator.
 // NOTE: special implementation instead of using cmp, this should be faster.
 template <std::size_t SSize>
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
 {
     const mp_size_t size_a = a._get_union().m_st._mp_size, size_b = b._get_union().m_st._mp_size;
@@ -7680,7 +7563,7 @@ inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
         = size_a >= 0 ? static_cast<std::size_t>(size_a) : static_cast<std::size_t>(nint_abs(size_a));
     const ::mp_limb_t *ptr_a = a.is_static() ? a._get_union().g_st().m_limbs.data() : a._get_union().g_dy()._mp_d;
     const ::mp_limb_t *ptr_b = b.is_static() ? b._get_union().g_st().m_limbs.data() : b._get_union().g_dy()._mp_d;
-    auto limb_cmp
+    const auto limb_cmp
         = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
     // NOTE: cannot understand why, but MSVC wants a checked iterator as 3rd
     // parameter here.
@@ -7893,72 +7776,48 @@ inline bool dispatch_less_than(T x, const integer<SSize> &a)
 } // namespace detail
 
 // Equality operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator==(const T &op1, const U &op2)
 {
     return detail::dispatch_equality(op1, op2);
 }
 
 // Inequality operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator!=(const T &op1, const U &op2)
 {
     return !(op1 == op2);
 }
 
 // Less-than operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator<(const T &op1, const U &op2)
 {
     return detail::dispatch_less_than(op1, op2);
 }
 
 // Less-than or equal operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator<=(const T &op1, const U &op2)
 {
     return !(op1 > op2);
 }
 
 // Greater-than operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator>(const T &op1, const U &op2)
 {
     return detail::dispatch_greater_than(op1, op2);
 }
 
 // Greater-than or equal operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator>=(const T &op1, const U &op2)
 {
     return !(op1 < op2);
@@ -8018,26 +7877,16 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
 } // namespace detail
 
 // Binary bitwise OR operator
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-operator|(const T &op1, const U &op2)
+inline auto operator|(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_or(op1, op2);
 }
 
 // In-place bitwise OR operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator|=(T &rop, const U &op)
 {
     detail::dispatch_in_place_or(rop, op);
@@ -8089,26 +7938,16 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
 } // namespace detail
 
 // Binary bitwise AND operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-operator&(const T &op1, const U &op2)
+inline auto operator&(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_and(op1, op2);
 }
 
 // In-place bitwise AND operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator&=(T &rop, const U &op)
 {
     detail::dispatch_in_place_and(rop, op);
@@ -8160,26 +7999,16 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
 } // namespace detail
 
 // Binary bitwise XOR operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-inline auto
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-inline detail::integer_common_t<T, U>
-#endif
-operator^(const T &op1, const U &op2)
+inline auto operator^(const T &op1, const U &op2)
 {
     return detail::dispatch_operator_xor(op1, op2);
 }
 
 // In-place bitwise XOR operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires integer_integral_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator^=(T &rop, const U &op)
 {
     detail::dispatch_in_place_xor(rop, op);
@@ -8195,23 +8024,18 @@ MPPP_END_NAMESPACE
 // macro, which does not support directly
 // class templates.
 
-namespace boost
-{
-
-namespace serialization
+namespace boost::serialization
 {
 
 template <std::size_t SSize>
 struct tracking_level<mppp::integer<SSize>> {
-    typedef mpl::integral_c_tag tag;
-    typedef mpl::int_<track_never> type;
+    using tag = mpl::integral_c_tag;
+    using type = mpl::int_<track_never>;
     BOOST_STATIC_CONSTANT(int, value = tracking_level::type::value);
     BOOST_STATIC_ASSERT((mpl::greater<implementation_level<mppp::integer<SSize>>, mpl::int_<primitive_type>>::value));
 };
 
-} // namespace serialization
-
-} // namespace boost
+} // namespace boost::serialization
 
 #endif
 
@@ -8221,13 +8045,6 @@ namespace std
 // Specialisation of std::hash for mppp::integer.
 template <size_t SSize>
 struct hash<mppp::integer<SSize>> {
-    // NOTE: these typedefs have been deprecated in C++17.
-#if MPPP_CPLUSPLUS < 201703L
-    // The argument type.
-    using argument_type = mppp::integer<SSize>;
-    // The result type.
-    using result_type = size_t;
-#endif
     // Call operator.
     size_t operator()(const mppp::integer<SSize> &n) const
     {
@@ -8251,8 +8068,7 @@ namespace fmt
 {
 
 template <std::size_t SSize>
-struct formatter<mppp::integer<SSize>> : mppp::detail::to_string_formatter {
-};
+struct formatter<mppp::integer<SSize>> : mppp::detail::to_string_formatter {};
 
 } // namespace fmt
 

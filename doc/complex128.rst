@@ -21,8 +21,8 @@ The complex128 class
 
    This class represents complex numbers as pairs of quadruple-precision IEEE 754
    floating-point values.
-   The class is a thin wrapper around the :cpp:type:`__complex128` type and the quadmath library, available on GCC,
-   Clang and the Intel compiler on most modern platforms, on top of which it provides the following additions:
+   The class is a thin wrapper around the :cpp:type:`__complex128` type and the quadmath library, available on GCC
+   and Clang on most modern platforms, on top of which it provides the following additions:
 
    * interoperability with other mp++ classes,
    * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
@@ -128,10 +128,6 @@ The complex128 class
 
    .. cpp:function:: template <real128_cpp_complex T> constexpr complex128(const T &c)
 
-      .. note::
-
-        This constructor is ``constexpr`` only if at least C++14 is being used.
-
       Constructor from ``std::complex``.
 
       :param x: the complex value that will be used for the initialisation.
@@ -183,10 +179,6 @@ The complex128 class
 
    .. cpp:function:: constexpr complex128 &operator=(const __complex128 &c)
 
-      .. note::
-
-        This operator is ``constexpr`` only if at least C++14 is being used.
-
       Assignment operator from :cpp:type:`__complex128`.
 
       :param c: the assignment argument.
@@ -194,10 +186,6 @@ The complex128 class
       :return: a reference to ``this``.
 
    .. cpp:function::  template <complex128_interoperable T> constexpr complex128 &operator=(const T &x)
-
-      .. note::
-
-        This operator is ``constexpr`` only if at least C++14 is being used.
 
       Assignment from interoperable types.
 
@@ -209,10 +197,6 @@ The complex128 class
         :cpp:class:`~mppp::complex128` from *x*.
 
    .. cpp:function:: template <real128_cpp_complex T> constexpr complex128 &operator=(const T &c)
-
-      .. note::
-
-        This operator is ``constexpr`` only if at least C++14 is being used.
 
       Assignment from complex C++ types.
 
@@ -261,10 +245,6 @@ The complex128 class
    .. cpp:function:: constexpr complex128 &set_real(const real128 &x)
    .. cpp:function:: constexpr complex128 &set_imag(const real128 &x)
 
-      .. note::
-
-        These functions are ``constexpr`` only if at least C++14 is being used.
-
       Setters for the real and imaginary parts.
 
       :param x: the desired value for the real or imaginary part of ``this``.
@@ -294,21 +274,12 @@ The complex128 class
 
    .. cpp:function:: template <real128_cpp_complex T> constexpr explicit operator T() const
 
-      .. note::
-
-        This operator is ``constexpr`` only if at least C++14 is being used.
-
       Conversion to complex C++ types.
 
       :return: ``this`` converted to the type ``T``.
 
    .. cpp:function:: template <complex128_interoperable T> constexpr bool get(T &rop) const
    .. cpp:function:: template <real128_cpp_complex T> constexpr bool get(T &rop) const
-
-      .. note::
-
-        The first overload is ``constexpr`` only if at least C++14 is being used.
-        The second overload is ``constexpr`` only if at least C++20 is being used.
 
       Conversion member functions to interoperable and complex C++ types.
 
@@ -351,10 +322,6 @@ The complex128 class
    .. cpp:function:: complex128 &arg()
    .. cpp:function:: constexpr complex128 &conj()
    .. cpp:function:: complex128 &proj()
-
-      .. note::
-
-        :cpp:func:`~mppp::complex128::conj()` is ``constexpr`` only if at least C++14 is being used.
 
       In-place absolute value, argument, complex conjugate and projection into Riemann sphere.
 
@@ -465,7 +432,7 @@ Types
 .. cpp:type:: mppp::cplex128 = __complex128
 
    :cpp:type:`__complex128` is a quadruple-precision complex floating-point type
-   available on GCC, Clang and the Intel compiler.
+   available on GCC and Clang.
    This is the type wrapped by the :cpp:class:`~mppp::complex128` class.
 
    Because :cpp:type:`__complex128` is defined in the ``<quadmath.h>`` header, mp++ also provides
@@ -538,10 +505,6 @@ Real/imaginary parts
 .. cpp:function:: constexpr mppp::complex128 &mppp::set_real(mppp::complex128 &c, const mppp::real128 &x)
 .. cpp:function:: constexpr mppp::complex128 &mppp::set_imag(mppp::complex128 &c, const mppp::real128 &x)
 
-   .. note::
-
-      These functions are ``constexpr`` only if at least C++14 is being used.
-
    Setters for the real/imaginary part.
 
    :param c: the :cpp:class:`~mppp::complex128` whose real/imaginary part will be set.
@@ -554,11 +517,6 @@ Conversion
 
 .. cpp:function:: template <mppp::complex128_interoperable T> constexpr bool mppp::get(T &rop, const mppp::complex128 &c)
 .. cpp:function:: template <mppp::real128_cpp_complex T> constexpr bool mppp::get(T &rop, const mppp::complex128 &c)
-
-   .. note::
-
-      The first overload is ``constexpr`` only if at least C++14 is being used.
-      The second overload is ``constexpr`` only if at least C++20 is being used.
 
    Conversion functions to interoperable and complex C++ types.
 
@@ -754,10 +712,6 @@ Mathematical operators
 .. cpp:function:: constexpr mppp::complex128 &mppp::operator++(mppp::complex128 &c)
 .. cpp:function:: constexpr mppp::complex128 &mppp::operator--(mppp::complex128 &c)
 
-   .. note::
-
-      These operators are ``constexpr`` only if at least C++14 is being used.
-
    Prefix increment and decrement.
 
    :param c: the argument.
@@ -766,10 +720,6 @@ Mathematical operators
 
 .. cpp:function:: constexpr mppp::complex128 mppp::operator++(mppp::complex128 &c, int)
 .. cpp:function:: constexpr mppp::complex128 mppp::operator--(mppp::complex128 &c, int)
-
-   .. note::
-
-      These operators are ``constexpr`` only if at least C++14 is being used.
 
    Suffix increment and decrement.
 
@@ -803,10 +753,6 @@ Mathematical operators
 .. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr T &mppp::operator-=(T &x, const U &y)
 .. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr T &mppp::operator*=(T &x, const U &y)
 .. cpp:function:: template <typename T, mppp::complex128_op_types<T> U> constexpr T &mppp::operator/=(T &x, const U &y)
-
-   .. note::
-
-      These operators are ``constexpr`` only if at least C++14 is being used.
 
    In-place arithmetic operators.
 

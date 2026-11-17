@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -21,12 +21,18 @@
 #include <mp++/mp++.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp_test;
+
+namespace
+{
 
 using mppp_types = std::tuple<integer<1>, rational<1>, real, real128, complex128, complex>;
 
@@ -38,16 +44,13 @@ using cpp_types = std::tuple<int, double, std::complex<double>
                              >;
 
 template <typename T>
-struct is_mppp_complex : std::false_type {
-};
+struct is_mppp_complex : std::false_type {};
 
 template <>
-struct is_mppp_complex<complex128> : std::true_type {
-};
+struct is_mppp_complex<complex128> : std::true_type {};
 
 template <>
-struct is_mppp_complex<complex> : std::true_type {
-};
+struct is_mppp_complex<complex> : std::true_type {};
 
 struct mppp_interop_tester {
     template <typename A, typename B>
@@ -114,10 +117,15 @@ struct mppp_interop_tester {
     }
 };
 
+} // namespace
+
 TEST_CASE("mp++ interop")
 {
     tuple_for_each(mppp_types{}, mppp_interop_tester{});
 }
+
+namespace
+{
 
 struct mppp_cpp_interop_tester {
     template <typename A, typename B>
@@ -186,10 +194,15 @@ struct mppp_cpp_interop_tester {
     }
 };
 
+} // namespace
+
 TEST_CASE("mppp cpp interop")
 {
     tuple_for_each(mppp_types{}, mppp_cpp_interop_tester{});
 }
+
+namespace
+{
 
 struct cpp_mppp_interop_tester {
     template <typename A, typename B>
@@ -264,7 +277,11 @@ struct cpp_mppp_interop_tester {
     }
 };
 
+} // namespace
+
 TEST_CASE("cpp mppp interop")
 {
     tuple_for_each(cpp_types{}, cpp_mppp_interop_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -23,6 +23,9 @@
 #include <mp++/rational.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -62,7 +65,7 @@ static inline void mpq_pow(::mpq_t rop, const ::mpq_t base, long exp)
 
 struct pow_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using rational = rational<S::value>;
         using integer = typename rational::int_t;
@@ -217,3 +220,5 @@ TEST_CASE("pow")
 {
     tuple_for_each(sizes{}, pow_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

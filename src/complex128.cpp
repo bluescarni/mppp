@@ -1,12 +1,10 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#include <mp++/config.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -16,19 +14,15 @@
 #include <ostream>
 #include <sstream>
 #include <string>
-#include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
 #include <string_view>
-
-#endif
+#include <vector>
 
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
 #include <quadmath.h>
 
 #include <mp++/complex128.hpp>
+#include <mp++/config.hpp>
 #include <mp++/detail/parse_complex.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
@@ -274,11 +268,7 @@ complex128::complex128(const char *begin, const char *end)
     construct_from_nts(buffer.data());
 }
 
-#if defined(MPPP_HAVE_STRING_VIEW)
-
 complex128::complex128(const ptag &, const std::string_view &s) : complex128(s.data(), s.data() + s.size()) {}
-
-#endif
 
 #if defined(MPPP_WITH_MPFR)
 

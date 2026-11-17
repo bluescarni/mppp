@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -22,15 +22,10 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
-#include <string_view>
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -74,10 +69,7 @@ static_assert(sizeof(expected_mpc_struct_t) == sizeof(mpc_struct_t) && offsetof(
 // Double check that complex is a standard layout class.
 static_assert(std::is_standard_layout<complex>::value, "complex is not a standard layout class.");
 
-#if MPPP_CPLUSPLUS >= 201703L
-
-// If we have C++17, we can use structured bindings to test the layout of mpc_struct_t
-// and its members' types.
+// We can use structured bindings to test the layout of mpc_struct_t and its members' types.
 constexpr bool test_mpc_struct_t()
 {
     auto [re, im] = mpc_struct_t{};
@@ -91,8 +83,6 @@ constexpr bool test_mpc_struct_t()
 }
 
 static_assert(test_mpc_struct_t());
-
-#endif
 
 } // namespace
 
@@ -127,16 +117,16 @@ complex::complex(const complex &other, complex_prec_t p)
     ::mpc_set(&m_mpc, &other.m_mpc, MPC_RNDNN);
 }
 
-// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
-complex::complex(complex &&other, complex_prec_t p_)
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+complex::complex(complex &&other, complex_prec_t p_) : m_mpc(other.m_mpc)
 {
     const auto p = static_cast<::mpfr_prec_t>(p_);
 
     // Check the precision first of all.
     check_init_prec(p);
 
-    // Shallow copy other.
-    m_mpc = other.m_mpc;
+    // NOTE: at this point, other has been shallow-copied into this and we know the precision is valid.
+
     // Mark the other as moved-from.
     other.m_mpc.re->_mpfr_d = nullptr;
 
@@ -181,12 +171,10 @@ complex::complex(const stag &, const std::string &s, int base, ::mpfr_prec_t p)
 {
 }
 
-#if defined(MPPP_HAVE_STRING_VIEW)
 complex::complex(const stag &, const std::string_view &s, int base, ::mpfr_prec_t p)
     : complex(s.data(), s.data() + s.size(), base, complex_prec_t(p))
 {
 }
-#endif
 
 // Constructor from range of characters, base and precision.
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
@@ -243,6 +231,8 @@ complex &complex::operator=(const ::mpc_t c)
 #if !defined(_MSC_VER) || defined(__clang__)
 
 // Move assignment from mpc_t.
+//
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 complex &complex::operator=(::mpc_t &&c)
 {
     // Clear this.
@@ -318,12 +308,10 @@ complex &complex::set_impl(const std::string &s, int base)
     return set(s.c_str(), base);
 }
 
-#if defined(MPPP_HAVE_STRING_VIEW)
 complex &complex::set_impl(const std::string_view &s, int base)
 {
     return set(s.data(), s.data() + s.size(), base);
 }
-#endif
 
 // Set to character range.
 complex &complex::set(const char *begin, const char *end, int base)
@@ -337,8 +325,8 @@ complex &complex::set(const char *begin, const char *end, int base)
 // Detect one.
 bool complex::is_one() const
 {
-    re_cref re{*this};
-    im_cref im{*this};
+    re_cref const re{*this};
+    im_cref const im{*this};
 
     return im->zero_p() && re->is_one();
 }
@@ -359,8 +347,8 @@ complex &complex::prec_round(::mpfr_prec_t p)
 
 std::string complex::to_string(int base) const
 {
-    re_cref re{*this};
-    im_cref im{*this};
+    re_cref const re{*this};
+    im_cref const im{*this};
 
     return '(' + re->to_string(base) + ',' + im->to_string(base) + ')';
 }
@@ -368,7 +356,7 @@ std::string complex::to_string(int base) const
 int cmpabs(const complex &c1, const complex &c2)
 {
     ::mpfr_clear_erangeflag();
-    auto retval = ::mpc_cmp_abs(c1.get_mpc_t(), c2.get_mpc_t());
+    auto const retval = ::mpc_cmp_abs(c1.get_mpc_t(), c2.get_mpc_t());
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
         throw std::domain_error(
@@ -472,7 +460,7 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
         throw std::invalid_argument("The mpfr_asprintf() function returned the error code -1");
         // LCOV_EXCL_STOP
     }
-    out_str_cleaner re_osc{out_str};
+    out_str_cleaner const re_osc{out_str};
 
     tmp += out_str;
     tmp += ',';
@@ -488,7 +476,7 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
         throw std::invalid_argument("The mpfr_asprintf() function returned the error code -1");
         // LCOV_EXCL_STOP
     }
-    out_str_cleaner im_osc{out_str};
+    out_str_cleaner const im_osc{out_str};
 
     tmp += out_str;
     tmp += ')';
@@ -532,7 +520,7 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
 // Get the number of significant digits required for a round-tripping representation.
 std::size_t complex::get_str_ndigits(int base) const
 {
-    re_cref re{*this};
+    re_cref const re{*this};
 
     return re->get_str_ndigits(base);
 }
@@ -581,56 +569,60 @@ namespace detail
 
 void dispatch_complex_in_place_add(complex &a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_add_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_add(complex &a, bool n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_add_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_sub(complex &a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_sub_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_sub_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_sub(complex &a, bool n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_sub_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_mul(complex &a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_mul_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_mul_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_mul(complex &a, bool n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_mul_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_div(complex &a, const real &x)
 {
-    auto wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_div_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
+    auto const wrapper = [&x](::mpc_t c, const ::mpc_t o) { ::mpc_div_fr(c, o, x.get_mpfr_t(), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(x.get_prec(), wrapper, a, a);
 }
 
 void dispatch_complex_in_place_div(complex &a, bool n)
 {
-    auto wrapper = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
+    auto const wrapper
+        = [n](::mpc_t c, const ::mpc_t o) { ::mpc_div_ui(c, o, static_cast<unsigned long>(n), MPC_RNDNN); };
 
     mpc_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
 }
@@ -638,8 +630,8 @@ void dispatch_complex_in_place_div(complex &a, bool n)
 bool dispatch_complex_equality(const complex &c1, const complex &c2)
 {
     // NOTE: don't use mpc_cmp() as it does not handle NaNs properly.
-    complex::re_cref re1{c1}, re2{c2};
-    complex::im_cref im1{c1}, im2{c2};
+    const complex::re_cref re1{c1}, re2{c2};
+    const complex::im_cref im1{c1}, im2{c2};
 
     return *re1 == *re2 && *im1 == *im2;
 }

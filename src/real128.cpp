@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -17,13 +17,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-
 #include <string_view>
-
-#endif
+#include <vector>
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -80,7 +75,7 @@ __float128 str_to_float128(const char *s)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     char *endptr;
-    auto retval = ::strtoflt128(s, &endptr);
+    auto const retval = ::strtoflt128(s, &endptr);
     if (mppp_unlikely(endptr == s || *endptr != '\0')) {
         // NOTE: the first condition handles an empty string.
         // endptr will point to the first character in the string which
@@ -110,11 +105,7 @@ real128::real128(const ptag &, const char *s) : m_value(detail::str_to_float128(
 
 real128::real128(const ptag &, const std::string &s) : real128(s.c_str()) {}
 
-#if defined(MPPP_HAVE_STRING_VIEW)
-
 real128::real128(const ptag &, const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
-
-#endif
 
 // Constructor from range of characters.
 real128::real128(const char *begin, const char *end)

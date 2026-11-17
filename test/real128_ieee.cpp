@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -15,6 +15,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -22,10 +24,6 @@ using int_t = integer<1>;
 
 TEST_CASE("real128 get_ieee()")
 {
-    // NOTE: not sure why, but we get
-    // a compiler error with ICC in C++17
-    // on these tuple operations below.
-#if !defined(__INTEL_COMPILER) || MPPP_CPLUSPLUS < 201703L
     std::uint_least8_t sign{};
     std::uint_least16_t exp{};
     std::uint_least64_t hi{};
@@ -81,5 +79,6 @@ TEST_CASE("real128 get_ieee()")
     REQUIRE(!exp);
     REQUIRE(!hi);
     REQUIRE(lo == 1u);
-#endif
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

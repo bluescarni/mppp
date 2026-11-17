@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -15,6 +15,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 // NOLINTNEXTLINE(google-build-using-namespace)
@@ -28,7 +31,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 
 struct get_mpz_t_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         integer n;
@@ -77,3 +80,5 @@ TEST_CASE("get_mpz_t")
 {
     tuple_for_each(sizes{}, get_mpz_t_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

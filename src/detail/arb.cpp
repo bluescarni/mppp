@@ -1,12 +1,10 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-#include <mp++/config.hpp>
 
 #include <stdexcept>
 
@@ -20,6 +18,7 @@
 
 #endif
 
+#include <mp++/config.hpp>
 // NOTE: this needs to be included early because certain arb functions
 // for interoperability with MPFR check if mpfr.h is included or not.
 #include <mp++/detail/mpfr.hpp>
@@ -126,10 +125,12 @@ struct acb_raii {
     // NOTE: the docs of ulong state that it has exactly either 64 or 32 bit width,
     // depending on the architecture.
     if (nl_digits<::ulong>() == 64) {
+        // NOLINTNEXTLINE(bugprone-signed-bitwise)
         if (mppp_unlikely(ret > (1ll << 32))) {
             throw std::invalid_argument("A precision of " + to_string(ret) + " bits is too large for Arb's functions");
         }
     } else {
+        // NOLINTNEXTLINE(bugprone-signed-bitwise)
         if (mppp_unlikely(ret > (1ll << 20))) {
             throw std::invalid_argument("A precision of " + to_string(ret) + " bits is too large for Arb's functions");
         }

@@ -13,7 +13,7 @@ target_compile_options(mp++_test PRIVATE
   "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
 )
 
-target_compile_features(mp++_test PRIVATE cxx_std_11)
+target_compile_features(mp++_test PRIVATE cxx_std_20)
 set_property(TARGET mp++_test PROPERTY CXX_EXTENSIONS NO)
 
 # Enable the "-Wno-psabi" flag on GCC to silence ABI-related
@@ -53,7 +53,7 @@ function(ADD_MPPP_TESTCASE arg1)
     "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
     "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
   )
-  target_compile_features(${arg1} PRIVATE cxx_std_11)
+  target_compile_features(${arg1} PRIVATE cxx_std_20)
   set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
   add_test(${arg1} ${arg1})
 endfunction()
@@ -200,10 +200,6 @@ if(MPPP_WITH_MPC)
   if(MPPP_WITH_FLINT)
     ADD_MPPP_TESTCASE(complex_agm)
   endif()
-endif()
-
-if(MPPP_TEST_PYBIND11)
-  add_subdirectory(pybind11)
 endif()
 
 ADD_MPPP_TESTCASE(type_name)

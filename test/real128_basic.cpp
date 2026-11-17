@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -14,7 +14,6 @@
 
 #include <mp++/config.hpp>
 
-#include <ciso646>
 #include <complex>
 #include <cstdint>
 #include <initializer_list>
@@ -23,14 +22,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -61,6 +57,8 @@
 
 #include "catch.hpp"
 
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
 
@@ -75,8 +73,6 @@ static std::mt19937 rng;
 static constexpr auto delta64 = detail::nl_digits<std::uint_least64_t>() - 64;
 static constexpr auto delta49 = detail::nl_digits<std::uint_least64_t>() - 49;
 
-#if MPPP_CPLUSPLUS >= 201402L
-
 constexpr auto test_cexpr_complex(std::complex<double> c)
 {
     real128 out{c};
@@ -89,10 +85,6 @@ constexpr auto test_cexpr_complex_ass(std::complex<double> c)
     out = c;
     return out;
 }
-
-#endif
-
-#if MPPP_CPLUSPLUS >= 202002L
 
 template <typename T>
 constexpr auto test_cexpr_complex_get1(real128 r)
@@ -110,8 +102,6 @@ constexpr auto test_cexpr_complex_get2(real128 r)
     return out;
 }
 
-#endif
-
 // NOLINTNEXTLINE(google-readability-function-size, hicpp-function-size, readability-function-size)
 TEST_CASE("real128 constructors")
 {
@@ -120,12 +110,7 @@ TEST_CASE("real128 constructors")
     REQUIRE(std::is_nothrow_destructible<real128>::value);
     REQUIRE(std::is_nothrow_move_constructible<real128>::value);
     REQUIRE(std::is_nothrow_move_assignable<real128>::value);
-#if defined(_LIBCPP_VERSION) || (defined(__GNUC__) && __GNUC__ >= 5)
-    // NOTE: libstdc++ earlier than GCC 5 has a different non-standard name
-    // for this type trait. So we enable the test only if we are using libc++ (from clang)
-    // or if the GCC version is at least 5.
     REQUIRE(std::is_trivially_copyable<real128>::value);
-#endif
     real128 r;
     REQUIRE((r.m_value == 0));
     constexpr real128 rc;
@@ -134,7 +119,7 @@ TEST_CASE("real128 constructors")
     real128 r2{r};
     REQUIRE((r2.m_value == 12));
     // Do some constexpr checks as well.
-    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{__float128(45)}, rc6{wchar_t{4}};
+    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{static_cast<__float128>(45)}, rc6{wchar_t{4}};
     REQUIRE((rc3.m_value == 12));
     REQUIRE((rc4.m_value == 5));
     REQUIRE((rc5.m_value == 45));
@@ -144,7 +129,7 @@ TEST_CASE("real128 constructors")
     REQUIRE((r3.m_value == 12));
     // NOLINTNEXTLINE(bugprone-use-after-move, clang-analyzer-cplusplus.Move, hicpp-invalid-access-moved)
     REQUIRE((r.m_value == 12));
-    real128 r4{__float128(-56)};
+    real128 r4{static_cast<__float128>(-56)};
     REQUIRE((r4.m_value == -56));
     real128 r5{-123};
     REQUIRE((r5.m_value == -123));
@@ -189,11 +174,11 @@ TEST_CASE("real128 constructors")
     REQUIRE((real128{n}.m_value == ::scalbnq(__float128(1), GMP_NUMB_BITS + 1)));
     // Use two limbs, nbits dividing exactly.
     n = -2;
-    n <<= 2 * GMP_NUMB_BITS - 1;
-    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(-2), 2 * GMP_NUMB_BITS - 1)));
+    n <<= (2 * GMP_NUMB_BITS) - 1;
+    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(-2), (2 * GMP_NUMB_BITS) - 1)));
     n.promote();
     n.neg();
-    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(2), 2 * GMP_NUMB_BITS - 1)));
+    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(2), (2 * GMP_NUMB_BITS) - 1)));
     n = 1;
     n <<= 16500ul;
     REQUIRE((real128{n}.m_value == real128{"inf"}.m_value));
@@ -201,8 +186,10 @@ TEST_CASE("real128 constructors")
     n <<= 16500ul;
     REQUIRE((real128{n}.m_value == real128{"-inf"}.m_value));
     // Random testing.
-    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (std::uint_least64_t(-1) << delta64) >> delta64);
-    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (std::uint_least64_t(-1) << delta49) >> delta49);
+    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (static_cast<std::uint_least64_t>(-1) << delta64)
+                                                                      >> delta64);
+    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (static_cast<std::uint_least64_t>(-1) << delta49)
+                                                                      >> delta49);
     std::uniform_int_distribution<int> sdist(0, 1);
     std::uniform_int_distribution<int> extra_bits(0, 8);
     for (int i = 0; i < ntries; ++i) {
@@ -211,11 +198,11 @@ TEST_CASE("real128 constructors")
         const auto sign = sdist(rng) != 0 ? 1 : -1;
         const auto ebits = extra_bits(rng);
         auto tmp_r = real128{((int_t{hi} << 64) * sign + lo) << ebits};
-        auto cmp_r = ::scalbnq(::scalbnq(__float128(hi) * sign, 64) + lo, ebits);
+        auto cmp_r = ::scalbnq(::scalbnq(static_cast<__float128>(hi) * sign, 64) + lo, ebits);
         REQUIRE((tmp_r.m_value == cmp_r));
         REQUIRE(static_cast<int_t>(tmp_r) == ((int_t{hi} << 64) * sign + lo) << ebits);
         tmp_r = real128{(int_t{hi} << (64 - ebits)) * sign + (lo >> ebits)};
-        cmp_r = ::scalbnq(__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
+        cmp_r = ::scalbnq(static_cast<__float128>(hi) * sign, 64 - ebits) + (lo >> ebits);
         REQUIRE((tmp_r.m_value == cmp_r));
         REQUIRE(static_cast<int_t>(tmp_r) == (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits));
     }
@@ -271,12 +258,10 @@ TEST_CASE("real128 constructors")
         Message("Cannot construct a real128 from a complex C++ value with a non-zero imaginary part of "
                 + detail::to_string(5.l)));
 #endif
-#if MPPP_CPLUSPLUS >= 201402L
     {
         constexpr auto tca = test_cexpr_complex(std::complex<double>{4, 0});
         REQUIRE(tca == 4);
     }
-#endif
     // String ctors.
     REQUIRE((real128{"0"}.m_value == 0));
     REQUIRE((real128{"-0"}.m_value == 0));
@@ -296,14 +281,12 @@ TEST_CASE("real128 constructors")
             return std::string(ex.what())
                    == "The string '-1234 ' does not represent a valid quadruple-precision floating-point value";
         });
-#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((real128{std::string_view{tmp_char + 6, 5}}.m_value == -1234));
     REQUIRE_THROWS_PREDICATE(
         (real128{std::string_view{tmp_char + 6, 6}}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return std::string(ex.what())
                    == "The string '-1234 ' does not represent a valid quadruple-precision floating-point value";
         });
-#endif
     REQUIRE((real128{"  -12300e-2"}.m_value == -123));
     REQUIRE_THROWS_PREDICATE(real128{""}, std::invalid_argument, [](const std::invalid_argument &ex) {
         return std::string(ex.what())
@@ -327,7 +310,7 @@ TEST_CASE("real128 constructors")
     REQUIRE((ra.m_value == 2));
     ra = real128{123};
     REQUIRE((ra.m_value == 123));
-    ra = __float128(-345);
+    ra = static_cast<__float128>(-345);
     REQUIRE((ra.m_value == -345));
     ra = 456.;
     REQUIRE((ra.m_value == 456));
@@ -364,16 +347,12 @@ TEST_CASE("real128 constructors")
 #else
     REQUIRE(!std::is_assignable<real128 &, std::complex<long double>>::value);
 #endif
-#if MPPP_CPLUSPLUS >= 201402L
     {
         constexpr auto tca = test_cexpr_complex_ass(std::complex<double>{4, 0});
         REQUIRE(tca == 4);
     }
-#endif
-#if defined(MPPP_HAVE_STRING_VIEW)
     ra = std::string_view{tmp_char + 6, 5};
     REQUIRE((ra.m_value == -1234));
-#endif
 
 #if defined(MPPP_WITH_MPFR)
     ra = real{123};
@@ -504,8 +483,10 @@ TEST_CASE("real128 conversions")
         REQUIRE(static_cast<int_t>(tmp) == 0);
     }
     // Test with integral values.
-    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (std::uint_least64_t(-1) << delta64) >> delta64);
-    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (std::uint_least64_t(-1) << delta49) >> delta49);
+    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (static_cast<std::uint_least64_t>(-1) << delta64)
+                                                                      >> delta64);
+    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (static_cast<std::uint_least64_t>(-1) << delta49)
+                                                                      >> delta49);
     std::uniform_int_distribution<int> extra_bits(0, 8);
     for (int i = 0; i < ntries; ++i) {
         const auto hi = dist49(rng);
@@ -513,10 +494,10 @@ TEST_CASE("real128 conversions")
         const auto sign = sdist(rng) != 0 ? 1 : -1;
         const auto ebits = extra_bits(rng);
         auto tmp_int = ((int_t{hi} << 64) * sign + lo) << ebits;
-        auto r = ::scalbnq(::scalbnq(__float128(hi) * sign, 64) + lo, ebits);
+        auto r = ::scalbnq(::scalbnq(static_cast<__float128>(hi) * sign, 64) + lo, ebits);
         REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
         tmp_int = (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits);
-        r = ::scalbnq(__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
+        r = ::scalbnq(static_cast<__float128>(hi) * sign, 64 - ebits) + (lo >> ebits);
         REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
         REQUIRE(real128{r}.get(nrop));
         REQUIRE(get(nrop, real128{r}));
@@ -640,7 +621,7 @@ TEST_CASE("real128 conversions")
 
     // Conversion to C++ complex types.
     {
-        MPPP_CONSTEXPR_14 auto cf = static_cast<std::complex<float>>(real128{12});
+        constexpr auto cf = static_cast<std::complex<float>>(real128{12});
         REQUIRE(cf.real() == 12);
         REQUIRE(cf.imag() == 0);
 
@@ -650,18 +631,12 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cf2, real128{1}));
         REQUIRE(cf2 == std::complex<float>{1, 0});
 
-        // NOTE: there seems to be a constexpr bug currently
-        // on GCC which makes this test fail. Clang seems to do fine:
-        // https://godbolt.org/z/5jK5voPfK
-        // Let's disable this test on GCC for the time being.
-#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cf3 = test_cexpr_complex_get1<float>(real128{7});
         REQUIRE(cf3 == std::complex<float>{7, 0});
         constexpr auto cf4 = test_cexpr_complex_get2<float>(real128{7});
         REQUIRE(cf4 == std::complex<float>{7, 0});
-#endif
 
-        MPPP_CONSTEXPR_14 auto cd = static_cast<std::complex<double>>(real128{-12});
+        constexpr auto cd = static_cast<std::complex<double>>(real128{-12});
         REQUIRE(cd.real() == -12);
         REQUIRE(cd.imag() == 0);
 
@@ -671,15 +646,13 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cd2, real128{1}));
         REQUIRE(cd2 == std::complex<double>{1, 0});
 
-#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cd3 = test_cexpr_complex_get1<double>(real128{7});
         REQUIRE(cd3 == std::complex<double>{7, 0});
         constexpr auto cd4 = test_cexpr_complex_get2<double>(real128{7});
         REQUIRE(cd4 == std::complex<double>{7, 0});
-#endif
 
 #if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
-        MPPP_CONSTEXPR_14 auto cld = static_cast<std::complex<long double>>(real128{-15});
+        constexpr auto cld = static_cast<std::complex<long double>>(real128{-15});
         REQUIRE(cld.real() == -15);
         REQUIRE(cld.imag() == 0);
 
@@ -689,12 +662,10 @@ TEST_CASE("real128 conversions")
         REQUIRE(get(cld2, real128{1}));
         REQUIRE(cld2 == std::complex<long double>{1, 0});
 
-#if MPPP_CPLUSPLUS >= 202002L && !defined(__GNUC__)
         constexpr auto cld3 = test_cexpr_complex_get1<long double>(real128{7});
         REQUIRE(cld3 == std::complex<long double>{7, 0});
         constexpr auto cld4 = test_cexpr_complex_get2<long double>(real128{7});
         REQUIRE(cld4 == std::complex<long double>{7, 0});
-#endif
 #else
         REQUIRE(!std::is_convertible<real128, std::complex<long double>>::value);
 #endif
@@ -792,14 +763,10 @@ TEST_CASE("real128 numeric_limits")
     static_assert(std::numeric_limits<real128>::round_style == std::round_to_nearest, "");
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
 TEST_CASE("real128 nts")
 {
     REQUIRE(std::is_nothrow_swappable_v<real128>);
 }
-
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -830,3 +797,5 @@ TEST_CASE("real128 boost_s11n")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -19,19 +19,15 @@
 #include <cmath>
 #include <complex>
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#if defined(MPPP_HAVE_STRING_VIEW)
-#include <string_view>
-#endif
 
 #if defined(MPPP_WITH_BOOST_S11N)
 
@@ -46,7 +42,7 @@
 
 #if defined(MPPP_WITH_FMT)
 
-#include <fmt/core.h>
+#include <fmt/base.h>
 
 #include <mp++/detail/fmt.hpp>
 
@@ -76,6 +72,7 @@ namespace detail
 // operator.
 constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 {
+    // NOLINTNEXTLINE(readability-avoid-nested-conditional-operator)
     return real_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
 }
 
@@ -221,31 +218,22 @@ using is_real_interoperable = detail::disjunction<is_cpp_arithmetic<T>, detail::
 #endif
                                                   >;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL real_interoperable = is_real_interoperable<T>::value;
-
-#endif
+concept real_interoperable = is_real_interoperable<T>::value;
 
 template <typename T>
 using is_cvr_real = std::is_same<detail::uncvref_t<T>, real>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T>
-MPPP_CONCEPT_DECL cvr_real = is_cvr_real<T>::value;
-
-#endif
-
-template <typename... Args>
-using cvr_real_enabler = detail::enable_if_t<detail::conjunction<is_cvr_real<Args>...>::value, int>;
+concept cvr_real = is_cvr_real<T>::value;
 
 // Special initialisation tags for real.
+//
+// NOLINTNEXTLINE(performance-enum-size)
 enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
     nan = MPFR_NAN_KIND,
     inf = MPFR_INF_KIND,
-    zero = MPFR_ZERO_KIND
+    zero = MPFR_ZERO_KIND,
 };
 
 // For the future:
@@ -323,8 +311,7 @@ class MPPP_DLL_PUBLIC real
 
     // Shallow copy constructor from mpfr_t, used
     // only by the complex class.
-    struct shallow_copy_t {
-    };
+    struct shallow_copy_t {};
     explicit real(shallow_copy_t, const ::mpfr_t r) : m_mpfr(r[0]) {}
 #endif
 
@@ -334,8 +321,7 @@ public:
 
 private:
     // A tag to call private ctors.
-    struct ptag {
-    };
+    struct ptag {};
     // Private ctor that sets to NaN with a certain precision,
     // without checking the input precision value.
     explicit real(const ptag &, ::mpfr_prec_t, bool);
@@ -431,32 +417,20 @@ private:
 
 public:
     // Generic constructors.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
-#endif
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init,hicpp-member-init,cppcoreguidelines-explicit-constructor,google-explicit-constructor,misc-explicit-constructor)
     real(const T &x) : real(ptag{}, detail::real_deduce_precision(x), true)
     {
         dispatch_construction(x);
     }
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
-#endif
     explicit real(const T &x, ::mpfr_prec_t p) : real(ptag{}, check_init_prec(p), true)
     {
         dispatch_construction(x);
     }
 
     // Constructors from std::complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &c)
         : real(c.imag() == 0 ? c.real()
@@ -465,11 +439,7 @@ public:
                                    + detail::to_string(c.imag())))
     {
     }
-#if defined(MPPP_HAVE_CONCEPTS)
     template <cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &c, ::mpfr_prec_t p)
         : real(c.imag() == 0 ? c.real()
@@ -484,27 +454,17 @@ private:
     MPPP_DLL_LOCAL void construct_from_c_string(const char *, int, ::mpfr_prec_t);
     explicit real(const ptag &, const char *, int, ::mpfr_prec_t);
     explicit real(const ptag &, const std::string &, int, ::mpfr_prec_t);
-#if defined(MPPP_HAVE_STRING_VIEW)
     explicit real(const ptag &, const std::string_view &, int, ::mpfr_prec_t);
-#endif
 
 public:
     // Constructor from string, base and precision.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &s, int base, ::mpfr_prec_t p) : real(ptag{}, s, base, p)
     {
     }
     // Constructor from string and precision.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
     explicit real(const T &s, ::mpfr_prec_t p) : real(s, 10, p)
     {
@@ -518,6 +478,8 @@ public:
     explicit real(const ::mpfr_t);
 #if !defined(_MSC_VER) || defined(__clang__)
     // Move constructor from mpfr_t.
+    //
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
 #endif
 
@@ -646,22 +608,14 @@ private:
 
 public:
     // Generic assignment operator.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
-#endif
     real &operator=(const T &x)
     {
         dispatch_assignment<true>(x);
         return *this;
     }
     // Assignment from std::complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-#endif
     real &operator=(const T &c)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
@@ -683,7 +637,7 @@ public:
 #endif
 
     // Check validity.
-    MPPP_NODISCARD bool is_valid() const noexcept
+    [[nodiscard]] bool is_valid() const noexcept
     {
         return m_mpfr._mpfr_d != nullptr;
     }
@@ -692,22 +646,14 @@ public:
     real &set(const real &);
 
     // Generic setter.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
-#endif
     real &set(const T &x)
     {
         dispatch_assignment<false>(x);
         return *this;
     }
     // Set to std::complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-#endif
     real &set(const T &c)
     {
         if (mppp_unlikely(c.imag() != 0)) {
@@ -722,17 +668,11 @@ private:
     MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
     real &set_impl(const char *, int);
     real &set_impl(const std::string &, int);
-#if defined(MPPP_HAVE_STRING_VIEW)
     real &set_impl(const std::string_view &, int);
-#endif
 
 public:
     // Setter to string.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <string_type T>
-#else
-    template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
-#endif
     real &set(const T &s, int base = 10)
     {
         return set_impl(s, base);
@@ -751,7 +691,7 @@ public:
     real &set_zero(int sign = 0);
 
     // Const reference to the internal mpfr_t.
-    MPPP_NODISCARD const mpfr_struct_t *get_mpfr_t() const
+    [[nodiscard]] const mpfr_struct_t *get_mpfr_t() const
     {
         return &m_mpfr;
     }
@@ -762,37 +702,37 @@ public:
     }
 
     // Detect NaN.
-    MPPP_NODISCARD bool nan_p() const
+    [[nodiscard]] bool nan_p() const
     {
         return mpfr_nan_p(&m_mpfr) != 0;
     }
     // Detect infinity.
-    MPPP_NODISCARD bool inf_p() const
+    [[nodiscard]] bool inf_p() const
     {
         return mpfr_inf_p(&m_mpfr) != 0;
     }
     // Detect finite number.
-    MPPP_NODISCARD bool number_p() const
+    [[nodiscard]] bool number_p() const
     {
         return mpfr_number_p(&m_mpfr) != 0;
     }
     // Detect zero.
-    MPPP_NODISCARD bool zero_p() const
+    [[nodiscard]] bool zero_p() const
     {
         return mpfr_zero_p(&m_mpfr) != 0;
     }
     // Detect regular number.
-    MPPP_NODISCARD bool regular_p() const
+    [[nodiscard]] bool regular_p() const
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
     // Detect integer.
-    MPPP_NODISCARD bool integer_p() const;
+    [[nodiscard]] bool integer_p() const;
     // Detect one.
-    MPPP_NODISCARD bool is_one() const;
+    [[nodiscard]] bool is_one() const;
 
     // Detect sign.
-    MPPP_NODISCARD int sgn() const
+    [[nodiscard]] int sgn() const
     {
         if (mppp_unlikely(nan_p())) {
             // NOTE: mpfr_sgn() in this case would set an error flag, and we generally
@@ -802,19 +742,19 @@ public:
         return mpfr_sgn(&m_mpfr);
     }
     // Get the sign bit.
-    MPPP_NODISCARD bool signbit() const
+    [[nodiscard]] bool signbit() const
     {
         return mpfr_signbit(&m_mpfr) != 0;
     }
 
     // Get the precision of this.
-    MPPP_NODISCARD ::mpfr_prec_t get_prec() const
+    [[nodiscard]] ::mpfr_prec_t get_prec() const
     {
         return mpfr_get_prec(&m_mpfr);
     }
 
     // Get the number of limbs necessary to represent this.
-    MPPP_NODISCARD std::size_t get_nlimbs() const;
+    [[nodiscard]] std::size_t get_nlimbs() const;
 
 private:
     // Utility function to check precision in set_prec().
@@ -850,7 +790,7 @@ private:
     // Generic conversion.
     // integer.
     template <typename T, detail::enable_if_t<detail::is_integer<T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to an integer");
@@ -903,7 +843,7 @@ private:
 #endif
     }
     template <typename T, detail::enable_if_t<detail::is_rational<T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a rational");
@@ -918,7 +858,7 @@ private:
     }
     // C++ floating-point.
     template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (std::is_same<T, float>::value) {
             return static_cast<T>(::mpfr_get_flt(&m_mpfr, MPFR_RNDN));
@@ -968,9 +908,8 @@ private:
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::negation<std::is_same<bool, T>>, detail::is_integral<T>,
                                                       detail::is_unsigned<T>>::value,
-                                  int>
-              = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+                                  int> = 0>
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a C++ unsigned integral type");
@@ -983,7 +922,7 @@ private:
     }
     // bool.
     template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         // NOTE: in C/C++ the conversion of NaN to bool gives true:
         // https://stackoverflow.com/questions/9158567/nan-to-bool-conversion-true-or-false
@@ -1014,7 +953,7 @@ private:
     }
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a C++ signed integral type");
@@ -1027,30 +966,22 @@ private:
     }
 #if defined(MPPP_WITH_QUADMATH)
     template <typename T, detail::enable_if_t<std::is_same<real128, T>::value, int> = 0>
-    MPPP_NODISCARD T dispatch_conversion() const
+    [[nodiscard]] T dispatch_conversion() const
     {
         return convert_to_real128();
     }
-    MPPP_NODISCARD real128 convert_to_real128() const;
+    [[nodiscard]] real128 convert_to_real128() const;
 #endif
 
 public:
     // Generic conversion operator.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
-#endif
     explicit operator T() const
     {
         return dispatch_conversion<T>();
     }
     // Conversion to std::complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-#endif
     explicit operator T() const
     {
         using value_type = typename T::value_type;
@@ -1114,21 +1045,13 @@ private:
 
 public:
     // Generic conversion function.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <real_interoperable T>
-#else
-    template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
-#endif
     bool get(T &rop) const
     {
         return dispatch_get(rop);
     }
     // Conversion function to std::complex.
-#if defined(MPPP_HAVE_CONCEPTS)
     template <cpp_complex T>
-#else
-    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-#endif
     bool get(T &rop) const
     {
         rop = static_cast<T>(*this);
@@ -1136,7 +1059,7 @@ public:
     }
 
     // Convert to string.
-    MPPP_NODISCARD std::string to_string(int base = 10) const;
+    [[nodiscard]] std::string to_string(int base = 10) const;
 
 private:
     template <typename T>
@@ -1284,11 +1207,11 @@ public:
 
 #if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
     // Get the number of significant digits required for a round-tripping representation.
-    MPPP_NODISCARD std::size_t get_str_ndigits(int = 10) const;
+    [[nodiscard]] std::size_t get_str_ndigits(int = 10) const;
 #endif
 
     // Size of the serialised binary representation.
-    MPPP_NODISCARD std::size_t binary_size() const;
+    [[nodiscard]] std::size_t binary_size() const;
 
 private:
     void binary_save_impl(char *, std::size_t) const;
@@ -1334,15 +1257,11 @@ template <typename T, typename U>
 using are_real_in_place_op_types
     = detail::conjunction<detail::negation<std::is_const<detail::unref_t<T>>>, are_real_op_types<T, U>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+concept real_op_types = are_real_op_types<T, U>::value;
 
 template <typename T, typename U>
-MPPP_CONCEPT_DECL real_op_types = are_real_op_types<T, U>::value;
-
-template <typename T, typename U>
-MPPP_CONCEPT_DECL real_in_place_op_types = are_real_in_place_op_types<T, U>::value;
-
-#endif
+concept real_in_place_op_types = are_real_in_place_op_types<T, U>::value;
 
 // Destructively set the precision.
 inline void set_prec(real &r, ::mpfr_prec_t p)
@@ -1378,19 +1297,11 @@ using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &
 
 } // namespace detail
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename... Args>
-MPPP_CONCEPT_DECL real_set_args = detail::is_detected<detail::real_set_t, Args...>::value;
-
-#endif
+concept real_set_args = detail::is_detected<detail::real_set_t, Args...>::value;
 
 // Generic setter.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <real_set_args... Args>
-#else
-template <typename... Args, detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int> = 0>
-#endif
 inline real &set(real &r, const Args &...args)
 {
     return r.set(args...);
@@ -1442,21 +1353,13 @@ inline void swap(real &a, real &b) noexcept
 }
 
 // Generic conversion functions.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <real_interoperable T>
-#else
-template <typename T, detail::enable_if_t<is_real_interoperable<T>::value, int> = 0>
-#endif
 inline bool get(T &rop, const real &x)
 {
     return x.get(rop);
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cpp_complex T>
-#else
-template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
-#endif
 inline bool get(T &rop, const real &x)
 {
     return x.get(rop);
@@ -1471,7 +1374,7 @@ inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
     }
     MPPP_MAYBE_TLS detail::mpz_raii m;
     ::mpfr_clear_erangeflag();
-    auto retval = ::mpfr_get_z_2exp(&m.m_mpz, r.get_mpfr_t());
+    auto const retval = ::mpfr_get_z_2exp(&m.m_mpz, r.get_mpfr_t());
     // LCOV_EXCL_START
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
@@ -1489,6 +1392,7 @@ namespace detail
 // A small helper to init the pairs in the functions below. We need this because
 // we cannot take the address of a const real as a real *.
 template <typename Arg, enable_if_t<!is_ncrvr<Arg &&>::value, int> = 0>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
@@ -1496,6 +1400,7 @@ inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min
 }
 
 template <typename Arg, enable_if_t<is_ncrvr<Arg &&>::value, int> = 0>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is a non-const rvalue ref, and a candidate for stealing resources.
@@ -1516,6 +1421,7 @@ template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value,
 void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
@@ -1525,6 +1431,7 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
 }
 
 template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int>>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&...args)
 {
     const auto prec0 = arg0.get_prec();
@@ -1602,7 +1509,10 @@ inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Ar
     if (p.second == r_prec) {
         // The target precision and the precision of the return value
         // match. No need to steal, just execute the function.
+        //
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
+                               // NOLINTNEXTLINE(bugprone-use-after-move)
                                args.get_mpfr_t()...);
     } else {
         if (r_prec > p.second) {
@@ -1689,7 +1599,10 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
         // We can steal from one or more args, and the precision of
         // the largest-precision arg we can steal from matches
         // the target precision. Use it.
+        //
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(),
+                               // NOLINTNEXTLINE(bugprone-use-after-move)
                                args.get_mpfr_t()...);
         return std::move(*p.first);
     } else {
@@ -1705,55 +1618,35 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
 } // namespace detail
 
 // Ternary addition.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U>
-#else
-template <typename T, typename U, cvr_real_enabler<T, U> = 0>
-#endif
 inline real &add(real &rop, T &&a, U &&b)
 {
     return detail::mpfr_nary_op_impl<true>(0, ::mpfr_add, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 // Ternary subtraction.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U>
-#else
-template <typename T, typename U, cvr_real_enabler<T, U> = 0>
-#endif
 inline real &sub(real &rop, T &&a, U &&b)
 {
     return detail::mpfr_nary_op_impl<true>(0, ::mpfr_sub, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 // Ternary multiplication.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U>
-#else
-template <typename T, typename U, cvr_real_enabler<T, U> = 0>
-#endif
 inline real &mul(real &rop, T &&a, U &&b)
 {
     return detail::mpfr_nary_op_impl<true>(0, ::mpfr_mul, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 // Ternary division.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U>
-#else
-template <typename T, typename U, cvr_real_enabler<T, U> = 0>
-#endif
 inline real &div(real &rop, T &&a, U &&b)
 {
     return detail::mpfr_nary_op_impl<true>(0, ::mpfr_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 // Quaternary fused multiply–add.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U, cvr_real V>
-#else
-template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
-#endif
 inline real &fma(real &rop, T &&a, U &&b, V &&c)
 {
     return detail::mpfr_nary_op_impl<true>(0, ::mpfr_fma, rop, std::forward<T>(a), std::forward<U>(b),
@@ -1761,11 +1654,7 @@ inline real &fma(real &rop, T &&a, U &&b, V &&c)
 }
 
 // Quaternary fused multiply–sub.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U, cvr_real V>
-#else
-template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
-#endif
 inline real &fms(real &rop, T &&a, U &&b, V &&c)
 {
     return detail::mpfr_nary_op_impl<true>(0, ::mpfr_fms, rop, std::forward<T>(a), std::forward<U>(b),
@@ -1773,11 +1662,7 @@ inline real &fms(real &rop, T &&a, U &&b, V &&c)
 }
 
 // Ternary fused multiply–add.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U, cvr_real V>
-#else
-template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
-#endif
 inline real fma(T &&a, U &&b, V &&c)
 {
     return detail::mpfr_nary_op_return_impl<true>(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b),
@@ -1785,11 +1670,7 @@ inline real fma(T &&a, U &&b, V &&c)
 }
 
 // Ternary fused multiply–sub.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U, cvr_real V>
-#else
-template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
-#endif
 inline real fms(T &&a, U &&b, V &&c)
 {
     return detail::mpfr_nary_op_return_impl<true>(0, ::mpfr_fms, std::forward<T>(a), std::forward<U>(b),
@@ -1797,91 +1678,59 @@ inline real fms(T &&a, U &&b, V &&c)
 }
 
 // mul2/div2 primitives.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real mul_2ui(T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &mul_2ui(real &rop, T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2ui(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real mul_2si(T &&x, long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &mul_2si(real &rop, T &&x, long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_2si(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real div_2ui(T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &div_2ui(real &rop, T &&x, unsigned long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2ui(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real div_2si(T &&x, long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(x));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &div_2si(real &rop, T &&x, long n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_2si(r, o, n, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x));
 }
 
@@ -1983,11 +1832,7 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
 
 // These are the headers of the overloads that will be produced. They are different depending
 // on whether concepts are available or not.
-#if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_REAL_MPFR_UNARY_HEADER template <cvr_real T>
-#else
-#define MPPP_REAL_MPFR_UNARY_HEADER template <typename T, cvr_real_enabler<T> = 0>
-#endif
 
 #define MPPP_REAL_MPFR_UNARY_IMPL(name, fname, rnd)                                                                    \
     MPPP_REAL_MPFR_UNARY_HEADER inline real &name(real &rop, T &&op)                                                   \
@@ -2019,14 +1864,8 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
 
 // These are the headers of the overloads that will be produced. They are different depending
 // on whether concepts are available or not.
-#if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_REAL_MPFR_BINARY_HEADER1 template <cvr_real T, cvr_real U>
 #define MPPP_REAL_MPFR_BINARY_HEADER2 template <typename T, real_op_types<T> U>
-#else
-#define MPPP_REAL_MPFR_BINARY_HEADER1 template <typename T, typename U, cvr_real_enabler<T, U> = 0>
-#define MPPP_REAL_MPFR_BINARY_HEADER2                                                                                  \
-    template <typename T, typename U, detail::enable_if_t<are_real_op_types<U, T>::value, int> = 0>
-#endif
 
 // The actual macro.
 #define MPPP_REAL_MPFR_BINARY_IMPL(name, fname, rnd)                                                                   \
@@ -2039,7 +1878,7 @@ MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
     namespace detail                                                                                                   \
     {                                                                                                                  \
     /* Both arguments are real. */                                                                                     \
-    template <typename T, typename U, cvr_real_enabler<T, U> = 0>                                                      \
+    template <cvr_real T, cvr_real U>                                                                                  \
     inline real dispatch_##name(T &&y, U &&x)                                                                          \
     {                                                                                                                  \
         return mpfr_nary_op_return_impl<rnd>(0, fname, std::forward<T>(y), std::forward<U>(x));                        \
@@ -2098,36 +1937,24 @@ MPPP_REAL_MPFR_UNARY_IMPL(cbrt, ::mpfr_cbrt, true)
 #if defined(MPPP_MPFR_HAVE_MPFR_ROOTN_UI)
 
 // K-th root.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &rootn_ui(real &rop, T &&op, unsigned long k)
 {
-    auto wrapper = [k](::mpfr_t r, const ::mpfr_t o) { ::mpfr_rootn_ui(r, o, k, MPFR_RNDN); };
+    auto const wrapper = [k](::mpfr_t r, const ::mpfr_t o) { ::mpfr_rootn_ui(r, o, k, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real rootn_ui(T &&r, unsigned long k)
 {
-    auto wrapper = [k](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_rootn_ui(rop, op, k, MPFR_RNDN); };
+    auto const wrapper = [k](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_rootn_ui(rop, op, k, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
 #endif
 
 // Ternary exponentiation.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U>
-#else
-template <typename T, typename U, cvr_real_enabler<T, U> = 0>
-#endif
 inline real &pow(real &rop, T &&op1, U &&op2)
 {
     return detail::mpfr_nary_op_impl<true>(0, ::mpfr_pow, rop, std::forward<T>(op1), std::forward<U>(op2));
@@ -2147,7 +1974,7 @@ inline real dispatch_real_pow(T &&op1, U &&op2)
 template <typename T, std::size_t SSize, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -2160,7 +1987,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_pow(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2173,7 +2000,8 @@ inline real dispatch_real_pow(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_pow(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2183,7 +2011,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_pow(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_pow_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -2199,8 +2028,7 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline real dispatch_real_pow(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -2210,10 +2038,10 @@ inline real dispatch_real_pow(T &&a, const U &x)
 }
 
 // (everything but unsigned integral)-real.
-template <typename T, typename U,
-          enable_if_t<
-              conjunction<is_real_interoperable<T>, negation<is_cpp_unsigned_integral<T>>, is_cvr_real<U>>::value, int>
-          = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<is_real_interoperable<T>, negation<is_cpp_unsigned_integral<T>>, is_cvr_real<U>>::value,
+                int> = 0>
 inline real dispatch_real_pow(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -2229,7 +2057,7 @@ template <typename T, typename U,
 inline real dispatch_real_pow(const T &n, U &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<U>(a));
@@ -2242,7 +2070,8 @@ inline real dispatch_real_pow(const T &n, U &&a)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_pow(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_pow(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -2250,12 +2079,8 @@ inline real dispatch_real_pow(const bool &n, T &&a)
 } // namespace detail
 
 // Binary exponentiation.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline real pow(T &&op1, U &&op2)
 {
     return detail::dispatch_real_pow(std::forward<T>(op1), std::forward<U>(op2));
@@ -2292,11 +2117,8 @@ MPPP_REAL_MPFR_UNARY_IMPL(atan, ::mpfr_atan, true)
 // for multiple retvals, thus we do a manual implementation
 // of this function. We keep the signature with cvr_real
 // for consistency with the other functions.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void sin_cos(real &sop, real &cop, T &&op)
 {
     if (mppp_unlikely(&sop == &cop)) {
@@ -2334,11 +2156,8 @@ MPPP_REAL_MPFR_UNARY_IMPL(atanh, ::mpfr_atanh, true)
 // for multiple retvals, thus we do a manual implementation
 // of this function. We keep the signature with cvr_real
 // for consistency with the other functions.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void sinh_cosh(real &sop, real &cop, T &&op)
 {
     if (mppp_unlikely(&sop == &cop)) {
@@ -2374,25 +2193,17 @@ MPPP_REAL_MPFR_UNARY_IMPL(log1p, ::mpfr_log1p, true)
 MPPP_REAL_MPFR_BINARY_IMPL(log_hypot, detail::arb_log_hypot, false)
 
 // log_base_ui.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &log_base_ui(real &rop, T &&op, unsigned long b)
 {
-    auto wrapper = [b](::mpfr_t r, const ::mpfr_t o) { detail::arb_log_base_ui(r, o, b); };
+    auto const wrapper = [b](::mpfr_t r, const ::mpfr_t o) { detail::arb_log_base_ui(r, o, b); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real log_base_ui(T &&r, unsigned long b)
 {
-    auto wrapper = [b](::mpfr_t rop, const ::mpfr_t op) { detail::arb_log_base_ui(rop, op, b); };
+    auto const wrapper = [b](::mpfr_t rop, const ::mpfr_t op) { detail::arb_log_base_ui(rop, op, b); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -2416,25 +2227,17 @@ MPPP_REAL_MPFR_UNARY_IMPL(j0, ::mpfr_j0, true)
 MPPP_REAL_MPFR_UNARY_IMPL(j1, ::mpfr_j1, true)
 
 // Bessel function of the first kind of order n.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &jn(real &rop, long n, T &&op)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_jn(r, n, o, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_jn(r, n, o, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real jn(long n, T &&r)
 {
-    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_jn(rop, n, op, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_jn(rop, n, op, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -2442,25 +2245,17 @@ MPPP_REAL_MPFR_UNARY_IMPL(y0, ::mpfr_y0, true)
 MPPP_REAL_MPFR_UNARY_IMPL(y1, ::mpfr_y1, true)
 
 // Bessel function of the second kind of order n.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &yn(real &rop, long n, T &&op)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_yn(r, n, o, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_yn(r, n, o, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real yn(long n, T &&r)
 {
-    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_yn(rop, n, op, MPFR_RNDN); };
+    auto const wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_yn(rop, n, op, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -2477,25 +2272,17 @@ MPPP_REAL_MPFR_UNARY_IMPL(li2, detail::real_li2_wrapper, true)
 #if defined(MPPP_WITH_FLINT)
 
 // Polylogarithm, integer order.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &polylog_si(real &rop, long n, T &&op)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { detail::arb_polylog_si(r, n, o); };
+    auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { detail::arb_polylog_si(r, n, o); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(op));
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real polylog_si(long n, T &&r)
 {
-    auto wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { detail::arb_polylog_si(rop, n, op); };
+    auto const wrapper = [n](::mpfr_t rop, const ::mpfr_t op) { detail::arb_polylog_si(rop, n, op); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
 
@@ -2546,11 +2333,8 @@ MPPP_REAL_MPFR_UNARY_IMPL(frac, detail::real_frac_wrapper, false)
 // for multiple retvals, thus we do a manual implementation
 // of this function. We keep the signature with cvr_real
 // for consistency with the other functions.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 inline void modf(real &iop, real &fop, T &&op)
 {
     if (mppp_unlikely(&iop == &fop)) {
@@ -2576,27 +2360,21 @@ inline void modf(real &iop, real &fop, T &&op)
 MPPP_REAL_MPFR_BINARY_IMPL(fmod, ::mpfr_fmod, true)
 MPPP_REAL_MPFR_BINARY_IMPL(remainder, ::mpfr_remainder, true)
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U>
-#else
-template <typename T, typename U, cvr_real_enabler<T, U> = 0>
-#endif
 inline real &remquo(real &rop, long *q, T &&x, U &&y)
 {
-    auto wrapper = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_remquo(r, q, o1, o2, MPFR_RNDN); };
+    auto const wrapper
+        = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_remquo(r, q, o1, o2, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x), std::forward<U>(y));
 }
 
 #if defined(MPPP_MPFR_HAVE_MPFR_FMODQUO)
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T, cvr_real U>
-#else
-template <typename T, typename U, cvr_real_enabler<T, U> = 0>
-#endif
 inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 {
-    auto wrapper = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_fmodquo(r, q, o1, o2, MPFR_RNDN); };
+    auto const wrapper
+        = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_fmodquo(r, q, o1, o2, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x), std::forward<U>(y));
 }
 
@@ -2611,11 +2389,7 @@ inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 // input and output, which is also unlike the other MPFR functions.
 // Hence, the custom implementations below.
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &nexttoward(real &rop, T &&x, const real &y)
 {
     // NOTE: we need to make a copy of y because we don't
@@ -2631,11 +2405,7 @@ inline real &nexttoward(real &rop, T &&x, const real &y)
     return rop;
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real nexttoward(T &&x, const real &y)
 {
     MPPP_MAYBE_TLS real y_copy;
@@ -2648,21 +2418,13 @@ inline real nexttoward(T &&x, const real &y)
     return retval;
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &nextafter(real &rop, T &&x, const real &y)
 {
     return nexttoward(rop, std::forward<T>(x), y);
 }
 
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real nextafter(T &&x, const real &y)
 {
     return nexttoward(std::forward<T>(x), y);
@@ -2712,11 +2474,7 @@ MPPP_DLL_PUBLIC real real_catalan(::mpfr_prec_t);
 MPPP_DLL_PUBLIC real &real_catalan(real &);
 
 // Identity operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real operator+(T &&r)
 {
     return std::forward<T>(r);
@@ -2736,7 +2494,7 @@ inline real dispatch_real_binary_add(T &&a, U &&b)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_add(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -2756,7 +2514,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_add(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -2771,7 +2529,8 @@ inline real dispatch_real_binary_add(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_add(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -2787,7 +2546,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_add(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -2808,7 +2568,7 @@ inline real dispatch_real_binary_add(T &&a, const rational<SSize> &q)
 {
     const auto qv = detail::get_mpq_view(q);
 
-    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_q(r, o, &qv, MPFR_RNDN); };
+    auto const wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_q(r, o, &qv, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
 }
@@ -2821,10 +2581,9 @@ inline real dispatch_real_binary_add(const rational<SSize> &q, T &&a)
 }
 
 // real-(float, double).
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
-    = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+                      int> = 0>
 inline real dispatch_real_binary_add(T &&a, const U &x)
 {
     // NOTE: the MPFR docs state that mpfr_add_d() assumes that
@@ -2834,16 +2593,15 @@ inline real dispatch_real_binary_add(T &&a, const U &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_add_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
 
 // (float, double)-real.
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value, int>
-    = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value,
+                      int> = 0>
 inline real dispatch_real_binary_add(const T &x, U &&a)
 {
     return dispatch_real_binary_add(std::forward<U>(a), x);
@@ -2857,8 +2615,7 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline real dispatch_real_binary_add(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -2876,8 +2633,7 @@ template <typename T, typename U,
 #endif
                                               >,
                                   is_cvr_real<U>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline real dispatch_real_binary_add(const T &x, U &&a)
 {
     return dispatch_real_binary_add(std::forward<U>(a), x);
@@ -2886,12 +2642,8 @@ inline real dispatch_real_binary_add(const T &x, U &&a)
 } // namespace detail
 
 // Binary addition.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline real operator+(T &&a, U &&b)
 {
     return detail::dispatch_real_binary_add(std::forward<T>(a), std::forward<U>(b));
@@ -2921,7 +2673,7 @@ template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_add(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -2940,7 +2692,8 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_add(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_add_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -2978,12 +2731,8 @@ inline void dispatch_real_in_place_add(T &x, U &&a)
 } // namespace detail
 
 // In-place addition.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_in_place_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator+=(T &a, U &&b)
 {
     detail::dispatch_real_in_place_add(a, std::forward<U>(b));
@@ -2997,11 +2746,7 @@ MPPP_DLL_PUBLIC real &operator++(real &);
 MPPP_DLL_PUBLIC real operator++(real &, int);
 
 // Negated copy.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <cvr_real T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real operator-(T &&r)
 {
     real retval{std::forward<T>(r)};
@@ -3023,7 +2768,7 @@ inline real dispatch_real_binary_sub(T &&a, U &&b)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_sub(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -3035,7 +2780,7 @@ inline real dispatch_real_binary_sub(T &&a, const integer<SSize> &n)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_sub(const integer<SSize> &n, T &&a)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_z_sub(r, n.get_mpz_view(), o, MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_z_sub(r, n.get_mpz_view(), o, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
@@ -3045,7 +2790,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_sub(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -3059,7 +2804,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_sub(const U &n, T &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -3074,7 +2819,8 @@ inline real dispatch_real_binary_sub(const U &n, T &&a)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3082,7 +2828,8 @@ inline real dispatch_real_binary_sub(T &&a, const bool &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_sub(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_sub(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3091,7 +2838,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_sub(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3104,7 +2852,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_sub(const U &n, T &&a)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_sub(r, static_cast<long>(n), o, MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_sub(r, static_cast<long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3118,7 +2867,7 @@ inline real dispatch_real_binary_sub(T &&a, const rational<SSize> &q)
 {
     const auto qv = detail::get_mpq_view(q);
 
-    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_q(r, o, &qv, MPFR_RNDN); };
+    auto const wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_q(r, o, &qv, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
 }
@@ -3132,10 +2881,9 @@ inline real dispatch_real_binary_sub(const rational<SSize> &q, T &&a)
 }
 
 // real-(float, double).
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
-    = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+                      int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const U &x)
 {
     // NOTE: the MPFR docs state that mpfr_sub_d() assumes that
@@ -3145,16 +2893,15 @@ inline real dispatch_real_binary_sub(T &&a, const U &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_sub_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
 
 // (float, double)-real.
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
-    = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+                      int> = 0>
 inline real dispatch_real_binary_sub(const U &x, T &&a)
 {
     // NOTE: the MPFR docs state that mpfr_d_sub() assumes that
@@ -3164,7 +2911,7 @@ inline real dispatch_real_binary_sub(const U &x, T &&a)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_d_sub() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_sub(r, static_cast<double>(x), o, MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_sub(r, static_cast<double>(x), o, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
@@ -3177,8 +2924,7 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline real dispatch_real_binary_sub(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3195,8 +2941,7 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline real dispatch_real_binary_sub(const U &x, T &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3208,12 +2953,8 @@ inline real dispatch_real_binary_sub(const U &x, T &&a)
 } // namespace detail
 
 // Binary subtraction.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline real operator-(T &&a, U &&b)
 {
     return detail::dispatch_real_binary_sub(std::forward<T>(a), std::forward<U>(b));
@@ -3243,7 +2984,7 @@ template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_sub(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -3262,7 +3003,8 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_sub(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_sub_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3300,12 +3042,8 @@ inline void dispatch_real_in_place_sub(T &x, U &&a)
 } // namespace detail
 
 // In-place subtraction.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_in_place_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator-=(T &a, U &&b)
 {
     detail::dispatch_real_in_place_sub(a, std::forward<U>(b));
@@ -3332,7 +3070,7 @@ inline real dispatch_real_binary_mul(T &&a, U &&b)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_mul(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -3352,7 +3090,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -3367,7 +3105,8 @@ inline real dispatch_real_binary_mul(T &&a, const U &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3383,7 +3122,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_mul(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3404,7 +3143,7 @@ inline real dispatch_real_binary_mul(T &&a, const rational<SSize> &q)
 {
     const auto qv = detail::get_mpq_view(q);
 
-    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_q(r, o, &qv, MPFR_RNDN); };
+    auto const wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_q(r, o, &qv, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
 }
@@ -3417,10 +3156,9 @@ inline real dispatch_real_binary_mul(const rational<SSize> &q, T &&a)
 }
 
 // real-(float, double).
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
-    = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+                      int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &x)
 {
     // NOTE: the MPFR docs state that mpfr_mul_d() assumes that
@@ -3430,16 +3168,15 @@ inline real dispatch_real_binary_mul(T &&a, const U &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_mul_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_mul_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
 
 // (float, double)-real.
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value, int>
-    = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<U>, disjunction<std::is_same<T, float>, std::is_same<T, double>>>::value,
+                      int> = 0>
 inline real dispatch_real_binary_mul(const T &x, U &&a)
 {
     return dispatch_real_binary_mul(std::forward<U>(a), x);
@@ -3453,8 +3190,7 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline real dispatch_real_binary_mul(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3472,8 +3208,7 @@ template <typename T, typename U,
 #endif
                                               >,
                                   is_cvr_real<U>>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline real dispatch_real_binary_mul(const T &x, U &&a)
 {
     return dispatch_real_binary_mul(std::forward<U>(a), x);
@@ -3482,12 +3217,8 @@ inline real dispatch_real_binary_mul(const T &x, U &&a)
 } // namespace detail
 
 // Binary multiplication.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline real operator*(T &&a, U &&b)
 {
     return detail::dispatch_real_binary_mul(std::forward<T>(a), std::forward<U>(b));
@@ -3517,7 +3248,7 @@ template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_mul(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -3536,7 +3267,7 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_mul(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_mul_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3574,12 +3305,8 @@ inline void dispatch_real_in_place_mul(T &x, U &&a)
 } // namespace detail
 
 // In-place multiplication.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_in_place_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator*=(T &a, U &&b)
 {
     detail::dispatch_real_in_place_mul(a, std::forward<U>(b));
@@ -3607,8 +3334,7 @@ template <
                                                         std::is_same<U, real128>
 #endif
                                                         >>::value,
-                int>
-    = 0>
+                int> = 0>
 inline real dispatch_real_binary_div(const U &x, T &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3621,7 +3347,7 @@ inline real dispatch_real_binary_div(const U &x, T &&a)
 template <typename T, std::size_t SSize>
 inline real dispatch_real_binary_div(T &&a, const integer<SSize> &n)
 {
-    auto wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
+    auto const wrapper = [&n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_z(r, o, n.get_mpz_view(), MPFR_RNDN); };
 
     // NOTE: in these mpfr_nary_op_return_impl() invocations, we are passing a min_prec
     // which is by definition valid because it is produced by an invocation of
@@ -3634,7 +3360,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -3648,7 +3374,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(const U &n, T &&a)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_div(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
@@ -3663,7 +3389,8 @@ inline real dispatch_real_binary_div(const U &n, T &&a)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_div(T &&a, const bool &n)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3671,7 +3398,8 @@ inline real dispatch_real_binary_div(T &&a, const bool &n)
 template <typename T, enable_if_t<is_cvr_real<T>::value, int> = 0>
 inline real dispatch_real_binary_div(const bool &n, T &&a)
 {
-    auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_div(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
+    auto const wrapper
+        = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_ui_div(r, static_cast<unsigned long>(n), o, MPFR_RNDN); };
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
 }
 
@@ -3680,7 +3408,7 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(T &&a, const U &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3693,7 +3421,8 @@ template <typename T, typename U, enable_if_t<conjunction<is_cvr_real<T>, is_cpp
 inline real dispatch_real_binary_div(const U &n, T &&a)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_div(r, static_cast<long>(n), o, MPFR_RNDN); };
+        auto const wrapper
+            = [n](::mpfr_t r, const ::mpfr_t o) { ::mpfr_si_div(r, static_cast<long>(n), o, MPFR_RNDN); };
 
         return mpfr_nary_op_return_impl<false>(real_deduce_precision(n), wrapper, std::forward<T>(a));
     } else {
@@ -3707,16 +3436,15 @@ inline real dispatch_real_binary_div(T &&a, const rational<SSize> &q)
 {
     const auto qv = detail::get_mpq_view(q);
 
-    auto wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_q(r, o, &qv, MPFR_RNDN); };
+    auto const wrapper = [&qv](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_q(r, o, &qv, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(q), wrapper, std::forward<T>(a));
 }
 
 // real-(float, double).
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
-    = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+                      int> = 0>
 inline real dispatch_real_binary_div(T &&a, const U &x)
 {
     // NOTE: the MPFR docs state that mpfr_div_d() assumes that
@@ -3726,16 +3454,15 @@ inline real dispatch_real_binary_div(T &&a, const U &x)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_div_d() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_d(r, o, static_cast<double>(x), MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_div_d(r, o, static_cast<double>(x), MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
 
 // (float, double)-real.
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value, int>
-    = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_cvr_real<T>, disjunction<std::is_same<U, float>, std::is_same<U, double>>>::value,
+                      int> = 0>
 inline real dispatch_real_binary_div(const U &x, T &&a)
 {
     // NOTE: the MPFR docs state that mpfr_d_div() assumes that
@@ -3745,7 +3472,7 @@ inline real dispatch_real_binary_div(const U &x, T &&a)
     constexpr auto dradix = static_cast<unsigned>(std::numeric_limits<double>::radix);
     static_assert(!(dradix & (dradix - 1)), "mpfr_d_div() requires the radix of the 'double' type to be a power of 2.");
 
-    auto wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_div(r, static_cast<double>(x), o, MPFR_RNDN); };
+    auto const wrapper = [x](::mpfr_t r, const ::mpfr_t o) { ::mpfr_d_div(r, static_cast<double>(x), o, MPFR_RNDN); };
 
     return mpfr_nary_op_return_impl<false>(real_deduce_precision(x), wrapper, std::forward<T>(a));
 }
@@ -3758,8 +3485,7 @@ template <typename T, typename U,
                                                               std::is_same<U, real128>
 #endif
                                                               >>::value,
-                      int>
-          = 0>
+                      int> = 0>
 inline real dispatch_real_binary_div(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3771,11 +3497,7 @@ inline real dispatch_real_binary_div(T &&a, const U &x)
 } // namespace detail
 
 // Binary division.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename U, real_op_types<U> T>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline real operator/(T &&a, U &&b)
 {
     return detail::dispatch_real_binary_div(std::forward<T>(a), std::forward<U>(b));
@@ -3805,7 +3527,7 @@ template <typename T, enable_if_t<is_cpp_unsigned_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_div(real &a, const T &n)
 {
     if (n <= nl_max<unsigned long>()) {
-        auto wrapper
+        auto const wrapper
             = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_ui(r, o, static_cast<unsigned long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
@@ -3824,7 +3546,7 @@ template <typename T, enable_if_t<is_cpp_signed_integral<T>::value, int> = 0>
 inline void dispatch_real_in_place_div(real &a, const T &n)
 {
     if (n <= nl_max<long>() && n >= nl_min<long>()) {
-        auto wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
+        auto const wrapper = [n](::mpfr_t r, const ::mpfr_t o) { mpfr_div_si(r, o, static_cast<long>(n), MPFR_RNDN); };
 
         mpfr_nary_op_impl<false>(real_deduce_precision(n), wrapper, a, a);
     } else {
@@ -3862,12 +3584,8 @@ inline void dispatch_real_in_place_div(T &x, U &&a)
 } // namespace detail
 
 // In-place division.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_in_place_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_in_place_op_types<T, U>::value, int> = 0>
-#endif
 inline T &operator/=(T &a, U &&b)
 {
     detail::dispatch_real_in_place_div(a, std::forward<U>(b));
@@ -3879,12 +3597,8 @@ using are_real_eq_op_types
     = detail::disjunction<are_real_op_types<T, U>, detail::conjunction<std::is_same<T, real>, is_cpp_complex<U>>,
                           detail::conjunction<std::is_same<U, real>, is_cpp_complex<T>>>;
 
-#if defined(MPPP_HAVE_CONCEPTS)
-
 template <typename T, typename U>
-MPPP_CONCEPT_DECL real_eq_op_types = are_real_eq_op_types<T, U>::value;
-
-#endif
+concept real_eq_op_types = are_real_eq_op_types<T, U>::value;
 
 namespace detail
 {
@@ -3974,24 +3688,16 @@ inline bool dispatch_real_equality(const T &x, const real &r)
 } // namespace detail
 
 // Equality operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_eq_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_eq_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator==(const T &a, const U &b)
 {
     return detail::dispatch_real_equality(a, b);
 }
 
 // Inequality operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_eq_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_eq_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator!=(const T &a, const U &b)
 {
     return !(a == b);
@@ -4130,12 +3836,8 @@ MPPP_DLL_PUBLIC bool dispatch_real_gt(const real128 &, const real &);
 } // namespace detail
 
 // Greater-than operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator>(const T &a, const U &b)
 {
     return detail::dispatch_real_gt(a, b);
@@ -4274,12 +3976,8 @@ MPPP_DLL_PUBLIC bool dispatch_real_gte(const real128 &, const real &);
 } // namespace detail
 
 // Greater-than or equal operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator>=(const T &a, const U &b)
 {
     return detail::dispatch_real_gte(a, b);
@@ -4418,12 +4116,8 @@ MPPP_DLL_PUBLIC bool dispatch_real_lt(const real128 &, const real &);
 } // namespace detail
 
 // Less-than operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator<(const T &a, const U &b)
 {
     return detail::dispatch_real_lt(a, b);
@@ -4562,12 +4256,8 @@ MPPP_DLL_PUBLIC bool dispatch_real_lte(const real128 &, const real &);
 } // namespace detail
 
 // Less-than or equal operator.
-#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
     requires real_op_types<T, U>
-#else
-template <typename T, typename U, detail::enable_if_t<are_real_op_types<T, U>::value, int> = 0>
-#endif
 inline bool operator<=(const T &a, const U &b)
 {
     return detail::dispatch_real_lte(a, b);
@@ -4610,13 +4300,6 @@ namespace std
 // Specialisation of std::hash for real.
 template <>
 struct hash<mppp::real> {
-    // NOTE: these typedefs have been deprecated in C++17.
-#if MPPP_CPLUSPLUS < 201703L
-    // The argument type.
-    using argument_type = mppp::real;
-    // The result type.
-    using result_type = size_t;
-#endif
     // Call operator.
     size_t operator()(const mppp::real &x) const
     {
@@ -4634,8 +4317,7 @@ namespace fmt
 {
 
 template <>
-struct formatter<mppp::real> : mppp::detail::to_string_formatter {
-};
+struct formatter<mppp::real> : mppp::detail::to_string_formatter {};
 
 } // namespace fmt
 

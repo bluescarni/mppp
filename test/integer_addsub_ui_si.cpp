@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -7,7 +7,6 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
-#include <limits>
 #include <random>
 #include <tuple>
 #include <type_traits>
@@ -18,6 +17,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -45,7 +47,7 @@ using sint_types = std::tuple<signed char, short, int, long, long long
 #endif
                               >;
 
-// NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTNEXTLINE(cert-err58-cpp,cert-msc32-c,cert-msc51-cpp,cppcoreguidelines-avoid-non-const-global-variables,bugprone-throwing-static-initialization,bugprone-random-generator-seed)
 static std::mt19937 rng;
 
 struct add_ui_tester {
@@ -228,7 +230,7 @@ struct add_ui_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(uint_types{}, runner<S>{});
         // Run a couple of tests with bool as well.
@@ -426,7 +428,7 @@ struct sub_ui_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(uint_types{}, runner<S>{});
         // Run a couple of tests with bool as well.
@@ -461,7 +463,7 @@ struct add_si_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(sint_types{}, runner<S>{});
     }
@@ -489,7 +491,7 @@ struct sub_si_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(sint_types{}, runner<S>{});
     }
@@ -499,3 +501,5 @@ TEST_CASE("sub_si")
 {
     tuple_for_each(sizes{}, sub_si_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

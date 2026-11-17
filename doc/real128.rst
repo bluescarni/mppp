@@ -21,8 +21,8 @@ The real128 class
 
    This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
    (which features up to 36 decimal digits of precision).
-   The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available on GCC,
-   Clang and the Intel compiler on most modern platforms, on top of which it provides the following additions:
+   The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available on GCC
+   and Clang on most modern platforms, on top of which it provides the following additions:
 
    * interoperability with other mp++ classes,
    * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
@@ -108,10 +108,6 @@ The real128 class
 
    .. cpp:function:: template <real128_cpp_complex T> constexpr explicit real128(const T &c)
 
-      .. note::
-
-        This constructor is ``constexpr`` only if at least C++14 is being used.
-
       .. versionadded:: 0.20
 
       Constructor from complex C++ types.
@@ -164,10 +160,6 @@ The real128 class
 
    .. cpp:function:: constexpr real128 &operator=(const __float128 &x)
 
-      .. note::
-
-        This operator is ``constexpr`` only if at least C++14 is being used.
-
       Assignment from a :cpp:type:`__float128`.
 
       :param x: the :cpp:type:`__float128` that will be assigned to the internal value.
@@ -175,10 +167,6 @@ The real128 class
       :return: a reference to ``this``.
 
    .. cpp:function:: template <real128_interoperable T> constexpr real128 &operator=(const T &x)
-
-      .. note::
-
-        This operator is ``constexpr`` only if at least C++14 is being used.
 
       Assignment from interoperable types.
 
@@ -190,10 +178,6 @@ The real128 class
         :cpp:class:`~mppp::real128` from *x*.
 
    .. cpp:function:: template <real128_cpp_complex T> constexpr real128 &operator=(const T &c)
-
-      .. note::
-
-        This operator is ``constexpr`` only if at least C++14 is being used.
 
       .. versionadded:: 0.20
 
@@ -214,10 +198,6 @@ The real128 class
          The :cpp:class:`~mppp::real` overload is available only if mp++ was configured with the
          ``MPPP_WITH_MPFR`` option enabled. The :cpp:class:`~mppp::complex` overload
          is available only if mp++ was configured with the ``MPPP_WITH_MPC`` option enabled.
-
-      .. note::
-
-        The :cpp:class:`~mppp::complex128` overload is ``constexpr`` only if at least C++14 is being used.
 
       .. versionadded:: 0.20
 
@@ -279,10 +259,6 @@ The real128 class
 
    .. cpp:function:: template <real128_cpp_complex T> constexpr explicit operator T() const
 
-      .. note::
-
-        This operator is ``constexpr`` only if at least C++14 is being used.
-
       .. versionadded:: 0.20
 
       Conversion to complex C++ types.
@@ -291,11 +267,6 @@ The real128 class
 
    .. cpp:function:: template <real128_interoperable T> constexpr bool get(T &rop) const
    .. cpp:function:: template <real128_cpp_complex T> constexpr bool get(T &rop) const
-
-      .. note::
-
-        The first overload is ``constexpr`` only if at least C++14 is being used.
-        The second overload is ``constexpr`` only if at least C++20 is being used.
 
       Conversion member functions to interoperable and complex C++ types.
 
@@ -375,11 +346,6 @@ The real128 class
 
    .. cpp:function:: constexpr int fpclassify() const
 
-      .. note::
-
-         This function is not ``constexpr`` if the Intel C++ compiler
-         is being used.
-
       Categorise the floating point value.
 
       This member function will categorise the floating-point value of ``this`` into the 5 categories,
@@ -399,11 +365,6 @@ The real128 class
    .. cpp:function:: constexpr bool isfinite() const
    .. cpp:function:: constexpr bool isnormal() const
 
-      .. note::
-
-         These functions are not ``constexpr`` if the Intel C++ compiler
-         is being used.
-
       Detect NaN, infinity, finite value (``finite()`` and ``isfinite()``) or
       normal value.
 
@@ -416,15 +377,6 @@ The real128 class
 
    .. cpp:function:: constexpr real128 &abs()
    .. cpp:function:: constexpr real128 &fabs()
-
-      .. note::
-
-        These functions are ``constexpr`` only if at least C++14 is being used.
-
-      .. note::
-
-         These functions are not ``constexpr`` if the Intel C++ compiler
-         is being used.
 
       In-place absolute value.
 
@@ -635,8 +587,7 @@ Types
 
 .. cpp:type:: __float128
 
-   A quadruple-precision floating-point type available on GCC, Clang and
-   the Intel compiler.
+   A quadruple-precision floating-point type available on GCC and Clang.
    This is the type wrapped by the :cpp:class:`~mppp::real128` class.
 
    .. seealso::
@@ -654,10 +605,7 @@ Concepts
 
    * ``T`` is :cpp:class:`~mppp::integer`, or
    * ``T`` is :cpp:class:`~mppp::rational`, or
-   * on GCC, the Intel compiler and Clang>=7, ``T`` satisfies
-     :cpp:concept:`mppp::cpp_arithmetic`, or
-   * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::cpp_arithmetic`, except if
-     ``T`` is ``long double``.
+   * on GCC and Clang, ``T`` satisfies :cpp:concept:`mppp::cpp_arithmetic`.
 
 .. cpp:concept:: template <typename T> mppp::real128_cpp_complex
 
@@ -665,12 +613,8 @@ Concepts
 
    This concept is satisfied by complex C++ types that can
    interoperate with :cpp:class:`~mppp::real128`.
-   Specifically, this concept is satisfied if either:
-
-   * on GCC, the Intel compiler and Clang>=7, ``T`` satisfies
-     :cpp:concept:`mppp::cpp_complex`, or
-   * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::cpp_complex`, except if
-     ``T`` is ``std::complex<long double>``.
+   Specifically, this concept is satisfied if, on GCC and Clang, ``T`` satisfies
+   :cpp:concept:`mppp::cpp_complex`.
 
 .. cpp:concept:: template <typename T, typename U> mppp::real128_op_types
 
@@ -704,11 +648,6 @@ Conversion
 
 .. cpp:function:: template <mppp::real128_interoperable T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
 .. cpp:function:: template <mppp::real128_cpp_complex T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
-
-   .. note::
-
-      The first overload is ``constexpr`` only if at least C++14 is being used.
-      The second overload is ``constexpr`` only if at least C++20 is being used.
 
    Conversion functions.
 
@@ -778,11 +717,6 @@ Arithmetic
 .. cpp:function:: constexpr mppp::real128 mppp::abs(const mppp::real128 &x)
 .. cpp:function:: constexpr mppp::real128 mppp::fabs(const mppp::real128 &x)
 
-   .. note::
-
-      These functions are not ``constexpr`` if the Intel C++ compiler
-      is being used.
-
    Absolute value.
 
    .. versionadded:: 0.23
@@ -840,11 +774,6 @@ Comparison
 
 .. cpp:function:: constexpr int mppp::fpclassify(const mppp::real128 &x)
 
-   .. note::
-
-      This function is not ``constexpr`` if the Intel C++ compiler
-      is being used.
-
    Categorise a :cpp:class:`~mppp::real128`.
 
    :param x: the value whose floating-point category will be returned.
@@ -875,11 +804,6 @@ Comparison
 .. cpp:function:: constexpr bool mppp::isfinite(const mppp::real128 &x)
 .. cpp:function:: constexpr bool mppp::isnormal(const mppp::real128 &x)
 
-   .. note::
-
-      These functions are not ``constexpr`` if the Intel C++ compiler
-      is being used.
-
    Detect special values.
 
    These functions will return ``true`` is *x* is, respectively:
@@ -901,11 +825,6 @@ Comparison
 
 .. cpp:function:: constexpr bool mppp::real128_equal_to(const mppp::real128 &x, const mppp::real128 &y)
 
-   .. note::
-
-      This function is not ``constexpr`` if the Intel C++ compiler
-      is being used.
-
    Equality predicate with special NaN handling.
 
    If both *x* and *y* are not NaN, this function is identical to the equality operator.
@@ -922,11 +841,6 @@ Comparison
      ``false`` otherwise.
 
 .. cpp:function:: constexpr bool mppp::real128_lt(const mppp::real128 &x, const mppp::real128 &y)
-
-   .. note::
-
-      This function is not ``constexpr`` if the Intel C++ compiler
-      is being used.
 
    Less-than predicate with special NaN handling.
 
@@ -945,11 +859,6 @@ Comparison
      ``false`` otherwise.
 
 .. cpp:function:: constexpr bool mppp::real128_gt(const mppp::real128 &x, const mppp::real128 &y)
-
-   .. note::
-
-      This function is not ``constexpr`` if the Intel C++ compiler
-      is being used.
 
    Greater-than predicate with special NaN handling.
 
@@ -1406,10 +1315,6 @@ Mathematical operators
 .. cpp:function:: constexpr mppp::real128 &mppp::operator++(mppp::real128 &x)
 .. cpp:function:: constexpr mppp::real128 &mppp::operator--(mppp::real128 &x)
 
-   .. note::
-
-      These operators are ``constexpr`` only if at least C++14 is being used.
-
    Prefix increment and decrement.
 
    :param x: the argument.
@@ -1418,10 +1323,6 @@ Mathematical operators
 
 .. cpp:function:: constexpr mppp::real128 mppp::operator++(mppp::real128 &x, int)
 .. cpp:function:: constexpr mppp::real128 mppp::operator--(mppp::real128 &x, int)
-
-   .. note::
-
-      These operators are ``constexpr`` only if at least C++14 is being used.
 
    Suffix increment and decrement.
 
@@ -1455,10 +1356,6 @@ Mathematical operators
 .. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr T &mppp::operator-=(T &x, const U &y)
 .. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr T &mppp::operator*=(T &x, const U &y)
 .. cpp:function:: template <typename T, mppp::real128_op_types<T> U> constexpr T &mppp::operator/=(T &x, const U &y)
-
-   .. note::
-
-      These operators are ``constexpr`` only if at least C++14 is being used.
 
    In-place arithmetic operators.
 
@@ -1521,9 +1418,8 @@ Constants
 ---------
 
 A few mathematical constants are provided. The constants are available as inline variables
-(e.g., :cpp:var:`mppp::pi_128`, requires C++17 or later) and as constexpr functions (e.g., :cpp:func:`mppp::real128_pi()`,
-always available). Inline variables and constexpr functions provide exactly the same functionality,
-but inline variables are more convenient if C++17 is an option.
+and as constexpr functions (e.g., :cpp:func:`mppp::real128_pi()`,
+always available).
 
 .. note::
    Some of these constants are also available as
@@ -1657,13 +1553,6 @@ Standard library specialisations
    Specialisation of ``std::hash`` for :cpp:class:`mppp::real128`.
 
    The hash is computed via :cpp:func:`std::size_t mppp::hash(const mppp::real128 &)`.
-
-   .. cpp:type:: public argument_type = mppp::real128
-   .. cpp:type:: public result_type = std::size_t
-
-   .. note::
-
-      The :cpp:type:`argument_type` and :cpp:type:`result_type` type aliases are defined only until C++14.
 
    .. cpp:function:: public std::size_t operator()(const mppp::real128 &x) const
 

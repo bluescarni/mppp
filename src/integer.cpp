@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -59,10 +59,7 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   nl_min<mpz_size_t>() >= nl_min<::mp_size_t>() && nl_max<mpz_size_t>() <= nl_max<::mp_size_t>(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
-#if MPPP_CPLUSPLUS >= 201703L
-
-// If we have C++17, we can use structured bindings to test the layout of mpz_struct_t
-// and its members' types.
+// We can use structured bindings to test the layout of mpz_struct_t and its members' types.
 constexpr bool test_mpz_struct_t()
 {
     // NOTE: if mpz_struct_t has more or fewer members, this will result
@@ -75,8 +72,6 @@ constexpr bool test_mpz_struct_t()
 }
 
 static_assert(test_mpz_struct_t(), "The mpz_struct_t does not have the expected layout.");
-
-#endif
 
 // The reason we are asserting this is the following: in a few places we are using the wrap-around property
 // of unsigned arithmetics, but if mp_limb_t is a narrow unsigned type (e.g., unsigned short or unsigned char)
@@ -95,6 +90,7 @@ static_assert(nl_digits<::mp_limb_t>() == GMP_LIMB_BITS,
 void mpz_alloc_cache::clear() noexcept
 {
 #if !defined(NDEBUG)
+    // NOLINTNEXTLINE(performance-avoid-endl)
     std::cout << "Cleaning up the mpz alloc cache." << std::endl;
 #endif
     // Get the GMP free() function.
@@ -195,7 +191,7 @@ void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
             std::abort();
         }
         // LCOV_EXCL_STOP
-        const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
+        const auto nbits = static_cast<std::size_t>(static_cast<unsigned>(GMP_NUMB_BITS) * nlimbs);
         // LCOV_EXCL_START
         if (mppp_unlikely(nbits > nl_max<::mp_bitcnt_t>())) {
             std::abort();

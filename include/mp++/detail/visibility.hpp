@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -21,13 +21,12 @@
 
 #else
 
-// Convenience macros for setting the visibility of entities
-// when building/using the shared library. Mostly inspired by:
+// Convenience macros for setting the visibility of entities when building/using the shared library. Mostly inspired by:
+//
 // https://gcc.gnu.org/wiki/Visibility
-// We check first for Windows, where we assume every compiler
-// knows dllexport/dllimport. On other platforms, we use the GCC-like
-// syntax for GCC, clang and ICC. Otherwise, we leave the definitions
-// empty.
+//
+// We check first for Windows, where we assume every compiler knows dllexport/dllimport. On other platforms, we use the
+// GCC-like syntax for GCC and clang. Otherwise, we leave the definitions empty.
 #if defined(_WIN32) || defined(__CYGWIN__)
 
 #if defined(mppp_EXPORTS)
@@ -42,7 +41,7 @@
 
 #define MPPP_DLL_LOCAL
 
-#elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
+#elif defined(__clang__) || defined(__GNUC__)
 
 #define MPPP_DLL_PUBLIC __attribute__((visibility("default")))
 #define MPPP_DLL_LOCAL __attribute__((visibility("hidden")))

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -6,11 +6,10 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
 #include <cassert>
 #include <iostream>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/real.hpp>
@@ -105,6 +104,7 @@ struct mpfr_tl_cleanup {
     ~mpfr_tl_cleanup()
     {
 #if !defined(NDEBUG)
+        // NOLINTNEXTLINE(performance-avoid-endl)
         std::cout << "Cleaning up thread local MPFR caches." << std::endl;
 #endif
         ::mpfr_free_cache2(MPFR_FREE_LOCAL_CACHE);
@@ -117,18 +117,12 @@ struct mpfr_global_cleanup {
     ~mpfr_global_cleanup()
     {
 #if !defined(NDEBUG)
+        // NOLINTNEXTLINE(performance-avoid-endl)
         std::cout << "Cleaning up global MPFR caches." << std::endl;
 #endif
         ::mpfr_free_cache2(MPFR_FREE_GLOBAL_CACHE);
     }
 };
-
-#if defined(__INTEL_COMPILER)
-
-#pragma warning(push)
-#pragma warning(disable : 854)
-
-#endif
 
 MPPP_CONSTINIT thread_local const mpfr_tl_cleanup mpfr_tl_cleanup_inst;
 // NOTE: because the destruction of thread-local objects
@@ -136,12 +130,6 @@ MPPP_CONSTINIT thread_local const mpfr_tl_cleanup mpfr_tl_cleanup_inst;
 // static storage duration, the global cleanup will always
 // be performed after thread-local cleanup.
 MPPP_CONSTINIT const mpfr_global_cleanup mpfr_global_cleanup_inst;
-
-#if defined(__INTEL_COMPILER)
-
-#pragma warning(pop)
-
-#endif
 
 #endif
 
@@ -172,27 +160,16 @@ struct flint_cleanup {
         // the sync setting on cout by the time we execute the following line.
         // However, we print only in debug mode, so it should not be too much of a problem
         // in practice.
+        //
+        // NOLINTNEXTLINE(performance-avoid-endl)
         std::cout << "Cleaning up thread local FLINT caches." << std::endl;
 #endif
         ::flint_cleanup();
     }
 };
 
-#if defined(__INTEL_COMPILER)
-
-#pragma warning(push)
-#pragma warning(disable : 854)
-
-#endif
-
 // Instantiate a cleanup object for each thread.
 MPPP_CONSTINIT thread_local const flint_cleanup flint_cleanup_inst;
-
-#if defined(__INTEL_COMPILER)
-
-#pragma warning(pop)
-
-#endif
 
 #endif
 

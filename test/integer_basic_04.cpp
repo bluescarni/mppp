@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -25,6 +25,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -69,11 +72,9 @@ static std::mt19937::result_type mt_rng_seed(0u);
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
-struct yes {
-};
+struct yes {};
 
-struct no {
-};
+struct no {};
 
 template <typename From, typename To>
 static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<const From &>())), yes{});
@@ -97,8 +98,7 @@ static inline bool roundtrip_conversion(const T &x)
     return retval;
 }
 
-struct no_conv {
-};
+struct no_conv {};
 
 struct int_convert_tester {
     template <typename S>
@@ -200,7 +200,7 @@ struct int_convert_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(int_types{}, runner<S>{});
         // Some testing for bool.
@@ -286,7 +286,7 @@ struct fp_convert_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(fp_types{}, runner<S>{});
     }
@@ -334,7 +334,7 @@ struct complex_convert_tester {
         }
     };
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         tuple_for_each(complex_types{}, runner<S>{});
     }
@@ -403,3 +403,5 @@ TEST_CASE("sizes")
 {
     tuple_for_each(sizes{}, sizes_tester{});
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

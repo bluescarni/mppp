@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -14,6 +14,8 @@
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
 
 // NOLINTNEXTLINE(google-build-using-namespace)
 using namespace mppp;
@@ -195,8 +197,8 @@ TEST_CASE("rootn_ui")
     // Test the special cases.
     {
         auto tmp = rootn_ui(complex{1, 2, complex_prec_t(32)}, 0);
-        REQUIRE(complex::re_cref { tmp } -> nan_p());
-        REQUIRE(complex::im_cref { tmp } -> nan_p());
+        REQUIRE(complex::re_cref{tmp}->nan_p());
+        REQUIRE(complex::im_cref{tmp}->nan_p());
         REQUIRE(tmp.get_prec() == 32);
     }
     {
@@ -208,3 +210,5 @@ TEST_CASE("rootn_ui")
 }
 
 #endif
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -6,18 +6,12 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
-#if MPPP_CPLUSPLUS < 201402L
-#include <algorithm>
-#endif
 #include <cassert>
 #include <cstddef>
-#if MPPP_CPLUSPLUS >= 201402L
 #include <iterator>
-#endif
 #include <string>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/utils.hpp>
 
 // NOLINTNEXTLINE(modernize-concat-nested-namespaces)
@@ -47,14 +41,14 @@ char *to_string_impl(char (&output)[N], __uint128_t n)
     std::size_t idx = 0;
     output[idx++] = '\0';
     // Reduce n iteratively by a factor of 100, and print the remainder at each iteration.
-    auto r = static_cast<unsigned>(n % 100u);
-    for (; n >= 100u; n = n / 100u, r = static_cast<unsigned>(n % 100u)) {
-        output[idx++] = d2_text[r * 2u + 1u];
+    auto r = static_cast<std::size_t>(n % 100u);
+    for (; n >= 100u; n = n / 100u, r = static_cast<std::size_t>(n % 100u)) {
+        output[idx++] = d2_text[(r * 2u) + 1u];
         output[idx++] = d2_text[r * 2u];
     }
     // Write the last two digits, skipping the second one if the current
     // remainder is not at least 10.
-    output[idx++] = d2_text[r * 2u + 1u];
+    output[idx++] = d2_text[(r * 2u) + 1u];
     if (r >= 10u) {
         output[idx++] = d2_text[r * 2u];
     }
@@ -69,17 +63,11 @@ std::string to_string(__uint128_t n)
     char output[40];
     // NOLINTNEXTLINE(llvm-qualified-auto, readability-qualified-auto)
     auto o = to_string_impl(output, n);
-#if MPPP_CPLUSPLUS >= 201402L
     // Now build the string by reading backwards. When reverse iterators are created,
     // the original iterator is decreased by one. Hence, we can build the begin directly
     // from o (which points 1 past the last written char), and the end from output + 1
     // (so that it will point to the terminator).
-    return std::string(std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1));
-#else
-    // In C++11, we reverse output and then create the string.
-    std::reverse(output, o);
-    return std::string(output);
-#endif
+    return {std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1)};
 }
 
 std::string to_string(__int128_t n)
@@ -92,12 +80,7 @@ std::string to_string(__int128_t n)
     if (neg) {
         *(o++) = '-';
     }
-#if MPPP_CPLUSPLUS >= 201402L
-    return std::string(std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1));
-#else
-    std::reverse(output, o);
-    return std::string(output);
-#endif
+    return {std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1)};
 }
 
 #endif

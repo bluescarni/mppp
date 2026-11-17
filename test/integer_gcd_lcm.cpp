@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -15,6 +15,9 @@
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
+
+// NOLINTBEGIN(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
+
 #include "test_utils.hpp"
 
 static const int ntries = 1000;
@@ -33,7 +36,7 @@ static std::mt19937 rng;
 
 struct gcd_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with zeroes.
@@ -183,7 +186,7 @@ TEST_CASE("gcd")
 
 struct lcm_tester {
     template <typename S>
-    inline void operator()(const S &) const
+    void operator()(const S &) const
     {
         using integer = integer<S::value>;
         // Start with zeroes.
@@ -334,7 +337,7 @@ TEST_CASE("lcm")
     // in 2-limb results.
     using int_t = integer<1>;
 
-    int_t n1{::mp_limb_t(-1)}, n2 = n1 - 1, n3;
+    int_t n1{static_cast<::mp_limb_t>(-1)}, n2 = n1 - 1, n3;
     int_t m1{n1}, m2{n2}, m3;
 
     lcm(n3, n1, n2);
@@ -370,3 +373,5 @@ TEST_CASE("lcm")
     REQUIRE(n3 == m3);
     REQUIRE(lcm(n1, n2) == n3);
 }
+
+// NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

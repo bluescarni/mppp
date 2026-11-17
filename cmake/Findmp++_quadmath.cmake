@@ -2,7 +2,7 @@
 # http://websvn.kde.org/trunk/KDE/kdeutils/cmake/modules/FindGMP.cmake?view=markup&pathrev=675218
 
 # Copyright (c) 2006, Laurent Montel, <montel@kde.org>
-# Copyright (c) 2008-2023 Francesco Biscani, <bluescarni@gmail.com>
+# Copyright (c) 2008-2026 Francesco Biscani, <bluescarni@gmail.com>
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -37,8 +37,34 @@ if(MPPP_QUADMATH_INCLUDE_DIR AND MPPP_QUADMATH_LIBRARY)
 	set(mp++_quadmath_FIND_QUIETLY TRUE)
 endif()
 
-find_path(MPPP_QUADMATH_INCLUDE_DIR NAMES quadmath.h)
+# NOTE: quadmath.h lives in GCC's private include directory (lib/gcc/<triple>/<version>/include),
+# which GCC searches implicitly but clang does not. When using clang with a GCC toolchain, locate
+# that directory via the libgcc used by clang.
+set(_MPPP_QUADMATH_INCLUDE_HINTS "")
+if(NOT MPPP_QUADMATH_INCLUDE_DIR AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT MSVC)
+    message(STATUS "Clang compiler detected, attempting to locate the include directory for quadmath.h.")
+
+    execute_process(COMMAND "${CMAKE_CXX_COMPILER}" -print-libgcc-file-name
+        OUTPUT_VARIABLE _MPPP_LIBGCC_FILE OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE _MPPP_LIBGCC_RES ERROR_QUIET)
+
+    if(_MPPP_LIBGCC_RES EQUAL 0 AND _MPPP_LIBGCC_FILE)
+        get_filename_component(_MPPP_LIBGCC_DIR "${_MPPP_LIBGCC_FILE}" DIRECTORY)
+        list(APPEND _MPPP_QUADMATH_INCLUDE_HINTS "${_MPPP_LIBGCC_DIR}/include")
+        message(STATUS "Tentative quadmath.h directory for Clang: ${_MPPP_LIBGCC_DIR}/include")
+        unset(_MPPP_LIBGCC_DIR)
+    else()
+        message(STATUS "Could not query Clang for the libgcc location, quadmath.h will be searched for in the default locations.")
+    endif()
+
+    unset(_MPPP_LIBGCC_RES)
+    unset(_MPPP_LIBGCC_FILE)
+endif()
+
+find_path(MPPP_QUADMATH_INCLUDE_DIR NAMES quadmath.h HINTS ${_MPPP_QUADMATH_INCLUDE_HINTS})
 find_library(MPPP_QUADMATH_LIBRARY NAMES quadmath)
+
+unset(_MPPP_QUADMATH_INCLUDE_HINTS)
 
 if(NOT MPPP_QUADMATH_INCLUDE_DIR OR NOT MPPP_QUADMATH_LIBRARY)
     cmake_push_check_state(RESET)
