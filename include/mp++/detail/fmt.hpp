@@ -9,9 +9,7 @@
 #ifndef MPPP_DETAIL_FMT_HPP
 #define MPPP_DETAIL_FMT_HPP
 
-#include <stdexcept>
-
-#include <fmt/core.h>
+#include <fmt/base.h>
 
 #include <mp++/config.hpp>
 
@@ -43,19 +41,12 @@ struct to_string_formatter {
             }
         }
 
-        // LCOV_EXCL_START
+        // The format spec was not terminated by a closing bracket. report_error() throws fmt::format_error at runtime,
+        // and it results in a compilation error when the format string is checked at compile time.
+        fmt::report_error("Invalid format");
 
-        // NOTE: strangely enough, fmt::throw_format_error() was promoted
-        // to the public API in fmt 10 and then promptly deprecated.
-#if FMT_VERSION < 100000 || FMT_VERSION >= 110000
-        throw std::invalid_argument("Invalid format");
-#else
-        fmt::throw_format_error("Invalid format");
-#endif
-
-        return it;
-
-        // LCOV_EXCL_STOP
+        // NOTE: unreachable, as report_error() does not return.
+        return it; // LCOV_EXCL_LINE
     }
 
     template <typename T, typename FormatContext>

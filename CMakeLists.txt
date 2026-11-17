@@ -397,9 +397,8 @@ if(MPPP_WITH_BOOST_S11N)
     target_link_libraries(mp++ PUBLIC Boost::serialization Boost::disable_autolinking)
 endif()
 
-# NOTE: need at least version 6.2
-# to print 128-bit integers.
-set(_MPPP_MIN_FMT_VERSION "6.2")
+# NOTE: fmt >= 11 provides the lightweight fmt/base.h header, and it supports __float128 directly.
+set(_MPPP_MIN_FMT_VERSION "11")
 if(MPPP_WITH_FMT)
     find_package(fmt ${_MPPP_MIN_FMT_VERSION} REQUIRED CONFIG)
     message(STATUS "fmt version: ${fmt_VERSION}")

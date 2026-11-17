@@ -649,6 +649,11 @@ TEST_CASE("fmt test")
     // Check that format strings are ignored.
     REQUIRE(fmt::format("foo {:} bar", -123_z2) == "foo -123 bar");
     REQUIRE(fmt::format("foo {:<30} bar", -123_z2) == "foo -123 bar");
+
+    // Check that an unterminated format spec results in an error.
+    //
+    // NOTE: fmt::runtime() is needed to defer the format string check to runtime.
+    REQUIRE_THROWS_AS(fmt::format(fmt::runtime("foo {:<30"), -123_z2), fmt::format_error);
 }
 
 #endif
