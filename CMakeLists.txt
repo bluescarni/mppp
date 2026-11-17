@@ -37,8 +37,6 @@ option(MPPP_WITH_MPC "Enable features relying on MPC." OFF)
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_WITH_BOOST_S11N "Enable features relying on the Boost.Serialization library." OFF)
 option(MPPP_WITH_FMT "Enable support for the fmt library." OFF)
-option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
-mark_as_advanced(MPPP_TEST_PYBIND11)
 option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_UNICODE "Enable Unicode solutions for MSVC." OFF)
@@ -248,7 +246,6 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/visibility.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/parse_complex.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/extra/pybind11.hpp"
   )
   source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" PREFIX "Header Files" FILES ${MPPP_HEADER_FILES})
   set(MPPP_SRC_FILES ${MPPP_SRC_FILES} ${MPPP_HEADER_FILES})
