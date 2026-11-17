@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -72,11 +72,9 @@ static std::mt19937::result_type mt_rng_seed(0u);
 // NOLINTNEXTLINE(cert-err58-cpp, cert-msc32-c, cert-msc51-cpp, cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937 rng;
 
-struct yes {
-};
+struct yes {};
 
-struct no {
-};
+struct no {};
 
 template <typename From, typename To>
 static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<const From &>())), yes{});
@@ -100,8 +98,7 @@ static inline bool roundtrip_conversion(const T &x)
     return retval;
 }
 
-struct no_conv {
-};
+struct no_conv {};
 
 struct int_convert_tester {
     template <typename S>

@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2026 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -75,8 +75,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static std::mt19937::result_type mt_rng_seed(0u);
 
-struct no_const {
-};
+struct no_const {};
 
 struct int_ctor_tester {
     template <typename S>
