@@ -72,12 +72,10 @@ static_assert(real_prec_min() <= real_prec_max(), "The minimum real precision is
 // Zero precision has a special meaning, depending on the context. Thus, the minimum precision must be nonzero.
 static_assert(real_prec_min() > 0, "The minimum real precision must be positive.");
 
-// A couple of sanity checks when constructing temporary mpfrs/mpfs from long double.
+// A couple of sanity checks when constructing temporary mpfrs from long double.
 static_assert(std::numeric_limits<long double>::max_digits10 < nl_max<int>() / 4, "Overflow error.");
 // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
 static_assert(std::numeric_limits<long double>::max_digits10 * 4 < nl_max<::mpfr_prec_t>(), "Overflow error.");
-// NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
-static_assert(std::numeric_limits<long double>::max_digits10 * 4 < nl_max<::mp_bitcnt_t>(), "Overflow error.");
 // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
 static_assert(real_prec_check(static_cast<::mpfr_prec_t>(std::numeric_limits<long double>::max_digits10 * 4)),
               "The precision required to represent long double is outside the MPFR min/max precision bounds.");
@@ -168,8 +166,6 @@ void real_round_wrapper(::mpfr_t rop, const ::mpfr_t op)
     mpfr_round(rop, op);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
-
 void real_roundeven_wrapper(::mpfr_t rop, const ::mpfr_t op)
 {
     if (mppp_unlikely(mpfr_nan_p(op) != 0)) {
@@ -178,8 +174,6 @@ void real_roundeven_wrapper(::mpfr_t rop, const ::mpfr_t op)
 
     ::mpfr_roundeven(rop, op);
 }
-
-#endif
 
 void real_trunc_wrapper(::mpfr_t rop, const ::mpfr_t op)
 {
@@ -1129,14 +1123,10 @@ real &real::round()
     return self_mpfr_unary_nornd(detail::real_round_wrapper);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
-
 real &real::roundeven()
 {
     return self_mpfr_unary_nornd(detail::real_roundeven_wrapper);
 }
-
-#endif
 
 real &real::trunc()
 {
@@ -2598,8 +2588,6 @@ std::size_t rbs_min_size()
 
 } // namespace detail
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
-
 // Get the number of significant digits required for a round-tripping representation.
 std::size_t real::get_str_ndigits(int base) const
 {
@@ -2616,8 +2604,6 @@ std::size_t get_str_ndigits(const real &r, int base)
 {
     return r.get_str_ndigits(base);
 }
-
-#endif
 
 // Size of the serialised binary representation: base size + limbs data.
 std::size_t real::binary_size() const

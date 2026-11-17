@@ -1772,8 +1772,6 @@ TEST_CASE("boost_s11n")
 
 #endif
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
-
 TEST_CASE("real str_ndigits")
 {
     using Catch::Matchers::Message;
@@ -1800,7 +1798,5 @@ TEST_CASE("real str_ndigits")
         Message(
             "Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is 63 instead"));
 }
-
-#endif
 
 // NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

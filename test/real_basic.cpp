@@ -1711,8 +1711,6 @@ TEST_CASE("real nts")
     REQUIRE(std::is_nothrow_swappable_v<real>);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
-
 TEST_CASE("real str_ndigits")
 {
     using Catch::Matchers::Message;
@@ -1739,8 +1737,6 @@ TEST_CASE("real str_ndigits")
         Message(
             "Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is 63 instead"));
 }
-
-#endif
 
 TEST_CASE("prec_to_nlimbs failure")
 {

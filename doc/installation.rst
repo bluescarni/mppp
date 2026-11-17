@@ -19,7 +19,7 @@ mp++ has the following dependencies:
 * the `GNU MPFR <https://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support
   for the ``long double`` type in :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
-  (MPFR 3 or a later version is required);
+  (MPFR 4.1.0 or a later version is required);
 * the `GNU MPC <http://www.multiprecision.org/mpc/>`__ multiprecision complex library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::complex` class;
 * the `FLINT <http://flintlib.org/>`__ library, *optional*,

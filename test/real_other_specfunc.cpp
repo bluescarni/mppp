@@ -82,8 +82,6 @@ TEST_CASE("real erfc")
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_BETA)
-
 TEST_CASE("real beta")
 {
     real r0{12, 450};
@@ -126,8 +124,6 @@ TEST_CASE("real beta")
     REQUIRE(beta(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
     REQUIRE(beta(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
-
-#endif
 
 TEST_CASE("real ai")
 {

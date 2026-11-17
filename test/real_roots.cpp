@@ -108,8 +108,6 @@ TEST_CASE("real cbrt")
     REQUIRE(r0.get_prec() == 128);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_ROOTN_UI)
-
 TEST_CASE("real rootn_ui")
 {
     real r0{0};
@@ -139,8 +137,6 @@ TEST_CASE("real rootn_ui")
     REQUIRE(!rootn_ui(real{"+0", 60}, 4).signbit());
     REQUIRE(!rootn_ui(real{"-0", 60}, 4).signbit());
 }
-
-#endif
 
 #if defined(MPPP_WITH_FLINT)
 

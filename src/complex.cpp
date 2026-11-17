@@ -515,8 +515,6 @@ std::ostream &operator<<(std::ostream &os, const complex &c)
     return os;
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
-
 // Get the number of significant digits required for a round-tripping representation.
 std::size_t complex::get_str_ndigits(int base) const
 {
@@ -529,8 +527,6 @@ std::size_t get_str_ndigits(const complex &c, int base)
 {
     return c.get_str_ndigits(base);
 }
-
-#endif
 
 complex &operator++(complex &c)
 {

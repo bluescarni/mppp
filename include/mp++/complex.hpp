@@ -838,10 +838,8 @@ public:
 
     [[nodiscard]] std::string to_string(int base = 10) const;
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
     // Get the number of significant digits required for a round-tripping representation.
     [[nodiscard]] std::size_t get_str_ndigits(int = 10) const;
-#endif
 
 private:
     template <typename T>
@@ -2877,12 +2875,8 @@ inline T &operator/=(T &a, U &&b)
 // Stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex &);
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
-
 // Get the number of significant digits required for a round-tripping representation.
 MPPP_DLL_PUBLIC std::size_t get_str_ndigits(const complex &, int = 10);
-
-#endif
 
 namespace detail
 {

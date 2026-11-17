@@ -173,9 +173,7 @@ MPPP_DLL_PUBLIC void real_li2_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t);
 MPPP_DLL_PUBLIC void real_ceil_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void real_floor_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void real_round_wrapper(::mpfr_t, const ::mpfr_t);
-#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
 MPPP_DLL_PUBLIC void real_roundeven_wrapper(::mpfr_t, const ::mpfr_t);
-#endif
 MPPP_DLL_PUBLIC void real_trunc_wrapper(::mpfr_t, const ::mpfr_t);
 MPPP_DLL_PUBLIC void real_frac_wrapper(::mpfr_t, const ::mpfr_t);
 
@@ -246,10 +244,6 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 //   and mpfr_set_z_2exp()?
 // - Do we need real_equal_to() to work also on invalid reals, the way
 //   real_lt/gt() do?
-// - Not sure what the caching situation is currently. The MPFR 4 changelog mentions it:
-//   https://www.mpfr.org/mpfr-4.0.0/#changes
-//   But experiments with valgrind and the real_alloc benchmark seem to indicate
-//   that no caching is done. Need to revisit this.
 
 // Multiprecision floating-point class.
 class MPPP_DLL_PUBLIC real
@@ -802,45 +796,12 @@ private:
     }
     // rational.
     template <std::size_t SSize>
-    bool rational_conversion(rational<SSize> &rop) const
+    void rational_conversion(rational<SSize> &rop) const
     {
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_Q)
         MPPP_MAYBE_TLS detail::mpq_raii mpq;
-        // NOTE: we already checked outside
-        // that rop is a finite number, hence
-        // this function cannot fail.
+        // NOTE: we already checked outside that this is a finite number, hence this function cannot fail.
         ::mpfr_get_q(&mpq.m_mpq, &m_mpfr);
         rop = &mpq.m_mpq;
-        return true;
-#else
-        // Clear the range error flag before attempting the conversion.
-        ::mpfr_clear_erangeflag();
-        // NOTE: this call can fail if the exponent of this is very close to the upper/lower limits of the exponent
-        // type. If the call fails (signalled by a range flag being set), we will return error.
-        MPPP_MAYBE_TLS detail::mpz_raii mpz;
-        const ::mpfr_exp_t exp2 = ::mpfr_get_z_2exp(&mpz.m_mpz, &m_mpfr);
-        // NOTE: not sure at the moment how to trigger this, let's leave it for now.
-        // LCOV_EXCL_START
-        if (mppp_unlikely(::mpfr_erangeflag_p())) {
-            // Let's first reset the error flag.
-            ::mpfr_clear_erangeflag();
-            return false;
-        }
-        // LCOV_EXCL_STOP
-        // The conversion to n * 2**exp succeeded. We will build a rational
-        // from n and exp.
-        rop._get_num() = &mpz.m_mpz;
-        rop._get_den().set_one();
-        if (exp2 >= ::mpfr_exp_t(0)) {
-            // The output value will be an integer.
-            rop._get_num() <<= detail::make_unsigned(exp2);
-        } else {
-            // The output value will be a rational. Canonicalisation will be needed.
-            rop._get_den() <<= detail::nint_abs(exp2);
-            canonicalise(rop);
-        }
-        return true;
-#endif
     }
     template <typename T, detail::enable_if_t<detail::is_rational<T>::value, int> = 0>
     [[nodiscard]] T dispatch_conversion() const
@@ -849,11 +810,7 @@ private:
             throw std::domain_error("Cannot convert a non-finite real to a rational");
         }
         T rop;
-        // LCOV_EXCL_START
-        if (mppp_unlikely(!rational_conversion(rop))) {
-            throw std::overflow_error("The exponent of a real is too large for conversion to rational");
-        }
-        // LCOV_EXCL_STOP
+        rational_conversion(rop);
         return rop;
     }
     // C++ floating-point.
@@ -1008,7 +965,8 @@ private:
         if (!number_p()) {
             return false;
         }
-        return rational_conversion(rop);
+        rational_conversion(rop);
+        return true;
     }
     bool dispatch_get(bool &b) const
     {
@@ -1199,16 +1157,12 @@ public:
     real &ceil();
     real &floor();
     real &round();
-#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
     real &roundeven();
-#endif
     real &trunc();
     real &frac();
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
     // Get the number of significant digits required for a round-tripping representation.
     [[nodiscard]] std::size_t get_str_ndigits(int = 10) const;
-#endif
 
     // Size of the serialised binary representation.
     [[nodiscard]] std::size_t binary_size() const;
@@ -1934,8 +1888,6 @@ MPPP_REAL_MPFR_UNARY_IMPL(rec_sqrt, ::mpfr_rec_sqrt, true)
 // Cubic root.
 MPPP_REAL_MPFR_UNARY_IMPL(cbrt, ::mpfr_cbrt, true)
 
-#if defined(MPPP_MPFR_HAVE_MPFR_ROOTN_UI)
-
 // K-th root.
 template <cvr_real T>
 inline real &rootn_ui(real &rop, T &&op, unsigned long k)
@@ -1950,8 +1902,6 @@ inline real rootn_ui(T &&r, unsigned long k)
     auto const wrapper = [k](::mpfr_t rop, const ::mpfr_t op) { ::mpfr_rootn_ui(rop, op, k, MPFR_RNDN); };
     return detail::mpfr_nary_op_return_impl<false>(0, wrapper, std::forward<T>(r));
 }
-
-#endif
 
 // Ternary exponentiation.
 template <cvr_real T, cvr_real U>
@@ -2215,12 +2165,8 @@ MPPP_REAL_MPFR_UNARY_IMPL(lngamma, ::mpfr_lngamma, true)
 MPPP_REAL_MPFR_UNARY_IMPL(lgamma, detail::real_lgamma_wrapper, true)
 MPPP_REAL_MPFR_UNARY_IMPL(digamma, ::mpfr_digamma, true)
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
-
 // gamma_inc.
 MPPP_REAL_MPFR_BINARY_IMPL(gamma_inc, ::mpfr_gamma_inc, true)
-
-#endif
 
 // Bessel functions.
 MPPP_REAL_MPFR_UNARY_IMPL(j0, ::mpfr_j0, true)
@@ -2305,12 +2251,8 @@ MPPP_REAL_MPFR_UNARY_IMPL(lambert_wm1, detail::arb_lambert_wm1, false)
 
 #endif
 
-#if defined(MPPP_MPFR_HAVE_MPFR_BETA)
-
 // beta.
 MPPP_REAL_MPFR_BINARY_IMPL(beta, ::mpfr_beta, true)
-
-#endif
 
 // hypot.
 MPPP_REAL_MPFR_BINARY_IMPL(hypot, ::mpfr_hypot, true)
@@ -2322,9 +2264,7 @@ MPPP_REAL_MPFR_BINARY_IMPL(agm, ::mpfr_agm, true)
 MPPP_REAL_MPFR_UNARY_IMPL(ceil, detail::real_ceil_wrapper, false)
 MPPP_REAL_MPFR_UNARY_IMPL(floor, detail::real_floor_wrapper, false)
 MPPP_REAL_MPFR_UNARY_IMPL(round, detail::real_round_wrapper, false)
-#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
 MPPP_REAL_MPFR_UNARY_IMPL(roundeven, detail::real_roundeven_wrapper, false)
-#endif
 MPPP_REAL_MPFR_UNARY_IMPL(trunc, detail::real_trunc_wrapper, false)
 MPPP_REAL_MPFR_UNARY_IMPL(frac, detail::real_frac_wrapper, false)
 
@@ -2368,8 +2308,6 @@ inline real &remquo(real &rop, long *q, T &&x, U &&y)
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x), std::forward<U>(y));
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_FMODQUO)
-
 template <cvr_real T, cvr_real U>
 inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
 {
@@ -2377,8 +2315,6 @@ inline real &fmodquo(real &rop, long *q, T &&x, U &&y)
         = [q](::mpfr_t r, const ::mpfr_t o1, const ::mpfr_t o2) { ::mpfr_fmodquo(r, q, o1, o2, MPFR_RNDN); };
     return detail::mpfr_nary_op_impl<false>(0, wrapper, rop, std::forward<T>(x), std::forward<U>(y));
 }
-
-#endif
 
 // NOTE: nexttoward()/nextafter() have different semantics with respect
 // to the usual MPFR functions. The basic gist is that the second argument
@@ -2439,12 +2375,8 @@ inline real nextafter(T &&x, const real &y)
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
-
 // Get the number of significant digits required for a round-tripping representation.
 MPPP_DLL_PUBLIC std::size_t get_str_ndigits(const real &, int = 10);
-
-#endif
 
 // Binary serialization.
 MPPP_DLL_PUBLIC std::size_t binary_size(const real &);

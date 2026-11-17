@@ -7,6 +7,8 @@ Changelog
 Changes
 ~~~~~~~
 
+- **BREAKING**: mp++ now requires MPFR>=4.1.0 if MPFR is enabled
+  (`#326 <https://github.com/bluescarni/mppp/pull/326>`__).
 - **BREAKING**: mp++ now requires C++20. The compatibility code for earlier
   versions of the standard (including the emulation of concepts) has been removed
   (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).

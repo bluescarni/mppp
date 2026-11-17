@@ -731,7 +731,7 @@ union integer_union {
             throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
                                     + to_string(x));
         }
-        // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
+        // NOTE: static checks for overflows and for the precision value are done in src/real.cpp.
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS mpz_raii tmp;
@@ -1502,7 +1502,7 @@ private:
             throw std::domain_error("Cannot assign the non-finite floating-point value " + detail::to_string(x)
                                     + " to an integer");
         }
-        // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
+        // NOTE: static checks for overflows and for the precision value are done in src/real.cpp.
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS detail::mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS detail::mpz_raii tmp;
