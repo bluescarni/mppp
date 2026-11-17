@@ -1,6 +1,48 @@
 Changelog
 =========
 
+3.0.0 (unreleased)
+------------------
+
+Changes
+~~~~~~~
+
+- **BREAKING**: mp++ now requires C++20. The compatibility code for earlier
+  versions of the standard (including the emulation of concepts) has been removed
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+- **BREAKING**: support for the classic Intel C++ compiler has been dropped
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+- **BREAKING**: the pybind11 integration utilities (i.e., the ``mp++/extra/pybind11.hpp``
+  header) have been removed
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+- **BREAKING**: when fmt support is enabled, mp++ now requires fmt>=11
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+- **BREAKING**: formatting an mp++ class via fmt with an invalid format
+  specification now raises ``fmt::format_error``
+  (instead of ``std::invalid_argument``)
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+- **BREAKING**: the ``MPPP_HAVE_STRING_VIEW`` definition has been removed,
+  as ``std::string_view`` is now always supported
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+- **BREAKING**: on PowerPC, the interoperability of :cpp:class:`~mppp::real128`
+  and :cpp:class:`~mppp::complex128` with ``long double`` is now disabled
+  also when compiling with Clang
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+- mp++'s headers now include ``fmt/base.h`` instead of ``fmt/core.h``.
+  Code relying on mp++ to include ``fmt/format.h`` (e.g., in order to use
+  ``fmt::format()``) must now include it explicitly
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+- The continuous integration pipeline has been migrated to GitHub Actions,
+  and it now includes a ``clang-tidy`` build
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+
+Fix
+~~~
+
+- Fix the detection of the quadmath header when compiling
+  with Clang
+  (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
+
 2.0.0 (2024-12-10)
 ------------------
 

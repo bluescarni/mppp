@@ -25,10 +25,11 @@ the library is configured with the
 
 .. note::
 
-   On Clang<7, :cpp:type:`__float128` cannot be used in mixed-mode
+   On PowerPC, :cpp:type:`__float128` cannot be used in mixed-mode
    operations with ``long double``. Accordingly,
    :cpp:class:`~mppp::real128` will disable interoperability with
-   ``long double`` if Clang<7 is being used.
+   ``long double`` on PowerPC (see the
+   :ref:`platform-specific notes <inst_plat_specific>`).
 
 As a thin wrapper, :cpp:class:`~mppp::real128` adds a few extra features
 on top of what :cpp:type:`__float128` already provides. Specifically, :cpp:class:`~mppp::real128`:
