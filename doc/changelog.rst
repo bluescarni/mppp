@@ -9,6 +9,10 @@ Changes
 
 - **BREAKING**: mp++ now requires MPFR>=4.1.0 if MPFR is enabled
   (`#326 <https://github.com/bluescarni/mppp/pull/326>`__).
+- **BREAKING**: if both MPFR and quadmath support are enabled,
+  mp++ now requires MPFR to be built with binary128 support
+  (and, when compiling with Clang or GCC<13, MPFR>=4.2.2)
+  (`#326 <https://github.com/bluescarni/mppp/pull/326>`__).
 - **BREAKING**: mp++ now requires C++20. The compatibility code for earlier
   versions of the standard (including the emulation of concepts) has been removed
   (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).
@@ -41,6 +45,13 @@ Changes
 Fix
 ~~~
 
+- The conversions between :cpp:class:`~mppp::real` and :cpp:class:`~mppp::real128`
+  (and, consequently, between :cpp:class:`~mppp::complex` and :cpp:class:`~mppp::complex128`)
+  are now correctly rounded. Previously, the conversion from :cpp:class:`~mppp::real`
+  to :cpp:class:`~mppp::real128` truncated the significand, while the conversion
+  from :cpp:class:`~mppp::real128` to a :cpp:class:`~mppp::real` with
+  less than 113 bits of precision could round more than once
+  (`#326 <https://github.com/bluescarni/mppp/pull/326>`__).
 - Fix the detection of the quadmath header when compiling
   with Clang
   (`#325 <https://github.com/bluescarni/mppp/pull/325>`__).

@@ -104,6 +104,15 @@ able to resolve the correct paths automatically, the other compilers
 might need assistance
 in order to identify the correct locations of these files.
 
+If both the ``MPPP_WITH_MPFR`` and ``MPPP_WITH_QUADMATH`` options are active,
+the MPFR library must have been built with support for the binary128
+floating-point format (MPFR enables such support automatically
+if it is available, and it can be explicitly requested via MPFR's
+``--enable-float128`` configuration option).
+Additionally, when compiling with Clang or with GCC versions earlier
+than 13, MPFR 4.2.2 or a later version is required. The mp++ build system
+checks these requirements at configuration time.
+
 To build mp++, you can run the following CMake command from the
 build directory:
 

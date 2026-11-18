@@ -235,15 +235,11 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
 };
 
 // For the future:
-// - construction from/conversion to interoperables can probably be improved performance wise, especially
-//   if we exploit the mpfr_t internals.
-// - probably we should have a build in the CI against the latest MPFR, built with sanitizers on.
-// - probably we should have MPFR as well in the 32bit coverage build.
-// - it seems like we might be doing multiple roundings when cting from real128.
-//   See if we can implement with only a single rounding, perhaps via an integer
-//   and mpfr_set_z_2exp()?
-// - Do we need real_equal_to() to work also on invalid reals, the way
-//   real_lt/gt() do?
+// - construction from/conversion to interoperables can probably be improved performance wise, especially if we exploit
+//   the mpfr_t internals;
+// - probably we should have a build in the CI against the latest MPFR, built with sanitizers on;
+// - probably we should have MPFR as well in the 32bit coverage build;
+// - do we need real_equal_to() to work also on invalid reals, the way real_lt/gt() do?
 
 // Multiprecision floating-point class.
 class MPPP_DLL_PUBLIC real
