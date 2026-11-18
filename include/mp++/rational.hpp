@@ -223,22 +223,18 @@ private:
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
                                     + detail::to_string(x));
         }
-        // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
+
+        // NOTE: static checks for overflows and for the precision value are done in src/real.cpp.
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS detail::mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
-        MPPP_MAYBE_TLS detail::mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));
         MPPP_MAYBE_TLS detail::mpq_raii mpq;
-        // NOTE: we go through an mpfr->mpf->mpq conversion chain as
-        // mpfr_get_q() does not exist.
-        // NOTE: probably coming in MPFR 4:
-        // https://lists.gforge.inria.fr/pipermail/mpfr-commits/2017-June/011186.html
+        // NOTE: we go through an mpfr->mpq conversion chain.
 #if defined(_MSC_VER)
         ::mpfr_set_d(&mpfr.m_mpfr, static_cast<double>(x), MPFR_RNDN);
 #else
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
 #endif
-        ::mpfr_get_f(&mpf.m_mpf, &mpfr.m_mpfr, MPFR_RNDN);
-        mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
+        ::mpfr_get_q(&mpq.m_mpq, &mpfr.m_mpfr);
         m_num = mpq_numref(&mpq.m_mpq);
         m_den = mpq_denref(&mpq.m_mpq);
     }

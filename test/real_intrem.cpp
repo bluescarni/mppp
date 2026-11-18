@@ -10,7 +10,6 @@
 #include <string>
 #include <utility>
 
-#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
 
@@ -308,8 +307,6 @@ TEST_CASE("real round")
     REQUIRE(round(real{"-2.5", 20}) == -3);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
-
 TEST_CASE("real roundeven")
 {
     real r0{0};
@@ -387,8 +384,6 @@ TEST_CASE("real roundeven")
     REQUIRE(roundeven(real{"2.5", 20}) == 2);
     REQUIRE(roundeven(real{"-2.5", 20}) == -2);
 }
-
-#endif
 
 TEST_CASE("real frac")
 {
@@ -606,8 +601,6 @@ TEST_CASE("real remquo")
     REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_FMODQUO)
-
 TEST_CASE("real fmodquo")
 {
     long q = 0;
@@ -636,7 +629,5 @@ TEST_CASE("real fmodquo")
     REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
     REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
 }
-
-#endif
 
 // NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)

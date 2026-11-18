@@ -593,10 +593,6 @@ The complex class
 
       .. versionadded:: 0.25
 
-      .. note::
-
-         This function is available from MPFR 4.1 onwards.
-
       Minimum number of digits necessary for round-tripping.
 
       This member function will return the minimum number of digits
@@ -1231,10 +1227,6 @@ Conversion
 .. cpp:function:: std::size_t mppp::get_str_ndigits(const mppp::complex &c, int base = 10)
 
    .. versionadded:: 0.25
-
-   .. note::
-
-      This function is available from MPFR 4.1 onwards.
 
    Minimum number of digits necessary for round-tripping.
 

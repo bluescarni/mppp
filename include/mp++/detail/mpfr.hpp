@@ -15,9 +15,9 @@
 
 #include <mp++/config.hpp>
 
-#if MPFR_VERSION_MAJOR < 3
+#if MPFR_VERSION < MPFR_VERSION_NUM(4, 1, 0)
 
-#error Minimum supported MPFR version is 3.
+#error The minimum supported MPFR version is 4.1.0.
 
 #endif
 

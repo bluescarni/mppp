@@ -577,6 +577,13 @@ TEST_CASE("real constructors")
                            real{"3.40917866435610111081769936359662259e-2", 10, 64}.get_mpfr_t()));
     REQUIRE(::mpfr_equal_p(real{-real128{"3.40917866435610111081769936359662259e-2"}, 64}.get_mpfr_t(),
                            real{"-3.40917866435610111081769936359662259e-2", 10, 64}.get_mpfr_t()));
+    // Correct rounding with a precision lower than real128's. The construction used to round more than once,
+    // resulting in 1.5 + 2**-51 here (rather than 1.5 + 2**-52).
+    {
+        const auto x = real128{3} / 2 + scalbn(real128{1}, -52) + scalbn(real128{1}, -53) - scalbn(real128{1}, -112);
+        REQUIRE((real{x, 53} == 1.5 + 0x1p-52));
+        REQUIRE((real{-x, 53} == -(1.5 + 0x1p-52)));
+    }
     REQUIRE_THROWS_PREDICATE((real{real128{}, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot init a real with a precision of 0: the maximum allowed precision is "
@@ -994,6 +1001,11 @@ TEST_CASE("real assignment")
     r8.set(real128{-456});
     REQUIRE(r8.get_prec() == 185);
     REQUIRE(mpfr_cmp_si((r8).get_mpfr_t(), -456l) == 0);
+    // Correct rounding with a precision lower than real128's (see the constructor tests).
+    r8.set_prec(53);
+    r8.set(real128{3} / 2 + scalbn(real128{1}, -52) + scalbn(real128{1}, -53) - scalbn(real128{1}, -112));
+    REQUIRE(r8.get_prec() == 53);
+    REQUIRE(r8 == 1.5 + 0x1p-52);
 #endif
     // Setter from string.
     r8.set_prec(123);
@@ -1624,6 +1636,21 @@ TEST_CASE("real conversion")
     REQUIRE((real{"-1.1", 10, 300}.get(rrop)));
     REQUIRE(get(rrop, real{"-1.1", 10, 300}));
     REQUIRE(abs(rrop - real128{"-1.1"}) < 1E-33);
+    // Correct rounding. The conversion used to truncate the significand rather than rounding it to nearest, so
+    // that the result was 1 ulp off for values such as 1.1 (whose binary expansion must be rounded up to fit in
+    // the 113 bits of real128).
+    REQUIRE(static_cast<real128>(real{"1.1", 10, 128}) == real128{"1.1"});
+    REQUIRE((real{"1.1", 10, 128}.get(rrop)));
+    REQUIRE(rrop == real128{"1.1"});
+    REQUIRE(get(rrop, real{"1.1", 10, 128}));
+    REQUIRE(rrop == real128{"1.1"});
+    REQUIRE(static_cast<real128>(real{"-1.1", 10, 128}) == real128{"-1.1"});
+    REQUIRE((real{"-1.1", 10, 128}.get(rrop)));
+    REQUIRE(rrop == real128{"-1.1"});
+    REQUIRE(get(rrop, real{"-1.1", 10, 128}));
+    REQUIRE(rrop == real128{"-1.1"});
+    REQUIRE(static_cast<real128>(real{"1.1", 10, 300}) == real128{"1.1"});
+    REQUIRE(static_cast<real128>(real{"-1.1", 10, 300}) == real128{"-1.1"});
 #endif
 
     // Conversions to std::complex.
@@ -1711,8 +1738,6 @@ TEST_CASE("real nts")
     REQUIRE(std::is_nothrow_swappable_v<real>);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
-
 TEST_CASE("real str_ndigits")
 {
     using Catch::Matchers::Message;
@@ -1739,8 +1764,6 @@ TEST_CASE("real str_ndigits")
         Message(
             "Invalid base value for get_str_ndigits(): the base must be in the [2,62] range, but it is 63 instead"));
 }
-
-#endif
 
 TEST_CASE("prec_to_nlimbs failure")
 {

@@ -767,10 +767,6 @@ The real class
 
       .. versionadded:: 0.25
 
-      .. note::
-
-         This function is available from MPFR 4.1 onwards.
-
       Minimum number of digits necessary for round-tripping.
 
       This member function will return the minimum number of digits
@@ -1047,10 +1043,6 @@ The real class
    .. cpp:function:: real &roundeven()
    .. cpp:function:: real &trunc()
    .. cpp:function:: real &frac()
-
-      .. note::
-
-         The ``roundeven()`` function is available from MPFR 4 onwards.
 
       In-place integer and remainder-related functions.
 
@@ -1480,10 +1472,6 @@ Conversion
 .. cpp:function:: std::size_t mppp::get_str_ndigits(const mppp::real &r, int base = 10)
 
    .. versionadded:: 0.25
-
-   .. note::
-
-      This function is available from MPFR 4.1 onwards.
 
    Minimum number of digits necessary for round-tripping.
 
@@ -2019,10 +2007,6 @@ Roots
 
    .. versionadded:: 0.12
 
-   .. note::
-
-      This function is available from MPFR 4 onwards.
-
    Binary :cpp:class:`~mppp::real` k-th root.
 
    This function will compute the k-th root of *op* and store it
@@ -2043,10 +2027,6 @@ Roots
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::rootn_ui(T &&r, unsigned long k)
 
    .. versionadded:: 0.12
-
-   .. note::
-
-      This function is available from MPFR 4 onwards.
 
    Unary :cpp:class:`~mppp::real` k-th root.
 
@@ -2635,10 +2615,6 @@ Gamma functions
 
    .. versionadded:: 0.17
 
-   .. note::
-
-      This function is available from MPFR 4 onwards.
-
    Ternary incomplete Gamma function.
 
    This function will set *rop* to the upper incomplete Gamma function of *x* and *y*.
@@ -2653,10 +2629,6 @@ Gamma functions
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::gamma_inc(T &&x, U &&y)
 
    .. versionadded:: 0.17
-
-   .. note::
-
-      This function is available from MPFR 4 onwards.
 
    Binary incomplete Gamma function.
 
@@ -2889,10 +2861,6 @@ Other special functions
 
    .. versionadded:: 0.17
 
-   .. note::
-
-      This function is available from MPFR 4 onwards.
-
    Ternary beta function.
 
    This function will set *rop* to the beta function of *x* and *y*.
@@ -2907,10 +2875,6 @@ Other special functions
 .. cpp:function:: template <typename T, mppp::real_op_types<T> U> mppp::real mppp::beta(T &&x, U &&y)
 
    .. versionadded:: 0.17
-
-   .. note::
-
-      This function is available from MPFR 4 onwards.
 
    Binary beta function.
 
@@ -2984,10 +2948,6 @@ Integer and remainder related functions
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::trunc(mppp::real &rop, T &&x)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real &mppp::frac(mppp::real &rop, T &&x)
 
-   .. note::
-
-      The ``roundeven()`` function is available from MPFR 4 onwards.
-
    Binary integer and remainder-related functions.
 
    These functions will set *rop* to, respectively:
@@ -3020,10 +2980,6 @@ Integer and remainder related functions
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::roundeven(T &&x)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::trunc(T &&x)
 .. cpp:function:: template <mppp::cvr_real T> mppp::real mppp::frac(T &&x)
-
-   .. note::
-
-      The ``roundeven()`` function is available from MPFR 4 onwards.
 
    Unary integer and remainder-related functions.
 
@@ -3119,10 +3075,6 @@ Integer and remainder related functions
 
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::fmodquo(mppp::real &rop, long *q, T &&x, U &&y)
 .. cpp:function:: template <mppp::cvr_real T, mppp::cvr_real U> mppp::real &mppp::remquo(mppp::real &rop, long *q, T &&x, U &&y)
-
-   .. note::
-
-      The ``fmodquo()`` function is available from MPFR 4 onwards.
 
    .. versionadded:: 0.21
 

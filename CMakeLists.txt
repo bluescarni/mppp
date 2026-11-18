@@ -322,19 +322,6 @@ endif()
 if(MPPP_WITH_MPFR)
     find_package(mp++_MPFR REQUIRED)
 
-    # Check support for certain MPFR functions.
-    set(CMAKE_REQUIRED_INCLUDES "${MPPP_MPFR_INCLUDE_DIR}")
-    set(CMAKE_REQUIRED_LIBRARIES "${MPPP_MPFR_LIBRARY}")
-    check_symbol_exists(mpfr_get_q "mpfr.h" MPPP_MPFR_HAVE_MPFR_GET_Q)
-    check_symbol_exists(mpfr_rootn_ui "mpfr.h" MPPP_MPFR_HAVE_MPFR_ROOTN_UI)
-    check_symbol_exists(mpfr_gamma_inc "mpfr.h" MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
-    check_symbol_exists(mpfr_beta "mpfr.h" MPPP_MPFR_HAVE_MPFR_BETA)
-    check_symbol_exists(mpfr_roundeven "mpfr.h" MPPP_MPFR_HAVE_MPFR_ROUNDEVEN)
-    check_symbol_exists(mpfr_fmodquo "mpfr.h" MPPP_MPFR_HAVE_MPFR_FMODQUO)
-    check_symbol_exists(mpfr_get_str_ndigits "mpfr.h" MPPP_MPFR_HAVE_MPFR_GET_STR_NDIGITS)
-    unset(CMAKE_REQUIRED_INCLUDES)
-    unset(CMAKE_REQUIRED_LIBRARIES)
-
     target_link_libraries(mp++ PUBLIC mp++::MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
@@ -349,11 +336,10 @@ endif()
 # Optional dependency on quadmath.
 if(MPPP_WITH_QUADMATH)
     include(CheckTypeSize)
-    check_type_size(__float128 _MPPP_FLOAT128_EXISTS BUILTIN_TYPES_ONLY LANGUAGE CXX)
-    if(NOT _MPPP_FLOAT128_EXISTS)
+    check_type_size(__float128 MPPP_FLOAT128_SIZE BUILTIN_TYPES_ONLY LANGUAGE CXX)
+    if(NOT MPPP_FLOAT128_SIZE)
         message(FATAL_ERROR "The 'MPPP_WITH_QUADMATH' option was enabled but the '__float128' type does not exist.")
     endif()
-    unset(_MPPP_FLOAT128_EXISTS)
 
     find_package(mp++_quadmath REQUIRED)
 
@@ -374,6 +360,37 @@ if(MPPP_WITH_QUADMATH)
 
     target_link_libraries(mp++ PRIVATE mp++::quadmath)
     set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
+endif()
+
+# Binary128 support in MPFR.
+if(MPPP_WITH_MPFR AND MPPP_WITH_QUADMATH)
+    # NOTE: MPFR declares mpfr_set/get_float128() only if MPFR_WANT_FLOAT128 is defined
+    # before mpfr.h is included. The mpfr_float128 macro selects the type used in the
+    # prototypes: it is honoured from MPFR 4.2.2 onwards, while earlier versions hard-code
+    # _Float128 (which, in C++, is available only on GCC >= 13).
+    include(CheckCXXSourceCompiles)
+    set(CMAKE_REQUIRED_DEFINITIONS "-DMPFR_WANT_FLOAT128" "-Dmpfr_float128=__float128")
+    set(CMAKE_REQUIRED_INCLUDES "${MPPP_MPFR_INCLUDE_DIR}" "${MPPP_GMP_INCLUDE_DIR}")
+    set(CMAKE_REQUIRED_LIBRARIES "${MPPP_MPFR_LIBRARY}" "${MPPP_GMP_LIBRARY}")
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mppp_mpfr_float128_check.cpp" _MPPP_MPFR_FLOAT128_CHECK_SRC)
+    check_cxx_source_compiles("${_MPPP_MPFR_FLOAT128_CHECK_SRC}" MPPP_MPFR_HAVE_FLOAT128)
+    unset(_MPPP_MPFR_FLOAT128_CHECK_SRC)
+    unset(CMAKE_REQUIRED_DEFINITIONS)
+    unset(CMAKE_REQUIRED_INCLUDES)
+    unset(CMAKE_REQUIRED_LIBRARIES)
+
+    if(MPPP_MPFR_HAVE_FLOAT128)
+        message(STATUS "binary128 conversion functions in MPFR successfully detected.")
+    else()
+        message(FATAL_ERROR "The interoperability between MPFR and libquadmath requires the binary128 "
+            "conversion functions of MPFR, which could not be detected. Please make sure that MPFR "
+            "was built with binary128 support (e.g., via the '--enable-float128' configure option). "
+            "With clang or GCC < 13, MPFR >= 4.2.2 is also required.")
+    endif()
+
+    # NOTE: the definitions are private because the MPFR binary128 functions are used
+    # only within the compiled parts of the library.
+    target_compile_definitions(mp++ PRIVATE MPFR_WANT_FLOAT128 mpfr_float128=__float128)
 endif()
 
 # Optional dependency on Boost s11n.

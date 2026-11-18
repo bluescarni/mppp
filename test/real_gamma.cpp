@@ -8,7 +8,6 @@
 
 #include <utility>
 
-#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
 
@@ -86,8 +85,6 @@ TEST_CASE("real digamma")
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 
-#if defined(MPPP_MPFR_HAVE_MPFR_GAMMA_INC)
-
 TEST_CASE("real gamma_inc")
 {
     real r0{12, 450};
@@ -133,7 +130,5 @@ TEST_CASE("real gamma_inc")
     REQUIRE(gamma_inc(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
     REQUIRE(gamma_inc(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
-
-#endif
 
 // NOLINTEND(misc-const-correctness,bugprone-chained-comparison,misc-use-anonymous-namespace,misc-use-internal-linkage,bugprone-random-generator-seed,bugprone-throwing-static-initialization,readability-function-size,google-readability-function-size,bugprone-use-after-move,clang-analyzer-cplusplus.Move,bugprone-signed-bitwise)
