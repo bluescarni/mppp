@@ -1157,6 +1157,16 @@ TEST_CASE("set")
         REQUIRE(c == complex{1.1_rq + 2.3_icq, complex_prec_t(14)});
         REQUIRE(c.get_prec() == 14);
     }
+    {
+        // Correct rounding with a precision lower than real128's (see the analogous tests for real).
+        const auto x = real128{3} / 2 + scalbn(real128{1}, -52) + scalbn(real128{1}, -53) - scalbn(real128{1}, -112);
+        complex c{1, 2, complex_prec_t(53)};
+        c.set(complex128{x, -x});
+        REQUIRE(c == complex{1.5 + 0x1p-52, -(1.5 + 0x1p-52), complex_prec_t(53)});
+        REQUIRE(c.get_prec() == 53);
+        REQUIRE(complex{complex128{x, -x}, complex_prec_t(53)}
+                == complex{1.5 + 0x1p-52, -(1.5 + 0x1p-52), complex_prec_t(53)});
+    }
 #endif
 
     // String setters.
@@ -1475,6 +1485,11 @@ TEST_CASE("conversions")
     {
         REQUIRE(static_cast<complex128>(complex{-63, 12}) == complex128{-63, 12});
     }
+    {
+        // Correct rounding (see the analogous tests for real).
+        REQUIRE(static_cast<complex128>(complex{"(1.1,-1.1)", complex_prec_t(128)})
+                == complex128{real128{"1.1"}, real128{"-1.1"}});
+    }
 #endif
 
     // Make sure we prevent conversion to ref/cv qualified
@@ -1611,6 +1626,10 @@ TEST_CASE("get conversions")
 
         REQUIRE(get(c, complex{-43, 35}));
         REQUIRE(c == complex128{-43, 35});
+
+        // Correct rounding (see the analogous tests for real).
+        REQUIRE(complex{"(1.1,-1.1)", complex_prec_t(128)}.get(c));
+        REQUIRE(c == complex128{real128{"1.1"}, real128{"-1.1"}});
     }
 #endif
 }
